@@ -188,7 +188,7 @@ export default function Page() {
                   <div className="flex-1" />
                 </div>
 
-                <ScrollArea className="h-[calc(100vh-50px)] pr-4">
+                <ScrollArea className="max-h-[500px] pr-4">
                   <div className="space-y-4">
                     {subtitles.map((subtitle) => (
                       <Card
@@ -201,17 +201,9 @@ export default function Page() {
                               <span className="text-sm font-medium text-muted-foreground">#{subtitle.index}</span>
                               <div className="flex items-center gap-2 text-sm">
                                 <Timer className="h-4 w-4 text-muted-foreground" />
-                                <Input
-                                  value={subtitle.startTime}
-                                  onChange={(e) => updateSubtitle(subtitle.index, "startTime", e.target.value)}
-                                  className="h-7 w-32 bg-background dark:bg-muted/30"
-                                />
-                                <span className="text-muted-foreground">→</span>
-                                <Input
-                                  value={subtitle.endTime}
-                                  onChange={(e) => updateSubtitle(subtitle.index, "endTime", e.target.value)}
-                                  className="h-7 w-32 bg-background dark:bg-muted/30"
-                                />
+                                <span className="text-sm text-muted-foreground">{subtitle.startTime}</span>
+                                <span className="text-sm text-muted-foreground">➝</span>
+                                <span className="text-sm text-muted-foreground">{subtitle.endTime}</span>
                               </div>
                             </div>
 
@@ -224,7 +216,8 @@ export default function Page() {
                                   e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
                                 }}
                                 placeholder="Original text"
-                                className="min-h-[30px] max-h-[120px] bg-muted/50 dark:bg-muted/30 overflow-y-auto"
+                                className="min-h-[35px] max-h-[120px] bg-muted/50 dark:bg-muted/30 resize-none overflow-y-hidden"
+                                rows={1}
                               />
                               <Textarea
                                 value={subtitle.translated}
@@ -234,7 +227,8 @@ export default function Page() {
                                   e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
                                 }}
                                 placeholder="Translated text"
-                                className="min-h-[30px] max-h-[120px]"
+                                className="min-h-[35px] max-h-[120px] resize-none overflow-y-hidden"
+                                rows={1}
                               />
                             </div>
                           </div>
