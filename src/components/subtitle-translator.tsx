@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -13,7 +13,6 @@ import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Save, Globe2, Timer, MessageSquare, Play, Square, Download } from "lucide-react"
 import { Navbar } from "./navbar"
-import { TranslationProcess } from "./translation-process"
 
 interface Subtitle {
   index: number
@@ -53,35 +52,17 @@ export default function Page() {
     },
   ])
   const [apiKey, setApiKey] = useState("")
-  const [splitSize, setSplitSize] = useState(150)
+  const [splitSize, setSplitSize] = useState(500)
   const [useCustomModel, setUseCustomModel] = useState(false)
   const [customBaseUrl, setCustomBaseUrl] = useState("")
   const [customModel, setCustomModel] = useState("")
   const [sourceLanguage, setSourceLanguage] = useState("japanese")
   const [targetLanguage, setTargetLanguage] = useState("indonesian")
-  const [processLog, setProcessLog] = useState<string>([
-    "Initializing translation process...",
-    "Loading source subtitles...",
-    "Analyzing context...",
-    "Translating subtitle 1: '(生徒A)ぶつけるなよ'",
-    "AI: Analyzing the context and cultural nuances...",
-    "AI: Considering the appropriate tone for a student's dialogue...",
-    "AI: Translating to Indonesian...",
-    "AI: Finalizing translation: '(Siswa A) Jangan sampai menabrak!'",
-    "Translating subtitle 2: '(生徒B)もっと 右右'",
-    "AI: Analyzing the directional instruction...",
-    "AI: Ensuring the translation maintains the urgency of the original...",
-    "AI: Translating to Indonesian...",
-    "AI: Finalizing translation: '(Siswa B) Lebih ke kanan lagi!'",
-    "Translating subtitle 3: '(生徒C)上げるぞ'",
-    "AI: Interpreting the context of the action...",
-    "AI: Considering the appropriate level of formality...",
-    "AI: Translating to Indonesian...",
-    "AI: Finalizing translation: '(Siswa C) Ayo angkat!'",
-    "Translation process completed.",
-  ].join('\n'))
   const [isTranslating, setIsTranslating] = useState(false)
-  const [progress, setProgress] = useState(0)
+  const [response, setResponse] = useState("")
+  const [activeTab, setActiveTab] = useState("basic")
+
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     if (isDarkMode) {
@@ -98,6 +79,78 @@ export default function Page() {
   const handleSave = () => {
     console.log("Saving:", { title, subtitles })
   }
+
+  const handleStartTranslation = async () => {
+    if (isTranslating) return
+    setIsTranslating(true)
+    setResponse("")
+
+    // Create a new AbortController
+    abortControllerRef.current = new AbortController()
+
+    // Set the active tab to "process"
+    setActiveTab("process")
+
+    try {
+      const requestBody = {
+        subtitles: subtitles.map(s => ({
+          index: s.index,
+          actor: "",
+          content: s.content,
+        })),
+        sourceLanguage,
+        targetLanguage,
+        contextDocument,
+        baseURL: useCustomModel ? customBaseUrl : undefined, // Include base URL if custom model
+        model: useCustomModel ? customModel : "deepseek", // Choose model based on user selection
+        temperature,
+        maxCompletionTokens: 8192,
+        contextMessage: [],
+      }
+
+      const res = await fetch('http://localhost:4000/api/stream/translate', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+        signal: abortControllerRef.current.signal, // Connect to abort signal
+      })
+
+      if (!res.ok) throw new Error('Request failed')
+
+      const reader = res.body?.getReader()
+      if (!reader) return
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = new TextDecoder().decode(value)
+        setResponse((prev) => prev + chunk)
+      }
+
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Request aborted')
+        setResponse((prev) => prev + '\n\n[Generation stopped by user]')
+      } else {
+        console.error('Error:', error)
+        setResponse((prev) => prev + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]`)
+      }
+
+    } finally {
+      setIsTranslating(false)
+      abortControllerRef.current = null
+    }
+  }
+
+  const handleStopTranslation = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort() // Trigger abort signal
+    }
+  }
+
 
   return (
     <div className={`min-h-screen ${isDarkMode ? "dark" : ""}`}>
@@ -193,27 +246,13 @@ export default function Page() {
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <Button
                     className="gap-2"
-                    onClick={() => {
-                      setIsTranslating(true)
-                      console.log("Start Translation")
-                      // Simulate translation progress
-                      const interval = setInterval(() => {
-                        setProgress((prev) => {
-                          if (prev >= 100) {
-                            clearInterval(interval)
-                            setIsTranslating(false)
-                            return 100
-                          }
-                          return prev + 10
-                        })
-                      }, 1000)
-                    }}
+                    onClick={handleStartTranslation}
                     disabled={isTranslating}
                   >
                     {isTranslating ? (
                       <>
                         <span className="loading loading-spinner loading-xs"></span>
-                        Translating... {progress}%
+                        Translating...
                       </>
                     ) : (
                       <>
@@ -225,11 +264,7 @@ export default function Page() {
                   <Button
                     variant="outline"
                     className="gap-2"
-                    onClick={() => {
-                      setIsTranslating(false)
-                      setProgress(0)
-                      console.log("Stop Translation")
-                    }}
+                    onClick={handleStopTranslation}
                     disabled={!isTranslating}
                   >
                     <Square className="h-4 w-4" />
@@ -240,7 +275,7 @@ export default function Page() {
                   className="w-full mt-2 gap-2"
                   variant="secondary"
                   onClick={() => console.log("Download Subtitles")}
-                  disabled={isTranslating || progress < 100}
+                  disabled={isTranslating}
                 >
                   <Download className="h-4 w-4" />
                   Download Translated Subtitles
@@ -249,7 +284,7 @@ export default function Page() {
 
               {/* Right Column - Settings */}
               <div className="flex flex-col h-full">
-                <Tabs defaultValue="basic" className="w-full">
+                <Tabs defaultValue="basic" value={activeTab} onValueChange={setActiveTab} className="w-full">
                   <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="basic">Basic</TabsTrigger>
                     <TabsTrigger value="advanced">Advanced</TabsTrigger>
@@ -374,6 +409,7 @@ export default function Page() {
                           <div className="space-y-2">
                             <label className="text-sm font-medium">Split Size</label>
                             <Input
+                              disabled
                               type="number"
                               value={splitSize}
                               onChange={(e) => {
@@ -406,7 +442,12 @@ export default function Page() {
                     </Card>
                   </TabsContent>
                   <TabsContent value="process" className="flex-grow space-y-4 mt-4">
-                    <TranslationProcess processLog={processLog} />
+                    <Textarea
+                      value={response.trim()}
+                      readOnly
+                      className="h-[500px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                      placeholder="Translation output will appear here..."
+                    />
                   </TabsContent>
                 </Tabs>
               </div>
@@ -417,4 +458,3 @@ export default function Page() {
     </div>
   )
 }
-
