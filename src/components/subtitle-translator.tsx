@@ -81,6 +81,18 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState("basic")
 
   const abortControllerRef = useRef<AbortController | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = textareaRef.current
+      const isAtBottom = scrollHeight - scrollTop <= clientHeight + 100
+
+      if (isAtBottom) {
+        textareaRef.current.scrollTop = scrollHeight
+      }
+    }
+  }, [response])
 
   useEffect(() => {
     if (isDarkMode) {
@@ -111,16 +123,11 @@ export default function Page() {
 
     // Scroll to top with fallback
     setTimeout(() => {
-      try {
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        })
-      } catch (e) {
-        // Fallback for older browsers
-        window.scrollTo(0, 0)
-      }
-    }, 100)
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, 300)
 
     try {
       const requestBody = {
@@ -322,7 +329,7 @@ export default function Page() {
                       </>
                     )}
                   </Button>
-                  <Button variant="outline" className="gap-2" onClick={handleStopTranslation} disabled={!isTranslating}>
+                  <Button variant="outline" className="gap-2" onClick={handleStopTranslation} disabled={!isTranslating || !response}>
                     <Square className="h-4 w-4" />
                     Stop
                   </Button>
@@ -499,6 +506,7 @@ export default function Page() {
                   </TabsContent>
                   <TabsContent value="process" className="flex-grow space-y-4 mt-4">
                     <Textarea
+                      ref={textareaRef}
                       value={response.trim()}
                       readOnly
                       className="h-[500px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
