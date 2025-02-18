@@ -23,6 +23,7 @@ import { Subtitle, SubtitleTranslated, UpdateSubtitle } from "@/types/types"
 import { initialSubtitles } from "@/lib/dummy"
 import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
+import { capitalizeWords } from "@/lib/utils"
 
 export default function Page() {
   const [isDarkMode, setIsDarkMode] = useState(true)
@@ -222,7 +223,7 @@ export default function Page() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 mb-4">
                   <Badge variant="secondary" className="gap-1">
-                    <Globe2 className="h-4 w-4" /> {sourceLanguage} → {targetLanguage}
+                    <Globe2 className="h-4 w-4" /> {capitalizeWords(sourceLanguage)} → {capitalizeWords(targetLanguage)}
                   </Badge>
                   <Badge variant="secondary" className="gap-1">
                     <MessageSquare className="h-4 w-4" /> {subtitles.length} Lines

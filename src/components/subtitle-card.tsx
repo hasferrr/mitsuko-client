@@ -14,13 +14,15 @@ export const SubtitleCard = memo(({ subtitle, updateSubtitle }: SubtitleCardProp
   const contentRef = useRef<HTMLTextAreaElement | null>(null)
   const translatedRef = useRef<HTMLTextAreaElement | null>(null)
 
-  const contentUpdate = () => {
+  const contentUpdate = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleResize(e)
     if (contentRef.current) {
       updateSubtitle(subtitle.index, "content", contentRef.current.value)
     }
   }
 
-  const translatedUpdate = () => {
+  const translatedUpdate = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleResize(e)
     if (translatedRef.current) {
       updateSubtitle(subtitle.index, "translated", translatedRef.current.value)
     }
@@ -35,14 +37,20 @@ export const SubtitleCard = memo(({ subtitle, updateSubtitle }: SubtitleCardProp
     <Card className="border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow">
       <CardContent className="p-4">
         <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-muted-foreground">#{subtitle.index}</span>
-            <div className="flex items-center gap-2 text-sm">
-              <Timer className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {timestampToString(subtitle.timestamp.start)} ➝ {timestampToString(subtitle.timestamp.end)}
-              </span>
+          <div className="flex items-center justify-between">
+            {/* Left side (timestamp and index) */}
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-muted-foreground">#{subtitle.index}</span>
+              <div className="flex items-center gap-2 text-sm">
+                <Timer className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  {timestampToString(subtitle.timestamp.start)} ➝ {timestampToString(subtitle.timestamp.end)}
+                </span>
+              </div>
             </div>
+
+            {/* Right side (actor) */}
+            <span className="text-sm font-medium text-muted-foreground">{subtitle.actor}</span>
           </div>
 
           <div className="grid gap-2">
