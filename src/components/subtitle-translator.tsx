@@ -33,6 +33,12 @@ interface Parsed {
   data: ASSParseOutput | null
 }
 
+interface ModelSettings {
+  apiKey: string
+  customBaseUrl: string
+  customModel: string
+}
+
 export default function Page() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [title, setTitle] = useState("Blue.Box.S01E19")
@@ -58,6 +64,18 @@ export default function Page() {
 
   const abortControllerRef = useRef<AbortController | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  // Load model settings from local storage on component mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem("modelSettings")
+    if (savedSettings) {
+      const { apiKey, customBaseUrl, customModel }: ModelSettings = JSON.parse(savedSettings)
+      setApiKey(apiKey)
+      setCustomBaseUrl(customBaseUrl)
+      setCustomModel(customModel)
+      setUseCustomModel(!!(apiKey || customBaseUrl || customModel))
+    }
+  }, [])
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -86,8 +104,11 @@ export default function Page() {
     )
   }, [])
 
+  // Save model settings to local storage
   const handleSave = () => {
-    console.log("Saving:", { title, subtitles })
+    const settings: ModelSettings = { apiKey, customBaseUrl, customModel }
+    localStorage.setItem("modelSettings", JSON.stringify(settings))
+    console.log("Saving:", { title, subtitles, settings })
   }
 
   const handleStartTranslation = async () => {
@@ -326,7 +347,7 @@ export default function Page() {
                 <Button
                   className="w-full mt-2 gap-2"
                   variant="secondary"
-                  onClick={handleFileDownload} // Use the new download handler
+                  onClick={handleFileDownload}
                   disabled={isTranslating}
                 >
                   <Download className="h-4 w-4" />
@@ -395,4 +416,3 @@ export default function Page() {
     </div>
   )
 }
-
