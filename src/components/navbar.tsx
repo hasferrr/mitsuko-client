@@ -3,13 +3,12 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { LogIn, Moon, Sun } from "lucide-react"
+import { useThemeStore } from "@/stores/useThemeStore"
 
-interface NavbarProps {
-  isDarkMode: boolean
-  onThemeToggle: () => void
-}
+export function Navbar() {
+  const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)
+  const setIsDarkModeGlobal = useThemeStore(state => state.setIsDarkMode)
 
-export function Navbar({ isDarkMode, onThemeToggle }: NavbarProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-8">
       <div className="container flex h-14 items-center">
@@ -30,8 +29,8 @@ export function Navbar({ isDarkMode, onThemeToggle }: NavbarProps) {
           </Link>
         </nav>
         <div className="flex items-center gap-2 ml-auto">
-          <Button variant="ghost" size="icon" onClick={onThemeToggle}>
-            {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          <Button variant="ghost" size="icon" onClick={() => setIsDarkModeGlobal(!isDarkModeGlobal)}>
+            {isDarkModeGlobal ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
           <Button variant="ghost" size="icon">
             <LogIn className="h-5 w-5" />

@@ -397,7 +397,7 @@ export const ContextExtractor = memo(({ }: ContextExtractorProps) => {
         </Button>
 
         <div className="flex items-center space-x-2">
-          <Switch id="batch-mode" checked={isBatchMode} onCheckedChange={setIsBatchMode} /> {/* Changed ID and checked prop */}
+          <Switch id="batch-mode" checked={isBatchMode} onCheckedChange={setIsBatchMode} />
           <label htmlFor="batch-mode" className="text-sm font-medium">
             Batch Mode
           </label>

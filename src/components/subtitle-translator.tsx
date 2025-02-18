@@ -27,6 +27,7 @@ import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
 import { capitalizeWords } from "@/lib/utils"
 import { parseTranslationJson } from "@/lib/parser"
+import { useThemeStore } from "@/stores/useThemeStore"
 
 interface Parsed {
   type: "srt" | "ass"
@@ -41,7 +42,8 @@ interface ModelSettings {
 }
 
 export default function Page() {
-  const [isDarkMode, setIsDarkMode] = useState(true)
+  const isDarkMode = useThemeStore(state => state.isDarkMode)
+
   const [title, setTitle] = useState("Blue.Box.S01E19")
   const [subtitles, setSubtitles] = useState<SubtitleTranslated[]>(initialSubtitles)
 
@@ -302,7 +304,7 @@ export default function Page() {
   return (
     <div className={`min-h-screen ${isDarkMode ? "dark" : ""}`}>
       <div className="min-h-screen bg-background text-foreground">
-        <Navbar isDarkMode={isDarkMode} onThemeToggle={() => setIsDarkMode(!isDarkMode)} />
+        <Navbar />
 
         <div className="container mx-auto py-4 px-4 mb-6">
           <div className="flex flex-col gap-4 max-w-5xl mx-auto">
