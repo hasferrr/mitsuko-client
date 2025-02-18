@@ -146,7 +146,7 @@ export const ContextDocumentInput = memo(({ contextDocument, setContextDocument 
       <Textarea
         value={contextDocument}
         onChange={handleContextDocumentChange}
-        className="min-h-[120px] max-h-[900px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+        className="min-h-[150px] h-[150px] max-h-[80vh] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
         placeholder="Add context about the video..."
         onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
       />
@@ -208,7 +208,7 @@ export const SystemPromptInput = memo(({ prompt, setPrompt }: SystemPromptInputP
         disabled
         value={prompt}
         onChange={handlePromptChange}
-        className="min-h-[120px] max-h-[900px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+        className="min-h-[150px] h-[150px] max-h-[80vh] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
         placeholder="Enter translation instructions..."
         onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
       />

@@ -26,9 +26,6 @@ export function Navbar({ isDarkMode, onThemeToggle }: NavbarProps) {
           <Link href="#" className="transition-colors hover:text-foreground/80 text-foreground/60">
             Discord
           </Link>
-          <Link href="#" className="transition-colors hover:text-foreground/80 text-foreground/60">
-            Sheet
-          </Link>
         </nav>
         <div className="flex items-center gap-2 ml-auto">
           <Button variant="ghost" size="icon" onClick={onThemeToggle}>
