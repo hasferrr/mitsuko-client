@@ -109,6 +109,19 @@ export default function Page() {
     // Set the active tab to "process"
     setActiveTab("process")
 
+    // Scroll to top with fallback
+    setTimeout(() => {
+      try {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        })
+      } catch (e) {
+        // Fallback for older browsers
+        window.scrollTo(0, 0)
+      }
+    }, 150)
+
     try {
       const requestBody = {
         subtitles: subtitles.map((s) => ({
@@ -460,3 +473,4 @@ export default function Page() {
     </div>
   )
 }
+
