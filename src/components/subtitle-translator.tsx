@@ -37,6 +37,7 @@ interface ModelSettings {
   apiKey: string
   customBaseUrl: string
   customModel: string
+  useCustomModel: boolean
 }
 
 export default function Page() {
@@ -69,11 +70,11 @@ export default function Page() {
   useEffect(() => {
     const savedSettings = localStorage.getItem("modelSettings")
     if (savedSettings) {
-      const { apiKey, customBaseUrl, customModel }: ModelSettings = JSON.parse(savedSettings)
+      const { apiKey, customBaseUrl, customModel, useCustomModel }: ModelSettings = JSON.parse(savedSettings)
       setApiKey(apiKey)
       setCustomBaseUrl(customBaseUrl)
       setCustomModel(customModel)
-      setUseCustomModel(!!(apiKey || customBaseUrl || customModel))
+      setUseCustomModel(useCustomModel)
     }
   }, [])
 
@@ -106,7 +107,7 @@ export default function Page() {
 
   // Save model settings to local storage
   const handleSave = () => {
-    const settings: ModelSettings = { apiKey, customBaseUrl, customModel }
+    const settings: ModelSettings = { apiKey, customBaseUrl, customModel, useCustomModel }
     localStorage.setItem("modelSettings", JSON.stringify(settings))
     console.log("Saving:", { title, subtitles, settings })
   }
@@ -131,6 +132,7 @@ export default function Page() {
       })
     }, 300)
 
+    let buffer = ""
     try {
       const requestBody = {
         subtitles: subtitles.map((s) => ({
@@ -171,7 +173,8 @@ export default function Page() {
         const { done, value } = await reader.read()
         if (done) break
         const chunk = new TextDecoder().decode(value)
-        setResponse((prev) => prev + chunk)
+        buffer += chunk
+        setResponse(buffer)
       }
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "AbortError") {
@@ -187,15 +190,16 @@ export default function Page() {
 
       let parsedResponse: SubtitleMinimal[] = []
       try {
-        parsedResponse = parseTranslationJson(response)
+        console.log(buffer)
+        parsedResponse = parseTranslationJson(buffer)
       } catch {
         console.error('Failed to parse')
       }
 
-      if (jsonResponse.length > 0) {
+      if (parsedResponse.length > 0) {
         setJsonResponse(parsedResponse)
         setSubtitles(prevSubtitles => {
-          const translationMap = new Map(jsonResponse.map(item => [item.index, item.content]))
+          const translationMap = new Map(parsedResponse.map(item => [item.index, item.content]))
           return prevSubtitles.map(subtitle => {
             const translatedContent = translationMap.get(subtitle.index)
             return translatedContent !== undefined
@@ -339,7 +343,7 @@ export default function Page() {
                       </>
                     )}
                   </Button>
-                  <Button variant="outline" className="gap-2" onClick={handleStopTranslation} disabled={!isTranslating || !response}>
+                  <Button variant="outline" className="gap-2" onClick={handleStopTranslation} disabled={!isTranslating}>
                     <Square className="h-4 w-4" />
                     Stop
                   </Button>

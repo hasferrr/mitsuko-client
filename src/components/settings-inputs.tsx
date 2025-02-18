@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { SubtitleMinimal } from "@/types/types"
+import { debounce } from "@/lib/utils"
 
 interface LanguageSelectionProps {
   sourceLanguage: string
