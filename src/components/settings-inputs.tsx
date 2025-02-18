@@ -1,11 +1,12 @@
 "use client"
 
-import { memo, Dispatch, SetStateAction, useCallback } from "react"
+import { memo, Dispatch, SetStateAction, useCallback, useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
+import { SubtitleMinimal } from "@/types/types"
 
 interface LanguageSelectionProps {
   sourceLanguage: string
@@ -48,6 +49,7 @@ interface SystemPromptInputProps {
 interface ProcessOutputProps {
   response: string
   textareaRef: React.RefObject<HTMLTextAreaElement | null>
+  jsonResponse: SubtitleMinimal[]
 }
 
 export const LanguageSelection = memo(({ sourceLanguage, setSourceLanguage, targetLanguage, setTargetLanguage }: LanguageSelectionProps) => {
@@ -216,14 +218,22 @@ export const SystemPromptInput = memo(({ prompt, setPrompt }: SystemPromptInputP
   )
 })
 
-export const ProcessOutput = memo(({ response, textareaRef }: ProcessOutputProps) => {
+export const ProcessOutput = memo(({ response, textareaRef, jsonResponse }: ProcessOutputProps) => {
   return (
-    <Textarea
-      ref={textareaRef}
-      value={response.trim()}
-      readOnly
-      className="h-[500px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
-      placeholder="Translation output will appear here..."
-    />
+    <div className="space-y-4">
+      <Textarea
+        ref={textareaRef}
+        value={response.trim()}
+        readOnly
+        className="h-[400px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+        placeholder="Translation output will appear here..."
+      />
+      <Textarea
+        value={jsonResponse.length ? `[${jsonResponse.map(s => JSON.stringify(s, null, 2))}]` : ""}
+        readOnly
+        className="h-[200px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm"
+        placeholder="Parsed JSON output will appear here..."
+      />
+    </div>
   )
 })

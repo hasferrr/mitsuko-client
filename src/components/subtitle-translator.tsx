@@ -19,13 +19,14 @@ import {
   SystemPromptInput,
   ProcessOutput,
 } from "./settings-inputs"
-import { ASSParseOutput, Subtitle, SubtitleTranslated, UpdateSubtitle } from "@/types/types"
+import { ASSParseOutput, Subtitle, SubtitleMinimal, SubtitleTranslated, UpdateSubtitle } from "@/types/types"
 import { initialSubtitles } from "@/lib/dummy"
 import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
 import { capitalizeWords } from "@/lib/utils"
+import { parseTranslationJson } from "@/lib/parser"
 
 interface Parsed {
   type: "srt" | "ass"
@@ -53,6 +54,7 @@ export default function Page() {
   const [response, setResponse] = useState("")
   const [activeTab, setActiveTab] = useState("basic")
   const [parsed, setParsed] = useState<Parsed>({ type: "srt", data: null })
+  const [jsonResponse, setJsonResponse] = useState<SubtitleMinimal[]>([])
 
   const abortControllerRef = useRef<AbortController | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
@@ -92,6 +94,7 @@ export default function Page() {
     if (isTranslating) return
     setIsTranslating(true)
     setResponse("")
+    setJsonResponse([]) // Clear previous parsed output
 
     // Create a new AbortController
     abortControllerRef.current = new AbortController()
@@ -111,7 +114,7 @@ export default function Page() {
       const requestBody = {
         subtitles: subtitles.map((s) => ({
           index: s.index,
-          actor: "",
+          actor: s.actor,
           content: s.content,
         })),
         sourceLanguage,
@@ -158,8 +161,28 @@ export default function Page() {
         setResponse((prev) => prev + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]`)
       }
     } finally {
-      setIsTranslating(false)
+      setTimeout(() => setIsTranslating(false), 500)
       abortControllerRef.current = null
+
+      let parsedResponse: SubtitleMinimal[] = []
+      try {
+        parsedResponse = parseTranslationJson(response)
+      } catch {
+        console.error('Failed to parse')
+      }
+
+      if (jsonResponse.length > 0) {
+        setJsonResponse(parsedResponse)
+        setSubtitles(prevSubtitles => {
+          const translationMap = new Map(jsonResponse.map(item => [item.index, item.content]))
+          return prevSubtitles.map(subtitle => {
+            const translatedContent = translationMap.get(subtitle.index)
+            return translatedContent !== undefined
+              ? { ...subtitle, translated: translatedContent }
+              : subtitle
+          })
+        })
+      }
     }
   }
 
@@ -355,7 +378,11 @@ export default function Page() {
                   </TabsContent>
 
                   <TabsContent value="process" className="flex-grow space-y-4 mt-4">
-                    <ProcessOutput response={response} textareaRef={textareaRef} />
+                    <ProcessOutput
+                      response={response}
+                      textareaRef={textareaRef}
+                      jsonResponse={jsonResponse}
+                    />
                   </TabsContent>
                 </Tabs>
               </div>
