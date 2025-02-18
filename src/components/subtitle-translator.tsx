@@ -63,8 +63,23 @@ export default function Page() {
   const [parsed, setParsed] = useState<Parsed>({ type: "srt", data: null })
   const [jsonResponse, setJsonResponse] = useState<SubtitleMinimal[]>([])
 
+  const hasChanges = useRef(false)
   const abortControllerRef = useRef<AbortController | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (hasChanges.current) event.preventDefault()
+    }
+    if (hasChanges.current) {
+      window.addEventListener('beforeunload', handleBeforeUnload)
+    } else {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [hasChanges.current])
 
   // Load model settings from local storage on component mount
   useEffect(() => {
@@ -98,6 +113,7 @@ export default function Page() {
   }, [isDarkMode])
 
   const updateSubtitle: UpdateSubtitle = useCallback((index, field, value) => {
+    hasChanges.current = true
     setSubtitles((prevSubtitles) =>
       prevSubtitles.map((subtitle) =>
         subtitle.index === index ? { ...subtitle, [field]: value } : subtitle
@@ -117,6 +133,8 @@ export default function Page() {
     setIsTranslating(true)
     setResponse("")
     setJsonResponse([]) // Clear previous parsed output
+    handleSave()
+    hasChanges.current = true
 
     // Create a new AbortController
     abortControllerRef.current = new AbortController()
