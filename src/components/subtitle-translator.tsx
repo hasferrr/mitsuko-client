@@ -1,27 +1,20 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
-import { Save, Globe2, Timer, MessageSquare, Play, Square, Download, Upload } from "lucide-react"
+import { Save, Globe2, MessageSquare, Play, Square, Download, Upload } from "lucide-react"
 import { Navbar } from "./navbar"
 import { Footer } from "./footer"
-
-interface Subtitle {
-  index: number
-  startTime: string
-  endTime: string
-  content: string
-  translated: string
-}
+import { SubtitleList } from "./subtitle-list"
+import { Subtitle } from "@/types/types"
 
 export default function Page() {
   const [isDarkMode, setIsDarkMode] = useState(true)
@@ -102,9 +95,11 @@ export default function Page() {
     }
   }, [isDarkMode])
 
-  const updateSubtitle = (index: number, field: keyof Subtitle, value: string | number) => {
-    setSubtitles(subtitles.map((subtitle) => (subtitle.index === index ? { ...subtitle, [field]: value } : subtitle)))
-  }
+  const updateSubtitle = useCallback((index: number, field: keyof Subtitle, value: string | number) => {
+    setSubtitles(prevSubtitles =>
+      prevSubtitles.map((subtitle) => (subtitle.index === index ? { ...subtitle, [field]: value } : subtitle))
+    )
+  }, [])
 
   const handleSave = () => {
     console.log("Saving:", { title, subtitles })
@@ -266,55 +261,8 @@ export default function Page() {
                   <div className="flex-1" />
                 </div>
 
-                <ScrollArea className="h-[500px] pr-4">
-                  <div className="space-y-4">
-                    {subtitles.map((subtitle) => (
-                      <Card
-                        key={subtitle.index + "-" + subtitle.startTime}
-                        className="border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow"
-                      >
-                        <CardContent className="p-4">
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-3">
-                              <span className="text-sm font-medium text-muted-foreground">#{subtitle.index}</span>
-                              <div className="flex items-center gap-2 text-sm">
-                                <Timer className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground">{subtitle.startTime}</span>
-                                <span className="text-sm text-muted-foreground">➝</span>
-                                <span className="text-sm text-muted-foreground">{subtitle.endTime}</span>
-                              </div>
-                            </div>
+                <SubtitleList subtitles={subtitles} updateSubtitle={updateSubtitle} />
 
-                            <div className="grid gap-2">
-                              <Textarea
-                                value={subtitle.content}
-                                onChange={(e) => {
-                                  updateSubtitle(subtitle.index, "content", e.target.value)
-                                  e.target.style.height = "auto"
-                                  e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
-                                }}
-                                placeholder="Original text"
-                                className="min-h-[35px] max-h-[120px] bg-muted/50 dark:bg-muted/30 resize-none overflow-y-hidden"
-                                rows={1}
-                              />
-                              <Textarea
-                                value={subtitle.translated}
-                                onChange={(e) => {
-                                  updateSubtitle(subtitle.index, "translated", e.target.value)
-                                  e.target.style.height = "auto"
-                                  e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
-                                }}
-                                placeholder="Translated text"
-                                className="min-h-[35px] max-h-[120px] resize-none overflow-y-hidden"
-                                rows={1}
-                              />
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </ScrollArea>
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <Button className="gap-2" onClick={handleStartTranslation} disabled={isTranslating}>
                     {isTranslating ? (
