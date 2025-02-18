@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
-import { Save, Globe2, Timer, MessageSquare, Play, Square, Download } from "lucide-react"
+import { Save, Globe2, Timer, MessageSquare, Play, Square, Download, Upload } from "lucide-react"
 import { Navbar } from "./navbar"
 import { Footer } from "./footer"
 
@@ -120,7 +120,7 @@ export default function Page() {
         // Fallback for older browsers
         window.scrollTo(0, 0)
       }
-    }, 150)
+    }, 100)
 
     try {
       const requestBody = {
@@ -180,6 +180,39 @@ export default function Page() {
     }
   }
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    try {
+      const text = await file.text()
+      // Basic SRT parsing
+      const subtitleBlocks = text.trim().split("\n\n")
+      const parsedSubtitles: Subtitle[] = subtitleBlocks.map((block) => {
+        const lines = block.split("\n")
+        const index = Number.parseInt(lines[0])
+        const [startTime, endTime] = lines[1].split(" --> ")
+        const content = lines.slice(2).join("\n")
+
+        return {
+          index,
+          startTime: startTime.trim(),
+          endTime: endTime.trim(),
+          content: content.trim(),
+          translated: "",
+        }
+      })
+
+      setSubtitles(parsedSubtitles)
+      setTitle(file.name.replace(".srt", ""))
+    } catch (error) {
+      console.error("Error parsing subtitle file:", error)
+    }
+
+    // Reset the input
+    event.target.value = ""
+  }
+
   return (
     <div className={`min-h-screen ${isDarkMode ? "dark" : ""}`}>
       <div className="min-h-screen bg-background text-foreground">
@@ -196,6 +229,16 @@ export default function Page() {
                   className="text-xl font-semibold h-12"
                 />
               </div>
+              <input type="file" accept=".srt" onChange={handleFileUpload} className="hidden" id="subtitle-upload" />
+              <Button
+                variant="outline"
+                size="lg"
+                className="gap-2"
+                onClick={() => document.getElementById("subtitle-upload")?.click()}
+              >
+                <Upload className="h-5 w-5" />
+                Upload SRT
+              </Button>
               <Button onClick={handleSave} size="lg" className="gap-2">
                 <Save className="h-5 w-5" />
                 Save Project
