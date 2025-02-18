@@ -19,11 +19,18 @@ import {
   SystemPromptInput,
   ProcessOutput,
 } from "./settings-inputs"
-import { Subtitle, SubtitleTranslated, UpdateSubtitle } from "@/types/types"
+import { ASSParseOutput, Subtitle, SubtitleTranslated, UpdateSubtitle } from "@/types/types"
 import { initialSubtitles } from "@/lib/dummy"
 import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
+import { generateSRT } from "@/lib/srt/generate"
+import { mergeASSback } from "@/lib/ass/merge"
 import { capitalizeWords } from "@/lib/utils"
+
+interface Parsed {
+  type: "srt" | "ass"
+  data: ASSParseOutput | null
+}
 
 export default function Page() {
   const [isDarkMode, setIsDarkMode] = useState(true)
@@ -45,6 +52,7 @@ export default function Page() {
   const [isTranslating, setIsTranslating] = useState(false)
   const [response, setResponse] = useState("")
   const [activeTab, setActiveTab] = useState("basic")
+  const [parsed, setParsed] = useState<Parsed>({ type: "srt", data: null })
 
   const abortControllerRef = useRef<AbortController | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
@@ -167,10 +175,21 @@ export default function Page() {
 
     try {
       const text = await file.text()
-      const subtitles: Subtitle[] = file.name.endsWith(".srt")
-        ? parseSRT(text)
-        : parseASS(text).subtitles
-      const parsedSubtitles = subtitles.map((subtitle) => ({
+      const type = file.name.endsWith(".srt") ? "srt" : "ass"
+
+      let parsedSubs
+      let subtitles
+      if (type === "srt") {
+        parsedSubs = parseSRT(text)
+        subtitles = parsedSubs
+        setParsed({ type, data: null })
+      } else {
+        parsedSubs = parseASS(text)
+        subtitles = parsedSubs.subtitles
+        setParsed({ type, data: parsedSubs })
+      }
+
+      const parsedSubtitles: SubtitleTranslated[] = subtitles.map((subtitle) => ({
         ...subtitle,
         translated: "",
       }))
@@ -183,6 +202,35 @@ export default function Page() {
 
     // Reset the input
     event.target.value = ""
+  }
+
+  const handleFileDownload = () => {
+    const subtitleData: Subtitle[] = subtitles.map((s) => ({
+      index: s.index,
+      timestamp: s.timestamp,
+      actor: s.actor,
+      content: s.translated, // Use translated content for download
+    }))
+
+    let fileContent = ""
+    if (parsed.type === "srt") {
+      fileContent = generateSRT(subtitleData)
+    } else if (parsed.type === "ass" && parsed.data) {
+      fileContent = mergeASSback(subtitleData, parsed.data)
+    } else {
+      console.error("Invalid file type or missing parsed data for download.")
+      return
+    }
+
+    const blob = new Blob([fileContent], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `${title}.${parsed.type}` // Use the original file type
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -255,7 +303,7 @@ export default function Page() {
                 <Button
                   className="w-full mt-2 gap-2"
                   variant="secondary"
-                  onClick={() => console.log("Download Subtitles")}
+                  onClick={handleFileDownload} // Use the new download handler
                   disabled={isTranslating}
                 >
                   <Download className="h-4 w-4" />
