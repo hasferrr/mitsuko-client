@@ -3,17 +3,22 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Slider } from "@/components/ui/slider"
-import { Switch } from "@/components/ui/switch"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Save, Globe2, MessageSquare, Play, Square, Download, Upload } from "lucide-react"
 import { Navbar } from "./navbar"
 import { Footer } from "./footer"
 import { SubtitleList } from "./subtitle-list"
+import {
+  LanguageSelection,
+  ModelSelection,
+  ContextDocumentInput,
+  TemperatureSlider,
+  SplitSizeInput,
+  SystemPromptInput,
+  ProcessOutput,
+} from "./settings-inputs"
 import { Subtitle } from "@/types/types"
 
 export default function Page() {
@@ -39,7 +44,7 @@ export default function Page() {
       startTime: "00:00:16,266",
       endTime: "00:00:17,308",
       content: "(生徒C)上げるぞ",
-      translated: "(Siswa C) Ayo angkat!",
+      translated: "",
     },
     {
       index: 4,
@@ -74,7 +79,7 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState("basic")
 
   const abortControllerRef = useRef<AbortController | null>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -305,96 +310,23 @@ export default function Page() {
                   <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
                     <Card className="border border-border bg-card text-card-foreground">
                       <CardContent className="p-4 space-y-4">
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Source Language</label>
-                            <Select defaultValue="japanese" onValueChange={setSourceLanguage}>
-                              <SelectTrigger className="bg-background dark:bg-muted/30">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="japanese">Japanese</SelectItem>
-                                <SelectItem value="english">English</SelectItem>
-                                <SelectItem value="korean">Korean</SelectItem>
-                                <SelectItem value="chinese">Chinese</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Target Language</label>
-                            <Select defaultValue="indonesian" onValueChange={setTargetLanguage}>
-                              <SelectTrigger className="bg-background dark:bg-muted/30">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="indonesian">Indonesian</SelectItem>
-                                <SelectItem value="english">English</SelectItem>
-                                <SelectItem value="japanese">Japanese</SelectItem>
-                                <SelectItem value="korean">Korean</SelectItem>
-                                <SelectItem value="chinese">Chinese</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Model</label>
-                          <Select defaultValue="deepseek" disabled={useCustomModel}>
-                            <SelectTrigger className="bg-background dark:bg-muted/30">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="deepseek">DeepSeek-R1</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                          <Switch id="custom-model" checked={useCustomModel} onCheckedChange={setUseCustomModel} />
-                          <label htmlFor="custom-model" className="text-sm font-medium">
-                            Use Custom Model
-                          </label>
-                        </div>
-
-                        {useCustomModel && (
-                          <div className="space-y-4 pt-2">
-                            <Input
-                              value={customBaseUrl}
-                              onChange={(e) => setCustomBaseUrl(e.target.value)}
-                              placeholder="Base URL"
-                              className="bg-background dark:bg-muted/30"
-                            />
-                            <Input
-                              value={customModel}
-                              onChange={(e) => setCustomModel(e.target.value)}
-                              placeholder="Model Name"
-                              className="bg-background dark:bg-muted/30"
-                            />
-                            <Input
-                              type="password"
-                              value={apiKey}
-                              onChange={(e) => setApiKey(e.target.value)}
-                              placeholder="API Key"
-                              className="bg-background dark:bg-muted/30"
-                            />
-                          </div>
-                        )}
-
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Context Document</label>
-                          <Textarea
-                            value={contextDocument}
-                            onChange={(e) => {
-                              setContextDocument(e.target.value)
-                              e.target.style.height = "auto"
-                              e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
-                            }}
-                            className="min-h-[120px] max-h-[900px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
-                            placeholder="Add context about the video..."
-                            onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
-                          />
-                        </div>
+                        <LanguageSelection
+                          sourceLanguage={sourceLanguage}
+                          setSourceLanguage={setSourceLanguage}
+                          targetLanguage={targetLanguage}
+                          setTargetLanguage={setTargetLanguage}
+                        />
+                        <ModelSelection
+                          useCustomModel={useCustomModel}
+                          setUseCustomModel={setUseCustomModel}
+                          customBaseUrl={customBaseUrl}
+                          setCustomBaseUrl={setCustomBaseUrl}
+                          customModel={customModel}
+                          setCustomModel={setCustomModel}
+                          apiKey={apiKey}
+                          setApiKey={setApiKey}
+                        />
+                        <ContextDocumentInput contextDocument={contextDocument} setContextDocument={setContextDocument} />
                       </CardContent>
                     </Card>
                   </TabsContent>
@@ -402,64 +334,15 @@ export default function Page() {
                   <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
                     <Card className="border border-border bg-card text-card-foreground">
                       <CardContent className="p-4 space-y-4">
-                        <div className="space-y-4">
-                          <div>
-                            <div className="flex justify-between mb-2">
-                              <label className="text-sm font-medium">Temperature</label>
-                              <span className="text-sm text-muted-foreground">{temperature}</span>
-                            </div>
-                            <Slider
-                              value={[temperature]}
-                              onValueChange={([value]) => setTemperature(value)}
-                              max={1.3}
-                              step={0.1}
-                              className="py-2"
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Split Size</label>
-                            <Input
-                              disabled
-                              type="number"
-                              value={splitSize}
-                              onChange={(e) => {
-                                const value = Number(e.target.value)
-                                setSplitSize(Math.max(0, Math.min(500, value)))
-                              }}
-                              min={0}
-                              max={500}
-                              className="bg-background dark:bg-muted/30"
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">System Prompt</label>
-                            <Textarea
-                              disabled
-                              value={prompt}
-                              onChange={(e) => {
-                                setPrompt(e.target.value)
-                                e.target.style.height = "auto"
-                                e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
-                              }}
-                              className="min-h-[120px] max-h-[900px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
-                              placeholder="Enter translation instructions..."
-                              onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
-                            />
-                          </div>
-                        </div>
+                        <TemperatureSlider temperature={temperature} setTemperature={setTemperature} />
+                        <SplitSizeInput splitSize={splitSize} setSplitSize={setSplitSize} />
+                        <SystemPromptInput prompt={prompt} setPrompt={setPrompt} />
                       </CardContent>
                     </Card>
                   </TabsContent>
+
                   <TabsContent value="process" className="flex-grow space-y-4 mt-4">
-                    <Textarea
-                      ref={textareaRef}
-                      value={response.trim()}
-                      readOnly
-                      className="h-[500px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
-                      placeholder="Translation output will appear here..."
-                    />
+                    <ProcessOutput response={response} textareaRef={textareaRef} />
                   </TabsContent>
                 </Tabs>
               </div>
