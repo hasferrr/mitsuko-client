@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -26,6 +26,7 @@ import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
 import { capitalizeWords } from "@/lib/utils"
 import { parseTranslationJson } from "@/lib/parser"
+import { create } from 'zustand'
 
 
 interface Parsed {
@@ -33,28 +34,126 @@ interface Parsed {
   data: ASSParseOutput | null
 }
 
-interface ModelSettings {
+// --- Subtitle Store ---
+interface SubtitleStore {
+  title: string
+  subtitles: SubtitleTranslated[]
+  setTitle: (title: string) => void
+  setSubtitles: (subtitles: SubtitleTranslated[]) => void
+  updateSubtitle: UpdateSubtitle
+}
+
+const useSubtitleStore = create<SubtitleStore>()(
+  (set, get) => ({
+    title: "Blue.Box.S01E19",
+    subtitles: initialSubtitles,
+    setTitle: (title) => set({ title }),
+    setSubtitles: (subtitles) => set({ subtitles }),
+    updateSubtitle: (index, field, value) => {
+      const updatedSubtitles = get().subtitles.map((subtitle) =>
+        subtitle.index === index ? { ...subtitle, [field]: value } : subtitle
+      )
+      set({ subtitles: updatedSubtitles })
+    },
+  })
+)
+
+// --- Settings Store ---
+interface SettingsStore {
+  sourceLanguage: string
+  targetLanguage: string
+  useCustomModel: boolean
   apiKey: string
   customBaseUrl: string
   customModel: string
-  useCustomModel: boolean
+  contextDocument: string
+  setSourceLanguage: (language: string) => void
+  setTargetLanguage: (language: string) => void
+  setUseCustomModel: (value: boolean) => void
+  setApiKey: (key: string) => void
+  setCustomBaseUrl: (url: string) => void
+  setCustomModel: (model: string) => void
+  setContextDocument: (doc: string) => void
 }
 
+const useSettingsStore = create<SettingsStore>()(
+  (set) => ({
+    sourceLanguage: "japanese",
+    targetLanguage: "indonesian",
+    useCustomModel: false,
+    apiKey: "",
+    customBaseUrl: "",
+    customModel: "",
+    contextDocument: "",
+    setSourceLanguage: (language) => set({ sourceLanguage: language }),
+    setTargetLanguage: (language) => set({ targetLanguage: language }),
+    setUseCustomModel: (value) => set({ useCustomModel: value }),
+    setApiKey: (key) => set({ apiKey: key }),
+    setCustomBaseUrl: (url) => set({ customBaseUrl: url }),
+    setCustomModel: (model) => set({ customModel: model }),
+    setContextDocument: (doc) => set({ contextDocument: doc }),
+  })
+)
+
+// --- Advanced Settings Store ---
+interface AdvancedSettingsStore {
+  temperature: number
+  splitSize: number
+  prompt: string
+  setTemperature: (temp: number) => void
+  setSplitSize: (size: number) => void
+  setPrompt: (prompt: string) => void
+}
+
+const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
+  (set) => ({
+    temperature: 0.6,
+    splitSize: 500,
+    prompt: "",
+    setTemperature: (temp) => set({ temperature: temp }),
+    setSplitSize: (size) => set({ splitSize: size }),
+    setPrompt: (prompt) => set({ prompt }),
+  })
+)
+
+
 export default function SubtitleTranslator() {
-  const [title, setTitle] = useState("Blue.Box.S01E19")
-  const [subtitles, setSubtitles] = useState<SubtitleTranslated[]>(initialSubtitles)
+  // Subtitle Store
+  const {
+    title,
+    subtitles,
+    setTitle,
+    setSubtitles,
+    updateSubtitle
+  } = useSubtitleStore()
 
-  const [sourceLanguage, setSourceLanguage] = useState("japanese")
-  const [targetLanguage, setTargetLanguage] = useState("indonesian")
-  const [useCustomModel, setUseCustomModel] = useState(false)
-  const [apiKey, setApiKey] = useState("")
-  const [customBaseUrl, setCustomBaseUrl] = useState("")
-  const [customModel, setCustomModel] = useState("")
-  const [contextDocument, setContextDocument] = useState("")
+  // Settings Store
+  const {
+    sourceLanguage,
+    targetLanguage,
+    useCustomModel,
+    apiKey,
+    customBaseUrl,
+    customModel,
+    contextDocument,
+    setSourceLanguage,
+    setTargetLanguage,
+    setUseCustomModel,
+    setApiKey,
+    setCustomBaseUrl,
+    setCustomModel,
+    setContextDocument,
+  } = useSettingsStore()
 
-  const [temperature, setTemperature] = useState(0.6)
-  const [splitSize, setSplitSize] = useState(500)
-  const [prompt, setPrompt] = useState("")
+  // Advanced Settings Store
+  const {
+    temperature,
+    splitSize,
+    prompt,
+    setTemperature,
+    setSplitSize,
+    setPrompt
+  } = useAdvancedSettingsStore()
 
   const [isTranslating, setIsTranslating] = useState(false)
   const [response, setResponse] = useState("")
@@ -65,6 +164,38 @@ export default function SubtitleTranslator() {
   const hasChanges = useRef(false)
   const abortControllerRef = useRef<AbortController | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    const loadSubtitleData = () => {
+      const storedSubtitleData = localStorage.getItem('subtitle-storage')
+      if (storedSubtitleData) {
+        const parsedData = JSON.parse(storedSubtitleData)
+        useSubtitleStore.setState(parsedData) // Use setState to merge
+      }
+    }
+
+    const loadSettingsData = () => {
+      const storedSettingsData = localStorage.getItem('settings-storage')
+      if (storedSettingsData) {
+        const parsedData = JSON.parse(storedSettingsData)
+        useSettingsStore.setState(parsedData) // Use setState to merge
+      }
+    }
+
+    const loadAdvancedSettingsData = () => {
+      const storedAdvancedSettingsData = localStorage.getItem('advanced-settings')
+      if (storedAdvancedSettingsData) {
+        const parsedData = JSON.parse(storedAdvancedSettingsData)
+        useAdvancedSettingsStore.setState(parsedData) // Use setState to merge
+      }
+    }
+
+    loadSubtitleData()
+    loadSettingsData()
+    loadAdvancedSettingsData()
+  }, []) // Empty dependency array ensures this runs only once on mount
+
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -80,17 +211,6 @@ export default function SubtitleTranslator() {
     }
   }, [hasChanges.current])
 
-  // Load model settings from local storage on component mount
-  useEffect(() => {
-    const savedSettings = localStorage.getItem("modelSettings")
-    if (savedSettings) {
-      const { apiKey, customBaseUrl, customModel, useCustomModel }: ModelSettings = JSON.parse(savedSettings)
-      setApiKey(apiKey)
-      setCustomBaseUrl(customBaseUrl)
-      setCustomModel(customModel)
-      setUseCustomModel(useCustomModel)
-    }
-  }, [])
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -103,28 +223,11 @@ export default function SubtitleTranslator() {
     }
   }, [response])
 
-  const updateSubtitle: UpdateSubtitle = useCallback((index, field, value) => {
-    hasChanges.current = true
-    setSubtitles((prevSubtitles) =>
-      prevSubtitles.map((subtitle) =>
-        subtitle.index === index ? { ...subtitle, [field]: value } : subtitle
-      )
-    )
-  }, [])
-
-  // Save model settings to local storage
-  const handleSave = () => {
-    const settings: ModelSettings = { apiKey, customBaseUrl, customModel, useCustomModel }
-    localStorage.setItem("modelSettings", JSON.stringify(settings))
-    console.log("Saving:", { title, subtitles, settings })
-  }
-
   const handleStartTranslation = async () => {
     if (isTranslating) return
     setIsTranslating(true)
     setResponse("")
     setJsonResponse([]) // Clear previous parsed output
-    handleSave()
     hasChanges.current = true
 
     // Create a new AbortController
@@ -207,15 +310,11 @@ export default function SubtitleTranslator() {
 
       if (parsedResponse.length > 0) {
         setJsonResponse(parsedResponse)
-        setSubtitles(prevSubtitles => {
-          const translationMap = new Map(parsedResponse.map(item => [item.index, item.content]))
-          return prevSubtitles.map(subtitle => {
-            const translatedContent = translationMap.get(subtitle.index)
-            return translatedContent !== undefined
-              ? { ...subtitle, translated: translatedContent }
-              : subtitle
-          })
+        const updatedSubtitles = subtitles.map(subtitle => {
+          const translated = parsedResponse.find(item => item.index === subtitle.index)
+          return translated ? { ...subtitle, translated: translated.content } : subtitle
         })
+        setSubtitles(updatedSubtitles)
       }
     }
   }
@@ -290,6 +389,35 @@ export default function SubtitleTranslator() {
     URL.revokeObjectURL(url)
   }
 
+
+  const handleSaveProject = () => {
+    // Save Subtitle Store
+    localStorage.setItem('subtitle-storage', JSON.stringify({
+      title: useSubtitleStore.getState().title,
+      subtitles: useSubtitleStore.getState().subtitles,
+    }))
+
+    // Save Settings Store
+    localStorage.setItem('settings-storage', JSON.stringify({
+      sourceLanguage: useSettingsStore.getState().sourceLanguage,
+      targetLanguage: useSettingsStore.getState().targetLanguage,
+      useCustomModel: useSettingsStore.getState().useCustomModel,
+      apiKey: useSettingsStore.getState().apiKey,
+      customBaseUrl: useSettingsStore.getState().customBaseUrl,
+      customModel: useSettingsStore.getState().customModel,
+      contextDocument: useSettingsStore.getState().contextDocument,
+    }))
+
+    // Save Advanced Settings Store
+    localStorage.setItem('advanced-settings', JSON.stringify({
+      temperature: useAdvancedSettingsStore.getState().temperature,
+      splitSize: useAdvancedSettingsStore.getState().splitSize,
+      prompt: useAdvancedSettingsStore.getState().prompt,
+    }))
+
+    console.log("Project Saved!")
+  }
+
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
       {/* Header */}
@@ -311,7 +439,7 @@ export default function SubtitleTranslator() {
           <Upload className="h-5 w-5" />
           Upload File
         </Button>
-        <Button onClick={handleSave} size="lg" className="gap-2">
+        <Button onClick={handleSaveProject} size="lg" className="gap-2">
           <Save className="h-5 w-5" />
           Save Project
         </Button>
@@ -410,6 +538,7 @@ export default function SubtitleTranslator() {
             <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
+                  {/* Use the state and setters from useAdvancedSettingsStore */}
                   <TemperatureSlider temperature={temperature} setTemperature={setTemperature} />
                   <SplitSizeInput splitSize={splitSize} setSplitSize={setSplitSize} />
                   <SystemPromptInput prompt={prompt} setPrompt={setPrompt} />
