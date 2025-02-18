@@ -1,9 +1,9 @@
-import { memo, useCallback, useRef } from "react"
+import { memo, useRef } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Timer } from "lucide-react"
 import { SubtitleTranslated, UpdateSubtitle } from "@/types/types"
-import { debounce, timestampToString } from "@/lib/utils"
+import { timestampToString } from "@/lib/utils"
 
 interface SubtitleCardProps {
   subtitle: SubtitleTranslated
@@ -11,48 +11,25 @@ interface SubtitleCardProps {
 }
 
 export const SubtitleCard = memo(({ subtitle, updateSubtitle }: SubtitleCardProps) => {
-  const contentRef = useRef<HTMLTextAreaElement>(null)
-  const translatedRef = useRef<HTMLTextAreaElement>(null)
+  const contentRef = useRef<HTMLTextAreaElement | null>(null)
+  const translatedRef = useRef<HTMLTextAreaElement | null>(null)
 
-  // Debounced handler for content changes.  Now reads from the ref.
-  const debouncedContentUpdate = useCallback(
-    debounce((index: number) => {
-      if (contentRef.current) {
-        updateSubtitle(index, "content", contentRef.current.value)
-      }
-    }, 300),
-    [updateSubtitle]
-  )
+  const contentUpdate = () => {
+    if (contentRef.current) {
+      updateSubtitle(subtitle.index, "content", contentRef.current.value)
+    }
+  }
 
-  // Debounced handler for translated changes. Now reads from the ref.
-  const debouncedTranslatedUpdate = useCallback(
-    debounce((index: number) => {
-      if (translatedRef.current) {
-        updateSubtitle(index, "translated", translatedRef.current.value)
-      }
-    }, 300),
-    [updateSubtitle]
-  )
+  const translatedUpdate = () => {
+    if (translatedRef.current) {
+      updateSubtitle(subtitle.index, "translated", translatedRef.current.value)
+    }
+  }
 
-  // useCallback is no longer necessary for onChange since it's now just for resizing
-  const handleContentResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
   }
-
-  const handleTranslatedResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    e.target.style.height = "auto"
-    e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
-  }
-
-  // Trigger the debounced update on blur (when the textarea loses focus)
-  const handleContentBlur = useCallback(() => {
-    debouncedContentUpdate(subtitle.index)
-  }, [debouncedContentUpdate, subtitle.index])
-
-  const handleTranslatedBlur = useCallback(() => {
-    debouncedTranslatedUpdate(subtitle.index)
-  }, [debouncedTranslatedUpdate, subtitle.index])
 
   return (
     <Card className="border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow">
@@ -71,20 +48,18 @@ export const SubtitleCard = memo(({ subtitle, updateSubtitle }: SubtitleCardProp
           <div className="grid gap-2">
             <Textarea
               ref={contentRef}
-              defaultValue={subtitle.content}
-              onBlur={handleContentBlur}
-              onFocus={handleContentResize}
-              onChange={handleContentResize}
+              value={subtitle.content}
+              onFocus={handleResize}
+              onChange={contentUpdate}
               placeholder="Original text"
               className="min-h-[36px] h-[36px] max-h-[120px] bg-muted/50 dark:bg-muted/30 resize-none overflow-y-hidden"
               rows={1}
             />
             <Textarea
               ref={translatedRef}
-              defaultValue={subtitle.translated}
-              onBlur={handleTranslatedBlur}
-              onFocus={handleTranslatedResize}
-              onChange={handleTranslatedResize}
+              value={subtitle.translated}
+              onFocus={handleResize}
+              onChange={translatedUpdate}
               placeholder="Translated text"
               className="min-h-[36px] h-[36px] max-h-[120px] resize-none overflow-y-hidden"
               rows={1}

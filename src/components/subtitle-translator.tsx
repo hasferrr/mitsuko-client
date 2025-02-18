@@ -19,8 +19,10 @@ import {
   SystemPromptInput,
   ProcessOutput,
 } from "./settings-inputs"
-import { SubtitleTranslated, UpdateSubtitle } from "@/types/types"
+import { Subtitle, SubtitleTranslated, UpdateSubtitle } from "@/types/types"
 import { initialSubtitles } from "@/lib/dummy"
+import { parseSRT } from "@/lib/srt/parse"
+import { parseASS } from "@/lib/ass/parse"
 
 export default function Page() {
   const [isDarkMode, setIsDarkMode] = useState(true)
@@ -123,7 +125,11 @@ export default function Page() {
         signal: abortControllerRef.current.signal, // Connect to abort signal
       })
 
-      if (!res.ok) throw new Error("Request failed")
+      if (!res.ok) {
+        const errorData = await res.json()
+        console.error("Error details from server:", errorData)
+        throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error}`)
+      }
 
       const reader = res.body?.getReader()
       if (!reader) return
@@ -160,12 +166,16 @@ export default function Page() {
 
     try {
       const text = await file.text()
-      // TODO
-      const subtitleBlocks = text.trim().split("\n\n")
-      const parsedSubtitles: SubtitleTranslated[] = []
+      const subtitles: Subtitle[] = file.name.endsWith(".srt")
+        ? parseSRT(text)
+        : parseASS(text).subtitles
+      const parsedSubtitles = subtitles.map((subtitle) => ({
+        ...subtitle,
+        translated: "",
+      }))
 
       setSubtitles(parsedSubtitles)
-      setTitle(file.name.replace(".srt", ""))
+      setTitle(file.name)
     } catch (error) {
       console.error("Error parsing subtitle file:", error)
     }
@@ -190,7 +200,7 @@ export default function Page() {
                   className="text-xl font-semibold h-12"
                 />
               </div>
-              <input type="file" accept=".srt" onChange={handleFileUpload} className="hidden" id="subtitle-upload" />
+              <input type="file" accept=".srt,.ass" onChange={handleFileUpload} className="hidden" id="subtitle-upload" />
               <Button
                 variant="outline"
                 size="lg"
@@ -198,7 +208,7 @@ export default function Page() {
                 onClick={() => document.getElementById("subtitle-upload")?.click()}
               >
                 <Upload className="h-5 w-5" />
-                Upload SRT
+                Upload File
               </Button>
               <Button onClick={handleSave} size="lg" className="gap-2">
                 <Save className="h-5 w-5" />
