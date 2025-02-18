@@ -1,12 +1,13 @@
 "use client"
 
+import Link from "next/link"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Save, Globe2, MessageSquare, Play, Square, Download, Upload } from "lucide-react"
+import { Save, Globe2, MessageSquare, Play, Square, Download, Upload, FileText } from "lucide-react"
 import { SubtitleList } from "./subtitle-list"
 import {
   LanguageSelection,
@@ -25,6 +26,7 @@ import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
 import { capitalizeWords } from "@/lib/utils"
 import { parseTranslationJson } from "@/lib/parser"
+
 
 interface Parsed {
   type: "srt" | "ass"
@@ -350,9 +352,20 @@ export default function SubtitleTranslator() {
               Stop
             </Button>
           </div>
+
+          <Link href="/extract-context" className="w-full mt-2 gap-2 inline-flex items-center justify-center">
+            <Button
+              variant="outline"
+              className="w-full gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              Extract Context from Subtitle
+            </Button>
+          </Link>
+
           <Button
             className="w-full mt-2 gap-2"
-            variant="secondary"
+            variant="outline"
             onClick={handleFileDownload}
             disabled={isTranslating}
           >
