@@ -2,11 +2,11 @@ import { memo, useCallback, useRef } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Timer } from "lucide-react"
-import { Subtitle, UpdateSubtitle } from "@/types/types"
-import { debounce } from "@/lib/utils"
+import { SubtitleTranslated, UpdateSubtitle } from "@/types/types"
+import { debounce, timestampToString } from "@/lib/utils"
 
 interface SubtitleCardProps {
-  subtitle: Subtitle
+  subtitle: SubtitleTranslated
   updateSubtitle: UpdateSubtitle
 }
 
@@ -55,9 +55,7 @@ export const SubtitleCard = memo(({ subtitle, updateSubtitle }: SubtitleCardProp
   }, [debouncedTranslatedUpdate, subtitle.index])
 
   return (
-    <Card
-      className="border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow"
-    >
+    <Card className="border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow">
       <CardContent className="p-4">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
@@ -65,7 +63,7 @@ export const SubtitleCard = memo(({ subtitle, updateSubtitle }: SubtitleCardProp
             <div className="flex items-center gap-2 text-sm">
               <Timer className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
-                {subtitle.startTime} ➝ {subtitle.endTime}
+                {timestampToString(subtitle.timestamp.start)} ➝ {timestampToString(subtitle.timestamp.end)}
               </span>
             </div>
           </div>

@@ -1,13 +1,56 @@
+export interface Timestamp {
+  h: number
+  m: number
+  s: number
+  ms: number
+}
+
 export interface Subtitle {
   index: number
-  startTime: string
-  endTime: string
+  timestamp: {
+    start: Timestamp
+    end: Timestamp
+  }
+  actor: string
   content: string
+}
+
+export type SubtitleNoTime = Omit<Subtitle, 'timestamp'>
+
+export type SubtitleTranslated = Subtitle & {
   translated: string
+}
+
+export type SubtitleNoTimeTranslated = Omit<SubtitleTranslated, 'timestamp'>
+
+export interface SubtitleMinimal {
+  index: number
+  content: string
+}
+
+export interface ASSParseOutput {
+  subtitles: Subtitle[]
+  header: string
+  events: SubtitleEvent[]
+  footer: string
+}
+
+export interface SubtitleEvent {
+  format: 'Dialogue' | 'Comment'
+  layer: number
+  start: string
+  end: string
+  style: string
+  name: string
+  marginL: string
+  marginR: string
+  marginV: string
+  effect: string
+  text: string
 }
 
 export type UpdateSubtitle = (
   index: number,
-  field: keyof Subtitle,
-  value: string | number,
+  field: keyof SubtitleTranslated,
+  value: SubtitleTranslated[keyof SubtitleTranslated],
 ) => void

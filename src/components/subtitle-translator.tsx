@@ -19,48 +19,13 @@ import {
   SystemPromptInput,
   ProcessOutput,
 } from "./settings-inputs"
-import { Subtitle } from "@/types/types"
+import { SubtitleTranslated, UpdateSubtitle } from "@/types/types"
+import { initialSubtitles } from "@/lib/dummy"
 
 export default function Page() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [title, setTitle] = useState("Blue.Box.S01E19")
-  const [subtitles, setSubtitles] = useState<Subtitle[]>([
-    {
-      index: 1,
-      startTime: "00:00:11,803",
-      endTime: "00:00:13,263",
-      content: "(生徒A)ぶつけるなよ",
-      translated: "(Siswa A) Jangan sampai menabrak!",
-    },
-    {
-      index: 2,
-      startTime: "00:00:14,472",
-      endTime: "00:00:15,765",
-      content: "(生徒B)もっと 右右",
-      translated: "(Siswa B) Lebih ke kanan lagi!",
-    },
-    {
-      index: 3,
-      startTime: "00:00:16,266",
-      endTime: "00:00:17,308",
-      content: "(生徒C)上げるぞ",
-      translated: "",
-    },
-    {
-      index: 4,
-      startTime: "00:00:29,404",
-      endTime: "00:00:30,447",
-      content: "(生徒たち)せ~の!",
-      translated: "",
-    },
-    {
-      index: 5,
-      startTime: "00:00:44,419",
-      endTime: "00:00:45,587",
-      content: "(クラスメイトたち)わあ...",
-      translated: "",
-    },
-  ])
+  const [subtitles, setSubtitles] = useState<SubtitleTranslated[]>(initialSubtitles)
 
   const [sourceLanguage, setSourceLanguage] = useState("japanese")
   const [targetLanguage, setTargetLanguage] = useState("indonesian")
@@ -100,9 +65,11 @@ export default function Page() {
     }
   }, [isDarkMode])
 
-  const updateSubtitle = useCallback((index: number, field: keyof Subtitle, value: string | number) => {
-    setSubtitles(prevSubtitles =>
-      prevSubtitles.map((subtitle) => (subtitle.index === index ? { ...subtitle, [field]: value } : subtitle))
+  const updateSubtitle: UpdateSubtitle = useCallback((index, field, value) => {
+    setSubtitles((prevSubtitles) =>
+      prevSubtitles.map((subtitle) =>
+        subtitle.index === index ? { ...subtitle, [field]: value } : subtitle
+      )
     )
   }, [])
 
@@ -193,22 +160,9 @@ export default function Page() {
 
     try {
       const text = await file.text()
-      // Basic SRT parsing
+      // TODO
       const subtitleBlocks = text.trim().split("\n\n")
-      const parsedSubtitles: Subtitle[] = subtitleBlocks.map((block) => {
-        const lines = block.split("\n")
-        const index = Number.parseInt(lines[0])
-        const [startTime, endTime] = lines[1].split(" --> ")
-        const content = lines.slice(2).join("\n")
-
-        return {
-          index,
-          startTime: startTime.trim(),
-          endTime: endTime.trim(),
-          content: content.trim(),
-          translated: "",
-        }
-      })
+      const parsedSubtitles: SubtitleTranslated[] = []
 
       setSubtitles(parsedSubtitles)
       setTitle(file.name.replace(".srt", ""))
