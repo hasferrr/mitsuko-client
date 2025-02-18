@@ -23,11 +23,8 @@ interface Subtitle {
 }
 
 export default function Page() {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(true)
   const [title, setTitle] = useState("Blue.Box.S01E19")
-  const [temperature, setTemperature] = useState(0.6)
-  const [prompt, setPrompt] = useState("")
-  const [contextDocument, setContextDocument] = useState("")
   const [subtitles, setSubtitles] = useState<Subtitle[]>([
     {
       index: 1,
@@ -50,14 +47,34 @@ export default function Page() {
       content: "(生徒C)上げるぞ",
       translated: "(Siswa C) Ayo angkat!",
     },
+    {
+      index: 4,
+      startTime: "00:00:29,404",
+      endTime: "00:00:30,447",
+      content: "(生徒たち)せ~の!",
+      translated: "",
+    },
+    {
+      index: 5,
+      startTime: "00:00:44,419",
+      endTime: "00:00:45,587",
+      content: "(クラスメイトたち)わあ...",
+      translated: "",
+    },
   ])
-  const [apiKey, setApiKey] = useState("")
-  const [splitSize, setSplitSize] = useState(500)
-  const [useCustomModel, setUseCustomModel] = useState(false)
-  const [customBaseUrl, setCustomBaseUrl] = useState("")
-  const [customModel, setCustomModel] = useState("")
+
   const [sourceLanguage, setSourceLanguage] = useState("japanese")
   const [targetLanguage, setTargetLanguage] = useState("indonesian")
+  const [useCustomModel, setUseCustomModel] = useState(false)
+  const [apiKey, setApiKey] = useState("")
+  const [customBaseUrl, setCustomBaseUrl] = useState("")
+  const [customModel, setCustomModel] = useState("")
+  const [contextDocument, setContextDocument] = useState("")
+
+  const [temperature, setTemperature] = useState(0.6)
+  const [splitSize, setSplitSize] = useState(500)
+  const [prompt, setPrompt] = useState("")
+
   const [isTranslating, setIsTranslating] = useState(false)
   const [response, setResponse] = useState("")
   const [activeTab, setActiveTab] = useState("basic")
@@ -157,8 +174,8 @@ export default function Page() {
       <div className="min-h-screen bg-background text-foreground">
         <Navbar isDarkMode={isDarkMode} onThemeToggle={() => setIsDarkMode(!isDarkMode)} />
 
-        <div className="container mx-auto py-8 px-4">
-          <div className="flex flex-col gap-6 max-w-5xl mx-auto">
+        <div className="container mx-auto py-4 px-4">
+          <div className="flex flex-col gap-4 max-w-5xl mx-auto">
             {/* Header */}
             <div className="flex items-center gap-4 mb-2">
               <div className="flex-1">
@@ -188,11 +205,11 @@ export default function Page() {
                   <div className="flex-1" />
                 </div>
 
-                <ScrollArea className="max-h-[500px] pr-4">
+                <ScrollArea className="h-[500px] pr-4">
                   <div className="space-y-4">
                     {subtitles.map((subtitle) => (
                       <Card
-                        key={subtitle.index}
+                        key={subtitle.index + '-' + subtitle.startTime}
                         className="border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow"
                       >
                         <CardContent className="p-4">
