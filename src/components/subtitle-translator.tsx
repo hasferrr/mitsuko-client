@@ -18,104 +18,22 @@ import {
   SystemPromptInput,
   ProcessOutput,
 } from "./settings-inputs"
-import { ASSParseOutput, Subtitle, SubtitleMinimal, SubtitleTranslated, UpdateSubtitle } from "@/types/types"
-import { initialSubtitles } from "@/lib/dummy"
+import { ASSParseOutput, Subtitle, SubtitleMinimal, SubtitleTranslated } from "@/types/types"
 import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
 import { capitalizeWords } from "@/lib/utils"
 import { parseTranslationJson } from "@/lib/parser"
-import { create } from 'zustand'
+import { useSubtitleStore } from "@/stores/useSubtitleStore"
+import { useSettingsStore } from "@/stores/useSettingsStore"
+import { useAdvancedSettingsStore } from "@/stores/useAdvancedSettingsStore"
 
 
 interface Parsed {
   type: "srt" | "ass"
   data: ASSParseOutput | null
 }
-
-// --- Subtitle Store ---
-interface SubtitleStore {
-  title: string
-  subtitles: SubtitleTranslated[]
-  setTitle: (title: string) => void
-  setSubtitles: (subtitles: SubtitleTranslated[]) => void
-  updateSubtitle: UpdateSubtitle
-}
-
-const useSubtitleStore = create<SubtitleStore>()(
-  (set, get) => ({
-    title: "Blue.Box.S01E19",
-    subtitles: initialSubtitles,
-    setTitle: (title) => set({ title }),
-    setSubtitles: (subtitles) => set({ subtitles }),
-    updateSubtitle: (index, field, value) => {
-      const updatedSubtitles = get().subtitles.map((subtitle) =>
-        subtitle.index === index ? { ...subtitle, [field]: value } : subtitle
-      )
-      set({ subtitles: updatedSubtitles })
-    },
-  })
-)
-
-// --- Settings Store ---
-interface SettingsStore {
-  sourceLanguage: string
-  targetLanguage: string
-  useCustomModel: boolean
-  apiKey: string
-  customBaseUrl: string
-  customModel: string
-  contextDocument: string
-  setSourceLanguage: (language: string) => void
-  setTargetLanguage: (language: string) => void
-  setUseCustomModel: (value: boolean) => void
-  setApiKey: (key: string) => void
-  setCustomBaseUrl: (url: string) => void
-  setCustomModel: (model: string) => void
-  setContextDocument: (doc: string) => void
-}
-
-const useSettingsStore = create<SettingsStore>()(
-  (set) => ({
-    sourceLanguage: "japanese",
-    targetLanguage: "indonesian",
-    useCustomModel: false,
-    apiKey: "",
-    customBaseUrl: "",
-    customModel: "",
-    contextDocument: "",
-    setSourceLanguage: (language) => set({ sourceLanguage: language }),
-    setTargetLanguage: (language) => set({ targetLanguage: language }),
-    setUseCustomModel: (value) => set({ useCustomModel: value }),
-    setApiKey: (key) => set({ apiKey: key }),
-    setCustomBaseUrl: (url) => set({ customBaseUrl: url }),
-    setCustomModel: (model) => set({ customModel: model }),
-    setContextDocument: (doc) => set({ contextDocument: doc }),
-  })
-)
-
-// --- Advanced Settings Store ---
-interface AdvancedSettingsStore {
-  temperature: number
-  splitSize: number
-  prompt: string
-  setTemperature: (temp: number) => void
-  setSplitSize: (size: number) => void
-  setPrompt: (prompt: string) => void
-}
-
-const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
-  (set) => ({
-    temperature: 0.6,
-    splitSize: 500,
-    prompt: "",
-    setTemperature: (temp) => set({ temperature: temp }),
-    setSplitSize: (size) => set({ splitSize: size }),
-    setPrompt: (prompt) => set({ prompt }),
-  })
-)
-
 
 export default function SubtitleTranslator() {
   // Subtitle Store
