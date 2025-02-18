@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Save, Globe2, Timer, MessageSquare, Play, Square, Download } from "lucide-react"
 import { Navbar } from "./navbar"
+import { Footer } from "./footer"
 
 interface Subtitle {
   index: number
@@ -110,7 +111,7 @@ export default function Page() {
 
     try {
       const requestBody = {
-        subtitles: subtitles.map(s => ({
+        subtitles: subtitles.map((s) => ({
           index: s.index,
           actor: "",
           content: s.content,
@@ -125,17 +126,17 @@ export default function Page() {
         contextMessage: [],
       }
 
-      const res = await fetch('http://localhost:4000/api/stream/translate', {
-        method: 'POST',
+      const res = await fetch("http://localhost:4000/api/stream/translate", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
         signal: abortControllerRef.current.signal, // Connect to abort signal
       })
 
-      if (!res.ok) throw new Error('Request failed')
+      if (!res.ok) throw new Error("Request failed")
 
       const reader = res.body?.getReader()
       if (!reader) return
@@ -146,16 +147,14 @@ export default function Page() {
         const chunk = new TextDecoder().decode(value)
         setResponse((prev) => prev + chunk)
       }
-
     } catch (error: unknown) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.log('Request aborted')
-        setResponse((prev) => prev + '\n\n[Generation stopped by user]')
+      if (error instanceof Error && error.name === "AbortError") {
+        console.log("Request aborted")
+        setResponse((prev) => prev + "\n\n[Generation stopped by user]")
       } else {
-        console.error('Error:', error)
+        console.error("Error:", error)
         setResponse((prev) => prev + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]`)
       }
-
     } finally {
       setIsTranslating(false)
       abortControllerRef.current = null
@@ -168,13 +167,12 @@ export default function Page() {
     }
   }
 
-
   return (
     <div className={`min-h-screen ${isDarkMode ? "dark" : ""}`}>
       <div className="min-h-screen bg-background text-foreground">
         <Navbar isDarkMode={isDarkMode} onThemeToggle={() => setIsDarkMode(!isDarkMode)} />
 
-        <div className="container mx-auto py-4 px-4">
+        <div className="container mx-auto py-4 px-4 mb-6">
           <div className="flex flex-col gap-4 max-w-5xl mx-auto">
             {/* Header */}
             <div className="flex items-center gap-4 mb-2">
@@ -209,7 +207,7 @@ export default function Page() {
                   <div className="space-y-4">
                     {subtitles.map((subtitle) => (
                       <Card
-                        key={subtitle.index + '-' + subtitle.startTime}
+                        key={subtitle.index + "-" + subtitle.startTime}
                         className="border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow"
                       >
                         <CardContent className="p-4">
@@ -255,11 +253,7 @@ export default function Page() {
                   </div>
                 </ScrollArea>
                 <div className="grid grid-cols-2 gap-4 mt-4">
-                  <Button
-                    className="gap-2"
-                    onClick={handleStartTranslation}
-                    disabled={isTranslating}
-                  >
+                  <Button className="gap-2" onClick={handleStartTranslation} disabled={isTranslating}>
                     {isTranslating ? (
                       <>
                         <span className="loading loading-spinner loading-xs"></span>
@@ -272,12 +266,7 @@ export default function Page() {
                       </>
                     )}
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="gap-2"
-                    onClick={handleStopTranslation}
-                    disabled={!isTranslating}
-                  >
+                  <Button variant="outline" className="gap-2" onClick={handleStopTranslation} disabled={!isTranslating}>
                     <Square className="h-4 w-4" />
                     Stop
                   </Button>
@@ -465,6 +454,8 @@ export default function Page() {
             </div>
           </div>
         </div>
+
+        <Footer />
       </div>
     </div>
   )
