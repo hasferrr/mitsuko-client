@@ -6,18 +6,16 @@ export const useBeforeUnload = () => {
   const setHasChanges = useUnsavedChangesStore((state) => state.setHasChanges)
 
   useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (hasChanges) event.preventDefault()
+    const handler = (event: BeforeUnloadEvent) => {
+      if (hasChanges) {
+        event.preventDefault()
+        event.returnValue = ""
+      }
     }
-    if (hasChanges) {
-      window.addEventListener("beforeunload", handleBeforeUnload)
-    } else {
-      window.removeEventListener("beforeunload", handleBeforeUnload)
-    }
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload)
-    }
+
+    window.addEventListener("beforeunload", handler)
+    return () => window.removeEventListener("beforeunload", handler)
   }, [hasChanges])
 
-  return setHasChanges
+  return { setHasChanges }
 }

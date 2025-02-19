@@ -10,6 +10,7 @@ import { SubtitleMinimal } from "@/types/types"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
+import { useBeforeUnload } from "@/hooks/use-before-unload"
 
 interface ProcessOutputProps {
   response: string
@@ -117,8 +118,10 @@ export const ModelSelection = memo(() => {
 export const ContextDocumentInput = memo(() => {
   const contextDocument = useSettingsStore((state) => state.contextDocument)
   const setContextDocument = useSettingsStore((state) => state.setContextDocument)
+  const { setHasChanges } = useBeforeUnload()
 
   const handleContextDocumentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setHasChanges(true)
     setContextDocument(e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
@@ -185,8 +188,10 @@ export const SplitSizeInput = memo(() => {
 export const SystemPromptInput = memo(() => {
   const prompt = useAdvancedSettingsStore((state) => state.prompt)
   const setPrompt = useAdvancedSettingsStore((state) => state.setPrompt)
+  const { setHasChanges } = useBeforeUnload()
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setHasChanges(true)
     setPrompt(e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`

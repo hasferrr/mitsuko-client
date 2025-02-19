@@ -66,7 +66,7 @@ export default function SubtitleTranslator() {
 
   const abortControllerRef = useRef<AbortController | null>(null)
 
-  const setHasChanges = useBeforeUnload()
+  const { setHasChanges } = useBeforeUnload()
 
   // Load data from localStorage on component mount
   useEffect(() => {

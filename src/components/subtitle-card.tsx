@@ -1,10 +1,13 @@
-import { memo, useRef } from "react"
+"use client"
+
+import React, { memo, useRef } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Timer } from "lucide-react"
 import { SubtitleTranslated } from "@/types/types"
 import { timestampToString } from "@/lib/utils"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
+import { useBeforeUnload } from "@/hooks/use-before-unload"
 
 interface SubtitleCardProps {
   subtitle: SubtitleTranslated
@@ -15,18 +18,12 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
   const translatedRef = useRef<HTMLTextAreaElement | null>(null)
   const updateSubtitle = useSubtitleStore((state) => state.updateSubtitle)
 
-  const contentUpdate = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    handleResize(e)
-    if (contentRef.current) {
-      updateSubtitle(subtitle.index, "content", contentRef.current.value)
-    }
-  }
+  const { setHasChanges } = useBeforeUnload()
 
-  const translatedUpdate = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const subtitleUpdate = (e: React.ChangeEvent<HTMLTextAreaElement>, field: keyof SubtitleTranslated) => {
+    setHasChanges(true)
     handleResize(e)
-    if (translatedRef.current) {
-      updateSubtitle(subtitle.index, "translated", translatedRef.current.value)
-    }
+    updateSubtitle(subtitle.index, field, e.target.value)
   }
 
   const handleResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -59,7 +56,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
               ref={contentRef}
               value={subtitle.content}
               onFocus={handleResize}
-              onChange={contentUpdate}
+              onChange={(e) => subtitleUpdate(e, "content")}
               placeholder="Original text"
               className="min-h-[36px] h-[36px] max-h-[120px] bg-muted/50 dark:bg-muted/30 resize-none overflow-y-hidden"
               rows={1}
@@ -68,7 +65,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
               ref={translatedRef}
               value={subtitle.translated}
               onFocus={handleResize}
-              onChange={translatedUpdate}
+              onChange={(e) => subtitleUpdate(e, "translated")}
               placeholder="Translated text"
               className="min-h-[36px] h-[36px] max-h-[120px] resize-none overflow-y-hidden"
               rows={1}
