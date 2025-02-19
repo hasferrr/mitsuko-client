@@ -17,11 +17,15 @@ export const useSubtitleStore = create<SubtitleStore>()(
     setTitle: (title) => set({ title }),
     setSubtitles: (subtitles) => set({ subtitles }),
     updateSubtitle: (index, field, value) => {
-      const updatedSubtitles = get().subtitles.map((subtitle) =>
-        subtitle.index === index ? { ...subtitle, [field]: value } : subtitle
-      )
-      set({ subtitles: updatedSubtitles })
+      set((state) => {
+        const i = index - 1
+        const updatedSubtitles = [...state.subtitles]
+        updatedSubtitles[i] = {
+          ...updatedSubtitles[i],
+          [field]: value,
+        }
+        return { subtitles: updatedSubtitles }
+      })
     },
   })
 )
-
