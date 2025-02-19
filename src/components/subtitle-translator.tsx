@@ -26,10 +26,10 @@ import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
 import { capitalizeWords } from "@/lib/utils"
 import { parseTranslationJson } from "@/lib/parser"
-import { useSubtitleStore } from "@/stores/useSubtitleStore"
-import { useSettingsStore } from "@/stores/useSettingsStore"
-import { useAdvancedSettingsStore } from "@/stores/useAdvancedSettingsStore"
-import { useBeforeUnload } from "@/hooks/useBeforeUnload"
+import { useSubtitleStore } from "@/stores/use-subtitle-store"
+import { useSettingsStore } from "@/stores/use-settings-store"
+import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
+import { useBeforeUnload } from "@/hooks/use-before-unload"
 
 
 interface Parsed {

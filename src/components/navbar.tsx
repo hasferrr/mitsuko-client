@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { LogIn, Moon, Sun } from "lucide-react"
-import { useThemeStore } from "@/stores/useThemeStore"
+import { useThemeStore } from "@/stores/use-theme-store"
 
 export function Navbar() {
   const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)

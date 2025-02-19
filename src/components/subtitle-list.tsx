@@ -1,7 +1,7 @@
 import { memo } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { SubtitleCard } from "./subtitle-card"
-import { useSubtitleStore } from "@/stores/useSubtitleStore"
+import { useSubtitleStore } from "@/stores/use-subtitle-store"
 
 export const SubtitleList = memo(() => {
   const subtitles = useSubtitleStore((state) => state.subtitles)

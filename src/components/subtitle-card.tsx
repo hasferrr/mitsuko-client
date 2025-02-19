@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Timer } from "lucide-react"
 import { SubtitleTranslated } from "@/types/types"
 import { timestampToString } from "@/lib/utils"
-import { useSubtitleStore } from "@/stores/useSubtitleStore"
+import { useSubtitleStore } from "@/stores/use-subtitle-store"
 
 interface SubtitleCardProps {
   subtitle: SubtitleTranslated

@@ -7,8 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { SubtitleMinimal } from "@/types/types"
-import { useSettingsStore } from "@/stores/useSettingsStore"
-import { useAdvancedSettingsStore } from "@/stores/useAdvancedSettingsStore"
+import { useSettingsStore } from "@/stores/use-settings-store"
+import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 
 interface ProcessOutputProps {
   response: string
