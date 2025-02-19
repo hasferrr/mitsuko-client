@@ -1,6 +1,6 @@
 "use client"
 
-import { memo, useState, useRef, useCallback, useEffect } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -15,6 +15,7 @@ import { isASS, isSRT, removeTimestamp } from "@/lib/ass/subtitle-utils"
 import { parseASS } from "@/lib/ass/parse"
 import { parseSRT } from "@/lib/srt/parse"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
+import { useSettingsStore } from "@/stores/use-settings-store"
 
 
 interface FileItem {
@@ -23,16 +24,7 @@ interface FileItem {
   content: string
 }
 
-interface ModelSettings {
-  apiKey: string
-  customBaseUrl: string
-  customModel: string
-  useCustomModel: boolean
-}
-
-interface ContextExtractorProps { }
-
-export const ContextExtractor = memo(({ }: ContextExtractorProps) => {
+export const ContextExtractor = () => {
   const [episodeNumber, setEpisodeNumber] = useState("")
   const [subtitleContent, setSubtitleContent] = useState("")
   const [previousContext, setPreviousContext] = useState("")
@@ -40,29 +32,35 @@ export const ContextExtractor = memo(({ }: ContextExtractorProps) => {
   const [isBatchMode, setIsBatchMode] = useState(false)
   const [contextResult, setContextResult] = useState("")
   const [isExtracting, setIsExtracting] = useState(false)
-
-  const [useCustomModel, setUseCustomModel] = useState(false)
-  const [apiKey, setApiKey] = useState("")
-  const [customBaseUrl, setCustomBaseUrl] = useState("")
-  const [customModel, setCustomModel] = useState("")
   const [activeTab, setActiveTab] = useState("result")
+
+  // Get state and setters from useSettingsStore
+  const useCustomModel = useSettingsStore((state) => state.useCustomModel)
+  const setUseCustomModel = useSettingsStore((state) => state.setUseCustomModel)
+  const apiKey = useSettingsStore((state) => state.apiKey)
+  const setApiKey = useSettingsStore((state) => state.setApiKey)
+  const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
+  const setCustomBaseUrl = useSettingsStore((state) => state.setCustomBaseUrl)
+  const customModel = useSettingsStore((state) => state.customModel)
+  const setCustomModel = useSettingsStore((state) => state.setCustomModel)
 
   const abortControllerRef = useRef<AbortController | null>(null)
   const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
 
   useAutoScroll(contextResult, contextResultRef)
 
-  // Load model settings from local storage on component mount
+  // Load data from localStorage on component mount
   useEffect(() => {
-    const savedSettings = localStorage.getItem("modelSettings")
-    if (savedSettings) {
-      const { apiKey, customBaseUrl, customModel, useCustomModel }: ModelSettings = JSON.parse(savedSettings)
-      setApiKey(apiKey)
-      setCustomBaseUrl(customBaseUrl)
-      setCustomModel(customModel)
-      setUseCustomModel(useCustomModel)
+    const loadSettingsData = () => {
+      const storedSettingsData = localStorage.getItem('settings-storage')
+      if (storedSettingsData) {
+        const parsedData = JSON.parse(storedSettingsData)
+        useSettingsStore.setState(parsedData) // Use setState to merge
+      }
     }
-  }, [])
+
+    loadSettingsData()
+  }, []) // Empty dependency array ensures this runs only once on mount
 
   const handleSubtitleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setSubtitleContent(e.target.value)
@@ -127,6 +125,15 @@ export const ContextExtractor = memo(({ }: ContextExtractorProps) => {
     setContextResult("")
 
     abortControllerRef.current = new AbortController()
+
+    setActiveTab("result")
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, 300)
 
     let buffer = ""
 
@@ -202,7 +209,10 @@ export const ContextExtractor = memo(({ }: ContextExtractorProps) => {
   }
 
   const handleSaveToFile = () => {
-    const blob = new Blob([contextResult], { type: "text/plain" })
+    const text = contextResult.trim()
+    if (!text) return
+
+    const blob = new Blob([text], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
@@ -212,53 +222,6 @@ export const ContextExtractor = memo(({ }: ContextExtractorProps) => {
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
-
-  const ModelSelection = useCallback(() => {
-    return (
-      <>
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Model</label>
-          <Select defaultValue="deepseek" disabled={useCustomModel}>
-            <SelectTrigger className="bg-background dark:bg-muted/30">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="deepseek">DeepSeek-R1</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Switch id="custom-model" checked={useCustomModel} onCheckedChange={setUseCustomModel} />
-          <label htmlFor="custom-model" className="text-sm font-medium">
-            Use Custom Model
-          </label>
-        </div>
-        {useCustomModel && (
-          <div className="space-y-4 pt-2">
-            <Input
-              value={customBaseUrl}
-              onChange={(e) => setCustomBaseUrl(e.target.value)}
-              placeholder="Base URL"
-              className="bg-background dark:bg-muted/30"
-            />
-            <Input
-              value={customModel}
-              onChange={(e) => setCustomModel(e.target.value)}
-              placeholder="Model Name"
-              className="bg-background dark:bg-muted/30"
-            />
-            <Input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="API Key"
-              className="bg-background dark:bg-muted/30"
-            />
-          </div>
-        )}
-      </>
-    )
-  }, [apiKey, customBaseUrl, customModel, useCustomModel, setApiKey, setCustomBaseUrl, setCustomModel, setUseCustomModel])
 
   return (
     <div className="grid lg:grid-cols-2 gap-6 container mx-auto py-4 px-4 mt-2 mb-6 max-w-5xl">
@@ -359,7 +322,49 @@ export const ContextExtractor = memo(({ }: ContextExtractorProps) => {
           <TabsContent value="settings" className="flex-grow space-y-4 mt-4">
             <Card className="border border-border bg-card text-card-foreground">
               <CardContent className="p-4 space-y-4">
-                <ModelSelection />
+
+                {/** Model Selection */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Model</label>
+                  <Select defaultValue="deepseek" disabled={useCustomModel}>
+                    <SelectTrigger className="bg-background dark:bg-muted/30">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="deepseek">DeepSeek-R1</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch id="custom-model" checked={useCustomModel} onCheckedChange={setUseCustomModel} />
+                  <label htmlFor="custom-model" className="text-sm font-medium">
+                    Use Custom Model
+                  </label>
+                </div>
+                {useCustomModel && (
+                  <div className="space-y-4 pt-2">
+                    <Input
+                      value={customBaseUrl}
+                      onChange={(e) => setCustomBaseUrl(e.target.value)}
+                      placeholder="Base URL"
+                      className="bg-background dark:bg-muted/30"
+                    />
+                    <Input
+                      value={customModel}
+                      onChange={(e) => setCustomModel(e.target.value)}
+                      placeholder="Model Name"
+                      className="bg-background dark:bg-muted/30"
+                    />
+                    <Input
+                      type="password"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      placeholder="API Key"
+                      className="bg-background dark:bg-muted/30"
+                    />
+                  </div>
+                )}
+
               </CardContent>
             </Card>
           </TabsContent>
@@ -389,7 +394,7 @@ export const ContextExtractor = memo(({ }: ContextExtractorProps) => {
           ) : (
             <>
               <Play className="h-4 w-4" />
-              Start Extraction
+              {isBatchMode ? "Coming Soon" : "Start Extraction"}
             </>
           )}
         </Button>
@@ -405,11 +410,11 @@ export const ContextExtractor = memo(({ }: ContextExtractorProps) => {
           </label>
         </div>
 
-        <Button variant="secondary" className="gap-2" onClick={handleSaveToFile}>
+        <Button variant="outline" className="gap-2" onClick={handleSaveToFile}>
           <Save className="h-4 w-4" />
           Save to File
         </Button>
       </div>
     </div>
   )
-})
+}
