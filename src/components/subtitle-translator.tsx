@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
+import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -176,6 +177,8 @@ export default function SubtitleTranslator() {
         buffer += chunk
         setResponse(buffer)
       }
+      handleSaveProject()
+
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "AbortError") {
         console.log("Request aborted")
@@ -279,31 +282,37 @@ export default function SubtitleTranslator() {
 
 
   const handleSaveProject = () => {
-    // Save Subtitle Store
-    localStorage.setItem('subtitle-storage', JSON.stringify({
-      title: useSubtitleStore.getState().title,
-      subtitles: useSubtitleStore.getState().subtitles,
-    }))
+    try {
+      // Save Subtitle Store
+      localStorage.setItem('subtitle-storage', JSON.stringify({
+        title: useSubtitleStore.getState().title,
+        subtitles: useSubtitleStore.getState().subtitles,
+      }))
 
-    // Save Settings Store
-    localStorage.setItem('settings-storage', JSON.stringify({
-      sourceLanguage: useSettingsStore.getState().sourceLanguage,
-      targetLanguage: useSettingsStore.getState().targetLanguage,
-      useCustomModel: useSettingsStore.getState().useCustomModel,
-      apiKey: useSettingsStore.getState().apiKey,
-      customBaseUrl: useSettingsStore.getState().customBaseUrl,
-      customModel: useSettingsStore.getState().customModel,
-      contextDocument: useSettingsStore.getState().contextDocument,
-    }))
+      // Save Settings Store
+      localStorage.setItem('settings-storage', JSON.stringify({
+        sourceLanguage: useSettingsStore.getState().sourceLanguage,
+        targetLanguage: useSettingsStore.getState().targetLanguage,
+        useCustomModel: useSettingsStore.getState().useCustomModel,
+        apiKey: useSettingsStore.getState().apiKey,
+        customBaseUrl: useSettingsStore.getState().customBaseUrl,
+        customModel: useSettingsStore.getState().customModel,
+        contextDocument: useSettingsStore.getState().contextDocument,
+      }))
 
-    // Save Advanced Settings Store
-    localStorage.setItem('advanced-settings', JSON.stringify({
-      temperature: useAdvancedSettingsStore.getState().temperature,
-      splitSize: useAdvancedSettingsStore.getState().splitSize,
-      prompt: useAdvancedSettingsStore.getState().prompt,
-    }))
+      // Save Advanced Settings Store
+      localStorage.setItem('advanced-settings', JSON.stringify({
+        temperature: useAdvancedSettingsStore.getState().temperature,
+        splitSize: useAdvancedSettingsStore.getState().splitSize,
+        prompt: useAdvancedSettingsStore.getState().prompt,
+      }))
 
-    console.log("Project Saved!")
+      toast.success("Project saved successfully!") // Success notification
+      hasChanges.current = false
+    } catch (error) {
+      console.error("Error saving project:", error)
+      toast.error("Failed to save project.") // Error notification
+    }
   }
 
   return (

@@ -1,5 +1,6 @@
 "use client"
 
+import { Toaster } from "sonner"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 import { useThemeStore } from "@/stores/useThemeStore"
@@ -12,6 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Navbar />
       {children}
       <Footer />
+      <Toaster />
     </div>
   )
 }
