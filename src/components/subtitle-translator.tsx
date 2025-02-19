@@ -197,7 +197,9 @@ export default function SubtitleTranslator() {
       }))
 
       setSubtitles(parsedSubtitles)
-      setTitle(file.name)
+      const fileName = file.name.split('.')
+      fileName.pop()
+      setTitle(fileName.join('.'))
     } catch (error) {
       console.error("Error parsing subtitle file:", error)
     }

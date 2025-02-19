@@ -15,6 +15,7 @@ import { isASS, isSRT, removeTimestamp } from "@/lib/ass/subtitle-utils"
 import { parseASS } from "@/lib/ass/parse"
 import { parseSRT } from "@/lib/srt/parse"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
+import { useBeforeUnload } from "@/hooks/use-before-unload"
 import { useSettingsStore } from "@/stores/use-settings-store"
 
 
@@ -47,15 +48,18 @@ export const ContextExtractor = () => {
   const abortControllerRef = useRef<AbortController | null>(null)
   const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
 
+  const { setHasChanges } = useBeforeUnload()
   useAutoScroll(contextResult, contextResultRef)
 
   const handleSubtitleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setHasChanges(true)
     setSubtitleContent(e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
   }, [])
 
   const handlePreviousContextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setHasChanges(true)
     setPreviousContext(e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
@@ -64,6 +68,7 @@ export const ContextExtractor = () => {
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (!files) return
+    setHasChanges(true)
 
     const newFiles: FileItem[] = []
     for (let i = 0; i < files.length; i++) {
@@ -110,6 +115,7 @@ export const ContextExtractor = () => {
     if (isExtracting) return
     setIsExtracting(true)
     setContextResult("")
+    setHasChanges(true)
 
     abortControllerRef.current = new AbortController()
 
