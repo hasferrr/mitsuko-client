@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useCallback, useEffect } from "react"
+import { useState, useRef, useCallback } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -48,19 +48,6 @@ export const ContextExtractor = () => {
   const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
 
   useAutoScroll(contextResult, contextResultRef)
-
-  // Load data from localStorage on component mount
-  useEffect(() => {
-    const loadSettingsData = () => {
-      const storedSettingsData = localStorage.getItem('settings-storage')
-      if (storedSettingsData) {
-        const parsedData = JSON.parse(storedSettingsData)
-        useSettingsStore.setState(parsedData) // Use setState to merge
-      }
-    }
-
-    loadSettingsData()
-  }, []) // Empty dependency array ensures this runs only once on mount
 
   const handleSubtitleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setSubtitleContent(e.target.value)

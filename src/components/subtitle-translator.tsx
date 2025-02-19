@@ -1,8 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useEffect, useRef } from "react"
-import { toast } from "sonner"
+import { useState, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -67,37 +66,6 @@ export default function SubtitleTranslator() {
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const { setHasChanges } = useBeforeUnload()
-
-  // Load data from localStorage on component mount
-  useEffect(() => {
-    const loadSubtitleData = () => {
-      const storedSubtitleData = localStorage.getItem('subtitle-storage')
-      if (storedSubtitleData) {
-        const parsedData = JSON.parse(storedSubtitleData)
-        useSubtitleStore.setState(parsedData) // Use setState to merge
-      }
-    }
-
-    const loadSettingsData = () => {
-      const storedSettingsData = localStorage.getItem('settings-storage')
-      if (storedSettingsData) {
-        const parsedData = JSON.parse(storedSettingsData)
-        useSettingsStore.setState(parsedData) // Use setState to merge
-      }
-    }
-
-    const loadAdvancedSettingsData = () => {
-      const storedAdvancedSettingsData = localStorage.getItem('advanced-settings')
-      if (storedAdvancedSettingsData) {
-        const parsedData = JSON.parse(storedAdvancedSettingsData)
-        useAdvancedSettingsStore.setState(parsedData) // Use setState to merge
-      }
-    }
-
-    loadSubtitleData()
-    loadSettingsData()
-    loadAdvancedSettingsData()
-  }, []) // Empty dependency array ensures this runs only once on mount
 
   const handleStartTranslation = async () => {
     if (isTranslating) return
@@ -267,41 +235,7 @@ export default function SubtitleTranslator() {
     URL.revokeObjectURL(url)
   }
 
-
-  const handleSaveProject = () => {
-    try {
-      // Save Subtitle Store
-      localStorage.setItem('subtitle-storage', JSON.stringify({
-        title: useSubtitleStore.getState().title,
-        subtitles: useSubtitleStore.getState().subtitles,
-      }))
-
-      // Save Settings Store
-      localStorage.setItem('settings-storage', JSON.stringify({
-        sourceLanguage: useSettingsStore.getState().sourceLanguage,
-        targetLanguage: useSettingsStore.getState().targetLanguage,
-        useCustomModel: useSettingsStore.getState().useCustomModel,
-        apiKey: useSettingsStore.getState().apiKey,
-        customBaseUrl: useSettingsStore.getState().customBaseUrl,
-        customModel: useSettingsStore.getState().customModel,
-        contextDocument: useSettingsStore.getState().contextDocument,
-      }))
-
-      // Save Advanced Settings Store
-      localStorage.setItem('advanced-settings', JSON.stringify({
-        temperature: useAdvancedSettingsStore.getState().temperature,
-        splitSize: useAdvancedSettingsStore.getState().splitSize,
-        prompt: useAdvancedSettingsStore.getState().prompt,
-      }))
-
-      toast.success("Project saved successfully!") // Success notification
-      setHasChanges(false)
-
-    } catch (error) {
-      console.error("Error saving project:", error)
-      toast.error("Failed to save project.") // Error notification
-    }
-  }
+  const handleSaveProject = () => { }
 
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
@@ -324,7 +258,7 @@ export default function SubtitleTranslator() {
           <Upload className="h-5 w-5" />
           Upload File
         </Button>
-        <Button onClick={handleSaveProject} size="lg" className="gap-2">
+        <Button onClick={handleSaveProject} size="lg" className="gap-2" disabled>
           <Save className="h-5 w-5" />
           Save Project
         </Button>
