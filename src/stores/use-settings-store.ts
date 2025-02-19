@@ -16,7 +16,6 @@ interface SettingsStore {
   setCustomBaseUrl: (url: string) => void
   setCustomModel: (model: string) => void
   setContextDocument: (doc: string) => void
-  hydrateStore: () => void
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -36,13 +35,6 @@ export const useSettingsStore = create<SettingsStore>()(
       setCustomBaseUrl: (url) => set({ customBaseUrl: url }),
       setCustomModel: (model) => set({ customModel: model }),
       setContextDocument: (doc) => set({ contextDocument: doc }),
-      hydrateStore: () => {
-        const storedSettingsData = localStorage.getItem('settings-storage');
-        if (storedSettingsData) {
-          const parsedData = JSON.parse(storedSettingsData);
-          set(parsedData)
-        }
-      },
     }),
     {
       name: 'settings-storage',

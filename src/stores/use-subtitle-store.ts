@@ -9,12 +9,11 @@ interface SubtitleStore {
   setTitle: (title: string) => void
   setSubtitles: (subtitles: SubtitleTranslated[]) => void
   updateSubtitle: UpdateSubtitle
-  hydrateStore: () => void
 }
 
 export const useSubtitleStore = create<SubtitleStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       title: "Blue.Box.S01E19",
       subtitles: initialSubtitles,
       setTitle: (title) => set({ title }),
@@ -29,13 +28,6 @@ export const useSubtitleStore = create<SubtitleStore>()(
           }
           return { subtitles: updatedSubtitles }
         })
-      },
-      hydrateStore: () => {
-        const storedSubtitleData = localStorage.getItem('subtitle-storage');
-        if (storedSubtitleData) {
-          const parsedData = JSON.parse(storedSubtitleData);
-          set(parsedData)
-        }
       }
     }),
     {
