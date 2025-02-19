@@ -14,6 +14,7 @@ import { Subtitle, SubtitleNoTime } from "@/types/types"
 import { isASS, isSRT, removeTimestamp } from "@/lib/ass/subtitle-utils"
 import { parseASS } from "@/lib/ass/parse"
 import { parseSRT } from "@/lib/srt/parse"
+import { useAutoScroll } from "@/hooks/use-auto-scroll"
 
 
 interface FileItem {
@@ -46,9 +47,10 @@ export const ContextExtractor = memo(({ }: ContextExtractorProps) => {
   const [customModel, setCustomModel] = useState("")
   const [activeTab, setActiveTab] = useState("result")
 
-
   const abortControllerRef = useRef<AbortController | null>(null)
   const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
+
+  useAutoScroll(contextResult, contextResultRef)
 
   // Load model settings from local storage on component mount
   useEffect(() => {
