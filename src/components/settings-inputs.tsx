@@ -1,6 +1,6 @@
 "use client"
 
-import { memo } from "react"
+import { memo, useEffect, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -12,7 +12,6 @@ import { useAdvancedSettingsStore } from "@/stores/useAdvancedSettingsStore"
 
 interface ProcessOutputProps {
   response: string
-  textareaRef: React.RefObject<HTMLTextAreaElement | null>
   jsonResponse: SubtitleMinimal[]
 }
 
@@ -207,7 +206,19 @@ export const SystemPromptInput = memo(() => {
   )
 })
 
-export const ProcessOutput = memo(({ response, textareaRef, jsonResponse }: ProcessOutputProps) => {
+export const ProcessOutput = memo(({ response, jsonResponse }: ProcessOutputProps) => {
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = textareaRef.current
+      const isAtBottom = scrollHeight - scrollTop <= clientHeight + 100
+
+      if (isAtBottom) {
+        textareaRef.current.scrollTop = scrollHeight
+      }
+    }
+  }, [response])
 
   return (
     <div className="space-y-4">

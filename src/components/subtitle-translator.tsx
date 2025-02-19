@@ -64,7 +64,6 @@ export default function SubtitleTranslator() {
 
   const hasChanges = useRef(false)
   const abortControllerRef = useRef<AbortController | null>(null)
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   // Load data from localStorage on component mount
   useEffect(() => {
@@ -111,18 +110,6 @@ export default function SubtitleTranslator() {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
   }, [hasChanges.current])
-
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = textareaRef.current
-      const isAtBottom = scrollHeight - scrollTop <= clientHeight + 100
-
-      if (isAtBottom) {
-        textareaRef.current.scrollTop = scrollHeight
-      }
-    }
-  }, [response])
 
   const handleStartTranslation = async () => {
     if (isTranslating) return
@@ -435,7 +422,6 @@ export default function SubtitleTranslator() {
             <TabsContent value="process" className="flex-grow space-y-4 mt-4">
               <ProcessOutput
                 response={response}
-                textareaRef={textareaRef}
                 jsonResponse={jsonResponse}
               />
             </TabsContent>
