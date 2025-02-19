@@ -17,6 +17,8 @@ import { parseSRT } from "@/lib/srt/parse"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
 import { useSettingsStore } from "@/stores/use-settings-store"
+import { useExtractionStore } from "@/stores/use-extraction-store"
+import { useExtractionInputStore } from "@/stores/use-extraction-input-store"
 
 
 interface FileItem {
@@ -26,13 +28,6 @@ interface FileItem {
 }
 
 export const ContextExtractor = () => {
-  const [episodeNumber, setEpisodeNumber] = useState("")
-  const [subtitleContent, setSubtitleContent] = useState("")
-  const [previousContext, setPreviousContext] = useState("")
-  const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([])
-  const [isBatchMode, setIsBatchMode] = useState(false)
-  const [contextResult, setContextResult] = useState("")
-  const [isExtracting, setIsExtracting] = useState(false)
   const [activeTab, setActiveTab] = useState("result")
 
   // Get state and setters from useSettingsStore
@@ -45,25 +40,44 @@ export const ContextExtractor = () => {
   const customModel = useSettingsStore((state) => state.customModel)
   const setCustomModel = useSettingsStore((state) => state.setCustomModel)
 
-  const abortControllerRef = useRef<AbortController | null>(null)
+  // Extraction Store
+  const contextResult = useExtractionStore((state) => state.contextResult)
+  const isExtracting = useExtractionStore((state) => state.isExtracting)
+  const extractContext = useExtractionStore((state) => state.extractContext)
+  const stopExtraction = useExtractionStore((state) => state.stopExtraction)
+
   const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
 
   const { setHasChanges } = useBeforeUnload()
   useAutoScroll(contextResult, contextResultRef)
+
+  const {
+    episodeNumber,
+    subtitleContent,
+    previousContext,
+    selectedFiles,
+    isBatchMode,
+    setEpisodeNumber,
+    setSubtitleContent,
+    setPreviousContext,
+    setSelectedFiles,
+    setIsBatchMode,
+  } = useExtractionInputStore()
+
 
   const handleSubtitleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
     setSubtitleContent(e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
-  }, [])
+  }, [setHasChanges, setSubtitleContent])
 
   const handlePreviousContextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
     setPreviousContext(e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
-  }, [])
+  }, [setHasChanges, setPreviousContext])
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -82,7 +96,7 @@ export const ContextExtractor = () => {
           content: text,
         })
       }
-      setSelectedFiles((prevFiles) => [...prevFiles, ...newFiles])
+      setSelectedFiles([...selectedFiles, ...newFiles])
     } else {
       // Single File Logic (For Subtitle Content)
       const file = files[0]
@@ -101,36 +115,27 @@ export const ContextExtractor = () => {
   }
 
   const removeFile = (id: string) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((file) => file.id !== id))
+    setSelectedFiles(selectedFiles.filter((file) => file.id !== id))
   }
 
   const moveFileUp = (index: number) => {
     if (index > 0) {
-      setSelectedFiles((prevFiles) => {
-        const newFiles = [...prevFiles]
-          ;[newFiles[index - 1], newFiles[index]] = [newFiles[index], newFiles[index - 1]]
-        return newFiles
-      })
+      const newFiles = [...selectedFiles]
+      ;[newFiles[index - 1], newFiles[index]] = [newFiles[index], newFiles[index - 1]]
+      setSelectedFiles(newFiles)
     }
   }
 
   const moveFileDown = (index: number) => {
     if (index < selectedFiles.length - 1) {
-      setSelectedFiles((prevFiles) => {
-        const newFiles = [...prevFiles]
-          ;[newFiles[index + 1], newFiles[index]] = [newFiles[index], newFiles[index + 1]]
-        return newFiles
-      })
+      const newFiles = [...selectedFiles]
+      ;[newFiles[index + 1], newFiles[index]] = [newFiles[index], newFiles[index + 1]]
+      setSelectedFiles(newFiles)
     }
   }
 
   const handleStartExtraction = async () => {
     if (isExtracting) return
-    setIsExtracting(true)
-    setContextResult("")
-    setHasChanges(true)
-
-    abortControllerRef.current = new AbortController()
 
     setActiveTab("result")
 
@@ -141,77 +146,31 @@ export const ContextExtractor = () => {
       })
     }, 300)
 
-    let buffer = ""
 
-    try {
-      let parsed: Subtitle[]
-      if (subtitleContent.trim() === "") {
-        throw new Error("Empty content")
-      } else if (isASS(subtitleContent)) {
-        parsed = parseASS(subtitleContent).subtitles
-      } else if (isSRT(subtitleContent)) {
-        parsed = parseSRT(subtitleContent)
-      } else {
-        throw new Error("Invalid subtitle content")
-      }
-      const subtitles: SubtitleNoTime[] = removeTimestamp(parsed)
-
-      const requestBody = {
-        input: {
-          episode: Number(episodeNumber),
-          subtitles: subtitles,
-          previous_context: previousContext,
-        },
-        baseURL: useCustomModel ? customBaseUrl : undefined,
-        model: useCustomModel ? customModel : "deepseek",
-        maxCompletionTokens: 8192,
-      }
-
-      const res = await fetch("http://localhost:4000/api/stream/extract-context", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-        signal: abortControllerRef.current.signal, // Connect to abort signal
-      })
-
-      if (!res.ok) {
-        const errorData = await res.json()
-        console.error("Error details from server:", errorData)
-        throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error}`)
-      }
-
-      const reader = res.body?.getReader()
-      if (!reader) return
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        const chunk = new TextDecoder().decode(value)
-        buffer += chunk
-        setContextResult(buffer)
-      }
-
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "AbortError") {
-        console.log("Request aborted")
-        setContextResult((prev) => prev + "\n\n[Generation stopped by user]")
-      } else {
-        console.error("Error:", error)
-        setContextResult((prev) => prev + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]`)
-      }
-    } finally {
-      setIsExtracting(false)
-      abortControllerRef.current = null
+    let parsed: Subtitle[]
+    if (subtitleContent.trim() === "") {
+      throw new Error("Empty content")
+    } else if (isASS(subtitleContent)) {
+      parsed = parseASS(subtitleContent).subtitles
+    } else if (isSRT(subtitleContent)) {
+      parsed = parseSRT(subtitleContent)
+    } else {
+      throw new Error("Invalid subtitle content")
     }
-  }
+    const subtitles: SubtitleNoTime[] = removeTimestamp(parsed)
 
-  const handleStopExtraction = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
+    const requestBody = {
+      input: {
+        episode: Number(episodeNumber),
+        subtitles: subtitles,
+        previous_context: previousContext,
+      },
+      baseURL: useCustomModel ? customBaseUrl : undefined,
+      model: useCustomModel ? customModel : "deepseek",
+      maxCompletionTokens: 8192,
     }
+
+    extractContext(requestBody, apiKey)
   }
 
   const handleSaveToFile = () => {
@@ -422,7 +381,7 @@ export const ContextExtractor = () => {
             </>
           )}
         </Button>
-        <Button variant="outline" className="gap-2" onClick={handleStopExtraction} disabled={!isExtracting}>
+        <Button variant="outline" className="gap-2" onClick={stopExtraction} disabled={!isExtracting}>
           <Square className="h-4 w-4" />
           Stop
         </Button>
