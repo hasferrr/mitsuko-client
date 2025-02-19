@@ -29,6 +29,7 @@ import { parseTranslationJson } from "@/lib/parser"
 import { useSubtitleStore } from "@/stores/useSubtitleStore"
 import { useSettingsStore } from "@/stores/useSettingsStore"
 import { useAdvancedSettingsStore } from "@/stores/useAdvancedSettingsStore"
+import { useBeforeUnload } from "@/hooks/useBeforeUnload"
 
 
 interface Parsed {
@@ -63,8 +64,9 @@ export default function SubtitleTranslator() {
   const [parsed, setParsed] = useState<Parsed>({ type: "srt", data: null })
   const [jsonResponse, setJsonResponse] = useState<SubtitleMinimal[]>([])
 
-  const hasChanges = useRef(false)
   const abortControllerRef = useRef<AbortController | null>(null)
+
+  const setHasChanges = useBeforeUnload()
 
   // Load data from localStorage on component mount
   useEffect(() => {
@@ -97,27 +99,12 @@ export default function SubtitleTranslator() {
     loadAdvancedSettingsData()
   }, []) // Empty dependency array ensures this runs only once on mount
 
-
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (hasChanges.current) event.preventDefault()
-    }
-    if (hasChanges.current) {
-      window.addEventListener('beforeunload', handleBeforeUnload)
-    } else {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [hasChanges.current])
-
   const handleStartTranslation = async () => {
     if (isTranslating) return
     setIsTranslating(true)
     setResponse("")
     setJsonResponse([]) // Clear previous parsed output
-    hasChanges.current = true
+    setHasChanges(true)
 
     // Create a new AbortController
     abortControllerRef.current = new AbortController()
@@ -308,7 +295,8 @@ export default function SubtitleTranslator() {
       }))
 
       toast.success("Project saved successfully!") // Success notification
-      hasChanges.current = false
+      setHasChanges(false)
+
     } catch (error) {
       console.error("Error saving project:", error)
       toast.error("Failed to save project.") // Error notification
