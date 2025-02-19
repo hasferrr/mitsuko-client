@@ -67,21 +67,34 @@ export const ContextExtractor = () => {
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    if (!files) return
+    if (!files || files.length === 0) return
     setHasChanges(true)
 
-    const newFiles: FileItem[] = []
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
+    if (isBatchMode) {
+      // Batch Mode Logic (Existing)
+      const newFiles: FileItem[] = []
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        const text = await file.text()
+        newFiles.push({
+          id: `${Date.now()}-${i}`, // Unique ID
+          name: file.name,
+          content: text,
+        })
+      }
+      setSelectedFiles((prevFiles) => [...prevFiles, ...newFiles])
+    } else {
+      // Single File Logic (For Subtitle Content)
+      const file = files[0]
       const text = await file.text()
-      newFiles.push({
-        id: `${Date.now()}-${i}`, // Unique ID
-        name: file.name,
-        content: text,
-      })
+      setSubtitleContent(text)
+      // Trigger resize
+      const textarea = document.getElementById("subtitle-content-textarea") as HTMLTextAreaElement
+      if (textarea) {
+        textarea.style.height = "auto"
+        textarea.style.height = `${Math.min(textarea.scrollHeight, 900)}px`
+      }
     }
-
-    setSelectedFiles((prevFiles) => [...prevFiles, ...newFiles])
 
     // Reset the input
     event.target.value = ""
@@ -219,7 +232,7 @@ export const ContextExtractor = () => {
   return (
     <div className="grid lg:grid-cols-2 gap-6 container mx-auto py-4 px-4 mt-2 mb-6 max-w-5xl">
       {/* Left Pane */}
-      <div className="space-y-4">
+      <div className="space-y-2">
         <div className="space-y-2">
           <label className="text-sm font-medium">Episode Number</label>
           <Input
@@ -233,11 +246,29 @@ export const ContextExtractor = () => {
         {!isBatchMode && ( // Show single-mode inputs when isBatchMode is false
           <>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Subtitle Content</label>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium">Subtitle Content</label>
+                <input
+                  type="file"
+                  accept=".srt,.ass,.txt"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="subtitle-content-upload"
+                />
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => document.getElementById("subtitle-content-upload")?.click()}
+                >
+                  <Upload className="h-4 w-4" />
+                  Upload
+                </Button>
+              </div>
               <Textarea
+                id="subtitle-content-textarea"
                 value={subtitleContent}
                 onChange={handleSubtitleContentChange}
-                className="min-h-[208px] h-[208px] max-h-[40vh] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                className="min-h-[208px] h-[208px] max-h-[208px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
                 placeholder="Paste subtitle content here..."
                 onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
               />
@@ -247,7 +278,7 @@ export const ContextExtractor = () => {
               <Textarea
                 value={previousContext}
                 onChange={handlePreviousContextChange}
-                className="min-h-[100px] h-[100px] max-h-[30vh] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                className="min-h-[100px] h-[100px] max-h-[100px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
                 placeholder="Paste previous context here..."
                 onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
               />
@@ -277,7 +308,7 @@ export const ContextExtractor = () => {
               </Button>
             </div>
 
-            <ScrollArea className="h-[340px] border rounded-md">
+            <ScrollArea className="h-[348px] border rounded-md">
               <div className="space-y-1 p-2">
                 {selectedFiles.map((file, index) => (
                   <div key={file.id} className="flex items-center justify-between border rounded-md p-2">
@@ -368,7 +399,7 @@ export const ContextExtractor = () => {
                 ref={contextResultRef}
                 value={contextResult.trim()}
                 readOnly
-                className="min-h-[420px] h-[420px] max-h-[80vh] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                className="min-h-[420px] h-[420px] max-h-[420px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
                 placeholder="Extracted context will appear here..."
               />
             </div>
