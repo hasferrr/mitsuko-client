@@ -1,7 +1,5 @@
 import { create } from "zustand"
 import { SubtitleMinimal, SubtitleTranslated } from "@/types/types"
-import { useAdvancedSettingsStore } from "./use-advanced-settings-store"
-import { useSettingsStore } from "./use-settings-store"
 import { parseTranslationJson } from "@/lib/parser"
 
 interface TranslationStore {
@@ -15,7 +13,7 @@ interface TranslationStore {
 
 interface FetchStore {
   abortControllerRef: React.RefObject<AbortController | null>
-  translateSubtitles: (subtitles: SubtitleTranslated[]) => Promise<SubtitleTranslated[]>
+  translateSubtitles: (requestBody: any, apiKey: string) => Promise<SubtitleTranslated[]> // Change here
   stopTranslation: () => void
 }
 
@@ -28,40 +26,21 @@ export const useTranslationStore = create<TranslationStore & FetchStore>((set, g
   setJsonResponse: (jsonResponse) => set({ jsonResponse }),
   abortControllerRef: { current: null },
   stopTranslation: () => get().abortControllerRef.current?.abort(),
-  translateSubtitles: async (subtitles) => {
-    if (get().isTranslating) return [] // Return empty array to satisfy type
+  translateSubtitles: async (requestBody, apiKey) => {
+    if (get().isTranslating) return []
 
     get().setIsTranslating(true)
     get().setResponse("")
     get().setJsonResponse([])
 
-    const settings = useSettingsStore.getState()
-    const advancedSettings = useAdvancedSettingsStore.getState()
-
     get().abortControllerRef.current = new AbortController()
     let buffer = ""
 
     try {
-      const requestBody = {
-        subtitles: subtitles.map((s) => ({
-          index: s.index,
-          actor: s.actor,
-          content: s.content,
-        })),
-        sourceLanguage: settings.sourceLanguage,
-        targetLanguage: settings.targetLanguage,
-        contextDocument: settings.contextDocument,
-        baseURL: settings.useCustomModel ? settings.customBaseUrl : undefined,
-        model: settings.useCustomModel ? settings.customModel : "deepseek",
-        temperature: advancedSettings.temperature,
-        maxCompletionTokens: 8192,
-        contextMessage: [],
-      }
-
       const res = await fetch("http://localhost:4000/api/stream/translate", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${settings.apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
@@ -76,7 +55,7 @@ export const useTranslationStore = create<TranslationStore & FetchStore>((set, g
 
       const reader = res.body?.getReader()
       if (!reader) {
-        return [] // Return empty array
+        return []
       }
 
       while (true) {
@@ -110,11 +89,12 @@ export const useTranslationStore = create<TranslationStore & FetchStore>((set, g
 
       if (parsedResponse.length > 0) {
         get().setJsonResponse(parsedResponse)
+        const subtitles: SubtitleTranslated[] = requestBody.subtitles
         const updatedSubtitles = subtitles.map(subtitle => {
           const translated = parsedResponse.find(item => item.index === subtitle.index)
           return translated ? { ...subtitle, translated: translated.content } : subtitle
         })
-        return updatedSubtitles // Return the updated subtitles
+        return updatedSubtitles
       }
 
       return []

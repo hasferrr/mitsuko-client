@@ -26,8 +26,9 @@ import { mergeASSback } from "@/lib/ass/merge"
 import { capitalizeWords } from "@/lib/utils"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import { useSettingsStore } from "@/stores/use-settings-store"
-import { useBeforeUnload } from "@/hooks/use-before-unload"
 import { useTranslationStore } from "@/stores/use-translation-store"
+import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
+import { useBeforeUnload } from "@/hooks/use-before-unload"
 
 
 interface Parsed {
@@ -45,11 +46,17 @@ export default function SubtitleTranslator() {
   // Settings Store
   const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
   const targetLanguage = useSettingsStore((state) => state.targetLanguage)
+  const useCustomModel = useSettingsStore((state) => state.useCustomModel)
+  const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
+  const customModel = useSettingsStore((state) => state.customModel)
+  const apiKey = useSettingsStore((state) => state.apiKey)
+  const contextDocument = useSettingsStore((state) => state.contextDocument)
+
+  // Advanced Settings Store
+  const temperature = useAdvancedSettingsStore((state) => state.temperature)
 
   // Translation Store
-  const response = useTranslationStore((state) => state.response)
   const isTranslating = useTranslationStore((state) => state.isTranslating)
-  const jsonResponse = useTranslationStore((state) => state.jsonResponse)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
 
@@ -69,7 +76,23 @@ export default function SubtitleTranslator() {
       })
     }, 300)
 
-    const updatedSubtitles = await translateSubtitles(subtitles)
+    const requestBody = {
+      subtitles: subtitles.map((s) => ({
+        index: s.index,
+        actor: s.actor,
+        content: s.content,
+      })),
+      sourceLanguage,
+      targetLanguage,
+      contextDocument,
+      baseURL: useCustomModel ? customBaseUrl : undefined,
+      model: useCustomModel ? customModel : "deepseek",
+      temperature,
+      maxCompletionTokens: 8192,
+      contextMessage: [],
+    }
+
+    const updatedSubtitles = await translateSubtitles(requestBody, apiKey)
     if (updatedSubtitles.length) {
       setSubtitles(updatedSubtitles)
     }
