@@ -37,41 +37,24 @@ interface Parsed {
 
 export default function SubtitleTranslator() {
   // Subtitle Store
-  const {
-    title,
-    subtitles,
-    setTitle,
-    setSubtitles,
-    updateSubtitle
-  } = useSubtitleStore()
+  const title = useSubtitleStore((state) => state.title)
+  const setTitle = useSubtitleStore((state) => state.setTitle)
+  const subtitles = useSubtitleStore((state) => state.subtitles)
+  const setSubtitles = useSubtitleStore((state) => state.setSubtitles)
 
   // Settings Store
-  const {
-    sourceLanguage,
-    targetLanguage,
-    useCustomModel,
-    apiKey,
-    customBaseUrl,
-    customModel,
-    contextDocument,
-    setSourceLanguage,
-    setTargetLanguage,
-    setUseCustomModel,
-    setApiKey,
-    setCustomBaseUrl,
-    setCustomModel,
-    setContextDocument,
-  } = useSettingsStore()
+  const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
+  const targetLanguage = useSettingsStore((state) => state.targetLanguage)
+  const useCustomModel = useSettingsStore((state) => state.useCustomModel)
+  const apiKey = useSettingsStore((state) => state.apiKey)
+  const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
+  const customModel = useSettingsStore((state) => state.customModel)
+  const contextDocument = useSettingsStore((state) => state.contextDocument)
 
   // Advanced Settings Store
-  const {
-    temperature,
-    splitSize,
-    prompt,
-    setTemperature,
-    setSplitSize,
-    setPrompt
-  } = useAdvancedSettingsStore()
+  const temperature = useAdvancedSettingsStore((state) => state.temperature)
+  const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
+  const prompt = useAdvancedSettingsStore((state) => state.prompt)
 
   const [isTranslating, setIsTranslating] = useState(false)
   const [response, setResponse] = useState("")
@@ -377,7 +360,7 @@ export default function SubtitleTranslator() {
             <div className="flex-1" />
           </div>
 
-          <SubtitleList subtitles={subtitles} updateSubtitle={updateSubtitle} />
+          <SubtitleList />
 
           <div className="grid grid-cols-2 gap-4 mt-4">
             <Button className="gap-2" onClick={handleStartTranslation} disabled={isTranslating}>
@@ -432,23 +415,9 @@ export default function SubtitleTranslator() {
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
-                  <LanguageSelection
-                    sourceLanguage={sourceLanguage}
-                    setSourceLanguage={setSourceLanguage}
-                    targetLanguage={targetLanguage}
-                    setTargetLanguage={setTargetLanguage}
-                  />
-                  <ModelSelection
-                    useCustomModel={useCustomModel}
-                    setUseCustomModel={setUseCustomModel}
-                    customBaseUrl={customBaseUrl}
-                    setCustomBaseUrl={setCustomBaseUrl}
-                    customModel={customModel}
-                    setCustomModel={setCustomModel}
-                    apiKey={apiKey}
-                    setApiKey={setApiKey}
-                  />
-                  <ContextDocumentInput contextDocument={contextDocument} setContextDocument={setContextDocument} />
+                  <LanguageSelection />
+                  <ModelSelection />
+                  <ContextDocumentInput />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -456,10 +425,9 @@ export default function SubtitleTranslator() {
             <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
-                  {/* Use the state and setters from useAdvancedSettingsStore */}
-                  <TemperatureSlider temperature={temperature} setTemperature={setTemperature} />
-                  <SplitSizeInput splitSize={splitSize} setSplitSize={setSplitSize} />
-                  <SystemPromptInput prompt={prompt} setPrompt={setPrompt} />
+                  <TemperatureSlider />
+                  <SplitSizeInput />
+                  <SystemPromptInput />
                 </CardContent>
               </Card>
             </TabsContent>

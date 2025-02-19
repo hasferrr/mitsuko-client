@@ -1,51 +1,14 @@
 "use client"
 
-import { memo, Dispatch, SetStateAction, useCallback, useState, useEffect } from "react"
+import { memo } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { SubtitleMinimal } from "@/types/types"
-import { debounce } from "@/lib/utils"
-
-interface LanguageSelectionProps {
-  sourceLanguage: string
-  setSourceLanguage: Dispatch<SetStateAction<string>>
-  targetLanguage: string
-  setTargetLanguage: Dispatch<SetStateAction<string>>
-}
-
-interface ModelSelectionProps {
-  useCustomModel: boolean
-  setUseCustomModel: Dispatch<SetStateAction<boolean>>
-  customBaseUrl: string
-  setCustomBaseUrl: Dispatch<SetStateAction<string>>
-  customModel: string
-  setCustomModel: Dispatch<SetStateAction<string>>
-  apiKey: string
-  setApiKey: Dispatch<SetStateAction<string>>
-}
-
-interface ContextDocumentInputProps {
-  contextDocument: string
-  setContextDocument: Dispatch<SetStateAction<string>>
-}
-
-interface TemperatureSliderProps {
-  temperature: number
-  setTemperature: Dispatch<SetStateAction<number>>
-}
-
-interface SplitSizeInputProps {
-  splitSize: number
-  setSplitSize: Dispatch<SetStateAction<number>>
-}
-
-interface SystemPromptInputProps {
-  prompt: string
-  setPrompt: Dispatch<SetStateAction<string>>
-}
+import { useSettingsStore } from "@/stores/useSettingsStore"
+import { useAdvancedSettingsStore } from "@/stores/useAdvancedSettingsStore"
 
 interface ProcessOutputProps {
   response: string
@@ -53,7 +16,13 @@ interface ProcessOutputProps {
   jsonResponse: SubtitleMinimal[]
 }
 
-export const LanguageSelection = memo(({ sourceLanguage, setSourceLanguage, targetLanguage, setTargetLanguage }: LanguageSelectionProps) => {
+
+export const LanguageSelection = memo(() => {
+  const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
+  const setSourceLanguage = useSettingsStore((state) => state.setSourceLanguage)
+  const targetLanguage = useSettingsStore((state) => state.targetLanguage)
+  const setTargetLanguage = useSettingsStore((state) => state.setTargetLanguage)
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className="space-y-2">
@@ -89,7 +58,16 @@ export const LanguageSelection = memo(({ sourceLanguage, setSourceLanguage, targ
   )
 })
 
-export const ModelSelection = memo(({ useCustomModel, setUseCustomModel, customBaseUrl, setCustomBaseUrl, customModel, setCustomModel, apiKey, setApiKey }: ModelSelectionProps) => {
+export const ModelSelection = memo(() => {
+  const useCustomModel = useSettingsStore((state) => state.useCustomModel)
+  const setUseCustomModel = useSettingsStore((state) => state.setUseCustomModel)
+  const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
+  const setCustomBaseUrl = useSettingsStore((state) => state.setCustomBaseUrl)
+  const customModel = useSettingsStore((state) => state.customModel)
+  const setCustomModel = useSettingsStore((state) => state.setCustomModel)
+  const apiKey = useSettingsStore((state) => state.apiKey)
+  const setApiKey = useSettingsStore((state) => state.setApiKey)
+
   return (
     <>
       <div className="space-y-2">
@@ -136,12 +114,15 @@ export const ModelSelection = memo(({ useCustomModel, setUseCustomModel, customB
   )
 })
 
-export const ContextDocumentInput = memo(({ contextDocument, setContextDocument }: ContextDocumentInputProps) => {
-  const handleContextDocumentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+export const ContextDocumentInput = memo(() => {
+  const contextDocument = useSettingsStore((state) => state.contextDocument)
+  const setContextDocument = useSettingsStore((state) => state.setContextDocument)
+
+  const handleContextDocumentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContextDocument(e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
-  }, [setContextDocument])
+  }
 
   return (
     <div className="space-y-2">
@@ -157,7 +138,9 @@ export const ContextDocumentInput = memo(({ contextDocument, setContextDocument 
   )
 })
 
-export const TemperatureSlider = memo(({ temperature, setTemperature }: TemperatureSliderProps) => {
+export const TemperatureSlider = memo(() => {
+  const temperature = useAdvancedSettingsStore((state) => state.temperature)
+  const setTemperature = useAdvancedSettingsStore((state) => state.setTemperature)
   return (
     <div>
       <div className="flex justify-between mb-2">
@@ -175,12 +158,14 @@ export const TemperatureSlider = memo(({ temperature, setTemperature }: Temperat
   )
 })
 
-export const SplitSizeInput = memo(({ splitSize, setSplitSize }: SplitSizeInputProps) => {
-  const handleSplitSizeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+export const SplitSizeInput = memo(() => {
+  const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
+  const setSplitSize = useAdvancedSettingsStore((state) => state.setSplitSize)
+
+  const handleSplitSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value)
     setSplitSize(Math.max(0, Math.min(500, value)))
-  }, [setSplitSize])
-
+  }
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium">Split Size</label>
@@ -197,12 +182,15 @@ export const SplitSizeInput = memo(({ splitSize, setSplitSize }: SplitSizeInputP
   )
 })
 
-export const SystemPromptInput = memo(({ prompt, setPrompt }: SystemPromptInputProps) => {
-  const handlePromptChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+export const SystemPromptInput = memo(() => {
+  const prompt = useAdvancedSettingsStore((state) => state.prompt)
+  const setPrompt = useAdvancedSettingsStore((state) => state.setPrompt)
+
+  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
-  }, [setPrompt])
+  }
 
   return (
     <div className="space-y-2">
@@ -220,6 +208,7 @@ export const SystemPromptInput = memo(({ prompt, setPrompt }: SystemPromptInputP
 })
 
 export const ProcessOutput = memo(({ response, textareaRef, jsonResponse }: ProcessOutputProps) => {
+
   return (
     <div className="space-y-4">
       <Textarea

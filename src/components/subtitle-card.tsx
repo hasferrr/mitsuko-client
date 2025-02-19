@@ -2,17 +2,18 @@ import { memo, useRef } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Timer } from "lucide-react"
-import { SubtitleTranslated, UpdateSubtitle } from "@/types/types"
+import { SubtitleTranslated } from "@/types/types"
 import { timestampToString } from "@/lib/utils"
+import { useSubtitleStore } from "@/stores/useSubtitleStore"
 
 interface SubtitleCardProps {
   subtitle: SubtitleTranslated
-  updateSubtitle: UpdateSubtitle
 }
 
-export const SubtitleCard = memo(({ subtitle, updateSubtitle }: SubtitleCardProps) => {
+export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
   const contentRef = useRef<HTMLTextAreaElement | null>(null)
   const translatedRef = useRef<HTMLTextAreaElement | null>(null)
+  const updateSubtitle = useSubtitleStore((state) => state.updateSubtitle)
 
   const contentUpdate = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     handleResize(e)
