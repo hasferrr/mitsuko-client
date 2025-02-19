@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useRef } from "react"
+import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -18,17 +18,16 @@ import {
   SystemPromptInput,
   ProcessOutput,
 } from "./settings-inputs"
-import { ASSParseOutput, Subtitle, SubtitleMinimal, SubtitleTranslated } from "@/types/types"
+import { ASSParseOutput, Subtitle, SubtitleTranslated } from "@/types/types"
 import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
 import { capitalizeWords } from "@/lib/utils"
-import { parseTranslationJson } from "@/lib/parser"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import { useSettingsStore } from "@/stores/use-settings-store"
-import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
+import { useTranslationStore } from "@/stores/use-translation-store"
 
 
 interface Parsed {
@@ -46,41 +45,23 @@ export default function SubtitleTranslator() {
   // Settings Store
   const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
   const targetLanguage = useSettingsStore((state) => state.targetLanguage)
-  const useCustomModel = useSettingsStore((state) => state.useCustomModel)
-  const apiKey = useSettingsStore((state) => state.apiKey)
-  const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
-  const customModel = useSettingsStore((state) => state.customModel)
-  const contextDocument = useSettingsStore((state) => state.contextDocument)
 
-  // Advanced Settings Store
-  const temperature = useAdvancedSettingsStore((state) => state.temperature)
-  const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
-  const prompt = useAdvancedSettingsStore((state) => state.prompt)
+  // Translation Store
+  const response = useTranslationStore((state) => state.response)
+  const isTranslating = useTranslationStore((state) => state.isTranslating)
+  const jsonResponse = useTranslationStore((state) => state.jsonResponse)
+  const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
+  const stopTranslation = useTranslationStore((state) => state.stopTranslation)
 
-  const [isTranslating, setIsTranslating] = useState(false)
-  const [response, setResponse] = useState("")
   const [activeTab, setActiveTab] = useState("basic")
   const [parsed, setParsed] = useState<Parsed>({ type: "srt", data: null })
-  const [jsonResponse, setJsonResponse] = useState<SubtitleMinimal[]>([])
-
-  const abortControllerRef = useRef<AbortController | null>(null)
 
   const { setHasChanges } = useBeforeUnload()
 
   const handleStartTranslation = async () => {
-    if (isTranslating) return
-    setIsTranslating(true)
-    setResponse("")
-    setJsonResponse([]) // Clear previous parsed output
     setHasChanges(true)
-
-    // Create a new AbortController
-    abortControllerRef.current = new AbortController()
-
-    // Set the active tab to "process"
     setActiveTab("process")
 
-    // Scroll to top with fallback
     setTimeout(() => {
       window.scrollTo({
         top: 0,
@@ -88,87 +69,14 @@ export default function SubtitleTranslator() {
       })
     }, 300)
 
-    let buffer = ""
-    try {
-      const requestBody = {
-        subtitles: subtitles.map((s) => ({
-          index: s.index,
-          actor: s.actor,
-          content: s.content,
-        })),
-        sourceLanguage,
-        targetLanguage,
-        contextDocument,
-        baseURL: useCustomModel ? customBaseUrl : undefined, // Include base URL if custom model
-        model: useCustomModel ? customModel : "deepseek", // Choose model based on user selection
-        temperature,
-        maxCompletionTokens: 8192,
-        contextMessage: [],
-      }
-
-      const res = await fetch("http://localhost:4000/api/stream/translate", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-        signal: abortControllerRef.current.signal, // Connect to abort signal
-      })
-
-      if (!res.ok) {
-        const errorData = await res.json()
-        console.error("Error details from server:", errorData)
-        throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error}`)
-      }
-
-      const reader = res.body?.getReader()
-      if (!reader) return
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        const chunk = new TextDecoder().decode(value)
-        buffer += chunk
-        setResponse(buffer)
-      }
-      handleSaveProject()
-
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "AbortError") {
-        console.log("Request aborted")
-        setResponse((prev) => prev + "\n\n[Generation stopped by user]")
-      } else {
-        console.error("Error:", error)
-        setResponse((prev) => prev + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]`)
-      }
-    } finally {
-      setTimeout(() => setIsTranslating(false), 500)
-      abortControllerRef.current = null
-
-      let parsedResponse: SubtitleMinimal[] = []
-      try {
-        console.log(buffer)
-        parsedResponse = parseTranslationJson(buffer)
-      } catch {
-        console.error('Failed to parse')
-      }
-
-      if (parsedResponse.length > 0) {
-        setJsonResponse(parsedResponse)
-        const updatedSubtitles = subtitles.map(subtitle => {
-          const translated = parsedResponse.find(item => item.index === subtitle.index)
-          return translated ? { ...subtitle, translated: translated.content } : subtitle
-        })
-        setSubtitles(updatedSubtitles)
-      }
+    const updatedSubtitles = await translateSubtitles(subtitles)
+    if (updatedSubtitles.length) {
+      setSubtitles(updatedSubtitles)
     }
   }
 
   const handleStopTranslation = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort() // Trigger abort signal
-    }
+    stopTranslation()
   }
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -353,10 +261,7 @@ export default function SubtitleTranslator() {
             </TabsContent>
 
             <TabsContent value="process" className="flex-grow space-y-4 mt-4">
-              <ProcessOutput
-                response={response}
-                jsonResponse={jsonResponse}
-              />
+              <ProcessOutput />
             </TabsContent>
           </Tabs>
         </div>

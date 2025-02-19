@@ -6,16 +6,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
-import { SubtitleMinimal } from "@/types/types"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
+import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
-
-interface ProcessOutputProps {
-  response: string
-  jsonResponse: SubtitleMinimal[]
-}
 
 
 export const LanguageSelection = memo(() => {
@@ -212,7 +207,9 @@ export const SystemPromptInput = memo(() => {
   )
 })
 
-export const ProcessOutput = memo(({ response, jsonResponse }: ProcessOutputProps) => {
+export const ProcessOutput = memo(() => {
+  const response = useTranslationStore((state) => state.response)
+  const jsonResponse = useTranslationStore((state) => state.jsonResponse)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   useAutoScroll(response, textareaRef)
 
