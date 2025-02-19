@@ -18,7 +18,7 @@ export function Navbar() {
             alt="Logo"
             className="w-6 h-6 object-cover"
           />
-          <span className="font-semibold">Mitsuko</span>
+          <Link href="/" className="font-semibold">Mitsuko</Link>
         </div>
         <nav className="flex items-center gap-6 text-sm">
           <Link href="#" className="transition-colors hover:text-foreground/80 text-foreground/60">
