@@ -11,15 +11,17 @@ export function parseSRT(fileContent: string): Subtitle[] {
   const subtitles: Subtitle[] = []
   let currentSubtitle: Partial<Subtitle> = {}
 
+  let index = 1
   for (let line of lines) {
     line = line.replaceAll('\r', '').trim()
     if (line === '') {
       if (currentSubtitle.index !== undefined) {
+        currentSubtitle.actor = ""
         subtitles.push(currentSubtitle as Subtitle)
         currentSubtitle = {}
       }
     } else if (currentSubtitle.index === undefined) {
-      currentSubtitle.index = parseInt(line, 10)
+      currentSubtitle.index = index++ // parseInt(line, 10)
     } else if (currentSubtitle.timestamp === undefined) {
       const [start, end] = line.split(' --> ')
       currentSubtitle.timestamp = {

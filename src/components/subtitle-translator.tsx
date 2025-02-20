@@ -194,19 +194,17 @@ export default function SubtitleTranslator() {
       const text = await file.text()
       const type = file.name.endsWith(".srt") ? "srt" : "ass"
 
-      let parsedSubs
-      let subtitles
+      let parsedSubs: Subtitle[] = []
       if (type === "srt") {
         parsedSubs = parseSRT(text)
-        subtitles = parsedSubs
         setParsed({ type, data: null })
       } else {
-        parsedSubs = parseASS(text)
-        subtitles = parsedSubs.subtitles
-        setParsed({ type, data: parsedSubs })
+        const data = parseASS(text)
+        parsedSubs = data.subtitles
+        setParsed({ type, data })
       }
 
-      const parsedSubtitles: SubtitleTranslated[] = subtitles.map((subtitle) => ({
+      const parsedSubtitles: SubtitleTranslated[] = parsedSubs.map((subtitle) => ({
         ...subtitle,
         translated: "",
       }))
