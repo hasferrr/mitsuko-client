@@ -30,7 +30,7 @@ import {
   ProcessOutput,
   MaxCompletionTokenInput,
 } from "./settings-inputs"
-import { Subtitle, SubtitleTranslated } from "@/types/types"
+import { ContextCompletion, Subtitle, SubtitleMinimal, SubtitleTranslated } from "@/types/types"
 import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
@@ -74,10 +74,12 @@ export default function SubtitleTranslator() {
 
   // Advanced Settings Store
   const temperature = useAdvancedSettingsStore((state) => state.temperature)
-  const maxCompletionTokens = useAdvancedSettingsStore(state => state.maxCompletionTokens) // Get from store
+  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
+  const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
 
   // Translation Store
   const isTranslating = useTranslationStore((state) => state.isTranslating)
+  const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
 
@@ -87,6 +89,7 @@ export default function SubtitleTranslator() {
 
   const handleStartTranslation = async () => {
     if (!subtitles.length) return
+    setIsTranslating(true)
     setHasChanges(true)
     setActiveTab("process")
 
@@ -97,30 +100,84 @@ export default function SubtitleTranslator() {
       })
     }, 300)
 
-    const requestBody = {
-      subtitles: subtitles.map((s) => ({
-        index: s.index,
-        actor: s.actor,
-        content: s.content,
-      })),
-      sourceLanguage,
-      targetLanguage,
-      contextDocument,
-      baseURL: useCustomModel ? customBaseUrl : undefined,
-      model: useCustomModel ? customModel : "deepseek",
-      temperature,
-      maxCompletionTokens,
-      contextMessage: [],
+    // Split subtitles into chunks
+    const subtitleChunks: SubtitleTranslated[][] = []
+    const size = Math.max(splitSize, 10)
+    for (let i = 0; i < subtitles.length; i += size) {
+      subtitleChunks.push(subtitles.slice(i, i + size))
     }
 
-    const updatedSubtitles = await translateSubtitles(requestBody, apiKey)
-    if (updatedSubtitles.length) {
-      setSubtitles(updatedSubtitles)
+    // Translate each chunk of subtitles from Japanese to Indonesian
+    const translatedChunks: SubtitleMinimal[][] = []
+    const context: ContextCompletion[] = []
+
+    for (let i = 0; i < subtitleChunks.length; i++) {
+      const chunk = subtitleChunks[i]
+      const requestBody = {
+        subtitles: chunk.map((s) => ({
+          index: s.index,
+          actor: s.actor,
+          content: s.content,
+        })),
+        sourceLanguage,
+        targetLanguage,
+        contextDocument,
+        baseURL: useCustomModel ? customBaseUrl : undefined,
+        model: useCustomModel ? customModel : "deepseek",
+        temperature,
+        maxCompletionTokens,
+        contextMessage: context,
+      }
+
+      const tlChunk = await translateSubtitles(requestBody, apiKey)
+
+      if (tlChunk.length) {
+        // Add translated chunk to list
+        translatedChunks.push(tlChunk)
+
+        // Update context for next chunk
+        context.push({
+          role: "user",
+          content: requestBody.subtitles
+        })
+        context.push({
+          role: "assistant",
+          content: requestBody.subtitles.map((s, i) => ({
+            index: s.index,
+            content: s.content,
+            translated: tlChunk[i]?.content || "",
+          })),
+        })
+      }
+
+      // Break if translation is stopped
+      const translatingStatus = useTranslationStore.getState().isTranslating
+      if (!translatingStatus) break
+
+      // Delay between each chunk
+      await new Promise((resolve) => setTimeout(resolve, 100))
     }
+
+    // Merge translated chunks back to original order
+    const translatedList = translatedChunks.flat()
+
+    // Merge translated subtitles with original subtitles
+    const merged: SubtitleTranslated[] = []
+    for (let i = 0; i < subtitles.length; i++) {
+      merged.push({
+        ...subtitles[i],
+        translated: translatedList[i]?.content || subtitles[i].translated,
+      })
+    }
+
+    // Update subtitles with merged translations
+    setSubtitles(merged)
+    setIsTranslating(false)
   }
 
   const handleStopTranslation = () => {
     stopTranslation()
+    setIsTranslating(false)
   }
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -253,7 +310,11 @@ export default function SubtitleTranslator() {
           <SubtitleList />
 
           <div className="grid grid-cols-2 gap-4 mt-4">
-            <Button className="gap-2" onClick={handleStartTranslation} disabled={isTranslating}>
+            <Button
+              className="gap-2"
+              onClick={handleStartTranslation} // Use the new function
+              disabled={isTranslating}
+            >
               {isTranslating ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -266,7 +327,12 @@ export default function SubtitleTranslator() {
                 </>
               )}
             </Button>
-            <Button variant="outline" className="gap-2" onClick={handleStopTranslation} disabled={!isTranslating}>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={handleStopTranslation}
+              disabled={!isTranslating}
+            >
               <Square className="h-4 w-4" />
               Stop
             </Button>

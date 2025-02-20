@@ -56,3 +56,15 @@ export type UpdateSubtitle = (
   field: keyof SubtitleTranslated,
   value: SubtitleTranslated[keyof SubtitleTranslated],
 ) => void
+
+interface CompletionUser {
+  role: "user"
+  content: SubtitleNoTime[]
+}
+
+interface CompletionAssistant {
+  role: "assistant"
+  content: SubtitleNoTimeNoActorTranslated[]
+}
+
+export type ContextCompletion = CompletionUser | CompletionAssistant

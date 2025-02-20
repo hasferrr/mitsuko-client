@@ -169,11 +169,10 @@ export const SplitSizeInput = memo(() => {
     <div className="space-y-2">
       <label className="text-sm font-medium">Split Size</label>
       <Input
-        disabled
         type="number"
         value={splitSize}
         onChange={handleSplitSizeChange}
-        min={0}
+        min={10}
         max={500}
         className="bg-background dark:bg-muted/30"
       />

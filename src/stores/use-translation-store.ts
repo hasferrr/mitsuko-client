@@ -11,7 +11,7 @@ interface TranslationStore {
   jsonResponse: SubtitleMinimal[]
   setJsonResponse: (jsonResponse: SubtitleMinimal[]) => void
   abortControllerRef: React.RefObject<AbortController | null>
-  translateSubtitles: (requestBody: any, apiKey: string) => Promise<SubtitleTranslated[]>
+  translateSubtitles: (requestBody: any, apiKey: string) => Promise<SubtitleMinimal[]>
   stopTranslation: () => void
 }
 
@@ -25,11 +25,8 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
   abortControllerRef: { current: null },
   stopTranslation: () => get().abortControllerRef.current?.abort(),
   translateSubtitles: async (requestBody, apiKey) => {
-    if (get().isTranslating) return []
-
-    get().setIsTranslating(true)
-    get().setResponse("")
-    get().setJsonResponse([])
+    set({ response: "" })
+    set({ jsonResponse: [] })
 
     get().abortControllerRef.current = new AbortController()
     let buffer = ""
@@ -61,7 +58,7 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
         if (done) break
         const chunk = new TextDecoder().decode(value)
         buffer += chunk
-        get().setResponse(buffer)
+        set(({ response: buffer }))
       }
 
     } catch (error: unknown) {
@@ -74,28 +71,15 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
       }
 
     } finally {
-      setTimeout(() => get().setIsTranslating(false), 500)
       get().abortControllerRef.current = null
-
       let parsedResponse: SubtitleMinimal[] = []
       try {
-        console.log(buffer)
         parsedResponse = parseTranslationJson(buffer)
+        set({ jsonResponse: parsedResponse })
       } catch {
-        console.error("Failed to parse")
+        console.log("Failed to parse: ", buffer)
       }
-
-      if (parsedResponse.length > 0) {
-        get().setJsonResponse(parsedResponse)
-        const subtitles: SubtitleTranslated[] = requestBody.subtitles
-        const updatedSubtitles = subtitles.map(subtitle => {
-          const translated = parsedResponse.find(item => item.index === subtitle.index)
-          return translated ? { ...subtitle, translated: translated.content } : subtitle
-        })
-        return updatedSubtitles
-      }
-
-      return []
+      return parsedResponse
     }
   },
 }),
