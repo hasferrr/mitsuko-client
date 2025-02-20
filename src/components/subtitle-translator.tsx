@@ -28,6 +28,7 @@ import {
   SplitSizeInput,
   SystemPromptInput,
   ProcessOutput,
+  MaxCompletionTokenInput,
 } from "./settings-inputs"
 import { Subtitle, SubtitleTranslated } from "@/types/types"
 import { parseSRT } from "@/lib/srt/parse"
@@ -73,6 +74,7 @@ export default function SubtitleTranslator() {
 
   // Advanced Settings Store
   const temperature = useAdvancedSettingsStore((state) => state.temperature)
+  const maxCompletionTokens = useAdvancedSettingsStore(state => state.maxCompletionTokens) // Get from store
 
   // Translation Store
   const isTranslating = useTranslationStore((state) => state.isTranslating)
@@ -107,7 +109,7 @@ export default function SubtitleTranslator() {
       baseURL: useCustomModel ? customBaseUrl : undefined,
       model: useCustomModel ? customModel : "deepseek",
       temperature,
-      maxCompletionTokens: 8192,
+      maxCompletionTokens,
       contextMessage: [],
     }
 
@@ -341,6 +343,7 @@ export default function SubtitleTranslator() {
                 <CardContent className="p-4 space-y-4">
                   <TemperatureSlider />
                   <SplitSizeInput />
+                  <MaxCompletionTokenInput />
                   <SystemPromptInput />
                 </CardContent>
               </Card>

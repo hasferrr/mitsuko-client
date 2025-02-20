@@ -2,6 +2,7 @@
 
 import { memo, useRef } from "react"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
@@ -175,6 +176,36 @@ export const SplitSizeInput = memo(() => {
         min={0}
         max={500}
         className="bg-background dark:bg-muted/30"
+      />
+    </div>
+  )
+})
+
+export const MaxCompletionTokenInput = memo(() => {
+  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
+  const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    // Allow only numbers, and handle empty string
+    if (/^\d*$/.test(value)) {
+      let num = parseInt(value, 10) // Prevent NaN
+      num = Math.min(num, 164_000)
+      setMaxCompletionTokens(value === "" ? 0 : num)
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-medium" htmlFor="max-completion-token">
+        Max Completion Token
+      </Label>
+      <Input
+        type="text"
+        value={maxCompletionTokens}
+        onChange={handleChange}
+        className="bg-background dark:bg-muted/30"
+        inputMode="numeric"
       />
     </div>
   )
