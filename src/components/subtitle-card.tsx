@@ -57,7 +57,6 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
               value={subtitle.content}
               onFocus={handleResize}
               onChange={(e) => subtitleUpdate(e, "content")}
-              placeholder="Original text"
               className="min-h-[36px] h-[36px] max-h-[120px] bg-muted/50 dark:bg-muted/30 resize-none overflow-y-hidden"
               rows={1}
             />
@@ -66,7 +65,6 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
               value={subtitle.translated}
               onFocus={handleResize}
               onChange={(e) => subtitleUpdate(e, "translated")}
-              placeholder="Translated text"
               className="min-h-[36px] h-[36px] max-h-[120px] resize-none overflow-y-hidden"
               rows={1}
             />

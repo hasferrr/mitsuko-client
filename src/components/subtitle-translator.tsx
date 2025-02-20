@@ -82,6 +82,8 @@ export default function SubtitleTranslator() {
   const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
+  const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
+  const appendJsonResponse = useTranslationStore((state) => state.appendJsonResponse)
 
   const [activeTab, setActiveTab] = useState(isTranslating ? "process" : "basic")
 
@@ -92,6 +94,7 @@ export default function SubtitleTranslator() {
     setIsTranslating(true)
     setHasChanges(true)
     setActiveTab("process")
+    setJsonResponse([])
 
     setTimeout(() => {
       window.scrollTo({
@@ -107,7 +110,7 @@ export default function SubtitleTranslator() {
       subtitleChunks.push(subtitles.slice(i, i + size))
     }
 
-    // Translate each chunk of subtitles from Japanese to Indonesian
+    // Translate each chunk of subtitles
     const translatedChunks: SubtitleMinimal[][] = []
     const context: ContextCompletion[] = []
 
@@ -132,8 +135,19 @@ export default function SubtitleTranslator() {
       const tlChunk = await translateSubtitles(requestBody, apiKey)
 
       if (tlChunk.length) {
-        // Add translated chunk to list
         translatedChunks.push(tlChunk)
+        appendJsonResponse(tlChunk)
+
+        // Merge translated subtitles with original subtitles
+        const translatedList = translatedChunks.flat()
+        const merged: SubtitleTranslated[] = []
+        for (let i = 0; i < subtitles.length; i++) {
+          merged.push({
+            ...subtitles[i],
+            translated: translatedList[i]?.content || subtitles[i].translated,
+          })
+        }
+        setSubtitles(merged)
 
         // Update context for next chunk
         context.push({
@@ -158,20 +172,6 @@ export default function SubtitleTranslator() {
       await new Promise((resolve) => setTimeout(resolve, 100))
     }
 
-    // Merge translated chunks back to original order
-    const translatedList = translatedChunks.flat()
-
-    // Merge translated subtitles with original subtitles
-    const merged: SubtitleTranslated[] = []
-    for (let i = 0; i < subtitles.length; i++) {
-      merged.push({
-        ...subtitles[i],
-        translated: translatedList[i]?.content || subtitles[i].translated,
-      })
-    }
-
-    // Update subtitles with merged translations
-    setSubtitles(merged)
     setIsTranslating(false)
   }
 

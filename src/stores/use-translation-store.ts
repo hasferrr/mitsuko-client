@@ -10,6 +10,7 @@ interface TranslationStore {
   setIsTranslating: (isTranslating: boolean) => void
   jsonResponse: SubtitleMinimal[]
   setJsonResponse: (jsonResponse: SubtitleMinimal[]) => void
+  appendJsonResponse: (jsonResponse: SubtitleMinimal[]) => void
   abortControllerRef: React.RefObject<AbortController | null>
   translateSubtitles: (requestBody: any, apiKey: string) => Promise<SubtitleMinimal[]>
   stopTranslation: () => void
@@ -22,11 +23,11 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
   setIsTranslating: (isTranslating) => set({ isTranslating }),
   jsonResponse: [],
   setJsonResponse: (jsonResponse) => set({ jsonResponse }),
+  appendJsonResponse: (newArr) => set((state) => ({ jsonResponse: [...state.jsonResponse, ...newArr] })),
   abortControllerRef: { current: null },
   stopTranslation: () => get().abortControllerRef.current?.abort(),
   translateSubtitles: async (requestBody, apiKey) => {
     set({ response: "" })
-    set({ jsonResponse: [] })
 
     get().abortControllerRef.current = new AbortController()
     let buffer = ""
@@ -75,7 +76,6 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
       let parsedResponse: SubtitleMinimal[] = []
       try {
         parsedResponse = parseTranslationJson(buffer)
-        set({ jsonResponse: parsedResponse })
       } catch {
         console.log("Failed to parse: ", buffer)
       }
