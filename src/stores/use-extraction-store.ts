@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { persist } from "zustand/middleware"
 
 interface ExtractionStore {
   contextResult: string
@@ -10,7 +11,7 @@ interface ExtractionStore {
   stopExtraction: () => void
 }
 
-export const useExtractionStore = create<ExtractionStore>((set, get) => ({
+export const useExtractionStore = create<ExtractionStore>()(persist((set, get) => ({
   contextResult: "",
   isExtracting: false,
   abortControllerRef: { current: null },
@@ -69,5 +70,9 @@ export const useExtractionStore = create<ExtractionStore>((set, get) => ({
       set({ abortControllerRef: { current: null } }) // Reset the ref
     }
   },
-}))
-
+}),
+  {
+    name: "extraction-storage",
+    partialize: (state) => ({ contextResult: state.contextResult }),
+  }
+))

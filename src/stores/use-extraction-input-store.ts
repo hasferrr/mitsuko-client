@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { persist } from "zustand/middleware"
 
 interface FileItem {
   id: string
@@ -19,15 +20,22 @@ interface ExtractionInputStore {
   setIsBatchMode: (isBatchMode: boolean) => void
 }
 
-export const useExtractionInputStore = create<ExtractionInputStore>((set) => ({
-  episodeNumber: "",
-  subtitleContent: "",
-  previousContext: "",
-  selectedFiles: [],
-  isBatchMode: false,
-  setEpisodeNumber: (episodeNumber) => set({ episodeNumber }),
-  setSubtitleContent: (subtitleContent) => set({ subtitleContent }),
-  setPreviousContext: (previousContext) => set({ previousContext }),
-  setSelectedFiles: (selectedFiles) => set({ selectedFiles }),
-  setIsBatchMode: (isBatchMode) => set({ isBatchMode }),
-}))
+export const useExtractionInputStore = create<ExtractionInputStore>()(
+  persist(
+    (set) => ({
+      episodeNumber: "",
+      subtitleContent: "",
+      previousContext: "",
+      selectedFiles: [],
+      isBatchMode: false,
+      setEpisodeNumber: (episodeNumber) => set({ episodeNumber }),
+      setSubtitleContent: (subtitleContent) => set({ subtitleContent }),
+      setPreviousContext: (previousContext) => set({ previousContext }),
+      setSelectedFiles: (selectedFiles) => set({ selectedFiles }),
+      setIsBatchMode: (isBatchMode) => set({ isBatchMode }),
+    }),
+    {
+      name: 'extraction-input-storage',
+    }
+  )
+)
