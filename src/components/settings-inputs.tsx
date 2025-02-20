@@ -13,6 +13,7 @@ import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
 import { Eye, EyeOff } from "lucide-react"
 import { Button } from "./ui/button"
+import { useSubtitleStore } from "@/stores/use-subtitle-store"
 
 
 export const LanguageSelection = memo(() => {
@@ -195,9 +196,14 @@ export const SplitSizeInput = memo(() => {
     // Allow only numbers, and handle empty string
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10) // Prevent NaN
-      num = Math.min(num, 1000)
+      num = Math.min(num, 500)
       setSplitSize(value === "" ? 0 : num)
     }
+  }
+
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setSplitSize(Math.min(Math.max(parseInt(value, 10), 10), 500))
   }
 
   return (
@@ -208,6 +214,7 @@ export const SplitSizeInput = memo(() => {
       <Input
         type="text"
         value={splitSize}
+        onBlur={handleBlur}
         onChange={handleChange}
         min={10}
         max={1000}
@@ -238,6 +245,11 @@ export const MaxCompletionTokenInput = memo(() => {
     }
   }
 
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setMaxCompletionTokens(Math.min(Math.max(parseInt(value, 10), 512), 164000))
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between mb-2 items-center">
@@ -246,6 +258,7 @@ export const MaxCompletionTokenInput = memo(() => {
       <Input
         type="text"
         value={maxCompletionTokens}
+        onBlur={handleBlur}
         onChange={handleChange}
         min={512}
         max={164000}
@@ -290,14 +303,20 @@ export const SystemPromptInput = memo(() => {
 export const StartIndexInput = memo(() => {
   const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
   const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
+  const subtitles = useSubtitleStore((state) => state.subtitles)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10)
-      num = Math.max(num, 1) // Ensure num is at least 1
-      setStartIndex(value === "" ? 1 : num) // Set to 1 if empty
+      num = Math.min(num, subtitles.length)
+      setStartIndex(value === "" ? 0 : num)
     }
+  }
+
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setStartIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
   }
 
   return (
@@ -308,13 +327,16 @@ export const StartIndexInput = memo(() => {
       <Input
         type="text"
         value={startIndex}
+        onBlur={handleBlur}
         onChange={handleChange}
         min={1}
+        max={subtitles.length}
+        step={1}
         className="bg-background dark:bg-muted/30"
         inputMode="numeric"
       />
       <p className="text-xs text-muted-foreground">
-        Start translation from this subtitle index. Useful for resuming translations.
+        Start translation from this subtitle index. Useful for resuming translations. (1-{subtitles.length})
       </p>
     </div>
   )
