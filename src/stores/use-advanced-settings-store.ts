@@ -16,7 +16,7 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
   persist(
     (set) => ({
       temperature: 0.6,
-      splitSize: 500,
+      splitSize: 150,
       prompt: "",
       maxCompletionTokens: 8192,
       setTemperature: (temp) => set({ temperature: temp }),

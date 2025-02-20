@@ -2,7 +2,6 @@
 
 import { memo, useEffect, useRef, useState } from "react"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
@@ -162,10 +161,12 @@ export const TemperatureSlider = memo(() => {
   const temperature = useAdvancedSettingsStore((state) => state.temperature)
   const setTemperature = useAdvancedSettingsStore((state) => state.setTemperature)
   return (
-    <div>
-      <div className="flex justify-between mb-2">
+    <div className="space-y-2">
+      <div className="flex justify-between mb-2 items-center">
         <label className="text-sm font-medium">Temperature</label>
-        <span className="text-sm text-muted-foreground">{temperature}</span>
+        <span className="text-sm text-muted-foreground">
+          {temperature}
+        </span>
       </div>
       <Slider
         value={[temperature]}
@@ -174,6 +175,9 @@ export const TemperatureSlider = memo(() => {
         step={0.1}
         className="py-2"
       />
+      <p className="text-xs text-muted-foreground">
+        Controls the randomness of the output. Higher values produce more diverse results, lower values produce more consistent results.
+      </p>
     </div>
   )
 })
@@ -182,21 +186,36 @@ export const SplitSizeInput = memo(() => {
   const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
   const setSplitSize = useAdvancedSettingsStore((state) => state.setSplitSize)
 
-  const handleSplitSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value)
-    setSplitSize(Math.max(0, Math.min(500, value)))
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    // Allow only numbers, and handle empty string
+    if (/^\d*$/.test(value)) {
+      let num = parseInt(value, 10) // Prevent NaN
+      num = Math.min(num, 1000)
+      setSplitSize(value === "" ? 0 : num)
+    }
   }
+
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">Split Size</label>
+      <div className="flex justify-between mb-2 items-center">
+        <label className="text-sm font-medium">Split Size</label>
+      </div>
       <Input
-        type="number"
+        type="text"
         value={splitSize}
-        onChange={handleSplitSizeChange}
+        onChange={handleChange}
         min={10}
-        max={500}
+        max={1000}
+        step={10}
         className="bg-background dark:bg-muted/30"
+        inputMode="numeric"
       />
+      <p className="text-xs text-muted-foreground">
+        Determines the number of dialogues to process in each chunk.
+        Smaller chunks can help with context management but may increase the token usage.
+        Larger chunks increase efficiency but may result in truncation due to the maximum model output token limit. (10-500)
+      </p>
     </div>
   )
 })
@@ -210,23 +229,29 @@ export const MaxCompletionTokenInput = memo(() => {
     // Allow only numbers, and handle empty string
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10) // Prevent NaN
-      num = Math.min(num, 164_000)
+      num = Math.min(num, 164000)
       setMaxCompletionTokens(value === "" ? 0 : num)
     }
   }
 
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-medium" htmlFor="max-completion-token">
-        Max Completion Token
-      </Label>
+      <div className="flex justify-between mb-2 items-center">
+        <label className="text-sm font-medium">Max Completion Token</label>
+      </div>
       <Input
         type="text"
         value={maxCompletionTokens}
         onChange={handleChange}
+        min={512}
+        max={164000}
+        step={512}
         className="bg-background dark:bg-muted/30"
         inputMode="numeric"
       />
+      <p className="text-xs text-muted-foreground">
+        Sets the maximum number of tokens the model can generate for each subtitle chunk. (512-164,000)
+      </p>
     </div>
   )
 })

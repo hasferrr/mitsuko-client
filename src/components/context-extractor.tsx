@@ -128,7 +128,9 @@ export const ContextExtractor = () => {
   const moveFileUp = (index: number) => {
     if (index > 0) {
       const newFiles = [...selectedFiles]
-      ;[newFiles[index - 1], newFiles[index]] = [newFiles[index], newFiles[index - 1]]
+      const temp = newFiles[index - 1]
+      newFiles[index - 1] = newFiles[index]
+      newFiles[index] = temp
       setSelectedFiles(newFiles)
     }
   }
@@ -136,7 +138,9 @@ export const ContextExtractor = () => {
   const moveFileDown = (index: number) => {
     if (index < selectedFiles.length - 1) {
       const newFiles = [...selectedFiles]
-      ;[newFiles[index + 1], newFiles[index]] = [newFiles[index], newFiles[index + 1]]
+      const temp = newFiles[index + 1]
+      newFiles[index + 1] = newFiles[index]
+      newFiles[index] = temp
       setSelectedFiles(newFiles)
     }
   }
@@ -280,7 +284,7 @@ export const ContextExtractor = () => {
                   <div key={file.id} className="flex items-center justify-between border rounded-md p-2">
                     <div className="flex items-center gap-2">
                       <File className="h-4 w-4" />
-                      <span className="text-sm">{file.name}</span>
+                      <div className="text-sm w-fit block break-all">{file.name}</div>
                     </div>
                     <div className="flex items-center gap-1">
                       <Button variant="ghost" size="icon" onClick={() => moveFileUp(index)}>
