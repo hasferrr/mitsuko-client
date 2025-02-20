@@ -2,12 +2,18 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { LogIn, Moon, Sun } from "lucide-react"
+import { LogIn, Moon, Sun, Loader2 } from "lucide-react"
 import { useThemeStore } from "@/stores/use-theme-store"
+import { useTranslationStore } from "@/stores/use-translation-store"
+import { useExtractionStore } from "@/stores/use-extraction-store"
 
 export function Navbar() {
   const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)
   const setIsDarkModeGlobal = useThemeStore(state => state.setIsDarkMode)
+  const isTranslating = useTranslationStore(state => state.isTranslating)
+  const isExtracting = useExtractionStore(state => state.isExtracting)
+
+  const isProcessing = isTranslating || isExtracting
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-8">
@@ -29,6 +35,12 @@ export function Navbar() {
           </Link>
         </nav>
         <div className="flex items-center gap-2 ml-auto">
+          {isProcessing && (
+            <div className="flex items-center gap-2 text-sm text-foreground/80 mr-4">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Processing...</span>
+            </div>
+          )}
           <Button variant="ghost" size="icon" onClick={() => setIsDarkModeGlobal(!isDarkModeGlobal)}>
             {isDarkModeGlobal ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
