@@ -271,6 +271,8 @@ export default function SubtitleTranslator() {
     useSubtitleStore.persist.clearStorage()
   }
 
+  const subName = parsed.type === "ass" ? "SSA" : "SRT"
+
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
       {/* Header */}
@@ -319,7 +321,7 @@ export default function SubtitleTranslator() {
                 <MessageSquare className="h-4 w-4" /> {subtitles.length} Lines
               </Badge>
               <Badge variant="secondary" className="gap-1 uppercase">
-                {parsed.type}
+                {subName}
               </Badge>
             </div>
           </div>
