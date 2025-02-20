@@ -84,6 +84,7 @@ export default function SubtitleTranslator() {
   const { setHasChanges } = useBeforeUnload()
 
   const handleStartTranslation = async () => {
+    if (!subtitles.length) return
     setHasChanges(true)
     setActiveTab("process")
 
@@ -164,6 +165,7 @@ export default function SubtitleTranslator() {
       actor: s.actor,
       content: s.translated, // Use translated content for download
     }))
+    if (!subtitleData.length) return
 
     let fileContent = ""
     if (parsed.type === "srt") {
@@ -216,6 +218,7 @@ export default function SubtitleTranslator() {
           size="lg"
           className="gap-2"
           onClick={() => document.getElementById("subtitle-upload")?.click()}
+          disabled={isTranslating}
         >
           <Upload className="h-5 w-5" />
           Upload File
