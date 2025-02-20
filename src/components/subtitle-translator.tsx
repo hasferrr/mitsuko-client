@@ -7,7 +7,18 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Save, Globe2, MessageSquare, Play, Square, Download, Upload, FileText } from "lucide-react"
+import {
+  Save,
+  Globe2,
+  MessageSquare,
+  Play,
+  Square,
+  Download,
+  Upload,
+  FileText,
+  Trash,
+  Loader2,
+} from "lucide-react"
 import { SubtitleList } from "./subtitle-list"
 import {
   LanguageSelection,
@@ -29,7 +40,17 @@ import { useSettingsStore } from "@/stores/use-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface Parsed {
   type: "srt" | "ass"
@@ -170,6 +191,10 @@ export default function SubtitleTranslator() {
 
   const handleSaveProject = () => { }
 
+  const handleDelete = () => {
+    setSubtitles([])
+  }
+
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
       {/* Header */}
@@ -181,7 +206,13 @@ export default function SubtitleTranslator() {
             className="text-xl font-semibold h-12"
           />
         </div>
-        <input type="file" accept=".srt,.ass" onChange={handleFileUpload} className="hidden" id="subtitle-upload" />
+        <input
+          type="file"
+          accept=".srt,.ass"
+          onChange={handleFileUpload}
+          className="hidden"
+          id="subtitle-upload"
+        />
         <Button
           variant="outline"
           size="lg"
@@ -202,13 +233,18 @@ export default function SubtitleTranslator() {
         {/* Left Column - Subtitles */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
-            <Badge variant="secondary" className="gap-1">
-              <Globe2 className="h-4 w-4" /> {capitalizeWords(sourceLanguage)} → {capitalizeWords(targetLanguage)}
-            </Badge>
-            <Badge variant="secondary" className="gap-1">
-              <MessageSquare className="h-4 w-4" /> {subtitles.length} Lines
-            </Badge>
-            <div className="flex-1" />
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="gap-1">
+                <Globe2 className="h-4 w-4" />{" "}
+                {capitalizeWords(sourceLanguage)} → {capitalizeWords(targetLanguage)}
+              </Badge>
+              <Badge variant="secondary" className="gap-1">
+                <MessageSquare className="h-4 w-4" /> {subtitles.length} Lines
+              </Badge>
+              <Badge variant="secondary" className="gap-1 uppercase">
+                {parsed.type}
+              </Badge>
+            </div>
           </div>
 
           <SubtitleList />
@@ -217,7 +253,7 @@ export default function SubtitleTranslator() {
             <Button className="gap-2" onClick={handleStartTranslation} disabled={isTranslating}>
               {isTranslating ? (
                 <>
-                  <span className="loading loading-spinner loading-xs"></span>
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Translating...
                 </>
               ) : (
@@ -233,15 +269,41 @@ export default function SubtitleTranslator() {
             </Button>
           </div>
 
-          <Link href="/extract-context" className="w-full mt-2 gap-2 inline-flex items-center justify-center">
-            <Button
-              variant="outline"
-              className="w-full gap-2"
-            >
+          <Link
+            href="/extract-context"
+            className="w-full mt-2 gap-2 inline-flex items-center justify-center"
+          >
+            <Button variant="outline" className="w-full gap-2">
               <FileText className="h-4 w-4" />
               Extract Context from Subtitle
             </Button>
           </Link>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full gap-2 mt-2"
+                disabled={isTranslating}
+              >
+                <Trash className="h-4 w-4" />
+                Remove All Subtitles
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action will remove all subtitles.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           <Button
             className="w-full mt-2 gap-2"

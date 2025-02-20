@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { File, XCircle, ArrowUpCircle, ArrowDownCircle, Upload, Save, Play, Square } from "lucide-react"
+import { File, XCircle, ArrowUpCircle, ArrowDownCircle, Upload, Save, Play, Square, Loader2 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -371,7 +371,7 @@ export const ContextExtractor = () => {
         <Button className="gap-2" onClick={handleStartExtraction} disabled={isExtracting || isBatchMode}>
           {isExtracting ? (
             <>
-              <span className="loading loading-spinner loading-xs"></span>
+              <Loader2 className="h-4 w-4 animate-spin" />
               Extracting...
             </>
           ) : (
