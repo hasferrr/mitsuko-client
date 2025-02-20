@@ -1,6 +1,6 @@
 "use client"
 
-import { memo, useRef } from "react"
+import { memo, useEffect, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -243,6 +243,12 @@ export const ProcessOutput = memo(() => {
   const jsonResponse = useTranslationStore((state) => state.jsonResponse)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   useAutoScroll(response, textareaRef)
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.scrollTop = textareaRef.current.scrollHeight
+    }
+  }, [textareaRef])
 
   return (
     <div className="space-y-4">

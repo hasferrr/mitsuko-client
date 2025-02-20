@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -46,11 +46,7 @@ export const ContextExtractor = () => {
   const extractContext = useExtractionStore((state) => state.extractContext)
   const stopExtraction = useExtractionStore((state) => state.stopExtraction)
 
-  const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
-
-  const { setHasChanges } = useBeforeUnload()
-  useAutoScroll(contextResult, contextResultRef)
-
+  // Extraction Input Store
   const {
     episodeNumber,
     subtitleContent,
@@ -63,6 +59,17 @@ export const ContextExtractor = () => {
     setSelectedFiles,
     setIsBatchMode,
   } = useExtractionInputStore()
+
+  const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
+
+  const { setHasChanges } = useBeforeUnload()
+  useAutoScroll(contextResult, contextResultRef)
+
+  useEffect(() => {
+    if (contextResultRef.current) {
+      contextResultRef.current.scrollTop = contextResultRef.current.scrollHeight
+    }
+  }, [contextResultRef])
 
 
   const handleSubtitleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {

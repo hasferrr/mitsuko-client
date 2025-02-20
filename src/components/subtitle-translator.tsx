@@ -81,7 +81,7 @@ export default function SubtitleTranslator() {
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
 
-  const [activeTab, setActiveTab] = useState("basic")
+  const [activeTab, setActiveTab] = useState(isTranslating ? "process" : "basic")
 
   const { setHasChanges } = useBeforeUnload()
 
