@@ -1,4 +1,4 @@
-import type { SubtitleMinimal, SubtitleNoTimeNoActorTranslated } from "../types/types"
+import type { SubOnlyTranslated, SubtitleNoTimeNoActorTranslated } from "../types/types"
 
 function keepOnlyWrapped(text: string, a: string, b: string): string {
   const startA = text.indexOf(a)
@@ -36,10 +36,10 @@ export function getContent(response: string): string {
   return removedThink.trim()
 }
 
-export function parseTranslationJson(response: string): SubtitleMinimal[] {
+export function parseTranslationJson(response: string): SubOnlyTranslated[] {
   const subtitles = JSON.parse(cleanUpJsonResponse(response)) as SubtitleNoTimeNoActorTranslated[]
   return subtitles.map((sub) => ({
     index: sub.index,
-    content: sub.translated || '',
+    translated: sub.translated || "",
   }))
 }

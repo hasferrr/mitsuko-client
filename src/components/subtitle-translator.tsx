@@ -30,7 +30,7 @@ import {
   ProcessOutput,
   MaxCompletionTokenInput,
 } from "./settings-inputs"
-import { ContextCompletion, Subtitle, SubtitleMinimal, SubtitleTranslated } from "@/types/types"
+import { ContextCompletion, Subtitle, SubOnlyTranslated, SubtitleTranslated } from "@/types/types"
 import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
@@ -111,7 +111,7 @@ export default function SubtitleTranslator() {
     }
 
     // Translate each chunk of subtitles
-    const translatedChunks: SubtitleMinimal[][] = []
+    const translatedChunks: SubOnlyTranslated[][] = []
     const context: ContextCompletion[] = []
 
     for (let i = 0; i < subtitleChunks.length; i++) {
@@ -132,7 +132,7 @@ export default function SubtitleTranslator() {
         contextMessage: context,
       }
 
-      let tlChunk: SubtitleMinimal[] = []
+      let tlChunk: SubOnlyTranslated[] = []
       try {
         tlChunk = await translateSubtitles(requestBody, apiKey)
       } catch {
@@ -150,7 +150,7 @@ export default function SubtitleTranslator() {
         for (let i = 0; i < subtitles.length; i++) {
           merged.push({
             ...subtitles[i],
-            translated: translatedList[i]?.content || subtitles[i].translated,
+            translated: translatedList[i]?.translated || subtitles[i].translated,
           })
         }
         setSubtitles(merged)
@@ -165,7 +165,7 @@ export default function SubtitleTranslator() {
           content: requestBody.subtitles.map((s, i) => ({
             index: s.index,
             content: s.content,
-            translated: tlChunk[i]?.content || "",
+            translated: tlChunk[i]?.translated || "",
           })),
         })
       }

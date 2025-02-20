@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { SubtitleMinimal, SubtitleTranslated } from "@/types/types"
+import { SubOnlyTranslated, SubtitleTranslated } from "@/types/types"
 import { parseTranslationJson } from "@/lib/parser"
 import { persist } from "zustand/middleware"
 
@@ -8,11 +8,11 @@ interface TranslationStore {
   setResponse: (response: string) => void
   isTranslating: boolean
   setIsTranslating: (isTranslating: boolean) => void
-  jsonResponse: SubtitleMinimal[]
-  setJsonResponse: (jsonResponse: SubtitleMinimal[]) => void
-  appendJsonResponse: (jsonResponse: SubtitleMinimal[]) => void
+  jsonResponse: SubOnlyTranslated[]
+  setJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
+  appendJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
   abortControllerRef: React.RefObject<AbortController | null>
-  translateSubtitles: (requestBody: any, apiKey: string) => Promise<SubtitleMinimal[]>
+  translateSubtitles: (requestBody: any, apiKey: string) => Promise<SubOnlyTranslated[]>
   stopTranslation: () => void
 }
 
@@ -74,7 +74,7 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
     }
 
     get().abortControllerRef.current = null
-    let parsedResponse: SubtitleMinimal[] = []
+    let parsedResponse: SubOnlyTranslated[] = []
     try {
       parsedResponse = parseTranslationJson(buffer)
     } catch {
