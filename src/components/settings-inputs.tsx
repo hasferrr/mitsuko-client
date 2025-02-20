@@ -1,6 +1,6 @@
 "use client"
 
-import { memo, useEffect, useRef } from "react"
+import { memo, useEffect, useRef, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -12,6 +12,8 @@ import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
+import { Eye, EyeOff } from "lucide-react"
+import { Button } from "./ui/button"
 
 
 export const LanguageSelection = memo(() => {
@@ -65,6 +67,8 @@ export const ModelSelection = memo(() => {
   const apiKey = useSettingsStore((state) => state.apiKey)
   const setApiKey = useSettingsStore((state) => state.setApiKey)
 
+  const [showApiKey, setShowApiKey] = useState(false)
+
   return (
     <>
       <div className="space-y-2">
@@ -98,13 +102,30 @@ export const ModelSelection = memo(() => {
             placeholder="Model Name"
             className="bg-background dark:bg-muted/30"
           />
-          <Input
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="API Key"
-            className="bg-background dark:bg-muted/30"
-          />
+          <div className="grid grid-cols-2 items-center gap-4">
+            <div className="col-span-2 relative">
+              <Input
+                type={showApiKey ? "text" : "password"}
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="API Key"
+                className="pr-12"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
+                onClick={() => setShowApiKey(!showApiKey)}
+              >
+                {showApiKey ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </>
@@ -255,13 +276,13 @@ export const ProcessOutput = memo(() => {
         ref={textareaRef}
         value={response.trim()}
         readOnly
-        className="h-[400px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+        className="h-[420px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
         placeholder="Translation output will appear here..."
       />
       <Textarea
         value={jsonResponse.length ? `[${jsonResponse.map(s => JSON.stringify(s, null, 2))}]` : ""}
         readOnly
-        className="h-[200px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm"
+        className="h-[270px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm"
         placeholder="Parsed JSON output will appear here..."
       />
     </div>

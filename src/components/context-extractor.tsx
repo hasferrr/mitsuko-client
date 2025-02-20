@@ -9,7 +9,6 @@ import { Switch } from "@/components/ui/switch"
 import { File, XCircle, ArrowUpCircle, ArrowDownCircle, Upload, Save, Play, Square, Loader2 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Subtitle, SubtitleNoTime } from "@/types/types"
 import { isASS, isSRT, removeTimestamp } from "@/lib/ass/subtitle-utils"
 import { parseASS } from "@/lib/ass/parse"
@@ -19,6 +18,7 @@ import { useBeforeUnload } from "@/hooks/use-before-unload"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useExtractionStore } from "@/stores/use-extraction-store"
 import { useExtractionInputStore } from "@/stores/use-extraction-input-store"
+import { ModelSelection } from "./settings-inputs"
 
 
 interface FileItem {
@@ -312,49 +312,7 @@ export const ContextExtractor = () => {
           <TabsContent value="settings" className="flex-grow space-y-4 mt-4">
             <Card className="border border-border bg-card text-card-foreground">
               <CardContent className="p-4 space-y-4">
-
-                {/** Model Selection */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Model</label>
-                  <Select defaultValue="deepseek" disabled={useCustomModel}>
-                    <SelectTrigger className="bg-background dark:bg-muted/30">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="deepseek">DeepSeek-R1</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch id="custom-model" checked={useCustomModel} onCheckedChange={setUseCustomModel} />
-                  <label htmlFor="custom-model" className="text-sm font-medium">
-                    Use Custom Model
-                  </label>
-                </div>
-                {useCustomModel && (
-                  <div className="space-y-4 pt-2">
-                    <Input
-                      value={customBaseUrl}
-                      onChange={(e) => setCustomBaseUrl(e.target.value)}
-                      placeholder="Base URL"
-                      className="bg-background dark:bg-muted/30"
-                    />
-                    <Input
-                      value={customModel}
-                      onChange={(e) => setCustomModel(e.target.value)}
-                      placeholder="Model Name"
-                      className="bg-background dark:bg-muted/30"
-                    />
-                    <Input
-                      type="password"
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      placeholder="API Key"
-                      className="bg-background dark:bg-muted/30"
-                    />
-                  </div>
-                )}
-
+                <ModelSelection />
               </CardContent>
             </Card>
           </TabsContent>
