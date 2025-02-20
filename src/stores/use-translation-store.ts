@@ -70,17 +70,18 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
         console.error("Error:", error)
         set((state) => ({ response: state.response + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]` }))
       }
-
-    } finally {
-      get().abortControllerRef.current = null
-      let parsedResponse: SubtitleMinimal[] = []
-      try {
-        parsedResponse = parseTranslationJson(buffer)
-      } catch {
-        console.log("Failed to parse: ", buffer)
-      }
-      return parsedResponse
+      throw error
     }
+
+    get().abortControllerRef.current = null
+    let parsedResponse: SubtitleMinimal[] = []
+    try {
+      parsedResponse = parseTranslationJson(buffer)
+    } catch {
+      console.log("Failed to parse: ", buffer)
+    }
+    return parsedResponse
+
   },
 }),
   {

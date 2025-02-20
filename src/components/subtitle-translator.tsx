@@ -132,7 +132,13 @@ export default function SubtitleTranslator() {
         contextMessage: context,
       }
 
-      const tlChunk = await translateSubtitles(requestBody, apiKey)
+      let tlChunk: SubtitleMinimal[] = []
+      try {
+        tlChunk = await translateSubtitles(requestBody, apiKey)
+      } catch {
+        setIsTranslating(false)
+        break
+      }
 
       if (tlChunk.length) {
         translatedChunks.push(tlChunk)
