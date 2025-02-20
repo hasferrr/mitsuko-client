@@ -1,6 +1,7 @@
 import { create } from "zustand"
 import { SubtitleMinimal, SubtitleTranslated } from "@/types/types"
 import { parseTranslationJson } from "@/lib/parser"
+import { persist } from "zustand/middleware"
 
 interface TranslationStore {
   response: string
@@ -9,15 +10,12 @@ interface TranslationStore {
   setIsTranslating: (isTranslating: boolean) => void
   jsonResponse: SubtitleMinimal[]
   setJsonResponse: (jsonResponse: SubtitleMinimal[]) => void
-}
-
-interface FetchStore {
   abortControllerRef: React.RefObject<AbortController | null>
-  translateSubtitles: (requestBody: any, apiKey: string) => Promise<SubtitleTranslated[]> // Change here
+  translateSubtitles: (requestBody: any, apiKey: string) => Promise<SubtitleTranslated[]>
   stopTranslation: () => void
 }
 
-export const useTranslationStore = create<TranslationStore & FetchStore>((set, get) => ({
+export const useTranslationStore = create<TranslationStore>()(persist((set, get) => ({
   response: "",
   setResponse: (response) => set({ response }),
   isTranslating: false,
@@ -100,4 +98,12 @@ export const useTranslationStore = create<TranslationStore & FetchStore>((set, g
       return []
     }
   },
-}))
+}),
+  {
+    name: "translation-storage",
+    partialize: (state) => ({
+      response: state.response,
+      jsonResponse: state.jsonResponse,
+    }),
+  }
+))
