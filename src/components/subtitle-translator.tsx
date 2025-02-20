@@ -29,8 +29,15 @@ import {
   SystemPromptInput,
   ProcessOutput,
   MaxCompletionTokenInput,
+  StartIndexInput,
 } from "./settings-inputs"
-import { ContextCompletion, Subtitle, SubOnlyTranslated, SubtitleTranslated } from "@/types/types"
+import {
+  ContextCompletion,
+  Subtitle,
+  SubOnlyTranslated,
+  SubtitleTranslated,
+  SubtitleNoTime,
+} from "@/types/types"
 import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
@@ -78,6 +85,7 @@ export default function SubtitleTranslator() {
   const temperature = useAdvancedSettingsStore((state) => state.temperature)
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
   const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
+  const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
 
   // Translation Store
   const isTranslating = useTranslationStore((state) => state.isTranslating)
@@ -114,17 +122,38 @@ export default function SubtitleTranslator() {
       })
     }, 300)
 
-    // Split subtitles into chunks
-    const subtitleChunks: SubtitleTranslated[][] = []
+    // Split subtitles into chunks, starting from startIndex - 1
+    const subtitleChunks: SubtitleNoTime[][] = []
     const size = Math.max(splitSize, 10)
-    for (let i = 0; i < subtitles.length; i += size) {
-      subtitleChunks.push(subtitles.slice(i, i + size))
+    for (let i = Math.max(startIndex - 1, 0); i < subtitles.length; i += size) {
+      subtitleChunks.push(subtitles.slice(i, i + size).map((s) => ({
+        index: s.index,
+        actor: s.actor,
+        content: s.content,
+      })))
     }
 
-    // Translate each chunk of subtitles
-    const translatedChunks: SubOnlyTranslated[][] = []
+    // Prepare context for the first chunk
     const context: ContextCompletion[] = []
+    if (startIndex > 1) {
+      context.push({
+        role: "user",
+        content: subtitles.slice(0, startIndex - 1).map((chunk) => ({
+          index: chunk.index,
+          actor: chunk.actor,
+          content: chunk.content,
+        })),
+      })
+      context.push({
+        role: "assistant",
+        content: [],
+      })
+    }
 
+    console.log(subtitleChunks)
+    console.log(context)
+
+    // Translate each chunk of subtitles
     for (let i = 0; i < subtitleChunks.length; i++) {
       const chunk = subtitleChunks[i]
       const requestBody = {
@@ -152,18 +181,47 @@ export default function SubtitleTranslator() {
       }
 
       if (tlChunk.length) {
-        translatedChunks.push(tlChunk)
         appendJsonResponse(tlChunk)
 
-        // Merge translated subtitles with original subtitles
-        const translatedList = translatedChunks.flat()
-        const merged: SubtitleTranslated[] = []
-        for (let i = 0; i < subtitles.length; i++) {
-          merged.push({
-            ...subtitles[i],
-            translated: translatedList[i]?.translated || subtitles[i].translated,
-          })
+        // Adjust index based on startIndex
+        const adjustedStartIndex = Math.max(startIndex - 1, 0)
+        const merged: SubtitleTranslated[] = [...subtitles]
+
+        /**
+         * Merge translated chunk with original subtitles
+         *
+         * Example:
+         * startIndex = 4
+         * adjustedStartIndex = 4 - 1 = 3
+         *
+         * tlChunk =      [4,5,6,7,8]
+         *             j = 0 1 2 3 4   <-- j is the index of tlChunk
+         * merged = [1,2,3,4,5,6,7,8,9]
+         *           0 1 2 3 4 5 6 7 8 <-- index of merged
+         * originalIndex = 3 4 5 6 7   <-- index of merged
+         *
+         * FOR LOOP:
+         * - 1ST ITERATION
+         * originalIndex = 3 + 0 = 3
+         * merged[3] = tlChunk[0]
+         * - 2ND ITERATION
+         * originalIndex = 3 + 1 = 4
+         * merged[4] = tlChunk[1]
+         * ...
+         * - NTH ITERATION
+         * originalIndex = 3 + N = 3 + N
+         * merged[3 + N] = tlChunk[N]
+         */
+        for (let j = 0; j < tlChunk.length; j++) {
+          const originalIndex = adjustedStartIndex + j
+          if (originalIndex < subtitles.length) {
+            merged[originalIndex] = {
+              ...merged[originalIndex],
+              translated: tlChunk[j]?.translated || merged[originalIndex].translated,
+            }
+          }
         }
+
         setSubtitles(merged)
 
         // Update context for next chunk
@@ -173,10 +231,10 @@ export default function SubtitleTranslator() {
         })
         context.push({
           role: "assistant",
-          content: requestBody.subtitles.map((s, i) => ({
+          content: requestBody.subtitles.map((s, subIndex) => ({
             index: s.index,
             content: s.content,
-            translated: tlChunk[i]?.translated || "",
+            translated: tlChunk[subIndex]?.translated || "",
           })),
         })
       }
@@ -427,6 +485,7 @@ export default function SubtitleTranslator() {
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
                   <TemperatureSlider />
+                  <StartIndexInput />
                   <SplitSizeInput />
                   <MaxCompletionTokenInput />
                   <SystemPromptInput />

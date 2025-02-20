@@ -287,6 +287,39 @@ export const SystemPromptInput = memo(() => {
   )
 })
 
+export const StartIndexInput = memo(() => {
+  const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
+  const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    if (/^\d*$/.test(value)) {
+      let num = parseInt(value, 10)
+      num = Math.max(num, 1) // Ensure num is at least 1
+      setStartIndex(value === "" ? 1 : num) // Set to 1 if empty
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between mb-2 items-center">
+        <label className="text-sm font-medium">Start Index</label>
+      </div>
+      <Input
+        type="text"
+        value={startIndex}
+        onChange={handleChange}
+        min={1}
+        className="bg-background dark:bg-muted/30"
+        inputMode="numeric"
+      />
+      <p className="text-xs text-muted-foreground">
+        Start translation from this subtitle index. Useful for resuming translations.
+      </p>
+    </div>
+  )
+})
+
 export const ProcessOutput = memo(() => {
   const response = useTranslationStore((state) => state.response)
   const jsonResponse = useTranslationStore((state) => state.jsonResponse)
