@@ -29,7 +29,7 @@ import {
   SystemPromptInput,
   ProcessOutput,
 } from "./settings-inputs"
-import { ASSParseOutput, Subtitle, SubtitleTranslated } from "@/types/types"
+import { Subtitle, SubtitleTranslated } from "@/types/types"
 import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
@@ -52,17 +52,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-interface Parsed {
-  type: "srt" | "ass"
-  data: ASSParseOutput | null
-}
-
 export default function SubtitleTranslator() {
   // Subtitle Store
   const title = useSubtitleStore((state) => state.title)
   const setTitle = useSubtitleStore((state) => state.setTitle)
   const subtitles = useSubtitleStore((state) => state.subtitles)
   const setSubtitles = useSubtitleStore((state) => state.setSubtitles)
+  const parsed = useSubtitleStore((state) => state.parsed)
+  const setParsed = useSubtitleStore((state) => state.setParsed)
+  const resetParsed = useSubtitleStore((state) => state.resetParsed)
 
   // Settings Store
   const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
@@ -82,7 +80,6 @@ export default function SubtitleTranslator() {
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
 
   const [activeTab, setActiveTab] = useState("basic")
-  const [parsed, setParsed] = useState<Parsed>({ type: "srt", data: null })
 
   const { setHasChanges } = useBeforeUnload()
 
@@ -193,6 +190,7 @@ export default function SubtitleTranslator() {
 
   const handleDelete = () => {
     setSubtitles([])
+    resetParsed()
   }
 
   return (
