@@ -153,6 +153,10 @@ export const ContextDocumentInput = memo(() => {
         placeholder="Add context about the video..."
         onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
       />
+      <p className="text-xs text-muted-foreground">
+        Provide context from previous episodes (can be generated using the
+        Extract Context feature). This improves accuracy and relevance.
+      </p>
     </div>
   )
 })
