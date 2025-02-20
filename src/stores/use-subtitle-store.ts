@@ -1,6 +1,5 @@
 import { create } from "zustand"
 import { SubtitleTranslated, UpdateSubtitle, ASSParseOutput } from "@/types/types"
-import { initialSubtitles } from "@/lib/dummy"
 import { persist } from "zustand/middleware"
 
 interface Parsed {
@@ -12,6 +11,7 @@ interface SubtitleStore {
   title: string
   subtitles: SubtitleTranslated[]
   parsed: Parsed
+  isInitRef: React.RefObject<boolean>
   setTitle: (title: string) => void
   setSubtitles: (subtitles: SubtitleTranslated[]) => void
   updateSubtitle: UpdateSubtitle
@@ -25,9 +25,10 @@ const initialParsedState: Parsed = { type: "srt", data: null }
 export const useSubtitleStore = create<SubtitleStore>()(
   persist(
     (set) => ({
-      title: "Blue.Box.S01E19",
-      subtitles: initialSubtitles,
+      title: "",
+      subtitles: [],
       parsed: initialParsedState,
+      isInitRef: { current: true },
       setTitle: (title) => set({ title }),
       setSubtitles: (subtitles) => set({ subtitles }),
       setParsed: (parsed) => set({ parsed }),

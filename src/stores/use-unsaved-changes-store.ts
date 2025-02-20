@@ -1,11 +1,11 @@
 import { create } from "zustand"
 
 interface UnsavedChangesStore {
-  hasChanges: boolean
-  setHasChanges: (hasChanges: boolean) => void
+  hasChangesRef: React.RefObject<boolean>
+  setHasChanges: (val: boolean) => void
 }
 
-export const useUnsavedChangesStore = create<UnsavedChangesStore>()((set) => ({
-  hasChanges: false,
-  setHasChanges: (hasChanges) => set({ hasChanges }),
+export const useUnsavedChangesStore = create<UnsavedChangesStore>()((set, get) => ({
+  hasChangesRef: { current: false },
+  setHasChanges: (val) => get().hasChangesRef.current = val,
 }))

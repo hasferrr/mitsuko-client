@@ -1,54 +1,245 @@
 import { SubtitleTranslated } from "@/types/types"
 
+export const initialTitle = "Blue.Box.S01E16"
 export const initialSubtitles: SubtitleTranslated[] = [
   {
-    index: 1,
-    timestamp: {
-      start: { h: 0, m: 0, s: 11, ms: 803 },
-      end: { h: 0, m: 0, s: 13, ms: 263 }
+    "index": 1,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 16,
+        "ms": 50
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 16,
+        "ms": 930
+      }
     },
-    actor: "",
-    content: "(生徒A)ぶつけるなよ",
-    translated: "(Siswa A) Jangan sampai menabrak!",
+    "actor": "千夏(ちなつ)",
+    "content": "おはよう",
+    "translated": "Selamat pagi"
   },
   {
-    index: 2,
-    timestamp: {
-      start: { h: 0, m: 0, s: 14, ms: 472 },
-      end: { h: 0, m: 0, s: 15, ms: 765 }
+    "index": 2,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 17,
+        "ms": 550
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 19,
+        "ms": 260
+      }
     },
-    actor: "",
-    content: "(生徒B)もっと 右右",
-    translated: "(Siswa B) Lebih ke kanan lagi!",
+    "actor": "大喜(たいき)",
+    "content": "おはようございます",
+    "translated": "Selamat pagi"
   },
   {
-    index: 3,
-    timestamp: {
-      start: { h: 0, m: 0, s: 16, ms: 266 },
-      end: { h: 0, m: 0, s: 17, ms: 308 }
+    "index": 3,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 19,
+        "ms": 350
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 21,
+        "ms": 350
+      }
     },
-    actor: "",
-    content: "(生徒C)上げるぞ",
-    translated: "",
+    "actor": "千夏",
+    "content": "相変わらず早起きだね",
+    "translated": "Kayaknya kamu masih rajin bangun pagi ya"
   },
   {
-    index: 4,
-    timestamp: {
-      start: { h: 0, m: 0, s: 29, ms: 404 },
-      end: { h: 0, m: 0, s: 30, ms: 447 }
+    "index": 4,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 21,
+        "ms": 850
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 23,
+        "ms": 310
+      }
     },
-    actor: "",
-    content: "(生徒たち)せ~の!",
-    translated: "",
+    "actor": "",
+    "content": "今日から新学期ですし",
+    "translated": "Kan hari ini mulai semester baru"
   },
   {
-    index: 5,
-    timestamp: {
-      start: { h: 0, m: 0, s: 44, ms: 419 },
-      end: { h: 0, m: 0, s: 45, ms: 587 }
+    "index": 5,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 23,
+        "ms": 390
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 25,
+        "ms": 480
+      }
     },
-    actor: "",
-    content: "(クラスメイトたち)わあ...",
-    translated: "",
+    "actor": "",
+    "content": "すごい寝ぐせ",
+    "translated": "Rambut tidurmu kacau banget"
+  },
+  {
+    "index": 6,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 25,
+        "ms": 560
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 26,
+        "ms": 440
+      }
+    },
+    "actor": "",
+    "content": "ここら辺",
+    "translated": ""
+  },
+  {
+    "index": 7,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 26,
+        "ms": 520
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 27,
+        "ms": 520
+      }
+    },
+    "actor": "",
+    "content": "えっ！",
+    "translated": ""
+  },
+  {
+    "index": 8,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 28,
+        "ms": 190
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 28,
+        "ms": 820
+      }
+    },
+    "actor": "",
+    "content": "あ…",
+    "translated": ""
+  },
+  {
+    "index": 9,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 29,
+        "ms": 980
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 31,
+        "ms": 400
+      }
+    },
+    "actor": "",
+    "content": "マヌケポーズ！",
+    "translated": ""
+  },
+  {
+    "index": 10,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 34,
+        "ms": 360
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 35,
+        "ms": 450
+      }
+    },
+    "actor": "大喜",
+    "content": "海に行ってから",
+    "translated": ""
+  },
+  {
+    "index": 11,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 36,
+        "ms": 30
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 39,
+        "ms": 330
+      }
+    },
+    "actor": "",
+    "content": "千夏先輩との間にあった\\Nわだかまりみたいなものが",
+    "translated": ""
+  },
+  {
+    "index": 12,
+    "timestamp": {
+      "start": {
+        "h": 0,
+        "m": 0,
+        "s": 39,
+        "ms": 410
+      },
+      "end": {
+        "h": 0,
+        "m": 0,
+        "s": 40,
+        "ms": 950
+      }
+    },
+    "actor": "",
+    "content": "なくなった気がする",
+    "translated": ""
   },
 ]

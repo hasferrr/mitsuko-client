@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -52,6 +52,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { initialSubtitles, initialTitle } from "@/lib/dummy"
 
 export default function SubtitleTranslator() {
   // Subtitle Store
@@ -62,6 +63,7 @@ export default function SubtitleTranslator() {
   const parsed = useSubtitleStore((state) => state.parsed)
   const setParsed = useSubtitleStore((state) => state.setParsed)
   const resetParsed = useSubtitleStore((state) => state.resetParsed)
+  const isInitRef = useSubtitleStore((state) => state.isInitRef)
 
   // Settings Store
   const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
@@ -88,6 +90,15 @@ export default function SubtitleTranslator() {
   const [activeTab, setActiveTab] = useState(isTranslating ? "process" : "basic")
 
   const { setHasChanges } = useBeforeUnload()
+
+  useEffect(() => {
+    const key = useSubtitleStore.persist.getOptions().name
+    if (key && !localStorage.getItem(key) && isInitRef.current) {
+      setTitle(initialTitle)
+      setSubtitles(initialSubtitles)
+    }
+    isInitRef.current = false
+  }, [])
 
   const handleStartTranslation = async () => {
     if (!subtitles.length) return
@@ -254,8 +265,10 @@ export default function SubtitleTranslator() {
   const handleSaveProject = () => { }
 
   const handleDelete = () => {
+    setTitle("")
     setSubtitles([])
     resetParsed()
+    useSubtitleStore.persist.clearStorage()
   }
 
   return (
