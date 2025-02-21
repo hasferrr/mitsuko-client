@@ -1,3 +1,4 @@
+import { EXTRACT_CONTEXT_URL, EXTRACT_CONTEXT_URL_FREE } from "@/constants/api"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
@@ -7,7 +8,7 @@ interface ExtractionStore {
   abortControllerRef: React.RefObject<AbortController | null>
   setContextResult: (result: string) => void
   setIsExtracting: (isExtracting: boolean) => void
-  extractContext: (requestBody: any, apiKey: string) => Promise<void>
+  extractContext: (requestBody: any, apiKey: string, isFree: boolean) => Promise<void>
   stopExtraction: () => void
 }
 
@@ -20,7 +21,7 @@ export const useExtractionStore = create<ExtractionStore>()(persist((set, get) =
   stopExtraction: () => {
     get().abortControllerRef.current?.abort()
   },
-  extractContext: async (requestBody, apiKey) => {
+  extractContext: async (requestBody, apiKey, isFree) => {
     if (get().isExtracting) return
 
     set({ isExtracting: true, contextResult: "" })
@@ -29,7 +30,7 @@ export const useExtractionStore = create<ExtractionStore>()(persist((set, get) =
     let buffer = ""
 
     try {
-      const res = await fetch("http://localhost:4000/api/stream/extract-context", {
+      const res = await fetch(isFree ? EXTRACT_CONTEXT_URL_FREE : EXTRACT_CONTEXT_URL, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -42,7 +43,7 @@ export const useExtractionStore = create<ExtractionStore>()(persist((set, get) =
       if (!res.ok) {
         const errorData = await res.json()
         console.error("Error details from server:", errorData)
-        throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error}`)
+        throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error || errorData.message}`)
       }
 
       const reader = res.body?.getReader()

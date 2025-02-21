@@ -3,7 +3,7 @@
 import { memo, useEffect, useRef, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/use-settings-store"
@@ -22,6 +22,7 @@ import {
   TEMPERATURE_MIN,
   TEMPERATURE_MAX,
 } from "@/constants/limits"
+import { FREE_MODELS } from "@/constants/model"
 import { parseTranslationJson } from "@/lib/parser"
 
 
@@ -35,7 +36,7 @@ export const LanguageSelection = memo(() => {
     <div className="grid gap-4 md:grid-cols-2">
       <div className="space-y-2">
         <label className="text-sm font-medium">Source Language</label>
-        <Select defaultValue={sourceLanguage} onValueChange={setSourceLanguage}>
+        <Select value={sourceLanguage} onValueChange={setSourceLanguage}>
           <SelectTrigger className="bg-background dark:bg-muted/30">
             <SelectValue />
           </SelectTrigger>
@@ -49,7 +50,7 @@ export const LanguageSelection = memo(() => {
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Target Language</label>
-        <Select defaultValue={targetLanguage} onValueChange={setTargetLanguage}>
+        <Select value={targetLanguage} onValueChange={setTargetLanguage}>
           <SelectTrigger className="bg-background dark:bg-muted/30">
             <SelectValue />
           </SelectTrigger>
@@ -67,6 +68,8 @@ export const LanguageSelection = memo(() => {
 })
 
 export const ModelSelection = memo(() => {
+  const selectedModel = useSettingsStore((state) => state.selectedModel)
+  const setSelectedModel = useSettingsStore((state) => state.setSelectedModel)
   const useCustomModel = useSettingsStore((state) => state.useCustomModel)
   const setUseCustomModel = useSettingsStore((state) => state.setUseCustomModel)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
@@ -82,12 +85,25 @@ export const ModelSelection = memo(() => {
     <>
       <div className="space-y-2">
         <label className="text-sm font-medium">Model</label>
-        <Select defaultValue="deepseek" disabled={useCustomModel}>
+        <Select
+          value={selectedModel}
+          onValueChange={setSelectedModel}
+          disabled={useCustomModel}
+        >
           <SelectTrigger className="bg-background dark:bg-muted/30">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="deepseek">DeepSeek-R1</SelectItem>
+            <SelectGroup>
+              <SelectLabel>
+                Free Models (Limited)
+              </SelectLabel>
+              {FREE_MODELS.map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectGroup>
           </SelectContent>
         </Select>
       </div>

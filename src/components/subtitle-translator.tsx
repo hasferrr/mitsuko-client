@@ -76,6 +76,7 @@ export default function SubtitleTranslator() {
   // Settings Store
   const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
   const targetLanguage = useSettingsStore((state) => state.targetLanguage)
+  const selectedModel = useSettingsStore((state) => state.selectedModel)
   const useCustomModel = useSettingsStore((state) => state.useCustomModel)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
   const customModel = useSettingsStore((state) => state.customModel)
@@ -167,8 +168,8 @@ export default function SubtitleTranslator() {
         sourceLanguage,
         targetLanguage,
         contextDocument,
-        baseURL: useCustomModel ? customBaseUrl : undefined,
-        model: useCustomModel ? customModel : "deepseek",
+        baseURL: useCustomModel ? customBaseUrl : "http://localhost:6969",
+        model: useCustomModel ? customModel : selectedModel,
         temperature: minMax(temperature, TEMPERATURE_MIN, TEMPERATURE_MAX),
         maxCompletionTokens: minMax(
           maxCompletionTokens,
@@ -180,7 +181,7 @@ export default function SubtitleTranslator() {
 
       let tlChunk: SubOnlyTranslated[] = []
       try {
-        tlChunk = await translateSubtitles(requestBody, apiKey)
+        tlChunk = await translateSubtitles(requestBody, apiKey, !useCustomModel)
       } catch {
         setIsTranslating(false)
         break

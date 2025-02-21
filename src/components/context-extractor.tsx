@@ -35,6 +35,7 @@ export const ContextExtractor = () => {
   const [activeTab, setActiveTab] = useState("result")
 
   // Settings Store
+  const selectedModel = useSettingsStore((state) => state.selectedModel)
   const useCustomModel = useSettingsStore((state) => state.useCustomModel)
   const apiKey = useSettingsStore((state) => state.apiKey)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
@@ -201,8 +202,8 @@ export const ContextExtractor = () => {
         subtitles: subtitles,
         previous_context: previousContext,
       },
-      baseURL: useCustomModel ? customBaseUrl : undefined,
-      model: useCustomModel ? customModel : "deepseek",
+      baseURL: useCustomModel ? customBaseUrl : "http://localhost:6969",
+      model: useCustomModel ? customModel : selectedModel,
       maxCompletionTokens: minMax(
         maxCompletionTokens,
         MAX_COMPLETION_TOKENS_MIN,
@@ -210,7 +211,7 @@ export const ContextExtractor = () => {
       ),
     }
 
-    extractContext(requestBody, apiKey)
+    await extractContext(requestBody, apiKey, !useCustomModel)
   }
 
   const handleSaveToFile = () => {

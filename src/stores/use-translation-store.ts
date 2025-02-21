@@ -1,7 +1,8 @@
 import { create } from "zustand"
-import { SubOnlyTranslated, SubtitleTranslated } from "@/types/types"
+import { SubOnlyTranslated } from "@/types/types"
 import { parseTranslationJson } from "@/lib/parser"
 import { persist } from "zustand/middleware"
+import { TRANSLATE_URL, TRANSLATE_URL_FREE } from "@/constants/api"
 
 interface TranslationStore {
   response: string
@@ -12,7 +13,7 @@ interface TranslationStore {
   setJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
   appendJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
   abortControllerRef: React.RefObject<AbortController | null>
-  translateSubtitles: (requestBody: any, apiKey: string) => Promise<SubOnlyTranslated[]>
+  translateSubtitles: (requestBody: any, apiKey: string, isFree: boolean) => Promise<SubOnlyTranslated[]>
   stopTranslation: () => void
 }
 
@@ -26,14 +27,14 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
   appendJsonResponse: (newArr) => set((state) => ({ jsonResponse: [...state.jsonResponse, ...newArr] })),
   abortControllerRef: { current: null },
   stopTranslation: () => get().abortControllerRef.current?.abort(),
-  translateSubtitles: async (requestBody, apiKey) => {
+  translateSubtitles: async (requestBody, apiKey, isFree) => {
     set({ response: "" })
 
     get().abortControllerRef.current = new AbortController()
     let buffer = ""
 
     try {
-      const res = await fetch("http://localhost:4000/api/stream/translate", {
+      const res = await fetch(isFree ? TRANSLATE_URL_FREE : TRANSLATE_URL, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -46,7 +47,7 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
       if (!res.ok) {
         const errorData = await res.json()
         console.error("Error details from server:", errorData)
-        throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error}`)
+        throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error || errorData.message}`)
       }
 
       const reader = res.body?.getReader()
