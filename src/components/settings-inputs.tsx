@@ -22,6 +22,7 @@ import {
   TEMPERATURE_MIN,
   TEMPERATURE_MAX,
 } from "@/constants/limits"
+import { parseTranslationJson } from "@/lib/parser"
 
 
 export const LanguageSelection = memo(() => {
@@ -352,32 +353,123 @@ export const StartIndexInput = memo(() => {
 })
 
 export const ProcessOutput = memo(() => {
+  // Translation store
   const response = useTranslationStore((state) => state.response)
   const jsonResponse = useTranslationStore((state) => state.jsonResponse)
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
-  useAutoScroll(response, textareaRef)
+  const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
+  const isTranslating = useTranslationStore((state) => state.isTranslating)
+
+  // Subtitle store
+  const subtitles = useSubtitleStore((state) => state.subtitles)
+  const setSubtitles = useSubtitleStore((state) => state.setSubtitles)
+
+  // State
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState("")
+  const topTextareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const bottomTextareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  const jsonText = jsonResponse.length ? `[${jsonResponse.map(s => JSON.stringify(s, null, 2))}]` : ""
+
+  useAutoScroll(response, topTextareaRef)
 
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.scrollTop = textareaRef.current.scrollHeight
+    setEditValue(jsonText)
+  }, [isEditing])
+
+  useEffect(() => {
+    if (isTranslating) {
+      setIsEditing(false)
     }
-  }, [textareaRef])
+  }, [isTranslating])
+
+  useEffect(() => {
+    if (topTextareaRef.current) {
+      topTextareaRef.current.scrollTop = topTextareaRef.current.scrollHeight
+    }
+  }, [topTextareaRef])
+
+  const handleChangeJSONInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditValue(e.target.value)
+  }
+
+  const handleEditText = () => {
+    bottomTextareaRef.current?.focus()
+    setIsEditing(true)
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditing(false)
+  }
+
+  const handleParseAndSave = () => {
+    try {
+      const parsed = parseTranslationJson(editValue)
+      setJsonResponse(parsed)
+    } catch {
+      "Failed to parse JSON. Please check the format."
+      return
+    }
+    setIsEditing(false)
+  }
+
+  const handleApply = () => {
+    const tlChunk = jsonResponse
+    if (!tlChunk.length) {
+      return
+    }
+
+    const merged = [...subtitles]
+    const adjustedStartIndex = tlChunk[0].index - 1
+
+    for (let i = 0; i < tlChunk.length; i++) {
+      const j = adjustedStartIndex + i
+      merged[j] = {
+        ...merged[j],
+        translated: tlChunk[i].translated || merged[j].translated,
+      }
+    }
+    setSubtitles(merged)
+  }
 
   return (
     <div className="space-y-4">
       <Textarea
-        ref={textareaRef}
+        ref={topTextareaRef}
         value={response.trim()}
         readOnly
-        className="h-[420px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+        className="h-[370px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
         placeholder="Translation output will appear here..."
       />
       <Textarea
-        value={jsonResponse.length ? `[${jsonResponse.map(s => JSON.stringify(s, null, 2))}]` : ""}
-        readOnly
-        className="h-[270px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm"
+        ref={bottomTextareaRef}
+        value={isEditing ? editValue : jsonText}
+        readOnly={!isEditing}
+        onChange={handleChangeJSONInput}
+        className="h-[277px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm"
         placeholder="Parsed JSON output will appear here..."
       />
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          variant={isEditing ? "default" : "outline"}
+          onClick={isEditing ? handleParseAndSave : handleEditText}
+          disabled={isTranslating}
+          className="w-full"
+        >
+          {isEditing ? "Parse & Save" : "Edit Text"}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={isEditing ? handleCancelEdit : handleApply}
+          disabled={isTranslating}
+          className="w-full"
+        >
+          {isEditing ? "Cancel" : "Apply to Subtitles"}
+        </Button>
+
+      </div>
     </div>
   )
 })

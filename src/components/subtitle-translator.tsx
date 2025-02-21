@@ -369,7 +369,7 @@ export default function SubtitleTranslator() {
       </div>
 
       {/* Main Content */}
-      <div className="grid lg:grid-cols-[1fr_400px] gap-6">
+      <div className="grid md:grid-cols-[1fr_400px] gap-6">
         {/* Left Column - Subtitles */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
