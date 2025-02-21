@@ -18,7 +18,11 @@ import { useBeforeUnload } from "@/hooks/use-before-unload"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useExtractionStore } from "@/stores/use-extraction-store"
 import { useExtractionInputStore } from "@/stores/use-extraction-input-store"
-import { ModelSelection } from "./settings-inputs"
+import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
+import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constants/limits"
+import { getContent } from "@/lib/parser"
+import { minMax } from "@/lib/utils"
+import { MaxCompletionTokenInput, ModelSelection } from "./settings-inputs"
 
 
 interface FileItem {
@@ -30,15 +34,14 @@ interface FileItem {
 export const ContextExtractor = () => {
   const [activeTab, setActiveTab] = useState("result")
 
-  // Get state and setters from useSettingsStore
+  // Settings Store
   const useCustomModel = useSettingsStore((state) => state.useCustomModel)
-  const setUseCustomModel = useSettingsStore((state) => state.setUseCustomModel)
   const apiKey = useSettingsStore((state) => state.apiKey)
-  const setApiKey = useSettingsStore((state) => state.setApiKey)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
-  const setCustomBaseUrl = useSettingsStore((state) => state.setCustomBaseUrl)
   const customModel = useSettingsStore((state) => state.customModel)
-  const setCustomModel = useSettingsStore((state) => state.setCustomModel)
+
+  // Advanced Settings Store
+  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
 
   // Extraction Store
   const contextResult = useExtractionStore((state) => state.contextResult)
@@ -178,14 +181,18 @@ export const ContextExtractor = () => {
       },
       baseURL: useCustomModel ? customBaseUrl : undefined,
       model: useCustomModel ? customModel : "deepseek",
-      maxCompletionTokens: 8192,
+      maxCompletionTokens: minMax(
+        maxCompletionTokens,
+        MAX_COMPLETION_TOKENS_MIN,
+        MAX_COMPLETION_TOKENS_MAX
+      ),
     }
 
     extractContext(requestBody, apiKey)
   }
 
   const handleSaveToFile = () => {
-    const text = contextResult.trim()
+    const text = getContent(contextResult)
     if (!text) return
 
     const blob = new Blob([text], { type: "text/plain" })
@@ -220,7 +227,7 @@ export const ContextExtractor = () => {
                 <label className="text-sm font-medium">Subtitle Content</label>
                 <input
                   type="file"
-                  accept=".srt,.ass,.txt"
+                  accept=".srt,.ass"
                   onChange={handleFileUpload}
                   className="hidden"
                   id="subtitle-content-upload"
@@ -228,6 +235,7 @@ export const ContextExtractor = () => {
                 <Button
                   variant="outline"
                   className="gap-2"
+                  size="sm"
                   onClick={() => document.getElementById("subtitle-content-upload")?.click()}
                 >
                   <Upload className="h-4 w-4" />
@@ -244,7 +252,25 @@ export const ContextExtractor = () => {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Previous Context</label>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium">Previous Context</label>
+                <input
+                  type="file"
+                  accept=".txt,.md"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="previous-context-upload"
+                />
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  size="sm"
+                  onClick={() => document.getElementById("previous-context-upload")?.click()}
+                >
+                  <Upload className="h-4 w-4" />
+                  Upload
+                </Button>
+              </div>
               <Textarea
                 value={previousContext}
                 onChange={handlePreviousContextChange}
@@ -263,7 +289,7 @@ export const ContextExtractor = () => {
               <input
                 type="file"
                 multiple
-                accept=".srt,.ass,.txt"
+                accept=".srt,.ass"
                 onChange={handleFileUpload}
                 className="hidden"
                 id="subtitle-files-upload"
@@ -317,6 +343,7 @@ export const ContextExtractor = () => {
             <Card className="border border-border bg-card text-card-foreground">
               <CardContent className="p-4 space-y-4">
                 <ModelSelection />
+                <MaxCompletionTokenInput />
               </CardContent>
             </Card>
           </TabsContent>
@@ -327,7 +354,7 @@ export const ContextExtractor = () => {
                 ref={contextResultRef}
                 value={contextResult.trim()}
                 readOnly
-                className="min-h-[420px] h-[420px] max-h-[420px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                className="h-[428px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
                 placeholder="Extracted context will appear here..."
               />
             </div>
