@@ -36,7 +36,7 @@ export const ContextExtractor = () => {
 
   // Settings Store
   const selectedModel = useSettingsStore((state) => state.selectedModel)
-  const useCustomModel = useSettingsStore((state) => state.useCustomModel)
+  const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
   const apiKey = useSettingsStore((state) => state.apiKey)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
   const customModel = useSettingsStore((state) => state.customModel)
@@ -202,8 +202,8 @@ export const ContextExtractor = () => {
         subtitles: subtitles,
         previous_context: previousContext,
       },
-      baseURL: useCustomModel ? customBaseUrl : "http://localhost:6969",
-      model: useCustomModel ? customModel : selectedModel,
+      baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
+      model: isUseCustomModel ? customModel : selectedModel,
       maxCompletionTokens: minMax(
         maxCompletionTokens,
         MAX_COMPLETION_TOKENS_MIN,
@@ -211,7 +211,7 @@ export const ContextExtractor = () => {
       ),
     }
 
-    await extractContext(requestBody, apiKey, !useCustomModel)
+    await extractContext(requestBody, apiKey, !isUseCustomModel)
   }
 
   const handleSaveToFile = () => {

@@ -77,7 +77,7 @@ export default function SubtitleTranslator() {
   const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
   const targetLanguage = useSettingsStore((state) => state.targetLanguage)
   const selectedModel = useSettingsStore((state) => state.selectedModel)
-  const useCustomModel = useSettingsStore((state) => state.useCustomModel)
+  const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
   const customModel = useSettingsStore((state) => state.customModel)
   const apiKey = useSettingsStore((state) => state.apiKey)
@@ -168,8 +168,8 @@ export default function SubtitleTranslator() {
         sourceLanguage,
         targetLanguage,
         contextDocument,
-        baseURL: useCustomModel ? customBaseUrl : "http://localhost:6969",
-        model: useCustomModel ? customModel : selectedModel,
+        baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
+        model: isUseCustomModel ? customModel : selectedModel,
         temperature: minMax(temperature, TEMPERATURE_MIN, TEMPERATURE_MAX),
         maxCompletionTokens: minMax(
           maxCompletionTokens,
@@ -181,7 +181,7 @@ export default function SubtitleTranslator() {
 
       let tlChunk: SubOnlyTranslated[] = []
       try {
-        tlChunk = await translateSubtitles(requestBody, apiKey, !useCustomModel)
+        tlChunk = await translateSubtitles(requestBody, apiKey, !isUseCustomModel)
       } catch {
         setIsTranslating(false)
         break

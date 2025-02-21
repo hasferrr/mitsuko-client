@@ -70,8 +70,8 @@ export const LanguageSelection = memo(() => {
 export const ModelSelection = memo(() => {
   const selectedModel = useSettingsStore((state) => state.selectedModel)
   const setSelectedModel = useSettingsStore((state) => state.setSelectedModel)
-  const useCustomModel = useSettingsStore((state) => state.useCustomModel)
-  const setUseCustomModel = useSettingsStore((state) => state.setUseCustomModel)
+  const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
+  const setIsUseCustomModel = useSettingsStore((state) => state.setIsUseCustomModel)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
   const setCustomBaseUrl = useSettingsStore((state) => state.setCustomBaseUrl)
   const customModel = useSettingsStore((state) => state.customModel)
@@ -88,7 +88,7 @@ export const ModelSelection = memo(() => {
         <Select
           value={selectedModel}
           onValueChange={setSelectedModel}
-          disabled={useCustomModel}
+          disabled={isUseCustomModel}
         >
           <SelectTrigger className="bg-background dark:bg-muted/30">
             <SelectValue />
@@ -108,12 +108,12 @@ export const ModelSelection = memo(() => {
         </Select>
       </div>
       <div className="flex items-center space-x-2">
-        <Switch id="custom-model" checked={useCustomModel} onCheckedChange={setUseCustomModel} />
+        <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={setIsUseCustomModel} />
         <label htmlFor="custom-model" className="text-sm font-medium">
           Use Custom Model
         </label>
       </div>
-      {useCustomModel && (
+      {isUseCustomModel && (
         <div className="space-y-4 pt-2">
           <Input
             value={customBaseUrl}
