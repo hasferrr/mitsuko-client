@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { META_DESCRIPTION, META_TITLE } from '@/constants/metadata'
 
 export const metadata: Metadata = {
-  title: 'Mitsuko',
-  description: 'Mitsuko',
+  title: META_TITLE,
+  description: META_DESCRIPTION,
 }
 
 export default function RootLayout({
@@ -14,7 +15,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="https://i.pinimg.com/1200x/2f/52/bb/2f52bb67e52f767ed39a2d655537829c.jpg" type="image/jpg" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="192x192" href="icon.png" />
       </head>
       <body>{children}</body>
     </html>
