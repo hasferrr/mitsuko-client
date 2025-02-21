@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { File, XCircle, ArrowUpCircle, ArrowDownCircle, Upload, Save, Play, Square, Loader2 } from "lucide-react"
+import { File, XCircle, ArrowUpCircle, ArrowDownCircle, Upload, Save, Play, Square, Loader2, ArrowUpDown, Trash2 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Subtitle, SubtitleNoTime } from "@/types/types"
@@ -158,6 +158,16 @@ export const ContextExtractor = () => {
       newFiles[index] = temp
       setSelectedFiles(newFiles)
     }
+  }
+
+  const handleCopyAndSortFiles = () => {
+    const sortedFiles = [...selectedFiles]
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }))
+    setSelectedFiles(sortedFiles)
+  }
+
+  const handleClearFiles = () => {
+    setSelectedFiles([])
   }
 
   const handleStartExtraction = async () => {
@@ -313,6 +323,26 @@ export const ContextExtractor = () => {
               >
                 <Upload className="h-4 w-4" />
                 Select Files
+              </Button>
+              {/* Sort Button */}
+              <Button
+                variant="outline"
+                className="gap-2"
+                size="sm"
+                onClick={handleCopyAndSortFiles}
+              >
+                <ArrowUpDown className="h-4 w-4" />
+                Sort
+              </Button>
+              {/* Clear Button */}
+              <Button
+                variant="outline"
+                className="gap-2"
+                size="sm"
+                onClick={handleClearFiles}
+              >
+                <Trash2 className="h-4 w-4" />
+                Clear
               </Button>
             </div>
 
