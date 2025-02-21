@@ -118,7 +118,7 @@ export const ModelSelection = memo(() => {
           <Input
             value={customBaseUrl}
             onChange={(e) => setCustomBaseUrl(e.target.value)}
-            placeholder="Base URL"
+            placeholder="Base URL (OpenAI compatibility)"
             className="bg-background dark:bg-muted/30"
           />
           <Input
