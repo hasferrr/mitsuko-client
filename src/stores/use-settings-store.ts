@@ -1,5 +1,9 @@
 import { create } from "zustand"
 import { persist } from 'zustand/middleware'
+import {
+  DEFAULT_SOURCE_LANGUAGE,
+  DEFAULT_TARGET_LANGUAGE,
+} from "@/constants/default"
 
 interface SettingsStore {
   sourceLanguage: string
@@ -21,8 +25,8 @@ interface SettingsStore {
 export const useSettingsStore = create<SettingsStore>()(
   persist(
     (set) => ({
-      sourceLanguage: "japanese",
-      targetLanguage: "indonesian",
+      sourceLanguage: DEFAULT_SOURCE_LANGUAGE,
+      targetLanguage: DEFAULT_TARGET_LANGUAGE,
       useCustomModel: false,
       apiKey: "",
       customBaseUrl: "",

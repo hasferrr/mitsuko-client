@@ -42,7 +42,7 @@ import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
-import { capitalizeWords } from "@/lib/utils"
+import { capitalizeWords, minMax } from "@/lib/utils"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
@@ -59,7 +59,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { initialSubtitles, initialTitle } from "@/lib/dummy"
+import { DEFAULT_SUBTITLES, DEFAULT_TITLE } from "@/constants/default"
+import { MAX_COMPLETION_TOKENS_MAX, MAX_COMPLETION_TOKENS_MIN, SPLIT_SIZE_MAX, SPLIT_SIZE_MIN, TEMPERATURE_MAX, TEMPERATURE_MIN } from "@/constants/limits"
 
 export default function SubtitleTranslator() {
   // Subtitle Store
@@ -102,8 +103,8 @@ export default function SubtitleTranslator() {
   useEffect(() => {
     const key = useSubtitleStore.persist.getOptions().name
     if (key && !localStorage.getItem(key) && isInitRef.current) {
-      setTitle(initialTitle)
-      setSubtitles(initialSubtitles)
+      setTitle(DEFAULT_TITLE)
+      setSubtitles(DEFAULT_SUBTITLES)
     }
     isInitRef.current = false
   }, [])
@@ -124,8 +125,9 @@ export default function SubtitleTranslator() {
 
     // Split subtitles into chunks, starting from startIndex - 1
     const subtitleChunks: SubtitleNoTime[][] = []
-    const size = Math.max(splitSize, 10)
-    for (let i = Math.max(startIndex - 1, 0); i < subtitles.length; i += size) {
+    const size = minMax(splitSize, SPLIT_SIZE_MIN, SPLIT_SIZE_MAX)
+    const adjustedStartIndex = minMax(startIndex - 1, 0, subtitles.length - 1)
+    for (let i = adjustedStartIndex; i < subtitles.length; i += size) {
       subtitleChunks.push(subtitles.slice(i, i + size).map((s) => ({
         index: s.index,
         actor: s.actor,
@@ -138,7 +140,7 @@ export default function SubtitleTranslator() {
     if (startIndex > 1) {
       context.push({
         role: "user",
-        content: subtitles.slice(0, startIndex - 1).map((chunk) => ({
+        content: subtitles.slice(0, adjustedStartIndex).map((chunk) => ({
           index: chunk.index,
           actor: chunk.actor,
           content: chunk.content,
@@ -167,8 +169,12 @@ export default function SubtitleTranslator() {
         contextDocument,
         baseURL: useCustomModel ? customBaseUrl : undefined,
         model: useCustomModel ? customModel : "deepseek",
-        temperature,
-        maxCompletionTokens,
+        temperature: minMax(temperature, TEMPERATURE_MIN, TEMPERATURE_MAX),
+        maxCompletionTokens: minMax(
+          maxCompletionTokens,
+          MAX_COMPLETION_TOKENS_MIN,
+          MAX_COMPLETION_TOKENS_MAX
+        ),
         contextMessage: context,
       }
 
@@ -182,10 +188,6 @@ export default function SubtitleTranslator() {
 
       if (tlChunk.length) {
         appendJsonResponse(tlChunk)
-
-        // Adjust index based on startIndex
-        const adjustedStartIndex = Math.max(startIndex - 1, 0)
-        const merged: SubtitleTranslated[] = [...subtitles]
 
         /**
          * Merge translated chunk with original subtitles
@@ -212,6 +214,7 @@ export default function SubtitleTranslator() {
          * originalIndex = 3 + N = 3 + N
          * merged[3 + N] = tlChunk[N]
          */
+        const merged: SubtitleTranslated[] = [...subtitles]
         for (let j = 0; j < tlChunk.length; j++) {
           const originalIndex = adjustedStartIndex + j
           if (originalIndex < subtitles.length) {

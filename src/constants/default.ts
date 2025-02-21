@@ -1,7 +1,16 @@
 import { SubtitleTranslated } from "@/types/types"
 
-export const initialTitle = "Blue.Box.S01E16"
-export const initialSubtitles: SubtitleTranslated[] = [
+export const DEFAULT_SOURCE_LANGUAGE = "japanese"
+export const DEFAULT_TARGET_LANGUAGE = "indonesian"
+
+export const DEFAULT_TEMPERATURE = 0.6
+export const DEFAULT_SPLIT_SIZE = 150
+export const DEFAULT_PROMPT = ""
+export const DEFAULT_MAX_COMPLETION_TOKENS = 8192
+export const DEFAULT_START_INDEX = 1
+
+export const DEFAULT_TITLE = "Blue.Box.S01E16 (example)"
+export const DEFAULT_SUBTITLES: SubtitleTranslated[] = [
   {
     "index": 1,
     "timestamp": {

@@ -14,6 +14,14 @@ import { useBeforeUnload } from "@/hooks/use-before-unload"
 import { Eye, EyeOff } from "lucide-react"
 import { Button } from "./ui/button"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
+import {
+  SPLIT_SIZE_MIN,
+  SPLIT_SIZE_MAX,
+  MAX_COMPLETION_TOKENS_MIN,
+  MAX_COMPLETION_TOKENS_MAX,
+  TEMPERATURE_MIN,
+  TEMPERATURE_MAX,
+} from "@/constants/limits"
 
 
 export const LanguageSelection = memo(() => {
@@ -176,7 +184,8 @@ export const TemperatureSlider = memo(() => {
       <Slider
         value={[temperature]}
         onValueChange={([value]) => setTemperature(value)}
-        max={1.3}
+        max={TEMPERATURE_MAX}
+        min={TEMPERATURE_MIN}
         step={0.1}
         className="py-2"
       />
@@ -196,14 +205,14 @@ export const SplitSizeInput = memo(() => {
     // Allow only numbers, and handle empty string
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10) // Prevent NaN
-      num = Math.min(num, 500)
+      num = Math.min(num, SPLIT_SIZE_MAX)
       setSplitSize(value === "" ? 0 : num)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setSplitSize(Math.min(Math.max(parseInt(value, 10), 10), 500))
+    setSplitSize(Math.min(Math.max(parseInt(value, 10), SPLIT_SIZE_MIN), SPLIT_SIZE_MAX))
   }
 
   return (
@@ -216,8 +225,8 @@ export const SplitSizeInput = memo(() => {
         value={splitSize}
         onBlur={handleBlur}
         onChange={handleChange}
-        min={10}
-        max={1000}
+        min={SPLIT_SIZE_MIN}
+        max={SPLIT_SIZE_MAX}
         step={10}
         className="bg-background dark:bg-muted/30"
         inputMode="numeric"
@@ -225,7 +234,7 @@ export const SplitSizeInput = memo(() => {
       <p className="text-xs text-muted-foreground">
         Determines the number of dialogues to process in each chunk.
         Smaller chunks can help with context management but may increase the token usage.
-        Larger chunks increase efficiency but may result in truncation due to the maximum model output token limit. (10-500)
+        Larger chunks increase efficiency but may result in truncation due to the maximum model output token limit. ({SPLIT_SIZE_MIN}-{SPLIT_SIZE_MAX})
       </p>
     </div>
   )
@@ -240,14 +249,14 @@ export const MaxCompletionTokenInput = memo(() => {
     // Allow only numbers, and handle empty string
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10) // Prevent NaN
-      num = Math.min(num, 164000)
+      num = Math.min(num, MAX_COMPLETION_TOKENS_MAX)
       setMaxCompletionTokens(value === "" ? 0 : num)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setMaxCompletionTokens(Math.min(Math.max(parseInt(value, 10), 512), 164000))
+    setMaxCompletionTokens(Math.min(Math.max(parseInt(value, 10), MAX_COMPLETION_TOKENS_MIN), MAX_COMPLETION_TOKENS_MAX))
   }
 
   return (
@@ -260,14 +269,14 @@ export const MaxCompletionTokenInput = memo(() => {
         value={maxCompletionTokens}
         onBlur={handleBlur}
         onChange={handleChange}
-        min={512}
-        max={164000}
+        min={MAX_COMPLETION_TOKENS_MIN}
+        max={MAX_COMPLETION_TOKENS_MAX}
         step={512}
         className="bg-background dark:bg-muted/30"
         inputMode="numeric"
       />
       <p className="text-xs text-muted-foreground">
-        Sets the maximum number of tokens the model can generate for each subtitle chunk. (512-164,000)
+        Sets the maximum number of tokens the model can generate for each subtitle chunk. ({MAX_COMPLETION_TOKENS_MIN}-{MAX_COMPLETION_TOKENS_MAX})
       </p>
     </div>
   )
