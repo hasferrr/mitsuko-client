@@ -63,6 +63,8 @@ export const ContextExtractor = () => {
     setIsBatchMode,
   } = useExtractionInputStore()
 
+  const subtitleContentRef = useRef<HTMLTextAreaElement | null>(null)
+  const previousContextRef = useRef<HTMLTextAreaElement | null>(null)
   const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
 
   const { setHasChanges } = useBeforeUnload()
@@ -89,36 +91,46 @@ export const ContextExtractor = () => {
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
   }, [setHasChanges, setPreviousContext])
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUploadSingle = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setState: (value: string) => void,
+    textarea: HTMLTextAreaElement | null,
+  ) => {
     const files = event.target.files
     if (!files || files.length === 0) return
     setHasChanges(true)
 
-    if (isBatchMode) {
-      // Batch Mode Logic (Existing)
-      const newFiles: FileItem[] = []
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i]
-        const text = await file.text()
-        newFiles.push({
-          id: `${Date.now()}-${i}`, // Unique ID
-          name: file.name,
-          content: text,
-        })
-      }
-      setSelectedFiles([...selectedFiles, ...newFiles])
-    } else {
-      // Single File Logic (For Subtitle Content)
-      const file = files[0]
-      const text = await file.text()
-      setSubtitleContent(text)
-      // Trigger resize
-      const textarea = document.getElementById("subtitle-content-textarea") as HTMLTextAreaElement
-      if (textarea) {
-        textarea.style.height = "auto"
-        textarea.style.height = `${Math.min(textarea.scrollHeight, 900)}px`
-      }
+    // Single File Logic (For Subtitle Content)
+    const file = files[0]
+    const text = await file.text()
+    setState(text)
+    // Trigger resize
+    if (textarea) {
+      textarea.style.height = "auto"
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 900)}px`
     }
+
+    // Reset the input
+    event.target.value = ""
+  }
+
+  const handleFileUploadBatch = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
+    setHasChanges(true)
+
+    // Batch Mode Logic (Existing)
+    const newFiles: FileItem[] = []
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      const text = await file.text()
+      newFiles.push({
+        id: `${Date.now()}-${i}`, // Unique ID
+        name: file.name,
+        content: text,
+      })
+    }
+    setSelectedFiles([...selectedFiles, ...newFiles])
 
     // Reset the input
     event.target.value = ""
@@ -150,7 +162,7 @@ export const ContextExtractor = () => {
 
   const handleStartExtraction = async () => {
     if (isExtracting) return
-
+    setHasChanges(true)
     setActiveTab("result")
 
     setTimeout(() => {
@@ -207,7 +219,7 @@ export const ContextExtractor = () => {
   }
 
   return (
-    <div className="grid lg:grid-cols-2 gap-6 container mx-auto py-4 px-4 mt-2 mb-6 max-w-5xl">
+    <div className="grid lg:grid-cols-2 gap-6 container mx-auto py-2 px-4 mt-2 mb-6 max-w-5xl">
       {/* Left Pane */}
       <div className="space-y-2">
         <div className="space-y-2">
@@ -228,14 +240,13 @@ export const ContextExtractor = () => {
                 <input
                   type="file"
                   accept=".srt,.ass"
-                  onChange={handleFileUpload}
+                  onChange={(e) => handleFileUploadSingle(e, setSubtitleContent, subtitleContentRef.current)}
                   className="hidden"
                   id="subtitle-content-upload"
                 />
                 <Button
                   variant="outline"
-                  className="gap-2"
-                  size="sm"
+                  className="gap-2 h-2 p-3"
                   onClick={() => document.getElementById("subtitle-content-upload")?.click()}
                 >
                   <Upload className="h-4 w-4" />
@@ -243,10 +254,10 @@ export const ContextExtractor = () => {
                 </Button>
               </div>
               <Textarea
-                id="subtitle-content-textarea"
+                ref={subtitleContentRef}
                 value={subtitleContent}
                 onChange={handleSubtitleContentChange}
-                className="min-h-[208px] h-[208px] max-h-[208px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                className="min-h-[185px] h-[185px] max-h-[185px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
                 placeholder="Paste subtitle content here..."
                 onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
               />
@@ -257,14 +268,13 @@ export const ContextExtractor = () => {
                 <input
                   type="file"
                   accept=".txt,.md"
-                  onChange={handleFileUpload}
+                  onChange={(e) => handleFileUploadSingle(e, setPreviousContext, previousContextRef.current)}
                   className="hidden"
                   id="previous-context-upload"
                 />
                 <Button
                   variant="outline"
-                  className="gap-2"
-                  size="sm"
+                  className="gap-2 h-2 p-3"
                   onClick={() => document.getElementById("previous-context-upload")?.click()}
                 >
                   <Upload className="h-4 w-4" />
@@ -272,9 +282,10 @@ export const ContextExtractor = () => {
                 </Button>
               </div>
               <Textarea
+                ref={previousContextRef}
                 value={previousContext}
                 onChange={handlePreviousContextChange}
-                className="min-h-[100px] h-[100px] max-h-[100px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                className="min-h-[132px] h-[132px] max-h-[132px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
                 placeholder="Paste previous context here..."
                 onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
               />
@@ -290,13 +301,14 @@ export const ContextExtractor = () => {
                 type="file"
                 multiple
                 accept=".srt,.ass"
-                onChange={handleFileUpload}
+                onChange={handleFileUploadBatch}
                 className="hidden"
                 id="subtitle-files-upload"
               />
               <Button
                 variant="outline"
                 className="gap-2"
+                size="sm"
                 onClick={() => document.getElementById("subtitle-files-upload")?.click()}
               >
                 <Upload className="h-4 w-4" />
@@ -354,7 +366,7 @@ export const ContextExtractor = () => {
                 ref={contextResultRef}
                 value={contextResult.trim()}
                 readOnly
-                className="h-[428px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                className="h-[416px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
                 placeholder="Extracted context will appear here..."
               />
             </div>
@@ -364,7 +376,7 @@ export const ContextExtractor = () => {
 
       {/* Bottom Controls */}
       <div className="lg:col-span-2 flex items-center justify-center gap-4">
-        <Button className="gap-2" onClick={handleStartExtraction} disabled={isExtracting || isBatchMode}>
+        <Button className="gap-2 w-[152px]" onClick={handleStartExtraction} disabled={isExtracting || isBatchMode}>
           {isExtracting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -377,7 +389,8 @@ export const ContextExtractor = () => {
             </>
           )}
         </Button>
-        <Button variant="outline" className="gap-2" onClick={stopExtraction} disabled={!isExtracting}>
+
+        <Button variant="outline" className="gap-2" onClick={stopExtraction} disabled={!isExtracting || !contextResult}>
           <Square className="h-4 w-4" />
           Stop
         </Button>
