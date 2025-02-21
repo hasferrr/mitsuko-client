@@ -190,39 +190,13 @@ export default function SubtitleTranslator() {
       if (tlChunk.length) {
         appendJsonResponse(tlChunk)
 
-        /**
-         * Merge translated chunk with original subtitles
-         *
-         * Example:
-         * startIndex = 4
-         * adjustedStartIndex = 4 - 1 = 3
-         *
-         * tlChunk =      [4,5,6,7,8]
-         *             j = 0 1 2 3 4   <-- j is the index of tlChunk
-         * merged = [1,2,3,4,5,6,7,8,9]
-         *           0 1 2 3 4 5 6 7 8 <-- index of merged
-         * originalIndex = 3 4 5 6 7   <-- index of merged
-         *
-         * FOR LOOP:
-         * - 1ST ITERATION
-         * originalIndex = 3 + 0 = 3
-         * merged[3] = tlChunk[0]
-         * - 2ND ITERATION
-         * originalIndex = 3 + 1 = 4
-         * merged[4] = tlChunk[1]
-         * ...
-         * - NTH ITERATION
-         * originalIndex = 3 + N = 3 + N
-         * merged[3 + N] = tlChunk[N]
-         */
+        // Merge translated chunk with original subtitles
         const merged: SubtitleTranslated[] = [...subtitles]
         for (let j = 0; j < tlChunk.length; j++) {
-          const originalIndex = adjustedStartIndex + j
-          if (originalIndex < subtitles.length) {
-            merged[originalIndex] = {
-              ...merged[originalIndex],
-              translated: tlChunk[j]?.translated || merged[originalIndex].translated,
-            }
+          const index = tlChunk[j].index - 1
+          merged[index] = {
+            ...merged[index],
+            translated: tlChunk[j].translated || merged[index].translated,
           }
         }
 

@@ -436,13 +436,11 @@ export const ProcessOutput = memo(() => {
     }
 
     const merged = [...subtitles]
-    const adjustedStartIndex = tlChunk[0].index - 1
-
     for (let i = 0; i < tlChunk.length; i++) {
-      const j = adjustedStartIndex + i
-      merged[j] = {
-        ...merged[j],
-        translated: tlChunk[i].translated || merged[j].translated,
+      const index = tlChunk[i].index - 1
+      merged[index] = {
+        ...merged[index],
+        translated: tlChunk[i].translated || merged[index].translated,
       }
     }
     setSubtitles(merged)
