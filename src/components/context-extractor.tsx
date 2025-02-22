@@ -23,6 +23,7 @@ import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constant
 import { getContent } from "@/lib/parser"
 import { minMax, cn } from "@/lib/utils"
 import { MaxCompletionTokenInput, ModelSelection } from "./settings-inputs"
+import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 
 
 interface FileItem {
@@ -97,11 +98,10 @@ export const ContextExtractor = () => {
   }, [setHasChanges, setPreviousContext])
 
   const handleFileUploadSingle = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    files: FileList | null,
     setState: (value: string) => void,
     textarea: HTMLTextAreaElement | null,
   ) => {
-    const files = event.target.files
     if (!files || files.length === 0) return
     setHasChanges(true)
 
@@ -114,13 +114,9 @@ export const ContextExtractor = () => {
       textarea.style.height = "auto"
       textarea.style.height = `${Math.min(textarea.scrollHeight, 900)}px`
     }
-
-    // Reset the input
-    event.target.value = ""
   }
 
-  const handleFileUploadBatch = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
+  const handleFileUploadBatch = async (files: FileList | null) => {
     if (!files || files.length === 0) return
     setHasChanges(true)
 
@@ -136,9 +132,6 @@ export const ContextExtractor = () => {
       })
     }
     setSelectedFiles([...selectedFiles, ...newFiles])
-
-    // Reset the input
-    event.target.value = ""
   }
 
   const removeFile = (id: string) => {
@@ -244,7 +237,7 @@ export const ContextExtractor = () => {
   }
 
   return (
-    <div className="grid lg:grid-cols-2 gap-6 container mx-auto py-2 px-4 mt-2 mb-6 max-w-5xl">
+    <div className="grid md:grid-cols-2 gap-6 container mx-auto py-2 px-4 mt-2 mb-6 max-w-5xl">
       {/* Left Pane */}
       <div className="space-y-2">
         <div className="space-y-2">
@@ -271,19 +264,26 @@ export const ContextExtractor = () => {
                 <input
                   type="file"
                   accept=".srt,.ass"
-                  onChange={(e) => handleFileUploadSingle(e, setSubtitleContent, subtitleContentRef.current)}
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      handleFileUploadSingle(e.target.files, setSubtitleContent, subtitleContentRef.current)
+                    }
+                  }}
                   className="hidden"
                   id="subtitle-content-upload"
                 />
+
                 <Button
                   variant="outline"
                   className="gap-2 h-2 p-3"
                   onClick={() => document.getElementById("subtitle-content-upload")?.click()}
+                  disabled={isExtracting}
                 >
                   <Upload className="h-4 w-4" />
                   Upload
                 </Button>
               </div>
+              <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, setSubtitleContent, subtitleContentRef.current)} disabled={isExtracting}>
               <Textarea
                 ref={subtitleContentRef}
                 value={subtitleContent}
@@ -295,6 +295,7 @@ export const ContextExtractor = () => {
                 placeholder="Paste subtitle content here..."
                 onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
               />
+              </DragAndDrop>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -302,7 +303,11 @@ export const ContextExtractor = () => {
                 <input
                   type="file"
                   accept=".txt,.md"
-                  onChange={(e) => handleFileUploadSingle(e, setPreviousContext, previousContextRef.current)}
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      handleFileUploadSingle(e.target.files, setPreviousContext, previousContextRef.current)
+                    }
+                  }}
                   className="hidden"
                   id="previous-context-upload"
                 />
@@ -310,11 +315,13 @@ export const ContextExtractor = () => {
                   variant="outline"
                   className="gap-2 h-2 p-3"
                   onClick={() => document.getElementById("previous-context-upload")?.click()}
+                  disabled={isExtracting}
                 >
                   <Upload className="h-4 w-4" />
                   Upload
                 </Button>
               </div>
+              <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, setPreviousContext, previousContextRef.current)} disabled={isExtracting}>
               <Textarea
                 ref={previousContextRef}
                 value={previousContext}
@@ -323,6 +330,7 @@ export const ContextExtractor = () => {
                 placeholder="Paste previous context here..."
                 onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
               />
+              </DragAndDrop>
             </div>
           </>
         )}
@@ -335,7 +343,11 @@ export const ContextExtractor = () => {
                 type="file"
                 multiple
                 accept=".srt,.ass"
-                onChange={handleFileUploadBatch}
+                onChange={(e) => {
+                  if (e.target.files) {
+                    handleFileUploadBatch(e.target.files)
+                  }
+                }}
                 className="hidden"
                 id="subtitle-files-upload"
               />
@@ -344,6 +356,7 @@ export const ContextExtractor = () => {
                 className="gap-2"
                 size="sm"
                 onClick={() => document.getElementById("subtitle-files-upload")?.click()}
+                disabled={isExtracting}
               >
                 <Upload className="h-4 w-4" />
                 Select Files
@@ -354,6 +367,7 @@ export const ContextExtractor = () => {
                 className="gap-2"
                 size="sm"
                 onClick={handleCopyAndSortFiles}
+                disabled={isExtracting}
               >
                 <ArrowUpDown className="h-4 w-4" />
                 Sort
@@ -364,12 +378,14 @@ export const ContextExtractor = () => {
                 className="gap-2"
                 size="sm"
                 onClick={handleClearFiles}
+                disabled={isExtracting}
               >
                 <Trash2 className="h-4 w-4" />
                 Clear
               </Button>
             </div>
 
+            <DragAndDrop onDropFiles={handleFileUploadBatch} disabled={isExtracting}>
             <ScrollArea className="h-[348px] border rounded-md">
               <div className="space-y-1 p-2">
                 {selectedFiles.map((file, index) => (
@@ -379,13 +395,13 @@ export const ContextExtractor = () => {
                       <div className="text-sm w-fit block break-all">{file.name}</div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => moveFileUp(index)}>
+                      <Button variant="ghost" size="icon" onClick={() => moveFileUp(index)} disabled={isExtracting}>
                         <ArrowUpCircle className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => moveFileDown(index)}>
+                      <Button variant="ghost" size="icon" onClick={() => moveFileDown(index)} disabled={isExtracting}>
                         <ArrowDownCircle className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => removeFile(file.id)}>
+                      <Button variant="ghost" size="icon" onClick={() => removeFile(file.id)} disabled={isExtracting}>
                         <XCircle className="h-4 w-4" />
                       </Button>
                     </div>
@@ -393,6 +409,7 @@ export const ContextExtractor = () => {
                 ))}
               </div>
             </ScrollArea>
+            </DragAndDrop>
           </div>
         )}
       </div>
