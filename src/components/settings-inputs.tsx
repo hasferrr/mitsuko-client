@@ -181,7 +181,7 @@ export const ContextDocumentInput = memo(() => {
       />
       <p className="text-xs text-muted-foreground">
         Provide context from previous episodes (can be generated using the
-        Extract Context feature). This improves accuracy and relevance.
+        <span className="font-semibold"> Extract Context</span> feature). This improves accuracy and relevance.
       </p>
     </div>
   )

@@ -6,6 +6,7 @@ import { LogIn, Moon, Sun, Loader2 } from "lucide-react"
 import { useThemeStore } from "@/stores/use-theme-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useExtractionStore } from "@/stores/use-extraction-store"
+import { DISCORD_LINK } from "@/constants/external-links"
 
 export function Navbar() {
   const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)
@@ -30,7 +31,12 @@ export function Navbar() {
           <Link href="#" className="transition-colors hover:text-foreground/80 text-foreground/60">
             About
           </Link>
-          <Link href="#" className="transition-colors hover:text-foreground/80 text-foreground/60">
+          <Link
+            href={DISCORD_LINK}
+            className="transition-colors hover:text-foreground/80 text-foreground/60"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Discord
           </Link>
         </nav>
