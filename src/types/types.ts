@@ -68,3 +68,8 @@ interface CompletionAssistant {
 }
 
 export type ContextCompletion = CompletionUser | CompletionAssistant
+
+export interface Parsed {
+  type: "srt" | "ass"
+  data: ASSParseOutput | null
+}

@@ -1,11 +1,6 @@
 import { create } from "zustand"
-import { SubtitleTranslated, UpdateSubtitle, ASSParseOutput } from "@/types/types"
+import { SubtitleTranslated, UpdateSubtitle, Parsed } from "@/types/types"
 import { persist } from "zustand/middleware"
-
-interface Parsed {
-  type: "srt" | "ass"
-  data: ASSParseOutput | null
-}
 
 interface SubtitleStore {
   title: string

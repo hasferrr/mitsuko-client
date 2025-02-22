@@ -80,6 +80,7 @@ import {
   TEMPERATURE_MAX,
   TEMPERATURE_MIN,
 } from "@/constants/limits"
+import { HistoryItemDetails } from "./history-item-details"
 
 
 export default function SubtitleTranslator() {
@@ -111,7 +112,7 @@ export default function SubtitleTranslator() {
   const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
 
   // Translation Store
-  const response = useTranslationStore((state) => state.response)
+  const setResponse = useTranslationStore((state) => state.setResponse)
   const isTranslating = useTranslationStore((state) => state.isTranslating)
   const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
@@ -267,12 +268,14 @@ export default function SubtitleTranslator() {
 
     setIsTranslating(false)
 
-    // Add to history *after* translation is complete
+    // Add to history *after* translation is complete, including subtitles and parsed
     if (allRawResponses.length > 0) {
       addHistory(
         title,
         allRawResponses,
-        useTranslationStore.getState().jsonResponse, // get updated state
+        useTranslationStore.getState().jsonResponse,
+        useSubtitleStore.getState().subtitles,
+        useSubtitleStore.getState().parsed,
       )
     }
   }
@@ -409,29 +412,42 @@ export default function SubtitleTranslator() {
   const handleApplyHistory = () => {
     if (selectedHistoryIndex === null) return
 
+    const selectedHistoryItem = history[selectedHistoryIndex]
+    const errors: string[] = []
+
+    // Check for errors first
+    if (!Array.isArray(selectedHistoryItem.subtitles)) {
+      errors.push("Invalid history item format: subtitles is not an array")
+    }
+    if (!selectedHistoryItem.parsed) {
+      errors.push("Invalid history item format: parsed data is missing")
+    }
+    if (!Array.isArray(selectedHistoryItem.content)) {
+      errors.push("Invalid history item format: content is not an array")
+    }
+    if (!Array.isArray(selectedHistoryItem.json)) {
+      errors.push("Invalid history item format: json is not an array")
+    }
+
+    // If there are errors, log them and return
+    if (errors.length > 0) {
+      errors.forEach(error => console.error(error))
+      return
+    }
+
+    // If no errors, apply the history item
     try {
-      const selectedHistoryItem = history[selectedHistoryIndex]
-
-      if (!Array.isArray(selectedHistoryItem.json)) {
-        console.error("Invalid history item format.")
-        return
-      }
-      // TODO: REWRITE apply -> response, jsonResponse, subtitle
-
-      // Create a map for quick lookup by index
-      // const historyMap = new Map(selectedHistoryItem.json.map(item => [item.index, item.translated]))
-
-      // Merge the history translations into the current subtitles
-      // const mergedSubtitles = subtitles.map(sub => {
-      //   const translatedText = historyMap.get(sub.index)
-      //   return translatedText !== undefined ? { ...sub, translated: translatedText } : sub
-      // })
-
-      // setSubtitles(mergedSubtitles)
+      setSubtitles(selectedHistoryItem.subtitles)
+      setParsed(selectedHistoryItem.parsed)
+      setTitle(selectedHistoryItem.title)
+      setResponse(selectedHistoryItem.content.join(""))
+      setJsonResponse(selectedHistoryItem.json)
 
     } catch (error) {
-      console.error("Error parsing or applying history:", error)
+      console.error("Error applying history:", error)
     }
+
+    setIsHistoryOpen(false)
   }
 
   const handleDeleteHistory = () => {
@@ -665,45 +681,69 @@ export default function SubtitleTranslator() {
 
           <ResizableHandle />
 
-          {/* Right Panel: Split Vertically */}
-          <ResizablePanel defaultSize={70} minSize={10}>
-            <ResizablePanelGroup direction="vertical" className="h-full">
-              {/* Top Panel: Raw Responses */}
-              <ResizablePanel defaultSize={70} minSize={10}>
+            {/* Right Panel: Split Vertically into Three */}
+            <ResizablePanel defaultSize={70} minSize={10}>
+              <ResizablePanelGroup direction="vertical" className="h-full">
+                {/* Top Panel: Subtitles and Parsed Data */}
+                <ResizablePanel defaultSize={50} minSize={10}>
+                  <ScrollArea className="h-full">
+                    <div className="p-6 max-w-none text-sm">
+                      {selectedHistoryIndex !== null && (
+                        <HistoryItemDetails
+                          parsed={history[selectedHistoryIndex].parsed}
+                          subtitles={history[selectedHistoryIndex].subtitles}
+                        />
+                      )}
+                    </div>
+                  </ScrollArea>
+                </ResizablePanel>
+
+                <ResizableHandle />
+
+                {/* Middle Panel: Raw Responses */}
+              <ResizablePanel defaultSize={25} minSize={10}>
                 <ScrollArea className="h-full">
                   <div className="p-6 max-w-none text-sm">
+
                     {selectedHistoryIndex !== null &&
+                      <>
+                      <p className="text-lg">Raw Response</p>{
                       history[selectedHistoryIndex].content.map((text, i) =>
                         text.split("\n").map((sentence, j) =>
                           !sentence ? (
                             <br key={`history-${selectedHistoryIndex}-${i}-${j}`} />
                           ) : (
-                            <div key={`history-${selectedHistoryIndex}-${i}-${j}`}>
+                            <pre
+                              className="whitespace-pre-wrap"
+                              key={`history-${selectedHistoryIndex}-${i}-${j}`}>
                               {sentence}
-                            </div>
+                            </pre>
                           )
                         )
-                      )}
+                      )
+                      }</>
+                    }
                   </div>
                 </ScrollArea>
               </ResizablePanel>
 
-              <ResizableHandle />
+                <ResizableHandle />
 
-              {/* Bottom Panel: JSON  */}
-              <ResizablePanel defaultSize={30} minSize={10}>
+                {/* Bottom Panel: JSON  */}
+              <ResizablePanel defaultSize={25} minSize={10}>
                 <ScrollArea className="h-full">
                   <div className="p-6 max-w-none text-sm font-mono">
                     {selectedHistoryIndex !== null && (
-                        <pre className="whitespace-pre-wrap">
-                          {JSON.stringify(history[selectedHistoryIndex].json, null, 2)}
-                        </pre>
+                      <pre className="whitespace-pre-wrap">
+                        {JSON.stringify(history[selectedHistoryIndex].json, null, 2)}
+                      </pre>
                     )}
                   </div>
                 </ScrollArea>
               </ResizablePanel>
-            </ResizablePanelGroup>
-          </ResizablePanel>
+              </ResizablePanelGroup>
+            </ResizablePanel>
+
         </ResizablePanelGroup>
 
           {/* History Action Buttons */}

@@ -1,17 +1,25 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import { SubOnlyTranslated } from "@/types/types"
+import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/types"
 
 interface HistoryItem {
   title: string
   content: string[]
   json: SubOnlyTranslated[]
+  subtitles: SubtitleTranslated[]
+  parsed: Parsed
   timestamp: string
 }
 
 interface HistoryStore {
   history: HistoryItem[]
-  addHistory: (title: string, content: string[], json: SubOnlyTranslated[]) => void
+  addHistory: (
+    title: string,
+    content: string[],
+    json: SubOnlyTranslated[],
+    subtitles: SubtitleTranslated[],
+    parsed: Parsed
+  ) => void
   clearHistory: () => void
 }
 
@@ -19,13 +27,16 @@ export const useHistoryStore = create<HistoryStore>()(
   persist(
     (set) => ({
       history: [],
-      addHistory: (title, content, json) => {
+      addHistory: (title, content, json, subtitles, parsed) => {
         const timestamp = new Date().toLocaleString()
         set((state) => ({
-          history: [...state.history, { title, content, json, timestamp }],
+          history: [
+            ...state.history,
+            { title, content, json, subtitles, parsed, timestamp },
+          ],
         }))
       },
-      clearHistory: () => set({ history: [] })
+      clearHistory: () => set({ history: [] }),
     }),
     {
       name: "history-storage",
