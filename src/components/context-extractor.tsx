@@ -21,7 +21,7 @@ import { useExtractionInputStore } from "@/stores/use-extraction-input-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constants/limits"
 import { getContent } from "@/lib/parser"
-import { minMax } from "@/lib/utils"
+import { minMax, cn } from "@/lib/utils"
 import { MaxCompletionTokenInput, ModelSelection } from "./settings-inputs"
 
 
@@ -33,6 +33,8 @@ interface FileItem {
 
 export const ContextExtractor = () => {
   const [activeTab, setActiveTab] = useState("result")
+  const [isEpisodeNumberValid, setIsEpisodeNumberValid] = useState(true)
+  const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
 
   // Settings Store
   const selectedModel = useSettingsStore((state) => state.selectedModel)
@@ -64,6 +66,7 @@ export const ContextExtractor = () => {
     setIsBatchMode,
   } = useExtractionInputStore()
 
+  const episodeNumberInputRef = useRef<HTMLInputElement | null>(null)
   const subtitleContentRef = useRef<HTMLTextAreaElement | null>(null)
   const previousContextRef = useRef<HTMLTextAreaElement | null>(null)
   const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
@@ -81,6 +84,7 @@ export const ContextExtractor = () => {
   const handleSubtitleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
     setSubtitleContent(e.target.value)
+    setIsSubtitleContentValid(true)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
   }, [setHasChanges, setSubtitleContent])
@@ -173,6 +177,16 @@ export const ContextExtractor = () => {
 
   const handleStartExtraction = async () => {
     if (isExtracting) return
+
+    if (episodeNumber.trim() === "") {
+      setIsEpisodeNumberValid(false)
+      return
+    }
+    if (subtitleContent.trim() === "" && !isBatchMode) {
+      setIsSubtitleContentValid(false)
+      return
+    }
+
     setHasChanges(true)
     setActiveTab("result")
 
@@ -236,10 +250,16 @@ export const ContextExtractor = () => {
         <div className="space-y-2">
           <label className="text-sm font-medium">Episode Number</label>
           <Input
+            ref={episodeNumberInputRef}
             value={episodeNumber}
-            onChange={(e) => setEpisodeNumber(e.target.value)}
+            onChange={(e) => {
+              setEpisodeNumber(e.target.value)
+              setIsEpisodeNumberValid(true)
+            }}
             placeholder="e.g., S01E01"
-            className="bg-background dark:bg-muted/30"
+            className={cn("bg-background dark:bg-muted/30",
+              !isEpisodeNumberValid && "outline outline-red-500"
+            )}
           />
         </div>
 
@@ -268,7 +288,10 @@ export const ContextExtractor = () => {
                 ref={subtitleContentRef}
                 value={subtitleContent}
                 onChange={handleSubtitleContentChange}
-                className="min-h-[185px] h-[185px] max-h-[185px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                className={cn(
+                  "min-h-[185px] h-[185px] max-h-[185px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
+                  !isSubtitleContentValid && "outline outline-red-500"
+                )}
                 placeholder="Paste subtitle content here..."
                 onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
               />
