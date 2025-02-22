@@ -83,6 +83,7 @@ export default function SubtitleTranslator() {
   const customModel = useSettingsStore((state) => state.customModel)
   const apiKey = useSettingsStore((state) => state.apiKey)
   const contextDocument = useSettingsStore((state) => state.contextDocument)
+  const setContextDocument = useSettingsStore((state) => state.setContextDocument)
 
   // Advanced Settings Store
   const temperature = useAdvancedSettingsStore((state) => state.temperature)
@@ -101,6 +102,8 @@ export default function SubtitleTranslator() {
   const [activeTab, setActiveTab] = useState(isTranslating ? "process" : "basic")
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
   const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [isContextUploadDialogOpen, setIsContextUploadDialogOpen] = useState(false)
+  const [pendingContextFile, setPendingContextFile] = useState<File | null>(null)
 
   const { setHasChanges } = useBeforeUnload()
 
@@ -250,6 +253,14 @@ export default function SubtitleTranslator() {
     }
   }
 
+  const handleContextFileUpload = async (fileList: FileList) => {
+    if (!fileList || fileList.length === 0) return
+
+    const file = fileList[0]
+    setPendingContextFile(file)
+    setIsContextUploadDialogOpen(true)
+  }
+
   const processFile = async () => {
     if (!pendingFile) return;
 
@@ -284,9 +295,27 @@ export default function SubtitleTranslator() {
     }
   }
 
+  const processContextFile = async () => {
+    if (!pendingContextFile) return
+    try {
+      const text = await pendingContextFile.text()
+      setContextDocument(text)
+    } catch (error) {
+      console.error("Error reading context file:", error)
+    } finally {
+      setIsContextUploadDialogOpen(false)
+      setPendingContextFile(null)
+    }
+  }
+
   const handleCancel = () => {
     setIsUploadDialogOpen(false)
     setPendingFile(null)
+  }
+
+  const handleContextCancel = () => {
+    setIsContextUploadDialogOpen(false)
+    setPendingContextFile(null)
   }
 
   const handleFileDownload = () => {
@@ -368,7 +397,7 @@ export default function SubtitleTranslator() {
       </div>
 
       {/* Main Content */}
-      <div className="grid md:grid-cols-[1fr_400px] gap-6">
+      <div className="grid md:grid-cols-[1fr_402px] gap-6">
         {/* Left Column - Subtitles */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
@@ -481,7 +510,10 @@ export default function SubtitleTranslator() {
                 <CardContent className="p-4 space-y-4">
                   <LanguageSelection />
                   <ModelSelection />
-                  <ContextDocumentInput />
+                  {/* Wrap ContextDocumentInput with DragAndDrop */}
+                  <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
+                    <ContextDocumentInput />
+                  </DragAndDrop>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -504,6 +536,7 @@ export default function SubtitleTranslator() {
           </Tabs>
         </div>
       </div>
+
       {/* Confirmation Dialog */}
       <AlertDialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
         <AlertDialogContent>
@@ -520,6 +553,26 @@ export default function SubtitleTranslator() {
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction onClick={processFile}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Context Confirmation Dialog */}
+      <AlertDialog open={isContextUploadDialogOpen} onOpenChange={setIsContextUploadDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Context Upload</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to upload this context file?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleContextCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={processContextFile}>
               Continue
             </AlertDialogAction>
           </AlertDialogFooter>
