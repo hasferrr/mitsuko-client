@@ -18,6 +18,7 @@ import {
   FileText,
   Trash,
   Loader2,
+  History as HistoryIcon,
 } from "lucide-react"
 import { SubtitleList } from "./subtitle-list"
 import {
@@ -42,11 +43,12 @@ import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
-import { capitalizeWords, minMax } from "@/lib/utils"
+import { capitalizeWords, cn, minMax } from "@/lib/utils"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
+import { useHistoryStore } from "@/stores/use-history-store"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
 import {
   AlertDialog,
@@ -59,9 +61,23 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { DEFAULT_SUBTITLES, DEFAULT_TITLE } from "@/constants/default"
-import { MAX_COMPLETION_TOKENS_MAX, MAX_COMPLETION_TOKENS_MIN, SPLIT_SIZE_MAX, SPLIT_SIZE_MIN, TEMPERATURE_MAX, TEMPERATURE_MIN } from "@/constants/limits"
+import {
+  MAX_COMPLETION_TOKENS_MAX,
+  MAX_COMPLETION_TOKENS_MIN,
+  SPLIT_SIZE_MAX,
+  SPLIT_SIZE_MIN,
+  TEMPERATURE_MAX,
+  TEMPERATURE_MIN,
+} from "@/constants/limits"
+
 
 export default function SubtitleTranslator() {
   // Subtitle Store
@@ -92,6 +108,7 @@ export default function SubtitleTranslator() {
   const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
 
   // Translation Store
+  const response = useTranslationStore((state) => state.response)
   const isTranslating = useTranslationStore((state) => state.isTranslating)
   const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
@@ -99,6 +116,13 @@ export default function SubtitleTranslator() {
   const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
   const appendJsonResponse = useTranslationStore((state) => state.appendJsonResponse)
 
+  // History Store & State
+  const addHistory = useHistoryStore((state) => state.addHistory)
+  const history = useHistoryStore((state) => state.history)
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState<number | null>(null)
+
+  // Other State
   const [activeTab, setActiveTab] = useState(isTranslating ? "process" : "basic")
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
   const [pendingFile, setPendingFile] = useState<File | null>(null)
@@ -232,6 +256,11 @@ export default function SubtitleTranslator() {
     }
 
     setIsTranslating(false)
+
+    // Add to history *after* translation is complete
+    if (response) {
+      addHistory(title, response.trim())
+    }
   }
 
   const handleStopTranslation = () => {
@@ -359,11 +388,15 @@ export default function SubtitleTranslator() {
 
   const subName = parsed.type === "ass" ? "SSA" : "SRT"
 
+  const handleHistoryClick = (index: number) => {
+    setSelectedHistoryIndex(index)
+  }
+
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-2">
-        <div className="flex-1">
+      <div className="flex flex-wrap items-center gap-4 mb-2">
+        <div className="flex-1 min-w-40">
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -390,14 +423,27 @@ export default function SubtitleTranslator() {
             Upload File
           </Button>
         </DragAndDrop>
+        {/* Save Button */}
         <Button onClick={handleSaveProject} size="lg" className="gap-2" disabled>
           <Save className="h-5 w-5" />
           Save Project
         </Button>
+        {/* History Button */}
+        <Button
+          variant={isHistoryOpen ? "default" : "outline"}
+          size="lg"
+          className="gap-2 p-4"
+          onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+        >
+          <HistoryIcon className="h-5 w-5" />
+          History
+        </Button>
       </div>
 
       {/* Main Content */}
-      <div className="grid md:grid-cols-[1fr_402px] gap-6">
+      <div
+        className={cn("grid md:grid-cols-[1fr_402px] gap-6", isHistoryOpen && "hidden")}
+      >
         {/* Left Column - Subtitles */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
@@ -536,6 +582,53 @@ export default function SubtitleTranslator() {
           </Tabs>
         </div>
       </div>
+
+      {/* History Panel */}
+      {isHistoryOpen && (
+        <ResizablePanelGroup direction="horizontal" className="h-[600px] border rounded-lg overflow-hidden mt-4">
+          <ResizablePanel defaultSize={30} minSize={20}>
+            <ScrollArea className="h-[450px]">
+              {history.map((item, index) => (
+                <div
+                  key={index}
+                  className="p-4 border-b hover:bg-muted/50 cursor-pointer transition-colors"
+                  onClick={() => handleHistoryClick(index)}
+                >
+                  <div className="flex items-start justify-between mb-1">
+                    <p>{item.title}</p>
+                    <span className="text-xs text-muted-foreground ml-2 shrink-0">
+                      {item.timestamp}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {item.content.substring(0, 100)}
+                    {item.content.length > 100 ? "..." : ""}
+                  </p>
+                </div>
+              ))}
+            </ScrollArea>
+          </ResizablePanel>
+
+          <ResizableHandle />
+
+          <ResizablePanel defaultSize={70}>
+            <ScrollArea className="h-[450px]">
+              <div className="p-6 max-w-none text-sm">
+                {selectedHistoryIndex !== null &&
+                  history[selectedHistoryIndex].content.split("\n").map((text, index) =>
+                    !text ? (
+                      <br key={`history-${selectedHistoryIndex}-${index}`} />
+                    ) : (
+                      <div key={`history-${selectedHistoryIndex}-${index}`}>
+                        {text}
+                      </div>
+                    )
+                  )}
+              </div>
+            </ScrollArea>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      )}
 
       {/* Confirmation Dialog */}
       <AlertDialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
