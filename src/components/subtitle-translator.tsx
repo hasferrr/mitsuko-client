@@ -59,6 +59,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { DEFAULT_SUBTITLES, DEFAULT_TITLE } from "@/constants/default"
 import { MAX_COMPLETION_TOKENS_MAX, MAX_COMPLETION_TOKENS_MIN, SPLIT_SIZE_MAX, SPLIT_SIZE_MIN, TEMPERATURE_MAX, TEMPERATURE_MIN } from "@/constants/limits"
 
@@ -233,9 +234,11 @@ export default function SubtitleTranslator() {
     setIsTranslating(false)
   }
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement> | FileList) => {
+    const fileList = event instanceof FileList ? event : event.target.files
+    if (!fileList || fileList.length === 0) return
+
+    const file = fileList[0]
 
     try {
       const text = await file.text()
@@ -264,8 +267,10 @@ export default function SubtitleTranslator() {
       console.error("Error parsing subtitle file:", error)
     }
 
-    // Reset the input
-    event.target.value = ""
+    // Reset the input if it's a file input event
+    if (!(event instanceof FileList)) {
+      event.target.value = ""
+    }
   }
 
   const handleFileDownload = () => {
@@ -327,16 +332,19 @@ export default function SubtitleTranslator() {
           className="hidden"
           id="subtitle-upload"
         />
-        <Button
-          variant="outline"
-          size="lg"
-          className="gap-2"
-          onClick={() => document.getElementById("subtitle-upload")?.click()}
-          disabled={isTranslating}
-        >
-          <Upload className="h-5 w-5" />
-          Upload File
-        </Button>
+        {/* Drag and Drop Area + Upload Button */}
+        <DragAndDrop onDropFiles={handleFileUpload} disabled={isTranslating}>
+          <Button
+            variant="outline"
+            size="lg"
+            className="gap-2"
+            onClick={() => document.getElementById("subtitle-upload")?.click()}
+            disabled={isTranslating}
+          >
+            <Upload className="h-5 w-5" />
+            Upload File
+          </Button>
+        </DragAndDrop>
         <Button onClick={handleSaveProject} size="lg" className="gap-2" disabled>
           <Save className="h-5 w-5" />
           Save Project
@@ -362,7 +370,10 @@ export default function SubtitleTranslator() {
             </div>
           </div>
 
-          <SubtitleList />
+          {/* Wrap SubtitleList with DragAndDrop */}
+          <DragAndDrop onDropFiles={handleFileUpload} disabled={isTranslating}>
+            <SubtitleList />
+          </DragAndDrop>
 
           <div className="grid grid-cols-2 gap-4 mt-4">
             <Button
