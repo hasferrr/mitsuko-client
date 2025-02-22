@@ -272,7 +272,7 @@ export default function SubtitleTranslator() {
       addHistory(
         title,
         allRawResponses,
-        JSON.stringify(useTranslationStore.getState().jsonResponse)
+        useTranslationStore.getState().jsonResponse, // get updated state
       )
     }
   }
@@ -410,20 +410,22 @@ export default function SubtitleTranslator() {
     if (selectedHistoryIndex === null) return
 
     try {
-      const parsedHistory = JSON.parse(history[selectedHistoryIndex].jsonStringified)
-      if (!Array.isArray(parsedHistory)) {
+      const selectedHistoryItem = history[selectedHistoryIndex]
+
+      if (!Array.isArray(selectedHistoryItem.json)) {
         console.error("Invalid history item format.")
         return
       }
       // TODO: REWRITE apply -> response, jsonResponse, subtitle
 
       // Create a map for quick lookup by index
-      // const historyMap = new Map(parsedHistory.map((item: { index: number, translated: string }) => [item.index, item.translated]))
+      // const historyMap = new Map(selectedHistoryItem.json.map(item => [item.index, item.translated]))
 
+      // Merge the history translations into the current subtitles
       // const mergedSubtitles = subtitles.map(sub => {
-      //   const translatedText = historyMap.get(sub.index);
-      //   return translatedText !== undefined ? { ...sub, translated: translatedText } : sub;
-      // });
+      //   const translatedText = historyMap.get(sub.index)
+      //   return translatedText !== undefined ? { ...sub, translated: translatedText } : sub
+      // })
 
       // setSubtitles(mergedSubtitles)
 
@@ -688,12 +690,14 @@ export default function SubtitleTranslator() {
 
               <ResizableHandle />
 
-              {/* Bottom Panel: JSON Stringified */}
+              {/* Bottom Panel: JSON  */}
               <ResizablePanel defaultSize={30} minSize={10}>
                 <ScrollArea className="h-full">
                   <div className="p-6 max-w-none text-sm font-mono">
                     {selectedHistoryIndex !== null && (
-                      <pre>{JSON.stringify(JSON.parse(history[selectedHistoryIndex].jsonStringified), null, 2)}</pre>
+                        <pre className="whitespace-pre-wrap">
+                          {JSON.stringify(history[selectedHistoryIndex].json, null, 2)}
+                        </pre>
                     )}
                   </div>
                 </ScrollArea>
