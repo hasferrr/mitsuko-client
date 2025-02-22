@@ -394,8 +394,6 @@ export default function SubtitleTranslator() {
     URL.revokeObjectURL(url)
   }
 
-  const handleSaveProject = () => { }
-
   const handleDelete = () => {
     setTitle("")
     setSubtitles([])
@@ -488,11 +486,6 @@ export default function SubtitleTranslator() {
             Upload File
           </Button>
         </DragAndDrop>
-        {/* Save Button */}
-        <Button onClick={handleSaveProject} size="lg" className="gap-2" disabled>
-          <Save className="h-5 w-5" />
-          Save Project
-        </Button>
         {/* History Button */}
         <Button
           variant={isHistoryOpen ? "default" : "outline"}
@@ -651,35 +644,40 @@ export default function SubtitleTranslator() {
       {/* History Panel */}
       {isHistoryOpen && (
         <>
-        <ResizablePanelGroup
-          direction="horizontal"
-          className="h-[1000px] border rounded-lg overflow-hidden mt-4"
-        >
-          {/* Left Panel: History List */}
-          <ResizablePanel defaultSize={30} minSize={20}>
-            <ScrollArea className="h-[550px]">
-              {history.map((item, index) => (
-                <div
-                  key={index}
-                  className="p-4 border-b hover:bg-muted/50 cursor-pointer transition-colors"
-                  onClick={() => handleHistoryClick(index)}
-                >
-                  <div className="flex items-start justify-between mb-1">
-                    <p>{item.title}</p>
-                    <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                      {item.timestamp}
-                    </span>
+          <ResizablePanelGroup
+            direction="horizontal"
+            className="h-[1000px] border rounded-lg overflow-hidden mt-4"
+          >
+            {/* Left Panel: History List */}
+            <ResizablePanel defaultSize={30} minSize={20}>
+              <ScrollArea className="h-[550px]">
+                {history.map((item, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "p-4 border-b hover:bg-muted/50 cursor-pointer transition-colors",
+                      selectedHistoryIndex === index && "bg-muted",
+                    )}
+                    onClick={() => handleHistoryClick(index)}
+                  >
+                    <div className="flex items-start justify-between mb-1">
+                      <p className={cn(selectedHistoryIndex === index && "font-semibold")}>
+                        {item.title}
+                      </p>
+                      <span className="text-xs text-muted-foreground ml-2 shrink-0">
+                        {item.timestamp}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {item.content.join("\n").substring(0, 100)}
+                      {item.content.join("\n").length > 100 ? "..." : ""}
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    {item.content.join("\n").substring(0, 100)}
-                    {item.content.join("\n").length > 100 ? "..." : ""}
-                  </p>
-                </div>
-              ))}
-            </ScrollArea>
-          </ResizablePanel>
+                ))}
+              </ScrollArea>
+            </ResizablePanel>
 
-          <ResizableHandle />
+            <ResizableHandle />
 
             {/* Right Panel: Split Vertically into Three */}
             <ResizablePanel defaultSize={70} minSize={10}>
@@ -701,50 +699,52 @@ export default function SubtitleTranslator() {
                 <ResizableHandle />
 
                 {/* Middle Panel: Raw Responses */}
-              <ResizablePanel defaultSize={25} minSize={10}>
-                <ScrollArea className="h-full">
-                  <div className="p-6 max-w-none text-sm">
-
-                    {selectedHistoryIndex !== null &&
-                      <>
-                      <p className="text-lg">Raw Response</p>{
-                      history[selectedHistoryIndex].content.map((text, i) =>
-                        text.split("\n").map((sentence, j) =>
-                          !sentence ? (
-                            <br key={`history-${selectedHistoryIndex}-${i}-${j}`} />
-                          ) : (
-                            <pre
-                              className="whitespace-pre-wrap"
-                              key={`history-${selectedHistoryIndex}-${i}-${j}`}>
-                              {sentence}
-                            </pre>
-                          )
-                        )
-                      )
-                      }</>
-                    }
-                  </div>
-                </ScrollArea>
-              </ResizablePanel>
+                <ResizablePanel defaultSize={25} minSize={10}>
+                  <ScrollArea className="h-full">
+                    <div className="p-6 max-w-none text-sm">
+                      <div className="space-y-4">
+                        {selectedHistoryIndex !== null &&
+                          <>
+                            <p className="text-lg">Raw Response</p>
+                            <div className="space-y-10">
+                              {history[selectedHistoryIndex].content.map((text, i) =>
+                                <pre
+                                  className="whitespace-pre-wrap"
+                                  key={`history-${selectedHistoryIndex}-${i}-${'j'}`}>
+                                  {text}
+                                </pre>
+                              )}
+                            </div>
+                          </>
+                        }
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </ResizablePanel>
 
                 <ResizableHandle />
 
                 {/* Bottom Panel: JSON  */}
-              <ResizablePanel defaultSize={25} minSize={10}>
-                <ScrollArea className="h-full">
-                  <div className="p-6 max-w-none text-sm font-mono">
-                    {selectedHistoryIndex !== null && (
-                      <pre className="whitespace-pre-wrap">
-                        {JSON.stringify(history[selectedHistoryIndex].json, null, 2)}
-                      </pre>
-                    )}
-                  </div>
-                </ScrollArea>
-              </ResizablePanel>
+                <ResizablePanel defaultSize={25} minSize={10}>
+                  <ScrollArea className="h-full">
+                    <div className="p-6 max-w-none text-sm">
+                      <div className="space-y-4">
+                        {selectedHistoryIndex !== null && (
+                          <>
+                            <p className="text-lg">Parsed Response</p>
+                            <pre className="whitespace-pre-wrap">
+                              {JSON.stringify(history[selectedHistoryIndex].json, null, 2)}
+                            </pre>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </ResizablePanel>
               </ResizablePanelGroup>
             </ResizablePanel>
 
-        </ResizablePanelGroup>
+          </ResizablePanelGroup>
 
           {/* History Action Buttons */}
           <div className="flex justify-center gap-4 mt-4">
@@ -777,7 +777,7 @@ export default function SubtitleTranslator() {
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" disabled={selectedHistoryIndex === null}>
-                  <XCircle className="h-4 w-4 mr-2" /> Delete Current
+                  <XCircle className="h-4 w-4 mr-2" /> Delete
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
