@@ -597,10 +597,11 @@ export default function SubtitleTranslator() {
       {isHistoryOpen && (
         <ResizablePanelGroup
           direction="horizontal"
-          className="h-[600px] border rounded-lg overflow-hidden mt-4"
+          className="h-[1000px] border rounded-lg overflow-hidden mt-4"
         >
+          {/* Left Panel: History List */}
           <ResizablePanel defaultSize={30} minSize={20}>
-            <ScrollArea className="h-[450px]">
+            <ScrollArea className="h-[550px]">
               {history.map((item, index) => (
                 <div
                   key={index}
@@ -624,23 +625,42 @@ export default function SubtitleTranslator() {
 
           <ResizableHandle />
 
-          <ResizablePanel defaultSize={70}>
-            <ScrollArea className="h-[450px]">
-              <div className="p-6 max-w-none text-sm">
-                {selectedHistoryIndex !== null &&
-                  history[selectedHistoryIndex].content.map((text, i) =>
-                    text.split("\n").map((sentence, j) =>
-                      !sentence ? (
-                        <br key={`history-${selectedHistoryIndex}-${i}-${j}`} />
-                      ) : (
-                        <div key={`history-${selectedHistoryIndex}-${i}-${j}`}>
-                          {sentence}
-                        </div>
-                      )
-                    )
-                  )}
-              </div>
-            </ScrollArea>
+          {/* Right Panel: Split Vertically */}
+          <ResizablePanel defaultSize={70} minSize={10}>
+            <ResizablePanelGroup direction="vertical" className="h-full">
+              {/* Top Panel: Raw Responses */}
+              <ResizablePanel defaultSize={70} minSize={10}>
+                <ScrollArea className="h-full">
+                  <div className="p-6 max-w-none text-sm">
+                    {selectedHistoryIndex !== null &&
+                      history[selectedHistoryIndex].content.map((text, i) =>
+                        text.split("\n").map((sentence, j) =>
+                          !sentence ? (
+                            <br key={`history-${selectedHistoryIndex}-${i}-${j}`} />
+                          ) : (
+                            <div key={`history-${selectedHistoryIndex}-${i}-${j}`}>
+                              {sentence}
+                            </div>
+                          )
+                        )
+                      )}
+                  </div>
+                </ScrollArea>
+              </ResizablePanel>
+
+              <ResizableHandle />
+
+              {/* Bottom Panel: JSON Stringified */}
+              <ResizablePanel defaultSize={30} minSize={10}>
+                <ScrollArea className="h-full">
+                  <div className="p-6 max-w-none text-sm font-mono">
+                    {selectedHistoryIndex !== null && (
+                      <pre>{JSON.stringify(JSON.parse(history[selectedHistoryIndex].jsonStringified), null, 2)}</pre>
+                    )}
+                  </div>
+                </ScrollArea>
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </ResizablePanel>
         </ResizablePanelGroup>
       )}
