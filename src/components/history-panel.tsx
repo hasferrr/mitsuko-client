@@ -113,29 +113,33 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
         {/* Left Panel: History List */}
         <ResizablePanel defaultSize={30} minSize={20}>
           <ScrollArea className="h-[550px]">
-            {history.map((item, index) => (
-              <div
-                key={index}
-                className={cn(
-                  "p-4 border-b hover:bg-muted/50 cursor-pointer transition-colors",
-                  selectedHistoryIndex === index && "bg-muted",
-                )}
-                onClick={() => handleHistoryClick(index)}
-              >
-                <div className="flex items-start justify-between mb-1">
-                  <p className={cn(selectedHistoryIndex === index && "font-semibold")}>
-                    {item.title}
+            {history.toReversed().map((item, reversedIndex) => {
+              const index = history.length - reversedIndex - 1
+              return (
+                <div
+                  key={index}
+                  className={cn(
+                    "p-4 border-b hover:bg-muted/50 cursor-pointer transition-colors",
+                    selectedHistoryIndex === index && "bg-muted",
+                  )}
+                  onClick={() => handleHistoryClick(index)}
+                >
+                  <div className="flex items-start justify-between mb-1">
+                    <p className={cn(selectedHistoryIndex === index && "font-semibold")}>
+                      {item.title}
+                    </p>
+                    <span className="text-xs text-muted-foreground ml-2 shrink-0">
+                      {item.timestamp}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {item.content.join("\n").substring(0, 100)}
+                    {item.content.join("\n").length > 100 ? "..." : ""}
                   </p>
-                  <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                    {item.timestamp}
-                  </span>
                 </div>
-                <p className="text-xs text-muted-foreground line-clamp-2">
-                  {item.content.join("\n").substring(0, 100)}
-                  {item.content.join("\n").length > 100 ? "..." : ""}
-                </p>
-              </div>
-            ))}
+              )
+            }
+            )}
           </ScrollArea>
         </ResizablePanel>
 
