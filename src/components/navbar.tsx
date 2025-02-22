@@ -39,6 +39,12 @@ export function Navbar() {
           >
             Discord
           </Link>
+          <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            Translation
+          </Link>
+          <Link href="/extract-context" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            Extract Context
+          </Link>
         </nav>
         <div className="flex items-center gap-2 ml-auto">
           {isProcessing && (
