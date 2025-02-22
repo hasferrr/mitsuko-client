@@ -99,6 +99,8 @@ export default function SubtitleTranslator() {
   const appendJsonResponse = useTranslationStore((state) => state.appendJsonResponse)
 
   const [activeTab, setActiveTab] = useState(isTranslating ? "process" : "basic")
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
 
   const { setHasChanges } = useBeforeUnload()
 
@@ -239,10 +241,21 @@ export default function SubtitleTranslator() {
     if (!fileList || fileList.length === 0) return
 
     const file = fileList[0]
+    setPendingFile(file) // Store the file
+    setIsUploadDialogOpen(true) // Open the dialog
+
+    // Reset the input if it's a file input event
+    if (!(event instanceof FileList)) {
+      event.target.value = ""
+    }
+  }
+
+  const processFile = async () => {
+    if (!pendingFile) return;
 
     try {
-      const text = await file.text()
-      const type = file.name.endsWith(".srt") ? "srt" : "ass"
+      const text = await pendingFile.text()
+      const type = pendingFile.name.endsWith(".srt") ? "srt" : "ass"
 
       let parsedSubs: Subtitle[] = []
       if (type === "srt") {
@@ -260,17 +273,20 @@ export default function SubtitleTranslator() {
       }))
 
       setSubtitles(parsedSubtitles)
-      const fileName = file.name.split('.')
+      const fileName = pendingFile.name.split('.')
       fileName.pop()
       setTitle(fileName.join('.'))
     } catch (error) {
       console.error("Error parsing subtitle file:", error)
+    } finally {
+      setIsUploadDialogOpen(false) // Close dialog after processing
+      setPendingFile(null) // Clear pending file
     }
+  }
 
-    // Reset the input if it's a file input event
-    if (!(event instanceof FileList)) {
-      event.target.value = ""
-    }
+  const handleCancel = () => {
+    setIsUploadDialogOpen(false)
+    setPendingFile(null)
   }
 
   const handleFileDownload = () => {
@@ -488,6 +504,27 @@ export default function SubtitleTranslator() {
           </Tabs>
         </div>
       </div>
+      {/* Confirmation Dialog */}
+      <AlertDialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm File Upload</AlertDialogTitle>
+            <AlertDialogDescription>
+              {subtitles.length > 0
+                ? "Uploading a new file will replace the current subtitles.  Are you sure you want to continue?"
+                : "Are you sure you want to upload this file?"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={processFile}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
