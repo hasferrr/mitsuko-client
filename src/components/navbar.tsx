@@ -1,12 +1,20 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { LogIn, Moon, Sun, Loader2 } from "lucide-react"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { NavLinks } from "@/components/nav-links"
+import { LogIn, Moon, Sun, Loader2, Menu } from "lucide-react"
 import { useThemeStore } from "@/stores/use-theme-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useExtractionStore } from "@/stores/use-extraction-store"
-import { DISCORD_LINK } from "@/constants/external-links"
 
 export function Navbar() {
   const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)
@@ -15,10 +23,11 @@ export function Navbar() {
   const isExtracting = useExtractionStore(state => state.isExtracting)
 
   const isProcessing = isTranslating || isExtracting
+  const [open, setOpen] = useState(false)
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-8">
-      <div className="container flex h-14 items-center">
+      <div className="flex h-14 items-center">
         <div className="flex items-center gap-2 mr-4">
           <img
             src="https://i.pinimg.com/1200x/2f/52/bb/2f52bb67e52f767ed39a2d655537829c.jpg"
@@ -27,24 +36,8 @@ export function Navbar() {
           />
           <Link href="/" className="font-semibold">Mitsuko</Link>
         </div>
-        <nav className="flex items-center gap-6 text-sm">
-          <Link href="#" className="transition-colors hover:text-foreground/80 text-foreground/60">
-            About
-          </Link>
-          <Link
-            href={DISCORD_LINK}
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Discord
-          </Link>
-          <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/60">
-            Translation
-          </Link>
-          <Link href="/extract-context" className="transition-colors hover:text-foreground/80 text-foreground/60">
-            Extract Context
-          </Link>
+        <nav className="items-center gap-6 text-sm hidden md:flex">
+          <NavLinks isMobile={false} />
         </nav>
         <div className="flex items-center gap-2 ml-auto">
           {isProcessing && (
@@ -59,9 +52,23 @@ export function Navbar() {
           <Button variant="ghost" size="icon">
             <LogIn className="h-5 w-5" />
           </Button>
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[250px]">
+              <SheetHeader>
+                <SheetTitle>Mitsuko</SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col items-start gap-6 text-sm mt-8">
+                <NavLinks isMobile={true} setOpen={setOpen} />
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
   )
 }
-

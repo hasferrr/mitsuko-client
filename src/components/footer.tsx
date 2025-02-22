@@ -4,7 +4,7 @@ import { Github, Twitter, DiscIcon as Discord } from "lucide-react"
 export function Footer() {
   return (
     <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex flex-col gap-4 p-8 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 p-8 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
           <nav className="flex flex-wrap gap-4 text-sm text-muted-foreground">
             <Link href="#" className="hover:text-foreground">
@@ -33,7 +33,7 @@ export function Footer() {
           </Link>
         </div>
       </div>
-      <div className="container border-t py-4">
+      <div className="border-t py-4">
         <p className="text-center text-sm text-muted-foreground">
           © {new Date().getFullYear()} Mitsuko. All rights reserved.
         </p>
