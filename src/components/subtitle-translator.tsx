@@ -154,6 +154,9 @@ export default function SubtitleTranslator() {
       })
     }, 300)
 
+    // Accumulate raw responses
+    const allRawResponses: string[] = []
+
     // Split subtitles into chunks, starting from startIndex - 1
     const subtitleChunks: SubtitleNoTime[][] = []
     const size = minMax(splitSize, SPLIT_SIZE_MIN, SPLIT_SIZE_MAX)
@@ -214,7 +217,10 @@ export default function SubtitleTranslator() {
         tlChunk = await translateSubtitles(requestBody, apiKey, !isUseCustomModel)
       } catch {
         setIsTranslating(false)
-        break
+      } finally {
+        allRawResponses.push(
+          useTranslationStore.getState().response
+        )
       }
 
       if (tlChunk.length) {
@@ -258,8 +264,12 @@ export default function SubtitleTranslator() {
     setIsTranslating(false)
 
     // Add to history *after* translation is complete
-    if (response) {
-      addHistory(title, response.trim())
+    if (allRawResponses.length > 0) {
+      addHistory(
+        title,
+        allRawResponses,
+        JSON.stringify(useTranslationStore.getState().jsonResponse)
+      )
     }
   }
 
@@ -585,7 +595,10 @@ export default function SubtitleTranslator() {
 
       {/* History Panel */}
       {isHistoryOpen && (
-        <ResizablePanelGroup direction="horizontal" className="h-[600px] border rounded-lg overflow-hidden mt-4">
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="h-[600px] border rounded-lg overflow-hidden mt-4"
+        >
           <ResizablePanel defaultSize={30} minSize={20}>
             <ScrollArea className="h-[450px]">
               {history.map((item, index) => (
@@ -601,8 +614,8 @@ export default function SubtitleTranslator() {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-2">
-                    {item.content.substring(0, 100)}
-                    {item.content.length > 100 ? "..." : ""}
+                    {item.content.join("\n").substring(0, 100)}
+                    {item.content.join("\n").length > 100 ? "..." : ""}
                   </p>
                 </div>
               ))}
@@ -615,13 +628,15 @@ export default function SubtitleTranslator() {
             <ScrollArea className="h-[450px]">
               <div className="p-6 max-w-none text-sm">
                 {selectedHistoryIndex !== null &&
-                  history[selectedHistoryIndex].content.split("\n").map((text, index) =>
-                    !text ? (
-                      <br key={`history-${selectedHistoryIndex}-${index}`} />
-                    ) : (
-                      <div key={`history-${selectedHistoryIndex}-${index}`}>
-                        {text}
-                      </div>
+                  history[selectedHistoryIndex].content.map((text, i) =>
+                    text.split("\n").map((sentence, j) =>
+                      !sentence ? (
+                        <br key={`history-${selectedHistoryIndex}-${i}-${j}`} />
+                      ) : (
+                        <div key={`history-${selectedHistoryIndex}-${i}-${j}`}>
+                          {sentence}
+                        </div>
+                      )
                     )
                   )}
               </div>
