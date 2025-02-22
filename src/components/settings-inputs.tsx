@@ -11,7 +11,7 @@ import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
-import { Eye, EyeOff } from "lucide-react"
+import { Currency, Eye, EyeOff } from "lucide-react"
 import { Button } from "./ui/button"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import {
@@ -24,6 +24,7 @@ import {
 } from "@/constants/limits"
 import { FREE_MODELS } from "@/constants/model"
 import { parseTranslationJson } from "@/lib/parser"
+import { cn } from "@/lib/utils"
 
 
 export const LanguageSelection = memo(() => {
@@ -382,6 +383,7 @@ export const ProcessOutput = memo(() => {
   // State
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState("")
+  const [isParseError, setIsParseError] = useState(false)
   const topTextareaRef = useRef<HTMLTextAreaElement | null>(null)
   const bottomTextareaRef = useRef<HTMLTextAreaElement | null>(null)
 
@@ -390,7 +392,16 @@ export const ProcessOutput = memo(() => {
   useAutoScroll(response, topTextareaRef)
 
   useEffect(() => {
+    if (isParseError) {
+      setIsParseError(false)
+    }
+  }, [editValue])
+
+  useEffect(() => {
     setEditValue(jsonText)
+    if (isParseError) {
+      setIsParseError(false)
+    }
   }, [isEditing])
 
   useEffect(() => {
@@ -422,8 +433,11 @@ export const ProcessOutput = memo(() => {
     try {
       const parsed = parseTranslationJson(editValue)
       setJsonResponse(parsed)
+      setIsParseError(false)
     } catch {
-      "Failed to parse JSON. Please check the format."
+      console.log("Failed to parse JSON. Please check the format.")
+      setIsParseError(true)
+      bottomTextareaRef?.current?.focus()
       return
     }
     setIsEditing(false)
@@ -452,7 +466,7 @@ export const ProcessOutput = memo(() => {
         ref={topTextareaRef}
         value={response.trim()}
         readOnly
-        className="h-[370px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+        className="h-[390px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
         placeholder="Translation output will appear here..."
       />
       <Textarea
@@ -460,7 +474,10 @@ export const ProcessOutput = memo(() => {
         value={isEditing ? editValue : jsonText}
         readOnly={!isEditing}
         onChange={handleChangeJSONInput}
-        className="h-[277px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm"
+        className={cn(
+          "h-[257px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm",
+          isParseError && "focus-visible:ring-red-600",
+        )}
         placeholder="Parsed JSON output will appear here..."
       />
       <div className="flex gap-2">
