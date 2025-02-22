@@ -97,6 +97,11 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
     setSelectedHistoryIndex(null)
   }
 
+  const handleDeleteAll = () => {
+    clearHistory()
+    setSelectedHistoryIndex(null)
+  }
+
   if (!isHistoryOpen) return null
 
   return (
@@ -269,7 +274,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => clearHistory()}>
+              <AlertDialogAction onClick={handleDeleteAll}>
                 Delete All
               </AlertDialogAction>
             </AlertDialogFooter>
