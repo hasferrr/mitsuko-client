@@ -19,6 +19,9 @@ import {
   Trash,
   Loader2,
   History as HistoryIcon,
+  XCircle,
+  CheckCircle,
+  FileJson,
 } from "lucide-react"
 import { SubtitleList } from "./subtitle-list"
 import {
@@ -119,6 +122,7 @@ export default function SubtitleTranslator() {
   // History Store & State
   const addHistory = useHistoryStore((state) => state.addHistory)
   const history = useHistoryStore((state) => state.history)
+  const clearHistory = useHistoryStore((state) => state.clearHistory)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState<number | null>(null)
 
@@ -402,6 +406,39 @@ export default function SubtitleTranslator() {
     setSelectedHistoryIndex(index)
   }
 
+  const handleApplyHistory = () => {
+    if (selectedHistoryIndex === null) return
+
+    try {
+      const parsedHistory = JSON.parse(history[selectedHistoryIndex].jsonStringified)
+      if (!Array.isArray(parsedHistory)) {
+        console.error("Invalid history item format.")
+        return
+      }
+      // TODO: REWRITE apply -> response, jsonResponse, subtitle
+
+      // Create a map for quick lookup by index
+      // const historyMap = new Map(parsedHistory.map((item: { index: number, translated: string }) => [item.index, item.translated]))
+
+      // const mergedSubtitles = subtitles.map(sub => {
+      //   const translatedText = historyMap.get(sub.index);
+      //   return translatedText !== undefined ? { ...sub, translated: translatedText } : sub;
+      // });
+
+      // setSubtitles(mergedSubtitles)
+
+    } catch (error) {
+      console.error("Error parsing or applying history:", error)
+    }
+  }
+
+  const handleDeleteHistory = () => {
+    if (selectedHistoryIndex === null) return
+    const updatedHistory = history.filter((_, index) => index !== selectedHistoryIndex)
+    useHistoryStore.setState({ history: updatedHistory })
+    setSelectedHistoryIndex(null)
+  }
+
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
       {/* Header */}
@@ -595,6 +632,7 @@ export default function SubtitleTranslator() {
 
       {/* History Panel */}
       {isHistoryOpen && (
+        <>
         <ResizablePanelGroup
           direction="horizontal"
           className="h-[1000px] border rounded-lg overflow-hidden mt-4"
@@ -663,6 +701,80 @@ export default function SubtitleTranslator() {
             </ResizablePanelGroup>
           </ResizablePanel>
         </ResizablePanelGroup>
+
+          {/* History Action Buttons */}
+          <div className="flex justify-center gap-4 mt-4">
+            <Button variant="outline" disabled>
+              <FileJson className="h-4 w-4 mr-2" /> Export All
+            </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="default" disabled={selectedHistoryIndex === null}>
+                  <CheckCircle className="h-4 w-4 mr-2" /> Apply
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Apply History</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to apply this translation history to the current subtitles? This will overwrite any existing translations.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleApplyHistory}>
+                    Apply
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={selectedHistoryIndex === null}>
+                  <XCircle className="h-4 w-4 mr-2" /> Delete Current
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete History Item</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete this history item? This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteHistory}>
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={history.length === 0}>
+                  <Trash className="h-4 w-4 mr-2" /> Delete All
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete All History</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete all history items? This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => clearHistory()}>
+                    Delete All
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </>
       )}
 
       {/* Confirmation Dialog */}
