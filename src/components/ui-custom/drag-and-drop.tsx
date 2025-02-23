@@ -16,24 +16,29 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({
   const [isDragOver, setIsDragOver] = useState(false)
 
   const handleDragOver = (event: DragEvent) => {
-    event.preventDefault()
-    event.stopPropagation()
-    if (!disabled && !isDragOver) {
-      setIsDragOver(true)
+    console.log('handleDragOver')
+    if (!disabled && event.dataTransfer.types.includes("Files")) {
+      event.preventDefault()
+      event.stopPropagation()
+      if (!isDragOver) {
+        setIsDragOver(true)
+      }
     }
   }
 
   const handleDragLeave = (event: DragEvent) => {
+    console.log('handleDragLeave')
     event.preventDefault()
     event.stopPropagation()
     setIsDragOver(false)
   }
 
   const handleDrop = (event: DragEvent) => {
-    event.preventDefault()
-    event.stopPropagation()
-    setIsDragOver(false)
-    if (!disabled) {
+    console.log('handleDrop')
+    if (!disabled && event.dataTransfer.types.includes("Files")) {
+      event.preventDefault()
+      event.stopPropagation()
+      setIsDragOver(false)
       onDropFiles(event.dataTransfer.files)
     }
   }
@@ -46,7 +51,6 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({
       className={cn(
         "p-0 border-2 border-dashed rounded-md ",
         isDragOver ? "border-primary" : "border-transparent",
-        disabled && "cursor-not-allowed opacity-50",
       )}
     >
       {children}
