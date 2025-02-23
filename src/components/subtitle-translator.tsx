@@ -18,6 +18,7 @@ import {
   Trash,
   Loader2,
   History as HistoryIcon,
+  AlignCenter,
 } from "lucide-react"
 import { SubtitleList } from "./subtitle-list"
 import {
@@ -71,7 +72,18 @@ import {
   TEMPERATURE_MIN,
 } from "@/constants/limits"
 import { HistoryPanel } from "./history-panel"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
+
+type DownloadOption = "original" | "translated" | "both"
+type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
 
 export default function SubtitleTranslator() {
   // Subtitle Store
@@ -119,6 +131,8 @@ export default function SubtitleTranslator() {
   const [pendingFile, setPendingFile] = useState<File | null>(null)
   const [isContextUploadDialogOpen, setIsContextUploadDialogOpen] = useState(false)
   const [pendingContextFile, setPendingContextFile] = useState<File | null>(null)
+  const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
+  const [bothFormat, setBothFormat] = useState<BothFormat>("o-n-t") // Keeps track of the format
 
   const { setHasChanges } = useBeforeUnload()
 
@@ -351,12 +365,49 @@ export default function SubtitleTranslator() {
   }
 
   const handleFileDownload = () => {
-    const subtitleData: Subtitle[] = subtitles.map((s) => ({
-      index: s.index,
-      timestamp: s.timestamp,
-      actor: s.actor,
-      content: s.translated, // Use translated content for download
-    }))
+    const subtitleData: Subtitle[] = subtitles.map((s) => {
+      // Determine content based on downloadOption
+      let content = ""
+      if (downloadOption === "original") {
+        content = s.content
+      } else if (downloadOption === "translated") {
+        content = s.translated
+      } else { // "both"
+        // Remove new line
+        const newContent = parsed.type === "ass"
+          ? s.content.replaceAll("\\N", " ").replaceAll("  ", " ").trim()
+          : s.content.replaceAll("\n", " ").replaceAll("  ", " ").trim()
+        const newTranslated = parsed.type === "ass"
+          ? s.translated.replaceAll("\\N", " ").replaceAll("  ", " ").trim()
+          : s.translated.replaceAll("\n", " ").replaceAll("  ", " ").trim()
+
+        // Added format options
+        if (bothFormat === "(o)-t") {
+          content = `(${newContent}) ${newTranslated}`
+        } else if (bothFormat === "(t)-o") {
+          content = `(${newTranslated}) ${newContent}`
+        } else if (bothFormat === "o-n-t") {
+          content = parsed.type === "ass"
+            ? `${newContent}\\N${newTranslated}`
+            : `${newContent}\n${newTranslated}`
+        } else if (bothFormat === "t-n-o") {
+          content = parsed.type === "ass"
+            ? `${newTranslated}\\N${newContent}`
+            : `${newTranslated}\n${newContent}`
+        } else {
+          content = ""
+          console.error("Invalid BothFormat")
+        }
+      }
+
+      return {
+        index: s.index,
+        timestamp: s.timestamp,
+        actor: s.actor,
+        content, // Use determined content
+      }
+    })
+
     if (!subtitleData.length) return
 
     let fileContent = ""
@@ -523,15 +574,92 @@ export default function SubtitleTranslator() {
             </AlertDialogContent>
           </AlertDialog>
 
-          <Button
-            className="w-full mt-2 gap-2"
-            variant="outline"
-            onClick={handleFileDownload}
-            disabled={isTranslating}
-          >
-            <Download className="h-4 w-4" />
-            Download Translated Subtitles
-          </Button>
+          {/* Download Section */}
+          <div className="flex gap-4 mt-4 items-center">
+            <Select
+              value={downloadOption}
+              onValueChange={(value) => {
+                setDownloadOption(value as "original" | "translated" | "both")
+                if (value !== "both") {
+                  setBothFormat("o-n-t") // Reset format if not "both"
+                }
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Download As" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="original">Original Text</SelectItem>
+                <SelectItem value="translated">Translated Text</SelectItem>
+                <SelectItem value="both">Original + Translated</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Dialog for "both" format selection */}
+            {downloadOption === "both" && (
+              <Dialog>
+                <DialogTrigger className="w-full" asChild>
+                  <Button variant="outline">
+                    <AlignCenter className="w-4 h-4" />
+                    Select Format
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Select Format</DialogTitle>
+                    <DialogDescription>
+                      Choose how the original and translated text should be combined:
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid grid-cols-2 gap-4 py-4">
+                    <Button
+                      variant={bothFormat === "(o)-t" ? "default" : "outline"}
+                      onClick={() => setBothFormat("(o)-t")}
+                      className="py-8 flex justify-center w-56"
+                    >
+                      (Original Text) Translated Text
+                    </Button>
+                    <Button
+                      variant={bothFormat === "(t)-o" ? "default" : "outline"}
+                      onClick={() => setBothFormat("(t)-o")}
+                      className="py-8 flex justify-center w-56"
+                    >
+                      (Translated Text) Original Text
+                    </Button>
+                    <Button
+                      variant={bothFormat === "o-n-t" ? "default" : "outline"}
+                      onClick={() => setBothFormat("o-n-t")}
+                      className="py-8 flex justify-center w-56"
+                    >
+                      Original Text<br />Translated Text
+                    </Button>
+                    <Button
+                      variant={bothFormat === "t-n-o" ? "default" : "outline"}
+                      onClick={() => setBothFormat("t-n-o")}
+                      className="py-8 flex justify-center w-56"
+                    >
+                      Translated Text<br />Original Text
+                    </Button>
+                  </div>
+                  <DialogClose asChild>
+                    <Button type="button">
+                      Confirm
+                    </Button>
+                  </DialogClose>
+                </DialogContent>
+              </Dialog>
+            )}
+            {/* END Dialog */}
+
+            <Button
+              variant="outline"
+              className="gap-2 w-full"
+              onClick={handleFileDownload}
+            >
+              <Download className="h-4 w-4" />
+              Download {subName}
+            </Button>
+          </div>
         </div>
 
         {/* Right Column - Settings */}
