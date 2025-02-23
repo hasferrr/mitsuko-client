@@ -1,6 +1,7 @@
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { persist, createJSONStorage } from "zustand/middleware"
 import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/types"
+import { indexedDBStorage } from "@/lib/indexedDBStorage"
 
 interface HistoryItem {
   title: string
@@ -40,6 +41,7 @@ export const useHistoryStore = create<HistoryStore>()(
     }),
     {
       name: "history-storage",
+      storage: createJSONStorage(() => indexedDBStorage),
     }
   )
 )
