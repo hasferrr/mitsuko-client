@@ -1,3 +1,4 @@
+import { memo } from "react"
 import { Parsed, SubtitleTranslated } from "@/types/types"
 import {
   Table,
@@ -14,7 +15,7 @@ interface HistoryItemDetailsProps {
   subtitles: SubtitleTranslated[]
 }
 
-export function HistoryItemDetails({ parsed, subtitles }: HistoryItemDetailsProps) {
+export const HistoryItemDetails = memo(({ parsed, subtitles }: HistoryItemDetailsProps) => {
   if (!parsed || !subtitles) {
     return <div>No data to display</div>
   }
@@ -39,7 +40,7 @@ export function HistoryItemDetails({ parsed, subtitles }: HistoryItemDetailsProp
             </TableRow>
           </TableHeader>
           <TableBody>
-            {subtitles.map((subtitle) => (
+            {subtitles.slice(0, 50).map((subtitle) => (
               <TableRow key={subtitle.index}>
                 <TableCell>{subtitle.index}</TableCell>
                 <TableCell>
@@ -57,4 +58,4 @@ export function HistoryItemDetails({ parsed, subtitles }: HistoryItemDetailsProp
       </div>
     </div>
   )
-}
+})
