@@ -114,6 +114,7 @@ export default function SubtitleTranslator() {
   const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
 
   // Translation Store
+  const response = useTranslationStore((state) => state.response)
   const isTranslating = useTranslationStore((state) => state.isTranslating)
   const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
@@ -531,7 +532,7 @@ export default function SubtitleTranslator() {
               variant="outline"
               className="gap-2"
               onClick={handleStopTranslation}
-              disabled={!isTranslating}
+              disabled={!isTranslating || !response}
             >
               <Square className="h-4 w-4" />
               Stop
