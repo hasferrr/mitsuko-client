@@ -150,7 +150,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
           <ResizablePanelGroup direction="vertical" className="h-full">
 
             {/* Top Panel: Subtitles and Parsed Data */}
-            <ResizablePanel defaultSize={1 / 3} minSize={10}>
+            <ResizablePanel minSize={10}>
               <ScrollArea className="h-full">
                 <div className="p-6 max-w-none text-sm">
                   {selectedHistoryIndex !== null && (
@@ -166,7 +166,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
             <ResizableHandle className="border" />
 
             {/* Middle Panel: Raw Responses */}
-            <ResizablePanel defaultSize={1 / 3} minSize={10}>
+            <ResizablePanel minSize={10}>
               <ScrollArea className="h-full">
                 <div className="p-6 max-w-none text-sm">
                   <div className="space-y-4">
@@ -192,7 +192,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
             <ResizableHandle className="border" />
 
             {/* Bottom Panel: JSON  */}
-            <ResizablePanel defaultSize={1 / 3} minSize={10}>
+            <ResizablePanel minSize={10}>
               <ScrollArea className="h-full">
                 <div className="p-6 max-w-none text-sm">
                   <div className="space-y-4">
@@ -214,7 +214,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
       </ResizablePanelGroup>
 
       {/* History Action Buttons */}
-      <div className="flex justify-center gap-4 mt-4">
+      <div className="flex justify-center gap-4 mt-4 flex-wrap">
         <Button variant="outline" disabled>
           <FileJson className="h-4 w-4 mr-2" /> Export All
         </Button>

@@ -446,7 +446,7 @@ export const ContextExtractor = () => {
       </div>
 
       {/* Bottom Controls */}
-      <div className="lg:col-span-2 flex items-center justify-center gap-4">
+      <div className="lg:col-span-2 flex items-center justify-center gap-4 flex-wrap">
         <Button className="gap-2 w-[152px]" onClick={handleStartExtraction} disabled={isExtracting || isBatchMode}>
           {isExtracting ? (
             <>
