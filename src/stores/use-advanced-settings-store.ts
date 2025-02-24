@@ -13,11 +13,13 @@ interface AdvancedSettingsStore {
   prompt: string
   maxCompletionTokens: number
   startIndex: number
+  isUseStructuredOutput: boolean
   setTemperature: (temp: number) => void
   setSplitSize: (size: number) => void
   setPrompt: (prompt: string) => void
   setMaxCompletionTokens: (tokens: number) => void
   setStartIndex: (index: number) => void
+  setIsUseStructuredOutput: (use: boolean) => void
 }
 
 export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
@@ -28,19 +30,22 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
       prompt: DEFAULT_PROMPT,
       maxCompletionTokens: DEFAULT_MAX_COMPLETION_TOKENS,
       startIndex: 1,
+      isUseStructuredOutput: true,
       setTemperature: (temp) => set({ temperature: temp }),
       setSplitSize: (size) => set({ splitSize: size }),
       setPrompt: (prompt) => set({ prompt }),
       setMaxCompletionTokens: (tokens) => set({ maxCompletionTokens: tokens }),
       setStartIndex: (index) => set({ startIndex: index }),
+      setIsUseStructuredOutput: (use: boolean) => set({ isUseStructuredOutput: use }),
     }),
     {
-      name: 'advanced-settings',
+      name: "advanced-settings",
       partialize: (state) => ({
         temperature: state.temperature,
         splitSize: state.splitSize,
         prompt: state.prompt,
         maxCompletionTokens: state.maxCompletionTokens,
+        isUseStructuredOutpu: state.isUseStructuredOutput,
       }),
     }
   )

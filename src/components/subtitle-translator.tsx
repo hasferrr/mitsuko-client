@@ -31,6 +31,7 @@ import {
   ProcessOutput,
   MaxCompletionTokenInput,
   StartIndexInput,
+  StructuredOutputSwitch,
 } from "./settings-inputs"
 import {
   ContextCompletion,
@@ -112,6 +113,7 @@ export default function SubtitleTranslator() {
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
   const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
   const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
+  const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
 
   // Translation Store
   const response = useTranslationStore((state) => state.response)
@@ -223,6 +225,7 @@ export default function SubtitleTranslator() {
           MAX_COMPLETION_TOKENS_MIN,
           MAX_COMPLETION_TOKENS_MAX
         ),
+        structuredOutput: isUseStructuredOutput,
         contextMessage: context,
       }
 
@@ -700,6 +703,7 @@ export default function SubtitleTranslator() {
                   <StartIndexInput />
                   <SplitSizeInput />
                   <MaxCompletionTokenInput />
+                  <StructuredOutputSwitch />
                   <SystemPromptInput />
                 </CardContent>
               </Card>

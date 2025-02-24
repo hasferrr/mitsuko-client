@@ -300,6 +300,27 @@ export const MaxCompletionTokenInput = memo(() => {
   )
 })
 
+export const StructuredOutputSwitch = memo(() => {
+  const useStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
+  const setUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium">Structured Outputs</label>
+        <Switch
+          checked={useStructuredOutput}
+          onCheckedChange={setUseStructuredOutput}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Enables structured JSON output. You can turn this option off if the model doesn't
+        support it (Error 400 status code (no body)), but you may parse the output manually.
+      </p>
+    </div>
+  )
+})
+
 export const SystemPromptInput = memo(() => {
   const prompt = useAdvancedSettingsStore((state) => state.prompt)
   const setPrompt = useAdvancedSettingsStore((state) => state.setPrompt)
