@@ -15,6 +15,7 @@ import { LogIn, Moon, Sun, Loader2, Menu } from "lucide-react"
 import { useThemeStore } from "@/stores/use-theme-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useExtractionStore } from "@/stores/use-extraction-store"
+import { NAVBAR_IMG_LINK } from "@/constants/external-links"
 
 export function Navbar() {
   const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)
@@ -30,7 +31,7 @@ export function Navbar() {
       <div className="flex h-14 items-center">
         <div className="flex items-center gap-2 mr-4">
           <img
-            src="https://i.pinimg.com/1200x/2f/52/bb/2f52bb67e52f767ed39a2d655537829c.jpg"
+            src={NAVBAR_IMG_LINK}
             alt="Logo"
             className="w-6 h-6 object-cover"
           />
