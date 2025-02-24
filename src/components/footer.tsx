@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Github, Twitter, DiscIcon as Discord } from "lucide-react"
+import { GITHUB_LINK } from "@/constants/external-links"
 
 export function Footer() {
   return (
@@ -19,7 +20,12 @@ export function Footer() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="#" className="text-muted-foreground hover:text-foreground">
+          <Link
+            href={GITHUB_LINK}
+            className="text-muted-foreground hover:text-foreground"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <span className="sr-only">GitHub</span>
             <Github className="h-5 w-5" />
           </Link>
