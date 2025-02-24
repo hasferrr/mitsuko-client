@@ -180,15 +180,23 @@ export default function SubtitleTranslator() {
     if (startIndex > 1) {
       context.push({
         role: "user",
-        content: subtitles.slice(0, adjustedStartIndex).map((chunk) => ({
-          index: chunk.index,
-          actor: chunk.actor,
-          content: chunk.content,
-        })),
+        content: subtitles
+          .slice(Math.max(0, adjustedStartIndex), adjustedStartIndex)
+          .map((chunk) => ({
+            index: chunk.index,
+            actor: chunk.actor,
+            content: chunk.content,
+          })),
       })
       context.push({
         role: "assistant",
-        content: [],
+        content: subtitles
+          .slice(Math.max(0, adjustedStartIndex), adjustedStartIndex)
+          .map((chunk) => ({
+            index: chunk.index,
+            content: chunk.content,
+            translated: chunk.translated,
+          })),
       })
     }
 
