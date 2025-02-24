@@ -78,8 +78,10 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
     let parsedResponse: SubOnlyTranslated[] = []
     try {
       parsedResponse = parseTranslationJson(buffer)
-    } catch {
+    } catch (error) {
       console.log("Failed to parse: ", buffer)
+      set((state) => ({ response: state.response + "\n\n[Failed to parse]" }))
+      throw error
     }
     return parsedResponse
 
