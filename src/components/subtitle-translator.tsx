@@ -32,6 +32,7 @@ import {
   MaxCompletionTokenInput,
   StartIndexInput,
   StructuredOutputSwitch,
+  ContextMemorySwitch,
 } from "./settings-inputs"
 import {
   ContextCompletion,
@@ -39,6 +40,8 @@ import {
   SubOnlyTranslated,
   SubtitleTranslated,
   SubtitleNoTime,
+  CompletionUser,
+  CompletionAssistant,
 } from "@/types/types"
 import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
@@ -114,6 +117,7 @@ export default function SubtitleTranslator() {
   const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
   const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
+  const isUseContextMemory = useAdvancedSettingsStore((state) => state.isUseContextMemory)
 
   // Translation Store
   const response = useTranslationStore((state) => state.response)
@@ -177,33 +181,60 @@ export default function SubtitleTranslator() {
       })))
     }
 
+    // Set Limited Context Memory size
+    const limitedContextMemorySize = 5
+
     // Prepare context for the first chunk
-    const context: ContextCompletion[] = []
+    let context: ContextCompletion[] = []
+
     if (startIndex > 1) {
-      context.push({
-        role: "user",
-        content: subtitles.slice(0, adjustedStartIndex).map((chunk) => ({
+      if (isUseContextMemory) {
+        context.push({
+          role: "user",
+          content: subtitles.slice(0, adjustedStartIndex).map((chunk) => ({
             index: chunk.index,
             actor: chunk.actor,
             content: chunk.content,
           })),
-      })
-      context.push({
-        role: "assistant",
-        content: subtitles.slice(0, adjustedStartIndex).map((chunk) => ({
+        })
+        context.push({
+          role: "assistant",
+          content: subtitles.slice(0, adjustedStartIndex).map((chunk) => ({
             index: chunk.index,
             content: chunk.content,
             translated: chunk.translated,
           })),
-      })
+        })
+      } else {
+        // Limited context (last contextMemorySize lines) OR all previous lines
+        const limitedStartIndex = Math.max(0, adjustedStartIndex - limitedContextMemorySize)
+        context.push({
+          role: "user",
+          content: subtitles.slice(limitedStartIndex, adjustedStartIndex).map((chunk) => ({
+            index: chunk.index,
+            actor: chunk.actor,
+            content: chunk.content,
+          })),
+        })
+        context.push({
+          role: "assistant",
+          content: subtitles.slice(limitedStartIndex, adjustedStartIndex).map((chunk) => ({
+            index: chunk.index,
+            content: chunk.content,
+            translated: chunk.translated,
+          })),
+        })
+      }
     }
-
-    console.log(subtitleChunks)
-    console.log(context)
 
     // Translate each chunk of subtitles
     for (let i = 0; i < subtitleChunks.length; i++) {
       const chunk = subtitleChunks[i]
+
+      console.log(`Batch ${i + 1}`)
+      console.log(chunk)
+      console.log(JSON.parse(JSON.stringify(context)))
+
       const requestBody = {
         subtitles: chunk.map((s) => ({
           index: s.index,
@@ -264,6 +295,26 @@ export default function SubtitleTranslator() {
             translated: tlChunk[subIndex]?.translated || "",
           })),
         })
+
+        // Only for Limited Context Memory
+        // Assume: size (split size) >= contextMemorySize
+        // Mutate the context, only take the last (pair of) context.
+        // Slice maximum of contextMemorySize of dialogues
+        if (isUseContextMemory || context.length < 2) {
+          continue
+        }
+        if (size < limitedContextMemorySize) {
+          console.error(
+            "Split size should be greater than or equal to context memory size " +
+            "The code below only takes the last (pair of) context"
+          )
+        }
+        context = [
+          context[context.length - 2],
+          context[context.length - 1],
+        ]
+        context[0].content = context[0].content.slice(-limitedContextMemorySize)
+        context[1].content = context[1].content.slice(-limitedContextMemorySize)
       }
 
       // Break if translation is stopped
@@ -694,12 +745,13 @@ export default function SubtitleTranslator() {
 
             <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
-                <CardContent className="p-4 space-y-4">
+                <CardContent className="p-4 space-y-5">
                   <TemperatureSlider />
                   <StartIndexInput />
                   <SplitSizeInput />
                   <MaxCompletionTokenInput />
                   <StructuredOutputSwitch />
+                  <ContextMemorySwitch />
                   <SystemPromptInput />
                 </CardContent>
               </Card>

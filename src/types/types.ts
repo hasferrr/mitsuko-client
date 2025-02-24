@@ -57,12 +57,12 @@ export type UpdateSubtitle = (
   value: SubtitleTranslated[keyof SubtitleTranslated],
 ) => void
 
-interface CompletionUser {
+export interface CompletionUser {
   role: "user"
   content: SubtitleNoTime[]
 }
 
-interface CompletionAssistant {
+export interface CompletionAssistant {
   role: "assistant"
   content: SubtitleNoTimeNoActorTranslated[]
 }

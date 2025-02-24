@@ -79,6 +79,7 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
     try {
       parsedResponse = parseTranslationJson(buffer)
     } catch (error) {
+      console.error("Error: ", error)
       console.log("Failed to parse: ", buffer)
       set((state) => ({ response: state.response + "\n\n[Failed to parse]" }))
       throw error

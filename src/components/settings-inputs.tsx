@@ -321,6 +321,31 @@ export const StructuredOutputSwitch = memo(() => {
   )
 })
 
+export const ContextMemorySwitch = memo(() => {
+  const isUseContextMemory = useAdvancedSettingsStore((state) => state.isUseContextMemory)
+  const setIsUseContextMemory = useAdvancedSettingsStore((state) => state.setIsUseContextMemory)
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium">Full Context Memory</label>
+        <Switch
+          checked={isUseContextMemory}
+          onCheckedChange={setIsUseContextMemory}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">
+        When enabled, it's using all previous chunks to improve translation
+        consistency and accuracy, but increases the risk of hitting input token limits
+        (for complex narratives, maintaining consistent terminology).
+        Use only for models with a context window length of 128k or higher.
+        When disabled, it's only including the last 5 dialogues from the previous chunk
+        (for simpler content, episodic content, long subs).
+      </p>
+    </div>
+  )
+})
+
 export const SystemPromptInput = memo(() => {
   const prompt = useAdvancedSettingsStore((state) => state.prompt)
   const setPrompt = useAdvancedSettingsStore((state) => state.setPrompt)
