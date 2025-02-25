@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/types"
-import { indexedDBStorage } from "@/lib/indexedDBStorage"
+import { indexedDBStorage } from "@/lib/indexed-db-storage"
 
 interface HistoryItem {
   title: string
