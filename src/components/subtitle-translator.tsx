@@ -33,6 +33,7 @@ import {
   StartIndexInput,
   StructuredOutputSwitch,
   ContextMemorySwitch,
+  AdvancedSettingsResetButton,
 } from "./settings-inputs"
 import {
   ContextCompletion,
@@ -40,8 +41,6 @@ import {
   SubOnlyTranslated,
   SubtitleTranslated,
   SubtitleNoTime,
-  CompletionUser,
-  CompletionAssistant,
 } from "@/types/types"
 import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
@@ -744,6 +743,7 @@ export default function SubtitleTranslator() {
                   <StructuredOutputSwitch />
                   <ContextMemorySwitch />
                   <SystemPromptInput />
+                  <AdvancedSettingsResetButton />
                 </CardContent>
               </Card>
             </TabsContent>

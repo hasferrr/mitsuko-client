@@ -1,3 +1,4 @@
+// settings-inputs.tsx
 "use client"
 
 import { memo, useEffect, useRef, useState } from "react"
@@ -25,6 +26,12 @@ import {
 import { FREE_MODELS } from "@/constants/model"
 import { parseTranslationJson } from "@/lib/parser"
 import { cn } from "@/lib/utils"
+import {
+  DEFAULT_TEMPERATURE,
+  DEFAULT_SPLIT_SIZE,
+  DEFAULT_PROMPT,
+  DEFAULT_MAX_COMPLETION_TOKENS
+} from "@/constants/default"
 
 
 export const LanguageSelection = memo(() => {
@@ -550,3 +557,13 @@ export const ProcessOutput = memo(() => {
     </div>
   )
 })
+
+export const AdvancedSettingsResetButton = () => {
+  const resetAdvancedSettings = useAdvancedSettingsStore((state) => state.resetAdvancedSettings)
+
+  return (
+    <Button variant="outline" onClick={resetAdvancedSettings}>
+      Reset Settings
+    </Button>
+  )
+}

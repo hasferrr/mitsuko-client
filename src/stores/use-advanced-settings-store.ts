@@ -22,18 +22,23 @@ interface AdvancedSettingsStore {
   setStartIndex: (index: number) => void
   setIsUseStructuredOutput: (use: boolean) => void
   setIsUseFullContextMemory: (use: boolean) => void
+  resetAdvancedSettings: () => void
+}
+
+const initialAdvancedSettings = {
+  temperature: DEFAULT_TEMPERATURE,
+  splitSize: DEFAULT_SPLIT_SIZE,
+  prompt: DEFAULT_PROMPT,
+  maxCompletionTokens: DEFAULT_MAX_COMPLETION_TOKENS,
+  startIndex: 1,
+  isUseStructuredOutput: true,
+  isUseFullContextMemory: false,
 }
 
 export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
   persist(
     (set) => ({
-      temperature: DEFAULT_TEMPERATURE,
-      splitSize: DEFAULT_SPLIT_SIZE,
-      prompt: DEFAULT_PROMPT,
-      maxCompletionTokens: DEFAULT_MAX_COMPLETION_TOKENS,
-      startIndex: 1,
-      isUseStructuredOutput: true,
-      isUseFullContextMemory: false,
+      ...initialAdvancedSettings,
       setTemperature: (temp) => set({ temperature: temp }),
       setSplitSize: (size) => set({ splitSize: size }),
       setPrompt: (prompt) => set({ prompt }),
@@ -41,6 +46,7 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
       setStartIndex: (index) => set({ startIndex: index }),
       setIsUseStructuredOutput: (use: boolean) => set({ isUseStructuredOutput: use }),
       setIsUseFullContextMemory: (use: boolean) => set({ isUseFullContextMemory: use }),
+      resetAdvancedSettings: () => set(initialAdvancedSettings),
     }),
     {
       name: "advanced-settings",
