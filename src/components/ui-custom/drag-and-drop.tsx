@@ -16,7 +16,6 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({
   const [isDragOver, setIsDragOver] = useState(false)
 
   const handleDragOver = (event: DragEvent) => {
-    console.log('handleDragOver')
     if (!disabled && event.dataTransfer.types.includes("Files")) {
       event.preventDefault()
       event.stopPropagation()
@@ -27,14 +26,12 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({
   }
 
   const handleDragLeave = (event: DragEvent) => {
-    console.log('handleDragLeave')
     event.preventDefault()
     event.stopPropagation()
     setIsDragOver(false)
   }
 
   const handleDrop = (event: DragEvent) => {
-    console.log('handleDrop')
     if (!disabled && event.dataTransfer.types.includes("Files")) {
       event.preventDefault()
       event.stopPropagation()
