@@ -117,7 +117,7 @@ export default function SubtitleTranslator() {
   const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
   const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
-  const isUseContextMemory = useAdvancedSettingsStore((state) => state.isUseContextMemory)
+  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
 
   // Translation Store
   const response = useTranslationStore((state) => state.response)
@@ -193,7 +193,7 @@ export default function SubtitleTranslator() {
         role: "user",
         content: subtitles
           .slice(
-            isUseContextMemory ? 0 : limitedContext,
+            isUseFullContextMemory ? 0 : limitedContext,
             adjustedStartIndex,
           )
           .map((chunk) => ({
@@ -206,7 +206,7 @@ export default function SubtitleTranslator() {
         role: "assistant",
         content: subtitles
           .slice(
-            isUseContextMemory ? 0 : limitedContext,
+            isUseFullContextMemory ? 0 : limitedContext,
             adjustedStartIndex,
           )
           .map((chunk) => ({
@@ -292,7 +292,7 @@ export default function SubtitleTranslator() {
       // Assume: size (split size) >= contextMemorySize
       // Mutate the context, only take the last (pair of) context.
       // Slice maximum of contextMemorySize of dialogues
-      if (isUseContextMemory || context.length < 2) {
+      if (isUseFullContextMemory || context.length < 2) {
         continue
       }
       if (size < limitedContextMemorySize) {

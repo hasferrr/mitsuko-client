@@ -322,16 +322,16 @@ export const StructuredOutputSwitch = memo(() => {
 })
 
 export const ContextMemorySwitch = memo(() => {
-  const isUseContextMemory = useAdvancedSettingsStore((state) => state.isUseContextMemory)
-  const setIsUseContextMemory = useAdvancedSettingsStore((state) => state.setIsUseContextMemory)
+  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
+  const setIsUseFullContextMemory = useAdvancedSettingsStore((state) => state.setIsUseFullContextMemory)
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium">Full Context Memory</label>
         <Switch
-          checked={isUseContextMemory}
-          onCheckedChange={setIsUseContextMemory}
+          checked={isUseFullContextMemory}
+          onCheckedChange={setIsUseFullContextMemory}
         />
       </div>
       <p className="text-xs text-muted-foreground">
