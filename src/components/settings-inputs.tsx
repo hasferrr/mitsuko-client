@@ -1,4 +1,3 @@
-// settings-inputs.tsx
 "use client"
 
 import { memo, useEffect, useRef, useState } from "react"
@@ -12,7 +11,7 @@ import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
-import { Currency, Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
 import { Button } from "./ui/button"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import {
@@ -23,15 +22,9 @@ import {
   TEMPERATURE_MIN,
   TEMPERATURE_MAX,
 } from "@/constants/limits"
-import { FREE_MODELS } from "@/constants/model"
+import { FREE_MODELS, SOURCE_LANGUAGES, TARGET_LANGUAGES } from "@/constants/model"
 import { parseTranslationJson } from "@/lib/parser"
 import { cn } from "@/lib/utils"
-import {
-  DEFAULT_TEMPERATURE,
-  DEFAULT_SPLIT_SIZE,
-  DEFAULT_PROMPT,
-  DEFAULT_MAX_COMPLETION_TOKENS
-} from "@/constants/default"
 
 
 export const LanguageSelection = memo(() => {
@@ -49,10 +42,11 @@ export const LanguageSelection = memo(() => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="japanese">Japanese</SelectItem>
-            <SelectItem value="english">English</SelectItem>
-            <SelectItem value="korean">Korean</SelectItem>
-            <SelectItem value="chinese">Chinese</SelectItem>
+            {SOURCE_LANGUAGES.map((lang) => (
+              <SelectItem key={lang.value} value={lang.value}>
+                {lang.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -63,11 +57,11 @@ export const LanguageSelection = memo(() => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="indonesian">Indonesian</SelectItem>
-            <SelectItem value="english">English</SelectItem>
-            <SelectItem value="japanese">Japanese</SelectItem>
-            <SelectItem value="korean">Korean</SelectItem>
-            <SelectItem value="chinese">Chinese</SelectItem>
+            {TARGET_LANGUAGES.map((lang) => (
+              <SelectItem key={lang.value} value={lang.value}>
+                {lang.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
