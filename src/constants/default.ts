@@ -1,7 +1,7 @@
 import { SubtitleTranslated } from "@/types/types"
 
-export const DEFAULT_SOURCE_LANGUAGE = "japanese"
-export const DEFAULT_TARGET_LANGUAGE = "indonesian"
+export const DEFAULT_SOURCE_LANGUAGE = "Japanese"
+export const DEFAULT_TARGET_LANGUAGE = "Indonesian"
 
 export const DEFAULT_TEMPERATURE = 0.6
 export const DEFAULT_SPLIT_SIZE = 150

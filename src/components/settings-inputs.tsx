@@ -3,7 +3,6 @@
 import { memo, useEffect, useRef, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/use-settings-store"
@@ -22,10 +21,12 @@ import {
   TEMPERATURE_MIN,
   TEMPERATURE_MAX,
 } from "@/constants/limits"
-import { FREE_MODELS, SOURCE_LANGUAGES, TARGET_LANGUAGES } from "@/constants/model"
+import { FREE_MODELS } from "@/constants/model"
 import { parseTranslationJson } from "@/lib/parser"
 import { cn } from "@/lib/utils"
 import { ModelSelector } from "@/components/model-selector"
+import { LANGUAGES } from "@/constants/lang"
+import { ComboBox } from "./ui-custom/combo-box"
 
 
 export const LanguageSelection = memo(() => {
@@ -38,33 +39,21 @@ export const LanguageSelection = memo(() => {
     <div className="grid gap-4 md:grid-cols-2">
       <div className="space-y-2">
         <label className="text-sm font-medium">Source Language</label>
-        <Select value={sourceLanguage} onValueChange={setSourceLanguage}>
-          <SelectTrigger className="bg-background dark:bg-muted/30">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SOURCE_LANGUAGES.map((lang) => (
-              <SelectItem key={lang.value} value={lang.value}>
-                {lang.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <ComboBox
+          data={LANGUAGES}
+          value={sourceLanguage}
+          setValue={setSourceLanguage}
+          name="language"
+        />
       </div>
       <div className="space-y-2">
         <label className="text-sm font-medium">Target Language</label>
-        <Select value={targetLanguage} onValueChange={setTargetLanguage}>
-          <SelectTrigger className="bg-background dark:bg-muted/30">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {TARGET_LANGUAGES.map((lang) => (
-              <SelectItem key={lang.value} value={lang.value}>
-                {lang.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <ComboBox
+          data={LANGUAGES}
+          value={targetLanguage}
+          setValue={setTargetLanguage}
+          name="language"
+        />
       </div>
     </div>
   )
