@@ -251,7 +251,7 @@ export const SplitSizeInput = memo(() => {
         Determines the number of dialogues to process in each chunk.
         Smaller chunks can help with context management and reliability.
         Larger chunks increase efficiency but may result in truncation
-        due to the maximum model output token limit. ({SPLIT_SIZE_MIN}-{SPLIT_SIZE_MAX})
+        due to the model output token limit. ({SPLIT_SIZE_MIN}-{SPLIT_SIZE_MAX})
       </p>
     </div>
   )
@@ -335,8 +335,8 @@ export const ContextMemorySwitch = memo(() => {
       </div>
       <p className="text-xs text-muted-foreground">
         When enabled, it's using all previous chunks to improve translation
-        consistency and accuracy, but increases the risk of hitting input token limits.
-        Use only for models with a context window length of 64k-128k or higher.
+        consistency and accuracy, but increases token usage the risk of hitting
+        input token limits. Best for models with large context windows (64k+ tokens).
         When disabled, it's only including the last 5 dialogues from the previous chunk.
       </p>
     </div>
