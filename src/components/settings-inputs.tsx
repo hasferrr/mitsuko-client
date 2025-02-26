@@ -3,7 +3,7 @@
 import { memo, useEffect, useRef, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/use-settings-store"
@@ -25,6 +25,7 @@ import {
 import { FREE_MODELS, SOURCE_LANGUAGES, TARGET_LANGUAGES } from "@/constants/model"
 import { parseTranslationJson } from "@/lib/parser"
 import { cn } from "@/lib/utils"
+import { ModelSelector } from "@/components/model-selector"
 
 
 export const LanguageSelection = memo(() => {
@@ -83,31 +84,27 @@ export const ModelSelection = memo(() => {
 
   const [showApiKey, setShowApiKey] = useState(false)
 
+  interface Model {
+    name: string
+    type: string
+  }
+
+  const types = Object.keys(FREE_MODELS)
+  const models: Model[] = Object.entries(FREE_MODELS).flatMap(([type, models]) =>
+    models.map((name) => ({ name, type }))
+  )
+
   return (
     <>
       <div className="space-y-2">
         <label className="text-sm font-medium">Model</label>
-        <Select
-          value={selectedModel}
-          onValueChange={setSelectedModel}
+        <ModelSelector
+          models={models}
+          types={types}
+          selectedModel={models.find(model => model.name === selectedModel)}
+          onSelectModel={(model: Model) => setSelectedModel(model.name)}
           disabled={isUseCustomModel}
-        >
-          <SelectTrigger className="bg-background dark:bg-muted/30">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>
-                Free Models (Limited)
-              </SelectLabel>
-              {FREE_MODELS.map((model) => (
-                <SelectItem key={model} value={model}>
-                  {model}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        />
       </div>
       <div className="flex items-center space-x-2">
         <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={setIsUseCustomModel} />
