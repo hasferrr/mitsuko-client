@@ -249,7 +249,7 @@ export const SplitSizeInput = memo(() => {
       />
       <p className="text-xs text-muted-foreground">
         Determines the number of dialogues to process in each chunk.
-        Smaller chunks can help with context management but may increase the token usage.
+        Smaller chunks can help with context management and reliability.
         Larger chunks increase efficiency but may result in truncation due to the maximum model output token limit. ({SPLIT_SIZE_MIN}-{SPLIT_SIZE_MAX})
       </p>
     </div>
@@ -313,7 +313,7 @@ export const StructuredOutputSwitch = memo(() => {
       </div>
       <p className="text-xs text-muted-foreground">
         Enables structured JSON output. You can turn this option off if the model doesn't
-        support it (Error 400 status code (no body)), but you may parse the output manually.
+        support it, but you may parse the output manually.
       </p>
     </div>
   )
@@ -334,11 +334,9 @@ export const ContextMemorySwitch = memo(() => {
       </div>
       <p className="text-xs text-muted-foreground">
         When enabled, it's using all previous chunks to improve translation
-        consistency and accuracy, but increases the risk of hitting input token limits
-        (for complex narratives, maintaining consistent terminology).
-        Use only for models with a context window length of 128k or higher.
+        consistency and accuracy, but increases the risk of hitting input token limits.
+        Use only for models with a context window length of 64k-128k or higher.
         When disabled, it's only including the last 5 dialogues from the previous chunk
-        (for simpler content, episodic content, long subs).
       </p>
     </div>
   )
