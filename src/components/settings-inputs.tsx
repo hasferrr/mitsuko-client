@@ -250,7 +250,8 @@ export const SplitSizeInput = memo(() => {
       <p className="text-xs text-muted-foreground">
         Determines the number of dialogues to process in each chunk.
         Smaller chunks can help with context management and reliability.
-        Larger chunks increase efficiency but may result in truncation due to the maximum model output token limit. ({SPLIT_SIZE_MIN}-{SPLIT_SIZE_MAX})
+        Larger chunks increase efficiency but may result in truncation
+        due to the maximum model output token limit. ({SPLIT_SIZE_MIN}-{SPLIT_SIZE_MAX})
       </p>
     </div>
   )
@@ -336,7 +337,7 @@ export const ContextMemorySwitch = memo(() => {
         When enabled, it's using all previous chunks to improve translation
         consistency and accuracy, but increases the risk of hitting input token limits.
         Use only for models with a context window length of 64k-128k or higher.
-        When disabled, it's only including the last 5 dialogues from the previous chunk
+        When disabled, it's only including the last 5 dialogues from the previous chunk.
       </p>
     </div>
   )
@@ -547,10 +548,17 @@ export const ProcessOutput = memo(() => {
 
 export const AdvancedSettingsResetButton = () => {
   const resetAdvancedSettings = useAdvancedSettingsStore((state) => state.resetAdvancedSettings)
+  const [value, setValue] = useState("Reset Settings")
+  const buttonRef = useRef<HTMLButtonElement | null>(null)
+  const handleReset = () => {
+    resetAdvancedSettings()
+    setValue("✅ Reset Success")
+    setTimeout(() => setValue("Reset Settings"), 2000)
+  }
 
   return (
-    <Button variant="outline" onClick={resetAdvancedSettings}>
-      Reset Settings
+    <Button ref={buttonRef} onClick={handleReset} variant="outline">
+      {value}
     </Button>
   )
 }

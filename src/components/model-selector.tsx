@@ -67,7 +67,7 @@ export function ModelSelector({
         <PopoverContent
           align="start"
           side="bottom"
-          className="w-full max-h-72 p-0 overflow-y-auto"
+          className="w-full max-h-[19rem] p-0 overflow-y-auto"
         >
           <Command loop>
             <CommandList
