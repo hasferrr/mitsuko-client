@@ -517,14 +517,13 @@ export const ProcessOutput = memo(() => {
         readOnly={!isEditing}
         onChange={handleChangeJSONInput}
         className={cn(
-          "h-[257px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm",
+          "h-[247px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm",
           isParseError && "focus-visible:ring-red-600",
         )}
         placeholder="Parsed JSON output will appear here..."
       />
       <div className="flex gap-2">
         <Button
-          size="sm"
           variant={isEditing ? "default" : "outline"}
           onClick={isEditing ? handleParseAndSave : handleEditText}
           disabled={isTranslating}
@@ -533,7 +532,6 @@ export const ProcessOutput = memo(() => {
           {isEditing ? "Parse & Save" : "Edit Text"}
         </Button>
         <Button
-          size="sm"
           variant="outline"
           onClick={isEditing ? handleCancelEdit : handleApply}
           disabled={isTranslating}

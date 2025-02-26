@@ -28,7 +28,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-8">
-      <div className="flex h-14 items-center">
+      <div className="flex h-14 items-center gap-2">
         <div className="flex items-center gap-2 mr-4">
           <img
             src={NAVBAR_IMG_LINK}
@@ -59,7 +59,7 @@ export function Navbar() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[250px]">
+            <SheetContent side="left" className="w-[250px] bg-background/95 backdrop-blur">
               <SheetHeader>
                 <SheetTitle>Mitsuko</SheetTitle>
               </SheetHeader>

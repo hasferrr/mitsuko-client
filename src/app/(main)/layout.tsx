@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isDarkMode = useThemeStore(state => state.isDarkMode)
 
   return (
-    <div className={`${isDarkMode ? "dark" : ""} bg-background text-foreground`}>
+    <div className={`${isDarkMode ? "dark" : ""} bg-background text-foreground min-h-screen`}>
       <Navbar />
       {children}
       <Footer />

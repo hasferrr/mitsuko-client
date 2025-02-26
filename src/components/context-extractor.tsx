@@ -289,7 +289,7 @@ export const ContextExtractor = () => {
                 value={subtitleContent}
                 onChange={handleSubtitleContentChange}
                 className={cn(
-                  "min-h-[185px] h-[185px] max-h-[185px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
+                  "min-h-[181px] h-[181px] max-h-[181px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
                   !isSubtitleContentValid && "outline outline-red-500"
                 )}
                 placeholder="Paste subtitle content here..."
@@ -326,7 +326,7 @@ export const ContextExtractor = () => {
                 ref={previousContextRef}
                 value={previousContext}
                 onChange={handlePreviousContextChange}
-                className="min-h-[132px] h-[132px] max-h-[132px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                className="min-h-[130px] h-[130px] max-h-[130px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
                 placeholder="Paste previous context here..."
                 onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
               />
@@ -386,7 +386,7 @@ export const ContextExtractor = () => {
             </div>
 
             <DragAndDrop onDropFiles={handleFileUploadBatch} disabled={isExtracting}>
-            <ScrollArea className="h-[348px] border rounded-md">
+            <ScrollArea className="h-[350px] border rounded-md">
               <div className="space-y-1 p-2">
                 {selectedFiles.map((file, index) => (
                   <div key={file.id} className="flex items-center justify-between border rounded-md p-2">

@@ -735,7 +735,7 @@ export default function SubtitleTranslator() {
 
             <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
-                <CardContent className="p-4 space-y-5">
+                <CardContent className="p-4 space-y-4">
                   <TemperatureSlider />
                   <StartIndexInput />
                   <SplitSizeInput />
