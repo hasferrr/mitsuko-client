@@ -52,6 +52,7 @@ export const ContextExtractor = () => {
   const isExtracting = useExtractionStore((state) => state.isExtracting)
   const extractContext = useExtractionStore((state) => state.extractContext)
   const stopExtraction = useExtractionStore((state) => state.stopExtraction)
+  const setIsExtracting = useExtractionStore((state) => state.setIsExtracting)
 
   // Extraction Input Store
   const {
@@ -180,6 +181,7 @@ export const ContextExtractor = () => {
       return
     }
 
+    setIsExtracting(true)
     setHasChanges(true)
     setActiveTab("result")
 
@@ -219,6 +221,12 @@ export const ContextExtractor = () => {
     }
 
     await extractContext(requestBody, apiKey, !isUseCustomModel)
+    setIsExtracting(false)
+  }
+
+  const handleStopExtraction = () => {
+    stopExtraction()
+    setIsExtracting(false)
   }
 
   const handleSaveToFile = () => {
@@ -284,17 +292,17 @@ export const ContextExtractor = () => {
                 </Button>
               </div>
               <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, setSubtitleContent, subtitleContentRef.current)} disabled={isExtracting}>
-              <Textarea
-                ref={subtitleContentRef}
-                value={subtitleContent}
-                onChange={handleSubtitleContentChange}
-                className={cn(
-                  "min-h-[181px] h-[181px] max-h-[181px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
-                  !isSubtitleContentValid && "outline outline-red-500"
-                )}
-                placeholder="Paste subtitle content here..."
-                onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
-              />
+                <Textarea
+                  ref={subtitleContentRef}
+                  value={subtitleContent}
+                  onChange={handleSubtitleContentChange}
+                  className={cn(
+                    "min-h-[181px] h-[181px] max-h-[181px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
+                    !isSubtitleContentValid && "outline outline-red-500"
+                  )}
+                  placeholder="Paste subtitle content here..."
+                  onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
+                />
               </DragAndDrop>
             </div>
             <div className="space-y-2">
@@ -322,14 +330,14 @@ export const ContextExtractor = () => {
                 </Button>
               </div>
               <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, setPreviousContext, previousContextRef.current)} disabled={isExtracting}>
-              <Textarea
-                ref={previousContextRef}
-                value={previousContext}
-                onChange={handlePreviousContextChange}
-                className="min-h-[130px] h-[130px] max-h-[130px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
-                placeholder="Paste previous context here..."
-                onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
-              />
+                <Textarea
+                  ref={previousContextRef}
+                  value={previousContext}
+                  onChange={handlePreviousContextChange}
+                  className="min-h-[130px] h-[130px] max-h-[130px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                  placeholder="Paste previous context here..."
+                  onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
+                />
               </DragAndDrop>
             </div>
           </>
@@ -386,29 +394,29 @@ export const ContextExtractor = () => {
             </div>
 
             <DragAndDrop onDropFiles={handleFileUploadBatch} disabled={isExtracting}>
-            <ScrollArea className="h-[350px] border rounded-md">
-              <div className="space-y-1 p-2">
-                {selectedFiles.map((file, index) => (
-                  <div key={file.id} className="flex items-center justify-between border rounded-md p-2">
-                    <div className="flex items-center gap-2">
-                      <File className="h-4 w-4" />
-                      <div className="text-sm w-fit block break-all">{file.name}</div>
+              <ScrollArea className="h-[350px] border rounded-md">
+                <div className="space-y-1 p-2">
+                  {selectedFiles.map((file, index) => (
+                    <div key={file.id} className="flex items-center justify-between border rounded-md p-2">
+                      <div className="flex items-center gap-2">
+                        <File className="h-4 w-4" />
+                        <div className="text-sm w-fit block break-all">{file.name}</div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => moveFileUp(index)} disabled={isExtracting}>
+                          <ArrowUpCircle className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => moveFileDown(index)} disabled={isExtracting}>
+                          <ArrowDownCircle className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => removeFile(file.id)} disabled={isExtracting}>
+                          <XCircle className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => moveFileUp(index)} disabled={isExtracting}>
-                        <ArrowUpCircle className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => moveFileDown(index)} disabled={isExtracting}>
-                        <ArrowDownCircle className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => removeFile(file.id)} disabled={isExtracting}>
-                        <XCircle className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
+                  ))}
+                </div>
+              </ScrollArea>
             </DragAndDrop>
           </div>
         )}
@@ -461,7 +469,7 @@ export const ContextExtractor = () => {
           )}
         </Button>
 
-        <Button variant="outline" className="gap-2" onClick={stopExtraction} disabled={!isExtracting || !contextResult}>
+        <Button variant="outline" className="gap-2" onClick={handleStopExtraction} disabled={!isExtracting || !contextResult}>
           <Square className="h-4 w-4" />
           Stop
         </Button>

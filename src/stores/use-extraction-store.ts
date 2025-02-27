@@ -1,11 +1,12 @@
 import { EXTRACT_CONTEXT_URL, EXTRACT_CONTEXT_URL_FREE } from "@/constants/api"
+import { sleep } from "@/lib/utils"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 interface ExtractionStore {
   contextResult: string
   isExtracting: boolean
-  abortControllerRef: React.RefObject<AbortController | null>
+  abortControllerRef: React.RefObject<AbortController>
   setContextResult: (result: string) => void
   setIsExtracting: (isExtracting: boolean) => void
   extractContext: (requestBody: any, apiKey: string, isFree: boolean) => Promise<void>
@@ -15,18 +16,20 @@ interface ExtractionStore {
 export const useExtractionStore = create<ExtractionStore>()(persist((set, get) => ({
   contextResult: "",
   isExtracting: false,
-  abortControllerRef: { current: null },
+  abortControllerRef: { current: new AbortController() },
   setContextResult: (result) => set({ contextResult: result }),
   setIsExtracting: (isExtracting) => set({ isExtracting }),
-  stopExtraction: () => {
-    get().abortControllerRef.current?.abort()
-  },
+  stopExtraction: () => get().abortControllerRef.current.abort(),
   extractContext: async (requestBody, apiKey, isFree) => {
-    if (get().isExtracting) return
+    set({ contextResult: "" })
 
-    set({ isExtracting: true, contextResult: "" })
-    const abortController = new AbortController()
-    set({ abortControllerRef: { current: abortController } })
+    while (!get().abortControllerRef.current.signal.aborted) {
+      get().abortControllerRef.current.abort()
+      await sleep(500)
+      console.log("reattempting")
+    }
+
+    get().abortControllerRef.current = new AbortController()
     let buffer = ""
 
     try {
@@ -37,7 +40,7 @@ export const useExtractionStore = create<ExtractionStore>()(persist((set, get) =
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
-        signal: abortController.signal,
+        signal: get().abortControllerRef.current.signal,
       })
 
       if (!res.ok) {
@@ -56,6 +59,7 @@ export const useExtractionStore = create<ExtractionStore>()(persist((set, get) =
         buffer += chunk
         set({ contextResult: buffer })
       }
+
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "AbortError") {
         console.log("Request aborted")
@@ -66,10 +70,9 @@ export const useExtractionStore = create<ExtractionStore>()(persist((set, get) =
           contextResult: state.contextResult + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]`,
         }))
       }
-    } finally {
-      set({ isExtracting: false })
-      set({ abortControllerRef: { current: null } }) // Reset the ref
     }
+
+    get().abortControllerRef.current.abort()
   },
 }),
   {

@@ -46,7 +46,7 @@ import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
-import { capitalizeWords, cn, minMax } from "@/lib/utils"
+import { capitalizeWords, cn, minMax, sleep } from "@/lib/utils"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
@@ -248,12 +248,11 @@ export default function SubtitleTranslator() {
       let tlChunk: SubOnlyTranslated[] = []
       try {
         tlChunk = await translateSubtitles(requestBody, apiKey, !isUseCustomModel)
+        allRawResponses.push(useTranslationStore.getState().response)
       } catch {
         setIsTranslating(false)
-      } finally {
-        allRawResponses.push(
-          useTranslationStore.getState().response
-        )
+        allRawResponses.push(useTranslationStore.getState().response)
+        break
       }
 
       if (!tlChunk.length) continue
@@ -312,7 +311,7 @@ export default function SubtitleTranslator() {
       if (!translatingStatus) break
 
       // Delay between each chunk
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      await sleep(1000)
     }
 
     setIsTranslating(false)
