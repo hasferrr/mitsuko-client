@@ -56,7 +56,7 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         prompt: state.prompt,
         maxCompletionTokens: state.maxCompletionTokens,
         isUseStructuredOutpu: state.isUseStructuredOutput,
-        isUseContextMemory: state.isUseFullContextMemory,
+        isUseFullContextMemory: state.isUseFullContextMemory,
       }),
     }
   )
