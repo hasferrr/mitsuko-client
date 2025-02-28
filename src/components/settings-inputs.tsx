@@ -324,7 +324,7 @@ export const ContextMemorySwitch = memo(() => {
       </div>
       <p className="text-xs text-muted-foreground">
         When enabled, it's using all previous chunks to improve translation
-        consistency and accuracy, but increases token usage the risk of hitting
+        consistency and accuracy, but increases token usage and the risk of hitting
         input token limits. Best for models with large context windows (64k+ tokens).
         When disabled, it's only including the last 5 dialogues from the previous chunk.
       </p>
