@@ -27,7 +27,7 @@ export function mergeSubtitles(events: SubtitleEvent[], subtitles: Subtitle[]): 
 export function reconstructAssSubtitle(header: string, footer: string, subtitleEvents: SubtitleEvent[]): string {
   let assString = header + '\n'
   for (const event of subtitleEvents) {
-    const line = `${event.format}: ${event.layer},${event.start},${event.end},${event.style},${event.name},${event.marginL},${event.marginR},${event.marginV},${event.effect},${event.text}`
+    const line = `${event.format}: ${event.layer},${event.start},${event.end},${event.style},${event.name},${event.marginL},${event.marginR},${event.marginV},${event.effect},${event.text.replaceAll("\n", "\\N")}`
     assString += line + '\n'
   }
   if (footer) {
