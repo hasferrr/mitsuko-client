@@ -12,6 +12,7 @@ export const LANGUAGES = [
   "Indonesian",
   "Italian",
   "Japanese",
+  "Japanese (Romaji)",
   "Korean",
   "Marathi",
   "Persian",
