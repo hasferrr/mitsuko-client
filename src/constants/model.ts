@@ -5,8 +5,8 @@ export const FREE_MODELS: ModelMap = new Map()
 FREE_MODELS.set("Free Models", [
   {
     name: "DeepSeek R1 (Free)",
-    maxInput: 164_000,
-    maxOutput: 164_000,
+    maxInput: 163_000,
+    maxOutput: 163_000,
     structuredOutput: true,
   },
 ])

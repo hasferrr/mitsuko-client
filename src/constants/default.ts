@@ -5,6 +5,7 @@ export const DEFAULT_TARGET_LANGUAGE = "Indonesian"
 
 export const DEFAULT_TEMPERATURE = 0.6
 export const DEFAULT_SPLIT_SIZE = 150
+export const DEFAULT_MAX_COMPLETION_TOKENS = 8129
 
 export const DEFAULT_TITLE = "Blue.Box.S01E16 (example)"
 export const DEFAULT_SUBTITLES: SubtitleTranslated[] = [

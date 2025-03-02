@@ -38,12 +38,10 @@ export function ModelSelector({
 
   const selectedModel = useSettingsStore((state) => state.selectedModel)
   const setSelectedModel = useSettingsStore((state) => state.setSelectedModel)
-  const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
   const setIsUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
 
   const handleSelect = (model: Model) => {
     setSelectedModel(model)
-    setMaxCompletionTokens(model.maxOutput)
     setIsUseStructuredOutput(model.structuredOutput)
     setOpen(false)
   }
