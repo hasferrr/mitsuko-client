@@ -6,6 +6,7 @@ import {
   DEFAULT_MAX_COMPLETION_TOKENS,
 } from "@/constants/default"
 import { useSubtitleStore } from "./use-subtitle-store"
+import { useSettingsStore } from "./use-settings-store"
 
 interface AdvancedSettingsStore {
   temperature: number
@@ -53,6 +54,9 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
       resetAdvancedSettings: () => set({
         ...initialAdvancedSettings,
         endIndex: useSubtitleStore.getState().subtitles?.length ?? initialAdvancedSettings.endIndex,
+        isUseStructuredOutput: useSettingsStore.getState().isUseCustomModel
+          ? initialAdvancedSettings.isUseStructuredOutput
+          : useSettingsStore.getState().modelDetail?.structuredOutput ?? initialAdvancedSettings.isUseStructuredOutput,
       }),
     }),
     {
