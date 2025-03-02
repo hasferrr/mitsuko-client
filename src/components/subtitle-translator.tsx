@@ -27,7 +27,6 @@ import {
   ContextDocumentInput,
   TemperatureSlider,
   SplitSizeInput,
-  SystemPromptInput,
   ProcessOutput,
   MaxCompletionTokenInput,
   StartIndexInput,
@@ -747,7 +746,6 @@ export default function SubtitleTranslator() {
                   <MaxCompletionTokenInput />
                   <StructuredOutputSwitch />
                   <ContextMemorySwitch />
-                  <SystemPromptInput />
                   <AdvancedSettingsResetButton />
                 </CardContent>
               </Card>

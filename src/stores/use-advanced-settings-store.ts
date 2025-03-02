@@ -63,7 +63,7 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         splitSize: state.splitSize,
         prompt: state.prompt,
         maxCompletionTokens: state.maxCompletionTokens,
-        isUseStructuredOutpu: state.isUseStructuredOutput,
+        isUseStructuredOutput: state.isUseStructuredOutput,
         isUseFullContextMemory: state.isUseFullContextMemory,
       }),
     }
