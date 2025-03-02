@@ -119,6 +119,7 @@ export default function SubtitleTranslator() {
   const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
+  const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
 
   // Translation Store
   const response = useTranslationStore((state) => state.response)
@@ -381,9 +382,12 @@ export default function SubtitleTranslator() {
       }))
 
       setSubtitles(parsedSubtitles)
+      setEndIndex(parsedSubtitles.length)
+
       const fileName = pendingFile.name.split('.')
       fileName.pop()
       setTitle(fileName.join('.'))
+
     } catch (error) {
       console.error("Error parsing subtitle file:", error)
     } finally {

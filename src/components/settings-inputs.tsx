@@ -21,7 +21,6 @@ import {
   TEMPERATURE_MIN,
   TEMPERATURE_MAX,
 } from "@/constants/limits"
-import { FREE_MODELS } from "@/constants/model"
 import { parseTranslationJson } from "@/lib/parser"
 import { cn } from "@/lib/utils"
 import { ModelSelector } from "@/components/model-selector"
@@ -406,6 +405,8 @@ export const EndIndexInput = memo(() => {
   const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
   const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
   const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
+
+  const initRef = useAdvancedSettingsStore((state) => state.initRef)
   const subtitles = useSubtitleStore((state) => state.subtitles)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -427,7 +428,10 @@ export const EndIndexInput = memo(() => {
   }
 
   useEffect(() => {
-    setEndIndex(subtitles.length)
+    if (initRef.current) {
+      setEndIndex(subtitles.length)
+      initRef.current = false
+    }
   }, [subtitles.length])
 
   return (

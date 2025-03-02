@@ -3,10 +3,10 @@ import { persist } from "zustand/middleware"
 import {
   DEFAULT_TEMPERATURE,
   DEFAULT_SPLIT_SIZE,
-  DEFAULT_PROMPT,
-  DEFAULT_MAX_COMPLETION_TOKENS,
 } from "@/constants/default"
 import { useSubtitleStore } from "./use-subtitle-store"
+import { useSettingsStore } from "./use-settings-store"
+import { MAX_COMPLETION_TOKENS_MAX } from "@/constants/limits"
 
 interface AdvancedSettingsStore {
   temperature: number
@@ -17,6 +17,7 @@ interface AdvancedSettingsStore {
   endIndex: number
   isUseStructuredOutput: boolean
   isUseFullContextMemory: boolean
+  initRef: React.RefObject<boolean>
   setTemperature: (temp: number) => void
   setSplitSize: (size: number) => void
   setPrompt: (prompt: string) => void
@@ -31,12 +32,13 @@ interface AdvancedSettingsStore {
 const initialAdvancedSettings = {
   temperature: DEFAULT_TEMPERATURE,
   splitSize: DEFAULT_SPLIT_SIZE,
-  prompt: DEFAULT_PROMPT,
-  maxCompletionTokens: DEFAULT_MAX_COMPLETION_TOKENS,
+  prompt: "",
+  maxCompletionTokens: MAX_COMPLETION_TOKENS_MAX,
   startIndex: 1,
   endIndex: 100000,
   isUseStructuredOutput: true,
   isUseFullContextMemory: false,
+  initRef: { current: true }
 }
 
 export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
@@ -54,6 +56,7 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
       resetAdvancedSettings: () => set({
         ...initialAdvancedSettings,
         endIndex: useSubtitleStore.getState().subtitles?.length ?? initialAdvancedSettings.endIndex,
+        maxCompletionTokens: useSettingsStore.getState().modelDetail?.maxOutput ?? initialAdvancedSettings.maxCompletionTokens,
       }),
     }),
     {
