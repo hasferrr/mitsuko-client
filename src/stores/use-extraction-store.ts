@@ -9,7 +9,7 @@ interface ExtractionStore {
   abortControllerRef: React.RefObject<AbortController>
   setContextResult: (result: string) => void
   setIsExtracting: (isExtracting: boolean) => void
-  extractContext: (requestBody: any, apiKey: string, isFree: boolean) => Promise<void>
+  extractContext: (requestBody: any, apiKey: string, isFree: boolean, attempt?: number) => Promise<void>
   stopExtraction: () => void
 }
 
@@ -20,7 +20,7 @@ export const useExtractionStore = create<ExtractionStore>()(persist((set, get) =
   setContextResult: (result) => set({ contextResult: result }),
   setIsExtracting: (isExtracting) => set({ isExtracting }),
   stopExtraction: () => get().abortControllerRef.current.abort(),
-  extractContext: async (requestBody, apiKey, isFree) => {
+  extractContext: async (requestBody, apiKey, isFree, attempt = 0) => {
     set({ contextResult: "" })
 
     while (!get().abortControllerRef.current.signal.aborted) {
@@ -58,6 +58,12 @@ export const useExtractionStore = create<ExtractionStore>()(persist((set, get) =
         const chunk = new TextDecoder().decode(value)
         buffer += chunk
         set({ contextResult: buffer })
+      }
+
+      if (!buffer.trim() && attempt < 3 && !get().abortControllerRef.current.signal.aborted) {
+        console.log("Retrying...")
+        await sleep(3000)
+        return get().extractContext(requestBody, apiKey, isFree, attempt + 1)
       }
 
     } catch (error: unknown) {

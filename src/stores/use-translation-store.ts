@@ -14,7 +14,7 @@ interface TranslationStore {
   setJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
   appendJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
   abortControllerRef: React.RefObject<AbortController>
-  translateSubtitles: (requestBody: any, apiKey: string, isFree: boolean) => Promise<SubOnlyTranslated[]>
+  translateSubtitles: (requestBody: any, apiKey: string, isFree: boolean, attempt?: number) => Promise<SubOnlyTranslated[]>
   stopTranslation: () => void
 }
 
@@ -28,7 +28,7 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
   appendJsonResponse: (newArr) => set((state) => ({ jsonResponse: [...state.jsonResponse, ...newArr] })),
   abortControllerRef: { current: new AbortController() },
   stopTranslation: () => get().abortControllerRef.current?.abort(),
-  translateSubtitles: async (requestBody, apiKey, isFree) => {
+  translateSubtitles: async (requestBody, apiKey, isFree, attempt = 0) => {
     set({ response: "" })
 
     while (!get().abortControllerRef.current.signal.aborted) {
@@ -68,6 +68,12 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
         const chunk = new TextDecoder().decode(value)
         buffer += chunk
         set({ response: buffer })
+      }
+
+      if (!buffer.trim() && attempt < 3 && !get().abortControllerRef.current.signal.aborted) {
+        console.log("Retrying...")
+        await sleep(3000)
+        return get().translateSubtitles(requestBody, apiKey, isFree, attempt + 1)
       }
 
     } catch (error: unknown) {
