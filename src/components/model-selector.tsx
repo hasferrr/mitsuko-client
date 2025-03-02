@@ -19,82 +19,91 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-
-interface Model<Type = string> {
-  name: string
-  type: Type
-}
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { Model, ModelMap } from "@/types/types"
 
 interface ModelSelectorProps extends PopoverProps {
-  types: string[]
-  models: Model[]
-  selectedModel?: Model
+  models: ModelMap
+  selectedModel?: string
   onSelectModel: (model: Model) => void
   disabled?: boolean
 }
 
 export function ModelSelector({
   models,
-  types,
   selectedModel,
   onSelectModel,
   disabled,
   ...props
 }: ModelSelectorProps) {
   const [open, setOpen] = React.useState(false)
+  const firstKey = models.keys().next().value
+  const [currentModel, setCurrentModel] = React.useState<Model | null>(firstKey ? models.get(firstKey)![0] : null)
 
   const handleSelect = (model: Model) => {
+    setCurrentModel(model)
     onSelectModel(model)
     setOpen(false)
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <Popover open={open} onOpenChange={setOpen} {...props}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            aria-label="Select a model"
-            className="w-full justify-between"
-            disabled={disabled}
-          >
-            {selectedModel ? selectedModel.name : "Select a model..."}
-            <ChevronsUpDown className="opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
+      <HoverCard openDelay={30} closeDelay={0}>
+        <HoverCardContent
+          side="left"
           align="start"
-          side="bottom"
-          className="w-full max-h-[19rem] p-0 overflow-y-auto"
+          className="w-[260px] text-sm dark:bg-foreground"
         >
-          <Command loop>
-            <CommandList
-              className="h-[var(--cmdk-list-height)] max-h-[400px] overflow-y-auto"
-            >
-              <CommandInput placeholder="Search Models..." />
-              <CommandEmpty>No Models found.</CommandEmpty>
-              {types.map((type) => (
-                <CommandGroup key={type} heading={type}>
-                  {models
-                    .filter((model) => model.type === type)
-                    .map((model) => (
+          <ModelDescription model={currentModel} isSelected={true} />
+        </HoverCardContent>
+
+        <Popover open={open} onOpenChange={setOpen} {...props}>
+          <PopoverTrigger asChild>
+            <HoverCardTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                aria-label="Select a model"
+                className="w-full justify-between"
+                disabled={disabled}
+              >
+                {selectedModel ? selectedModel : "Select a model..."}
+                <ChevronsUpDown className="opacity-50" />
+              </Button>
+            </HoverCardTrigger>
+          </PopoverTrigger>
+
+          <PopoverContent
+            align="start"
+            side="bottom"
+            className="w-full max-h-[19rem] p-0 overflow-y-auto"
+          >
+            <Command loop>
+              <CommandList
+                className="h-[var(--cmdk-list-height)] max-h-[400px] overflow-y-auto"
+              >
+                <CommandInput placeholder="Search Models..." />
+                <CommandEmpty>No Models found.</CommandEmpty>
+                {Array.from(models).map(([key, value]) => (
+                  <CommandGroup key={key} heading={key}>
+                    {value.map((model) => (
                       <ModelItem
                         key={model.name}
                         model={model}
-                        isSelected={selectedModel?.name === model.name}
+                        isSelected={selectedModel === model.name}
                         onSelect={() => {
                           handleSelect(model)
                         }}
                       />
                     ))}
-                </CommandGroup>
-              ))}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+                  </CommandGroup>
+                ))}
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </HoverCard>
     </div>
   )
 }
@@ -120,16 +129,58 @@ function ModelItem({ model, isSelected, onSelect }: ModelItemProps) {
   })
 
   return (
-    <CommandItem
-      key={model.name}
-      onSelect={onSelect}
-      ref={ref}
-      className="data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground"
-    >
-      {model.name}
-      <Check
-        className={cn("ml-auto", isSelected ? "opacity-100" : "opacity-0")}
-      />
-    </CommandItem>
+    <HoverCard openDelay={0} closeDelay={0}>
+      <HoverCardTrigger asChild>
+        <div>
+          <CommandItem
+            onSelect={onSelect}
+            ref={ref}
+            className="data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground"
+          >
+            {model.name}
+            <Check
+              className={cn("ml-auto", isSelected ? "opacity-100" : "opacity-0")}
+            />
+          </CommandItem>
+        </div>
+      </HoverCardTrigger>
+      <HoverCardContent
+        side="left"
+        align="start"
+        className={cn("w-[260px] text-sm")}
+        animate={false}
+      >
+        <ModelDescription model={model} isSelected={isSelected} />
+      </HoverCardContent>
+    </HoverCard>
+  )
+}
+
+interface ModelDescriptionProps {
+  model: Model | null
+  isSelected?: boolean
+}
+
+function ModelDescription({ model, isSelected }: ModelDescriptionProps) {
+  return model ? (
+    <div className="dark:bg-foreground dark:text-background">
+      {isSelected && (
+        <div className="text-xs text-muted-foreground mb-1">
+          Currently Selected Model
+        </div>
+      )}
+      <h4 className="font-semibold mb-1">{model.name}</h4>
+      <p className="text-sm">
+        Context Length: {model.maxInput.toLocaleString()}
+      </p>
+      <p className="text-sm">
+        Max Completion: {model.maxOutput.toLocaleString()}
+      </p>
+      <p className="text-sm">
+        Structured Output: {model.structuredOutput ? "Yes" : <span className="font-semibold">No</span>}
+      </p>
+    </div>
+  ) : (
+    <p className="text-sm">No model selected</p>
   )
 }

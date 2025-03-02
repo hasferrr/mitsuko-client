@@ -73,25 +73,14 @@ export const ModelSelection = memo(() => {
 
   const [showApiKey, setShowApiKey] = useState(false)
 
-  interface Model {
-    name: string
-    type: string
-  }
-
-  const types = Object.keys(FREE_MODELS)
-  const models: Model[] = Object.entries(FREE_MODELS).flatMap(([type, models]) =>
-    models.map((name) => ({ name, type }))
-  )
-
   return (
     <>
       <div className="space-y-2">
         <label className="text-sm font-medium">Model</label>
         <ModelSelector
-          models={models}
-          types={types}
-          selectedModel={models.find(model => model.name === selectedModel)}
-          onSelectModel={(model: Model) => setSelectedModel(model.name)}
+          models={FREE_MODELS}
+          selectedModel={selectedModel}
+          onSelectModel={(model) => setSelectedModel(model.name)}
           disabled={isUseCustomModel}
         />
       </div>

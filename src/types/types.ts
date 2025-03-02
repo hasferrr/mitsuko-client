@@ -73,3 +73,12 @@ export interface Parsed {
   type: "srt" | "ass"
   data: ASSParseOutput | null
 }
+
+export interface Model {
+  name: string
+  maxInput: number
+  maxOutput: number
+  structuredOutput: boolean
+}
+
+export type ModelMap = Map<string, Model[]>

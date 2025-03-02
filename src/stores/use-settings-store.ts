@@ -30,7 +30,10 @@ export const useSettingsStore = create<SettingsStore>()(
     (set) => ({
       sourceLanguage: DEFAULT_SOURCE_LANGUAGE,
       targetLanguage: DEFAULT_TARGET_LANGUAGE,
-      selectedModel: Object.values(FREE_MODELS)[0][0] || "",
+      selectedModel: (() => {
+        const firstModel = FREE_MODELS.values().next().value
+        return firstModel && firstModel.length > 0 ? firstModel[0].name : ""
+      })(),
       isUseCustomModel: false,
       apiKey: "",
       customBaseUrl: "",
