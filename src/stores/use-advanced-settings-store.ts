@@ -17,7 +17,6 @@ interface AdvancedSettingsStore {
   endIndex: number
   isUseStructuredOutput: boolean
   isUseFullContextMemory: boolean
-  initRef: React.RefObject<boolean>
   setTemperature: (temp: number) => void
   setSplitSize: (size: number) => void
   setPrompt: (prompt: string) => void
@@ -38,7 +37,6 @@ const initialAdvancedSettings = {
   endIndex: 100000,
   isUseStructuredOutput: true,
   isUseFullContextMemory: false,
-  initRef: { current: true }
 }
 
 export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(

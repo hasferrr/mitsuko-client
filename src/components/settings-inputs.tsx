@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils"
 import { ModelSelector } from "@/components/model-selector"
 import { LANGUAGES } from "@/constants/lang"
 import { ComboBox } from "./ui-custom/combo-box"
+import { useInitRefStore } from "@/stores/use-init-store"
 
 
 export const LanguageSelection = memo(() => {
@@ -406,7 +407,7 @@ export const EndIndexInput = memo(() => {
   const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
   const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
 
-  const initRef = useAdvancedSettingsStore((state) => state.initRef)
+  const initRef = useInitRefStore((state) => state.initRefEndIndex)
   const subtitles = useSubtitleStore((state) => state.subtitles)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

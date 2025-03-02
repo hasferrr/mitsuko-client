@@ -52,6 +52,7 @@ import { useSettingsStore } from "@/stores/use-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useHistoryStore } from "@/stores/use-history-store"
+import { useInitRefStore } from "@/stores/use-init-store"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
 import {
   AlertDialog,
@@ -98,7 +99,6 @@ export default function SubtitleTranslator() {
   const parsed = useSubtitleStore((state) => state.parsed)
   const setParsed = useSubtitleStore((state) => state.setParsed)
   const resetParsed = useSubtitleStore((state) => state.resetParsed)
-  const isInitRef = useSubtitleStore((state) => state.isInitRef)
 
   // Settings Store
   const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
@@ -141,17 +141,19 @@ export default function SubtitleTranslator() {
   const [isContextUploadDialogOpen, setIsContextUploadDialogOpen] = useState(false)
   const [pendingContextFile, setPendingContextFile] = useState<File | null>(null)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
-  const [bothFormat, setBothFormat] = useState<BothFormat>("o-n-t") // Keeps track of the format
+  const [bothFormat, setBothFormat] = useState<BothFormat>("o-n-t")
 
+  // Other
   const { setHasChanges } = useBeforeUnload()
+  const initRef = useInitRefStore((state) => state.initRefSubtitle)
 
   useEffect(() => {
     const key = useSubtitleStore.persist.getOptions().name
-    if (key && !localStorage.getItem(key) && isInitRef.current) {
+    if (key && !localStorage.getItem(key) && initRef.current) {
       setTitle(DEFAULT_TITLE)
       setSubtitles(DEFAULT_SUBTITLES)
     }
-    isInitRef.current = false
+    initRef.current = false
   }, [])
 
   const handleStartTranslation = async () => {

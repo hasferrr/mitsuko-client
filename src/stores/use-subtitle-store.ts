@@ -6,7 +6,6 @@ interface SubtitleStore {
   title: string
   subtitles: SubtitleTranslated[]
   parsed: Parsed
-  isInitRef: React.RefObject<boolean>
   setTitle: (title: string) => void
   setSubtitles: (subtitles: SubtitleTranslated[]) => void
   updateSubtitle: UpdateSubtitle
@@ -23,7 +22,6 @@ export const useSubtitleStore = create<SubtitleStore>()(
       title: "",
       subtitles: [],
       parsed: initialParsedState,
-      isInitRef: { current: true },
       setTitle: (title) => set({ title }),
       setSubtitles: (subtitles) => set({ subtitles }),
       setParsed: (parsed) => set({ parsed }),
