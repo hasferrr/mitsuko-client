@@ -368,7 +368,7 @@ export const StartIndexInput = memo(() => {
       num = value === "" ? 0 : num
       setStartIndex(num)
       if (num > endIndex) {
-        setEndIndex(num)
+        setEndIndex(Math.max(1, num))
       }
     }
   }
@@ -415,10 +415,10 @@ export const EndIndexInput = memo(() => {
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10)
       num = Math.min(num, subtitles.length)
-      num = value === "" ? subtitles.length : num
+      num = value === "" ? 0 : num
       setEndIndex(num)
       if (num < startIndex) {
-        setStartIndex(num)
+        setStartIndex(Math.max(1, num))
       }
     }
   }
