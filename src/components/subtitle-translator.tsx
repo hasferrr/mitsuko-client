@@ -253,7 +253,7 @@ export default function SubtitleTranslator() {
 
       let tlChunk: SubOnlyTranslated[] = []
       try {
-        tlChunk = await translateSubtitles(requestBody, apiKey, !isUseCustomModel)
+        tlChunk = await translateSubtitles(requestBody, isUseCustomModel ? apiKey : "", !isUseCustomModel)
         allRawResponses.push(useTranslationStore.getState().response)
       } catch {
         setIsTranslating(false)

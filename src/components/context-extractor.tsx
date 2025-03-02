@@ -220,7 +220,7 @@ export const ContextExtractor = () => {
       ),
     }
 
-    await extractContext(requestBody, apiKey, !isUseCustomModel)
+    await extractContext(requestBody, isUseCustomModel ? apiKey : "", !isUseCustomModel)
     setIsExtracting(false)
   }
 
