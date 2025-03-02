@@ -3,7 +3,7 @@ import { SubOnlyTranslated } from "@/types/types"
 import { parseTranslationJson } from "@/lib/parser"
 import { persist } from "zustand/middleware"
 import { TRANSLATE_URL, TRANSLATE_URL_FREE } from "@/constants/api"
-import { sleep } from "@/lib/utils"
+import { abortedAbortController, sleep } from "@/lib/utils"
 
 interface TranslationStore {
   response: string
@@ -26,7 +26,7 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
   jsonResponse: [],
   setJsonResponse: (jsonResponse) => set({ jsonResponse }),
   appendJsonResponse: (newArr) => set((state) => ({ jsonResponse: [...state.jsonResponse, ...newArr] })),
-  abortControllerRef: { current: new AbortController() },
+  abortControllerRef: { current: abortedAbortController() },
   stopTranslation: () => get().abortControllerRef.current?.abort(),
   translateSubtitles: async (requestBody, apiKey, isFree, attempt = 0) => {
     set({ response: "" })

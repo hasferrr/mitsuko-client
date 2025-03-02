@@ -42,3 +42,9 @@ export function minMax(value: number, min: number, max: number): number {
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
+
+export function abortedAbortController() {
+  const controller = new AbortController()
+  controller.abort()
+  return controller
+}

@@ -1,5 +1,5 @@
 import { EXTRACT_CONTEXT_URL, EXTRACT_CONTEXT_URL_FREE } from "@/constants/api"
-import { sleep } from "@/lib/utils"
+import { abortedAbortController, sleep } from "@/lib/utils"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
@@ -16,7 +16,7 @@ interface ExtractionStore {
 export const useExtractionStore = create<ExtractionStore>()(persist((set, get) => ({
   contextResult: "",
   isExtracting: false,
-  abortControllerRef: { current: new AbortController() },
+  abortControllerRef: { current: abortedAbortController() },
   setContextResult: (result) => set({ contextResult: result }),
   setIsExtracting: (isExtracting) => set({ isExtracting }),
   stopExtraction: () => get().abortControllerRef.current.abort(),
