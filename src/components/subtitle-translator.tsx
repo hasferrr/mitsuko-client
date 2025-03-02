@@ -31,6 +31,7 @@ import {
   ProcessOutput,
   MaxCompletionTokenInput,
   StartIndexInput,
+  EndIndexInput,
   StructuredOutputSwitch,
   ContextMemorySwitch,
   AdvancedSettingsResetButton,
@@ -116,6 +117,7 @@ export default function SubtitleTranslator() {
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
   const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
   const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
+  const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
 
@@ -173,8 +175,9 @@ export default function SubtitleTranslator() {
     const subtitleChunks: SubtitleNoTime[][] = []
     const size = minMax(splitSize, SPLIT_SIZE_MIN, SPLIT_SIZE_MAX)
     const adjustedStartIndex = minMax(startIndex - 1, 0, subtitles.length - 1)
-    for (let i = adjustedStartIndex; i < subtitles.length; i += size) {
-      subtitleChunks.push(subtitles.slice(i, i + size).map((s) => ({
+    const adjustedEndIndex = minMax(endIndex - 1, adjustedStartIndex, subtitles.length - 1)
+    for (let i = adjustedStartIndex; i <= adjustedEndIndex; i += size) {
+      subtitleChunks.push(subtitles.slice(i, Math.min(i + size, adjustedEndIndex + 1)).map((s) => ({
         index: s.index,
         actor: s.actor,
         content: s.content,
@@ -739,6 +742,7 @@ export default function SubtitleTranslator() {
                   <ModelDetail />
                   <TemperatureSlider />
                   <StartIndexInput />
+                  <EndIndexInput />
                   <SplitSizeInput />
                   <MaxCompletionTokenInput />
                   <StructuredOutputSwitch />

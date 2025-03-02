@@ -6,6 +6,7 @@ import {
   DEFAULT_PROMPT,
   DEFAULT_MAX_COMPLETION_TOKENS,
 } from "@/constants/default"
+import { useSubtitleStore } from "./use-subtitle-store"
 
 interface AdvancedSettingsStore {
   temperature: number
@@ -13,6 +14,7 @@ interface AdvancedSettingsStore {
   prompt: string
   maxCompletionTokens: number
   startIndex: number
+  endIndex: number
   isUseStructuredOutput: boolean
   isUseFullContextMemory: boolean
   setTemperature: (temp: number) => void
@@ -20,6 +22,7 @@ interface AdvancedSettingsStore {
   setPrompt: (prompt: string) => void
   setMaxCompletionTokens: (tokens: number) => void
   setStartIndex: (index: number) => void
+  setEndIndex: (index: number) => void
   setIsUseStructuredOutput: (use: boolean) => void
   setIsUseFullContextMemory: (use: boolean) => void
   resetAdvancedSettings: () => void
@@ -31,6 +34,7 @@ const initialAdvancedSettings = {
   prompt: DEFAULT_PROMPT,
   maxCompletionTokens: DEFAULT_MAX_COMPLETION_TOKENS,
   startIndex: 1,
+  endIndex: 100000,
   isUseStructuredOutput: true,
   isUseFullContextMemory: false,
 }
@@ -44,9 +48,13 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
       setPrompt: (prompt) => set({ prompt }),
       setMaxCompletionTokens: (tokens) => set({ maxCompletionTokens: tokens }),
       setStartIndex: (index) => set({ startIndex: index }),
+      setEndIndex: (index) => set({ endIndex: index }),
       setIsUseStructuredOutput: (use: boolean) => set({ isUseStructuredOutput: use }),
       setIsUseFullContextMemory: (use: boolean) => set({ isUseFullContextMemory: use }),
-      resetAdvancedSettings: () => set(initialAdvancedSettings),
+      resetAdvancedSettings: () => set({
+        ...initialAdvancedSettings,
+        endIndex: useSubtitleStore.getState().subtitles?.length ?? initialAdvancedSettings.endIndex,
+      }),
     }),
     {
       name: "advanced-settings",
