@@ -20,90 +20,80 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
-import { Model, ModelMap } from "@/types/types"
+import { Model } from "@/types/types"
+import { useSettingsStore } from "@/stores/use-settings-store"
+import { FREE_MODELS } from "@/constants/model"
+import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 
 interface ModelSelectorProps extends PopoverProps {
-  models: ModelMap
-  selectedModel?: string
-  onSelectModel: (model: Model) => void
   disabled?: boolean
 }
 
 export function ModelSelector({
-  models,
-  selectedModel,
-  onSelectModel,
   disabled,
   ...props
 }: ModelSelectorProps) {
+  const models = FREE_MODELS
   const [open, setOpen] = React.useState(false)
-  const firstKey = models.keys().next().value
-  const [currentModel, setCurrentModel] = React.useState<Model | null>(firstKey ? models.get(firstKey)![0] : null)
+
+  const selectedModel = useSettingsStore((state) => state.selectedModel)
+  const setSelectedModel = useSettingsStore((state) => state.setSelectedModel)
+  const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
+  const setIsUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
 
   const handleSelect = (model: Model) => {
-    setCurrentModel(model)
-    onSelectModel(model)
+    setSelectedModel(model)
+    setMaxCompletionTokens(model.maxOutput)
+    setIsUseStructuredOutput(model.structuredOutput)
     setOpen(false)
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <HoverCard openDelay={30} closeDelay={0}>
-        <HoverCardContent
-          side="left"
-          align="start"
-          className="w-[260px] text-sm dark:bg-foreground"
-        >
-          <ModelDescription model={currentModel} isSelected={true} />
-        </HoverCardContent>
-
-        <Popover open={open} onOpenChange={setOpen} {...props}>
-          <PopoverTrigger asChild>
-            <HoverCardTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                aria-label="Select a model"
-                className="w-full justify-between"
-                disabled={disabled}
-              >
-                {selectedModel ? selectedModel : "Select a model..."}
-                <ChevronsUpDown className="opacity-50" />
-              </Button>
-            </HoverCardTrigger>
-          </PopoverTrigger>
-
-          <PopoverContent
-            align="start"
-            side="bottom"
-            className="w-full max-h-[19rem] p-0 overflow-y-auto"
+      <Popover open={open} onOpenChange={setOpen} {...props}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            aria-label="Select a model"
+            className="w-full justify-between"
+            disabled={disabled}
           >
-            <Command loop>
-              <CommandList
-                className="h-[var(--cmdk-list-height)] max-h-[400px] overflow-y-auto"
-              >
-                <CommandInput placeholder="Search Models..." />
-                <CommandEmpty>No Models found.</CommandEmpty>
-                {Array.from(models).map(([key, value]) => (
-                  <CommandGroup key={key} heading={key}>
-                    {value.map((model) => (
-                      <ModelItem
-                        key={model.name}
-                        model={model}
-                        isSelected={selectedModel === model.name}
-                        onSelect={() => {
-                          handleSelect(model)
-                        }}
-                      />
-                    ))}
-                  </CommandGroup>
-                ))}
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      </HoverCard>
+            {selectedModel ? selectedModel : "Select a model..."}
+            <ChevronsUpDown className="opacity-50" />
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent
+          align="start"
+          side="bottom"
+          className="w-full max-h-[19rem] p-0 overflow-y-auto"
+        >
+          <Command loop>
+            <CommandList
+              className="h-[var(--cmdk-list-height)] max-h-[400px] overflow-y-auto"
+            >
+              <CommandInput placeholder="Search Models..." />
+              <CommandEmpty>No Models found.</CommandEmpty>
+              {Array.from(models).map(([key, value]) => (
+                <CommandGroup key={key} heading={key}>
+                  {value.map((model) => (
+                    <ModelItem
+                      key={model.name}
+                      model={model}
+                      isSelected={selectedModel === model.name}
+                      onSelect={() => {
+                        handleSelect(model)
+                      }}
+                    />
+                  ))}
+                </CommandGroup>
+              ))}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }
@@ -147,7 +137,7 @@ function ModelItem({ model, isSelected, onSelect }: ModelItemProps) {
       <HoverCardContent
         side="left"
         align="start"
-        className={cn("w-[260px] text-sm")}
+        className="w-[260px] text-sm"
         animate={false}
       >
         <ModelDescription model={model} isSelected={isSelected} />

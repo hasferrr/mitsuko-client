@@ -83,6 +83,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ModelDetail } from "./model-detail"
 
 
 type DownloadOption = "original" | "translated" | "both"
@@ -735,6 +736,7 @@ export default function SubtitleTranslator() {
             <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
+                  <ModelDetail />
                   <TemperatureSlider />
                   <StartIndexInput />
                   <SplitSizeInput />

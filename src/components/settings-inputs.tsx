@@ -60,8 +60,6 @@ export const LanguageSelection = memo(() => {
 })
 
 export const ModelSelection = memo(() => {
-  const selectedModel = useSettingsStore((state) => state.selectedModel)
-  const setSelectedModel = useSettingsStore((state) => state.setSelectedModel)
   const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
   const setIsUseCustomModel = useSettingsStore((state) => state.setIsUseCustomModel)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
@@ -77,12 +75,7 @@ export const ModelSelection = memo(() => {
     <>
       <div className="space-y-2">
         <label className="text-sm font-medium">Model</label>
-        <ModelSelector
-          models={FREE_MODELS}
-          selectedModel={selectedModel}
-          onSelectModel={(model) => setSelectedModel(model.name)}
-          disabled={isUseCustomModel}
-        />
+        <ModelSelector disabled={isUseCustomModel} />
       </div>
       <div className="flex items-center space-x-2">
         <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={setIsUseCustomModel} />
@@ -236,22 +229,28 @@ export const SplitSizeInput = memo(() => {
 })
 
 export const MaxCompletionTokenInput = memo(() => {
+  const modelDetail = useSettingsStore((state) => state.modelDetail)
+  const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
   const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
+
+  const maxToken = isUseCustomModel || !modelDetail
+    ? MAX_COMPLETION_TOKENS_MAX
+    : modelDetail.maxOutput
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     // Allow only numbers, and handle empty string
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10) // Prevent NaN
-      num = Math.min(num, MAX_COMPLETION_TOKENS_MAX)
+      num = Math.min(num, maxToken)
       setMaxCompletionTokens(value === "" ? 0 : num)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setMaxCompletionTokens(Math.min(Math.max(parseInt(value, 10), MAX_COMPLETION_TOKENS_MIN), MAX_COMPLETION_TOKENS_MAX))
+    setMaxCompletionTokens(Math.min(Math.max(parseInt(value, 10), MAX_COMPLETION_TOKENS_MIN), maxToken))
   }
 
   return (
@@ -265,27 +264,33 @@ export const MaxCompletionTokenInput = memo(() => {
         onBlur={handleBlur}
         onChange={handleChange}
         min={MAX_COMPLETION_TOKENS_MIN}
-        max={MAX_COMPLETION_TOKENS_MAX}
+        max={maxToken}
         step={512}
         className="bg-background dark:bg-muted/30"
         inputMode="numeric"
       />
       <p className="text-xs text-muted-foreground">
-        Sets the maximum number of tokens the model can generate for each subtitle chunk. ({MAX_COMPLETION_TOKENS_MIN}-{MAX_COMPLETION_TOKENS_MAX})
+        Sets the maximum number of tokens the model can generate for each subtitle chunk.
+        ({MAX_COMPLETION_TOKENS_MIN}-{maxToken})
       </p>
     </div>
   )
 })
 
 export const StructuredOutputSwitch = memo(() => {
+  const modelDetail = useSettingsStore((state) => state.modelDetail)
+  const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
   const useStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
   const setUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
+
+  const disabled = !isUseCustomModel && !modelDetail?.structuredOutput
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium">Structured Outputs</label>
         <Switch
+          disabled={disabled}
           checked={useStructuredOutput}
           onCheckedChange={setUseStructuredOutput}
         />

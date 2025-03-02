@@ -5,11 +5,13 @@ import {
   DEFAULT_TARGET_LANGUAGE,
 } from "@/constants/default"
 import { FREE_MODELS } from "@/constants/model"
+import { Model } from "@/types/types"
 
 interface SettingsStore {
   sourceLanguage: string
   targetLanguage: string
   selectedModel: string
+  modelDetail: Model | null
   isUseCustomModel: boolean
   apiKey: string
   customBaseUrl: string
@@ -17,7 +19,7 @@ interface SettingsStore {
   contextDocument: string
   setSourceLanguage: (language: string) => void
   setTargetLanguage: (language: string) => void
-  setSelectedModel: (model: string) => void
+  setSelectedModel: (model: string | Model) => void
   setIsUseCustomModel: (value: boolean) => void
   setApiKey: (key: string) => void
   setCustomBaseUrl: (url: string) => void
@@ -25,15 +27,15 @@ interface SettingsStore {
   setContextDocument: (doc: string) => void
 }
 
+const firstModel = FREE_MODELS.values().next().value
+
 export const useSettingsStore = create<SettingsStore>()(
   persist(
     (set) => ({
       sourceLanguage: DEFAULT_SOURCE_LANGUAGE,
       targetLanguage: DEFAULT_TARGET_LANGUAGE,
-      selectedModel: (() => {
-        const firstModel = FREE_MODELS.values().next().value
-        return firstModel && firstModel.length > 0 ? firstModel[0].name : ""
-      })(),
+      selectedModel: firstModel && firstModel.length > 0 ? firstModel[0].name : "",
+      modelDetail: firstModel && firstModel.length > 0 ? firstModel[0] : null,
       isUseCustomModel: false,
       apiKey: "",
       customBaseUrl: "",
@@ -41,7 +43,10 @@ export const useSettingsStore = create<SettingsStore>()(
       contextDocument: "",
       setSourceLanguage: (language) => set({ sourceLanguage: language }),
       setTargetLanguage: (language) => set({ targetLanguage: language }),
-      setSelectedModel: (model) => set({ selectedModel: model }),
+      setSelectedModel: (model: string | Model) => set({
+        selectedModel: typeof model === "string" ? model : model.name,
+        modelDetail: typeof model === "string" ? null : model,
+      }),
       setIsUseCustomModel: (value) => set({ isUseCustomModel: value }),
       setApiKey: (key) => set({ apiKey: key }),
       setCustomBaseUrl: (url) => set({ customBaseUrl: url }),
