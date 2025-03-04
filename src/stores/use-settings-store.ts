@@ -27,7 +27,7 @@ interface SettingsStore {
   setContextDocument: (doc: string) => void
 }
 
-const firstModel = FREE_MODELS.values().next().value
+const firstModel = Object.values(FREE_MODELS)[0]
 
 export const useSettingsStore = create<SettingsStore>()(
   persist(

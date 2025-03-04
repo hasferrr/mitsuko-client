@@ -74,7 +74,7 @@ export function ModelSelector({
             >
               <CommandInput placeholder="Search Models..." />
               <CommandEmpty>No Models found.</CommandEmpty>
-              {Array.from(models).map(([key, value]) => (
+              {Object.entries(models).map(([key, value]) => (
                 <CommandGroup key={key} heading={key}>
                   {value.map((model) => (
                     <ModelItem

@@ -1,3 +1,6 @@
+import { z } from "zod"
+import { modelSchema, modelCollectionSchema } from "@/lib/zod"
+
 export interface Timestamp {
   h: number
   m: number
@@ -74,11 +77,5 @@ export interface Parsed {
   data: ASSParseOutput | null
 }
 
-export interface Model {
-  name: string
-  maxInput: number
-  maxOutput: number
-  structuredOutput: boolean
-}
-
-export type ModelMap = Map<string, Model[]>
+export type Model = z.infer<typeof modelSchema>
+export type ModelCollection = z.infer<typeof modelCollectionSchema>
