@@ -114,6 +114,7 @@ export default function SubtitleTranslator() {
   // Advanced Settings Store
   const temperature = useAdvancedSettingsStore((state) => state.temperature)
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
+  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.isMaxCompletionTokensAuto)
   const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
   const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
   const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
@@ -242,7 +243,7 @@ export default function SubtitleTranslator() {
         baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
         model: isUseCustomModel ? customModel : selectedModel,
         temperature: minMax(temperature, TEMPERATURE_MIN, TEMPERATURE_MAX),
-        maxCompletionTokens: minMax(
+        maxCompletionTokens: isMaxCompletionTokensAuto ? undefined : minMax(
           maxCompletionTokens,
           MAX_COMPLETION_TOKENS_MIN,
           MAX_COMPLETION_TOKENS_MAX

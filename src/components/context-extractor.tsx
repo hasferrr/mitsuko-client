@@ -46,6 +46,7 @@ export const ContextExtractor = () => {
 
   // Advanced Settings Store
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
+  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.isMaxCompletionTokensAuto)
 
   // Extraction Store
   const contextResult = useExtractionStore((state) => state.contextResult)
@@ -213,7 +214,7 @@ export const ContextExtractor = () => {
       },
       baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
       model: isUseCustomModel ? customModel : selectedModel,
-      maxCompletionTokens: minMax(
+      maxCompletionTokens: isMaxCompletionTokensAuto ? undefined : minMax(
         maxCompletionTokens,
         MAX_COMPLETION_TOKENS_MIN,
         MAX_COMPLETION_TOKENS_MAX

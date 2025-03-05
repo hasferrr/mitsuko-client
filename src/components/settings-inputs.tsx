@@ -233,6 +233,8 @@ export const MaxCompletionTokenInput = memo(() => {
   const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
   const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
+  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.isMaxCompletionTokensAuto)
+  const setIsMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.setIsMaxCompletionTokensAuto)
 
   const maxToken = isUseCustomModel || !modelDetail
     ? MAX_COMPLETION_TOKENS_MAX
@@ -257,6 +259,10 @@ export const MaxCompletionTokenInput = memo(() => {
     <div className="space-y-2">
       <div className="flex justify-between mb-2 items-center">
         <label className="text-sm font-medium">Max Completion Token</label>
+        <Switch
+          checked={!isMaxCompletionTokensAuto}
+          onCheckedChange={(checked) => setIsMaxCompletionTokensAuto(!checked)}
+        />
       </div>
       <Input
         type="text"
@@ -268,11 +274,15 @@ export const MaxCompletionTokenInput = memo(() => {
         step={512}
         className="bg-background dark:bg-muted/30"
         inputMode="numeric"
+        disabled={isMaxCompletionTokensAuto}
       />
-      <p className="text-xs text-muted-foreground">
-        Sets the maximum number of tokens the model can generate for each subtitle chunk.
-        ({MAX_COMPLETION_TOKENS_MIN}-{maxToken})
-      </p>
+      {isMaxCompletionTokensAuto
+        ? <p className="text-xs text-muted-foreground">
+          Maximum number of tokens the model can generate for each subtitle chunk is set to auto.
+        </p>
+        : <p className="text-xs text-muted-foreground">
+          Sets the maximum number of tokens the model can generate for each subtitle chunk. ({MAX_COMPLETION_TOKENS_MIN}-{maxToken})
+        </p>}
     </div>
   )
 })
