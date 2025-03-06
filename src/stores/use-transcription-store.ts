@@ -54,6 +54,7 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
       startTranscription: async () => {
         const file = get().file
         if (!file) return
+        if (file.size > 20 * 1024 * 1024) return
 
         set({ transcriptionText: "", subtitles: [], progress: 0 })
 

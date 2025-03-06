@@ -59,6 +59,8 @@ export default function Transcription() {
   const [selectedModel, setSelectedModel] = useState(models[0].value)
   const [isSpeakerDetection, setIsSpeakerDetection] = useState(false)
 
+  const isExceeded = file ? file.size > 20 * 1024 * 1024 : false
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFileAndUrl(e.target.files[0])
@@ -81,6 +83,7 @@ export default function Transcription() {
     setIsTranscribing(false)
     stopTranscription()
   }
+
   return (
     <div className="mx-auto py-8 px-4 max-w-6xl">
       <div className="mb-8">
@@ -125,8 +128,12 @@ export default function Transcription() {
 
                 {audioUrl && <audio ref={audioRef} controls className="w-full h-10 mb-2" src={audioUrl} />}
 
-                <div className="text-xs text-muted-foreground">
-                  {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
+                <div className="text-xs text-muted-foreground flex flex-col">
+                  <p>
+                    {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
+                  </p>
+                  {isExceeded &&
+                    <p className="text-red-500">File size exceeds 20MB</p>}
                 </div>
               </div>
             )}
@@ -184,7 +191,7 @@ export default function Transcription() {
               <div className="pt-4 flex gap-2">
                 <Button
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                  disabled={!file || isTranscribing}
+                  disabled={!file || isTranscribing || isExceeded}
                   onClick={handleStartTranscription}
                 >
                   {isTranscribing ? (
