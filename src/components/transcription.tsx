@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { timestampToString } from "@/lib/utils"
+import { useAutoScroll } from "@/hooks/use-auto-scroll"
 
 
 const languages = [
@@ -39,6 +40,7 @@ const models = [
 ]
 
 export default function Transcription() {
+  const transcriptionAreaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
 
@@ -60,6 +62,8 @@ export default function Transcription() {
   const [selectedModel, setSelectedModel] = useState(models[0].value)
   const [isSpeakerDetection, setIsSpeakerDetection] = useState(false)
 
+  useAutoScroll(transcriptionText, transcriptionAreaRef)
+
   const isExceeded = file ? file.size > 20 * 1024 * 1024 : false
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -75,6 +79,12 @@ export default function Transcription() {
   }
 
   const handleStartTranscription = async () => {
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, 300)
     setIsTranscribing(true)
     await startTranscription()
     setIsTranscribing(false)
@@ -253,7 +263,7 @@ export default function Transcription() {
                       className="text-xs border-border"
                       onClick={exportTranscription}
                     >
-                      <Download className="mr-1 h-3 w-3" /> Export
+                      <Download className="mr-1 h-3 w-3" /> Export SRT
                     </Button>
                   )}
                 </div>
@@ -280,7 +290,8 @@ export default function Transcription() {
                   </div>
                 ) : (
                   <Textarea
-                    value={transcriptionText}
+                    ref={transcriptionAreaRef}
+                    value={transcriptionText.trim()}
                     readOnly
                     className="w-full h-96 p-4 bg-background text-foreground resize-none"
                   />

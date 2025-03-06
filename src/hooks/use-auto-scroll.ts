@@ -4,7 +4,7 @@ export const useAutoScroll = (dependency: unknown, ref: RefObject<HTMLTextAreaEl
   useEffect(() => {
     if (ref.current) {
       const { scrollTop, scrollHeight, clientHeight } = ref.current
-      const isAtBottom = scrollHeight - scrollTop <= clientHeight + 100
+      const isAtBottom = scrollHeight - scrollTop <= clientHeight + 200
 
       if (isAtBottom) {
         ref.current.scrollTop = scrollHeight
