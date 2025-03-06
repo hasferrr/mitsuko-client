@@ -169,8 +169,8 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
       name: "transcription-storage",
       partialize: (state) => ({
         transcriptionText: state.transcriptionText,
-        subtitles: state.transcriptSubtitles,
-      }),
+        transcriptSubtitles: state.transcriptSubtitles,
+      } as TranscriptionStore),
     }
   )
 )
