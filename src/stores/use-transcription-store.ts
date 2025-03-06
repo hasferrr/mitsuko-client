@@ -1,3 +1,4 @@
+import { TRANSCRIPT_URL } from "@/constants/api"
 import { cleanUpJsonResponse } from "@/lib/parser"
 import { parseSRT } from "@/lib/srt/parse"
 import { abortedAbortController, sleep } from "@/lib/utils"
@@ -67,7 +68,7 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
           const formData = new FormData()
           formData.append("audio", file)
 
-          const res = await fetch("http://localhost:4000/api/stream/transcript", {
+          const res = await fetch(TRANSCRIPT_URL, {
             method: "POST",
             body: formData,
             signal: get().abortControllerRef.current.signal,
