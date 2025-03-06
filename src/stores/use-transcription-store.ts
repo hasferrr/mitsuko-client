@@ -1,3 +1,4 @@
+import { abortedAbortController, sleep } from "@/lib/utils"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
@@ -10,17 +11,18 @@ interface Subtitle {
 
 interface TranscriptionStore {
   file: File | null
+  audioUrl: string | null
   isTranscribing: boolean
+  abortControllerRef: React.RefObject<AbortController>
   progress: number
   transcriptionText: string
   subtitles: Subtitle[]
-  audioUrl: string | null
   setFileAndUrl: (file: File | null) => void
+  setAudioUrl: (audioUrl: string | null) => void
   setIsTranscribing: (isTranscribing: boolean) => void
   setProgress: (progress: number) => void
   setTranscriptionText: (transcriptionText: string) => void
   setSubtitles: (subtitles: Subtitle[]) => void
-  setAudioUrl: (audioUrl: string | null) => void
   startTranscription: () => Promise<void>
   stopTranscription: () => void
   exportTranscription: () => void
@@ -30,15 +32,16 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
   persist(
     (set, get) => ({
       file: null,
+      audioUrl: null,
       isTranscribing: false,
+      abortControllerRef: { current: abortedAbortController() },
       progress: 0,
       transcriptionText: "",
       subtitles: [],
-      audioUrl: null,
       setFileAndUrl: (file) => {
         if (file) {
           const url = URL.createObjectURL(file)
-          set({ file, audioUrl: url, transcriptionText: "", subtitles: [], progress: 0, isTranscribing: false })
+          set({ file, audioUrl: url })
         } else {
           set({ file: null, audioUrl: null })
         }
@@ -52,69 +55,61 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         const file = get().file
         if (!file) return
 
-        set({ isTranscribing: true, progress: 0 })
+        set({ transcriptionText: "", subtitles: [], progress: 0 })
 
-        // Simulate streaming transcription
-        const transcriptionLines = [
-          "Hello and welcome to this podcast.",
-          "Today we're discussing the future of AI technology.",
-          "Our guest is a renowned expert in machine learning.",
-          "Let's start by talking about recent developments.",
-          "The pace of innovation has been remarkable lately.",
-          "Neural networks have become increasingly sophisticated.",
-          "This has led to breakthroughs in natural language processing.",
-          "Applications like TalkNotes wouldn't be possible without these advances.",
-          "What do you think will be the next major breakthrough?",
-          "I believe multimodal AI systems will define the next era.",
-        ]
+        if (!get().abortControllerRef.current.signal.aborted) {
+          get().abortControllerRef.current.abort()
+          await sleep(1000)
+        }
+        get().abortControllerRef.current = new AbortController()
 
-        let currentProgress = 0
-        let currentText = ""
+        let buffer = ""
 
-        const interval = setInterval(() => {
-          if (get().isTranscribing === false) {
-            clearInterval(interval)
+        try {
+          const formData = new FormData()
+          formData.append("audio", file)
+
+          const res = await fetch("http://localhost:4000/api/stream/transcript", {
+            method: "POST",
+            body: formData,
+            signal: get().abortControllerRef.current.signal,
+          })
+
+          if (!res.ok) {
+            const errorData = await res.json()
+            console.error("Error details from server:", errorData)
+            throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error || errorData.message}`)
+          }
+
+          const reader = res.body?.getReader()
+          if (!reader) {
             return
           }
-          if (currentProgress < transcriptionLines.length) {
-            const newLine = transcriptionLines[currentProgress]
-            currentText += newLine + " "
-            set({ transcriptionText: currentText })
 
-            const formatTimestamp = (seconds: number): string => {
-              const hours = Math.floor(seconds / 3600)
-              const minutes = Math.floor((seconds % 3600) / 60)
-              const secs = Math.floor(seconds % 60)
-              const ms = Math.floor((seconds % 1) * 1000)
-
-              return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")},${ms.toString().padStart(3, "0")}`
-            }
-
-            const startTime = formatTimestamp(currentProgress * 5)
-            const endTime = formatTimestamp(currentProgress * 5 + 4.5)
-
-            set((state) => ({
-              subtitles: [
-                ...state.subtitles,
-                {
-                  id: currentProgress + 1,
-                  start: startTime,
-                  end: endTime,
-                  text: newLine,
-                },
-              ],
-            }))
-
-            currentProgress++
-            set({ progress: (currentProgress / transcriptionLines.length) * 100 })
-          } else {
-            clearInterval(interval)
-            set({ isTranscribing: false, progress: 100 })
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            const chunk = new TextDecoder().decode(value)
+            buffer += chunk
+            set({ transcriptionText: buffer })
           }
-        }, 1500)
+
+        } catch (error) {
+          if (error instanceof Error && error.name === "AbortError") {
+            console.log("Request aborted")
+            set((state) => ({ transcriptionText: state.transcriptionText + "\n\n[Generation stopped by user]" }))
+          } else {
+            console.error("Error:", error)
+            set((state) => ({ transcriptionText: state.transcriptionText + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]` }))
+          }
+          get().abortControllerRef.current.abort()
+          throw error
+        }
+
+        get().abortControllerRef.current.abort()
       },
       stopTranscription: () => {
-        set({ isTranscribing: false })
+        get().abortControllerRef.current.abort()
       },
       exportTranscription: () => {
         const subtitles = get().subtitles
@@ -140,10 +135,8 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
     {
       name: "transcription-storage",
       partialize: (state) => ({
-        ...state,
-        file: undefined,
-        url: undefined,
-        isTranscribing: undefined,
+        transcriptionText: state.transcriptionText,
+        subtitles: state.subtitles,
       }),
     }
   )
