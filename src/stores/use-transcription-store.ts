@@ -1,5 +1,6 @@
 import { TRANSCRIPT_URL } from "@/constants/api"
 import { cleanUpJsonResponse } from "@/lib/parser"
+import { generateSRT } from "@/lib/srt/generate"
 import { parseSRT } from "@/lib/srt/parse"
 import { abortedAbortController, sleep } from "@/lib/utils"
 import { Subtitle } from "@/types/types"
@@ -151,9 +152,7 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         set({ transcriptSubtitles: parseSRT(srt) })
       },
       exportTranscription: () => {
-        const subtitles = get().transcriptSubtitles
-        let srtContent = ""
-
+        const srtContent = generateSRT(get().transcriptSubtitles)
         const blob = new Blob([srtContent], { type: "text/plain" })
         const url = URL.createObjectURL(blob)
         const a = document.createElement("a")
