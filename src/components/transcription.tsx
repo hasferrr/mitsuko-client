@@ -29,6 +29,7 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { timestampToString } from "@/lib/utils"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
+import { DragAndDrop } from "./ui-custom/drag-and-drop"
 
 
 const languages = [
@@ -78,6 +79,12 @@ export default function Transcription() {
     }
   }
 
+  const handleDropFiles = (files: FileList) => {
+    if (files.length > 0) {
+      setFileAndUrl(files[0])
+    }
+  }
+
   const handleStartTranscription = async () => {
     setTimeout(() => {
       window.scrollTo({
@@ -111,16 +118,24 @@ export default function Transcription() {
           {/* File Upload */}
           <div className="bg-card border border-border rounded-lg p-6">
             <h2 className="text-lg font-medium mb-4">Upload Audio</h2>
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="audio/*,.aac" className="hidden" />
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".aac,audio/wav,audio/mp3,audio/aiff,audio/ogg,audio/flac"
+              className="hidden"
+            />
             {!file ? (
-              <div
-                onClick={handleUploadClick}
-                className="border-2 border-dashed border-border rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
-              >
-                <Upload className="h-10 w-10 text-muted-foreground mb-3" />
-                <p className="text-muted-foreground text-sm mb-1">Click to upload or drag and drop</p>
-                <p className="text-muted-foreground text-xs">MP3, WAV, M4A, and more (max 20MB)</p>
-              </div>
+              <DragAndDrop onDropFiles={handleDropFiles} disabled={isTranscribing}>
+                <div
+                  onClick={handleUploadClick}
+                  className="border-2 border-dashed border-border rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
+                >
+                  <Upload className="h-10 w-10 text-muted-foreground mb-3" />
+                  <p className="text-muted-foreground text-sm mb-1">Click to upload or drag and drop</p>
+                  <p className="text-muted-foreground text-xs">AAC, FLAC, MP3, and more (max 20MB)</p>
+                </div>
+              </DragAndDrop>
             ) : (
               <div className="border border-border rounded-lg p-4">
                 <div className="flex items-center mb-3">
