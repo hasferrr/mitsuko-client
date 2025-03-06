@@ -17,6 +17,7 @@ import {
   Edit,
   Save,
   ClipboardPaste,
+  Trash,
 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -33,6 +34,18 @@ import { timestampToString } from "@/lib/utils"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { DragAndDrop } from "./ui-custom/drag-and-drop"
 import { toast } from "sonner"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { useBeforeUnload } from "@/hooks/use-before-unload"
 
 
 const languages = [
@@ -61,14 +74,17 @@ export default function Transcription() {
     exportTranscription,
     parseTranscription,
     setTranscriptionText,
+    setTranscriptSubtitles,
   } = useTranscriptionStore()
 
   const [selectedLanguage, setSelectedLanguage] = useState(languages[0].value)
   const [selectedModel, setSelectedModel] = useState(models[0].value)
   const [isSpeakerDetection, setIsSpeakerDetection] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [isClearDialogOpen, setIsClearDialogOpen] = useState(false)
 
   useAutoScroll(transcriptionText, transcriptionAreaRef)
+  const { setHasChanges } = useBeforeUnload()
 
   const isExceeded = file ? file.size > 20 * 1024 * 1024 : false
 
@@ -99,6 +115,7 @@ export default function Transcription() {
       })
     }, 300)
     setIsTranscribing(true)
+    setHasChanges(true)
     try {
       await startTranscription()
       handleStopTranscription()
@@ -114,6 +131,7 @@ export default function Transcription() {
 
   const handleTranscriptionTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setTranscriptionText(e.target.value)
+    setHasChanges(true)
   }
 
   const handleParse = () => {
@@ -136,6 +154,16 @@ export default function Transcription() {
   const handleExport = () => {
     handleParse()
     exportTranscription()
+  }
+
+  const handleClear = () => {
+    setIsClearDialogOpen(true)
+  }
+
+  const handleConfirmClear = () => {
+    setTranscriptionText("")
+    setTranscriptSubtitles([])
+    setIsClearDialogOpen(false)
   }
 
   return (
@@ -308,6 +336,33 @@ export default function Transcription() {
 
                   {(transcriptionText || isEditing) && (
                     <div className="flex gap-2">
+                      <AlertDialog open={isClearDialogOpen} onOpenChange={setIsClearDialogOpen}>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-xs border-border"
+                            onClick={handleClear}
+                            disabled={isTranscribing}
+                          >
+                            <Trash className="h-3 w-3 mr-1" /> Clear
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently clear the transcription and subtitles.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleConfirmClear}>
+                              Confirm
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                       <Button
                         size="sm"
                         variant="outline"
@@ -361,6 +416,33 @@ export default function Transcription() {
 
                   {transcriptSubtitles.length > 0 && (
                     <div className="flex gap-2">
+                      <AlertDialog open={isClearDialogOpen} onOpenChange={setIsClearDialogOpen}>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-xs border-border"
+                            onClick={handleClear}
+                            disabled={isTranscribing}
+                          >
+                            <Trash className="h-3 w-3 mr-1" /> Clear
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently clear the transcription and subtitles.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleConfirmClear}>
+                              Confirm
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                       <Button
                         size="sm"
                         variant="outline"

@@ -16,14 +16,16 @@ import { useThemeStore } from "@/stores/use-theme-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useExtractionStore } from "@/stores/use-extraction-store"
 import { NAVBAR_IMG_LINK } from "@/constants/external-links"
+import { useTranscriptionStore } from "@/stores/use-transcription-store"
 
 export function Navbar() {
   const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)
   const setIsDarkModeGlobal = useThemeStore(state => state.setIsDarkMode)
   const isTranslating = useTranslationStore(state => state.isTranslating)
   const isExtracting = useExtractionStore(state => state.isExtracting)
+  const isTranscribing = useTranscriptionStore(state => state.isTranscribing)
 
-  const isProcessing = isTranslating || isExtracting
+  const isProcessing = isTranslating || isExtracting || isTranscribing
   const [open, setOpen] = useState(false)
 
   return (
