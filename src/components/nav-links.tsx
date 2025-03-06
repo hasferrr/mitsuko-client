@@ -47,7 +47,14 @@ export const NavLinks = ({ isMobile, setOpen }: NavLinksProps) => {
         className="transition-colors hover:text-foreground/80 text-foreground/60"
         onClick={closeSheet}
       >
-        Translation
+        Translate
+      </Link>
+      <Link
+        href="/transcribe"
+        className="transition-colors hover:text-foreground/80 text-foreground/60"
+        onClick={closeSheet}
+      >
+        Transcribe
       </Link>
       <Link
         href="/extract-context"
