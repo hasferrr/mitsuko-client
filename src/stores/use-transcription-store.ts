@@ -72,9 +72,15 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
           })
 
           if (!res.ok) {
-            const errorData = await res.json()
-            console.error("Error details from server:", errorData)
-            throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error || errorData.message}`)
+            try {
+              const errorData = await res.clone().json()
+              console.error("Error details from server:", errorData)
+              throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error || errorData.message}`)
+            } catch (jsonError) {
+              const errorText = await res.text()
+              console.error("Error details from server (text):", errorText)
+              throw new Error(`Request failed (${res.status}), ${errorText}`)
+            }
           }
 
           const reader = res.body?.getReader()
