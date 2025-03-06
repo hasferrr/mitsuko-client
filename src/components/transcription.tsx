@@ -13,7 +13,10 @@ import {
   File,
   AudioWaveform,
   Square,
-  Loader2
+  Loader2,
+  Edit,
+  Save,
+  ClipboardPaste,
 } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { Textarea } from "@/components/ui/textarea"
@@ -30,6 +33,7 @@ import { Switch } from "@/components/ui/switch"
 import { timestampToString } from "@/lib/utils"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { DragAndDrop } from "./ui-custom/drag-and-drop"
+import { toast } from "sonner"
 
 
 const languages = [
@@ -56,12 +60,15 @@ export default function Transcription() {
     setIsTranscribing,
     startTranscription,
     stopTranscription,
-    exportTranscription
+    exportTranscription,
+    parseTranscription,
+    setTranscriptionText,
   } = useTranscriptionStore()
 
   const [selectedLanguage, setSelectedLanguage] = useState(languages[0].value)
   const [selectedModel, setSelectedModel] = useState(models[0].value)
   const [isSpeakerDetection, setIsSpeakerDetection] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
 
   useAutoScroll(transcriptionText, transcriptionAreaRef)
 
@@ -101,6 +108,32 @@ export default function Transcription() {
   const handleStopTranscription = () => {
     setIsTranscribing(false)
     stopTranscription()
+  }
+
+  const handleTranscriptionTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setTranscriptionText(e.target.value)
+  }
+
+  const handleParse = () => {
+    try {
+      parseTranscription()
+    } catch (error) {
+      toast.error(
+        <div className="select-none">
+          <div>Parse Error! Please follow this format:</div>
+          <div className="font-mono">
+            <div>mm:ss:ms {"-->"} mm:ss:ms</div>
+            <div>transcription text</div>
+          </div>
+        </div>
+      )
+      throw error
+    }
+  }
+
+  const handleExport = () => {
+    handleParse()
+    exportTranscription()
   }
 
   return (
@@ -271,15 +304,29 @@ export default function Transcription() {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-medium">Transcription Result</h2>
 
-                  {transcriptionText && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-border"
-                      onClick={exportTranscription}
-                    >
-                      <Download className="mr-1 h-3 w-3" /> Export SRT
-                    </Button>
+                  {(transcriptionText || isEditing) && (
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs border-border"
+                        onClick={() => setIsEditing(!isEditing)}
+                        disabled={isTranscribing}
+                      >
+                        {isEditing
+                          ? <Save className="h-3 w-3" />
+                          : <Edit className="h-3 w-3" />}
+                        {isEditing ? "Save" : "Edit"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs border-border"
+                        onClick={handleExport}
+                      >
+                        <Download className="h-3 w-3" /> Export SRT
+                      </Button>
+                    </div>
                   )}
                 </div>
 
@@ -293,7 +340,7 @@ export default function Transcription() {
                   </div>
                 )}
 
-                {!transcriptionText && !isTranscribing ? (
+                {!transcriptionText && !isTranscribing && !isEditing ? (
                   <div className="border border-border rounded-lg p-8 flex flex-col items-center justify-center">
                     <AudioWaveform className="h-10 w-10 text-muted-foreground mb-3" />
                     <p className="text-muted-foreground text-sm mb-1">
@@ -306,8 +353,9 @@ export default function Transcription() {
                 ) : (
                   <Textarea
                     ref={transcriptionAreaRef}
-                    value={transcriptionText.trim()}
-                    readOnly
+                    value={transcriptionText}
+                    readOnly={!isEditing || isTranscribing}
+                    onChange={handleTranscriptionTextChange}
                     className="w-full h-96 p-4 bg-background text-foreground resize-none"
                   />
                 )}
@@ -320,14 +368,24 @@ export default function Transcription() {
                   <h2 className="text-lg font-medium">Subtitles with Timestamps</h2>
 
                   {transcriptSubtitles.length > 0 && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-border"
-                      onClick={exportTranscription}
-                    >
-                      <Download className="mr-1 h-3 w-3" /> Export SRT
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs border-border"
+                        onClick={handleParse}
+                      >
+                        <ClipboardPaste className="h-3 w-3" /> Parse Subtitle
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs border-border"
+                        onClick={handleExport}
+                      >
+                        <Download className="h-3 w-3" /> Export SRT
+                      </Button>
+                    </div>
                   )}
                 </div>
 

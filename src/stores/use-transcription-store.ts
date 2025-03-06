@@ -1,5 +1,5 @@
 import { TRANSCRIPT_URL } from "@/constants/api"
-import { cleanUpJsonResponse } from "@/lib/parser"
+import { isSRT } from "@/lib/ass/subtitle-utils"
 import { generateSRT } from "@/lib/srt/generate"
 import { parseSRT } from "@/lib/srt/parse"
 import { abortedAbortController, sleep } from "@/lib/utils"
@@ -133,13 +133,30 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
          */
         for (let line of lines) {
           line = line.trim()
-          const splitted = line.split(" --> ")
+          const splitted = line.split("-->")
           if (splitted.length === 2) {
-            const [start, end] = splitted
-            const [startMinute, startSecond, startMillisecond] = start.split(":")
-            const [endMinute, endSecond, endMillisecond] = end.split(":")
-            const s = `00:${startMinute}:${startSecond},${startMillisecond}`
-            const e = `00:${endMinute}:${endSecond},${endMillisecond}`
+            let [start, end] = splitted
+            start = start.trim()
+            end = end.trim()
+
+            const [startMinuteStr, startSecondStr, startMillisecondStr] = start.split(":")
+            const [endMinuteStr, endSecondStr, endMillisecondStr] = end.split(":")
+
+            const startMinute = parseInt(startMinuteStr, 10)
+            const startSecond = parseInt(startSecondStr, 10)
+            const startMillisecond = parseInt(startMillisecondStr, 10)
+            const endMinute = parseInt(endMinuteStr, 10)
+            const endSecond = parseInt(endSecondStr, 10)
+            const endMillisecond = parseInt(endMillisecondStr, 10)
+
+            if (isNaN(startMinute) || isNaN(startSecond) || isNaN(startMillisecond) ||
+              isNaN(endMinute) || isNaN(endSecond) || isNaN(endMillisecond)) {
+              throw new Error("Invalid time format in transcription text")
+            }
+
+            const s = `00:${startMinute.toString().padStart(2, '0')}:${startSecond.toString().padStart(2, '0')},${startMillisecond.toString().padStart(3, '0')}`
+            const e = `00:${endMinute.toString().padStart(2, '0')}:${endSecond.toString().padStart(2, '0')},${endMillisecond.toString().padStart(3, '0')}`
+
             srtArr.push(`\n${i}\n${s} --> ${e}`)
             i++
           } else {
@@ -148,11 +165,20 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         }
 
         const srt = srtArr.join("\n")
+        if (!isSRT(srt)) {
+          throw new Error("Invalid SRT format")
+        }
+
         console.log(srt)
         set({ transcriptSubtitles: parseSRT(srt) })
       },
       exportTranscription: () => {
-        const srtContent = generateSRT(get().transcriptSubtitles)
+        const subtitles = get().transcriptSubtitles
+        if (!subtitles.length) return
+
+        const srtContent = generateSRT(subtitles)
+        if (!srtContent) return
+
         const blob = new Blob([srtContent], { type: "text/plain" })
         const url = URL.createObjectURL(blob)
         const a = document.createElement("a")
