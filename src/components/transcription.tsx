@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
+import { timestampToString } from "@/lib/utils"
 
 
 const languages = [
@@ -46,7 +47,7 @@ export default function Transcription() {
     isTranscribing,
     progress,
     transcriptionText,
-    subtitles,
+    transcriptSubtitles,
     audioUrl,
     setFileAndUrl,
     setIsTranscribing,
@@ -76,7 +77,8 @@ export default function Transcription() {
   const handleStartTranscription = async () => {
     setIsTranscribing(true)
     await startTranscription()
-    handleStartTranscription()
+    setIsTranscribing(false)
+    stopTranscription()
   }
 
   const handleStopTranscription = () => {
@@ -291,7 +293,7 @@ export default function Transcription() {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-medium">Subtitles with Timestamps</h2>
 
-                  {subtitles.length > 0 && (
+                  {transcriptSubtitles.length > 0 && (
                     <Button
                       size="sm"
                       variant="outline"
@@ -303,7 +305,7 @@ export default function Transcription() {
                   )}
                 </div>
 
-                {subtitles.length === 0 && !isTranscribing ? (
+                {transcriptSubtitles.length === 0 && !isTranscribing ? (
                   <div className="border border-border rounded-lg p-8 flex flex-col items-center justify-center">
                     <Clock className="h-10 w-10 text-muted-foreground mb-3" />
                     <p className="text-muted-foreground text-sm mb-1">
@@ -313,18 +315,18 @@ export default function Transcription() {
                   </div>
                 ) : (
                   <div className="h-96 overflow-y-auto pr-2">
-                    {subtitles.map((subtitle) => (
+                    {transcriptSubtitles.map((subtitle) => (
                       <div
-                        key={subtitle.id}
+                        key={`transcript-subtitle-${subtitle.index}`}
                         className="mb-4 p-3 border border-border rounded-md hover:border-border/80 transition-colors"
                       >
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-xs font-medium">#{subtitle.id}</span>
+                          <span className="text-xs font-medium">#{subtitle.index}</span>
                           <span className="text-xs text-muted-foreground">
-                            {subtitle.start} → {subtitle.end}
+                            {timestampToString(subtitle.timestamp.start)} → {timestampToString(subtitle.timestamp.end)}
                           </span>
                         </div>
-                        <p className="text-sm">{subtitle.text}</p>
+                        <p className="text-sm">{subtitle.content}</p>
                       </div>
                     ))}
 

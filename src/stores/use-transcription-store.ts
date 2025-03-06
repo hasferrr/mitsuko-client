@@ -1,13 +1,9 @@
+import { cleanUpJsonResponse } from "@/lib/parser"
+import { parseSRT } from "@/lib/srt/parse"
 import { abortedAbortController, sleep } from "@/lib/utils"
+import { Subtitle } from "@/types/types"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-
-interface Subtitle {
-  id: number
-  start: string
-  end: string
-  text: string
-}
 
 interface TranscriptionStore {
   file: File | null
@@ -16,15 +12,16 @@ interface TranscriptionStore {
   abortControllerRef: React.RefObject<AbortController>
   progress: number
   transcriptionText: string
-  subtitles: Subtitle[]
+  transcriptSubtitles: Subtitle[]
   setFileAndUrl: (file: File | null) => void
   setAudioUrl: (audioUrl: string | null) => void
   setIsTranscribing: (isTranscribing: boolean) => void
   setProgress: (progress: number) => void
   setTranscriptionText: (transcriptionText: string) => void
-  setSubtitles: (subtitles: Subtitle[]) => void
+  setTranscriptSubtitles: (subtitles: Subtitle[]) => void
   startTranscription: () => Promise<void>
   stopTranscription: () => void
+  parseTranscription: () => void
   exportTranscription: () => void
 }
 
@@ -37,7 +34,7 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
       abortControllerRef: { current: abortedAbortController() },
       progress: 0,
       transcriptionText: "",
-      subtitles: [],
+      transcriptSubtitles: [],
       setFileAndUrl: (file) => {
         if (file) {
           const url = URL.createObjectURL(file)
@@ -49,14 +46,14 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
       setIsTranscribing: (isTranscribing) => set({ isTranscribing }),
       setProgress: (progress) => set({ progress }),
       setTranscriptionText: (transcriptionText) => set({ transcriptionText }),
-      setSubtitles: (subtitles) => set({ subtitles }),
+      setTranscriptSubtitles: (subtitles) => set({ transcriptSubtitles: subtitles }),
       setAudioUrl: (audioUrl) => set({ audioUrl }),
       startTranscription: async () => {
         const file = get().file
         if (!file) return
         if (file.size > 20 * 1024 * 1024) return
 
-        set({ transcriptionText: "", subtitles: [], progress: 0 })
+        set({ transcriptionText: "", transcriptSubtitles: [], progress: 0 })
 
         if (!get().abortControllerRef.current.signal.aborted) {
           get().abortControllerRef.current.abort()
@@ -108,19 +105,53 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         }
 
         get().abortControllerRef.current.abort()
+        get().parseTranscription()
       },
       stopTranscription: () => {
         get().abortControllerRef.current.abort()
       },
-      exportTranscription: () => {
-        const subtitles = get().subtitles
-        let srtContent = ""
+      parseTranscription: () => {
+        const text = get().transcriptionText.trim()
+        const lines = text.split("\n").filter((line) => line.trim() !== "")
 
-        subtitles.forEach((subtitle, index) => {
-          srtContent += `${index + 1}\n`
-          srtContent += `${subtitle.start} --> ${subtitle.end}\n`
-          srtContent += `${subtitle.text}\n\n`
-        })
+        const check = (i: number) => lines.length > 0 && (
+          lines[i].trim().startsWith("[")
+          || lines[i].trim().startsWith("```")
+        )
+        while (check(lines.length - 1)) lines.pop()
+        while (check(0)) lines.shift()
+
+        let i = 1
+        let srtArr: string[] = []
+
+        /**
+         * Format:
+         * mm:ss:ms --> mm:ss:ms
+         * Transcribed Text
+         */
+        for (let line of lines) {
+          line = line.trim()
+          const splitted = line.split(" --> ")
+          if (splitted.length === 2) {
+            const [start, end] = splitted
+            const [startMinute, startSecond, startMillisecond] = start.split(":")
+            const [endMinute, endSecond, endMillisecond] = end.split(":")
+            const s = `00:${startMinute}:${startSecond},${startMillisecond}`
+            const e = `00:${endMinute}:${endSecond},${endMillisecond}`
+            srtArr.push(`\n${i}\n${s} --> ${e}`)
+            i++
+          } else {
+            srtArr.push(line)
+          }
+        }
+
+        const srt = srtArr.join("\n")
+        console.log(srt)
+        set({ transcriptSubtitles: parseSRT(srt) })
+      },
+      exportTranscription: () => {
+        const subtitles = get().transcriptSubtitles
+        let srtContent = ""
 
         const blob = new Blob([srtContent], { type: "text/plain" })
         const url = URL.createObjectURL(blob)
@@ -137,7 +168,7 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
       name: "transcription-storage",
       partialize: (state) => ({
         transcriptionText: state.transcriptionText,
-        subtitles: state.subtitles,
+        subtitles: state.transcriptSubtitles,
       }),
     }
   )
