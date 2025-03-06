@@ -137,6 +137,7 @@ export default function Transcription() {
   const handleParse = () => {
     try {
       parseTranscription()
+      toast.success("Parse Success!")
     } catch (error) {
       toast.error(
         <div className="select-none">
@@ -152,8 +153,14 @@ export default function Transcription() {
   }
 
   const handleExport = () => {
-    handleParse()
     exportTranscription()
+  }
+
+  const handleIsEditing = () => {
+    if (isEditing) {
+      handleParse()
+    }
+    setIsEditing(!isEditing)
   }
 
   const handleClear = () => {
@@ -161,6 +168,7 @@ export default function Transcription() {
   }
 
   const handleConfirmClear = () => {
+    setIsEditing(false)
     setTranscriptionText("")
     setTranscriptSubtitles([])
     setIsClearDialogOpen(false)
@@ -367,7 +375,7 @@ export default function Transcription() {
                         size="sm"
                         variant="outline"
                         className="text-xs border-border"
-                        onClick={() => setIsEditing(!isEditing)}
+                        onClick={handleIsEditing}
                         disabled={isTranscribing}
                       >
                         {isEditing
