@@ -27,6 +27,58 @@ export function cleanUpJsonResponse(response: string): string {
   return jsonString
 }
 
+export function repairJson(input: string): string {
+  input = input.trim()
+  let openBraces = 0, closeBraces = 0, lastBalancedIndex = 1
+  let inString = false
+  let quoteChar: "'" | '"' | null = null
+
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i]
+
+    // The current character is a quote `"` or `'` and it's not escaped.
+    if ((char === '"' || char === "'") && input[i - 1] !== '\\') {
+      let backslashes = 0
+      for (let j = i - 1; j >= 0 && input[j] === "\\"; j--) {
+        backslashes++
+      }
+      if (backslashes % 2 !== 0) {
+        if (inString && quoteChar === char) {
+          // we've found the closing quote of the string
+          inString = false
+          quoteChar = null
+        } else if (!inString) {
+          // we've encountered the opening quote of a new string
+          inString = true
+          quoteChar = char
+        }
+      }
+    }
+
+    // Determining the last index where the braces are balanced
+    if (!inString) {
+      if (char === '{') openBraces++
+      else if (char === '}') closeBraces++
+      if (openBraces === closeBraces && openBraces > 0) {
+        lastBalancedIndex = i + 1
+      }
+    }
+  }
+
+  if (openBraces === 0) {
+    return input
+  }
+
+  let result = input.slice(0, lastBalancedIndex).trim()
+  if (result.endsWith(',')) {
+    result = result.slice(0, -1)
+  }
+  if (result.startsWith('[') && !result.endsWith(']')) {
+    result += ']'
+  }
+  return result
+}
+
 export function getThink(response: string): string {
   return keepOnlyWrapped(response, '<think>', '</think>')
 }
@@ -37,7 +89,7 @@ export function getContent(response: string): string {
 }
 
 export function parseTranslationJson(response: string): SubOnlyTranslated[] {
-  const subtitles = JSON.parse(cleanUpJsonResponse(response)) as SubtitleNoTimeNoActorTranslated[]
+  const subtitles = JSON.parse(repairJson(cleanUpJsonResponse(response))) as SubtitleNoTimeNoActorTranslated[]
   return subtitles.map((sub) => ({
     index: sub.index,
     translated: sub.translated || "",
