@@ -18,7 +18,6 @@ import {
   Save,
   ClipboardPaste,
 } from "lucide-react"
-import { Progress } from "@/components/ui/progress"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useTranscriptionStore } from "@/stores/use-transcription-store"
@@ -52,7 +51,6 @@ export default function Transcription() {
   const {
     file,
     isTranscribing,
-    progress,
     transcriptionText,
     transcriptSubtitles,
     audioUrl,
@@ -78,6 +76,7 @@ export default function Transcription() {
     if (e.target.files && e.target.files[0]) {
       setFileAndUrl(e.target.files[0])
     }
+    e.target.value = ""
   }
 
   const handleUploadClick = () => {
@@ -100,9 +99,12 @@ export default function Transcription() {
       })
     }, 300)
     setIsTranscribing(true)
-    await startTranscription()
-    setIsTranscribing(false)
-    stopTranscription()
+    try {
+      await startTranscription()
+      handleStopTranscription()
+    } catch (error) {
+      handleStopTranscription()
+    }
   }
 
   const handleStopTranscription = () => {
@@ -329,16 +331,6 @@ export default function Transcription() {
                     </div>
                   )}
                 </div>
-
-                {isTranscribing && (
-                  <div className="mb-4">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs text-muted-foreground">Transcribing...</span>
-                      <span className="text-xs text-muted-foreground">{Math.round(progress)}%</span>
-                    </div>
-                    <Progress value={progress} className="h-1 bg-secondary" />
-                  </div>
-                )}
 
                 {!transcriptionText && !isTranscribing && !isEditing ? (
                   <div className="border border-border rounded-lg p-8 flex flex-col items-center justify-center">

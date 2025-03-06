@@ -12,13 +12,11 @@ interface TranscriptionStore {
   audioUrl: string | null
   isTranscribing: boolean
   abortControllerRef: React.RefObject<AbortController>
-  progress: number
   transcriptionText: string
   transcriptSubtitles: Subtitle[]
   setFileAndUrl: (file: File | null) => void
   setAudioUrl: (audioUrl: string | null) => void
   setIsTranscribing: (isTranscribing: boolean) => void
-  setProgress: (progress: number) => void
   setTranscriptionText: (transcriptionText: string) => void
   setTranscriptSubtitles: (subtitles: Subtitle[]) => void
   startTranscription: () => Promise<void>
@@ -34,7 +32,6 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
       audioUrl: null,
       isTranscribing: false,
       abortControllerRef: { current: abortedAbortController() },
-      progress: 0,
       transcriptionText: "",
       transcriptSubtitles: [],
       setFileAndUrl: (file) => {
@@ -46,7 +43,6 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         }
       },
       setIsTranscribing: (isTranscribing) => set({ isTranscribing }),
-      setProgress: (progress) => set({ progress }),
       setTranscriptionText: (transcriptionText) => set({ transcriptionText }),
       setTranscriptSubtitles: (subtitles) => set({ transcriptSubtitles: subtitles }),
       setAudioUrl: (audioUrl) => set({ audioUrl }),
@@ -55,7 +51,7 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         if (!file) return
         if (file.size > 20 * 1024 * 1024) return
 
-        set({ transcriptionText: "", transcriptSubtitles: [], progress: 0 })
+        set({ transcriptionText: "", transcriptSubtitles: [] })
 
         if (!get().abortControllerRef.current.signal.aborted) {
           get().abortControllerRef.current.abort()
