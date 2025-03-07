@@ -21,7 +21,7 @@ import {
   TEMPERATURE_MIN,
   TEMPERATURE_MAX,
 } from "@/constants/limits"
-import { parseTranslationJson } from "@/lib/parser"
+import { parseTranslationJsonStrict } from "@/lib/parser"
 import { cn } from "@/lib/utils"
 import { ModelSelector } from "@/components/model-selector"
 import { LANGUAGES } from "@/constants/lang"
@@ -530,7 +530,7 @@ export const ProcessOutput = memo(() => {
 
   const handleParseAndSave = () => {
     try {
-      const parsed = parseTranslationJson(editValue)
+      const parsed = parseTranslationJsonStrict(editValue)
       setJsonResponse(parsed)
       setIsParseError(false)
     } catch {

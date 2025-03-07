@@ -95,3 +95,11 @@ export function parseTranslationJson(response: string): SubOnlyTranslated[] {
     translated: sub.translated || "",
   }))
 }
+
+export function parseTranslationJsonStrict(response: string): SubOnlyTranslated[] {
+  const subtitles = JSON.parse(cleanUpJsonResponse(response)) as SubtitleNoTimeNoActorTranslated[]
+  return subtitles.map((sub) => ({
+    index: sub.index,
+    translated: sub.translated || "",
+  }))
+}
