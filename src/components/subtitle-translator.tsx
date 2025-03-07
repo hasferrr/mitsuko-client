@@ -278,20 +278,18 @@ export default function SubtitleTranslator() {
       try {
         tlChunk = await translateSubtitles(requestBody, isUseCustomModel ? apiKey : "", !isUseCustomModel)
         allRawResponses.push(useTranslationStore.getState().response)
+        console.log("result: ", tlChunk)
       } catch {
         setIsTranslating(false)
         allRawResponses.push(useTranslationStore.getState().response)
         break
       }
 
-      console.log("result: ", tlChunk)
-      if (!tlChunk.length) continue
-
       // Update the parsed json
       appendJsonResponse(tlChunk)
 
       // Merge translated chunk with original subtitles
-      const merged: SubtitleTranslated[] = [...subtitles]
+      const merged: SubtitleTranslated[] = [...useSubtitleStore.getState().subtitles]
       for (let j = 0; j < tlChunk.length; j++) {
         const index = tlChunk[j].index - 1
         merged[index] = {
@@ -299,8 +297,11 @@ export default function SubtitleTranslator() {
           translated: tlChunk[j].translated || merged[index].translated,
         }
       }
-
       setSubtitles(merged)
+
+      // Break if translation is stopped
+      const translatingStatus = useTranslationStore.getState().isTranslating
+      if (!translatingStatus) break
 
       // Update context for next chunk
       context.push({
@@ -316,36 +317,33 @@ export default function SubtitleTranslator() {
         })),
       })
 
-      // Only for Limited Context Memory
+      // Edit the Context - Only for Limited Context Memory
       // Assume: size (split size) >= contextMemorySize
       // Mutate the context, only take the last (pair of) context.
       // Slice maximum of contextMemorySize of dialogues
-      if (isUseFullContextMemory || context.length < 2) {
-        continue
+      if (!isUseFullContextMemory && context.length >= 2) {
+        if (size < limitedContextMemorySize) {
+          console.error(
+            "Split size should be greater than or equal to context memory size " +
+            "The code below only takes the last (pair of) context"
+          )
+        }
+        context = [
+          context[context.length - 2],
+          context[context.length - 1],
+        ]
+        context[0].content = context[0].content.slice(-limitedContextMemorySize)
+        context[1].content = context[1].content.slice(-limitedContextMemorySize)
       }
-      if (size < limitedContextMemorySize) {
-        console.error(
-          "Split size should be greater than or equal to context memory size " +
-          "The code below only takes the last (pair of) context"
-        )
-      }
-      context = [
-        context[context.length - 2],
-        context[context.length - 1],
-      ]
-      context[0].content = context[0].content.slice(-limitedContextMemorySize)
-      context[1].content = context[1].content.slice(-limitedContextMemorySize)
 
-      // Break if translation is stopped
-      const translatingStatus = useTranslationStore.getState().isTranslating
-      if (!translatingStatus) break
-
+      // Process the next chunk
       if (isAutoContinue) {
-        const startNewIndex = tlChunk[tlChunk.length - 1].index + 1
-        if (startNewIndex > endIndex) break
+        const nextIndex = tlChunk[tlChunk.length - 1].index + 1
 
-        const s = minMax(startNewIndex - 1, startNewIndex - 1, subtitles.length - 1)
-        const e = minMax(endIndex - 1, s, subtitles.length - 1)
+        const s = nextIndex - 1
+        const e = minMax(adjustedEndIndex, s, subtitles.length - 1)
+        if (s > adjustedEndIndex) break
+
         const nextChunk = firstChunk(size, s, e)[0]
         if (nextChunk.length) {
           subtitleChunks.push(nextChunk)
