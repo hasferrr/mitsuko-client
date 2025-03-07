@@ -120,6 +120,7 @@ export default function SubtitleTranslator() {
   const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
+  const isDynamicSplit = useAdvancedSettingsStore((state) => state.isDynamicSplit)
   const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
 
   // Translation Store
@@ -157,6 +158,28 @@ export default function SubtitleTranslator() {
     initRef.current = false
   }, [])
 
+  const fixedSplit = (size: number, s: number, e: number) => {
+    const subtitleChunks: SubtitleNoTime[][] = []
+    for (let i = s; i <= e; i += size) {
+      subtitleChunks.push(subtitles.slice(i, Math.min(i + size, e + 1)).map((s) => ({
+        index: s.index,
+        actor: s.actor,
+        content: s.content,
+      })))
+    }
+    return subtitleChunks
+  }
+
+  const firstChunk = (size: number, s: number, e: number) => {
+    const subtitleChunks: SubtitleNoTime[][] = []
+    subtitleChunks.push(subtitles.slice(s, Math.min(s + size, e + 1)).map((s) => ({
+      index: s.index,
+      actor: s.actor,
+      content: s.content,
+    })))
+    return subtitleChunks
+  }
+
   const handleStartTranslation = async () => {
     if (!subtitles.length) return
     setIsTranslating(true)
@@ -175,17 +198,14 @@ export default function SubtitleTranslator() {
     const allRawResponses: string[] = []
 
     // Split subtitles into chunks, starting from startIndex - 1
-    const subtitleChunks: SubtitleNoTime[][] = []
     const size = minMax(splitSize, SPLIT_SIZE_MIN, SPLIT_SIZE_MAX)
     const adjustedStartIndex = minMax(startIndex - 1, 0, subtitles.length - 1)
     const adjustedEndIndex = minMax(endIndex - 1, adjustedStartIndex, subtitles.length - 1)
-    for (let i = adjustedStartIndex; i <= adjustedEndIndex; i += size) {
-      subtitleChunks.push(subtitles.slice(i, Math.min(i + size, adjustedEndIndex + 1)).map((s) => ({
-        index: s.index,
-        actor: s.actor,
-        content: s.content,
-      })))
-    }
+
+    // TODO: currently, isDynamicSplit is always true
+    const subtitleChunks = isDynamicSplit
+      ? firstChunk(size, adjustedStartIndex, adjustedEndIndex)
+      : fixedSplit(size, adjustedStartIndex, adjustedEndIndex)
 
     // Set Limited Context Memory size
     const limitedContextMemorySize = 5
@@ -224,10 +244,10 @@ export default function SubtitleTranslator() {
     }
 
     // Translate each chunk of subtitles
-    for (let i = 0; i < subtitleChunks.length; i++) {
-      const chunk = subtitleChunks[i]
-
-      console.log(`Batch ${i + 1}`)
+    let batch = 0
+    while (subtitleChunks.length > 0) {
+      const chunk = subtitleChunks.shift()!
+      console.log(`Batch ${batch + 1}`)
       console.log(chunk)
       console.log(JSON.parse(JSON.stringify(context)))
 
@@ -262,6 +282,7 @@ export default function SubtitleTranslator() {
         break
       }
 
+      console.log("result: ", tlChunk)
       if (!tlChunk.length) continue
 
       // Update the parsed json
@@ -317,8 +338,21 @@ export default function SubtitleTranslator() {
       const translatingStatus = useTranslationStore.getState().isTranslating
       if (!translatingStatus) break
 
+      if (isDynamicSplit) {
+        const startNewIndex = tlChunk[tlChunk.length - 1].index + 1
+        if (startNewIndex > endIndex) break
+
+        const s = minMax(startNewIndex - 1, startNewIndex - 1, subtitles.length - 1)
+        const e = minMax(endIndex - 1, s, subtitles.length - 1)
+        const nextChunk = firstChunk(size, s, e)[0]
+        if (nextChunk.length) {
+          subtitleChunks.push(nextChunk)
+        }
+      }
+
       // Delay between each chunk
-      await sleep(1000)
+      await sleep(3000)
+      batch++
     }
 
     setIsTranslating(false)
