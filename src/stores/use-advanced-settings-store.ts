@@ -18,7 +18,6 @@ interface AdvancedSettingsStore {
   isUseStructuredOutput: boolean
   isUseFullContextMemory: boolean
   isMaxCompletionTokensAuto: boolean
-  isDynamicSplit: boolean
   setTemperature: (temp: number) => void
   setSplitSize: (size: number) => void
   setPrompt: (prompt: string) => void
@@ -28,7 +27,6 @@ interface AdvancedSettingsStore {
   setIsUseStructuredOutput: (use: boolean) => void
   setIsUseFullContextMemory: (use: boolean) => void
   setIsMaxCompletionTokensAuto: (auto: boolean) => void
-  setIsDynamicSplit: (bool: boolean) => void
   resetAdvancedSettings: () => void
 }
 
@@ -42,7 +40,6 @@ const initialAdvancedSettings = {
   isUseStructuredOutput: true,
   isUseFullContextMemory: false,
   isMaxCompletionTokensAuto: true,
-  isDynamicSplit: true,
 }
 
 export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
@@ -58,7 +55,6 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
       setIsUseStructuredOutput: (use: boolean) => set({ isUseStructuredOutput: use }),
       setIsUseFullContextMemory: (use: boolean) => set({ isUseFullContextMemory: use }),
       setIsMaxCompletionTokensAuto: (auto) => set({ isMaxCompletionTokensAuto: auto }),
-      setIsDynamicSplit: (bool) => set({ isDynamicSplit: bool }),
       resetAdvancedSettings: () => set({
         ...initialAdvancedSettings,
         endIndex: useSubtitleStore.getState().subtitles?.length ?? initialAdvancedSettings.endIndex,
@@ -76,7 +72,6 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         isUseStructuredOutput: state.isUseStructuredOutput,
         isUseFullContextMemory: state.isUseFullContextMemory,
         isMaxCompletionTokensAuto: state.isMaxCompletionTokensAuto,
-        isDynamicSplit: state.isDynamicSplit,
       }),
     }
   )

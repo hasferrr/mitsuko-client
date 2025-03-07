@@ -120,7 +120,6 @@ export default function SubtitleTranslator() {
   const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
-  const isDynamicSplit = useAdvancedSettingsStore((state) => state.isDynamicSplit)
   const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
 
   // Translation Store
@@ -202,8 +201,10 @@ export default function SubtitleTranslator() {
     const adjustedStartIndex = minMax(startIndex - 1, 0, subtitles.length - 1)
     const adjustedEndIndex = minMax(endIndex - 1, adjustedStartIndex, subtitles.length - 1)
 
-    // TODO: currently, isDynamicSplit is always true
-    const subtitleChunks = isDynamicSplit
+    const isAutoContinue = true
+
+    // NOTE: isAutoContinue is ALYWAYS true
+    const subtitleChunks = isAutoContinue
       ? firstChunk(size, adjustedStartIndex, adjustedEndIndex)
       : fixedSplit(size, adjustedStartIndex, adjustedEndIndex)
 
@@ -338,7 +339,7 @@ export default function SubtitleTranslator() {
       const translatingStatus = useTranslationStore.getState().isTranslating
       if (!translatingStatus) break
 
-      if (isDynamicSplit) {
+      if (isAutoContinue) {
         const startNewIndex = tlChunk[tlChunk.length - 1].index + 1
         if (startNewIndex > endIndex) break
 
