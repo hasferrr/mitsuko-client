@@ -57,7 +57,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
               value={subtitle.content}
               onFocus={handleResize}
               onChange={(e) => subtitleUpdate(e, "content")}
-              className="min-h-[36px] h-[36px] max-h-[120px] bg-muted/50 dark:bg-muted/30 resize-none overflow-y-hidden"
+              className="md:min-h-[36px] md:h-[36px] min-h-[40px] h-[40px] max-h-[120px] bg-muted/50 dark:bg-muted/30 resize-none overflow-y-hidden"
               rows={1}
             />
             <Textarea
@@ -65,7 +65,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
               value={subtitle.translated}
               onFocus={handleResize}
               onChange={(e) => subtitleUpdate(e, "translated")}
-              className="min-h-[36px] h-[36px] max-h-[120px] resize-none overflow-y-hidden"
+              className="md:min-h-[36px] md:h-[36px] min-h-[40px] h-[40px] max-h-[120px] resize-none overflow-y-hidden"
               rows={1}
             />
           </div>
