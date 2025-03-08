@@ -7,39 +7,42 @@ export function parseTimestamp(timestamp: string): Timestamp {
 }
 
 export function parseSRT(fileContent: string): Subtitle[] {
-  const lines = fileContent.split('\n')
+  const lines = fileContent.trim().split('\n').map(line => line.trim())
   const subtitles: Subtitle[] = []
-  let currentSubtitle: Partial<Subtitle> = {}
 
-  let index = 1
-  for (let line of lines) {
-    line = line.replaceAll('\r', '').trim()
-    if (line === '') {
-      if (currentSubtitle.index !== undefined) {
-        currentSubtitle.actor = ""
-        subtitles.push(currentSubtitle as Subtitle)
-        currentSubtitle = {}
-      }
-    } else if (currentSubtitle.index === undefined) {
-      currentSubtitle.index = index++ // parseInt(line, 10)
-    } else if (currentSubtitle.timestamp === undefined) {
-      const [start, end] = line.split(' --> ')
-      currentSubtitle.timestamp = {
-        start: parseTimestamp(start),
-        end: parseTimestamp(end),
-      }
-    } else {
-      if (currentSubtitle.content === undefined) {
-        currentSubtitle.content = line
-      } else {
-        currentSubtitle.content += '\n' + line
-      }
-    }
+  let i = 0
+  while (i < lines.length && !lines[i].includes("-->")) {
+    i++
   }
 
-  if (currentSubtitle.index !== undefined) {
-    currentSubtitle.actor = ""
-    subtitles.push(currentSubtitle as Subtitle)
+  let currentIndex = 1
+  while (i < lines.length) {
+    const index = currentIndex
+    const timestamp = lines[i].split("-->")
+    const start = parseTimestamp(timestamp[0].trim())
+    const end = parseTimestamp(timestamp[1].trim())
+    const content: string[] = []
+    i++
+
+    while (i < lines.length) {
+      if (lines[i].includes("-->")) {
+        while (content.length && !content[content.length - 1]) {
+          content.pop()
+        }
+        content.pop()
+        break
+      }
+      content.push(lines[i])
+      i++
+    }
+
+    subtitles.push({
+      index,
+      timestamp: { start, end },
+      actor: "",
+      content: content.join("\n").trim(),
+    })
+    currentIndex++
   }
 
   return subtitles
