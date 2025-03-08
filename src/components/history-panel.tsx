@@ -25,6 +25,7 @@ import {
 import { CheckCircle, FileJson, Trash, XCircle } from "lucide-react"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
+import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 
 interface HistoryPanelProps {
   isHistoryOpen: boolean
@@ -40,6 +41,9 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
   // Translation Store
   const setResponse = useTranslationStore((state) => state.setResponse)
   const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
+
+  // Advanced Settings Store
+  const resetIndex = useAdvancedSettingsStore((state) => state.resetIndex)
 
   // History Store & State
   const history = useHistoryStore((state) => state.history)
@@ -85,6 +89,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
       setResponse(selectedHistoryItem.content.join(""))
       setJsonResponse(selectedHistoryItem.json)
       setIsHistoryOpen(false)
+      resetIndex(1, selectedHistoryItem.subtitles.length)
     } catch (error) {
       console.error("Error applying history:", error)
     }

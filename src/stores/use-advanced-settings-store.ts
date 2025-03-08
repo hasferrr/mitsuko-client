@@ -28,6 +28,7 @@ interface AdvancedSettingsStore {
   setIsUseFullContextMemory: (use: boolean) => void
   setIsMaxCompletionTokensAuto: (auto: boolean) => void
   resetAdvancedSettings: () => void
+  resetIndex: (s?: number, e?: number) => void
 }
 
 const initialAdvancedSettings = {
@@ -62,6 +63,10 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
           ? initialAdvancedSettings.isUseStructuredOutput
           : useSettingsStore.getState().modelDetail?.structuredOutput ?? initialAdvancedSettings.isUseStructuredOutput,
       }),
+      resetIndex: (s?: number, e?: number) => set({
+        startIndex: s || 1,
+        endIndex: e || (useSubtitleStore.getState().subtitles?.length ?? initialAdvancedSettings.endIndex),
+      })
     }),
     {
       name: "advanced-settings",
