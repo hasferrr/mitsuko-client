@@ -46,7 +46,7 @@ import { parseSRT } from "@/lib/srt/parse"
 import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
-import { capitalizeWords, cn, minMax, sleep } from "@/lib/utils"
+import { cn, minMax, sleep } from "@/lib/utils"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
@@ -590,7 +590,7 @@ export default function SubtitleTranslator() {
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="gap-1">
                 <Globe2 className="h-4 w-4" />{" "}
-                {capitalizeWords(sourceLanguage)} → {capitalizeWords(targetLanguage)}
+                {sourceLanguage} → {targetLanguage}
               </Badge>
               <Badge variant="secondary" className="gap-1">
                 <MessageSquare className="h-4 w-4" /> {subtitles.length} Lines
