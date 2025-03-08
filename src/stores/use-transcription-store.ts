@@ -1,5 +1,5 @@
 import { TRANSCRIPT_URL } from "@/constants/api"
-import { isSRT } from "@/lib/ass/subtitle-utils"
+import { isSRT } from "@/lib/subtitle-utils"
 import { generateSRT } from "@/lib/srt/generate"
 import { parseSRT } from "@/lib/srt/parse"
 import { handleStream } from "@/lib/stream"

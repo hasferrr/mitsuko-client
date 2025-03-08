@@ -10,7 +10,7 @@ import { File, XCircle, ArrowUpCircle, ArrowDownCircle, Upload, Save, Play, Squa
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Subtitle, SubtitleNoTime } from "@/types/types"
-import { isASS, isSRT, removeTimestamp } from "@/lib/ass/subtitle-utils"
+import { isASS, isSRT, removeTimestamp } from "@/lib/subtitle-utils"
 import { parseASS } from "@/lib/ass/parse"
 import { parseSRT } from "@/lib/srt/parse"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
