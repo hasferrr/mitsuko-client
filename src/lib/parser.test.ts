@@ -1,4 +1,4 @@
-import { test, expect } from "bun:test"
+import { test, expect, describe } from "bun:test"
 import { repairJson } from "@/lib/parser"
 
 function parseAndRepair(input: string): any {
@@ -105,9 +105,10 @@ const testData = [
   },
 ]
 
-
-testData.forEach(({ input, expected }, i) => {
-  test(`Input: ${i}`, () => {
-    expect(parseAndRepair(input)).toEqual(expected)
+describe("parse & repair json", () => {
+  testData.forEach(({ input, expected }, i) => {
+    test(`Input: ${i}`, () => {
+      expect(parseAndRepair(input)).toEqual(expected)
+    })
   })
 })
