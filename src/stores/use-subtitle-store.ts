@@ -1,6 +1,12 @@
 import { create } from "zustand"
-import { SubtitleTranslated, UpdateSubtitle, Parsed } from "@/types/types"
+import { SubtitleTranslated, Parsed } from "@/types/types"
 import { persist } from "zustand/middleware"
+
+type UpdateSubtitle = (
+  index: number,
+  field: keyof SubtitleTranslated,
+  value: SubtitleTranslated[keyof SubtitleTranslated],
+) => void
 
 interface SubtitleStore {
   title: string

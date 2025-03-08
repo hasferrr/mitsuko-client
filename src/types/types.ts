@@ -54,12 +54,6 @@ export interface SubtitleEvent {
   text: string
 }
 
-export type UpdateSubtitle = (
-  index: number,
-  field: keyof SubtitleTranslated,
-  value: SubtitleTranslated[keyof SubtitleTranslated],
-) => void
-
 export interface CompletionUser {
   role: "user"
   content: SubtitleNoTime[]
