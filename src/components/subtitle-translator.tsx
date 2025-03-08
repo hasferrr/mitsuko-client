@@ -149,6 +149,7 @@ export default function SubtitleTranslator() {
   // Other
   const { setHasChanges } = useBeforeUnload()
   const initRef = useInitRefStore((state) => state.initRefSubtitle)
+  const subName = parsed.type === "ass" ? "SSA" : "SRT"
 
   useEffect(() => {
     const key = useSubtitleStore.persist.getOptions().name
@@ -534,8 +535,6 @@ export default function SubtitleTranslator() {
     resetParsed()
     useSubtitleStore.persist.clearStorage()
   }
-
-  const subName = parsed.type === "ass" ? "SSA" : "SRT"
 
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
