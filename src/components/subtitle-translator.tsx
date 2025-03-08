@@ -85,6 +85,8 @@ import {
 } from "@/components/ui/select"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ModelDetail } from "./model-detail"
+import { isASS, isSRT } from "@/lib/subtitle-utils"
+import { toast } from "sonner"
 
 
 type DownloadOption = "original" | "translated" | "both"
@@ -404,13 +406,17 @@ export default function SubtitleTranslator() {
       const type = pendingFile.name.endsWith(".srt") ? "srt" : "ass"
 
       let parsedSubs: Subtitle[] = []
-      if (type === "srt") {
+      if (type === "srt" && isSRT(text)) {
         parsedSubs = parseSRT(text)
         setParsed({ type, data: null })
-      } else {
+      } else if (type === "ass" && isASS(text)) {
         const data = parseASS(text)
         parsedSubs = data.subtitles
         setParsed({ type, data })
+      } else {
+        console.error("Invalid file type")
+        toast.error("Invalid file type")
+        return
       }
 
       const parsedSubtitles: SubtitleTranslated[] = parsedSubs.map((subtitle) => ({
