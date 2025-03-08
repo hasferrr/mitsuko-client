@@ -2,6 +2,7 @@ import { TRANSCRIPT_URL } from "@/constants/api"
 import { isSRT } from "@/lib/ass/subtitle-utils"
 import { generateSRT } from "@/lib/srt/generate"
 import { parseSRT } from "@/lib/srt/parse"
+import { handleStream } from "@/lib/stream"
 import { abortedAbortController, sleep } from "@/lib/utils"
 import { Subtitle } from "@/types/types"
 import { create } from "zustand"
@@ -53,62 +54,17 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
 
         set({ transcriptionText: "", transcriptSubtitles: [] })
 
-        if (!get().abortControllerRef.current.signal.aborted) {
-          get().abortControllerRef.current.abort()
-          await sleep(1000)
-        }
-        get().abortControllerRef.current = new AbortController()
+        const formData = new FormData()
+        formData.append("audio", file)
 
-        let buffer = ""
+        await handleStream(
+          get().setTranscriptionText,
+          get().abortControllerRef,
+          TRANSCRIPT_URL,
+          {},
+          formData,
+        )
 
-        try {
-          const formData = new FormData()
-          formData.append("audio", file)
-
-          const res = await fetch(TRANSCRIPT_URL, {
-            method: "POST",
-            body: formData,
-            signal: get().abortControllerRef.current.signal,
-          })
-
-          if (!res.ok) {
-            try {
-              const errorData = await res.clone().json()
-              console.error("Error details from server:", errorData)
-              throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error || errorData.message}`)
-            } catch (jsonError) {
-              const errorText = await res.text()
-              console.error("Error details from server (text):", errorText)
-              throw new Error(`Request failed (${res.status}), ${errorText}`)
-            }
-          }
-
-          const reader = res.body?.getReader()
-          if (!reader) {
-            return
-          }
-
-          while (true) {
-            const { done, value } = await reader.read()
-            if (done) break
-            const chunk = new TextDecoder().decode(value)
-            buffer += chunk
-            set({ transcriptionText: buffer })
-          }
-
-        } catch (error) {
-          if (error instanceof Error && error.name === "AbortError") {
-            console.log("Request aborted")
-            set((state) => ({ transcriptionText: state.transcriptionText + "\n\n[Generation stopped by user]" }))
-          } else {
-            console.error("Error:", error)
-            set((state) => ({ transcriptionText: state.transcriptionText + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]` }))
-          }
-          get().abortControllerRef.current.abort()
-          throw error
-        }
-
-        get().abortControllerRef.current.abort()
         get().parseTranscription()
       },
       stopTranscription: () => {

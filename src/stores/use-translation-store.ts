@@ -3,7 +3,8 @@ import { SubOnlyTranslated } from "@/types/types"
 import { parseTranslationJson } from "@/lib/parser"
 import { persist } from "zustand/middleware"
 import { TRANSLATE_URL, TRANSLATE_URL_FREE } from "@/constants/api"
-import { abortedAbortController, sleep } from "@/lib/utils"
+import { abortedAbortController } from "@/lib/utils"
+import { handleStream } from "@/lib/stream"
 
 interface TranslationStore {
   response: string
@@ -14,7 +15,7 @@ interface TranslationStore {
   setJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
   appendJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
   abortControllerRef: React.RefObject<AbortController>
-  translateSubtitles: (requestBody: any, apiKey: string, isFree: boolean, attempt?: number) => Promise<SubOnlyTranslated[]>
+  translateSubtitles: (requestBody: any, apiKey: string, isFree: boolean) => Promise<SubOnlyTranslated[]>
   stopTranslation: () => void
 }
 
@@ -28,67 +29,18 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
   appendJsonResponse: (newArr) => set((state) => ({ jsonResponse: [...state.jsonResponse, ...newArr] })),
   abortControllerRef: { current: abortedAbortController() },
   stopTranslation: () => get().abortControllerRef.current?.abort(),
-  translateSubtitles: async (requestBody, apiKey, isFree, attempt = 0) => {
-    set({ response: "" })
+  translateSubtitles: async (requestBody, apiKey, isFree) => {
+    const buffer = await handleStream(
+      get().setResponse,
+      get().abortControllerRef,
+      isFree ? TRANSLATE_URL_FREE : TRANSLATE_URL,
+      {
+        Authorization: isFree ? "" : `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      JSON.stringify(requestBody),
+    )
 
-    while (!get().abortControllerRef.current.signal.aborted) {
-      get().abortControllerRef.current.abort()
-      await sleep(500)
-      console.log("reattempting")
-    }
-
-    get().abortControllerRef.current = new AbortController()
-    let buffer = ""
-
-    try {
-      const res = await fetch(isFree ? TRANSLATE_URL_FREE : TRANSLATE_URL, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-        signal: get().abortControllerRef.current.signal,
-      })
-
-      if (!res.ok) {
-        const errorData = await res.json()
-        console.error("Error details from server:", errorData)
-        throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error || errorData.message}`)
-      }
-
-      const reader = res.body?.getReader()
-      if (!reader) {
-        return []
-      }
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        const chunk = new TextDecoder().decode(value)
-        buffer += chunk
-        set({ response: buffer })
-      }
-
-      if (!buffer.trim() && attempt < 3 && !get().abortControllerRef.current.signal.aborted) {
-        console.log("Retrying...")
-        await sleep(3000)
-        return get().translateSubtitles(requestBody, apiKey, isFree, attempt + 1)
-      }
-
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "AbortError") {
-        console.log("Request aborted")
-        set((state) => ({ response: state.response + "\n\n[Generation stopped by user]" }))
-      } else {
-        console.error("Error:", error)
-        set((state) => ({ response: state.response + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]` }))
-      }
-      get().abortControllerRef.current.abort()
-      throw error
-    }
-
-    get().abortControllerRef.current.abort()
     let parsedResponse: SubOnlyTranslated[] = []
     try {
       parsedResponse = parseTranslationJson(buffer)
