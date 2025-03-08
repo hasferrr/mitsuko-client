@@ -1,4 +1,12 @@
-import { ContextExtractor } from "@/components/context-extractor";
+import { ContextExtractor } from "@/components/context-extractor"
+import { DEPLOYMENT_URL } from "@/constants/external-links"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: DEPLOYMENT_URL + '/extract-context',
+  },
+}
 
 export default function ExtractionPage() {
   return <ContextExtractor />

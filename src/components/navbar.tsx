@@ -33,6 +33,8 @@ export function Navbar() {
       <div className="flex h-14 items-center gap-2">
         <div className="flex items-center gap-2 mr-4">
           <img
+            width={4 * 6}
+            height={4 * 6}
             src={NAVBAR_IMG_LINK}
             alt="Logo"
             className="w-6 h-6 object-cover"
