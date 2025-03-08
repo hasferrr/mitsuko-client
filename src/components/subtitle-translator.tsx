@@ -122,8 +122,7 @@ export default function SubtitleTranslator() {
   const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
-  const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
-  const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
+  const resetIndex = useAdvancedSettingsStore((state) => state.resetIndex)
 
   // Translation Store
   const response = useTranslationStore((state) => state.response)
@@ -425,8 +424,7 @@ export default function SubtitleTranslator() {
       }))
 
       setSubtitles(parsedSubtitles)
-      setStartIndex(1)
-      setEndIndex(parsedSubtitles.length)
+      resetIndex(1, parsedSubtitles.length)
 
       const fileName = pendingFile.name.split('.')
       fileName.pop()
