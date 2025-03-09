@@ -128,14 +128,14 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
                 value={customStart}
                 onChange={(e) => setCustomStart(e.target.value)}
                 disabled={!removeBetweenCustomChecked}
-                className="w-24"
+                className="w-24 font-mono"
               />
               <Input
                 placeholder="End"
                 value={customEnd}
                 onChange={(e) => setCustomEnd(e.target.value)}
                 disabled={!removeBetweenCustomChecked}
-                className="w-24"
+                className="w-24 font-mono"
               />
             </div>
           </div>
