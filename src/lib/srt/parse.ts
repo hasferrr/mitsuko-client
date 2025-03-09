@@ -1,6 +1,6 @@
 import type { Subtitle, Timestamp } from '../../types/types'
 
-export function parseTimestamp(timestamp: string): Timestamp {
+function parseTimestamp(timestamp: string): Timestamp {
   const [hms, ms] = timestamp.split(',')
   const [h, m, s] = hms.split(':').map(Number)
   return { h, m, s, ms: Number(ms) }

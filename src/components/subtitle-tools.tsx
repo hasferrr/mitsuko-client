@@ -17,7 +17,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import type { Timestamp } from "@/types/types"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +27,11 @@ import {
   AlertDialogHeader as AlertDialogHeaderInner,
   AlertDialogTitle as AlertDialogTitleInner,
 } from "@/components/ui/alert-dialog"
+import {
+  removeAllLineBreaks,
+  removeContentBetween,
+  shiftSubtitles
+} from "@/lib/subtitle-utils"
 
 interface SubtitleToolsProps {
   isOpen: boolean
@@ -36,8 +40,8 @@ interface SubtitleToolsProps {
 }
 
 export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleToolsProps) => {
-  const [removeAllLineBreaks, setRemoveAllLineBreaks] = useState(false)
-  const [removeBetweenCustom, setRemoveBetweenCustom] = useState(false)
+  const [removeAllLineBreaksChecked, setRemoveAllLineBreaksChecked] = useState(false)
+  const [removeBetweenCustomChecked, setRemoveBetweenCustomChecked] = useState(false)
   const [customStart, setCustomStart] = useState("(")
   const [customEnd, setCustomEnd] = useState(")")
   const [shiftTime, setShiftTime] = useState(0)
@@ -52,68 +56,22 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
 
   const handleRemoveAllLineBreaks = (field: "content" | "translated") => {
     if (!subtitles.length) return
-
-    const updatedSubtitles = subtitles.map((subtitle) => {
-      const updatedContent =
-        parsed.type === "ass"
-          ? subtitle[field].replaceAll("\\N", " ").replaceAll("\n", " ").replaceAll("  ", " ")
-          : subtitle[field].replaceAll("\n", " ").replaceAll("  ", " ")
-      return { ...subtitle, [field]: updatedContent }
-    })
+    const updatedSubtitles = removeAllLineBreaks(subtitles, field, parsed.type === "ass")
     setSubtitles(updatedSubtitles)
-
     toast.success(`Removed all line breaks from ${field}`)
   }
 
   const handleRemoveBetweenCustom = (field: "content" | "translated") => {
     if (!subtitles.length || !customStart || !customEnd) return
-
-    const regex = new RegExp(`${escapeRegExp(customStart)}(.*?)${escapeRegExp(customEnd)}`, "g")
-
-    const updatedSubtitles = subtitles.map((subtitle) => {
-      const updatedContent = subtitle[field].replace(regex, "").trim()
-      return { ...subtitle, [field]: updatedContent }
-    })
+    const updatedSubtitles = removeContentBetween(subtitles, field, customStart, customEnd)
     setSubtitles(updatedSubtitles)
-
     toast.success(`Removed content between "${customStart}" and "${customEnd}" from ${field}`)
-  }
-  // Helper function to escape special characters for regex
-  function escapeRegExp(string: string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
-  }
-
-
-  const parseTimestamp = (timestamp: Timestamp) => {
-    return timestamp.h * 3600000 + timestamp.m * 60000 + timestamp.s * 1000 + timestamp.ms
-  }
-
-  const formatTimestamp = (timeMs: number): Timestamp => {
-    const h = Math.floor(timeMs / 3600000)
-    const m = Math.floor((timeMs % 3600000) / 60000)
-    const s = Math.floor((timeMs % 60000) / 1000)
-    const ms = timeMs % 1000
-    return { h, m, s, ms }
   }
 
   const handleShiftSubtitles = () => {
     if (!subtitles.length) return
-    const shiftMs = shiftTime
-
-    const updatedSubtitles = subtitles.map((subtitle) => {
-      const startMs = parseTimestamp(subtitle.timestamp.start)
-      const endMs = parseTimestamp(subtitle.timestamp.end)
-
-      const newStartMs = Math.max(0, startMs + shiftMs)
-      const newEndMs = Math.max(0, endMs + shiftMs)
-
-      const newStart = formatTimestamp(newStartMs)
-      const newEnd = formatTimestamp(newEndMs)
-
-      return { ...subtitle, timestamp: { start: newStart, end: newEnd } }
-    })
+    const updatedSubtitles = shiftSubtitles(subtitles, shiftTime)
     setSubtitles(updatedSubtitles)
-
     toast.success(`Shifted subtitles by ${shiftTime} miliseconds`)
   }
 
@@ -145,20 +103,19 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
             <div className="flex items-center space-x-3">
               <Checkbox
                 id="removeAllLineBreaks"
-                checked={removeAllLineBreaks}
-                onCheckedChange={(checked) => setRemoveAllLineBreaks(!!checked)}
+                checked={removeAllLineBreaksChecked}
+                onCheckedChange={(checked) => setRemoveAllLineBreaksChecked(!!checked)}
                 className="data-[state=checked]:bg-primary"
               />
               <label htmlFor="removeAllLineBreaks" className="text-sm font-medium leading-none cursor-pointer">
                 Remove all line breaks
               </label>
             </div>
-            {/* Custom Removal Section */}
             <div className="flex items-center space-x-3">
               <Checkbox
                 id="removeBetweenCustom"
-                checked={removeBetweenCustom}
-                onCheckedChange={(checked) => setRemoveBetweenCustom(!!checked)}
+                checked={removeBetweenCustomChecked}
+                onCheckedChange={(checked) => setRemoveBetweenCustomChecked(!!checked)}
                 className="data-[state=checked]:bg-primary"
               />
               <label htmlFor="removeBetweenCustom" className="text-sm font-medium leading-none cursor-pointer">
@@ -170,15 +127,14 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
                 placeholder="Start"
                 value={customStart}
                 onChange={(e) => setCustomStart(e.target.value)}
-                disabled={!removeBetweenCustom}
+                disabled={!removeBetweenCustomChecked}
                 className="w-24"
-
               />
               <Input
                 placeholder="End"
                 value={customEnd}
                 onChange={(e) => setCustomEnd(e.target.value)}
-                disabled={!removeBetweenCustom}
+                disabled={!removeBetweenCustomChecked}
                 className="w-24"
               />
             </div>
@@ -189,11 +145,11 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
               size="sm"
               onClick={() =>
                 showConfirmationDialog(() => {
-                  if (removeAllLineBreaks) handleRemoveAllLineBreaks("content")
-                  if (removeBetweenCustom) handleRemoveBetweenCustom("content")
+                  if (removeAllLineBreaksChecked) handleRemoveAllLineBreaks("content")
+                  if (removeBetweenCustomChecked) handleRemoveBetweenCustom("content")
                 })
               }
-              disabled={!removeAllLineBreaks && !removeBetweenCustom}
+              disabled={!removeAllLineBreaksChecked && !removeBetweenCustomChecked}
             >
               Apply to Original
             </Button>
@@ -202,11 +158,11 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
               size="sm"
               onClick={() =>
                 showConfirmationDialog(() => {
-                  if (removeAllLineBreaks) handleRemoveAllLineBreaks("translated")
-                  if (removeBetweenCustom) handleRemoveBetweenCustom("translated")
+                  if (removeAllLineBreaksChecked) handleRemoveAllLineBreaks("translated")
+                  if (removeBetweenCustomChecked) handleRemoveBetweenCustom("translated")
                 })
               }
-              disabled={!removeAllLineBreaks && !removeBetweenCustom}
+              disabled={!removeAllLineBreaksChecked && !removeBetweenCustomChecked}
             >
               Apply to Translated
             </Button>
