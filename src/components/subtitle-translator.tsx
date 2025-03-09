@@ -19,6 +19,7 @@ import {
   Loader2,
   History as HistoryIcon,
   AlignCenter,
+  Box,
 } from "lucide-react"
 import { SubtitleList } from "./subtitle-list"
 import {
@@ -87,6 +88,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, Di
 import { ModelDetail } from "./model-detail"
 import { isASS, isSRT } from "@/lib/subtitle-utils"
 import { toast } from "sonner"
+import { SubtitleTools } from "./subtitle-tools"
 
 
 type DownloadOption = "original" | "translated" | "both"
@@ -145,6 +147,7 @@ export default function SubtitleTranslator() {
   const [pendingContextFile, setPendingContextFile] = useState<File | null>(null)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [bothFormat, setBothFormat] = useState<BothFormat>("o-n-t")
+  const [toolsOpen, setToolsOpen] = useState(false)
 
   // Other
   const { setHasChanges } = useBeforeUnload()
@@ -585,10 +588,10 @@ export default function SubtitleTranslator() {
       >
         {/* Left Column - Subtitles */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-4 justify-between mr-4">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary" className="gap-1">
-                <Globe2 className="h-4 w-4" />{" "}
+                <Globe2 className="h-4 w-4" />
                 {sourceLanguage} → {targetLanguage}
               </Badge>
               <Badge variant="secondary" className="gap-1">
@@ -598,6 +601,15 @@ export default function SubtitleTranslator() {
                 {subName}
               </Badge>
             </div>
+            <SubtitleTools isOpen={toolsOpen} setIsOpen={setToolsOpen}>
+              <Badge
+                variant="outline"
+                className="gap-1 cursor-pointer hover:bg-secondary select-none rounded-lg"
+              >
+                <Box className="h-4 w-4" />
+                Tools
+              </Badge>
+            </SubtitleTools>
           </div>
 
           {/* Wrap SubtitleList with DragAndDrop */}
