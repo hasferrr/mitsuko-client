@@ -20,6 +20,7 @@ import {
   History as HistoryIcon,
   AlignCenter,
   Box,
+  SquareChartGantt,
 } from "lucide-react"
 import { SubtitleList } from "./subtitle-list"
 import {
@@ -89,6 +90,7 @@ import { ModelDetail } from "./model-detail"
 import { isASS, isSRT } from "@/lib/subtitle-utils"
 import { toast } from "sonner"
 import { SubtitleTools } from "./subtitle-tools"
+import { SubtitleCount } from "./subtitle-count"
 
 
 type DownloadOption = "original" | "translated" | "both"
@@ -148,6 +150,7 @@ export default function SubtitleTranslator() {
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [bothFormat, setBothFormat] = useState<BothFormat>("o-n-t")
   const [toolsOpen, setToolsOpen] = useState(false)
+  const [countOpen, setCountOpen] = useState(false)
 
   // Other
   const { setHasChanges } = useBeforeUnload()
@@ -588,7 +591,7 @@ export default function SubtitleTranslator() {
       >
         {/* Left Column - Subtitles */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4 justify-between mr-4">
+          <div className="flex items-center mb-4 justify-between mr-4">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary" className="gap-1">
                 <Globe2 className="h-4 w-4" />
@@ -601,15 +604,26 @@ export default function SubtitleTranslator() {
                 {subName}
               </Badge>
             </div>
-            <SubtitleTools isOpen={toolsOpen} setIsOpen={setToolsOpen}>
-              <Badge
-                variant="outline"
-                className="gap-1 cursor-pointer hover:bg-secondary select-none rounded-lg"
-              >
-                <Box className="h-4 w-4" />
-                Tools
-              </Badge>
-            </SubtitleTools>
+            <div className="flex flex-wrap items-center gap-2 justify-end">
+              <SubtitleCount isOpen={countOpen} setIsOpen={setCountOpen}>
+                <Badge
+                  variant="outline"
+                  className="gap-1 cursor-pointer hover:bg-secondary select-none rounded-lg"
+                >
+                  <SquareChartGantt className="h-4 w-4" />
+                  Count
+                </Badge>
+              </SubtitleCount>
+              <SubtitleTools isOpen={toolsOpen} setIsOpen={setToolsOpen}>
+                <Badge
+                  variant="outline"
+                  className="gap-1 cursor-pointer hover:bg-secondary select-none rounded-lg"
+                >
+                  <Box className="h-4 w-4" />
+                  Tools
+                </Badge>
+              </SubtitleTools>
+            </div>
           </div>
 
           {/* Wrap SubtitleList with DragAndDrop */}
