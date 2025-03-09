@@ -29,12 +29,11 @@ import {
   ContextDocumentInput,
   TemperatureSlider,
   SplitSizeInput,
-  ProcessOutput,
   MaxCompletionTokenInput,
   StartIndexInput,
   EndIndexInput,
   StructuredOutputSwitch,
-  ContextMemorySwitch,
+  FullContextMemorySwitch,
   AdvancedSettingsResetButton,
 } from "./settings-inputs"
 import {
@@ -91,6 +90,7 @@ import { isASS, isSRT } from "@/lib/subtitle-utils"
 import { toast } from "sonner"
 import { SubtitleTools } from "./subtitle-tools"
 import { SubtitleCount } from "./subtitle-count"
+import { SubtitleProcessOutput } from "./subtitle-process-output"
 
 
 type DownloadOption = "original" | "translated" | "both"
@@ -816,14 +816,14 @@ export default function SubtitleTranslator() {
                   <SplitSizeInput />
                   <MaxCompletionTokenInput />
                   <StructuredOutputSwitch />
-                  <ContextMemorySwitch />
+                  <FullContextMemorySwitch />
                   <AdvancedSettingsResetButton />
                 </CardContent>
               </Card>
             </TabsContent>
 
             <TabsContent value="process" className="flex-grow space-y-4 mt-4">
-              <ProcessOutput />
+              <SubtitleProcessOutput />
             </TabsContent>
           </Tabs>
         </div>

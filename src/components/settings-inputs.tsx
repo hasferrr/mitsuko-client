@@ -7,8 +7,6 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
-import { useTranslationStore } from "@/stores/use-translation-store"
-import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
 import { Eye, EyeOff } from "lucide-react"
 import { Button } from "./ui/button"
@@ -21,8 +19,6 @@ import {
   TEMPERATURE_MIN,
   TEMPERATURE_MAX,
 } from "@/constants/limits"
-import { parseTranslationJsonStrict } from "@/lib/parser"
-import { cn } from "@/lib/utils"
 import { ModelSelector } from "@/components/model-selector"
 import { LANGUAGES } from "@/constants/lang"
 import { ComboBox } from "./ui-custom/combo-box"
@@ -183,6 +179,111 @@ export const TemperatureSlider = memo(() => {
   )
 })
 
+export const StartIndexInput = memo(() => {
+  const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
+  const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
+  const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
+  const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
+  const subtitles = useSubtitleStore((state) => state.subtitles)
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    if (/^\d*$/.test(value)) {
+      let num = parseInt(value, 10)
+      num = Math.min(num, subtitles.length)
+      num = value === "" ? 0 : num
+      setStartIndex(num)
+      if (num > endIndex) {
+        setEndIndex(Math.max(1, num))
+      }
+    }
+  }
+
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setStartIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between mb-2 items-center">
+        <label className="text-sm font-medium">Start Index</label>
+      </div>
+      <Input
+        type="text"
+        value={startIndex}
+        onBlur={handleBlur}
+        onChange={handleChange}
+        min={1}
+        max={subtitles.length}
+        step={1}
+        className="bg-background dark:bg-muted/30"
+        inputMode="numeric"
+      />
+      <p className="text-xs text-muted-foreground">
+        Start translation from this subtitle index. Useful for resuming translations. (1-{subtitles.length})
+      </p>
+    </div>
+  )
+})
+
+export const EndIndexInput = memo(() => {
+  const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
+  const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
+  const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
+  const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
+
+  const initRef = useInitRefStore((state) => state.initRefEndIndex)
+  const subtitles = useSubtitleStore((state) => state.subtitles)
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    if (/^\d*$/.test(value)) {
+      let num = parseInt(value, 10)
+      num = Math.min(num, subtitles.length)
+      num = value === "" ? 0 : num
+      setEndIndex(num)
+      if (num < startIndex) {
+        setStartIndex(Math.max(1, num))
+      }
+    }
+  }
+
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setEndIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
+  }
+
+  useEffect(() => {
+    if (initRef.current) {
+      setEndIndex(subtitles.length)
+      initRef.current = false
+    }
+  }, [subtitles.length])
+
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between mb-2 items-center">
+        <label className="text-sm font-medium">End Index</label>
+      </div>
+      <Input
+        type="text"
+        value={endIndex}
+        onBlur={handleBlur}
+        onChange={handleChange}
+        min={1}
+        max={subtitles.length}
+        step={1}
+        className="bg-background dark:bg-muted/30"
+        inputMode="numeric"
+      />
+      <p className="text-xs text-muted-foreground">
+        End translation at this subtitle index. This index will also be translated. (1-{subtitles.length})
+      </p>
+    </div>
+  )
+})
+
 export const SplitSizeInput = memo(() => {
   const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
   const setSplitSize = useAdvancedSettingsStore((state) => state.setSplitSize)
@@ -313,7 +414,7 @@ export const StructuredOutputSwitch = memo(() => {
   )
 })
 
-export const ContextMemorySwitch = memo(() => {
+export const FullContextMemorySwitch = memo(() => {
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
   const setIsUseFullContextMemory = useAdvancedSettingsStore((state) => state.setIsUseFullContextMemory)
 
@@ -359,245 +460,6 @@ export const SystemPromptInput = memo(() => {
         placeholder="Enter translation instructions..."
         onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
       />
-    </div>
-  )
-})
-
-export const StartIndexInput = memo(() => {
-  const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
-  const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
-  const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
-  const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
-  const subtitles = useSubtitleStore((state) => state.subtitles)
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    if (/^\d*$/.test(value)) {
-      let num = parseInt(value, 10)
-      num = Math.min(num, subtitles.length)
-      num = value === "" ? 0 : num
-      setStartIndex(num)
-      if (num > endIndex) {
-        setEndIndex(Math.max(1, num))
-      }
-    }
-  }
-
-  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    setStartIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
-  }
-
-  return (
-    <div className="space-y-2">
-      <div className="flex justify-between mb-2 items-center">
-        <label className="text-sm font-medium">Start Index</label>
-      </div>
-      <Input
-        type="text"
-        value={startIndex}
-        onBlur={handleBlur}
-        onChange={handleChange}
-        min={1}
-        max={subtitles.length}
-        step={1}
-        className="bg-background dark:bg-muted/30"
-        inputMode="numeric"
-      />
-      <p className="text-xs text-muted-foreground">
-        Start translation from this subtitle index. Useful for resuming translations. (1-{subtitles.length})
-      </p>
-    </div>
-  )
-})
-
-export const EndIndexInput = memo(() => {
-  const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
-  const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
-  const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
-  const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
-
-  const initRef = useInitRefStore((state) => state.initRefEndIndex)
-  const subtitles = useSubtitleStore((state) => state.subtitles)
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    if (/^\d*$/.test(value)) {
-      let num = parseInt(value, 10)
-      num = Math.min(num, subtitles.length)
-      num = value === "" ? 0 : num
-      setEndIndex(num)
-      if (num < startIndex) {
-        setStartIndex(Math.max(1, num))
-      }
-    }
-  }
-
-  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    setEndIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
-  }
-
-  useEffect(() => {
-    if (initRef.current) {
-      setEndIndex(subtitles.length)
-      initRef.current = false
-    }
-  }, [subtitles.length])
-
-  return (
-    <div className="space-y-2">
-      <div className="flex justify-between mb-2 items-center">
-        <label className="text-sm font-medium">End Index</label>
-      </div>
-      <Input
-        type="text"
-        value={endIndex}
-        onBlur={handleBlur}
-        onChange={handleChange}
-        min={1}
-        max={subtitles.length}
-        step={1}
-        className="bg-background dark:bg-muted/30"
-        inputMode="numeric"
-      />
-      <p className="text-xs text-muted-foreground">
-        End translation at this subtitle index. This index will also be translated. (1-{subtitles.length})
-      </p>
-    </div>
-  )
-})
-
-export const ProcessOutput = memo(() => {
-  // Translation store
-  const response = useTranslationStore((state) => state.response)
-  const jsonResponse = useTranslationStore((state) => state.jsonResponse)
-  const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
-  const isTranslating = useTranslationStore((state) => state.isTranslating)
-
-  // Subtitle store
-  const subtitles = useSubtitleStore((state) => state.subtitles)
-  const setSubtitles = useSubtitleStore((state) => state.setSubtitles)
-
-  // State
-  const [isEditing, setIsEditing] = useState(false)
-  const [editValue, setEditValue] = useState("")
-  const [isParseError, setIsParseError] = useState(false)
-  const topTextareaRef = useRef<HTMLTextAreaElement | null>(null)
-  const bottomTextareaRef = useRef<HTMLTextAreaElement | null>(null)
-
-  const jsonText = jsonResponse.length ? `[${jsonResponse.map(s => JSON.stringify(s, null, 2))}]` : ""
-
-  useAutoScroll(response, topTextareaRef)
-
-  useEffect(() => {
-    if (isParseError) {
-      setIsParseError(false)
-    }
-  }, [editValue])
-
-  useEffect(() => {
-    setEditValue(jsonText)
-    if (isParseError) {
-      setIsParseError(false)
-    }
-  }, [isEditing])
-
-  useEffect(() => {
-    if (isTranslating) {
-      setIsEditing(false)
-    }
-  }, [isTranslating])
-
-  useEffect(() => {
-    if (topTextareaRef.current) {
-      topTextareaRef.current.scrollTop = topTextareaRef.current.scrollHeight
-    }
-  }, [topTextareaRef])
-
-  const handleChangeJSONInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditValue(e.target.value)
-  }
-
-  const handleEditText = () => {
-    bottomTextareaRef.current?.focus()
-    setIsEditing(true)
-  }
-
-  const handleCancelEdit = () => {
-    setIsEditing(false)
-  }
-
-  const handleParseAndSave = () => {
-    try {
-      const parsed = parseTranslationJsonStrict(editValue)
-      setJsonResponse(parsed)
-      setIsParseError(false)
-    } catch {
-      console.log("Failed to parse JSON. Please check the format.")
-      setIsParseError(true)
-      bottomTextareaRef?.current?.focus()
-      return
-    }
-    setIsEditing(false)
-  }
-
-  const handleApply = () => {
-    const tlChunk = jsonResponse
-    if (!tlChunk.length) {
-      return
-    }
-
-    const merged = [...subtitles]
-    for (let i = 0; i < tlChunk.length; i++) {
-      const index = tlChunk[i].index - 1
-      merged[index] = {
-        ...merged[index],
-        translated: tlChunk[i].translated || merged[index].translated,
-      }
-    }
-    setSubtitles(merged)
-  }
-
-  return (
-    <div className="space-y-4">
-      <Textarea
-        ref={topTextareaRef}
-        value={response.trim()}
-        readOnly
-        className="h-[390px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
-        placeholder="Translation output will appear here..."
-      />
-      <Textarea
-        ref={bottomTextareaRef}
-        value={isEditing ? editValue : jsonText}
-        readOnly={!isEditing}
-        onChange={handleChangeJSONInput}
-        className={cn(
-          "h-[247px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm",
-          isParseError && "focus-visible:ring-red-600",
-        )}
-        placeholder="Parsed JSON output will appear here..."
-      />
-      <div className="flex gap-2">
-        <Button
-          variant={isEditing ? "default" : "outline"}
-          onClick={isEditing ? handleParseAndSave : handleEditText}
-          disabled={isTranslating}
-          className="w-full"
-        >
-          {isEditing ? "Parse & Save" : "Edit Text"}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={isEditing ? handleCancelEdit : handleApply}
-          disabled={isTranslating}
-          className="w-full"
-        >
-          {isEditing ? "Cancel" : "Apply to Subtitles"}
-        </Button>
-
-      </div>
     </div>
   )
 })
