@@ -58,14 +58,14 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
     if (!subtitles.length) return
     const updatedSubtitles = removeAllLineBreaks(subtitles, field, parsed.type === "ass")
     setSubtitles(updatedSubtitles)
-    toast.success(`Removed all line breaks from ${field}`)
+    toast.success(`Removed all line breaks from ${field === "content" ? "original" : "translated"} text`)
   }
 
   const handleRemoveBetweenCustom = (field: "content" | "translated") => {
     if (!subtitles.length || !customStart || !customEnd) return
     const updatedSubtitles = removeContentBetween(subtitles, field, customStart, customEnd)
     setSubtitles(updatedSubtitles)
-    toast.success(`Removed content between "${customStart}" and "${customEnd}" from ${field}`)
+    toast.success(`Removed content between "${customStart}" and "${customEnd}" from ${field === "content" ? "original" : "translated"} text`)
   }
 
   const handleShiftSubtitles = () => {
