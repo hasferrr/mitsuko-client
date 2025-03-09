@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
-import { Eye, EyeOff } from "lucide-react"
+import { ChevronsRight, Eye, EyeOff } from "lucide-react"
 import { Button } from "./ui/button"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import {
@@ -23,6 +23,7 @@ import { ModelSelector } from "@/components/model-selector"
 import { LANGUAGES } from "@/constants/lang"
 import { ComboBox } from "./ui-custom/combo-box"
 import { useInitRefStore } from "@/stores/use-init-store"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 
 export const LanguageSelection = memo(() => {
@@ -204,22 +205,56 @@ export const StartIndexInput = memo(() => {
     setStartIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
   }
 
+  const handleFindEmptyTranslation = () => {
+    for (let i = 0; i < subtitles.length; i++) {
+      if (
+        subtitles[i].translated.trim() === "" &&
+        subtitles[i].content.trim() !== ""
+      ) {
+        setStartIndex(i + 1)
+        setEndIndex(subtitles.length)
+        break
+      }
+    }
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between mb-2 items-center">
         <label className="text-sm font-medium">Start Index</label>
       </div>
-      <Input
-        type="text"
-        value={startIndex}
-        onBlur={handleBlur}
-        onChange={handleChange}
-        min={1}
-        max={subtitles.length}
-        step={1}
-        className="bg-background dark:bg-muted/30"
-        inputMode="numeric"
-      />
+      <div className="relative">
+        <Input
+          type="text"
+          value={startIndex}
+          onBlur={handleBlur}
+          onChange={handleChange}
+          min={1}
+          max={subtitles.length}
+          step={1}
+          className="bg-background dark:bg-muted/30 pr-10"
+          inputMode="numeric"
+        />
+        <TooltipProvider>
+          <Tooltip delayDuration={10}>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
+                onClick={handleFindEmptyTranslation}
+              >
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="font-medium text-center">Find the first subtitle with empty</p>
+              <p className="font-medium text-center">translation and set it as the start index</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
       <p className="text-xs text-muted-foreground">
         Start translation from this subtitle index. Useful for resuming translations. (1-{subtitles.length})
       </p>
