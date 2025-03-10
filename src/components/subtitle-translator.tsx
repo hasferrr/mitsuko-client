@@ -89,8 +89,8 @@ import { ModelDetail } from "./model-detail"
 import { isASS, isSRT } from "@/lib/subtitle-utils"
 import { toast } from "sonner"
 import { SubtitleTools } from "./subtitle-tools"
-import { SubtitleCount } from "./subtitle-count"
-import { SubtitleProcessOutput } from "./subtitle-process-output"
+import { SubtitleProgress } from "./subtitle-progress"
+import { SubtitleResultOutput } from "./subtitle-result-output"
 
 
 type DownloadOption = "original" | "translated" | "both"
@@ -142,7 +142,7 @@ export default function SubtitleTranslator() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
 
   // Other State
-  const [activeTab, setActiveTab] = useState(isTranslating ? "process" : "basic")
+  const [activeTab, setActiveTab] = useState(isTranslating ? "result" : "basic")
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
   const [pendingFile, setPendingFile] = useState<File | null>(null)
   const [isContextUploadDialogOpen, setIsContextUploadDialogOpen] = useState(false)
@@ -150,7 +150,7 @@ export default function SubtitleTranslator() {
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [bothFormat, setBothFormat] = useState<BothFormat>("o-n-t")
   const [toolsOpen, setToolsOpen] = useState(false)
-  const [countOpen, setCountOpen] = useState(false)
+  const [progressOpen, setProgressOpen] = useState(false)
 
   // Other
   const { setHasChanges } = useBeforeUnload()
@@ -192,7 +192,7 @@ export default function SubtitleTranslator() {
     if (!subtitles.length) return
     setIsTranslating(true)
     setHasChanges(true)
-    setActiveTab("process")
+    setActiveTab("result")
     setJsonResponse([])
 
     setTimeout(() => {
@@ -605,15 +605,15 @@ export default function SubtitleTranslator() {
               </Badge>
             </div>
             <div className="flex flex-wrap items-center gap-2 justify-end">
-              <SubtitleCount isOpen={countOpen} setIsOpen={setCountOpen}>
+              <SubtitleProgress isOpen={progressOpen} setIsOpen={setProgressOpen}>
                 <Badge
                   variant="outline"
                   className="gap-1 cursor-pointer hover:bg-secondary select-none rounded-lg"
                 >
                   <SquareChartGantt className="h-4 w-4" />
-                  Count
+                  Progress
                 </Badge>
-              </SubtitleCount>
+              </SubtitleProgress>
               <SubtitleTools isOpen={toolsOpen} setIsOpen={setToolsOpen}>
                 <Badge
                   variant="outline"
@@ -790,7 +790,7 @@ export default function SubtitleTranslator() {
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="basic">Basic</TabsTrigger>
               <TabsTrigger value="advanced">Advanced</TabsTrigger>
-              <TabsTrigger value="process">Process</TabsTrigger>
+              <TabsTrigger value="result">Result</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
@@ -822,8 +822,8 @@ export default function SubtitleTranslator() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="process" className="flex-grow space-y-4 mt-4">
-              <SubtitleProcessOutput />
+            <TabsContent value="result" className="flex-grow space-y-4 mt-4">
+              <SubtitleResultOutput />
             </TabsContent>
           </Tabs>
         </div>

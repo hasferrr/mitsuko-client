@@ -10,7 +10,7 @@ import { parseTranslationJsonStrict } from "@/lib/parser"
 import { cn } from "@/lib/utils"
 
 
-export const SubtitleProcessOutput = memo(() => {
+export const SubtitleResultOutput = memo(() => {
   // Translation store
   const response = useTranslationStore((state) => state.response)
   const jsonResponse = useTranslationStore((state) => state.jsonResponse)
@@ -119,7 +119,7 @@ export const SubtitleProcessOutput = memo(() => {
           "h-[247px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm",
           isParseError && "focus-visible:ring-red-600",
         )}
-        placeholder="Parsed JSON output will appear here..."
+        placeholder="Accumulated result will appear here..."
       />
       <div className="flex gap-2">
         <Button

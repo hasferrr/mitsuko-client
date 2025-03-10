@@ -20,7 +20,7 @@ interface SubtitleCountProps {
   children: React.ReactNode
 }
 
-export const SubtitleCount = ({ isOpen, setIsOpen, children }: SubtitleCountProps) => {
+export const SubtitleProgress = ({ isOpen, setIsOpen, children }: SubtitleCountProps) => {
   const subtitles = useSubtitleStore((state) => state.subtitles)
   const [translatedCount, setTranslatedCount] = useState<number | null>(null)
   const [originalCount, setOriginalCount] = useState<number | null>(null)
@@ -131,7 +131,7 @@ export const SubtitleCount = ({ isOpen, setIsOpen, children }: SubtitleCountProp
                 <>
                   {untranslatedIntervals.length > 0 && (
                     <div className="">
-                      Untranslated intervals: {untranslatedIntervals.join(", ")}
+                      Untranslated at index: {untranslatedIntervals.join(", ")}
                     </div>
                   )}
                 </>
@@ -141,7 +141,7 @@ export const SubtitleCount = ({ isOpen, setIsOpen, children }: SubtitleCountProp
                   Missing original text: {originalCount} / {subtitles.length}
                   {missingOriginalIntervals.length > 0 && (
                     <div className="">
-                      Missing original intervals: {missingOriginalIntervals.join(", ")}
+                      Missing text at index: {missingOriginalIntervals.join(", ")}
                     </div>
                   )}
                 </div>
