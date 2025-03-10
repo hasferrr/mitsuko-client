@@ -1,33 +1,46 @@
 import { test, expect, describe } from "bun:test"
-import { repairJson } from "@/lib/parser"
+import { isEscaped, repairJson } from "@/lib/parser"
+import { SubtitleNoTimeNoActorTranslated } from "@/types/types"
 
 function parseAndRepair(input: string): any {
   try {
     const repaired = repairJson(input)
     return JSON.parse(repaired)
   } catch (error) {
-    return null
+    return "error parsing"
   }
 }
 
-const arr2 = [
+const wrapSub = (arr: SubtitleNoTimeNoActorTranslated[]) => {
+  return { subtitles: arr }
+}
+
+const _arr2 = [
   { "index": 1, "content": "x", "translated": "y" },
   { "index": 2, "content": "v", "translated": "w" }
 ]
-const arr1 = [arr2[0]]
+const _arr1 = [_arr2[0]]
+const arr2 = wrapSub(_arr2)
+const arr1 = wrapSub(_arr1)
 
 
 const testData = [
+  // empty test
   {
-    input: "[]",
-    expected: [],
+    input: "",
+    expected: wrapSub([]),
   },
   {
-    input: `[
+    input: `{"subtitles":[]}`,
+    expected: wrapSub([]),
+  },
+  // escaped char test
+  {
+    input: `{"subtitles":[
       {"index":1,"content":"{\\\\an8}BASEMENT LEVEL FIVE","translated":"{\\\\an8}BASEMENT LEVEL LIMA"},
       {"index":2,"content":"{\\\\an8}You keep dodging my attacks. \\" test \\" ","translated":"{\\\\an8}Kau terus menghindari seranganku."}
-    ]`,
-    expected: [
+    ]}`,
+    expected: wrapSub([
       {
         index: 1,
         content: "{\\an8}BASEMENT LEVEL FIVE",
@@ -37,14 +50,14 @@ const testData = [
         content: "{\\an8}You keep dodging my attacks. \" test \" ",
         translated: "{\\an8}Kau terus menghindari seranganku.",
       }
-    ],
+    ]),
   },
   {
-    input: `[
+    input: `{"subtitles":[
       {"index":1,"content":"BASEMENT LEVEL FIVE","translated":"BASEMENT LEVEL LIMA"},
       {"index":2,"content":"You keep dodging my \\" attacks.","translated":"Kau terus menghindari seranganku."}
-    ]`,
-    expected: [
+    ]}`,
+    expected: wrapSub([
       {
         index: 1,
         content: "BASEMENT LEVEL FIVE",
@@ -54,14 +67,14 @@ const testData = [
         content: "You keep dodging my \" attacks.",
         translated: "Kau terus menghindari seranganku.",
       }
-    ],
+    ]),
   },
   {
-    input: `[
+    input: `{"subtitles":[
       {"index":1,"content":"BASEMENT LEVEL FIVE","translated":"BASEMENT LEVEL LIMA"},
       {"index":2,"content":"You keep dodging my attacks. \\\\","translated":"Kau terus menghindari seranganku."}
-    ]`,
-    expected: [
+    ]}`,
+    expected: wrapSub([
       {
         index: 1,
         content: "BASEMENT LEVEL FIVE",
@@ -71,39 +84,92 @@ const testData = [
         content: "You keep dodging my attacks. \\",
         translated: "Kau terus menghindari seranganku.",
       }
-    ],
+    ]),
+  },
+  // bracket test
+  {
+    input: `{"subtitles":[
+      {"index":1,"content":"x","translated":"y"},
+      {"index":2,"content":"v","translated":"w"}]`,
+    expected: arr2,
   },
   {
-    input: `[
+    input: `{"subtitles":[
+      {"index":1,"content":"x","translated":"y"},
+      {"index":2,"content":"v","translated":"w"},`,
+    expected: arr2,
+  },
+  {
+    input: `{"subtitles":[
       {"index":1,"content":"x","translated":"y"},
       {"index":2,"content":"v","translated":"w"}`,
     expected: arr2,
   },
   {
-    input: `[
+    input: `{"subtitles":[
       {"index":1,"content":"x","translated":"y"},
       {"index":2,"content":"v","translated":"w"`,
     expected: arr1,
   },
   {
-    input: `[
+    input: `{"subtitles":[
       {"index":1,"content":"x","translated":"y"},
       {"index":2,"content":"v","transla`,
     expected: arr1,
   },
   {
-    input: `[{"index":1,"content":"x","translated":"y"},`,
+    input: `{"subtitles":[{"index":1,"content":"x","translated":"y"}]`,
     expected: arr1,
   },
   {
-    input: `[{"index":1,"content":"x","translated":"y"`,
-    expected: [],
+    input: `{"subtitles":[{"index":1,"content":"x","translated":"y"},`,
+    expected: arr1,
   },
   {
-    input: `[{"index":1,"cont"`,
-    expected: [],
+    input: `{"subtitles":[{"index":1,"content":"x","translated":"y"}`,
+    expected: arr1,
+  },
+  {
+    input: `{"subtitles":[{"index":1,"content":"x","translated":"y"`,
+    expected: wrapSub([]),
+  },
+  {
+    input: `{"subtitles":[{"index":1,"content":"x","translated":"y`,
+    expected: wrapSub([]),
+  },
+  {
+    input: `{"subtitles":[{"index":1,"cont"`,
+    expected: wrapSub([]),
+  },
+  {
+    input: `{"subtitles":[{"`,
+    expected: wrapSub([]),
+  },
+  {
+    input: `{"subtitles"`,
+    expected: wrapSub([]),
+  },
+  {
+    input: `{"subtitles`,
+    expected: wrapSub([]),
+  },
+  {
+    input: `{"`,
+    expected: wrapSub([]),
   },
 ]
+
+describe("isEscaped", () => {
+  test("1", () => expect(isEscaped("", 0)).toBe(false))
+  test("2", () => expect(isEscaped("a", 0)).toBe(false))
+  test("3", () => expect(isEscaped("\\a", 1)).toBe(true))
+  test("4", () => expect(isEscaped("\\\\a", 2)).toBe(false))
+  test("5", () => expect(isEscaped("\\\\\\a", 3)).toBe(true))
+  test("6", () => expect(isEscaped("\\\\\\\\", 3)).toBe(true))
+  test("7", () => expect(isEscaped("\\\\\\\\\\", 4)).toBe(false))
+  test("8", () => expect(isEscaped("\\\\", 0)).toBe(false))
+  test("9", () => expect(isEscaped("\\\\", 1)).toBe(true))
+})
 
 describe("parse & repair json", () => {
   testData.forEach(({ input, expected }, i) => {

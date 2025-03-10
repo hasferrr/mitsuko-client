@@ -23,60 +23,68 @@ export function cleanUpJsonResponse(response: string): string {
   const jsonString = keepOnlyWrapped(removedThink, a, b).replace(a, '').replace(b, '')
     || keepOnlyWrapped(removedThink, b, b).replaceAll(b, '')
     || removedThink.replaceAll(a, '').replaceAll(b, '')
-    || '[]'
+    || `{"subtitles":[]}`
   return jsonString
+}
+
+export function isEscaped(str: string, index: number): boolean {
+  let backslashes = 0
+  for (let i = index - 1; i >= 0 && str[i] === '\\'; i--) {
+    backslashes++
+  }
+  return backslashes > 0 && backslashes % 2 !== 0
 }
 
 export function repairJson(input: string): string {
   input = input.trim()
-  let openBraces = 0, closeBraces = 0, lastBalancedIndex = 1
-  let inString = false
-  let quoteChar: "'" | '"' | null = null
+
+  type OpenBracket = "{" | "["
+  type CloseBracket = "}" | "]"
+  type Index = number
+
+  const stack: [OpenBracket, Index][] = []
+  const candidate = new Set(["{", "[", "}", "]"])
+  const map = new Map<OpenBracket, CloseBracket>()
+  map.set("{", "}")
+  map.set("[", "]")
+
+  let lastBalancedIndex = 0
 
   for (let i = 0; i < input.length; i++) {
     const char = input[i]
+    if (candidate.has(char) && isEscaped(input, i)) continue
 
-    // The current character is a quote `"` or `'` and it's not escaped.
-    if ((char === '"' || char === "'") && input[i - 1] !== '\\') {
-      let backslashes = 0
-      for (let j = i - 1; j >= 0 && input[j] === "\\"; j--) {
-        backslashes++
+    if (char === "{") {
+      stack.push([char, i])
+    } else if (char === "[") {
+      stack.push([char, i])
+    } else if (char === "}") {
+      if (stack[stack.length - 1][0] === "{") {
+        stack.pop()
+        lastBalancedIndex = i + 1
       }
-      if (backslashes % 2 !== 0) {
-        if (inString && quoteChar === char) {
-          // we've found the closing quote of the string
-          inString = false
-          quoteChar = null
-        } else if (!inString) {
-          // we've encountered the opening quote of a new string
-          inString = true
-          quoteChar = char
-        }
-      }
-    }
-
-    // Determining the last index where the braces are balanced
-    if (!inString) {
-      if (char === '{') openBraces++
-      else if (char === '}') closeBraces++
-      if (openBraces === closeBraces && openBraces > 0) {
+    } else if (char === "]") {
+      if (stack[stack.length - 1][0] === "[") {
+        stack.pop()
         lastBalancedIndex = i + 1
       }
     }
   }
 
-  if (openBraces === 0) {
-    return input
+  if (lastBalancedIndex === 0) {
+    return `{"subtitles":[]}`
   }
 
-  let result = input.slice(0, lastBalancedIndex).trim()
-  if (result.endsWith(',')) {
-    result = result.slice(0, -1)
+  input = input.slice(0, lastBalancedIndex).trim()
+
+  while (stack.length > 0 && stack[stack.length - 1][1] > lastBalancedIndex) {
+    stack.pop()
   }
-  if (result.startsWith('[') && !result.endsWith(']')) {
-    result += ']'
+  while (stack.length > 0) {
+    input += map.get(stack.pop()![0])
   }
-  return result
+
+  return input
 }
 
 export function getThink(response: string): string {
@@ -89,14 +97,16 @@ export function getContent(response: string): string {
 }
 
 export function parseTranslationJson(response: string): SubOnlyTranslated[] {
-  const subtitles = JSON.parse(repairJson(cleanUpJsonResponse(response))) as SubtitleNoTimeNoActorTranslated[]
+  const repaired = repairJson(cleanUpJsonResponse(response))
+  const parsed = JSON.parse(repaired) as Record<"subtitles", SubtitleNoTimeNoActorTranslated[]> | SubtitleNoTimeNoActorTranslated[]
+  const subtitles = Array.isArray(parsed) ? parsed : parsed.subtitles
   return subtitles.map((sub) => ({
     index: sub.index,
     translated: sub.translated || "",
   }))
 }
 
-export function parseTranslationJsonStrict(response: string): SubOnlyTranslated[] {
+export function parseTranslationArrayStrict(response: string): SubOnlyTranslated[] {
   const subtitles = JSON.parse(cleanUpJsonResponse(response)) as SubtitleNoTimeNoActorTranslated[]
   return subtitles.map((sub) => ({
     index: sub.index,

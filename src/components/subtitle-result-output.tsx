@@ -6,7 +6,7 @@ import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { Button } from "./ui/button"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
-import { parseTranslationJsonStrict } from "@/lib/parser"
+import { parseTranslationArrayStrict } from "@/lib/parser"
 import { cn } from "@/lib/utils"
 
 
@@ -72,7 +72,7 @@ export const SubtitleResultOutput = memo(() => {
 
   const handleParseAndSave = () => {
     try {
-      const parsed = parseTranslationJsonStrict(editValue)
+      const parsed = parseTranslationArrayStrict(editValue)
       setJsonResponse(parsed)
       setIsParseError(false)
     } catch {
