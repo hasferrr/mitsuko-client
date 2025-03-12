@@ -90,3 +90,34 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Set the default width of the scrollbar to zero */
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Change the scrollbar width on hover */
+.overflow-y-auto:hover::-webkit-scrollbar,
+.overflow-auto:hover::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Set the track color */
+.overflow-y-auto::-webkit-scrollbar-track,
+.overflow-auto::-webkit-scrollbar-track {
+  background: none;
+}
+
+/* Set the thumb color */
+.overflow-y-auto::-webkit-scrollbar-thumb,
+.overflow-auto::-webkit-scrollbar-thumb {
+  background: rgba(136, 136, 136, 0.3);
+  border-radius: 6px;
+}
+
+/* Set the thumb color on hover */
+.overflow-y-auto::-webkit-scrollbar-thumb:hover,
+.overflow-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(175, 175, 175, 0.3);
+}
