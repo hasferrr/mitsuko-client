@@ -39,9 +39,11 @@ export function Navbar() {
             alt="Logo"
             className="w-6 h-6 object-cover"
           />
-          <Link href="/" className="font-semibold">Mitsuko</Link>
+          <Link href="/" className="font-semibold">
+            Mitsuko
+          </Link>
         </div>
-        <nav className="items-center gap-6 text-sm hidden md:flex">
+        <nav className="items-center gap-6 text-sm hidden lg:flex">
           <NavLinks isMobile={false} />
         </nav>
         <div className="flex items-center gap-2 ml-auto">
@@ -59,15 +61,17 @@ export function Navbar() {
           </Button>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className="lg:hidden">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[250px] bg-background/95 backdrop-blur">
-              <SheetHeader>
-                <SheetTitle>Mitsuko</SheetTitle>
+            <SheetContent side="left" className="w-[250px] p-8">
+              <SheetHeader className="pb-0">
+                <SheetTitle className="text-xl font-semibold text-left">
+                  Mitsuko
+                </SheetTitle>
               </SheetHeader>
-              <nav className="flex flex-col items-start gap-6 text-sm mt-8">
+              <nav className="flex flex-col items-start gap-6 text-[15px] mt-6 font-semibold">
                 <NavLinks isMobile={true} setOpen={setOpen} />
               </nav>
             </SheetContent>
