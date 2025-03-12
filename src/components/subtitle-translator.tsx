@@ -35,6 +35,7 @@ import {
   StructuredOutputSwitch,
   FullContextMemorySwitch,
   AdvancedSettingsResetButton,
+  BetterContextCachingSwitch,
 } from "./settings-inputs"
 import {
   ContextCompletion,
@@ -128,18 +129,17 @@ export default function SubtitleTranslator() {
   const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
+  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.isBetterContextCaching)
   const resetIndex = useAdvancedSettingsStore((state) => state.resetIndex)
 
   // Translation Store
   const response = useTranslationStore((state) => state.response)
   const isTranslating = useTranslationStore((state) => state.isTranslating)
-  const betterContextCaching = useTranslationStore((state) => state.betterContextCaching)
   const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
   const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
   const appendJsonResponse = useTranslationStore((state) => state.appendJsonResponse)
-  const setBetterContextCaching = useTranslationStore((state) => state.setBetterContextCaching)
 
   // History Store & State
   const addHistory = useHistoryStore((state) => state.addHistory)
@@ -335,17 +335,17 @@ export default function SubtitleTranslator() {
 
       // For Limited Context Memory
       if (!isUseFullContextMemory) {
-        // When betterContextCaching is TRUE
+        // When isBetterContextCaching is TRUE
         // Only wake the last (pair of) context.
         context = [
           context[context.length - 2],
           context[context.length - 1],
         ]
 
-        // When betterContextCaching is FALSE
+        // When isBetterContextCaching is FALSE
         // Assume: size (split size) >= contextMemorySize
         // Slice maximum of contextMemorySize of dialogues
-        if (!betterContextCaching && context.length >= 2) {
+        if (!isBetterContextCaching && context.length >= 2) {
           if (size < limitedContextMemorySize) {
             console.error(
               "Split size should be greater than or equal to context memory size " +
@@ -838,6 +838,7 @@ export default function SubtitleTranslator() {
                   <MaxCompletionTokenInput />
                   <StructuredOutputSwitch />
                   <FullContextMemorySwitch />
+                  <BetterContextCachingSwitch />
                   <AdvancedSettingsResetButton />
                 </CardContent>
               </Card>

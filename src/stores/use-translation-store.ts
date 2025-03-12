@@ -15,8 +15,6 @@ interface TranslationStore {
   setJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
   appendJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
   abortControllerRef: React.RefObject<AbortController>
-  betterContextCaching: boolean
-  setBetterContextCaching: (bool: boolean) => void
   translateSubtitles: (requestBody: any, apiKey: string, isFree: boolean) => Promise<{ parsed: SubOnlyTranslated[], raw: string }>
   stopTranslation: () => void
 }
@@ -30,8 +28,6 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
   setJsonResponse: (jsonResponse) => set({ jsonResponse }),
   appendJsonResponse: (newArr) => set((state) => ({ jsonResponse: [...state.jsonResponse, ...newArr] })),
   abortControllerRef: { current: abortedAbortController() },
-  betterContextCaching: true,
-  setBetterContextCaching: (bool) => set({ betterContextCaching: bool }),
   stopTranslation: () => get().abortControllerRef.current?.abort(),
   translateSubtitles: async (requestBody, apiKey, isFree) => {
     const buffer = await handleStream(

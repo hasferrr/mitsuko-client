@@ -466,7 +466,33 @@ export const FullContextMemorySwitch = memo(() => {
         When enabled, it's using all previous chunks to improve translation
         consistency and accuracy, but increases token usage and the risk of hitting
         input token limits. Best for models with large context windows (64k+ tokens).
-        When disabled, it's only including the last 5 dialogues from the previous chunk.
+        When disabled, it's only including the last previous chunk.
+      </p>
+    </div>
+  )
+})
+
+export const BetterContextCachingSwitch = memo(() => {
+  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.isBetterContextCaching)
+  const setIsBetterContextCaching = useAdvancedSettingsStore((state) => state.setIsBetterContextCaching)
+  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium">Better Context Caching</label>
+        <Switch
+          checked={isBetterContextCaching || isUseFullContextMemory}
+          onCheckedChange={setIsBetterContextCaching}
+          disabled={isUseFullContextMemory}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Hit the cache to reduce input token cost significantly.
+        When <span className="font-semibold">Full Context Memory</span> is disabled
+        AND when <span className="font-semibold">Better Context Caching</span> is enabled,
+        it will use the last previous chunk as a context.
+        Otherwise, it's only take the last 5 dialogues from the previous chunk.
       </p>
     </div>
   )
