@@ -56,7 +56,6 @@ export const handleStream = async (
       return await handleStream(setResponse, abortControllerRef, requestUrl, requestHeader, requestBody, attempt + 1)
     }
 
-    await sleep(500)
     abortControllerRef.current.abort()
     return buffer
 

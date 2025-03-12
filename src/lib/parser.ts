@@ -93,7 +93,7 @@ export function getThink(response: string): string {
 
 export function getContent(response: string): string {
   const removedThink = removeWrapped(response, '<think>', '</think>')
-  return removedThink.trim()
+  return removedThink
 }
 
 export function parseTranslationJson(response: string): SubOnlyTranslated[] {

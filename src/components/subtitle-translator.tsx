@@ -91,6 +91,8 @@ import { toast } from "sonner"
 import { SubtitleTools } from "./subtitle-tools"
 import { SubtitleProgress } from "./subtitle-progress"
 import { SubtitleResultOutput } from "./subtitle-result-output"
+import { getContent } from "@/lib/parser"
+import { createContextMemory } from "@/lib/context-memory"
 
 
 type DownloadOption = "original" | "translated" | "both"
@@ -131,11 +133,13 @@ export default function SubtitleTranslator() {
   // Translation Store
   const response = useTranslationStore((state) => state.response)
   const isTranslating = useTranslationStore((state) => state.isTranslating)
+  const betterContextCaching = useTranslationStore((state) => state.betterContextCaching)
   const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
   const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
   const appendJsonResponse = useTranslationStore((state) => state.appendJsonResponse)
+  const setBetterContextCaching = useTranslationStore((state) => state.setBetterContextCaching)
 
   // History Store & State
   const addHistory = useHistoryStore((state) => state.addHistory)
@@ -223,11 +227,12 @@ export default function SubtitleTranslator() {
     // Prepare context for the first chunk
     let context: ContextCompletion[] = []
 
+    // TODO: split by number of split size
     if (startIndex > 1) {
       const limitedContext = Math.max(0, adjustedStartIndex - limitedContextMemorySize)
       context.push({
         role: "user",
-        content: subtitles
+        content: createContextMemory(subtitles
           .slice(
             isUseFullContextMemory ? 0 : limitedContext,
             adjustedStartIndex,
@@ -236,11 +241,12 @@ export default function SubtitleTranslator() {
             index: chunk.index,
             actor: chunk.actor,
             content: chunk.content,
-          })),
+          }))
+        ),
       })
       context.push({
         role: "assistant",
-        content: subtitles
+        content: createContextMemory(subtitles
           .slice(
             isUseFullContextMemory ? 0 : limitedContext,
             adjustedStartIndex,
@@ -249,7 +255,8 @@ export default function SubtitleTranslator() {
             index: chunk.index,
             content: chunk.content,
             translated: chunk.translated,
-          })),
+          }))
+        ),
       })
     }
 
@@ -262,11 +269,13 @@ export default function SubtitleTranslator() {
       console.log(JSON.parse(JSON.stringify(context)))
 
       const requestBody = {
-        subtitles: chunk.map((s) => ({
-          index: s.index,
-          actor: s.actor,
-          content: s.content,
-        })),
+        subtitles: {
+          subtitles: chunk.map((s) => ({
+            index: s.index,
+            actor: s.actor,
+            content: s.content,
+          }))
+        },
         sourceLanguage,
         targetLanguage,
         contextDocument,
@@ -283,8 +292,11 @@ export default function SubtitleTranslator() {
       }
 
       let tlChunk: SubOnlyTranslated[] = []
+      let rawResponse = ""
       try {
-        tlChunk = await translateSubtitles(requestBody, isUseCustomModel ? apiKey : "", !isUseCustomModel)
+        const result = await translateSubtitles(requestBody, isUseCustomModel ? apiKey : "", !isUseCustomModel)
+        tlChunk = result.parsed
+        rawResponse = result.raw
         allRawResponses.push(useTranslationStore.getState().response)
         console.log("result: ", tlChunk)
       } catch {
@@ -314,34 +326,43 @@ export default function SubtitleTranslator() {
       // Update context for next chunk
       context.push({
         role: "user",
-        content: requestBody.subtitles
+        content: createContextMemory(requestBody.subtitles)
       })
       context.push({
         role: "assistant",
-        content: requestBody.subtitles.map((s, subIndex) => ({
-          index: s.index,
-          content: s.content,
-          translated: tlChunk[subIndex]?.translated || "",
-        })),
+        content: getContent(rawResponse),
       })
 
-      // Edit the Context - Only for Limited Context Memory
-      // Assume: size (split size) >= contextMemorySize
-      // Mutate the context, only take the last (pair of) context.
-      // Slice maximum of contextMemorySize of dialogues
-      if (!isUseFullContextMemory && context.length >= 2) {
-        if (size < limitedContextMemorySize) {
-          console.error(
-            "Split size should be greater than or equal to context memory size " +
-            "The code below only takes the last (pair of) context"
-          )
-        }
+      // For Limited Context Memory
+      if (!isUseFullContextMemory) {
+        // When betterContextCaching is TRUE
+        // Only wake the last (pair of) context.
         context = [
           context[context.length - 2],
           context[context.length - 1],
         ]
-        context[0].content = context[0].content.slice(-limitedContextMemorySize)
-        context[1].content = context[1].content.slice(-limitedContextMemorySize)
+
+        // When betterContextCaching is FALSE
+        // Assume: size (split size) >= contextMemorySize
+        // Slice maximum of contextMemorySize of dialogues
+        if (!betterContextCaching && context.length >= 2) {
+          if (size < limitedContextMemorySize) {
+            console.error(
+              "Split size should be greater than or equal to context memory size " +
+              "The code below only takes the last (pair of) context"
+            )
+          }
+
+          const lastUser = requestBody.subtitles.subtitles
+          const lastAssistant = requestBody.subtitles.subtitles.map((s, subIndex) => ({
+            index: s.index,
+            content: s.content,
+            translated: tlChunk[subIndex]?.translated || "",
+          }))
+
+          context[0].content = createContextMemory(lastUser.slice(-limitedContextMemorySize))
+          context[1].content = createContextMemory(lastAssistant.slice(-limitedContextMemorySize))
+        }
       }
 
       // Process the next chunk

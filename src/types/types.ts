@@ -56,12 +56,12 @@ export interface SubtitleEvent {
 
 export interface CompletionUser {
   role: "user"
-  content: SubtitleNoTime[]
+  content: string
 }
 
 export interface CompletionAssistant {
   role: "assistant"
-  content: SubtitleNoTimeNoActorTranslated[]
+  content: string
 }
 
 export type ContextCompletion = CompletionUser | CompletionAssistant
