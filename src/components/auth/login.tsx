@@ -3,26 +3,15 @@
 import { supabase } from "@/services/supabase"
 import { useEffect, useState } from "react"
 import { Button } from "../ui/button"
-import { useSessionStore } from "@/stores/use-session-store"
+import { useSessionStore } from "@/contexts/session-context"
 
 export function Login() {
-  const { session, setSession } = useSessionStore()
+  const session = useSessionStore((state) => state.session)
+  const setSession = useSessionStore((state) => state.setSession)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-
-    return () => subscription.unsubscribe()
   }, [])
 
   const signUp = async () => {
