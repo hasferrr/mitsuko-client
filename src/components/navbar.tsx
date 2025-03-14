@@ -56,8 +56,10 @@ export function Navbar() {
           <Button variant="ghost" size="icon" onClick={() => setIsDarkModeGlobal(!isDarkModeGlobal)}>
             {isDarkModeGlobal ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
-          <Button variant="ghost" size="icon">
-            <LogIn className="h-5 w-5" />
+          <Button variant="ghost">
+            <Link href="/auth/login">
+              <LogIn className="h-5 w-5" />
+            </Link>
           </Button>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
