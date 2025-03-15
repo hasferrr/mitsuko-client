@@ -58,8 +58,9 @@ export function Navbar() {
           <Button variant="ghost" size="icon" onClick={() => setIsDarkModeGlobal(!isDarkModeGlobal)}>
             {isDarkModeGlobal ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
-          <Link href="/auth/login">
-            <Button variant="ghost" className="mx-0 px-2" size={session ? "icon" : undefined}>
+          {/* <Link href="/auth/login"> */}
+          <>
+            <Button variant="ghost" className="mx-0 px-2 cursor-not-allowed" size={session ? "icon" : undefined}>
               {session ? (
                 <UserRound className="h-5 w-5" />
               ) : (
@@ -69,7 +70,8 @@ export function Navbar() {
                 </>
               )}
             </Button>
-          </Link>
+          </>
+          {/* </Link> */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="lg:hidden">

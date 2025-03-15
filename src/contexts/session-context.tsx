@@ -1,4 +1,4 @@
-import { supabase } from '@/services/supabase'
+// import { supabase } from '@/services/supabase'
 import { useSessionStore } from '@/stores/use-session-store'
 import { createContext, PropsWithChildren, useEffect } from 'react'
 
@@ -8,23 +8,26 @@ export default function SessionStoreProvider({ children }: PropsWithChildren) {
   const setSession = useSessionStore((state) => state.setSession)
 
   useEffect(() => {
-    if (typeof window === "undefined") return
+    // if (typeof window === "undefined") return
 
-    supabase.auth.getSession()
-      .then(({ data: { session } }) => {
-        setSession(session)
-      })
-      .catch((error) => {
-        console.error('Failed to fetch session:', error)
-      })
+    // supabase.auth.getSession()
+    //   .then(({ data: { session } }) => {
+    //     setSession(session)
+    //   })
+    //   .catch((error) => {
+    //     console.error('Failed to fetch session:', error)
+    //   })
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
+    // const {
+    //   data: { subscription },
+    // } = supabase.auth.onAuthStateChange((_event, session) => {
+    //   setSession(session)
+    // })
 
-    return () => subscription.unsubscribe()
+    // return () => subscription.unsubscribe()
+
+    // disable temporarily
+    setSession(true as unknown as null)
   }, [])
 
   return (
