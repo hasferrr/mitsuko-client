@@ -21,6 +21,7 @@ import {
   AlignCenter,
   Box,
   SquareChartGantt,
+  LogInIcon,
 } from "lucide-react"
 import { SubtitleList } from "./subtitle-list"
 import {
@@ -94,6 +95,7 @@ import { SubtitleProgress } from "./subtitle-progress"
 import { SubtitleResultOutput } from "./subtitle-result-output"
 import { getContent } from "@/lib/parser"
 import { createContextMemory } from "@/lib/context-memory"
+import { useSessionStore } from "@/stores/use-session-store"
 
 
 type DownloadOption = "original" | "translated" | "both"
@@ -144,6 +146,9 @@ export default function SubtitleTranslator() {
   // History Store & State
   const addHistory = useHistoryStore((state) => state.addHistory)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+
+  // Other Store
+  const session = useSessionStore((state) => state.session)
 
   // Other State
   const [activeTab, setActiveTab] = useState(isTranslating ? "result" : "basic")
@@ -655,8 +660,8 @@ export default function SubtitleTranslator() {
           <div className="grid grid-cols-2 gap-4 mt-4">
             <Button
               className="gap-2"
-              onClick={handleStartTranslation} // Use the new function
-              disabled={isTranslating}
+              onClick={handleStartTranslation}
+              disabled={isTranslating || !session}
             >
               {isTranslating ? (
                 <>
@@ -666,7 +671,7 @@ export default function SubtitleTranslator() {
               ) : (
                 <>
                   <Play className="h-4 w-4" />
-                  Start Translation
+                  {session ? "Start Translation" : "Sign In to Start"}
                 </>
               )}
             </Button>

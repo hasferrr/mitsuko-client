@@ -24,6 +24,7 @@ import { getContent } from "@/lib/parser"
 import { minMax, cn } from "@/lib/utils"
 import { MaxCompletionTokenInput, ModelSelection } from "./settings-inputs"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
+import { useSessionStore } from "@/stores/use-session-store"
 
 
 interface FileItem {
@@ -68,6 +69,9 @@ export const ContextExtractor = () => {
     setSelectedFiles,
     setIsBatchMode,
   } = useExtractionInputStore()
+
+  // Other Store
+  const session = useSessionStore((state) => state.session)
 
   const episodeNumberInputRef = useRef<HTMLInputElement | null>(null)
   const subtitleContentRef = useRef<HTMLTextAreaElement | null>(null)
@@ -456,7 +460,11 @@ export const ContextExtractor = () => {
 
       {/* Bottom Controls */}
       <div className="lg:col-span-2 flex items-center justify-center gap-4 flex-wrap">
-        <Button className="gap-2 w-[152px]" onClick={handleStartExtraction} disabled={isExtracting || isBatchMode}>
+        <Button
+          className="gap-2 w-[152px]"
+          onClick={handleStartExtraction}
+          disabled={isExtracting || isBatchMode || !session}
+        >
           {isExtracting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -465,7 +473,9 @@ export const ContextExtractor = () => {
           ) : (
             <>
               <Play className="h-4 w-4" />
-              {isBatchMode ? "Coming Soon" : "Start Extraction"}
+              {isBatchMode ? "Coming Soon" : (
+                !!session ? "Start Extraction" : "Sign In to Start"
+              )}
             </>
           )}
         </Button>

@@ -46,6 +46,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
+import { useSessionStore } from "@/stores/use-session-store"
 
 
 const languages = [
@@ -76,6 +77,8 @@ export default function Transcription() {
     setTranscriptionText,
     setTranscriptSubtitles,
   } = useTranscriptionStore()
+
+  const session = useSessionStore((state) => state.session)
 
   const [selectedLanguage, setSelectedLanguage] = useState(languages[0].value)
   const [selectedModel, setSelectedModel] = useState(models[0].value)
@@ -287,9 +290,10 @@ export default function Transcription() {
               </div>
 
               <div className="pt-4 flex gap-2">
+                {/* Start Button */}
                 <Button
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                  disabled={!file || isTranscribing || isExceeded}
+                  disabled={!file || isTranscribing || isExceeded || !session}
                   onClick={handleStartTranscription}
                 >
                   {isTranscribing ? (
@@ -300,10 +304,11 @@ export default function Transcription() {
                   ) : (
                     <>
                       <Wand2 className="h-4 w-4" />
-                      Transcribe
+                      {session ? "Transcribe" : "Sign in to Start"}
                     </>
                   )}
                 </Button>
+
                 {/* Stop Button */}
                 <Button
                   variant="outline"
