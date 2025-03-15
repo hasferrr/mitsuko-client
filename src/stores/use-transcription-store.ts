@@ -57,13 +57,15 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         const formData = new FormData()
         formData.append("audio", file)
 
-        await handleStream(
-          get().setTranscriptionText,
-          get().abortControllerRef,
-          TRANSCRIPT_URL,
-          {},
-          formData,
-        )
+        await handleStream({
+          setResponse: get().setTranscriptionText,
+          abortControllerRef: get().abortControllerRef,
+          isFree: true,
+          apiKey: "",
+          requestUrl: TRANSCRIPT_URL,
+          requestHeader: {},
+          requestBody: formData,
+        })
 
         get().parseTranscription()
       },

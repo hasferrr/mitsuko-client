@@ -22,16 +22,17 @@ export const useExtractionStore = create<ExtractionStore>()(persist((set, get) =
   setIsExtracting: (isExtracting) => set({ isExtracting }),
   stopExtraction: () => get().abortControllerRef.current.abort(),
   extractContext: async (requestBody, apiKey, isFree) => {
-    await handleStream(
-      get().setContextResult,
-      get().abortControllerRef,
-      isFree ? EXTRACT_CONTEXT_URL_FREE : EXTRACT_CONTEXT_URL,
-      {
-        Authorization: isFree ? "" : `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+    await handleStream({
+      setResponse: get().setContextResult,
+      abortControllerRef: get().abortControllerRef,
+      isFree,
+      apiKey,
+      requestUrl: isFree ? EXTRACT_CONTEXT_URL_FREE : EXTRACT_CONTEXT_URL,
+      requestHeader: {
+        "Content-Type": "application/json"
       },
-      JSON.stringify(requestBody),
-    )
+      requestBody: JSON.stringify(requestBody),
+    })
   },
 }),
   {

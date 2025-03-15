@@ -30,16 +30,17 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
   abortControllerRef: { current: abortedAbortController() },
   stopTranslation: () => get().abortControllerRef.current?.abort(),
   translateSubtitles: async (requestBody, apiKey, isFree) => {
-    const buffer = await handleStream(
-      get().setResponse,
-      get().abortControllerRef,
-      isFree ? TRANSLATE_URL_FREE : TRANSLATE_URL,
-      {
-        Authorization: isFree ? "" : `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+    const buffer = await handleStream({
+      setResponse: get().setResponse,
+      abortControllerRef: get().abortControllerRef,
+      isFree,
+      apiKey,
+      requestUrl: isFree ? TRANSLATE_URL_FREE : TRANSLATE_URL,
+      requestHeader: {
+        "Content-Type": "application/json"
       },
-      JSON.stringify(requestBody),
-    )
+      requestBody: JSON.stringify(requestBody),
+    })
 
     let parsedResponse: SubOnlyTranslated[] = []
     try {

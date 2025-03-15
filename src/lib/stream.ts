@@ -1,13 +1,31 @@
+import { useSessionStore } from "@/stores/use-session-store"
 import { sleep } from "./utils"
 
-export const handleStream = async (
+interface handleStreamParams {
   setResponse: (buffer: string) => void,
   abortControllerRef: React.RefObject<AbortController>,
+  isFree: boolean,
+  apiKey: string,
   requestUrl: string,
   requestHeader: Record<string, string>,
   requestBody: BodyInit,
-  attempt: number = 0,
-): Promise<string> => {
+  attempt?: number,
+}
+
+export const handleStream = async (params: handleStreamParams): Promise<string> => {
+  const {
+    setResponse,
+    abortControllerRef,
+    isFree,
+    apiKey,
+    requestUrl,
+    requestHeader,
+    requestBody,
+    attempt = 0,
+  } = params
+
+  const accessToken = useSessionStore.getState().session?.access_token
+
   setResponse("")
 
   if (!abortControllerRef.current.signal.aborted) {
@@ -20,7 +38,11 @@ export const handleStream = async (
   try {
     const res = await fetch(requestUrl, {
       method: "POST",
-      headers: requestHeader,
+      headers: {
+        ...requestHeader,
+        Authorization: accessToken ? `Bearer ${accessToken}` : "",
+        "api-key": !isFree ? `Bearer ${apiKey}` : "",
+      },
       body: requestBody,
       signal: abortControllerRef.current.signal,
     })
@@ -53,7 +75,7 @@ export const handleStream = async (
     if (!buffer.trim() && attempt < 3 && !abortControllerRef.current.signal.aborted) {
       console.log("Retrying...")
       await sleep(3000)
-      return await handleStream(setResponse, abortControllerRef, requestUrl, requestHeader, requestBody, attempt + 1)
+      return await handleStream({ ...params, attempt: attempt + 1 })
     }
 
     abortControllerRef.current.abort()
