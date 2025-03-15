@@ -11,12 +11,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { NavLinks } from "@/components/nav-links"
-import { LogIn, Moon, Sun, Loader2, Menu } from "lucide-react"
+import { LogIn, Moon, Sun, Loader2, Menu, UserRound } from "lucide-react"
 import { useThemeStore } from "@/stores/use-theme-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useExtractionStore } from "@/stores/use-extraction-store"
 import { NAVBAR_IMG_LINK } from "@/constants/external-links"
 import { useTranscriptionStore } from "@/stores/use-transcription-store"
+import { useSessionStore } from "@/stores/use-session-store"
 
 export function Navbar() {
   const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)
@@ -24,6 +25,7 @@ export function Navbar() {
   const isTranslating = useTranslationStore(state => state.isTranslating)
   const isExtracting = useExtractionStore(state => state.isExtracting)
   const isTranscribing = useTranscriptionStore(state => state.isTranscribing)
+  const session = useSessionStore((state) => state.session)
 
   const isProcessing = isTranslating || isExtracting || isTranscribing
   const [open, setOpen] = useState(false)
@@ -56,11 +58,18 @@ export function Navbar() {
           <Button variant="ghost" size="icon" onClick={() => setIsDarkModeGlobal(!isDarkModeGlobal)}>
             {isDarkModeGlobal ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
-          <Button variant="ghost">
-            <Link href="/auth/login">
-              <LogIn className="h-5 w-5" />
-            </Link>
-          </Button>
+          <Link href="/auth/login">
+            <Button variant="ghost" className="mx-0 px-2" size={session ? "icon" : undefined}>
+              {session ? (
+                <UserRound className="h-5 w-5" />
+              ) : (
+                <>
+                  <LogIn className="h-5 w-5" />
+                  Sign in
+                </>
+              )}
+            </Button>
+          </Link>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="lg:hidden">
