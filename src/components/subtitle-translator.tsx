@@ -274,6 +274,7 @@ export default function SubtitleTranslator() {
       console.log(JSON.parse(JSON.stringify(context)))
 
       const requestBody = {
+        title: title.slice(0, 150),
         subtitles: {
           subtitles: chunk.map((s) => ({
             index: s.index,
