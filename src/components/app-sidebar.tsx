@@ -5,8 +5,8 @@ import {
   AudioWaveform,
   BookOpen,
   Disc,
-  Folders,
   HistoryIcon,
+  House,
   Languages,
 } from "lucide-react"
 
@@ -24,16 +24,11 @@ import { CHANGE_LOG_LINK, DISCORD_LINK } from "@/constants/external-links"
 
 // This is sample data.
 const data = {
-  user: {
-    name: "yuki",
-    email: "e@mail.com",
-    avatar: "",
-  },
   navMain: [
     {
       title: "Dashboard",
       url: "/",
-      icon: Folders,
+      icon: House,
     },
     {
       title: "Translate",
@@ -89,7 +84,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.links} label="Links" noDropDown noMore newTabLink />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
