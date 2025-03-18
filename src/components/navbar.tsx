@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { NavbarLinks } from "@/components/navbar-links"
 import { Moon, Sun, Loader2 } from "lucide-react"
 import { useThemeStore } from "@/stores/use-theme-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
@@ -31,21 +30,17 @@ export function Navbar() {
         </div>
         <Breadcrumb>
           <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="/">
-                <div className="flex items-center gap-2">
-                  <img
-                    width={4 * 6}
-                    height={4 * 6}
-                    src={NAVBAR_IMG_LINK}
-                    alt="Logo"
-                    className="w-6 h-6 object-cover"
-                  />
-                  <Link href="/" className="text-sm">
-                    Mitsuko
-                  </Link>
-                </div>
-              </BreadcrumbLink>
+            <BreadcrumbItem className="hidden md:block text-foreground hover:underline">
+              <Link href="/" className="flex items-center gap-2">
+                <img
+                  width={4 * 6}
+                  height={4 * 6}
+                  src={NAVBAR_IMG_LINK}
+                  alt="Logo"
+                  className="w-6 h-6 object-cover"
+                />
+                Mitsuko
+              </Link>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="hidden md:block" />
             <BreadcrumbItem>
