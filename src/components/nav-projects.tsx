@@ -25,6 +25,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Project } from "@/types/project"
+import { useProjectStore } from "@/stores/use-project-store"
 
 interface NavProjectsProps {
   projects: Project[],
@@ -40,6 +41,7 @@ export function NavProjects({
   addButtonFn,
 }: NavProjectsProps) {
   const { isMobile } = useSidebar()
+  const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -47,7 +49,7 @@ export function NavProjects({
       <SidebarMenu>
         {projects.map((project) => (
           <SidebarMenuItem key={project.id}>
-            <SidebarMenuButton>
+            <SidebarMenuButton onClick={() => setCurrentProject(project)}>
               <span>{project.name}</span>
             </SidebarMenuButton>
             <DropdownMenu>
