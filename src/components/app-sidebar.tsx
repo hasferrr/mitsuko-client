@@ -32,7 +32,7 @@ const data = {
     },
     {
       title: "Translate",
-      url: "/",
+      url: "/translate",
       icon: Languages,
     },
     {
