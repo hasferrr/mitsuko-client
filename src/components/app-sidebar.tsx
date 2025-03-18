@@ -65,11 +65,13 @@ const data = {
       title: "Discord",
       url: DISCORD_LINK,
       icon: Disc,
+      newTab: true,
     },
     {
       title: "Changelog",
       url: CHANGE_LOG_LINK,
       icon: HistoryIcon,
+      newTab: true,
     },
   ],
 }

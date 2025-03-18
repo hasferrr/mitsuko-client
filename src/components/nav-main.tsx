@@ -10,11 +10,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 
 interface Item {
   title: string
   url: string
   icon?: LucideIcon
+  newTab?: boolean
 }
 
 interface NavMainProps {
@@ -34,7 +36,11 @@ export function NavMain({
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
-            <Link href={item.url}>
+            <Link
+              href={item.url}
+              target={cn(item.newTab && "_blank")}
+              rel={cn(item.newTab && "noopener noreferrer")}
+            >
               <SidebarMenuButton tooltip={item.title}>
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
