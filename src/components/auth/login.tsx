@@ -35,7 +35,7 @@ export function Login() {
   if (!mounted || !_hasHydrated) return null
 
   return (
-    <div className="mx-auto flex flex-col gap-4 items-center justify-center max-w-5xl my-10 md:min-h-[22rem] min-h-[20rem]">
+    <div className="mx-auto flex flex-col gap-4 items-center justify-center">
       {!session ? (
         <Button onClick={signUp}>Sign in with Google</Button>
       ) : (
