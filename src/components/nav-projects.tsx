@@ -4,8 +4,8 @@ import {
   Folder,
   Forward,
   MoreHorizontal,
+  PlusCircle,
   Trash2,
-  type LucideIcon,
 } from "lucide-react"
 
 import {
@@ -24,26 +24,18 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import Link from "next/link"
+import { Project } from "@/types/project"
 
 interface NavProjectsProps {
-  projects: {
-    name: string
-    url: string
-    icon?: LucideIcon
-  }[],
-  noDropDown?: boolean,
-  noMore?: boolean,
+  projects: Project[],
+  addButton?: boolean,
   label?: string,
-  newTabLink?: boolean,
 }
 
 export function NavProjects({
   projects,
-  noDropDown,
-  noMore,
+  addButton,
   label,
-  newTabLink,
 }: NavProjectsProps) {
   const { isMobile } = useSidebar()
 
@@ -51,54 +43,47 @@ export function NavProjects({
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>{label ? label : "Projects"}</SidebarGroupLabel>
       <SidebarMenu>
-        {projects.map((item) => (
-          <SidebarMenuItem key={item.name}>
+        {projects.map((project) => (
+          <SidebarMenuItem key={project.id}>
             <SidebarMenuButton asChild>
-              <Link
-                href={item.url}
-                target={newTabLink ? "_blank" : undefined}
-                rel={newTabLink ? "noopener noreferrer" : undefined}
-              >
-                {item.icon  && <item.icon />}
-                <span>{item.name}</span>
-              </Link>
+              <button>
+                <span>{project.name}</span>
+              </button>
             </SidebarMenuButton>
-            {!noDropDown && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction showOnHover>
-                    <MoreHorizontal />
-                    <span className="sr-only">More</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-48 rounded-lg"
-                  side={isMobile ? "bottom" : "right"}
-                  align={isMobile ? "end" : "start"}
-                >
-                  <DropdownMenuItem>
-                    <Folder className="text-muted-foreground" />
-                    <span>View Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Forward className="text-muted-foreground" />
-                    <span>Share Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Trash2 className="text-muted-foreground" />
-                    <span>Delete Project</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuAction showOnHover>
+                  <MoreHorizontal />
+                  <span className="sr-only">More</span>
+                </SidebarMenuAction>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-48 rounded-lg"
+                side={isMobile ? "bottom" : "right"}
+                align={isMobile ? "end" : "start"}
+              >
+                <DropdownMenuItem>
+                  <Folder className="text-muted-foreground" />
+                  <span>View Project</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Forward className="text-muted-foreground" />
+                  <span>Share Project</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Trash2 className="text-muted-foreground" />
+                  <span>Delete Project</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        {!noMore && (
+        {!addButton && (
           <SidebarMenuItem>
             <SidebarMenuButton className="text-sidebar-foreground/70">
-              <MoreHorizontal className="text-sidebar-foreground/70" />
-              <span>More</span>
+              <PlusCircle className="text-sidebar-foreground/70" />
+              <span>Add Project</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         )}

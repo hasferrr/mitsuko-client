@@ -48,16 +48,31 @@ const data = {
   ],
   projects: [
     {
+      id: "1",
       name: "Design Engineering",
-      url: "/",
+      translations: [],
+      transcriptions: [],
+      extractions: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
+      id: "2",
       name: "Sales & Marketing",
-      url: "/",
+      translations: [],
+      transcriptions: [],
+      extractions: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
+      id: "3",
       name: "Travel",
-      url: "/",
+      translations: [],
+      transcriptions: [],
+      extractions: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
   ],
   links: [
@@ -82,7 +97,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader></SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} noMore />
+        <NavProjects projects={data.projects} />
         <NavMain items={data.links} label="Links" />
       </SidebarContent>
       <SidebarFooter>
