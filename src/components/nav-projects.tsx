@@ -28,14 +28,16 @@ import { Project } from "@/types/project"
 
 interface NavProjectsProps {
   projects: Project[],
-  addButton?: boolean,
   label?: string,
+  addButton?: boolean,
+  addButtonFn?: () => void,
 }
 
 export function NavProjects({
   projects,
-  addButton,
   label,
+  addButton,
+  addButtonFn,
 }: NavProjectsProps) {
   const { isMobile } = useSidebar()
 
@@ -45,10 +47,8 @@ export function NavProjects({
       <SidebarMenu>
         {projects.map((project) => (
           <SidebarMenuItem key={project.id}>
-            <SidebarMenuButton asChild>
-              <button>
-                <span>{project.name}</span>
-              </button>
+            <SidebarMenuButton>
+              <span>{project.name}</span>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -81,7 +81,10 @@ export function NavProjects({
         ))}
         {!addButton && (
           <SidebarMenuItem>
-            <SidebarMenuButton className="text-sidebar-foreground/70">
+            <SidebarMenuButton
+              className="text-sidebar-foreground/70"
+              onClick={addButtonFn}
+            >
               <PlusCircle className="text-sidebar-foreground/70" />
               <span>Add Project</span>
             </SidebarMenuButton>

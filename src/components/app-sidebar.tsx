@@ -64,13 +64,19 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const projects = useProjectStore((state) => state.projects)
+  const createProject = useProjectStore((state) => state.createProject)
 
   return (
     <Sidebar collapsible="icon" variant="floating" {...props}>
       <SidebarHeader></SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={projects} />
+        <NavProjects
+          projects={projects}
+          addButtonFn={() => {
+            createProject("New Project " + crypto.randomUUID().slice(0, 3))
+          }}
+        />
         <NavMain items={data.links} label="Links" />
       </SidebarContent>
       <SidebarFooter>
