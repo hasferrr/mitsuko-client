@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navbar"
 import { useThemeStore } from "@/stores/use-theme-store"
 import { PropsWithChildren } from "react"
 import SessionStoreProvider from "@/contexts/session-context"
+import ProjectStoreProvider from "@/contexts/project-context"
 import { AppSidebarWrapper } from "@/components/app-sidebar-wrapper"
 import { cn } from "@/lib/utils"
 
@@ -32,7 +33,9 @@ export default function Layout({ children }: PropsWithChildren) {
 function Providers({ children }: PropsWithChildren) {
   return (
     <SessionStoreProvider>
-      {children}
+      <ProjectStoreProvider>
+        {children}
+      </ProjectStoreProvider>
     </SessionStoreProvider>
   )
 }

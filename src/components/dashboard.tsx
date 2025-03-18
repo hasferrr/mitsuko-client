@@ -10,18 +10,9 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Project, Translation, Transcription, Extraction } from "@/types/project"
+import { Translation, Transcription, Extraction } from "@/types/project"
 import { DashboardItemList } from "./dashboard-item-list"
-
-const currentProject: Project = {
-  id: "1",
-  name: "Anime Series Localization",
-  translations: ["trans-1", "trans-2"],
-  transcriptions: ["transcript-1"],
-  extractions: ["extract-1"],
-  createdAt: new Date("2024-03-15T08:00:00"),
-  updatedAt: new Date("2024-03-15T10:00:00"),
-}
+import { useProjectStore } from "@/stores/use-project-store"
 
 const translations: Translation[] = [
   {
@@ -75,6 +66,8 @@ const extractions: Extraction[] = [
 ]
 
 export const Dashboard = () => {
+  const currentProject = useProjectStore((state) => state.currentProject)
+
   const translationComponentList = translations.map((translation) => (
     <DashboardItemList
       key={translation.id}
@@ -119,6 +112,10 @@ export const Dashboard = () => {
       }
     />
   ))
+
+  if (!currentProject) {
+    return <div>No Project Selected</div>
+  }
 
   return (
     <div className="flex-1 p-6">

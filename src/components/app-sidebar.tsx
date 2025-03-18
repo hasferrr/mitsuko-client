@@ -21,8 +21,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { CHANGE_LOG_LINK, DISCORD_LINK } from "@/constants/external-links"
+import { useProjectStore } from "@/stores/use-project-store"
 
-// This is sample data.
 const data = {
   navMain: [
     {
@@ -46,35 +46,6 @@ const data = {
       icon: BookOpen,
     },
   ],
-  projects: [
-    {
-      id: "1",
-      name: "Design Engineering",
-      translations: [],
-      transcriptions: [],
-      extractions: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: "2",
-      name: "Sales & Marketing",
-      translations: [],
-      transcriptions: [],
-      extractions: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: "3",
-      name: "Travel",
-      translations: [],
-      transcriptions: [],
-      extractions: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ],
   links: [
     {
       title: "Discord",
@@ -92,12 +63,14 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const projects = useProjectStore((state) => state.projects)
+
   return (
     <Sidebar collapsible="icon" variant="floating" {...props}>
       <SidebarHeader></SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavProjects projects={projects} />
         <NavMain items={data.links} label="Links" />
       </SidebarContent>
       <SidebarFooter>
