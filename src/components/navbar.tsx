@@ -11,6 +11,7 @@ import { NAVBAR_IMG_LINK } from "@/constants/external-links"
 import { useTranscriptionStore } from "@/stores/use-transcription-store"
 import { SidebarTrigger } from "./ui/sidebar"
 import { Separator } from "./ui/separator"
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "./ui/breadcrumb"
 
 export function Navbar() {
   const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)
@@ -28,26 +29,43 @@ export function Navbar() {
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="h-4" />
         </div>
-        <div className="flex items-center gap-2 mr-4">
-          <img
-            width={4 * 6}
-            height={4 * 6}
-            src={NAVBAR_IMG_LINK}
-            alt="Logo"
-            className="w-6 h-6 object-cover"
-          />
-          <Link href="/" className="text-sm hover:text-foreground/80 text-foreground/60 dark:text-foreground/80 transition-all">
-            Mitsuko
-          </Link>
-        </div>
-        <nav className="items-center gap-6 text-sm hidden md:flex">
-          <NavbarLinks />
-        </nav>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink href="/">
+                <div className="flex items-center gap-2">
+                  <img
+                    width={4 * 6}
+                    height={4 * 6}
+                    src={NAVBAR_IMG_LINK}
+                    alt="Logo"
+                    className="w-6 h-6 object-cover"
+                  />
+                  <Link href="/" className="text-sm">
+                    Mitsuko
+                  </Link>
+                </div>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="line-clamp-1">
+                Current Project
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="block" />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="line-clamp-1">
+                Translation
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <div className="flex items-center gap-2 ml-auto">
           {isProcessing && (
             <div className="flex items-center gap-2 text-sm text-foreground/80 mr-4">
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Processing...</span>
+              <span className="hidden md:block">Processing...</span>
             </div>
           )}
           <Button variant="ghost" size="icon" onClick={() => setIsDarkModeGlobal(!isDarkModeGlobal)} className="transition-none">

@@ -62,12 +62,12 @@ const data = {
   ],
   links: [
     {
-      name: "Discord",
+      title: "Discord",
       url: DISCORD_LINK,
       icon: Disc,
     },
     {
-      name: "Changelog",
+      title: "Changelog",
       url: CHANGE_LOG_LINK,
       icon: HistoryIcon,
     },
@@ -81,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} noMore />
-        <NavProjects projects={data.links} label="Links" noDropDown noMore newTabLink />
+        <NavMain items={data.links} label="Links" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

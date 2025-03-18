@@ -26,13 +26,7 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 
-export function NavProjects({
-  projects,
-  noDropDown,
-  noMore,
-  label,
-  newTabLink,
-}: {
+interface NavProjectsProps {
   projects: {
     name: string
     url: string
@@ -42,7 +36,15 @@ export function NavProjects({
   noMore?: boolean,
   label?: string,
   newTabLink?: boolean,
-}) {
+}
+
+export function NavProjects({
+  projects,
+  noDropDown,
+  noMore,
+  label,
+  newTabLink,
+}: NavProjectsProps) {
   const { isMobile } = useSidebar()
 
   return (
