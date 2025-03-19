@@ -1,33 +1,40 @@
 import { Button } from "../ui/button"
-import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter } from "../ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter, DialogDescription } from "../ui/dialog"
 
 interface DeleteDialogueProps {
+  handleDelete: () => void
   isDeleteModalOpen: boolean
   setIsDeleteModalOpen: (open: boolean) => void
-  handleDelete: () => void
+  isProcessing?: boolean
 }
 
 export const DeleteDialogue = ({
+  handleDelete,
   isDeleteModalOpen,
   setIsDeleteModalOpen,
-  handleDelete,
-}: DeleteDialogueProps) => {
-  return (
-    <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Confirm Deletion</DialogTitle>
-        </DialogHeader>
-        <p>Are you sure you want to delete this project?</p>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
-            Cancel
-          </Button>
-          <Button variant="destructive" onClick={handleDelete}>
-            Delete
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
+  isProcessing = false
+}: DeleteDialogueProps) => (
+  <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+      </DialogHeader>
+      <DialogDescription className="hidden" />
+      <p className="text-sm">
+        Are you sure you want to delete this item?
+      </p>
+      <DialogFooter>
+        <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
+          Cancel
+        </Button>
+        <Button
+          variant="destructive"
+          onClick={handleDelete}
+          disabled={isProcessing}
+        >
+          {isProcessing ? "Deleting..." : "Delete"}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+)

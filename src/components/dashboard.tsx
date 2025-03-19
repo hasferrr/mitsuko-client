@@ -20,9 +20,9 @@ import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter } from "
 import { Input } from "./ui/input"
 import { DeleteDialogue } from "./ui-custom/delete-dialogue"
 import { db } from "@/lib/db/db"
-import { createTranslation } from "@/lib/db/translation"
-import { createTranscription } from "@/lib/db/transcription"
-import { createExtraction } from "@/lib/db/extraction"
+import { createTranslation, deleteTranslation, updateTranslation } from "@/lib/db/translation"
+import { createTranscription, deleteTranscription, updateTranscription } from "@/lib/db/transcription"
+import { createExtraction, deleteExtraction, updateExtraction } from "@/lib/db/extraction"
 
 export const Dashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -63,11 +63,17 @@ export const Dashboard = () => {
       title={translation.title}
       description={`${translation.parsed.type.toUpperCase()} • ${translation.subtitles.length} Lines`}
       date={translation.updatedAt.toLocaleDateString()}
-      action={
-        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      }
+      handleEdit={async (newName) => {
+        await updateTranslation(translation.id, { title: newName })
+        loadProjects()
+        // TODO: handle when current item is processing (also below)
+      }}
+      handleDelete={async () => {
+        if (!currentProject) return
+        await deleteTranslation(currentProject.id, translation.id)
+        loadProjects()
+        // TODO: handle when current item is processing (also below)
+      }}
     />
   ))
 
@@ -78,11 +84,15 @@ export const Dashboard = () => {
       title={transcription.title}
       description={`${transcription.transcriptSubtitles.length} segments`}
       date={transcription.createdAt.toLocaleDateString()}
-      action={
-        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      }
+      handleEdit={async (newName) => {
+        await updateTranscription(transcription.id, { title: newName })
+        loadProjects()
+      }}
+      handleDelete={async () => {
+        if (!currentProject) return
+        await deleteTranscription(currentProject.id, transcription.id)
+        loadProjects()
+      }}
     />
   ))
 
@@ -93,11 +103,15 @@ export const Dashboard = () => {
       title={`Episode ${extraction.episodeNumber || "X"}`}
       description={extraction.contextResult}
       date={extraction.updatedAt.toLocaleDateString()}
-      action={
-        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      }
+      handleEdit={async (newName) => {
+        await updateExtraction(extraction.id, { episodeNumber: newName })
+        loadProjects()
+      }}
+      handleDelete={async () => {
+        if (!currentProject) return
+        await deleteExtraction(currentProject.id, extraction.id)
+        loadProjects()
+      }}
     />
   ))
 
