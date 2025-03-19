@@ -52,71 +52,6 @@ export const Dashboard = () => {
     loadData()
   }, [currentProject])
 
-  const translationComponentList = translations.map((translation) => (
-    <DashboardItemList
-      key={translation.id}
-      id={translation.id}
-      projectId={currentProject!.id}
-      type="translation"
-      icon={<Globe className="h-5 w-5 text-blue-500" />}
-      title={translation.title}
-      description={`${translation.parsed.type.toUpperCase()} • ${translation.subtitles.length} Lines`}
-      date={translation.updatedAt.toLocaleDateString()}
-      handleEdit={async (newName) => {
-        await updateTranslation(translation.id, { title: newName })
-        loadProjects()
-        // TODO: handle when current item is processing (also below)
-      }}
-      handleDelete={async () => {
-        await deleteTranslation(currentProject!.id, translation.id)
-        loadProjects()
-        // TODO: handle when current item is processing (also below)
-      }}
-    />
-  ))
-
-  const transcriptionComponentList = transcriptions.map((transcription) => (
-    <DashboardItemList
-      key={transcription.id}
-      id={transcription.id}
-      projectId={currentProject!.id}
-      type="transcription"
-      icon={<Headphones className="h-5 w-5 text-green-500" />}
-      title={transcription.title}
-      description={`${transcription.transcriptSubtitles.length} segments`}
-      date={transcription.createdAt.toLocaleDateString()}
-      handleEdit={async (newName) => {
-        await updateTranscription(transcription.id, { title: newName })
-        loadProjects()
-      }}
-      handleDelete={async () => {
-        await deleteTranscription(currentProject!.id, transcription.id)
-        loadProjects()
-      }}
-    />
-  ))
-
-  const extractionComponentList = extractions.map((extraction) => (
-    <DashboardItemList
-      key={extraction.id}
-      id={extraction.id}
-      projectId={currentProject!.id}
-      type="extraction"
-      icon={<FileText className="h-5 w-5 text-purple-500" />}
-      title={`Episode ${extraction.episodeNumber || "X"}`}
-      description={extraction.contextResult}
-      date={extraction.updatedAt.toLocaleDateString()}
-      handleEdit={async (newName) => {
-        await updateExtraction(extraction.id, { episodeNumber: newName })
-        loadProjects()
-      }}
-      handleDelete={async () => {
-        await deleteExtraction(currentProject!.id, extraction.id)
-        loadProjects()
-      }}
-    />
-  ))
-
 
   if (!currentProject) {
     return <div className="p-6">No Project Selected</div>
@@ -131,6 +66,71 @@ export const Dashboard = () => {
     deleteProject(currentProject.id)
     setIsDeleteModalOpen(false)
   }
+
+  const translationComponentList = translations.map((translation) => (
+    <DashboardItemList
+      key={translation.id}
+      id={translation.id}
+      projectId={currentProject.id}
+      type="translation"
+      icon={<Globe className="h-5 w-5 text-blue-500" />}
+      title={translation.title}
+      description={`${translation.parsed.type.toUpperCase()} • ${translation.subtitles.length} Lines`}
+      date={translation.updatedAt.toLocaleDateString()}
+      handleEdit={async (newName) => {
+        await updateTranslation(translation.id, { title: newName })
+        loadProjects()
+        // TODO: handle when current item is processing (also below)
+      }}
+      handleDelete={async () => {
+        await deleteTranslation(currentProject.id, translation.id)
+        loadProjects()
+        // TODO: handle when current item is processing (also below)
+      }}
+    />
+  ))
+
+  const transcriptionComponentList = transcriptions.map((transcription) => (
+    <DashboardItemList
+      key={transcription.id}
+      id={transcription.id}
+      projectId={currentProject.id}
+      type="transcription"
+      icon={<Headphones className="h-5 w-5 text-green-500" />}
+      title={transcription.title}
+      description={`${transcription.transcriptSubtitles.length} segments`}
+      date={transcription.createdAt.toLocaleDateString()}
+      handleEdit={async (newName) => {
+        await updateTranscription(transcription.id, { title: newName })
+        loadProjects()
+      }}
+      handleDelete={async () => {
+        await deleteTranscription(currentProject.id, transcription.id)
+        loadProjects()
+      }}
+    />
+  ))
+
+  const extractionComponentList = extractions.map((extraction) => (
+    <DashboardItemList
+      key={extraction.id}
+      id={extraction.id}
+      projectId={currentProject.id}
+      type="extraction"
+      icon={<FileText className="h-5 w-5 text-purple-500" />}
+      title={`Episode ${extraction.episodeNumber || "X"}`}
+      description={extraction.contextResult}
+      date={extraction.updatedAt.toLocaleDateString()}
+      handleEdit={async (newName) => {
+        await updateExtraction(extraction.id, { episodeNumber: newName })
+        loadProjects()
+      }}
+      handleDelete={async () => {
+        await deleteExtraction(currentProject.id, extraction.id)
+        loadProjects()
+      }}
+    />
+  ))
 
   const NewTranslationButton = (
     <Button
