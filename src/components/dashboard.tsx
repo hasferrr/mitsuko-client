@@ -132,6 +132,64 @@ export const Dashboard = () => {
     setIsDeleteModalOpen(false)
   }
 
+  const NewTranslationButton = (
+    <Button
+      size="sm"
+      variant="outline"
+      className="line-clamp-2"
+      onClick={async () => {
+        await createTranslation(currentProject.id, {
+          title: `Subtitle ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
+          subtitles: [],
+          parsed: {
+            type: "srt",
+            data: null
+          }
+        })
+        loadProjects()
+      }}
+    >
+      New Translation
+    </Button>
+  )
+
+  const NewTranscriptionButton = (
+    <Button
+      size="sm"
+      variant="outline"
+      className="line-clamp-2"
+      onClick={async () => {
+        await createTranscription(currentProject.id, {
+          title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
+          transcriptionText: "",
+          transcriptSubtitles: []
+        })
+        loadProjects()
+      }}
+    >
+      New Transcription
+    </Button>
+  )
+
+  const NewExtractionButton = (
+    <Button
+      size="sm"
+      variant="outline"
+      className="line-clamp-2"
+      onClick={async () => {
+        await createExtraction(currentProject.id, {
+          episodeNumber: "",
+          subtitleContent: "",
+          previousContext: "",
+          contextResult: ""
+        })
+        loadProjects()
+      }}
+    >
+      New Extraction
+    </Button>
+  )
+
   return (
     <div className="flex-1 p-6">
       <div className="mb-6">
@@ -163,10 +221,10 @@ export const Dashboard = () => {
       />
 
       <Tabs defaultValue="overview" className="mb-6">
-        <TabsList className="bg-card border border-border p-1 rounded-lg">
+        <TabsList className="bg-card border border-border p-1 rounded-lg w-fit h-fit flex flex-wrap">
           <TabsTrigger value="overview" className="data-[state=active]:bg-secondary rounded-md">
             <LayoutDashboard className="h-4 w-4 mr-2" />
-            Overview
+            Overview ({translations.length + transcriptions.length + extractions.length})
           </TabsTrigger>
           <TabsTrigger value="translations" className="data-[state=active]:bg-secondary rounded-md">
             <Globe className="h-4 w-4 mr-2" />
@@ -187,21 +245,30 @@ export const Dashboard = () => {
           <div className="space-y-6">
 
             <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="text-sm font-medium mb-4">Translations</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium">Translations</h3>
+                {NewTranslationButton}
+              </div>
               <div className="space-y-3">
                 {translationComponentList}
               </div>
             </div>
 
             <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="text-sm font-medium mb-4">Transcriptions</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium">Transcriptions</h3>
+                {NewTranscriptionButton}
+              </div>
               <div className="space-y-3">
                 {transcriptionComponentList}
               </div>
             </div>
 
             <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="text-sm font-medium mb-4">Extractions</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium">Extractions</h3>
+                {NewExtractionButton}
+              </div>
               <div className="space-y-3">
                 {extractionComponentList}
               </div>
@@ -215,24 +282,7 @@ export const Dashboard = () => {
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium">All Translations</h3>
-              <Button
-                size="sm"
-                variant="outline"
-                className="line-clamp-2"
-                onClick={async () => {
-                  await createTranslation(currentProject.id, {
-                    title: `Subtitle ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
-                    subtitles: [],
-                    parsed: {
-                      type: "srt",
-                      data: null
-                    }
-                  })
-                  loadProjects()
-                }}
-              >
-                New Translation
-              </Button>
+              {NewTranslationButton}
             </div>
             <div className="space-y-3">
               {translationComponentList}
@@ -245,21 +295,7 @@ export const Dashboard = () => {
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium">All Transcriptions</h3>
-              <Button
-                size="sm"
-                variant="outline"
-                className="line-clamp-2"
-                onClick={async () => {
-                  await createTranscription(currentProject.id, {
-                    title: `Audio ${new Date().toLocaleDateString()}`,
-                    transcriptionText: "",
-                    transcriptSubtitles: []
-                  })
-                  loadProjects()
-                }}
-              >
-                New Transcription
-              </Button>
+              {NewTranscriptionButton}
             </div>
             <div className="space-y-3">
               {transcriptionComponentList}
@@ -272,22 +308,7 @@ export const Dashboard = () => {
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium">All Extractions</h3>
-              <Button
-                size="sm"
-                variant="outline"
-                className="line-clamp-2"
-                onClick={async () => {
-                  await createExtraction(currentProject.id, {
-                    episodeNumber: "",
-                    subtitleContent: "",
-                    previousContext: "",
-                    contextResult: ""
-                  })
-                  loadProjects()
-                }}
-              >
-                New Extraction
-              </Button>
+              {NewExtractionButton}
             </div>
             <div className="space-y-3">
               {extractionComponentList}
