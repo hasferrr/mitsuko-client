@@ -55,6 +55,8 @@ export const Dashboard = () => {
   const translationComponentList = translations.map((translation) => (
     <DashboardItemList
       key={translation.id}
+      id={translation.id}
+      type="translation"
       icon={<Globe className="h-5 w-5 text-blue-500" />}
       title={translation.title}
       description={`${translation.parsed.type.toUpperCase()} • ${translation.subtitles.length} Lines`}
@@ -65,8 +67,7 @@ export const Dashboard = () => {
         // TODO: handle when current item is processing (also below)
       }}
       handleDelete={async () => {
-        if (!currentProject) return
-        await deleteTranslation(currentProject.id, translation.id)
+        await deleteTranslation(currentProject!.id, translation.id)
         loadProjects()
         // TODO: handle when current item is processing (also below)
       }}
@@ -76,6 +77,8 @@ export const Dashboard = () => {
   const transcriptionComponentList = transcriptions.map((transcription) => (
     <DashboardItemList
       key={transcription.id}
+      id={transcription.id}
+      type="transcription"
       icon={<Headphones className="h-5 w-5 text-green-500" />}
       title={transcription.title}
       description={`${transcription.transcriptSubtitles.length} segments`}
@@ -85,8 +88,7 @@ export const Dashboard = () => {
         loadProjects()
       }}
       handleDelete={async () => {
-        if (!currentProject) return
-        await deleteTranscription(currentProject.id, transcription.id)
+        await deleteTranscription(currentProject!.id, transcription.id)
         loadProjects()
       }}
     />
@@ -95,6 +97,8 @@ export const Dashboard = () => {
   const extractionComponentList = extractions.map((extraction) => (
     <DashboardItemList
       key={extraction.id}
+      id={extraction.id}
+      type="extraction"
       icon={<FileText className="h-5 w-5 text-purple-500" />}
       title={`Episode ${extraction.episodeNumber || "X"}`}
       description={extraction.contextResult}
@@ -104,12 +108,12 @@ export const Dashboard = () => {
         loadProjects()
       }}
       handleDelete={async () => {
-        if (!currentProject) return
-        await deleteExtraction(currentProject.id, extraction.id)
+        await deleteExtraction(currentProject!.id, extraction.id)
         loadProjects()
       }}
     />
   ))
+
 
   if (!currentProject) {
     return <div className="p-6">No Project Selected</div>
