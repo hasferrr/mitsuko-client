@@ -74,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects
           projects={projects}
           addButtonFn={() => {
-            createProject("New Project " + crypto.randomUUID().slice(0, 3))
+            createProject("Project " + crypto.randomUUID().slice(0, 3))
           }}
         />
         <NavMain items={data.links} label="Links" />
