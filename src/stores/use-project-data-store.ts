@@ -14,6 +14,12 @@ interface ProjectDataStore {
   upsertTranslationData: (id: string, value: Translation) => void
   upsertTranscriptionData: (id: string, value: Transcription) => void
   upsertExtractionData: (id: string, value: Extraction) => void
+  removeTranslationData: (id: string) => void
+  removeTranscriptionData: (id: string) => void
+  removeExtractionData: (id: string) => void
+  renameTranslationData: (id: string, name: string) => void
+  renameTranscriptionData: (id: string, name: string) => void
+  renameExtractionData: (id: string, name: string) => void
 }
 
 export const useProjectDataStore = create<ProjectDataStore>((set, get) => ({
@@ -39,5 +45,35 @@ export const useProjectDataStore = create<ProjectDataStore>((set, get) => ({
 
   upsertExtractionData: (id, value) => {
     get().extractionData[id] = value
+  },
+
+  removeTranslationData: (id) => {
+    delete get().translationData[id]
+  },
+
+  removeTranscriptionData: (id) => {
+    delete get().transcriptionData[id]
+  },
+
+  removeExtractionData: (id) => {
+    delete get().extractionData[id]
+  },
+
+  renameTranslationData: (id, name) => {
+    if (get().translationData[id]) {
+      get().translationData[id].title = name
+    }
+  },
+
+  renameTranscriptionData: (id, name) => {
+    if (get().translationData[id]) {
+      get().translationData[id].title = name
+    }
+  },
+
+  renameExtractionData: (id, name) => {
+    if (get().extractionData[id]) {
+      get().extractionData[id].episodeNumber = name
+    }
   },
 }))
