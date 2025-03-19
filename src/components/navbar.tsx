@@ -55,8 +55,10 @@ export function Navbar() {
               <>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="line-clamp-1">
-                    {currentProject.name}
+                  <BreadcrumbPage className="line-clamp-1 hover:underline">
+                    <Link href="/">
+                      {currentProject.name}
+                    </Link>
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </>
