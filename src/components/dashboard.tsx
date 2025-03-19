@@ -1,12 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import {
   Globe,
   Headphones,
   LayoutDashboard,
-  MoreHorizontal,
   FileText,
   Edit,
   Trash,
@@ -16,8 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Translation, Transcription, Extraction } from "@/types/project"
 import { DashboardItemList } from "./dashboard-item-list"
 import { useProjectStore } from "@/stores/use-project-store"
-import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter } from "./ui/dialog"
-import { Input } from "./ui/input"
+import { EditDialogue } from "./ui-custom/edit-dialogue"
 import { DeleteDialogue } from "./ui-custom/delete-dialogue"
 import { db } from "@/lib/db/db"
 import { createTranslation, deleteTranslation, updateTranslation } from "@/lib/db/translation"
@@ -27,7 +24,6 @@ import { createExtraction, deleteExtraction, updateExtraction } from "@/lib/db/e
 export const Dashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [newProjectName, setNewProjectName] = useState("")
 
   const loadProjects = useProjectStore((state) => state.loadProjects)
   const currentProject = useProjectStore((state) => state.currentProject)
@@ -119,13 +115,8 @@ export const Dashboard = () => {
     return <div className="p-6">No Project Selected</div>
   }
 
-  const editProject = () => {
-    setIsEditModalOpen(true)
-    setNewProjectName(currentProject.name || "")
-  }
-
-  const handleSave = () => {
-    updateProject(currentProject.id, newProjectName.trim())
+  const handleSave = async (newName: string) => {
+    updateProject(currentProject.id, newName.trim())
     setIsEditModalOpen(false)
   }
 
@@ -139,7 +130,7 @@ export const Dashboard = () => {
       <div className="mb-6">
         <div className="text-2xl font-medium mb-2 flex gap-4 items-center">
           <h1>{currentProject.name}</h1>
-          <button onClick={editProject}>
+          <button onClick={() => setIsEditModalOpen(true)}>
             <Edit size={4 * 5} />
           </button>
           <button onClick={() => setIsDeleteModalOpen(true)}>
@@ -151,20 +142,12 @@ export const Dashboard = () => {
         </p>
       </div>
 
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Project Name</DialogTitle>
-          </DialogHeader>
-          <Input
-            value={newProjectName}
-            onChange={(e) => setNewProjectName(e.target.value)}
-          />
-          <DialogFooter>
-            <Button onClick={handleSave}>Save</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EditDialogue
+        isOpen={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        initialValue={currentProject.name}
+        onSave={handleSave}
+      />
 
       <DeleteDialogue
         handleDelete={handleDelete}

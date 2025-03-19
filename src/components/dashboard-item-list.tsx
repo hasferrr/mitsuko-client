@@ -3,9 +3,8 @@
 import { useState } from "react"
 import { Button } from "./ui/button"
 import { Edit, Trash } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "./ui/dialog"
-import { Input } from "./ui/input"
 import { DeleteDialogue } from "./ui-custom/delete-dialogue"
+import { EditDialogue } from "./ui-custom/edit-dialogue"
 
 export const DashboardItemList = ({
   icon,
@@ -24,18 +23,7 @@ export const DashboardItemList = ({
 }) => {
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [newName, setNewName] = useState(title)
   const [isProcessing, setIsProcessing] = useState(false)
-
-  const handleSave = async () => {
-    setIsProcessing(true)
-    try {
-      await handleEdit(newName)
-      setIsEditOpen(false)
-    } finally {
-      setIsProcessing(false)
-    }
-  }
 
   const handleConfirmDelete = async () => {
     setIsProcessing(true)
@@ -82,37 +70,21 @@ export const DashboardItemList = ({
         </div>
       </div>
 
-      {/* Edit Dialog */}
-      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogDescription className="hidden" />
-            <DialogTitle>Rename Item</DialogTitle>
-          </DialogHeader>
-          <Input
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSave()}
-          />
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsEditOpen(false)}
-              disabled={isProcessing}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={isProcessing || !newName.trim()}
-            >
-              {isProcessing ? "Saving..." : "Save Changes"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EditDialogue
+        isOpen={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        initialValue={title}
+        onSave={async (newValue) => {
+          setIsProcessing(true)
+          try {
+            await handleEdit(newValue)
+          } finally {
+            setIsProcessing(false)
+          }
+        }}
+        isProcessing={isProcessing}
+      />
 
-      {/* Delete Dialog */}
       <DeleteDialogue
         handleDelete={handleConfirmDelete}
         isDeleteModalOpen={isDeleteOpen}
