@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import {
   Globe,
@@ -7,12 +8,17 @@ import {
   LayoutDashboard,
   MoreHorizontal,
   FileText,
+  Edit,
+  Trash,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Translation, Transcription, Extraction } from "@/types/project"
 import { DashboardItemList } from "./dashboard-item-list"
 import { useProjectStore } from "@/stores/use-project-store"
+import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter } from "./ui/dialog"
+import { Input } from "./ui/input"
+import { DeleteDialogue } from "./ui-custom/delete-dialogue"
 
 const translations: Translation[] = [
   {
@@ -67,7 +73,12 @@ const extractions: Extraction[] = [
 ]
 
 export const Dashboard = () => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [newProjectName, setNewProjectName] = useState("")
   const currentProject = useProjectStore((state) => state.currentProject)
+  const updateProject = useProjectStore((state) => state.updateProject)
+  const deleteProject = useProjectStore((state) => state.deleteProject)
 
   const translationComponentList = translations.map((translation) => (
     <DashboardItemList
@@ -115,17 +126,61 @@ export const Dashboard = () => {
   ))
 
   if (!currentProject) {
-    return <div>No Project Selected</div>
+    return <div className="p-6">No Project Selected</div>
+  }
+
+  const editProject = () => {
+    setIsEditModalOpen(true)
+    setNewProjectName(currentProject.name || "")
+  }
+
+  const handleSave = () => {
+    updateProject(currentProject.id, newProjectName.trim())
+    setIsEditModalOpen(false)
+  }
+
+  const handleDelete = () => {
+    deleteProject(currentProject.id)
+    setIsDeleteModalOpen(false)
   }
 
   return (
     <div className="flex-1 p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-medium mb-2">{currentProject.name}</h1>
+        <div className="text-2xl font-medium mb-2 flex gap-4 items-center">
+          <h1>{currentProject.name}</h1>
+          <button onClick={editProject}>
+            <Edit size={4 * 5} />
+          </button>
+          <button onClick={() => setIsDeleteModalOpen(true)}>
+            <Trash size={4 * 5} />
+          </button>
+        </div>
         <p className="text-muted-foreground">
           Last updated: {currentProject.updatedAt.toLocaleDateString()}
         </p>
       </div>
+
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Project Name</DialogTitle>
+          </DialogHeader>
+          <Input
+            value={newProjectName}
+            onChange={(e) => setNewProjectName(e.target.value)}
+          />
+          <DialogFooter>
+            <Button onClick={handleSave}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <DeleteDialogue
+        handleDelete={handleDelete}
+        isDeleteModalOpen={isDeleteModalOpen}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+      />
 
       <Tabs defaultValue="overview" className="mb-6">
         <TabsList className="bg-card border border-border p-1 rounded-lg">

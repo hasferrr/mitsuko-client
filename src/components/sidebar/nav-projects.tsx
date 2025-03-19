@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  Folder,
   Forward,
   MoreHorizontal,
   PlusCircle,
@@ -12,7 +11,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -27,6 +25,8 @@ import {
 import { Project } from "@/types/project"
 import { useProjectStore } from "@/stores/use-project-store"
 import { redirect } from "next/navigation"
+import { DeleteDialogue } from "../ui-custom/delete-dialogue"
+import { useState } from "react"
 
 interface NavProjectsProps {
   projects: Project[],
@@ -43,6 +43,10 @@ export function NavProjects({
 }: NavProjectsProps) {
   const { isMobile } = useSidebar()
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
+  const deleteProject = useProjectStore((state) => state.deleteProject)
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [idToDelete, setIdToDelete] = useState("")
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -68,16 +72,14 @@ export function NavProjects({
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem>
-                  <Folder className="text-muted-foreground" />
-                  <span>View Project</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem disabled>
                   <Forward className="text-muted-foreground" />
                   <span>Share Project</span>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                  setIdToDelete(project.id)
+                  setIsDeleteModalOpen(true)
+                }}>
                   <Trash2 className="text-muted-foreground" />
                   <span>Delete Project</span>
                 </DropdownMenuItem>
@@ -96,6 +98,14 @@ export function NavProjects({
             </SidebarMenuButton>
           </SidebarMenuItem>
         )}
+        <DeleteDialogue
+          handleDelete={() => {
+            deleteProject(idToDelete)
+            setIsDeleteModalOpen(false)
+          }}
+          isDeleteModalOpen={isDeleteModalOpen}
+          setIsDeleteModalOpen={setIsDeleteModalOpen}
+        />
       </SidebarMenu>
     </SidebarGroup>
   )
