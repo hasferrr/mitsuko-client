@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun, Loader2 } from "lucide-react"
 import { useThemeStore } from "@/stores/use-theme-store"
@@ -10,11 +11,19 @@ import { NAVBAR_IMG_LINK } from "@/constants/external-links"
 import { useTranscriptionStore } from "@/stores/use-transcription-store"
 import { SidebarTrigger } from "./ui/sidebar"
 import { Separator } from "./ui/separator"
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "./ui/breadcrumb"
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, BreadcrumbPage } from "./ui/breadcrumb"
+import { useProjectStore } from "@/stores/use-project-store"
+import { capitalize } from "@/lib/utils"
 
 export function Navbar() {
+  const _pathname = usePathname()
+  const pathname = capitalize(_pathname.slice(1).replaceAll("-", " "))
+
   const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)
   const setIsDarkModeGlobal = useThemeStore(state => state.setIsDarkMode)
+
+  const currentProject = useProjectStore(state => state.currentProject)
+
   const isTranslating = useTranslationStore(state => state.isTranslating)
   const isExtracting = useExtractionStore(state => state.isExtracting)
   const isTranscribing = useTranscriptionStore(state => state.isTranscribing)
@@ -42,18 +51,26 @@ export function Navbar() {
                 Mitsuko
               </Link>
             </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="line-clamp-1">
-                Current Project
-              </BreadcrumbPage>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="line-clamp-1">
-                Translation
-              </BreadcrumbPage>
-            </BreadcrumbItem>
+            {currentProject && (
+              <>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="line-clamp-1">
+                    {currentProject.name}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </>
+            )}
+            {currentProject && pathname && (
+              <>
+                <BreadcrumbSeparator className="block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="line-clamp-1">
+                    {pathname}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </>
+            )}
           </BreadcrumbList>
         </Breadcrumb>
         <div className="flex items-center gap-2 ml-auto">

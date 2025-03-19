@@ -34,3 +34,10 @@ export function abortedAbortController() {
   controller.abort()
   return controller
 }
+
+export function capitalize(s: string): string {
+  if (!s) return s
+  const arr = s.split(" ")
+  arr.forEach((val, i) => arr[i] = val[0].toUpperCase() + val.slice(1))
+  return arr.join(" ")
+}
