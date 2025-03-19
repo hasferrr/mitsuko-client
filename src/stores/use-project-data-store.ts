@@ -12,6 +12,8 @@ interface ProjectDataStore {
   transcriptionData: Record<string, Transcription>
   extractionData: Record<string, Extraction>
   upsertTranslationData: (id: string, value: Translation) => void
+  upsertTranscriptionData: (id: string, value: Transcription) => void
+  upsertExtractionData: (id: string, value: Extraction) => void
 }
 
 export const useProjectDataStore = create<ProjectDataStore>((set, get) => ({
@@ -29,5 +31,13 @@ export const useProjectDataStore = create<ProjectDataStore>((set, get) => ({
 
   upsertTranslationData: (id, value) => {
     get().translationData[id] = value
-  }
+  },
+
+  upsertTranscriptionData: (id, value) => {
+    get().transcriptionData[id] = value
+  },
+
+  upsertExtractionData: (id, value) => {
+    get().extractionData[id] = value
+  },
 }))

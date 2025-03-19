@@ -56,6 +56,7 @@ export const Dashboard = () => {
     <DashboardItemList
       key={translation.id}
       id={translation.id}
+      projectId={currentProject!.id}
       type="translation"
       icon={<Globe className="h-5 w-5 text-blue-500" />}
       title={translation.title}
@@ -78,6 +79,7 @@ export const Dashboard = () => {
     <DashboardItemList
       key={transcription.id}
       id={transcription.id}
+      projectId={currentProject!.id}
       type="transcription"
       icon={<Headphones className="h-5 w-5 text-green-500" />}
       title={transcription.title}
@@ -98,6 +100,7 @@ export const Dashboard = () => {
     <DashboardItemList
       key={extraction.id}
       id={extraction.id}
+      projectId={currentProject!.id}
       type="extraction"
       icon={<FileText className="h-5 w-5 text-purple-500" />}
       title={`Episode ${extraction.episodeNumber || "X"}`}
