@@ -21,8 +21,8 @@ export const DashboardItemList = ({
             {icon}
           </div>
           <div>
-            <h4 className="text-sm font-medium">{title}</h4>
-            <p className="text-xs text-muted-foreground">{description}</p>
+            <h4 className="text-sm font-medium line-clamp-2">{title}</h4>
+            <p className="text-xs text-muted-foreground line-clamp-2">{description}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">

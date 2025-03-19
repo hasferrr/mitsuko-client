@@ -26,7 +26,14 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     set({ loading: true, error: null })
     try {
       const projects = await getAllProjects()
-      set({ projects, loading: false })
+      set((state) => ({
+        projects,
+        currentProject: (() => {
+          const curr = state.currentProject
+          return curr ? projects.find((pr) => pr.id === curr.id) : null
+        })(),
+        loading: false,
+      }))
     } catch (error) {
       set({ error: 'Failed to load projects', loading: false })
     }

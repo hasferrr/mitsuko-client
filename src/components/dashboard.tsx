@@ -20,12 +20,16 @@ import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter } from "
 import { Input } from "./ui/input"
 import { DeleteDialogue } from "./ui-custom/delete-dialogue"
 import { db } from "@/lib/db/db"
+import { createTranslation } from "@/lib/db/translation"
+import { createTranscription } from "@/lib/db/transcription"
+import { createExtraction } from "@/lib/db/extraction"
 
 export const Dashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [newProjectName, setNewProjectName] = useState("")
 
+  const loadProjects = useProjectStore((state) => state.loadProjects)
   const currentProject = useProjectStore((state) => state.currentProject)
   const updateProject = useProjectStore((state) => state.updateProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
@@ -44,9 +48,9 @@ export const Dashboard = () => {
         db.extractions.bulkGet(currentProject.extractions)
       ])
 
-      setTranslations(translationsData.filter((t): t is Translation => !!t))
-      setTranscriptions(transcriptionsData.filter((t): t is Transcription => !!t))
-      setExtractions(extractionsData.filter((e): e is Extraction => !!e))
+      setTranslations(translationsData.filter((t): t is Translation => !!t).reverse())
+      setTranscriptions(transcriptionsData.filter((t): t is Transcription => !!t).reverse())
+      setExtractions(extractionsData.filter((e): e is Extraction => !!e).reverse())
     }
 
     loadData()
@@ -86,8 +90,8 @@ export const Dashboard = () => {
     <DashboardItemList
       key={extraction.id}
       icon={<FileText className="h-5 w-5 text-purple-500" />}
-      title={`Episode ${extraction.episodeNumber}`}
-      description={`Context: ${extraction.previousContext.slice(0, 40)}...`}
+      title={`Episode ${extraction.episodeNumber || "X"}`}
+      description={extraction.contextResult}
       date={extraction.updatedAt.toLocaleDateString()}
       action={
         <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
@@ -207,9 +211,24 @@ export const Dashboard = () => {
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium">All Translations</h3>
-              <Link href="/translate">
-                <Button size="sm">New Translation</Button>
-              </Link>
+              <Button
+                size="sm"
+                variant="outline"
+                className="line-clamp-2"
+                onClick={async () => {
+                  await createTranslation(currentProject.id, {
+                    title: `Subtitle ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
+                    subtitles: [],
+                    parsed: {
+                      type: "srt",
+                      data: null
+                    }
+                  })
+                  loadProjects()
+                }}
+              >
+                New Translation
+              </Button>
             </div>
             <div className="space-y-3">
               {translationComponentList}
@@ -222,9 +241,21 @@ export const Dashboard = () => {
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium">All Transcriptions</h3>
-              <Link href="/transcribe">
-                <Button size="sm">New Transcription</Button>
-              </Link>
+              <Button
+                size="sm"
+                variant="outline"
+                className="line-clamp-2"
+                onClick={async () => {
+                  await createTranscription(currentProject.id, {
+                    title: `Audio ${new Date().toLocaleDateString()}`,
+                    transcriptionText: "",
+                    transcriptSubtitles: []
+                  })
+                  loadProjects()
+                }}
+              >
+                New Transcription
+              </Button>
             </div>
             <div className="space-y-3">
               {transcriptionComponentList}
@@ -237,9 +268,22 @@ export const Dashboard = () => {
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium">All Extractions</h3>
-              <Link href="/extract-context">
-                <Button size="sm">New Extraction</Button>
-              </Link>
+              <Button
+                size="sm"
+                variant="outline"
+                className="line-clamp-2"
+                onClick={async () => {
+                  await createExtraction(currentProject.id, {
+                    episodeNumber: "",
+                    subtitleContent: "",
+                    previousContext: "",
+                    contextResult: ""
+                  })
+                  loadProjects()
+                }}
+              >
+                New Extraction
+              </Button>
             </div>
             <div className="space-y-3">
               {extractionComponentList}
