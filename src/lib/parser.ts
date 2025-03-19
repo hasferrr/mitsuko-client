@@ -1,6 +1,6 @@
 import type { SubOnlyTranslated, SubtitleNoTimeNoActorTranslated } from "../types/types"
 
-function keepOnlyWrapped(text: string, a: string, b: string): string {
+export function keepOnlyWrapped(text: string, a: string, b: string): string {
   const startA = text.indexOf(a)
   if (startA === -1) return ''
   const startB = text.indexOf(b, startA + a.length)
@@ -8,7 +8,7 @@ function keepOnlyWrapped(text: string, a: string, b: string): string {
   return text.substring(startA, startB + b.length)
 }
 
-function removeWrapped(text: string, a: string, b: string): string {
+export function removeWrapped(text: string, a: string, b: string): string {
   const startA = text.indexOf(a)
   if (startA === -1) return text
   const startB = text.indexOf(b, startA + a.length)
