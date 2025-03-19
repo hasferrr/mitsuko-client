@@ -59,6 +59,7 @@ const extractions: Extraction[] = [
     episodeNumber: "12",
     subtitleContent: "Character introduction...",
     previousContext: "Opening scene...",
+    contextResult: "Context scene...",
     createdAt: new Date("2024-03-15T09:00:00"),
     updatedAt: new Date("2024-03-15T09:30:00"),
     projectId: "1"

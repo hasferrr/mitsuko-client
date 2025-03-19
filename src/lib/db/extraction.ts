@@ -4,7 +4,7 @@ import { db } from "./db"
 // Extraction CRUD functions
 export const createExtraction = async (
   projectId: string,
-  data: Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext">
+  data: Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">
 ): Promise<Extraction> => {
   return db.transaction('rw', db.projects, db.extractions, async () => {
     const id = crypto.randomUUID()

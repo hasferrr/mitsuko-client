@@ -42,6 +42,7 @@ export interface Extraction {
   episodeNumber: string
   subtitleContent: string
   previousContext: string
+  contextResult: string
   createdAt: Date
   updatedAt: Date
   projectId: string
