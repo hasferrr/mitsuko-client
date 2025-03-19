@@ -66,15 +66,27 @@ export const updateProject = async (id: string, update: Pick<Project, "name">): 
 }
 
 export const deleteProject = async (id: string): Promise<void> => {
-  return db.transaction('rw', db.projects, db.translations, db.transcriptions, db.extractions, async () => {
+  return db.transaction('rw', [db.projects, db.translations, db.transcriptions, db.extractions, db.projectOrders], async () => {
     const project = await db.projects.get(id)
     if (!project) return
+
+    const projectOrders = await db.projectOrders.get('main')
+    const filterOrders = async () => {
+      if (!projectOrders) return
+      await db.projectOrders.update('main', order => {
+        if (order) {
+          order.order = projectOrders.order.filter((orderId) => orderId !== id)
+          order.updatedAt = new Date()
+        }
+      })
+    }
 
     // Delete all related entities in single operations
     await Promise.all([
       db.translations.bulkDelete(project.translations),
       db.transcriptions.bulkDelete(project.transcriptions),
-      db.extractions.bulkDelete(project.extractions)
+      db.extractions.bulkDelete(project.extractions),
+      filterOrders(),
     ])
 
     await db.projects.delete(id)
