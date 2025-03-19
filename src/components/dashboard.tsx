@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import {
   Globe,
@@ -19,66 +19,38 @@ import { useProjectStore } from "@/stores/use-project-store"
 import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter } from "./ui/dialog"
 import { Input } from "./ui/input"
 import { DeleteDialogue } from "./ui-custom/delete-dialogue"
-
-const translations: Translation[] = [
-  {
-    id: "trans-1",
-    title: "Episode 12 Subtitles",
-    subtitles: [],
-    parsed: {
-      type: "ass",
-      data: null
-    },
-    createdAt: new Date("2024-03-15T08:30:00"),
-    updatedAt: new Date("2024-03-15T09:45:00"),
-    projectId: "1",
-  },
-  {
-    id: "trans-2",
-    title: "Episode 13 Subtitles",
-    subtitles: [],
-    parsed: {
-      type: "srt",
-      data: null
-    },
-    createdAt: new Date("2024-03-14T10:00:00"),
-    updatedAt: new Date("2024-03-14T12:30:00"),
-    projectId: "1",
-  }
-]
-
-const transcriptions: Transcription[] = [
-  {
-    id: "transcript-1",
-    title: "Episode 12 Audio Transcription",
-    transcriptionText: "",
-    transcriptSubtitles: [],
-    createdAt: new Date("2024-03-13T14:00:00"),
-    updatedAt: new Date("2024-03-13T16:30:00"),
-    projectId: "1"
-  }
-]
-
-const extractions: Extraction[] = [
-  {
-    id: "extract-1",
-    episodeNumber: "12",
-    subtitleContent: "Character introduction...",
-    previousContext: "Opening scene...",
-    contextResult: "Context scene...",
-    createdAt: new Date("2024-03-15T09:00:00"),
-    updatedAt: new Date("2024-03-15T09:30:00"),
-    projectId: "1"
-  }
-]
+import { db } from "@/lib/db/db"
 
 export const Dashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [newProjectName, setNewProjectName] = useState("")
+
   const currentProject = useProjectStore((state) => state.currentProject)
   const updateProject = useProjectStore((state) => state.updateProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
+
+  const [translations, setTranslations] = useState<Translation[]>([])
+  const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
+  const [extractions, setExtractions] = useState<Extraction[]>([])
+
+  useEffect(() => {
+    if (!currentProject) return
+
+    const loadData = async () => {
+      const [translationsData, transcriptionsData, extractionsData] = await Promise.all([
+        db.translations.bulkGet(currentProject.translations),
+        db.transcriptions.bulkGet(currentProject.transcriptions),
+        db.extractions.bulkGet(currentProject.extractions)
+      ])
+
+      setTranslations(translationsData.filter((t): t is Translation => !!t))
+      setTranscriptions(transcriptionsData.filter((t): t is Transcription => !!t))
+      setExtractions(extractionsData.filter((e): e is Extraction => !!e))
+    }
+
+    loadData()
+  }, [currentProject])
 
   const translationComponentList = translations.map((translation) => (
     <DashboardItemList
