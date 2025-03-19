@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Project } from "@/types/project"
 import { useProjectStore } from "@/stores/use-project-store"
+import { redirect } from "next/navigation"
 
 interface NavProjectsProps {
   projects: Project[],
@@ -49,7 +50,10 @@ export function NavProjects({
       <SidebarMenu>
         {projects.map((project) => (
           <SidebarMenuItem key={project.id}>
-            <SidebarMenuButton onClick={() => setCurrentProject(project)}>
+            <SidebarMenuButton onClick={() => {
+              setCurrentProject(project)
+              redirect("/")
+            }}>
               <span>{project.name}</span>
             </SidebarMenuButton>
             <DropdownMenu>
