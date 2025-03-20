@@ -10,7 +10,6 @@ import { Model } from "@/types/types"
 interface SettingsStore {
   sourceLanguage: string
   targetLanguage: string
-  selectedModel: string
   modelDetail: Model | null
   isUseCustomModel: boolean
   apiKey: string
@@ -19,7 +18,7 @@ interface SettingsStore {
   contextDocument: string
   setSourceLanguage: (language: string) => void
   setTargetLanguage: (language: string) => void
-  setSelectedModel: (model: string | Model) => void
+  setModelDetail: (model: Model) => void
   setIsUseCustomModel: (value: boolean) => void
   setApiKey: (key: string) => void
   setCustomBaseUrl: (url: string) => void
@@ -34,7 +33,6 @@ export const useSettingsStore = create<SettingsStore>()(
     (set) => ({
       sourceLanguage: DEFAULT_SOURCE_LANGUAGE,
       targetLanguage: DEFAULT_TARGET_LANGUAGE,
-      selectedModel: firstModel && firstModel.length > 0 ? firstModel[0].name : "",
       modelDetail: firstModel && firstModel.length > 0 ? firstModel[0] : null,
       isUseCustomModel: false,
       apiKey: "",
@@ -43,10 +41,7 @@ export const useSettingsStore = create<SettingsStore>()(
       contextDocument: "",
       setSourceLanguage: (language) => set({ sourceLanguage: language }),
       setTargetLanguage: (language) => set({ targetLanguage: language }),
-      setSelectedModel: (model: string | Model) => set({
-        selectedModel: typeof model === "string" ? model : model.name,
-        modelDetail: typeof model === "string" ? null : model,
-      }),
+      setModelDetail: (model) => set({ modelDetail: model }),
       setIsUseCustomModel: (value) => set({ isUseCustomModel: value }),
       setApiKey: (key) => set({ apiKey: key }),
       setCustomBaseUrl: (url) => set({ customBaseUrl: url }),

@@ -39,7 +39,7 @@ export const ContextExtractor = () => {
   const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
 
   // Settings Store
-  const selectedModel = useSettingsStore((state) => state.selectedModel)
+  const modelDetail = useSettingsStore((state) => state.modelDetail)
   const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
   const apiKey = useSettingsStore((state) => state.apiKey)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
@@ -217,7 +217,7 @@ export const ContextExtractor = () => {
         previous_context: previousContext,
       },
       baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
-      model: isUseCustomModel ? customModel : selectedModel,
+      model: isUseCustomModel ? customModel : modelDetail?.name || "",
       maxCompletionTokens: isMaxCompletionTokensAuto ? undefined : minMax(
         maxCompletionTokens,
         MAX_COMPLETION_TOKENS_MIN,

@@ -123,7 +123,7 @@ export default function SubtitleTranslator() {
   // Settings Store
   const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
   const targetLanguage = useSettingsStore((state) => state.targetLanguage)
-  const selectedModel = useSettingsStore((state) => state.selectedModel)
+  const modelDetail = useSettingsStore((state) => state.modelDetail)
   const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
   const customModel = useSettingsStore((state) => state.customModel)
@@ -294,7 +294,7 @@ export default function SubtitleTranslator() {
         targetLanguage,
         contextDocument,
         baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
-        model: isUseCustomModel ? customModel : selectedModel,
+        model: isUseCustomModel ? customModel : modelDetail?.name || "",
         temperature: minMax(temperature, TEMPERATURE_MIN, TEMPERATURE_MAX),
         maxCompletionTokens: isMaxCompletionTokensAuto ? undefined : minMax(
           maxCompletionTokens,

@@ -36,12 +36,12 @@ export function ModelSelector({
   const models = FREE_MODELS
   const [open, setOpen] = React.useState(false)
 
-  const selectedModel = useSettingsStore((state) => state.selectedModel)
-  const setSelectedModel = useSettingsStore((state) => state.setSelectedModel)
+  const modelDetail = useSettingsStore((state) => state.modelDetail)
+  const setModelDetail = useSettingsStore((state) => state.setModelDetail)
   const setIsUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
 
   const handleSelect = (model: Model) => {
-    setSelectedModel(model)
+    setModelDetail(model)
     setIsUseStructuredOutput(model.structuredOutput)
     setOpen(false)
   }
@@ -58,7 +58,7 @@ export function ModelSelector({
             className="w-full justify-between"
             disabled={disabled}
           >
-            {selectedModel ? selectedModel : "Select a model..."}
+            {modelDetail ? modelDetail.name : "Select a model..."}
             <ChevronsUpDown className="opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -80,7 +80,7 @@ export function ModelSelector({
                     <ModelItem
                       key={model.name}
                       model={model}
-                      isSelected={selectedModel === model.name}
+                      isSelected={modelDetail?.name === model.name}
                       onSelect={() => {
                         handleSelect(model)
                       }}
