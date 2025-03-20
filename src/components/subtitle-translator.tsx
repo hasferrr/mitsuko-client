@@ -245,6 +245,7 @@ export default function SubtitleTranslator() {
     setHasChanges(true)
     setActiveTab("result")
     setJsonResponse([])
+    await save(true)
 
     setTimeout(() => {
       window.scrollTo({
@@ -445,6 +446,8 @@ export default function SubtitleTranslator() {
         useSubtitleStore.getState().parsed,
       )
     }
+
+    await save(true)
   }
 
   const handleStopTranslation = () => {
