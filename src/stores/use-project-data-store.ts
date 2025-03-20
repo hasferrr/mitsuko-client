@@ -17,9 +17,13 @@ interface ProjectDataStore {
   saveData: (id: string, type: ProjectType, revalidate?: boolean) => Promise<void>
   upsertData: (id: string, type: ProjectType, value: Translation | Transcription | Extraction) => void
   removeData: (id: string, type: ProjectType) => void
+
+  translationData: Record<string, Translation>
+  transcriptionData: Record<string, Transcription>
+  extractionData: Record<string, Extraction>
 }
 
-export const useProjectDataStore = create<ProjectDataStore>((set) => ({
+export const useProjectDataStore = create<ProjectDataStore>((set, get) => ({
   currentTranslationId: null,
   currentTranscriptionId: null,
   currentExtractionId: null,
@@ -75,5 +79,15 @@ export const useProjectDataStore = create<ProjectDataStore>((set) => ({
     } else if (type === "extraction") {
       useExtractionDataStore.getState().removeData(id)
     }
+  },
+
+  get translationData() {
+    return useTranslationDataStore.getState().data
+  },
+  get transcriptionData() {
+    return useTranscriptionDataStore.getState().data
+  },
+  get extractionData() {
+    return useExtractionDataStore.getState().data
   },
 }))
