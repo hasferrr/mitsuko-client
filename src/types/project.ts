@@ -1,4 +1,4 @@
-import { SubtitleTranslated, Parsed, Subtitle } from "./types"
+import { SubtitleTranslated, Parsed, Subtitle, Model, SubOnlyTranslated } from "./types"
 
 export interface ProjectOrder {
   id: string
@@ -25,6 +25,9 @@ export interface Translation {
   createdAt: Date
   updatedAt: Date
   projectId: string
+  basicSettings: BasicSettings
+  advancedSettings: AdvancedSettings
+  response: ResponseTranslation
 }
 
 export interface Transcription {
@@ -46,4 +49,29 @@ export interface Extraction {
   createdAt: Date
   updatedAt: Date
   projectId: string
+}
+
+export interface BasicSettings {
+  sourceLanguage: string
+  targetLanguage: string
+  modelDetail: Model | null
+  isUseCustomModel: boolean
+  contextDocument: string
+}
+
+export interface AdvancedSettings {
+  temperature: number
+  startIndex: number
+  endIndex: number
+  splitSize: number
+  maxCompletionTokens: number
+  isUseStructuredOutput: boolean
+  isUseFullContextMemory: boolean
+  isBetterContextCaching: boolean
+  isMaxCompletionTokensAuto: boolean
+}
+
+export interface ResponseTranslation {
+  response: string
+  jsonResponse: SubOnlyTranslated[]
 }

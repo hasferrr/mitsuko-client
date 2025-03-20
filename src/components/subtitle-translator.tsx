@@ -121,27 +121,44 @@ export default function SubtitleTranslator() {
   const resetParsed = useSubtitleStore((state) => state.resetParsed)
 
   // Settings Store
-  const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
-  const targetLanguage = useSettingsStore((state) => state.targetLanguage)
-  const modelDetail = useSettingsStore((state) => state.modelDetail)
-  const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
-  const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
-  const customModel = useSettingsStore((state) => state.customModel)
-  const apiKey = useSettingsStore((state) => state.apiKey)
-  const contextDocument = useSettingsStore((state) => state.contextDocument)
-  const setContextDocument = useSettingsStore((state) => state.setContextDocument)
+  const {
+    sourceLanguage,
+    targetLanguage,
+    modelDetail,
+    isUseCustomModel,
+    customBaseUrl,
+    customModel,
+    apiKey,
+    contextDocument,
+    setSourceLanguage,
+    setTargetLanguage,
+    setModelDetail,
+    setIsUseCustomModel,
+    setContextDocument,
+  } = useSettingsStore()
 
   // Advanced Settings Store
-  const temperature = useAdvancedSettingsStore((state) => state.temperature)
-  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
-  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.isMaxCompletionTokensAuto)
-  const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
-  const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
-  const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
-  const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
-  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
-  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.isBetterContextCaching)
-  const resetIndex = useAdvancedSettingsStore((state) => state.resetIndex)
+  const {
+    temperature,
+    maxCompletionTokens,
+    isMaxCompletionTokensAuto,
+    splitSize,
+    startIndex,
+    endIndex,
+    isUseStructuredOutput,
+    isUseFullContextMemory,
+    isBetterContextCaching,
+    setTemperature,
+    setSplitSize,
+    setMaxCompletionTokens,
+    setStartIndex,
+    setEndIndex,
+    setIsUseStructuredOutput,
+    setIsUseFullContextMemory,
+    setIsMaxCompletionTokensAuto,
+    setIsBetterContextCaching,
+    resetIndex,
+  } = useAdvancedSettingsStore()
 
   // Translation Store
   const response = useTranslationStore((state) => state.response)
@@ -149,6 +166,7 @@ export default function SubtitleTranslator() {
   const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
+  const setResponse = useTranslationStore((state) => state.setResponse)
   const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
   const appendJsonResponse = useTranslationStore((state) => state.appendJsonResponse)
 
@@ -180,6 +198,22 @@ export default function SubtitleTranslator() {
     setTitle(tld.title)
     setSubtitles(tld.subtitles)
     setParsed(tld.parsed)
+    setSourceLanguage(tld.basicSettings.sourceLanguage)
+    setTargetLanguage(tld.basicSettings.targetLanguage)
+    setModelDetail(tld.basicSettings.modelDetail)
+    setIsUseCustomModel(tld.basicSettings.isUseCustomModel)
+    setContextDocument(tld.basicSettings.contextDocument)
+    setTemperature(tld.advancedSettings.temperature)
+    setSplitSize(tld.advancedSettings.splitSize)
+    setMaxCompletionTokens(tld.advancedSettings.maxCompletionTokens)
+    setStartIndex(tld.advancedSettings.startIndex)
+    setEndIndex(tld.advancedSettings.endIndex)
+    setIsUseStructuredOutput(tld.advancedSettings.isUseStructuredOutput)
+    setIsUseFullContextMemory(tld.advancedSettings.isUseFullContextMemory)
+    setIsMaxCompletionTokensAuto(tld.advancedSettings.isMaxCompletionTokensAuto)
+    setIsBetterContextCaching(tld.advancedSettings.isBetterContextCaching)
+    setResponse(tld.response.response)
+    setJsonResponse(tld.response.jsonResponse)
     return () => { save() }
   }, [])
 

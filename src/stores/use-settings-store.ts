@@ -1,11 +1,12 @@
 import { create } from "zustand"
-import { persist } from 'zustand/middleware'
 import {
   DEFAULT_SOURCE_LANGUAGE,
   DEFAULT_TARGET_LANGUAGE,
 } from "@/constants/default"
 import { FREE_MODELS } from "@/constants/model"
 import { Model } from "@/types/types"
+import { useProjectDataStore } from "./use-project-data-store"
+import { BasicSettings } from "@/types/project"
 
 interface SettingsStore {
   sourceLanguage: string
@@ -18,7 +19,7 @@ interface SettingsStore {
   contextDocument: string
   setSourceLanguage: (language: string) => void
   setTargetLanguage: (language: string) => void
-  setModelDetail: (model: Model) => void
+  setModelDetail: (model: Model | null) => void
   setIsUseCustomModel: (value: boolean) => void
   setApiKey: (key: string) => void
   setCustomBaseUrl: (url: string) => void
@@ -26,11 +27,21 @@ interface SettingsStore {
   setContextDocument: (doc: string) => void
 }
 
+const updateSettings = <K extends keyof BasicSettings>(field: K, value: BasicSettings[K], noSave?: boolean) => {
+  const id = useProjectDataStore.getState().currentTranslationId
+  if (!id) return
+  const translationData = useProjectDataStore.getState().translationData[id]
+  if (!translationData) return
+  translationData.basicSettings[field] = value
+  if (noSave) return
+  useProjectDataStore.getState().saveData(id, "translation")
+}
+
 const firstModel = Object.values(FREE_MODELS)[0]
 
 export const useSettingsStore = create<SettingsStore>()(
-  persist(
-    (set) => ({
+  (set) => {
+    return {
       sourceLanguage: DEFAULT_SOURCE_LANGUAGE,
       targetLanguage: DEFAULT_TARGET_LANGUAGE,
       modelDetail: firstModel && firstModel.length > 0 ? firstModel[0] : null,
@@ -39,17 +50,29 @@ export const useSettingsStore = create<SettingsStore>()(
       customBaseUrl: "",
       customModel: "",
       contextDocument: "",
-      setSourceLanguage: (language) => set({ sourceLanguage: language }),
-      setTargetLanguage: (language) => set({ targetLanguage: language }),
-      setModelDetail: (model) => set({ modelDetail: model }),
-      setIsUseCustomModel: (value) => set({ isUseCustomModel: value }),
+      setSourceLanguage: (language) => {
+        set({ sourceLanguage: language })
+        updateSettings("sourceLanguage", language)
+      },
+      setTargetLanguage: (language) => {
+        set({ targetLanguage: language })
+        updateSettings("targetLanguage", language)
+      },
+      setModelDetail: (model) => {
+        set({ modelDetail: model })
+        updateSettings("modelDetail", model)
+      },
+      setIsUseCustomModel: (value) => {
+        set({ isUseCustomModel: value })
+        updateSettings("isUseCustomModel", value)
+      },
       setApiKey: (key) => set({ apiKey: key }),
       setCustomBaseUrl: (url) => set({ customBaseUrl: url }),
       setCustomModel: (model) => set({ customModel: model }),
-      setContextDocument: (doc) => set({ contextDocument: doc }),
-    }),
-    {
-      name: 'settings-storage',
+      setContextDocument: (doc) => {
+        set({ contextDocument: doc })
+        updateSettings("contextDocument", doc, true)
+      },
     }
-  )
+  }
 )

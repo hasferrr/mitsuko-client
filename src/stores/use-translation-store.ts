@@ -1,33 +1,57 @@
 import { create } from "zustand"
 import { SubOnlyTranslated } from "@/types/types"
 import { parseTranslationJson } from "@/lib/parser"
-import { persist } from "zustand/middleware"
 import { TRANSLATE_URL, TRANSLATE_URL_FREE } from "@/constants/api"
 import { abortedAbortController } from "@/lib/utils"
 import { handleStream } from "@/lib/stream"
+import { ResponseTranslation } from "@/types/project"
+import { useProjectDataStore } from "./use-project-data-store"
 
 interface TranslationStore {
   response: string
-  setResponse: (response: string) => void
-  isTranslating: boolean
-  setIsTranslating: (isTranslating: boolean) => void
   jsonResponse: SubOnlyTranslated[]
+  isTranslating: boolean
+  abortControllerRef: React.RefObject<AbortController>
+  setResponse: (response: string) => void
   setJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
   appendJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
-  abortControllerRef: React.RefObject<AbortController>
-  translateSubtitles: (requestBody: any, apiKey: string, isFree: boolean) => Promise<{ parsed: SubOnlyTranslated[], raw: string }>
+  setIsTranslating: (isTranslating: boolean) => void
   stopTranslation: () => void
+  translateSubtitles: (requestBody: any, apiKey: string, isFree: boolean) => Promise<{ parsed: SubOnlyTranslated[], raw: string }>
 }
 
-export const useTranslationStore = create<TranslationStore>()(persist((set, get) => ({
+const updateResponseNoSave = <K extends keyof ResponseTranslation>(field: K, value: ResponseTranslation[K]) => {
+  const id = useProjectDataStore.getState().currentTranslationId
+  if (!id) return
+  const translationData = useProjectDataStore.getState().translationData[id]
+  if (!translationData) return
+  translationData.response[field] = value
+}
+
+export const useTranslationStore = create<TranslationStore>()((set, get) => ({
   response: "",
-  setResponse: (response) => set({ response }),
-  isTranslating: false,
-  setIsTranslating: (isTranslating) => set({ isTranslating }),
   jsonResponse: [],
-  setJsonResponse: (jsonResponse) => set({ jsonResponse }),
-  appendJsonResponse: (newArr) => set((state) => ({ jsonResponse: [...state.jsonResponse, ...newArr] })),
+  isTranslating: false,
   abortControllerRef: { current: abortedAbortController() },
+
+  setResponse: (response) => {
+    set({ response })
+    updateResponseNoSave("response", response)
+  },
+  setJsonResponse: (jsonResponse) => {
+    set({ jsonResponse })
+    updateResponseNoSave("jsonResponse", jsonResponse)
+  },
+  appendJsonResponse: (newArr) => {
+    set((state) => {
+      const updatedResponse = [...state.jsonResponse, ...newArr]
+      updateResponseNoSave("jsonResponse", [...updatedResponse])
+      return { jsonResponse: updatedResponse }
+    })
+  },
+
+  setIsTranslating: (isTranslating) => set({ isTranslating }),
+
   stopTranslation: () => get().abortControllerRef.current?.abort(),
   translateSubtitles: async (requestBody, apiKey, isFree) => {
     const buffer = await handleStream({
@@ -57,12 +81,4 @@ export const useTranslationStore = create<TranslationStore>()(persist((set, get)
       raw: buffer,
     }
   },
-}),
-  {
-    name: "translation-storage",
-    partialize: (state) => ({
-      response: state.response,
-      jsonResponse: state.jsonResponse,
-    }),
-  }
-))
+}))
