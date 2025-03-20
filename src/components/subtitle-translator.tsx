@@ -179,6 +179,7 @@ export default function SubtitleTranslator() {
     setTitle(tld.title)
     setSubtitles(tld.subtitles)
     setParsed(tld.parsed)
+    return () => { saveData(currentTranslationId, "translation") }
   }, [])
 
   const fixedSplit = (size: number, s: number, e: number) => {
