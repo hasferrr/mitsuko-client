@@ -35,12 +35,8 @@ export const Dashboard = () => {
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
   const [extractions, setExtractions] = useState<Extraction[]>([])
 
-  const removeTranslationData = useProjectDataStore((state) => state.removeTranslationData)
-  const removeTranscriptionData = useProjectDataStore((state) => state.removeTranscriptionData)
-  const removeExtractionData = useProjectDataStore((state) => state.removeExtractionData)
-  const renameTranslationData = useProjectDataStore((state) => state.renameTranslationData)
-  const renameTranscriptionData = useProjectDataStore((state) => state.renameTranscriptionData)
-  const renameExtractionData = useProjectDataStore((state) => state.renameExtractionData)
+  const mutateData = useProjectDataStore((state) => state.mutateData)
+  const removeData = useProjectDataStore((state) => state.removeData)
 
   useEffect(() => {
     if (!currentProject) return
@@ -87,13 +83,13 @@ export const Dashboard = () => {
       date={translation.updatedAt.toLocaleDateString()}
       handleEdit={async (newName) => {
         await updateTranslation(translation.id, { title: newName })
+        mutateData(translation.id, "translation", "title", newName)
         loadProjects()
-        renameTranslationData(translation.id, newName)
       }}
       handleDelete={async () => {
         await deleteTranslation(currentProject.id, translation.id)
+        removeData(translation.id, "translation")
         loadProjects()
-        removeTranslationData(translation.id)
       }}
     />
   ))
@@ -110,13 +106,13 @@ export const Dashboard = () => {
       date={transcription.createdAt.toLocaleDateString()}
       handleEdit={async (newName) => {
         await updateTranscription(transcription.id, { title: newName })
-        renameTranscriptionData(transcription.id, newName)
+        mutateData(transcription.id, "transcription", "title", newName)
         loadProjects()
       }}
       handleDelete={async () => {
         await deleteTranscription(currentProject.id, transcription.id)
+        removeData(transcription.id, "transcription")
         loadProjects()
-        removeTranscriptionData(transcription.id)
       }}
     />
   ))
@@ -133,13 +129,13 @@ export const Dashboard = () => {
       date={extraction.updatedAt.toLocaleDateString()}
       handleEdit={async (newName) => {
         await updateExtraction(extraction.id, { episodeNumber: newName })
-        renameExtractionData(extraction.id, newName)
+        mutateData(extraction.id, "extraction", "episodeNumber", newName)
         loadProjects()
       }}
       handleDelete={async () => {
         await deleteExtraction(currentProject.id, extraction.id)
+        removeData(extraction.id, "extraction")
         loadProjects()
-        removeExtractionData(extraction.id)
       }}
     />
   ))

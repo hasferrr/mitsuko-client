@@ -18,15 +18,8 @@ interface ProjectDataStore {
   extractionData: Record<string, Extraction>
   mutateData: (id: string, type: ProjectType, key: keyof Translation | keyof Transcription | keyof Extraction, value: any) => void
   saveData: (id: string, type: ProjectType) => Promise<void>
-  upsertTranslationData: (id: string, value: Translation) => void
-  upsertTranscriptionData: (id: string, value: Transcription) => void
-  upsertExtractionData: (id: string, value: Extraction) => void
-  removeTranslationData: (id: string) => void
-  removeTranscriptionData: (id: string) => void
-  removeExtractionData: (id: string) => void
-  renameTranslationData: (id: string, name: string) => void
-  renameTranscriptionData: (id: string, name: string) => void
-  renameExtractionData: (id: string, name: string) => void
+  upsertData: (id: string, type: ProjectType, value: Translation | Transcription | Extraction) => void
+  removeData: (id: string, type: ProjectType) => void
 }
 
 export const useProjectDataStore = create<ProjectDataStore>((set, get) => ({
@@ -45,17 +38,17 @@ export const useProjectDataStore = create<ProjectDataStore>((set, get) => ({
   mutateData: (id, type, key, value) => {
     const state = get()
     if (type === "translation") {
-      const obj = state.translationData[id]
-      if (!obj) return
-      obj[key as keyof Translation] = value
+      const data = state.translationData[id]
+      if (!data) return
+      data[key as keyof Translation] = value
     } else if (type === "transcription") {
-      const obj = state.transcriptionData[id]
-      if (!obj) return
-      obj[key as keyof Transcription] = value
+      const data = state.transcriptionData[id]
+      if (!data) return
+      data[key as keyof Transcription] = value
     } else if (type === "extraction") {
-      const obj = state.extractionData[id]
-      if (!obj) return
-      obj[key as keyof Extraction] = value
+      const data = state.extractionData[id]
+      if (!data) return
+      data[key as keyof Extraction] = value
     }
   },
 
@@ -90,45 +83,25 @@ export const useProjectDataStore = create<ProjectDataStore>((set, get) => ({
     }
   },
 
-  upsertTranslationData: (id, value) => {
-    get().translationData[id] = value
+  upsertData: (id, type, value) => {
+    const obj = type === "translation"
+      ? get().translationData
+      : type === "transcription"
+        ? get().transcriptionData
+        : type === "extraction"
+          ? get().extractionData
+          : {}
+    obj[id] = value
   },
 
-  upsertTranscriptionData: (id, value) => {
-    get().transcriptionData[id] = value
-  },
-
-  upsertExtractionData: (id, value) => {
-    get().extractionData[id] = value
-  },
-
-  removeTranslationData: (id) => {
-    delete get().translationData[id]
-  },
-
-  removeTranscriptionData: (id) => {
-    delete get().transcriptionData[id]
-  },
-
-  removeExtractionData: (id) => {
-    delete get().extractionData[id]
-  },
-
-  renameTranslationData: (id, name) => {
-    if (get().translationData[id]) {
-      get().translationData[id].title = name
-    }
-  },
-
-  renameTranscriptionData: (id, name) => {
-    if (get().translationData[id]) {
-      get().translationData[id].title = name
-    }
-  },
-
-  renameExtractionData: (id, name) => {
-    if (get().extractionData[id]) {
-      get().extractionData[id].episodeNumber = name
-    }
+  removeData: (id, type) => {
+    const obj = type === "translation"
+      ? get().translationData
+      : type === "transcription"
+        ? get().transcriptionData
+        : type === "extraction"
+          ? get().extractionData
+          : {}
+    delete obj[id]
   },
 }))

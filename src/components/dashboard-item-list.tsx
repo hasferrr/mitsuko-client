@@ -42,9 +42,7 @@ export const DashboardItemList = ({
     translationData,
     transcriptionData,
     extractionData,
-    upsertTranslationData,
-    upsertTranscriptionData,
-    upsertExtractionData,
+    upsertData,
   } = useProjectDataStore()
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
@@ -56,7 +54,7 @@ export const DashboardItemList = ({
         if (!(id in translationData)) {
           const translation = await getTranslation(projectId, id)
           if (translation) {
-            upsertTranslationData(id, translation)
+            upsertData(id, "translation", translation)
           }
         }
         setCurrentTranslationId(id)
@@ -66,7 +64,7 @@ export const DashboardItemList = ({
         if (!(id in transcriptionData)) {
           const transcription = await getTranscription(projectId, id)
           if (transcription) {
-            upsertTranscriptionData(id, transcription)
+            upsertData(id, "transcription", transcription)
           }
         }
         setCurrentTranscriptionId(id)
@@ -76,7 +74,7 @@ export const DashboardItemList = ({
         if (!(id in extractionData)) {
           const extraction = await getExtraction(projectId, id)
           if (extraction) {
-            upsertExtractionData(id, extraction)
+            upsertData(id, "extraction", extraction)
           }
         }
         setCurrentExtractionId(id)
