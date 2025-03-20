@@ -7,6 +7,7 @@ import { FREE_MODELS } from "@/constants/model"
 import { Model } from "@/types/types"
 import { useProjectDataStore } from "./use-project-data-store"
 import { BasicSettings } from "@/types/project"
+import { persist } from "zustand/middleware"
 
 interface SettingsStore {
   sourceLanguage: string
@@ -40,8 +41,8 @@ const updateSettings = <K extends keyof BasicSettings>(field: K, value: BasicSet
 const firstModel = Object.values(FREE_MODELS)[0]
 
 export const useSettingsStore = create<SettingsStore>()(
-  (set) => {
-    return {
+  persist(
+    (set) => ({
       sourceLanguage: DEFAULT_SOURCE_LANGUAGE,
       targetLanguage: DEFAULT_TARGET_LANGUAGE,
       modelDetail: firstModel && firstModel.length > 0 ? firstModel[0] : null,
@@ -73,6 +74,14 @@ export const useSettingsStore = create<SettingsStore>()(
         set({ contextDocument: doc })
         updateSettings("contextDocument", doc, true)
       },
+    }),
+    {
+      name: "settings-storage",
+      partialize: (state) => ({
+        apiKey: state.apiKey,
+        customBaseUrl: state.customBaseUrl,
+        customModel: state.customModel,
+      }),
     }
-  }
+  )
 )
