@@ -577,7 +577,7 @@ export default function SubtitleTranslator() {
 
   const handleSave = async () => {
     setIsSaving(true)
-    await saveData(currentTranslationId, "translation")
+    await saveData(currentTranslationId, "translation", true)
     setIsSaving(false)
   }
 

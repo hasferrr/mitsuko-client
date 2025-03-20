@@ -17,7 +17,7 @@ interface ProjectDataStore {
   transcriptionData: Record<string, Transcription>
   extractionData: Record<string, Extraction>
   mutateData: (id: string, type: ProjectType, key: keyof Translation | keyof Transcription | keyof Extraction, value: any) => void
-  saveData: (id: string, type: ProjectType) => Promise<void>
+  saveData: (id: string, type: ProjectType, revalidate?: boolean) => Promise<void>
   upsertData: (id: string, type: ProjectType, value: Translation | Transcription | Extraction) => void
   removeData: (id: string, type: ProjectType) => void
 }
@@ -52,8 +52,9 @@ export const useProjectDataStore = create<ProjectDataStore>((set, get) => ({
     }
   },
 
-  saveData: async (id, type) => {
+  saveData: async (id, type, revalidate) => {
     const state = get()
+    let result = null
 
     try {
       if (type === "translation") {
@@ -62,24 +63,34 @@ export const useProjectDataStore = create<ProjectDataStore>((set, get) => ({
           console.error("Translation not found in store")
           return
         }
-        await updateTranslation(id, translation)
+        result = await updateTranslation(id, translation)
       } else if (type === "transcription") {
         const transcription = state.transcriptionData[id]
         if (!transcription) {
           console.error("Transcription not found in store")
           return
         }
-        await updateTranscription(id, transcription)
+        result = await updateTranscription(id, transcription)
       } else if (type === "extraction") {
         const extraction = state.extractionData[id]
         if (!extraction) {
           console.error("Extraction not found in store")
           return
         }
-        await updateExtraction(id, extraction)
+        result = await updateExtraction(id, extraction)
       }
     } catch (error) {
       console.error(`Failed to save ${type} data:`, error)
+    }
+
+    if (revalidate && result) {
+      if (type === "translation") {
+        set({ translationData: { ...state.translationData, [id]: result as Translation } })
+      } else if (type === "transcription") {
+        set({ transcriptionData: { ...state.transcriptionData, [id]: result as Transcription } })
+      } else if (type === "extraction") {
+        set({ extractionData: { ...state.extractionData, [id]: result as Extraction } })
+      }
     }
   },
 
