@@ -194,15 +194,15 @@ export const StartIndexInput = memo(() => {
       num = Math.min(num, subtitles.length)
       num = value === "" ? 0 : num
       setStartIndex(num)
-      if (num > endIndex) {
-        setEndIndex(Math.max(1, num))
-      }
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
     setStartIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
+    if (startIndex > endIndex) {
+      setEndIndex(Math.max(1, startIndex))
+    }
   }
 
   const handleFindEmptyTranslation = () => {
@@ -278,15 +278,15 @@ export const EndIndexInput = memo(() => {
       num = Math.min(num, subtitles.length)
       num = value === "" ? 0 : num
       setEndIndex(num)
-      if (num < startIndex) {
-        setStartIndex(Math.max(1, num))
-      }
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
     setEndIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
+    if (endIndex < startIndex) {
+      setStartIndex(Math.max(1, endIndex))
+    }
   }
 
   useEffect(() => {
