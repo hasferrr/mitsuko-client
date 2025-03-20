@@ -180,7 +180,7 @@ export default function Transcription() {
   return (
     <div className="mx-auto py-8 px-4 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Audio Transcription</h1>
+        <h1 className="text-2xl font-medium mb-2">Audio Transcription</h1>
         <p className="text-muted-foreground">
           Upload your audio file and get accurate transcriptions with timestamps
         </p>
