@@ -1,6 +1,7 @@
 import { create } from "zustand"
 import { SubtitleTranslated, Parsed } from "@/types/types"
 import { persist } from "zustand/middleware"
+import { useProjectDataStore } from "./use-project-data-store"
 
 type UpdateSubtitle = (
   index: number,
@@ -23,29 +24,63 @@ const initialParsedState: Parsed = { type: "srt", data: null }
 
 
 export const useSubtitleStore = create<SubtitleStore>()(
-  persist(
-    (set) => ({
-      title: "",
-      subtitles: [],
-      parsed: initialParsedState,
-      setTitle: (title) => set({ title }),
-      setSubtitles: (subtitles) => set({ subtitles }),
-      setParsed: (parsed) => set({ parsed }),
-      resetParsed: () => set({ parsed: initialParsedState }),
-      updateSubtitle: (index, field, value) => {
-        set((state) => {
-          const i = index - 1
-          const updatedSubtitles = [...state.subtitles]
-          updatedSubtitles[i] = {
-            ...updatedSubtitles[i],
-            [field]: value,
-          }
-          return { subtitles: updatedSubtitles }
-        })
+  (set) => ({
+    title: "",
+    subtitles: [],
+    parsed: initialParsedState,
+    setTitle: (title) => {
+      set({ title })
+      const id = useProjectDataStore.getState().currentTranslationId
+      if (id) {
+        useProjectDataStore
+          .getState()
+          .mutateData(id, "translation", "title", title)
       }
-    }),
-    {
-      name: 'subtitle-storage',
+    },
+    setSubtitles: (subtitles) => {
+      set({ subtitles })
+      const id = useProjectDataStore.getState().currentTranslationId
+      if (id) {
+        useProjectDataStore
+          .getState()
+          .mutateData(id, "translation", "subtitles", subtitles)
+      }
+    },
+    setParsed: (parsed) => {
+      set({ parsed })
+      const id = useProjectDataStore.getState().currentTranslationId
+      if (id) {
+        useProjectDataStore
+          .getState()
+          .mutateData(id, "translation", "parsed", parsed)
+      }
+    },
+    resetParsed: () => {
+      set({ parsed: initialParsedState })
+      const id = useProjectDataStore.getState().currentTranslationId
+      if (id) {
+        useProjectDataStore
+          .getState()
+          .mutateData(id, "translation", "parsed", initialParsedState)
+      }
+    },
+    updateSubtitle: (index, field, value) => {
+      set((state) => {
+        const i = index - 1
+        const updatedSubtitles = [...state.subtitles]
+        updatedSubtitles[i] = {
+          ...updatedSubtitles[i],
+          [field]: value,
+        }
+        const id = useProjectDataStore.getState().currentTranslationId
+        if (id) {
+          useProjectDataStore
+            .getState()
+            .mutateData(id, "translation", "subtitles", updatedSubtitles)
+        }
+        return { subtitles: updatedSubtitles }
+      })
     }
-  )
+
+  })
 )

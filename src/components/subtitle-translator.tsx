@@ -21,7 +21,7 @@ import {
   AlignCenter,
   Box,
   SquareChartGantt,
-  LogInIcon,
+  SaveIcon,
 } from "lucide-react"
 import { SubtitleList } from "./subtitle-list"
 import {
@@ -55,7 +55,6 @@ import { useSettingsStore } from "@/stores/use-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useHistoryStore } from "@/stores/use-history-store"
-import { useInitRefStore } from "@/stores/use-init-store"
 import { useBeforeUnload } from "@/hooks/use-before-unload"
 import {
   AlertDialog,
@@ -69,7 +68,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
-import { DEFAULT_SUBTITLES, DEFAULT_TITLE } from "@/constants/default"
 import {
   MAX_COMPLETION_TOKENS_MAX,
   MAX_COMPLETION_TOKENS_MIN,
@@ -96,12 +94,22 @@ import { SubtitleResultOutput } from "./subtitle-result-output"
 import { getContent } from "@/lib/parser"
 import { createContextMemory } from "@/lib/context-memory"
 import { useSessionStore } from "@/stores/use-session-store"
+import { useProjectDataStore } from "@/stores/use-project-data-store"
 
 
 type DownloadOption = "original" | "translated" | "both"
 type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
 
 export default function SubtitleTranslator() {
+  const currentTranslationId = useProjectDataStore((state) => state.currentTranslationId)
+  if (!currentTranslationId) {
+    return <div className="p-4">No translation project selected</div>
+  }
+
+  // Project Data Store
+  const translationData = useProjectDataStore((state) => state.translationData)
+  const saveData = useProjectDataStore((state) => state.saveData)
+
   // Subtitle Store
   const title = useSubtitleStore((state) => state.title)
   const setTitle = useSubtitleStore((state) => state.setTitle)
@@ -160,19 +168,17 @@ export default function SubtitleTranslator() {
   const [bothFormat, setBothFormat] = useState<BothFormat>("o-n-t")
   const [toolsOpen, setToolsOpen] = useState(false)
   const [progressOpen, setProgressOpen] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   // Other
   const { setHasChanges } = useBeforeUnload()
-  const initRef = useInitRefStore((state) => state.initRefSubtitle)
   const subName = parsed.type === "ass" ? "SSA" : "SRT"
 
   useEffect(() => {
-    const key = useSubtitleStore.persist.getOptions().name
-    if (key && !localStorage.getItem(key) && initRef.current) {
-      setTitle(DEFAULT_TITLE)
-      setSubtitles(DEFAULT_SUBTITLES)
-    }
-    initRef.current = false
+    const tld = translationData[currentTranslationId]
+    setTitle(tld.title)
+    setSubtitles(tld.subtitles)
+    setParsed(tld.parsed)
   }, [])
 
   const fixedSplit = (size: number, s: number, e: number) => {
@@ -566,7 +572,12 @@ export default function SubtitleTranslator() {
     setTitle("")
     setSubtitles([])
     resetParsed()
-    useSubtitleStore.persist.clearStorage()
+  }
+
+  const handleSave = async () => {
+    setIsSaving(true)
+    await saveData(currentTranslationId, "translation")
+    setIsSaving(false)
   }
 
   return (
@@ -597,18 +608,28 @@ export default function SubtitleTranslator() {
             disabled={isTranslating}
           >
             <Upload className="h-5 w-5" />
-            Upload File
+            Upload
           </Button>
         </DragAndDrop>
+        {/* Save Button */}
+        <Button
+          variant="outline"
+          size="lg"
+          className="gap-2"
+          onClick={handleSave}
+          disabled={isTranslating || isSaving}
+        >
+          <SaveIcon className="h-5 w-5" />
+          Save
+        </Button>
         {/* History Button */}
         <Button
           variant={isHistoryOpen ? "default" : "outline"}
           size="lg"
-          className="gap-2"
+          className="gap-2 px-4"
           onClick={() => setIsHistoryOpen(!isHistoryOpen)}
         >
           <HistoryIcon className="h-5 w-5" />
-          History
         </Button>
       </div>
 
