@@ -7,7 +7,7 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
-import { useBeforeUnload } from "@/hooks/use-before-unload"
+import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { ChevronsRight, Eye, EyeOff } from "lucide-react"
 import { Button } from "./ui/button"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
@@ -127,7 +127,7 @@ export const ModelSelection = memo(() => {
 export const ContextDocumentInput = memo(() => {
   const contextDocument = useSettingsStore((state) => state.contextDocument)
   const setContextDocument = useSettingsStore((state) => state.setContextDocument)
-  const { setHasChanges } = useBeforeUnload()
+  const { setHasChanges } = useUnsavedChanges()
 
   const handleContextDocumentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
@@ -501,7 +501,7 @@ export const BetterContextCachingSwitch = memo(() => {
 export const SystemPromptInput = memo(() => {
   const prompt = useAdvancedSettingsStore((state) => state.prompt)
   const setPrompt = useAdvancedSettingsStore((state) => state.setPrompt)
-  const { setHasChanges } = useBeforeUnload()
+  const { setHasChanges } = useUnsavedChanges()
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)

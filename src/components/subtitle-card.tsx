@@ -7,7 +7,7 @@ import { Timer } from "lucide-react"
 import { SubtitleTranslated } from "@/types/types"
 import { timestampToString } from "@/lib/utils"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
-import { useBeforeUnload } from "@/hooks/use-before-unload"
+import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 
 interface SubtitleCardProps {
   subtitle: SubtitleTranslated
@@ -18,7 +18,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
   const translatedRef = useRef<HTMLTextAreaElement | null>(null)
   const updateSubtitle = useSubtitleStore((state) => state.updateSubtitle)
 
-  const { setHasChanges } = useBeforeUnload()
+  const { setHasChanges } = useUnsavedChanges()
 
   const subtitleUpdate = (e: React.ChangeEvent<HTMLTextAreaElement>, field: keyof SubtitleTranslated) => {
     setHasChanges(true)

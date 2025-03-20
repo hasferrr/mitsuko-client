@@ -45,7 +45,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { useBeforeUnload } from "@/hooks/use-before-unload"
+import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSessionStore } from "@/stores/use-session-store"
 
 
@@ -87,7 +87,7 @@ export default function Transcription() {
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false)
 
   useAutoScroll(transcriptionText, transcriptionAreaRef)
-  const { setHasChanges } = useBeforeUnload()
+  const { setHasChanges } = useUnsavedChanges()
 
   const isExceeded = file ? file.size > 20 * 1024 * 1024 : false
 

@@ -55,7 +55,7 @@ import { useSettingsStore } from "@/stores/use-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useHistoryStore } from "@/stores/use-history-store"
-import { useBeforeUnload } from "@/hooks/use-before-unload"
+import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -190,7 +190,7 @@ export default function SubtitleTranslator() {
   const [isSaving, setIsSaving] = useState(false)
 
   // Other
-  const { setHasChanges } = useBeforeUnload()
+  const { setHasChanges } = useUnsavedChanges()
   const subName = parsed.type === "ass" ? "SSA" : "SRT"
 
   useEffect(() => {

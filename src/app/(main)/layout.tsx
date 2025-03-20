@@ -7,6 +7,7 @@ import { useThemeStore } from "@/stores/use-theme-store"
 import { PropsWithChildren } from "react"
 import SessionStoreProvider from "@/contexts/session-context"
 import ProjectStoreProvider from "@/contexts/project-context"
+import UnsavedChangesProvider from "@/contexts/unsaved-changes-context"
 import { AppSidebarWrapper } from "@/components/sidebar/app-sidebar-wrapper"
 import { cn } from "@/lib/utils"
 
@@ -34,7 +35,9 @@ function Providers({ children }: PropsWithChildren) {
   return (
     <SessionStoreProvider>
       <ProjectStoreProvider>
-        {children}
+        <UnsavedChangesProvider>
+          {children}
+        </UnsavedChangesProvider>
       </ProjectStoreProvider>
     </SessionStoreProvider>
   )

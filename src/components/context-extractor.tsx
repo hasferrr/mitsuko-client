@@ -14,7 +14,7 @@ import { isASS, isSRT, removeTimestamp } from "@/lib/subtitle-utils"
 import { parseASS } from "@/lib/ass/parse"
 import { parseSRT } from "@/lib/srt/parse"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
-import { useBeforeUnload } from "@/hooks/use-before-unload"
+import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useExtractionStore } from "@/stores/use-extraction-store"
 import { useExtractionInputStore } from "@/stores/use-extraction-input-store"
@@ -78,7 +78,7 @@ export const ContextExtractor = () => {
   const previousContextRef = useRef<HTMLTextAreaElement | null>(null)
   const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
 
-  const { setHasChanges } = useBeforeUnload()
+  const { setHasChanges } = useUnsavedChanges()
   useAutoScroll(contextResult, contextResultRef)
 
   useEffect(() => {
