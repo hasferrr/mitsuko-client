@@ -28,7 +28,7 @@ export function Navbar() {
   const isTranslating = useTranslationStore(state => state.isTranslating)
   const isExtracting = useExtractionStore(state => state.isExtracting)
   const isTranscribing = useTranscriptionStore(state => state.isTranscribing)
-  const isProcessing = isTranslating || isExtracting || isTranscribing
+  const isProcessing = isTranslating.size || isExtracting || isTranscribing
 
   // Project Store
   const currentProject = useProjectStore(state => state.currentProject)

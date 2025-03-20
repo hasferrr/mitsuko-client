@@ -20,7 +20,8 @@ export const SubtitleResultOutput = memo(() => {
   const response = useTranslationStore((state) => state.response)
   const jsonResponse = useTranslationStore((state) => state.jsonResponse)
   const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
-  const isTranslating = useTranslationStore((state) => state.isTranslating)
+  const _isTranslating = useTranslationStore((state) => state.isTranslating)
+  const isTranslating = _isTranslating.has(currentTranslationId!)
 
   // Subtitle store
   const subtitles = useSubtitleStore((state) => state.subtitles)

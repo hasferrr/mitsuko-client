@@ -162,13 +162,15 @@ export default function SubtitleTranslator() {
 
   // Translation Store
   const response = useTranslationStore((state) => state.response)
-  const isTranslating = useTranslationStore((state) => state.isTranslating)
-  const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
+  const _isTranslating = useTranslationStore((state) => state.isTranslating)
+  const _setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
   const setResponse = useTranslationStore((state) => state.setResponse)
   const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
   const appendJsonResponse = useTranslationStore((state) => state.appendJsonResponse)
+  const isTranslating = _isTranslating.has(currentTranslationId)
+  const setIsTranslating = (isTranslating: boolean) => _setIsTranslating(currentTranslationId, isTranslating)
 
   // History Store & State
   const addHistory = useHistoryStore((state) => state.addHistory)
