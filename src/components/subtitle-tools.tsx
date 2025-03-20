@@ -32,6 +32,8 @@ import {
   removeContentBetween,
   shiftSubtitles
 } from "@/lib/subtitle-utils"
+import { useProjectDataStore } from "@/stores/use-project-data-store"
+import { SubtitleTranslated } from "@/types/types"
 
 interface SubtitleToolsProps {
   isOpen: boolean
@@ -40,6 +42,9 @@ interface SubtitleToolsProps {
 }
 
 export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleToolsProps) => {
+  const currentTranslationId = useProjectDataStore((state) => state.currentTranslationId)
+  const saveData = useProjectDataStore((state) => state.saveData)
+
   const [removeAllLineBreaksChecked, setRemoveAllLineBreaksChecked] = useState(false)
   const [removeBetweenCustomChecked, setRemoveBetweenCustomChecked] = useState(false)
   const [customStart, setCustomStart] = useState("(")
@@ -51,7 +56,13 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
   })
 
   const subtitles = useSubtitleStore((state) => state.subtitles)
-  const setSubtitles = useSubtitleStore((state) => state.setSubtitles)
+  const _setSubtitles = useSubtitleStore((state) => state.setSubtitles)
+  const setSubtitles = async (subtitles: SubtitleTranslated[]) => {
+    _setSubtitles(subtitles)
+    if (currentTranslationId) {
+      await saveData(currentTranslationId, "translation", true)
+    }
+  }
   const parsed = useSubtitleStore((state) => state.parsed)
 
   const handleRemoveAllLineBreaks = (field: "content" | "translated") => {

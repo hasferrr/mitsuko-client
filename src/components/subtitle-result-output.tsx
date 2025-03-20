@@ -8,9 +8,14 @@ import { Button } from "./ui/button"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import { parseTranslationArrayStrict } from "@/lib/parser"
 import { cn } from "@/lib/utils"
+import { useProjectDataStore } from "@/stores/use-project-data-store"
+import { SubtitleTranslated } from "@/types/types"
 
 
 export const SubtitleResultOutput = memo(() => {
+  const currentTranslationId = useProjectDataStore((state) => state.currentTranslationId)
+  const saveData = useProjectDataStore((state) => state.saveData)
+
   // Translation store
   const response = useTranslationStore((state) => state.response)
   const jsonResponse = useTranslationStore((state) => state.jsonResponse)
@@ -19,7 +24,13 @@ export const SubtitleResultOutput = memo(() => {
 
   // Subtitle store
   const subtitles = useSubtitleStore((state) => state.subtitles)
-  const setSubtitles = useSubtitleStore((state) => state.setSubtitles)
+  const _setSubtitles = useSubtitleStore((state) => state.setSubtitles)
+  const setSubtitles = async (subtitles: SubtitleTranslated[]) => {
+    _setSubtitles(subtitles)
+    if (currentTranslationId) {
+      await saveData(currentTranslationId, "translation", true)
+    }
+  }
 
   // State
   const [isEditing, setIsEditing] = useState(false)

@@ -108,7 +108,8 @@ export default function SubtitleTranslator() {
 
   // Project Data Store
   const translationData = useProjectDataStore((state) => state.translationData)
-  const saveData = useProjectDataStore((state) => state.saveData)
+  const _saveData = useProjectDataStore((state) => state.saveData)
+  const save = (revalidate?: boolean) => _saveData(currentTranslationId, "translation", revalidate)
 
   // Subtitle Store
   const title = useSubtitleStore((state) => state.title)
@@ -179,7 +180,7 @@ export default function SubtitleTranslator() {
     setTitle(tld.title)
     setSubtitles(tld.subtitles)
     setParsed(tld.parsed)
-    return () => { saveData(currentTranslationId, "translation") }
+    return () => { save() }
   }, [])
 
   const fixedSplit = (size: number, s: number, e: number) => {
@@ -331,6 +332,7 @@ export default function SubtitleTranslator() {
         }
       }
       setSubtitles(merged)
+      await save()
 
       // Break if translation is stopped
       const translatingStatus = useTranslationStore.getState().isTranslating
@@ -466,6 +468,7 @@ export default function SubtitleTranslator() {
 
       setSubtitles(parsedSubtitles)
       resetIndex(1, parsedSubtitles.length)
+      await save()
 
       const fileName = pendingFile.name.split('.')
       fileName.pop()
@@ -569,15 +572,15 @@ export default function SubtitleTranslator() {
     URL.revokeObjectURL(url)
   }
 
-  const handleDelete = () => {
-    setTitle("")
+  const handleDelete = async () => {
     setSubtitles([])
     resetParsed()
+    await save()
   }
 
   const handleSave = async () => {
     setIsSaving(true)
-    await saveData(currentTranslationId, "translation", true)
+    await save(true)
     setIsSaving(false)
   }
 

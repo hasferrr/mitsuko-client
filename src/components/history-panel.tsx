@@ -26,6 +26,8 @@ import { CheckCircle, FileJson, Trash, XCircle } from "lucide-react"
 import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
+import { useProjectDataStore } from "@/stores/use-project-data-store"
+import { SubtitleTranslated } from "@/types/types"
 
 interface HistoryPanelProps {
   isHistoryOpen: boolean
@@ -33,9 +35,18 @@ interface HistoryPanelProps {
 }
 
 export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelProps) {
+  const currentTranslationId = useProjectDataStore((state) => state.currentTranslationId)
+  const saveData = useProjectDataStore((state) => state.saveData)
+
   // Subtitle Store
   const setTitle = useSubtitleStore((state) => state.setTitle)
-  const setSubtitles = useSubtitleStore((state) => state.setSubtitles)
+  const _setSubtitles = useSubtitleStore((state) => state.setSubtitles)
+  const setSubtitles = async (subtitles: SubtitleTranslated[]) => {
+    _setSubtitles(subtitles)
+    if (currentTranslationId) {
+      await saveData(currentTranslationId, "translation", true)
+    }
+  }
   const setParsed = useSubtitleStore((state) => state.setParsed)
 
   // Translation Store
