@@ -13,22 +13,48 @@ import { SidebarTrigger } from "./ui/sidebar"
 import { Separator } from "./ui/separator"
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, BreadcrumbPage } from "./ui/breadcrumb"
 import { useProjectStore } from "@/stores/use-project-store"
-import { capitalize } from "@/lib/utils"
+import { useProjectDataStore } from "@/stores/use-project-data-store"
+import { useEffect, useState } from "react"
 
 export function Navbar() {
   const _pathname = usePathname()
-  const pathname = capitalize(_pathname.slice(1).replaceAll("-", " "))
+  const [pathname, setPathname] = useState("")
 
+  // Theme
   const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)
   const setIsDarkModeGlobal = useThemeStore(state => state.setIsDarkMode)
 
-  const currentProject = useProjectStore(state => state.currentProject)
-
+  // Process
   const isTranslating = useTranslationStore(state => state.isTranslating)
   const isExtracting = useExtractionStore(state => state.isExtracting)
   const isTranscribing = useTranscriptionStore(state => state.isTranscribing)
-
   const isProcessing = isTranslating || isExtracting || isTranscribing
+
+  // Project Store
+  const currentProject = useProjectStore(state => state.currentProject)
+
+  const tlId = useProjectDataStore(state => state.currentTranslationId)
+  const tsId = useProjectDataStore(state => state.currentTranscriptionId)
+  const exId = useProjectDataStore(state => state.currentExtractionId)
+
+  const tlData = useProjectDataStore(state => state.translationData)
+  const tsData = useProjectDataStore(state => state.transcriptionData)
+  const exData = useProjectDataStore(state => state.extractionData)
+
+  useEffect(() => {
+    setPathname("")
+    const len = 40
+    const getTruncatedTitle = (title: string) => title.length > len ? title.slice(0, len) + "..." : title
+    if (_pathname === "/translate" && tlId && tlData[tlId]) {
+      setPathname(getTruncatedTitle(tlData[tlId].title))
+    }
+    if (_pathname === "/transcribe" && tsId && tsData[tsId]) {
+      setPathname(getTruncatedTitle(tsData[tsId].title))
+    }
+    if (_pathname === "/extract-context" && exId && exData[exId]) {
+      setPathname("Episode " + getTruncatedTitle(exData[exId].episodeNumber))
+    }
+  }, [_pathname, tlId, tsId, exId, tlData, tsData, exData])
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pr-8">
@@ -67,7 +93,7 @@ export function Navbar() {
               <>
                 <BreadcrumbSeparator className="block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="line-clamp-1">
+                  <BreadcrumbPage className="line-clamp-1 hover:underline">
                     {pathname}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
