@@ -343,6 +343,7 @@ export default function SubtitleTranslator() {
           requestBody,
           isUseCustomModel ? apiKey : "",
           !isUseCustomModel,
+          currentId,
           (response) => setResponse(currentId, response)
         )
         tlChunk = result.parsed
@@ -452,7 +453,7 @@ export default function SubtitleTranslator() {
   }
 
   const handleStopTranslation = () => {
-    stopTranslation()
+    stopTranslation(currentId)
     setIsTranslating(currentId, false)
   }
 

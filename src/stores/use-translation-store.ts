@@ -2,25 +2,25 @@ import { create } from "zustand"
 import { SubOnlyTranslated } from "@/types/types"
 import { parseTranslationJson } from "@/lib/parser"
 import { TRANSLATE_URL, TRANSLATE_URL_FREE } from "@/constants/api"
-import { abortedAbortController } from "@/lib/utils"
 import { handleStream } from "@/lib/stream"
 
 interface TranslationStore {
   isTranslatingSet: Set<string>
-  abortControllerRef: React.RefObject<AbortController>
+  abortControllerMap: Map<string, AbortController>
   setIsTranslating: (translationId: string, isTranslating: boolean) => void
-  stopTranslation: () => void
+  stopTranslation: (id: string) => void
   translateSubtitles: (
     requestBody: any,
     apiKey: string,
     isFree: boolean,
+    id: string,
     setResponse: (response: string) => void
   ) => Promise<{ parsed: SubOnlyTranslated[], raw: string }>
 }
 
 export const useTranslationStore = create<TranslationStore>()((set, get) => ({
   isTranslatingSet: new Set(),
-  abortControllerRef: { current: abortedAbortController() },
+  abortControllerMap: new Map(),
 
   setIsTranslating: (translationId, isTranslating) => {
     if (isTranslating) {
@@ -30,16 +30,20 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
     }
   },
 
-  stopTranslation: () => get().abortControllerRef.current?.abort(),
+  stopTranslation: (id: string) => get().abortControllerMap.get(id)?.abort(),
   translateSubtitles: async (
     requestBody: any,
     apiKey: string,
     isFree: boolean,
+    id: string,
     setResponse: (response: string) => void
   ): Promise<{ parsed: SubOnlyTranslated[], raw: string }> => {
+    const abortController = new AbortController()
+    get().abortControllerMap.set(id, abortController)
+
     const buffer: string = await handleStream({
       setResponse,
-      abortControllerRef: get().abortControllerRef,
+      abortControllerRef: { current: abortController },
       isFree,
       apiKey,
       requestUrl: isFree ? TRANSLATE_URL_FREE : TRANSLATE_URL,
@@ -59,6 +63,7 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
       throw error
     }
 
+    get().abortControllerMap.delete(id)
     return {
       parsed: parsedResponse,
       raw: buffer,
