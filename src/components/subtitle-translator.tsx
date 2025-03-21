@@ -501,11 +501,12 @@ export default function SubtitleTranslator() {
 
       setSubtitles(currentId, parsedSubtitles)
       resetIndex(1, parsedSubtitles.length)
-      await saveData(currentId)
 
       const fileName = pendingFile.name.split('.')
       fileName.pop()
       setTitle(currentId, fileName.join('.'))
+
+      await saveData(currentId)
 
     } catch (error) {
       console.error("Error parsing subtitle file:", error)
