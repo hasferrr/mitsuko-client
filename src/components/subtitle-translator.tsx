@@ -50,7 +50,6 @@ import { parseASS } from "@/lib/ass/parse"
 import { generateSRT } from "@/lib/srt/generate"
 import { mergeASSback } from "@/lib/ass/merge"
 import { cn, minMax, sleep } from "@/lib/utils"
-import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
@@ -94,31 +93,47 @@ import { SubtitleResultOutput } from "./subtitle-result-output"
 import { getContent } from "@/lib/parser"
 import { createContextMemory } from "@/lib/context-memory"
 import { useSessionStore } from "@/stores/use-session-store"
-import { useProjectDataStore } from "@/stores/use-project-data-store"
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 
 
 type DownloadOption = "original" | "translated" | "both"
 type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
 
 export default function SubtitleTranslator() {
-  const currentTranslationId = useProjectDataStore((state) => state.currentTranslationId)
+  const currentTranslationId = useTranslationDataStore((state) => state.currentId)
   if (!currentTranslationId) {
     return <div className="p-4">No translation project selected</div>
   }
 
-  // Project Data Store
-  const translationData = useProjectDataStore((state) => state.translationData)
-  const _saveData = useProjectDataStore((state) => state.saveData)
-  const save = (revalidate?: boolean) => _saveData(currentTranslationId, "translation", revalidate)
+  // Destructure raw setter functions with underscore names for subtitle and response:
+  const {
+    setTitle: _setTitle,
+    setSubtitles: _setSubtitles,
+    setParsed: _setParsed,
+    resetParsed: _resetParsed,
+    updateSubtitle: _updateSubtitle,
+    setResponse: _setResponse,
+    setJsonResponse: _setJsonResponse,
+    appendJsonResponse: _appendJsonResponse,
+  } = useTranslationDataStore()
 
-  // Subtitle Store
-  const title = useSubtitleStore((state) => state.title)
-  const setTitle = useSubtitleStore((state) => state.setTitle)
-  const subtitles = useSubtitleStore((state) => state.subtitles)
-  const setSubtitles = useSubtitleStore((state) => state.setSubtitles)
-  const parsed = useSubtitleStore((state) => state.parsed)
-  const setParsed = useSubtitleStore((state) => state.setParsed)
-  const resetParsed = useSubtitleStore((state) => state.resetParsed)
+  // Create curried setter functions that automatically pass currentTranslationId
+  const setTitle = (title: string) => _setTitle(currentTranslationId, title)
+  const setSubtitles = (subtitles: typeof tld.subtitles) => _setSubtitles(currentTranslationId, subtitles)
+  const setParsed = (parsed: typeof tld.parsed) => _setParsed(currentTranslationId, parsed)
+  const resetParsed = () => _resetParsed(currentTranslationId)
+  const setJsonResponse = (jsonRes: SubOnlyTranslated[]) => _setJsonResponse(currentTranslationId, jsonRes)
+  const appendJsonResponse = (arr: SubOnlyTranslated[]) => _appendJsonResponse(currentTranslationId, arr)
+
+  // Use translation data store; extract data and save function
+  const translationData = useTranslationDataStore((state) => state.data)
+  const _saveData = useTranslationDataStore((state) => state.saveData)
+  const save = (revalidate?: boolean) => _saveData(currentTranslationId, revalidate)
+
+  const tld = translationData[currentTranslationId] || { title: "", subtitles: [], parsed: { type: "srt", data: null } }
+  const title = tld.title
+  const subtitles = tld.subtitles
+  const parsed = tld.parsed
 
   // Settings Store
   const {
@@ -161,14 +176,10 @@ export default function SubtitleTranslator() {
   } = useAdvancedSettingsStore()
 
   // Translation Store
-  const response = useTranslationStore((state) => state.response)
   const _isTranslating = useTranslationStore((state) => state.isTranslating)
   const _setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
-  const setResponse = useTranslationStore((state) => state.setResponse)
-  const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
-  const appendJsonResponse = useTranslationStore((state) => state.appendJsonResponse)
   const isTranslating = _isTranslating.has(currentTranslationId)
   const setIsTranslating = (isTranslating: boolean) => _setIsTranslating(currentTranslationId, isTranslating)
 
@@ -196,10 +207,6 @@ export default function SubtitleTranslator() {
   const subName = parsed.type === "ass" ? "SSA" : "SRT"
 
   useEffect(() => {
-    const tld = translationData[currentTranslationId]
-    setTitle(tld.title)
-    setSubtitles(tld.subtitles)
-    setParsed(tld.parsed)
     setSourceLanguage(tld.basicSettings.sourceLanguage)
     setTargetLanguage(tld.basicSettings.targetLanguage)
     setModelDetail(tld.basicSettings.modelDetail)
@@ -214,8 +221,6 @@ export default function SubtitleTranslator() {
     setIsUseFullContextMemory(tld.advancedSettings.isUseFullContextMemory)
     setIsMaxCompletionTokensAuto(tld.advancedSettings.isMaxCompletionTokensAuto)
     setIsBetterContextCaching(tld.advancedSettings.isBetterContextCaching)
-    setResponse(tld.response.response)
-    setJsonResponse(tld.response.jsonResponse)
     return () => { save() }
   }, [])
 
@@ -348,11 +353,11 @@ export default function SubtitleTranslator() {
         const result = await translateSubtitles(requestBody, isUseCustomModel ? apiKey : "", !isUseCustomModel)
         tlChunk = result.parsed
         rawResponse = result.raw
-        allRawResponses.push(useTranslationStore.getState().response)
+        allRawResponses.push(useTranslationDataStore.getState().data[currentTranslationId].response.response)
         console.log("result: ", tlChunk)
       } catch {
         setIsTranslating(false)
-        allRawResponses.push(useTranslationStore.getState().response)
+        allRawResponses.push(useTranslationDataStore.getState().data[currentTranslationId].response.response)
         break
       }
 
@@ -360,7 +365,7 @@ export default function SubtitleTranslator() {
       appendJsonResponse(tlChunk)
 
       // Merge translated chunk with original subtitles
-      const merged: SubtitleTranslated[] = [...useSubtitleStore.getState().subtitles]
+      const merged: SubtitleTranslated[] = [...subtitles]
       for (let j = 0; j < tlChunk.length; j++) {
         const index = tlChunk[j].index - 1
         merged[index] = {
@@ -372,7 +377,7 @@ export default function SubtitleTranslator() {
       await save()
 
       // Break if translation is stopped
-      const translatingStatus = useTranslationStore.getState().isTranslating
+      const translatingStatus = isTranslating
       if (!translatingStatus) break
 
       // Update context for next chunk
@@ -443,9 +448,9 @@ export default function SubtitleTranslator() {
       addHistory(
         title,
         allRawResponses,
-        useTranslationStore.getState().jsonResponse,
-        useSubtitleStore.getState().subtitles,
-        useSubtitleStore.getState().parsed,
+        useTranslationDataStore.getState().data[currentTranslationId].response.jsonResponse,
+        useTranslationDataStore.getState().data[currentTranslationId].subtitles,
+        useTranslationDataStore.getState().data[currentTranslationId].parsed,
       )
     }
 
@@ -744,7 +749,7 @@ export default function SubtitleTranslator() {
               variant="outline"
               className="gap-2"
               onClick={handleStopTranslation}
-              disabled={!isTranslating || !response}
+              disabled={!isTranslating || !tld.response.response}
             >
               <Square className="h-4 w-4" />
               Stop

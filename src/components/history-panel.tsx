@@ -23,10 +23,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { CheckCircle, FileJson, Trash, XCircle } from "lucide-react"
-import { useSubtitleStore } from "@/stores/use-subtitle-store"
-import { useTranslationStore } from "@/stores/use-translation-store"
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
-import { useProjectDataStore } from "@/stores/use-project-data-store"
 import { SubtitleTranslated } from "@/types/types"
 
 interface HistoryPanelProps {
@@ -35,23 +33,13 @@ interface HistoryPanelProps {
 }
 
 export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelProps) {
-  const currentTranslationId = useProjectDataStore((state) => state.currentTranslationId)
-  const saveData = useProjectDataStore((state) => state.saveData)
-
-  // Subtitle Store
-  const setTitle = useSubtitleStore((state) => state.setTitle)
-  const _setSubtitles = useSubtitleStore((state) => state.setSubtitles)
-  const setSubtitles = async (subtitles: SubtitleTranslated[]) => {
-    _setSubtitles(subtitles)
-    if (currentTranslationId) {
-      await saveData(currentTranslationId, "translation", true)
-    }
-  }
-  const setParsed = useSubtitleStore((state) => state.setParsed)
-
-  // Translation Store
-  const setResponse = useTranslationStore((state) => state.setResponse)
-  const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
+  const currentId = useTranslationDataStore((state) => state.currentId)
+  const setTitle = useTranslationDataStore((state) => state.setTitle)
+  const setSubtitles = useTranslationDataStore((state) => state.setSubtitles)
+  const setParsed = useTranslationDataStore((state) => state.setParsed)
+  const setResponse = useTranslationDataStore((state) => state.setResponse)
+  const setJsonResponse = useTranslationDataStore((state) => state.setJsonResponse)
+  const saveData = useTranslationDataStore((state) => state.saveData)
 
   // Advanced Settings Store
   const resetIndex = useAdvancedSettingsStore((state) => state.resetIndex)
@@ -66,8 +54,8 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
     setSelectedHistoryIndex(index)
   }
 
-  const handleApplyHistory = () => {
-    if (selectedHistoryIndex === null) return
+  const handleApplyHistory = async () => {
+    if (selectedHistoryIndex === null || !currentId) return
 
     const selectedHistoryItem = history[selectedHistoryIndex]
     const errors: string[] = []
@@ -94,11 +82,12 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
 
     // If no errors, apply the history item
     try {
-      setSubtitles(selectedHistoryItem.subtitles)
-      setParsed(selectedHistoryItem.parsed)
-      setTitle(selectedHistoryItem.title)
-      setResponse(selectedHistoryItem.content.join(""))
-      setJsonResponse(selectedHistoryItem.json)
+      setTitle(currentId, selectedHistoryItem.title)
+      setSubtitles(currentId, selectedHistoryItem.subtitles)
+      setParsed(currentId, selectedHistoryItem.parsed)
+      setResponse(currentId, selectedHistoryItem.content.join(""))
+      setJsonResponse(currentId, selectedHistoryItem.json)
+      await saveData(currentId, true)
       setIsHistoryOpen(false)
       resetIndex(1, selectedHistoryItem.subtitles.length)
     } catch (error) {

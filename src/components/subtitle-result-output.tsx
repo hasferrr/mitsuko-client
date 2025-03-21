@@ -2,36 +2,26 @@
 
 import { memo, useEffect, useRef, useState } from "react"
 import { Textarea } from "@/components/ui/textarea"
-import { useTranslationStore } from "@/stores/use-translation-store"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { Button } from "./ui/button"
-import { useSubtitleStore } from "@/stores/use-subtitle-store"
 import { parseTranslationArrayStrict } from "@/lib/parser"
 import { cn } from "@/lib/utils"
-import { useProjectDataStore } from "@/stores/use-project-data-store"
-import { SubtitleTranslated } from "@/types/types"
-
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
+import { useTranslationStore } from "@/stores/use-translation-store"
 
 export const SubtitleResultOutput = memo(() => {
-  const currentTranslationId = useProjectDataStore((state) => state.currentTranslationId)
-  const saveData = useProjectDataStore((state) => state.saveData)
+  const currentId = useTranslationDataStore((state) => state.currentId)
+  const translationData = useTranslationDataStore((state) => state.data)
+  const setSubtitles = useTranslationDataStore((state) => state.setSubtitles)
+  const setJsonResponse = useTranslationDataStore((state) => state.setJsonResponse)
+  const saveData = useTranslationDataStore((state) => state.saveData)
+  const isTranslatingSet = useTranslationStore((state) => state.isTranslating)
 
-  // Translation store
-  const response = useTranslationStore((state) => state.response)
-  const jsonResponse = useTranslationStore((state) => state.jsonResponse)
-  const setJsonResponse = useTranslationStore((state) => state.setJsonResponse)
-  const _isTranslating = useTranslationStore((state) => state.isTranslating)
-  const isTranslating = _isTranslating.has(currentTranslationId!)
-
-  // Subtitle store
-  const subtitles = useSubtitleStore((state) => state.subtitles)
-  const _setSubtitles = useSubtitleStore((state) => state.setSubtitles)
-  const setSubtitles = async (subtitles: SubtitleTranslated[]) => {
-    _setSubtitles(subtitles)
-    if (currentTranslationId) {
-      await saveData(currentTranslationId, "translation", true)
-    }
-  }
+  const translation = currentId ? translationData[currentId] : null
+  const subtitles = translation?.subtitles ?? []
+  const response = translation?.response.response ?? ""
+  const jsonResponse = translation?.response.jsonResponse ?? []
+  const isTranslating = isTranslatingSet.has(currentId ?? "")
 
   // State
   const [isEditing, setIsEditing] = useState(false)
@@ -83,9 +73,10 @@ export const SubtitleResultOutput = memo(() => {
   }
 
   const handleParseAndSave = () => {
+    if (!currentId) return
     try {
       const parsed = parseTranslationArrayStrict(editValue)
-      setJsonResponse(parsed)
+      setJsonResponse(currentId, parsed)
       setIsParseError(false)
     } catch {
       console.log("Failed to parse JSON. Please check the format.")
@@ -96,7 +87,8 @@ export const SubtitleResultOutput = memo(() => {
     setIsEditing(false)
   }
 
-  const handleApply = () => {
+  const handleApply = async () => {
+    if (!currentId) return
     const tlChunk = jsonResponse
     if (!tlChunk.length) {
       return
@@ -110,7 +102,8 @@ export const SubtitleResultOutput = memo(() => {
         translated: tlChunk[i].translated || merged[index].translated,
       }
     }
-    setSubtitles(merged)
+    setSubtitles(currentId, merged)
+    await saveData(currentId, true)
   }
 
   return (
@@ -150,7 +143,6 @@ export const SubtitleResultOutput = memo(() => {
         >
           {isEditing ? "Cancel" : "Apply to Subtitles"}
         </Button>
-
       </div>
     </div>
   )

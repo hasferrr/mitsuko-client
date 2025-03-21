@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { memo, useState } from "react"
-import { useSubtitleStore } from "@/stores/use-subtitle-store"
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,7 +32,6 @@ import {
   removeContentBetween,
   shiftSubtitles
 } from "@/lib/subtitle-utils"
-import { useProjectDataStore } from "@/stores/use-project-data-store"
 import { SubtitleTranslated } from "@/types/types"
 
 interface SubtitleToolsProps {
@@ -42,8 +41,10 @@ interface SubtitleToolsProps {
 }
 
 export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleToolsProps) => {
-  const currentTranslationId = useProjectDataStore((state) => state.currentTranslationId)
-  const saveData = useProjectDataStore((state) => state.saveData)
+  const currentId = useTranslationDataStore((state) => state.currentId)
+  const translationData = useTranslationDataStore((state) => state.data)
+  const setSubtitles = useTranslationDataStore((state) => state.setSubtitles)
+  const saveData = useTranslationDataStore((state) => state.saveData)
 
   const [removeAllLineBreaksChecked, setRemoveAllLineBreaksChecked] = useState(false)
   const [removeBetweenCustomChecked, setRemoveBetweenCustomChecked] = useState(false)
@@ -55,34 +56,34 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
     action: () => { },
   })
 
-  const subtitles = useSubtitleStore((state) => state.subtitles)
-  const _setSubtitles = useSubtitleStore((state) => state.setSubtitles)
-  const setSubtitles = async (subtitles: SubtitleTranslated[]) => {
-    _setSubtitles(subtitles)
-    if (currentTranslationId) {
-      await saveData(currentTranslationId, "translation", true)
-    }
+  const translation = currentId ? translationData[currentId] : null
+  const subtitles = translation?.subtitles ?? []
+  const parsed = translation?.parsed ?? { type: "srt", data: null }
+
+  const handleSetSubtitles = async (newSubtitles: SubtitleTranslated[]) => {
+    if (!currentId) return
+    setSubtitles(currentId, newSubtitles)
+    await saveData(currentId, true)
   }
-  const parsed = useSubtitleStore((state) => state.parsed)
 
   const handleRemoveAllLineBreaks = (field: "content" | "translated") => {
     if (!subtitles.length) return
     const updatedSubtitles = removeAllLineBreaks(subtitles, field, parsed.type === "ass")
-    setSubtitles(updatedSubtitles)
+    handleSetSubtitles(updatedSubtitles)
     toast.success(`Removed all line breaks from ${field === "content" ? "original" : "translated"} text`)
   }
 
   const handleRemoveBetweenCustom = (field: "content" | "translated") => {
     if (!subtitles.length || !customStart || !customEnd) return
     const updatedSubtitles = removeContentBetween(subtitles, field, customStart, customEnd)
-    setSubtitles(updatedSubtitles)
+    handleSetSubtitles(updatedSubtitles)
     toast.success(`Removed content between "${customStart}" and "${customEnd}" from ${field === "content" ? "original" : "translated"} text`)
   }
 
   const handleShiftSubtitles = () => {
     if (!subtitles.length) return
     const updatedSubtitles = shiftSubtitles(subtitles, shiftTime)
-    setSubtitles(updatedSubtitles)
+    handleSetSubtitles(updatedSubtitles)
     toast.success(`Shifted subtitles by ${shiftTime} miliseconds`)
   }
 

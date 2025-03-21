@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
-import { useSubtitleStore } from "@/stores/use-subtitle-store"
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 
 interface SubtitleCountProps {
   isOpen: boolean
@@ -21,7 +21,10 @@ interface SubtitleCountProps {
 }
 
 export const SubtitleProgress = ({ isOpen, setIsOpen, children }: SubtitleCountProps) => {
-  const subtitles = useSubtitleStore((state) => state.subtitles)
+  const currentId = useTranslationDataStore((state) => state.currentId)
+  const translationData = useTranslationDataStore((state) => state.data)
+  const subtitles = currentId ? translationData[currentId]?.subtitles ?? [] : []
+
   const [translatedCount, setTranslatedCount] = useState<number | null>(null)
   const [originalCount, setOriginalCount] = useState<number | null>(null)
   const [untranslatedIntervals, setUntranslatedIntervals] = useState<string[]>([])

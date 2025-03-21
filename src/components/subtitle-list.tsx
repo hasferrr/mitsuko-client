@@ -1,10 +1,12 @@
 import { memo } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { SubtitleCard } from "./subtitle-card"
-import { useSubtitleStore } from "@/stores/use-subtitle-store"
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 
 export const SubtitleList = memo(() => {
-  const subtitles = useSubtitleStore((state) => state.subtitles)
+  const currentId = useTranslationDataStore((state) => state.currentId)
+  const translationData = useTranslationDataStore((state) => state.data)
+  const subtitles = currentId ? translationData[currentId]?.subtitles ?? [] : []
 
   return (
     <ScrollArea className="h-[510px] pr-4">

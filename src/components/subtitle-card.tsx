@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Timer } from "lucide-react"
 import { SubtitleTranslated } from "@/types/types"
 import { timestampToString } from "@/lib/utils"
-import { useSubtitleStore } from "@/stores/use-subtitle-store"
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 
 interface SubtitleCardProps {
@@ -16,14 +16,16 @@ interface SubtitleCardProps {
 export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
   const contentRef = useRef<HTMLTextAreaElement | null>(null)
   const translatedRef = useRef<HTMLTextAreaElement | null>(null)
-  const updateSubtitle = useSubtitleStore((state) => state.updateSubtitle)
+  const currentId = useTranslationDataStore((state) => state.currentId)
+  const updateSubtitle = useTranslationDataStore((state) => state.updateSubtitle)
 
   const { setHasChanges } = useUnsavedChanges()
 
   const subtitleUpdate = (e: React.ChangeEvent<HTMLTextAreaElement>, field: keyof SubtitleTranslated) => {
+    if (!currentId) return
     setHasChanges(true)
     handleResize(e)
-    updateSubtitle(subtitle.index, field, e.target.value)
+    updateSubtitle(currentId, subtitle.index, field, e.target.value)
   }
 
   const handleResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

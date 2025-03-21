@@ -10,7 +10,7 @@ import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { ChevronsRight, Eye, EyeOff } from "lucide-react"
 import { Button } from "./ui/button"
-import { useSubtitleStore } from "@/stores/use-subtitle-store"
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import {
   SPLIT_SIZE_MIN,
   SPLIT_SIZE_MAX,
@@ -185,7 +185,9 @@ export const StartIndexInput = memo(() => {
   const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
   const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
   const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
-  const subtitles = useSubtitleStore((state) => state.subtitles)
+  const currentId = useTranslationDataStore((state) => state.currentId)
+  const translationData = useTranslationDataStore((state) => state.data)
+  const subtitles = currentId ? translationData[currentId]?.subtitles ?? [] : []
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
@@ -267,9 +269,9 @@ export const EndIndexInput = memo(() => {
   const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
   const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
   const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
-
-  const initRef = useInitRefStore((state) => state.initRefEndIndex)
-  const subtitles = useSubtitleStore((state) => state.subtitles)
+  const currentId = useTranslationDataStore((state) => state.currentId)
+  const translationData = useTranslationDataStore((state) => state.data)
+  const subtitles = currentId ? translationData[currentId]?.subtitles ?? [] : []
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
@@ -288,13 +290,6 @@ export const EndIndexInput = memo(() => {
       setStartIndex(Math.max(1, endIndex))
     }
   }
-
-  useEffect(() => {
-    if (initRef.current) {
-      setEndIndex(subtitles.length)
-      initRef.current = false
-    }
-  }, [subtitles.length])
 
   return (
     <div className="space-y-2">

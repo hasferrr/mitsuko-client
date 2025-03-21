@@ -4,10 +4,9 @@ import {
   DEFAULT_SPLIT_SIZE,
   DEFAULT_MAX_COMPLETION_TOKENS,
 } from "@/constants/default"
-import { useSubtitleStore } from "./use-subtitle-store"
 import { useSettingsStore } from "./use-settings-store"
 import { AdvancedSettings } from "@/types/project"
-import { useProjectDataStore } from "./use-project-data-store"
+import { useTranslationDataStore } from "./use-translation-data-store"
 
 interface AdvancedSettingsStore {
   temperature: number
@@ -35,13 +34,13 @@ interface AdvancedSettingsStore {
 }
 
 const updateSettings = <K extends keyof AdvancedSettings>(field: K, value: AdvancedSettings[K], noSave?: boolean) => {
-  const id = useProjectDataStore.getState().currentTranslationId
-  if (!id) return
-  const translationData = useProjectDataStore.getState().translationData[id]
+  const currentId = useTranslationDataStore.getState().currentId
+  if (!currentId) return
+  const translationData = useTranslationDataStore.getState().data[currentId]
   if (!translationData) return
   translationData.advancedSettings[field] = value
   if (noSave) return
-  useProjectDataStore.getState().saveData(id, "translation")
+  useTranslationDataStore.getState().saveData(currentId)
 }
 
 const initialAdvancedSettings = {
@@ -102,26 +101,30 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         updateSettings("isBetterContextCaching", bool)
       },
       resetAdvancedSettings: () => {
+        const currentId = useTranslationDataStore.getState().currentId
+        const translationData = currentId ? useTranslationDataStore.getState().data[currentId] : null
+        const subtitles = translationData?.subtitles ?? []
+
         const newSettings = {
           ...initialAdvancedSettings,
-          endIndex: useSubtitleStore.getState().subtitles?.length ?? initialAdvancedSettings.endIndex,
+          endIndex: subtitles.length || initialAdvancedSettings.endIndex,
           isUseStructuredOutput: useSettingsStore.getState().isUseCustomModel
             ? initialAdvancedSettings.isUseStructuredOutput
             : useSettingsStore.getState().modelDetail?.structuredOutput ?? initialAdvancedSettings.isUseStructuredOutput,
         }
         set(newSettings)
 
-        const id = useProjectDataStore.getState().currentTranslationId
-        if (!id) return
-        const translationData = useProjectDataStore.getState().translationData[id]
-        if (!translationData) return
+        if (!currentId || !translationData) return
         translationData.advancedSettings = newSettings
-        useProjectDataStore.getState().saveData(id, "translation")
-
+        useTranslationDataStore.getState().saveData(currentId)
       },
       resetIndex: (s?: number, e?: number) => {
+        const currentId = useTranslationDataStore.getState().currentId
+        const translationData = currentId ? useTranslationDataStore.getState().data[currentId] : null
+        const subtitles = translationData?.subtitles ?? []
+
         const startIndex = s || 1
-        const endIndex = e || (useSubtitleStore.getState().subtitles?.length ?? initialAdvancedSettings.endIndex)
+        const endIndex = e || (subtitles.length || initialAdvancedSettings.endIndex)
         set({ startIndex, endIndex })
         updateSettings("startIndex", startIndex, true)
         updateSettings("endIndex", endIndex)
