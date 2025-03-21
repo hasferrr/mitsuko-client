@@ -10,6 +10,7 @@ import { EditDialogue } from "./ui-custom/edit-dialogue"
 import { getExtraction } from "@/lib/db/extraction"
 import { getTranslation } from "@/lib/db/translation"
 import { getTranscription } from "@/lib/db/transcription"
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 
 interface DashboardItemListProps {
   id: string
@@ -36,14 +37,17 @@ export const DashboardItemList = ({
 }: DashboardItemListProps) => {
   const router = useRouter()
   const {
-    setCurrentTranslationId,
     setCurrentTranscriptionId,
     setCurrentExtractionId,
-    translationData,
     transcriptionData,
     extractionData,
     upsertData,
   } = useProjectDataStore()
+  const {
+    setCurrentId: setCurrentTranslationId,
+    data: translationData,
+    upsertData: upsertTranslationData,
+  } = useTranslationDataStore()
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -54,7 +58,7 @@ export const DashboardItemList = ({
         if (!(id in translationData)) {
           const translation = await getTranslation(projectId, id)
           if (translation) {
-            upsertData(id, "translation", translation)
+            upsertTranslationData(id, translation)
           }
         }
         setCurrentTranslationId(id)

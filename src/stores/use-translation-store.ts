@@ -5,7 +5,7 @@ import { TRANSLATE_URL, TRANSLATE_URL_FREE } from "@/constants/api"
 import { abortedAbortController } from "@/lib/utils"
 import { handleStream } from "@/lib/stream"
 import { ResponseTranslation } from "@/types/project"
-import { useProjectDataStore } from "./use-project-data-store"
+import { useTranslationDataStore } from "./use-translation-data-store"
 
 interface TranslationStore {
   response: string
@@ -21,9 +21,9 @@ interface TranslationStore {
 }
 
 const updateResponseNoSave = <K extends keyof ResponseTranslation>(field: K, value: ResponseTranslation[K]) => {
-  const id = useProjectDataStore.getState().currentTranslationId
-  if (!id) return
-  const translationData = useProjectDataStore.getState().translationData[id]
+  const currentId = useTranslationDataStore.getState().currentId
+  if (!currentId) return
+  const translationData = useTranslationDataStore.getState().data[currentId]
   if (!translationData) return
   translationData.response[field] = value
 }

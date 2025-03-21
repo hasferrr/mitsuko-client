@@ -21,6 +21,7 @@ import { createTranslation, deleteTranslation, updateTranslation } from "@/lib/d
 import { createTranscription, deleteTranscription, updateTranscription } from "@/lib/db/transcription"
 import { createExtraction, deleteExtraction, updateExtraction } from "@/lib/db/extraction"
 import { useProjectDataStore } from "@/stores/use-project-data-store"
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 
 export const Dashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -37,6 +38,7 @@ export const Dashboard = () => {
 
   const mutateData = useProjectDataStore((state) => state.mutateData)
   const removeData = useProjectDataStore((state) => state.removeData)
+  const { mutateData: mutateTranslationData, removeData: removeTranslationData } = useTranslationDataStore()
 
   useEffect(() => {
     if (!currentProject) return
@@ -83,12 +85,12 @@ export const Dashboard = () => {
       date={translation.updatedAt.toLocaleDateString()}
       handleEdit={async (newName) => {
         await updateTranslation(translation.id, { title: newName })
-        mutateData(translation.id, "translation", "title", newName)
+        mutateTranslationData(translation.id, "title", newName)
         loadProjects()
       }}
       handleDelete={async () => {
         await deleteTranslation(currentProject.id, translation.id)
-        removeData(translation.id, "translation")
+        removeTranslationData(translation.id)
         loadProjects()
       }}
     />

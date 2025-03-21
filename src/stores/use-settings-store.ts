@@ -5,9 +5,9 @@ import {
 } from "@/constants/default"
 import { FREE_MODELS } from "@/constants/model"
 import { Model } from "@/types/types"
-import { useProjectDataStore } from "./use-project-data-store"
 import { BasicSettings } from "@/types/project"
 import { persist } from "zustand/middleware"
+import { useTranslationDataStore } from "./use-translation-data-store"
 
 interface SettingsStore {
   sourceLanguage: string
@@ -29,13 +29,13 @@ interface SettingsStore {
 }
 
 const updateSettings = <K extends keyof BasicSettings>(field: K, value: BasicSettings[K], noSave?: boolean) => {
-  const id = useProjectDataStore.getState().currentTranslationId
-  if (!id) return
-  const translationData = useProjectDataStore.getState().translationData[id]
+  const currentId = useTranslationDataStore.getState().currentId
+  if (!currentId) return
+  const translationData = useTranslationDataStore.getState().data[currentId]
   if (!translationData) return
   translationData.basicSettings[field] = value
   if (noSave) return
-  useProjectDataStore.getState().saveData(id, "translation")
+  useTranslationDataStore.getState().saveData(currentId)
 }
 
 const firstModel = Object.values(FREE_MODELS)[0]

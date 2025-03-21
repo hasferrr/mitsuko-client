@@ -14,6 +14,7 @@ import { Separator } from "./ui/separator"
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, BreadcrumbPage } from "./ui/breadcrumb"
 import { useProjectStore } from "@/stores/use-project-store"
 import { useProjectDataStore } from "@/stores/use-project-data-store"
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import { useEffect, useState } from "react"
 
 export function Navbar() {
@@ -33,11 +34,11 @@ export function Navbar() {
   // Project Store
   const currentProject = useProjectStore(state => state.currentProject)
 
-  const tlId = useProjectDataStore(state => state.currentTranslationId)
+  const tlId = useTranslationDataStore(state => state.currentId)
   const tsId = useProjectDataStore(state => state.currentTranscriptionId)
   const exId = useProjectDataStore(state => state.currentExtractionId)
 
-  const tlData = useProjectDataStore(state => state.translationData)
+  const tlData = useTranslationDataStore(state => state.data)
   const tsData = useProjectDataStore(state => state.transcriptionData)
   const exData = useProjectDataStore(state => state.extractionData)
 
