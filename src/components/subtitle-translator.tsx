@@ -100,40 +100,30 @@ type DownloadOption = "original" | "translated" | "both"
 type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
 
 export default function SubtitleTranslator() {
-  const currentTranslationId = useTranslationDataStore((state) => state.currentId)
-  if (!currentTranslationId) {
+  const currentId = useTranslationDataStore((state) => state.currentId)
+  if (!currentId) {
     return <div className="p-4">No translation project selected</div>
   }
 
-  // Destructure raw setter functions with underscore names for subtitle and response:
+  // Get translation data and functions from store
+  const translationData = useTranslationDataStore((state) => state.data)
   const {
-    setTitle: _setTitle,
-    setSubtitles: _setSubtitles,
-    setParsed: _setParsed,
-    resetParsed: _resetParsed,
-    updateSubtitle: _updateSubtitle,
-    setResponse: _setResponse,
-    setJsonResponse: _setJsonResponse,
-    appendJsonResponse: _appendJsonResponse,
+    setTitle,
+    setSubtitles,
+    setParsed,
+    resetParsed,
+    updateSubtitle,
+    setResponse,
+    setJsonResponse,
+    appendJsonResponse,
+    saveData
   } = useTranslationDataStore()
 
-  // Create curried setter functions that automatically pass currentTranslationId
-  const setTitle = (title: string) => _setTitle(currentTranslationId, title)
-  const setSubtitles = (subtitles: typeof tld.subtitles) => _setSubtitles(currentTranslationId, subtitles)
-  const setParsed = (parsed: typeof tld.parsed) => _setParsed(currentTranslationId, parsed)
-  const resetParsed = () => _resetParsed(currentTranslationId)
-  const setJsonResponse = (jsonRes: SubOnlyTranslated[]) => _setJsonResponse(currentTranslationId, jsonRes)
-  const appendJsonResponse = (arr: SubOnlyTranslated[]) => _appendJsonResponse(currentTranslationId, arr)
-
-  // Use translation data store; extract data and save function
-  const translationData = useTranslationDataStore((state) => state.data)
-  const _saveData = useTranslationDataStore((state) => state.saveData)
-  const save = (revalidate?: boolean) => _saveData(currentTranslationId, revalidate)
-
-  const tld = translationData[currentTranslationId] || { title: "", subtitles: [], parsed: { type: "srt", data: null } }
-  const title = tld.title
-  const subtitles = tld.subtitles
-  const parsed = tld.parsed
+  // Get current translation data
+  const translation = translationData[currentId]
+  const title = translation?.title ?? ""
+  const subtitles = translation?.subtitles ?? []
+  const parsed = translation?.parsed ?? { type: "srt", data: null }
 
   // Settings Store
   const {
@@ -180,8 +170,8 @@ export default function SubtitleTranslator() {
   const _setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
-  const isTranslating = _isTranslating.has(currentTranslationId)
-  const setIsTranslating = (isTranslating: boolean) => _setIsTranslating(currentTranslationId, isTranslating)
+  const isTranslating = _isTranslating.has(currentId)
+  const setIsTranslating = (isTranslating: boolean) => _setIsTranslating(currentId, isTranslating)
 
   // History Store & State
   const addHistory = useHistoryStore((state) => state.addHistory)
@@ -207,21 +197,21 @@ export default function SubtitleTranslator() {
   const subName = parsed.type === "ass" ? "SSA" : "SRT"
 
   useEffect(() => {
-    setSourceLanguage(tld.basicSettings.sourceLanguage)
-    setTargetLanguage(tld.basicSettings.targetLanguage)
-    setModelDetail(tld.basicSettings.modelDetail)
-    setIsUseCustomModel(tld.basicSettings.isUseCustomModel)
-    setContextDocument(tld.basicSettings.contextDocument)
-    setTemperature(tld.advancedSettings.temperature)
-    setSplitSize(tld.advancedSettings.splitSize)
-    setMaxCompletionTokens(tld.advancedSettings.maxCompletionTokens)
-    setStartIndex(tld.advancedSettings.startIndex)
-    setEndIndex(tld.advancedSettings.endIndex)
-    setIsUseStructuredOutput(tld.advancedSettings.isUseStructuredOutput)
-    setIsUseFullContextMemory(tld.advancedSettings.isUseFullContextMemory)
-    setIsMaxCompletionTokensAuto(tld.advancedSettings.isMaxCompletionTokensAuto)
-    setIsBetterContextCaching(tld.advancedSettings.isBetterContextCaching)
-    return () => { save() }
+    setSourceLanguage(translation?.basicSettings.sourceLanguage)
+    setTargetLanguage(translation?.basicSettings.targetLanguage)
+    setModelDetail(translation?.basicSettings.modelDetail)
+    setIsUseCustomModel(translation?.basicSettings.isUseCustomModel)
+    setContextDocument(translation?.basicSettings.contextDocument)
+    setTemperature(translation?.advancedSettings.temperature)
+    setSplitSize(translation?.advancedSettings.splitSize)
+    setMaxCompletionTokens(translation?.advancedSettings.maxCompletionTokens)
+    setStartIndex(translation?.advancedSettings.startIndex)
+    setEndIndex(translation?.advancedSettings.endIndex)
+    setIsUseStructuredOutput(translation?.advancedSettings.isUseStructuredOutput)
+    setIsUseFullContextMemory(translation?.advancedSettings.isUseFullContextMemory)
+    setIsMaxCompletionTokensAuto(translation?.advancedSettings.isMaxCompletionTokensAuto)
+    setIsBetterContextCaching(translation?.advancedSettings.isBetterContextCaching)
+    return () => { saveData(currentId, true) }
   }, [])
 
   const fixedSplit = (size: number, s: number, e: number) => {
@@ -251,8 +241,8 @@ export default function SubtitleTranslator() {
     setIsTranslating(true)
     setHasChanges(true)
     setActiveTab("result")
-    setJsonResponse([])
-    await save(true)
+    setJsonResponse(currentId, [])
+    await saveData(currentId, true)
 
     setTimeout(() => {
       window.scrollTo({
@@ -353,16 +343,16 @@ export default function SubtitleTranslator() {
         const result = await translateSubtitles(requestBody, isUseCustomModel ? apiKey : "", !isUseCustomModel)
         tlChunk = result.parsed
         rawResponse = result.raw
-        allRawResponses.push(useTranslationDataStore.getState().data[currentTranslationId].response.response)
+        allRawResponses.push(useTranslationDataStore.getState().data[currentId].response.response)
         console.log("result: ", tlChunk)
       } catch {
         setIsTranslating(false)
-        allRawResponses.push(useTranslationDataStore.getState().data[currentTranslationId].response.response)
+        allRawResponses.push(useTranslationDataStore.getState().data[currentId].response.response)
         break
       }
 
       // Update the parsed json
-      appendJsonResponse(tlChunk)
+      appendJsonResponse(currentId, tlChunk)
 
       // Merge translated chunk with original subtitles
       const merged: SubtitleTranslated[] = [...subtitles]
@@ -373,8 +363,8 @@ export default function SubtitleTranslator() {
           translated: tlChunk[j].translated || merged[index].translated,
         }
       }
-      setSubtitles(merged)
-      await save()
+      setSubtitles(currentId, merged)
+      await saveData(currentId)
 
       // Break if translation is stopped
       const translatingStatus = isTranslating
@@ -448,13 +438,13 @@ export default function SubtitleTranslator() {
       addHistory(
         title,
         allRawResponses,
-        useTranslationDataStore.getState().data[currentTranslationId].response.jsonResponse,
-        useTranslationDataStore.getState().data[currentTranslationId].subtitles,
-        useTranslationDataStore.getState().data[currentTranslationId].parsed,
+        useTranslationDataStore.getState().data[currentId].response.jsonResponse,
+        useTranslationDataStore.getState().data[currentId].subtitles,
+        useTranslationDataStore.getState().data[currentId].parsed,
       )
     }
 
-    await save(true)
+    await saveData(currentId, true)
   }
 
   const handleStopTranslation = () => {
@@ -494,11 +484,11 @@ export default function SubtitleTranslator() {
       let parsedSubs: Subtitle[] = []
       if (type === "srt" && isSRT(text)) {
         parsedSubs = parseSRT(text)
-        setParsed({ type, data: null })
+        setParsed(currentId, { type, data: null })
       } else if (type === "ass" && isASS(text)) {
         const data = parseASS(text)
         parsedSubs = data.subtitles
-        setParsed({ type, data })
+        setParsed(currentId, { type, data })
       } else {
         console.error("Invalid file type")
         toast.error("Invalid file type")
@@ -510,13 +500,13 @@ export default function SubtitleTranslator() {
         translated: "",
       }))
 
-      setSubtitles(parsedSubtitles)
+      setSubtitles(currentId, parsedSubtitles)
       resetIndex(1, parsedSubtitles.length)
-      await save()
+      await saveData(currentId)
 
       const fileName = pendingFile.name.split('.')
       fileName.pop()
-      setTitle(fileName.join('.'))
+      setTitle(currentId, fileName.join('.'))
 
     } catch (error) {
       console.error("Error parsing subtitle file:", error)
@@ -617,14 +607,14 @@ export default function SubtitleTranslator() {
   }
 
   const handleDelete = async () => {
-    setSubtitles([])
-    resetParsed()
-    await save()
+    setSubtitles(currentId, [])
+    resetParsed(currentId)
+    await saveData(currentId)
   }
 
   const handleSave = async () => {
     setIsSaving(true)
-    await save(true)
+    await saveData(currentId, true)
     setIsSaving(false)
   }
 
@@ -635,7 +625,7 @@ export default function SubtitleTranslator() {
         <div className="flex-1 min-w-40">
           <Input
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => setTitle(currentId, e.target.value)}
             className="text-xl font-semibold h-12"
           />
         </div>
@@ -749,7 +739,7 @@ export default function SubtitleTranslator() {
               variant="outline"
               className="gap-2"
               onClick={handleStopTranslation}
-              disabled={!isTranslating || !tld.response.response}
+              disabled={!isTranslating || !translation.response.response}
             >
               <Square className="h-4 w-4" />
               Stop
