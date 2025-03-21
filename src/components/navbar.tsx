@@ -13,8 +13,9 @@ import { SidebarTrigger } from "./ui/sidebar"
 import { Separator } from "./ui/separator"
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, BreadcrumbPage } from "./ui/breadcrumb"
 import { useProjectStore } from "@/stores/use-project-store"
-import { useProjectDataStore } from "@/stores/use-project-data-store"
 import { useTranslationDataStore } from "@/stores/use-translation-data-store"
+import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
+import { useExtractionDataStore } from "@/stores/use-extraction-data-store"
 import { useEffect, useState } from "react"
 
 export function Navbar() {
@@ -35,12 +36,12 @@ export function Navbar() {
   const currentProject = useProjectStore(state => state.currentProject)
 
   const tlId = useTranslationDataStore(state => state.currentId)
-  const tsId = useProjectDataStore(state => state.currentTranscriptionId)
-  const exId = useProjectDataStore(state => state.currentExtractionId)
+  const tsId = useTranscriptionDataStore(state => state.currentId)
+  const exId = useExtractionDataStore(state => state.currentId)
 
   const tlData = useTranslationDataStore(state => state.data)
-  const tsData = useProjectDataStore(state => state.transcriptionData)
-  const exData = useProjectDataStore(state => state.extractionData)
+  const tsData = useTranscriptionDataStore(state => state.data)
+  const exData = useExtractionDataStore(state => state.data)
 
   useEffect(() => {
     setPathname("")

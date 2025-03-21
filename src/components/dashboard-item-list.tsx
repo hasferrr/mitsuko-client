@@ -4,13 +4,14 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "./ui/button"
 import { Edit, Trash } from "lucide-react"
-import { useProjectDataStore } from "@/stores/use-project-data-store"
 import { DeleteDialogue } from "./ui-custom/delete-dialogue"
 import { EditDialogue } from "./ui-custom/edit-dialogue"
 import { getExtraction } from "@/lib/db/extraction"
 import { getTranslation } from "@/lib/db/translation"
 import { getTranscription } from "@/lib/db/transcription"
 import { useTranslationDataStore } from "@/stores/use-translation-data-store"
+import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
+import { useExtractionDataStore } from "@/stores/use-extraction-data-store"
 
 interface DashboardItemListProps {
   id: string
@@ -36,18 +37,23 @@ export const DashboardItemList = ({
   handleDelete,
 }: DashboardItemListProps) => {
   const router = useRouter()
-  const {
-    setCurrentTranscriptionId,
-    setCurrentExtractionId,
-    transcriptionData,
-    extractionData,
-    upsertData,
-  } = useProjectDataStore()
+
   const {
     setCurrentId: setCurrentTranslationId,
     data: translationData,
     upsertData: upsertTranslationData,
   } = useTranslationDataStore()
+  const {
+    setCurrentId: setCurrentTranscriptionId,
+    data: transcriptionData,
+    upsertData: upsertTranscriptionData,
+  } = useTranscriptionDataStore()
+  const {
+    setCurrentId: setCurrentExtractionId,
+    data: extractionData,
+    upsertData: upsertExtractionData,
+  } = useExtractionDataStore()
+
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -68,7 +74,7 @@ export const DashboardItemList = ({
         if (!(id in transcriptionData)) {
           const transcription = await getTranscription(projectId, id)
           if (transcription) {
-            upsertData(id, "transcription", transcription)
+            upsertTranscriptionData(id, transcription)
           }
         }
         setCurrentTranscriptionId(id)
@@ -78,7 +84,7 @@ export const DashboardItemList = ({
         if (!(id in extractionData)) {
           const extraction = await getExtraction(projectId, id)
           if (extraction) {
-            upsertData(id, "extraction", extraction)
+            upsertExtractionData(id, extraction)
           }
         }
         setCurrentExtractionId(id)
