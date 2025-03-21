@@ -27,9 +27,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 
 export const LanguageSelection = memo(() => {
-  const sourceLanguage = useSettingsStore((state) => state.sourceLanguage)
+  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
   const setSourceLanguage = useSettingsStore((state) => state.setSourceLanguage)
-  const targetLanguage = useSettingsStore((state) => state.targetLanguage)
+  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage())
   const setTargetLanguage = useSettingsStore((state) => state.setTargetLanguage)
 
   return (
@@ -57,7 +57,7 @@ export const LanguageSelection = memo(() => {
 })
 
 export const ModelSelection = memo(() => {
-  const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
   const setIsUseCustomModel = useSettingsStore((state) => state.setIsUseCustomModel)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
   const setCustomBaseUrl = useSettingsStore((state) => state.setCustomBaseUrl)
@@ -125,7 +125,7 @@ export const ModelSelection = memo(() => {
 })
 
 export const ContextDocumentInput = memo(() => {
-  const contextDocument = useSettingsStore((state) => state.contextDocument)
+  const contextDocument = useSettingsStore((state) => state.getContextDocument())
   const setContextDocument = useSettingsStore((state) => state.setContextDocument)
   const { setHasChanges } = useUnsavedChanges()
 
@@ -155,7 +155,7 @@ export const ContextDocumentInput = memo(() => {
 })
 
 export const TemperatureSlider = memo(() => {
-  const temperature = useAdvancedSettingsStore((state) => state.temperature)
+  const temperature = useAdvancedSettingsStore((state) => state.getTemperature())
   const setTemperature = useAdvancedSettingsStore((state) => state.setTemperature)
   return (
     <div className="space-y-2">
@@ -181,8 +181,8 @@ export const TemperatureSlider = memo(() => {
 })
 
 export const StartIndexInput = memo(() => {
-  const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
-  const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
+  const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex())
+  const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex())
   const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
   const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
   const currentId = useTranslationDataStore((state) => state.currentId)
@@ -265,8 +265,8 @@ export const StartIndexInput = memo(() => {
 })
 
 export const EndIndexInput = memo(() => {
-  const startIndex = useAdvancedSettingsStore((state) => state.startIndex)
-  const endIndex = useAdvancedSettingsStore((state) => state.endIndex)
+  const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex())
+  const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex())
   const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
   const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
   const currentId = useTranslationDataStore((state) => state.currentId)
@@ -315,7 +315,7 @@ export const EndIndexInput = memo(() => {
 })
 
 export const SplitSizeInput = memo(() => {
-  const splitSize = useAdvancedSettingsStore((state) => state.splitSize)
+  const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize())
   const setSplitSize = useAdvancedSettingsStore((state) => state.setSplitSize)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -360,11 +360,11 @@ export const SplitSizeInput = memo(() => {
 })
 
 export const MaxCompletionTokenInput = memo(() => {
-  const modelDetail = useSettingsStore((state) => state.modelDetail)
-  const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
-  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
+  const modelDetail = useSettingsStore((state) => state.getModelDetail())
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
+  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
   const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
-  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.isMaxCompletionTokensAuto)
+  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())
   const setIsMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.setIsMaxCompletionTokensAuto)
 
   const maxToken = isUseCustomModel || !modelDetail
@@ -419,9 +419,9 @@ export const MaxCompletionTokenInput = memo(() => {
 })
 
 export const StructuredOutputSwitch = memo(() => {
-  const modelDetail = useSettingsStore((state) => state.modelDetail)
-  const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
-  const useStructuredOutput = useAdvancedSettingsStore((state) => state.isUseStructuredOutput)
+  const modelDetail = useSettingsStore((state) => state.getModelDetail())
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
+  const useStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput())
   const setUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
 
   const disabled = !isUseCustomModel && !modelDetail?.structuredOutput
@@ -445,7 +445,7 @@ export const StructuredOutputSwitch = memo(() => {
 })
 
 export const FullContextMemorySwitch = memo(() => {
-  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
+  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
   const setIsUseFullContextMemory = useAdvancedSettingsStore((state) => state.setIsUseFullContextMemory)
 
   return (
@@ -468,9 +468,9 @@ export const FullContextMemorySwitch = memo(() => {
 })
 
 export const BetterContextCachingSwitch = memo(() => {
-  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.isBetterContextCaching)
+  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching())
   const setIsBetterContextCaching = useAdvancedSettingsStore((state) => state.setIsBetterContextCaching)
-  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.isUseFullContextMemory)
+  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
 
   return (
     <div className="space-y-2">
@@ -494,8 +494,8 @@ export const BetterContextCachingSwitch = memo(() => {
 })
 
 export const SystemPromptInput = memo(() => {
-  const prompt = useAdvancedSettingsStore((state) => state.prompt)
-  const setPrompt = useAdvancedSettingsStore((state) => state.setPrompt)
+  const prompt = ""
+  const setPrompt = (val: string) => { }
   const { setHasChanges } = useUnsavedChanges()
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

@@ -39,15 +39,15 @@ export const ContextExtractor = () => {
   const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
 
   // Settings Store
-  const modelDetail = useSettingsStore((state) => state.modelDetail)
-  const isUseCustomModel = useSettingsStore((state) => state.isUseCustomModel)
+  const modelDetail = useSettingsStore((state) => state.getModelDetail())
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
   const apiKey = useSettingsStore((state) => state.apiKey)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
   const customModel = useSettingsStore((state) => state.customModel)
 
   // Advanced Settings Store
-  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.maxCompletionTokens)
-  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.isMaxCompletionTokensAuto)
+  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
+  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())
 
   // Extraction Store
   const contextResult = useExtractionStore((state) => state.contextResult)

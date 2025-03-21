@@ -12,13 +12,13 @@ interface TranslationDataStore {
   saveData: (id: string, revalidate?: boolean) => Promise<void>
   upsertData: (id: string, value: Translation) => void
   removeData: (id: string) => void
-  // Subtitle methods (migrated from use-subtitle-store)
+  // Subtitle methods
   setTitle: (id: string, title: string) => void
   setSubtitles: (id: string, subtitles: SubtitleTranslated[]) => void
   setParsed: (id: string, parsed: Parsed) => void
   resetParsed: (id: string) => void
   updateSubtitle: (id: string, index: number, field: keyof SubtitleTranslated, value: any) => void
-  // Response methods (migrated from use-translation-store)
+  // Response methods
   setResponse: (id: string, response: string) => void
   setJsonResponse: (id: string, jsonResponse: SubOnlyTranslated[]) => void
   appendJsonResponse: (id: string, arr: SubOnlyTranslated[]) => void
@@ -69,7 +69,7 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       return { data: newData }
     })
   },
-  // New subtitle setter functions
+  // Subtitle methods
   setTitle: (id, title) => {
     get().mutateData(id, "title", title)
   },
@@ -91,7 +91,7 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       get().mutateData(id, "subtitles", updated)
     }
   },
-  // New response setters that update the ResponseTranslation property of the translation data
+  // Response methods
   setResponse: (id, res) => {
     const translation = get().data[id]
     if (!translation) return

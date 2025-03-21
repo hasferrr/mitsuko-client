@@ -25,8 +25,8 @@ export interface Translation {
   createdAt: Date
   updatedAt: Date
   projectId: string
-  basicSettings: BasicSettings
-  advancedSettings: AdvancedSettings
+  basicSettingsId: string
+  advancedSettingsId: string
   response: ResponseTranslation
 }
 
@@ -52,14 +52,18 @@ export interface Extraction {
 }
 
 export interface BasicSettings {
+  id: string
   sourceLanguage: string
   targetLanguage: string
   modelDetail: Model | null
   isUseCustomModel: boolean
   contextDocument: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface AdvancedSettings {
+  id: string
   temperature: number
   startIndex: number
   endIndex: number
@@ -69,6 +73,8 @@ export interface AdvancedSettings {
   isUseFullContextMemory: boolean
   isBetterContextCaching: boolean
   isMaxCompletionTokensAuto: boolean
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface ResponseTranslation {

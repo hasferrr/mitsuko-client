@@ -36,7 +36,7 @@ export function ModelSelector({
   const models = FREE_MODELS
   const [open, setOpen] = React.useState(false)
 
-  const modelDetail = useSettingsStore((state) => state.modelDetail)
+  const modelDetail = useSettingsStore((state) => state.getModelDetail())
   const setModelDetail = useSettingsStore((state) => state.setModelDetail)
   const setIsUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
 

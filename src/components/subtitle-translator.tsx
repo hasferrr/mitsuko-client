@@ -94,6 +94,7 @@ import { getContent } from "@/lib/parser"
 import { createContextMemory } from "@/lib/context-memory"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useTranslationDataStore } from "@/stores/use-translation-data-store"
+import { getAdvancedSettings, getBasicSettings } from "@/lib/db/settings"
 
 
 type DownloadOption = "original" | "translated" | "both"
@@ -127,14 +128,16 @@ export default function SubtitleTranslator() {
 
   // Settings Store
   const {
-    sourceLanguage,
-    targetLanguage,
-    modelDetail,
-    isUseCustomModel,
+    getSourceLanguage,
+    getTargetLanguage,
+    getModelDetail,
+    getIsUseCustomModel,
+    getContextDocument,
     customBaseUrl,
     customModel,
     apiKey,
-    contextDocument,
+    setCurrentId: setSettingsCurrentId,
+    upsertData: upsertSettingsData,
     setSourceLanguage,
     setTargetLanguage,
     setModelDetail,
@@ -142,17 +145,25 @@ export default function SubtitleTranslator() {
     setContextDocument,
   } = useSettingsStore()
 
+  const sourceLanguage = getSourceLanguage()
+  const targetLanguage = getTargetLanguage()
+  const modelDetail = getModelDetail()
+  const isUseCustomModel = getIsUseCustomModel()
+  const contextDocument = getContextDocument()
+
   // Advanced Settings Store
   const {
-    temperature,
-    maxCompletionTokens,
-    isMaxCompletionTokensAuto,
-    splitSize,
-    startIndex,
-    endIndex,
-    isUseStructuredOutput,
-    isUseFullContextMemory,
-    isBetterContextCaching,
+    getTemperature,
+    getMaxCompletionTokens,
+    getIsMaxCompletionTokensAuto,
+    getSplitSize,
+    getStartIndex,
+    getEndIndex,
+    getIsUseStructuredOutput,
+    getIsUseFullContextMemory,
+    getIsBetterContextCaching,
+    setCurrentId: setAdvancedSettingsCurrentId,
+    upsertData: upsertAdvancedSettingsData,
     setTemperature,
     setSplitSize,
     setMaxCompletionTokens,
@@ -164,6 +175,16 @@ export default function SubtitleTranslator() {
     setIsBetterContextCaching,
     resetIndex,
   } = useAdvancedSettingsStore()
+
+  const temperature = getTemperature()
+  const maxCompletionTokens = getMaxCompletionTokens()
+  const isMaxCompletionTokensAuto = getIsMaxCompletionTokensAuto()
+  const splitSize = getSplitSize()
+  const startIndex = getStartIndex()
+  const endIndex = getEndIndex()
+  const isUseStructuredOutput = getIsUseStructuredOutput()
+  const isUseFullContextMemory = getIsUseFullContextMemory()
+  const isBetterContextCaching = getIsBetterContextCaching()
 
   // Translation Store
   const isTranslatingSet = useTranslationStore((state) => state.isTranslatingSet)
@@ -196,20 +217,30 @@ export default function SubtitleTranslator() {
   const subName = parsed.type === "ass" ? "SSA" : "SRT"
 
   useEffect(() => {
-    setSourceLanguage(translation?.basicSettings.sourceLanguage)
-    setTargetLanguage(translation?.basicSettings.targetLanguage)
-    setModelDetail(translation?.basicSettings.modelDetail)
-    setIsUseCustomModel(translation?.basicSettings.isUseCustomModel)
-    setContextDocument(translation?.basicSettings.contextDocument)
-    setTemperature(translation?.advancedSettings.temperature)
-    setSplitSize(translation?.advancedSettings.splitSize)
-    setMaxCompletionTokens(translation?.advancedSettings.maxCompletionTokens)
-    setStartIndex(translation?.advancedSettings.startIndex)
-    setEndIndex(translation?.advancedSettings.endIndex)
-    setIsUseStructuredOutput(translation?.advancedSettings.isUseStructuredOutput)
-    setIsUseFullContextMemory(translation?.advancedSettings.isUseFullContextMemory)
-    setIsMaxCompletionTokensAuto(translation?.advancedSettings.isMaxCompletionTokensAuto)
-    setIsBetterContextCaching(translation?.advancedSettings.isBetterContextCaching)
+    if (!translationData[currentId]) return
+    setSettingsCurrentId(translationData[currentId].basicSettingsId)
+    setAdvancedSettingsCurrentId(translationData[currentId].advancedSettingsId)
+
+    // Fetch settings data if available
+    if (translationData[currentId].basicSettingsId) {
+      getBasicSettings(translationData[currentId].basicSettingsId)
+        .then(settings => {
+          if (settings) {
+            upsertSettingsData(settings.id, settings)
+          }
+        })
+    }
+
+    // Fetch advanced settings data if available
+    if (translationData[currentId].advancedSettingsId) {
+      getAdvancedSettings(translationData[currentId].advancedSettingsId)
+        .then(advancedSettings => {
+          if (advancedSettings) {
+            upsertAdvancedSettingsData(advancedSettings.id, advancedSettings)
+          }
+        })
+    }
+
     return () => { saveData(currentId, true) }
   }, [])
 
