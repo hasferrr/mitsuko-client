@@ -29,9 +29,20 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
   data: {},
   setCurrentId: (id) => set({ currentId: id }),
   mutateData: (id, key, value) => {
-    const data = get().data[id]
-    if (!data) return
-    data[key] = value
+    set(state => {
+      const data = state.data[id]
+      if (!data) return state
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [id]: {
+            ...data,
+            [key]: value
+          }
+        }
+      }
+    })
   },
   saveData: async (id, revalidate) => {
     const translation = get().data[id]
