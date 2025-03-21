@@ -3,10 +3,11 @@ import { SubOnlyTranslated } from "@/types/types"
 import { parseTranslationJson } from "@/lib/parser"
 import { TRANSLATE_URL, TRANSLATE_URL_FREE } from "@/constants/api"
 import { handleStream } from "@/lib/stream"
+import { RefObject } from "react"
 
 interface TranslationStore {
   isTranslatingSet: Set<string>
-  abortControllerMap: Map<string, AbortController>
+  abortControllerMap: Map<string, RefObject<AbortController>>
   setIsTranslating: (translationId: string, isTranslating: boolean) => void
   stopTranslation: (id: string) => void
   translateSubtitles: (
@@ -30,7 +31,12 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
     }
   },
 
-  stopTranslation: (id: string) => get().abortControllerMap.get(id)?.abort(),
+  stopTranslation: (id: string) => {
+    get().isTranslatingSet.delete(id)
+    get().abortControllerMap.get(id)?.current.abort()
+    get().abortControllerMap.delete(id)
+  },
+
   translateSubtitles: async (
     requestBody: any,
     apiKey: string,
@@ -38,12 +44,12 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
     id: string,
     setResponse: (response: string) => void
   ): Promise<{ parsed: SubOnlyTranslated[], raw: string }> => {
-    const abortController = new AbortController()
-    get().abortControllerMap.set(id, abortController)
+    const abortControllerRef = { current: new AbortController() }
+    get().abortControllerMap.set(id, abortControllerRef)
 
     const buffer: string = await handleStream({
       setResponse,
-      abortControllerRef: { current: abortController },
+      abortControllerRef,
       isFree,
       apiKey,
       requestUrl: isFree ? TRANSLATE_URL_FREE : TRANSLATE_URL,

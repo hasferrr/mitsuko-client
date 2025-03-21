@@ -241,7 +241,7 @@ export default function SubtitleTranslator() {
     setHasChanges(true)
     setActiveTab("result")
     setJsonResponse(currentId, [])
-    await saveData(currentId, true)
+    await saveData(currentId)
 
     setTimeout(() => {
       window.scrollTo({
@@ -458,6 +458,7 @@ export default function SubtitleTranslator() {
   const handleStopTranslation = () => {
     stopTranslation(currentId)
     setIsTranslating(currentId, false)
+    saveData(currentId)
   }
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement> | FileList) => {
