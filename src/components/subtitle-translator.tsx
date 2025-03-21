@@ -372,8 +372,11 @@ export default function SubtitleTranslator() {
       await saveData(currentId)
 
       // Break if translation is stopped
-      const translatingStatus = isTranslating
-      if (!translatingStatus) break
+      const translatingStatus = useTranslationStore.getState().isTranslatingSet.has(currentId)
+      if (!translatingStatus) {
+        console.log('translation is stopped', 'isTranslating is FALSE')
+        break
+      }
 
       // Update context for next chunk
       context.push({
