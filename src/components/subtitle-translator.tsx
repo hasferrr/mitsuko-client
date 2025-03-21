@@ -339,7 +339,12 @@ export default function SubtitleTranslator() {
       let tlChunk: SubOnlyTranslated[] = []
       let rawResponse = ""
       try {
-        const result = await translateSubtitles(requestBody, isUseCustomModel ? apiKey : "", !isUseCustomModel)
+        const result = await translateSubtitles(
+          requestBody,
+          isUseCustomModel ? apiKey : "",
+          !isUseCustomModel,
+          (response) => setResponse(currentId, response)
+        )
         tlChunk = result.parsed
         rawResponse = result.raw
         allRawResponses.push(useTranslationDataStore.getState().data[currentId].response.response)
