@@ -9,7 +9,7 @@ interface TranslationDataStore {
   // Existing methods
   setCurrentId: (id: string) => void
   mutateData: (id: string, key: keyof Translation, value: any) => void
-  saveData: (id: string, revalidate?: boolean) => Promise<void>
+  saveData: (id: string) => Promise<void>
   upsertData: (id: string, value: Translation) => void
   removeData: (id: string) => void
   // Subtitle methods
@@ -44,7 +44,7 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       }
     })
   },
-  saveData: async (id, revalidate) => {
+  saveData: async (id) => {
     const translation = get().data[id]
     if (!translation) {
       console.error("Translation not found in store")
@@ -52,9 +52,7 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     }
     try {
       const result = await updateTranslation(id, translation)
-      if (revalidate && result) {
-        set({ data: { ...get().data, [id]: result } })
-      }
+      set({ data: { ...get().data, [id]: result } })
     } catch (error) {
       console.error("Failed to save translation data:", error)
     }

@@ -103,7 +103,7 @@ export const SubtitleResultOutput = memo(() => {
       }
     }
     setSubtitles(currentId, merged)
-    await saveData(currentId, true)
+    await saveData(currentId)
   }
 
   return (

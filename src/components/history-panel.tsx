@@ -87,7 +87,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
       setParsed(currentId, selectedHistoryItem.parsed)
       setResponse(currentId, selectedHistoryItem.content.join(""))
       setJsonResponse(currentId, selectedHistoryItem.json)
-      await saveData(currentId, true)
+      await saveData(currentId)
       setIsHistoryOpen(false)
       resetIndex(1, selectedHistoryItem.subtitles.length)
     } catch (error) {

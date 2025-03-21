@@ -227,7 +227,7 @@ export default function SubtitleTranslator() {
         })
     }
 
-    return () => { saveData(currentId, true) }
+    return () => { saveData(currentId) }
   }, [])
 
   const fixedSplit = (size: number, s: number, e: number) => {
@@ -375,6 +375,7 @@ export default function SubtitleTranslator() {
 
       // Update the parsed json
       appendJsonResponse(currentId, tlChunk)
+      await saveData(currentId)
 
       // Merge translated chunk with original subtitles
       const merged: SubtitleTranslated[] = [...subtitles]
@@ -469,7 +470,7 @@ export default function SubtitleTranslator() {
       )
     }
 
-    await saveData(currentId, true)
+    await saveData(currentId)
   }
 
   const handleStopTranslation = () => {
@@ -641,7 +642,7 @@ export default function SubtitleTranslator() {
 
   const handleSave = async () => {
     setIsSaving(true)
-    await saveData(currentId, true)
+    await saveData(currentId)
     setIsSaving(false)
   }
 

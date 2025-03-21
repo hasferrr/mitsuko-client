@@ -63,7 +63,7 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
   const handleSetSubtitles = async (newSubtitles: SubtitleTranslated[]) => {
     if (!currentId) return
     setSubtitles(currentId, newSubtitles)
-    await saveData(currentId, true)
+    await saveData(currentId)
   }
 
   const handleRemoveAllLineBreaks = (field: "content" | "translated") => {
