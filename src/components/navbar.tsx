@@ -23,8 +23,8 @@ export function Navbar() {
   const [pathname, setPathname] = useState("")
 
   // Theme
-  const isDarkModeGlobal = useThemeStore(state => state.isDarkMode)
-  const setIsDarkModeGlobal = useThemeStore(state => state.setIsDarkMode)
+  const isDarkMode = useThemeStore(state => state.isDarkMode)
+  const setIsDarkMode = useThemeStore(state => state.setIsDarkMode)
 
   // Process
   const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
@@ -57,6 +57,18 @@ export function Navbar() {
       setPathname("Episode " + getTruncatedTitle(exData[exId].episodeNumber))
     }
   }, [_pathname, tlId, tsId, exId, tlData, tsData, exData])
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [isDarkMode])
+
+  const handleToggle = () => {
+    setIsDarkMode(!isDarkMode)
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pr-8">
@@ -110,8 +122,12 @@ export function Navbar() {
               <span className="hidden md:block">Processing...</span>
             </div>
           )}
-          <Button variant="ghost" size="icon" onClick={() => setIsDarkModeGlobal(!isDarkModeGlobal)} className="transition-none">
-            {isDarkModeGlobal ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          <Button variant="ghost" size="icon" onClick={handleToggle} className="transition-none">
+            {isDarkMode ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
           </Button>
         </div>
       </div>
