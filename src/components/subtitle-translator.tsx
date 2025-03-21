@@ -113,7 +113,6 @@ export default function SubtitleTranslator() {
     setSubtitles,
     setParsed,
     resetParsed,
-    updateSubtitle,
     setResponse,
     setJsonResponse,
     appendJsonResponse,
@@ -138,10 +137,6 @@ export default function SubtitleTranslator() {
     apiKey,
     setCurrentId: setSettingsCurrentId,
     upsertData: upsertSettingsData,
-    setSourceLanguage,
-    setTargetLanguage,
-    setModelDetail,
-    setIsUseCustomModel,
     setContextDocument,
   } = useSettingsStore()
 
@@ -164,15 +159,6 @@ export default function SubtitleTranslator() {
     getIsBetterContextCaching,
     setCurrentId: setAdvancedSettingsCurrentId,
     upsertData: upsertAdvancedSettingsData,
-    setTemperature,
-    setSplitSize,
-    setMaxCompletionTokens,
-    setStartIndex,
-    setEndIndex,
-    setIsUseStructuredOutput,
-    setIsUseFullContextMemory,
-    setIsMaxCompletionTokensAuto,
-    setIsBetterContextCaching,
     resetIndex,
   } = useAdvancedSettingsStore()
 
