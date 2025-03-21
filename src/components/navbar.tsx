@@ -25,10 +25,10 @@ export function Navbar() {
   const setIsDarkModeGlobal = useThemeStore(state => state.setIsDarkMode)
 
   // Process
-  const isTranslating = useTranslationStore(state => state.isTranslating)
+  const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
   const isExtracting = useExtractionStore(state => state.isExtracting)
   const isTranscribing = useTranscriptionStore(state => state.isTranscribing)
-  const isProcessing = isTranslating.size || isExtracting || isTranscribing
+  const isProcessing = isTranslatingSet.size || isExtracting || isTranscribing
 
   // Project Store
   const currentProject = useProjectStore(state => state.currentProject)

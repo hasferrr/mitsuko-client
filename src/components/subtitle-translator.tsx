@@ -166,11 +166,11 @@ export default function SubtitleTranslator() {
   } = useAdvancedSettingsStore()
 
   // Translation Store
-  const _isTranslating = useTranslationStore((state) => state.isTranslating)
+  const isTranslatingSet = useTranslationStore((state) => state.isTranslatingSet)
   const _setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
-  const isTranslating = _isTranslating.has(currentId)
+  const isTranslating = isTranslatingSet.has(currentId)
   const setIsTranslating = (isTranslating: boolean) => _setIsTranslating(currentId, isTranslating)
 
   // History Store & State

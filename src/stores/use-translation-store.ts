@@ -10,7 +10,7 @@ import { useProjectDataStore } from "./use-project-data-store"
 interface TranslationStore {
   response: string
   jsonResponse: SubOnlyTranslated[]
-  isTranslating: Set<string>
+  isTranslatingSet: Set<string>
   abortControllerRef: React.RefObject<AbortController>
   setResponse: (response: string) => void
   setJsonResponse: (jsonResponse: SubOnlyTranslated[]) => void
@@ -31,7 +31,7 @@ const updateResponseNoSave = <K extends keyof ResponseTranslation>(field: K, val
 export const useTranslationStore = create<TranslationStore>()((set, get) => ({
   response: "",
   jsonResponse: [],
-  isTranslating: new Set(),
+  isTranslatingSet: new Set(),
   abortControllerRef: { current: abortedAbortController() },
 
   setResponse: (response) => {
@@ -52,9 +52,9 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
 
   setIsTranslating: (translationId, isTranslating) => {
     if (isTranslating) {
-      get().isTranslating.add(translationId)
+      get().isTranslatingSet.add(translationId)
     } else {
-      get().isTranslating.delete(translationId)
+      get().isTranslatingSet.delete(translationId)
     }
   },
 
