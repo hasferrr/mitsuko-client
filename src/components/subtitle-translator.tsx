@@ -167,11 +167,10 @@ export default function SubtitleTranslator() {
 
   // Translation Store
   const isTranslatingSet = useTranslationStore((state) => state.isTranslatingSet)
-  const _setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
+  const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
   const isTranslating = isTranslatingSet.has(currentId)
-  const setIsTranslating = (isTranslating: boolean) => _setIsTranslating(currentId, isTranslating)
 
   // History Store & State
   const addHistory = useHistoryStore((state) => state.addHistory)
@@ -238,7 +237,7 @@ export default function SubtitleTranslator() {
 
   const handleStartTranslation = async () => {
     if (!subtitles.length) return
-    setIsTranslating(true)
+    setIsTranslating(currentId, true)
     setHasChanges(true)
     setActiveTab("result")
     setJsonResponse(currentId, [])
@@ -346,7 +345,7 @@ export default function SubtitleTranslator() {
         allRawResponses.push(useTranslationDataStore.getState().data[currentId].response.response)
         console.log("result: ", tlChunk)
       } catch {
-        setIsTranslating(false)
+        setIsTranslating(currentId, false)
         allRawResponses.push(useTranslationDataStore.getState().data[currentId].response.response)
         break
       }
@@ -431,7 +430,7 @@ export default function SubtitleTranslator() {
       batch++
     }
 
-    setIsTranslating(false)
+    setIsTranslating(currentId, false)
 
     // Add to history *after* translation is complete, including subtitles and parsed
     if (allRawResponses.length > 0) {
@@ -449,7 +448,7 @@ export default function SubtitleTranslator() {
 
   const handleStopTranslation = () => {
     stopTranslation()
-    setIsTranslating(false)
+    setIsTranslating(currentId, false)
   }
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement> | FileList) => {
