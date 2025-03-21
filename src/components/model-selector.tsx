@@ -123,7 +123,6 @@ function ModelItem({ model, isSelected, onSelect }: ModelItemProps) {
           <CommandItem
             onSelect={onSelect}
             ref={ref}
-            className="data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground"
           >
             {model.name}
             <Check
@@ -151,7 +150,7 @@ interface ModelDescriptionProps {
 
 function ModelDescription({ model, isSelected }: ModelDescriptionProps) {
   return model ? (
-    <div className="dark:bg-foreground dark:text-background">
+    <div className="bg-popover text-popover-foreground">
       {isSelected && (
         <div className="text-xs text-muted-foreground mb-1">
           Currently Selected Model
