@@ -23,48 +23,50 @@ import {
 import { CHANGE_LOG_LINK, DISCORD_LINK } from "@/constants/external-links"
 import { useProjectStore } from "@/stores/use-project-store"
 
-const data = {
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/",
-      icon: House,
-    },
-    {
-      title: "Translate",
-      url: "/translate",
-      icon: Languages,
-    },
-    {
-      title: "Transcribe",
-      url: "/transcribe",
-      icon: AudioWaveform,
-    },
-    {
-      title: "Extract Context",
-      url: "/extract-context",
-      icon: BookOpen,
-    },
-  ],
-  links: [
-    {
-      title: "Discord",
-      url: DISCORD_LINK,
-      icon: Disc,
-      newTab: true,
-    },
-    {
-      title: "Changelog",
-      url: CHANGE_LOG_LINK,
-      icon: HistoryIcon,
-      newTab: true,
-    },
-  ],
-}
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const projects = useProjectStore((state) => state.projects)
   const createProject = useProjectStore((state) => state.createProject)
+  const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
+
+  const data = {
+    navMain: [
+      {
+        title: "Dashboard",
+        url: "/",
+        icon: House,
+        onClick: () => setCurrentProject(null),
+      },
+      {
+        title: "Translate",
+        url: "/translate",
+        icon: Languages,
+      },
+      {
+        title: "Transcribe",
+        url: "/transcribe",
+        icon: AudioWaveform,
+      },
+      {
+        title: "Extract Context",
+        url: "/extract-context",
+        icon: BookOpen,
+      },
+    ],
+    links: [
+      {
+        title: "Discord",
+        url: DISCORD_LINK,
+        icon: Disc,
+        newTab: true,
+      },
+      {
+        title: "Changelog",
+        url: CHANGE_LOG_LINK,
+        icon: HistoryIcon,
+        newTab: true,
+      },
+    ],
+  }
 
   return (
     <Sidebar collapsible="icon" variant="floating" {...props}>

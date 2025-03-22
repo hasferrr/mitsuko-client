@@ -34,6 +34,7 @@ export function Navbar() {
 
   // Project Store
   const currentProject = useProjectStore(state => state.currentProject)
+  const setCurrentProject = useProjectStore(state => state.setCurrentProject)
 
   const tlId = useTranslationDataStore(state => state.currentId)
   const tsId = useTranscriptionDataStore(state => state.currentId)
@@ -80,7 +81,7 @@ export function Navbar() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="hidden md:block text-foreground hover:underline">
-              <Link href="/" className="flex items-center gap-2">
+              <Link href="/" className="flex items-center gap-2" onClick={() => setCurrentProject(null)}>
                 <img
                   width={4 * 6}
                   height={4 * 6}

@@ -17,6 +17,7 @@ interface Item {
   url: string
   icon?: LucideIcon
   newTab?: boolean
+  onClick?: () => void
 }
 
 interface NavMainProps {
@@ -40,6 +41,7 @@ export function NavMain({
               href={item.url}
               target={cn(item.newTab && "_blank")}
               rel={cn(item.newTab && "noopener noreferrer")}
+              onClick={item.onClick}
             >
               <SidebarMenuButton tooltip={item.title}>
                 {item.icon && <item.icon />}
