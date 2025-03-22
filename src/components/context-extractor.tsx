@@ -25,6 +25,7 @@ import { minMax, cn } from "@/lib/utils"
 import { MaxCompletionTokenInput, ModelSelection } from "./settings-inputs"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { useSessionStore } from "@/stores/use-session-store"
+import { useExtractionDataStore } from "@/stores/use-extraction-data-store"
 
 
 interface FileItem {
@@ -34,6 +35,11 @@ interface FileItem {
 }
 
 export const ContextExtractor = () => {
+  const currentId = useExtractionDataStore((state) => state.currentId)
+  if (!currentId) {
+    return <div className="p-4">No extraction project selected</div>
+  }
+
   const [activeTab, setActiveTab] = useState("result")
   const [isEpisodeNumberValid, setIsEpisodeNumberValid] = useState(true)
   const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
@@ -49,26 +55,29 @@ export const ContextExtractor = () => {
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
   const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())
 
+  // Extraction Data Store
+  const episodeNumber = useExtractionDataStore((state) => state.getEpisodeNumber())
+  const subtitleContent = useExtractionDataStore((state) => state.getSubtitleContent())
+  const previousContext = useExtractionDataStore((state) => state.getPreviousContext())
+  const contextResult = useExtractionDataStore((state) => state.getContextResult())
+  const setEpisodeNumber = useExtractionDataStore((state) => state.setEpisodeNumber)
+  const setSubtitleContent = useExtractionDataStore((state) => state.setSubtitleContent)
+  const setPreviousContext = useExtractionDataStore((state) => state.setPreviousContext)
+  const setContextResult = useExtractionDataStore((state) => state.setContextResult)
+  const saveData = useExtractionDataStore((state) => state.saveData)
+
   // Extraction Store
-  const contextResult = useExtractionStore((state) => state.contextResult)
-  const isExtracting = useExtractionStore((state) => state.isExtracting)
+  const isExtractingSet = useExtractionStore((state) => state.isExtractingSet)
   const extractContext = useExtractionStore((state) => state.extractContext)
   const stopExtraction = useExtractionStore((state) => state.stopExtraction)
   const setIsExtracting = useExtractionStore((state) => state.setIsExtracting)
+  const isExtracting = isExtractingSet.has(currentId)
 
   // Extraction Input Store
-  const {
-    episodeNumber,
-    subtitleContent,
-    previousContext,
-    selectedFiles,
-    isBatchMode,
-    setEpisodeNumber,
-    setSubtitleContent,
-    setPreviousContext,
-    setSelectedFiles,
-    setIsBatchMode,
-  } = useExtractionInputStore()
+  const selectedFiles = useExtractionInputStore((state) => state.selectedFiles)
+  const isBatchMode = useExtractionInputStore((state) => state.isBatchMode)
+  const setSelectedFiles = useExtractionInputStore((state) => state.setSelectedFiles)
+  const setIsBatchMode = useExtractionInputStore((state) => state.setIsBatchMode)
 
   // Other Store
   const session = useSessionStore((state) => state.session)
@@ -87,10 +96,15 @@ export const ContextExtractor = () => {
     }
   }, [contextResultRef])
 
+  useEffect(() => {
+    return () => {
+      saveData(currentId)
+    }
+  }, [])
 
   const handleSubtitleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
-    setSubtitleContent(e.target.value)
+    setSubtitleContent(currentId, e.target.value)
     setIsSubtitleContentValid(true)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
@@ -98,7 +112,7 @@ export const ContextExtractor = () => {
 
   const handlePreviousContextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
-    setPreviousContext(e.target.value)
+    setPreviousContext(currentId, e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
   }, [setHasChanges, setPreviousContext])
@@ -120,8 +134,10 @@ export const ContextExtractor = () => {
       textarea.style.height = "auto"
       textarea.style.height = `${Math.min(textarea.scrollHeight, 900)}px`
     }
+    await saveData(currentId)
   }
 
+  // Note: Batch mode files are saved to localStorage which is shared across extraction projects
   const handleFileUploadBatch = async (files: FileList | null) => {
     if (!files || files.length === 0) return
     setHasChanges(true)
@@ -175,8 +191,7 @@ export const ContextExtractor = () => {
   }
 
   const handleStartExtraction = async () => {
-    if (isExtracting) return
-
+    await saveData(currentId)
     if (episodeNumber.trim() === "") {
       setIsEpisodeNumberValid(false)
       return
@@ -186,7 +201,7 @@ export const ContextExtractor = () => {
       return
     }
 
-    setIsExtracting(true)
+    setIsExtracting(currentId, true)
     setHasChanges(true)
     setActiveTab("result")
 
@@ -225,16 +240,30 @@ export const ContextExtractor = () => {
       ),
     }
 
-    await extractContext(requestBody, isUseCustomModel ? apiKey : "", !isUseCustomModel)
-    setIsExtracting(false)
+    try {
+      await extractContext(
+        requestBody,
+        isUseCustomModel ? apiKey : "",
+        !isUseCustomModel,
+        currentId,
+        (response) => setContextResult(currentId, response)
+      )
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsExtracting(currentId, false)
+      await saveData(currentId)
+    }
   }
 
-  const handleStopExtraction = () => {
-    stopExtraction()
-    setIsExtracting(false)
+  const handleStopExtraction = async () => {
+    stopExtraction(currentId)
+    setIsExtracting(currentId, false)
+    await saveData(currentId)
   }
 
-  const handleSaveToFile = () => {
+  const handleSaveToFile = async () => {
+    await saveData(currentId)
     const text = getContent(contextResult)
     if (!text) return
 
@@ -259,7 +288,7 @@ export const ContextExtractor = () => {
             ref={episodeNumberInputRef}
             value={episodeNumber}
             onChange={(e) => {
-              setEpisodeNumber(e.target.value)
+              setEpisodeNumber(currentId, e.target.value)
               setIsEpisodeNumberValid(true)
             }}
             placeholder="e.g., S01E01"
@@ -279,7 +308,11 @@ export const ContextExtractor = () => {
                   accept=".srt,.ass"
                   onChange={(e) => {
                     if (e.target.files) {
-                      handleFileUploadSingle(e.target.files, setSubtitleContent, subtitleContentRef.current)
+                      handleFileUploadSingle(
+                        e.target.files,
+                        (text) => setSubtitleContent(currentId, text),
+                        subtitleContentRef.current
+                      )
                     }
                   }}
                   className="hidden"
@@ -296,7 +329,7 @@ export const ContextExtractor = () => {
                   Upload
                 </Button>
               </div>
-              <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, setSubtitleContent, subtitleContentRef.current)} disabled={isExtracting}>
+              <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, (text) => setSubtitleContent(currentId, text), subtitleContentRef.current)} disabled={isExtracting}>
                 <Textarea
                   ref={subtitleContentRef}
                   value={subtitleContent}
@@ -318,7 +351,7 @@ export const ContextExtractor = () => {
                   accept=".txt,.md"
                   onChange={(e) => {
                     if (e.target.files) {
-                      handleFileUploadSingle(e.target.files, setPreviousContext, previousContextRef.current)
+                      handleFileUploadSingle(e.target.files, (text) => setPreviousContext(currentId, text), previousContextRef.current)
                     }
                   }}
                   className="hidden"
@@ -334,7 +367,7 @@ export const ContextExtractor = () => {
                   Upload
                 </Button>
               </div>
-              <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, setPreviousContext, previousContextRef.current)} disabled={isExtracting}>
+              <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, (text) => setPreviousContext(currentId, text), previousContextRef.current)} disabled={isExtracting}>
                 <Textarea
                   ref={previousContextRef}
                   value={previousContext}

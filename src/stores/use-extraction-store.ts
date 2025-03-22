@@ -1,30 +1,46 @@
 import { EXTRACT_CONTEXT_URL, EXTRACT_CONTEXT_URL_FREE } from "@/constants/api"
 import { handleStream } from "@/lib/stream"
-import { abortedAbortController, sleep } from "@/lib/utils"
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { RefObject } from "react"
 
 interface ExtractionStore {
-  contextResult: string
-  isExtracting: boolean
-  abortControllerRef: React.RefObject<AbortController>
-  setContextResult: (result: string) => void
-  setIsExtracting: (isExtracting: boolean) => void
-  extractContext: (requestBody: any, apiKey: string, isFree: boolean) => Promise<void>
-  stopExtraction: () => void
+  isExtractingSet: Set<string>
+  abortControllerMap: Map<string, RefObject<AbortController>>
+  setIsExtracting: (extractionId: string, isExtracting: boolean) => void
+  stopExtraction: (id: string) => void
+  extractContext: (
+    requestBody: any,
+    apiKey: string,
+    isFree: boolean,
+    extractionId: string,
+    setResponse: (response: string) => void
+  ) => Promise<void>
 }
 
-export const useExtractionStore = create<ExtractionStore>()(persist((set, get) => ({
-  contextResult: "",
-  isExtracting: false,
-  abortControllerRef: { current: abortedAbortController() },
-  setContextResult: (result) => set({ contextResult: result }),
-  setIsExtracting: (isExtracting) => set({ isExtracting }),
-  stopExtraction: () => get().abortControllerRef.current.abort(),
-  extractContext: async (requestBody, apiKey, isFree) => {
+export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
+  isExtractingSet: new Set(),
+  abortControllerMap: new Map(),
+  setIsExtracting: (extractionId, isExtracting) => {
+    if (isExtracting) {
+      get().isExtractingSet.add(extractionId)
+    } else {
+      get().isExtractingSet.delete(extractionId)
+    }
+  },
+  stopExtraction: (id) => get().abortControllerMap.get(id)?.current.abort(),
+  extractContext: async (
+    requestBody: any,
+    apiKey: string,
+    isFree: boolean,
+    extractionId: string,
+    setResponse: (response: string) => void
+  ) => {
+    const abortControllerRef = { current: new AbortController() }
+    get().abortControllerMap.set(extractionId, abortControllerRef)
+
     await handleStream({
-      setResponse: get().setContextResult,
-      abortControllerRef: get().abortControllerRef,
+      setResponse,
+      abortControllerRef,
       isFree,
       apiKey,
       requestUrl: isFree ? EXTRACT_CONTEXT_URL_FREE : EXTRACT_CONTEXT_URL,
@@ -33,10 +49,7 @@ export const useExtractionStore = create<ExtractionStore>()(persist((set, get) =
       },
       requestBody: JSON.stringify(requestBody),
     })
+
+    get().abortControllerMap.delete(extractionId)
   },
-}),
-  {
-    name: "extraction-storage",
-    partialize: (state) => ({ contextResult: state.contextResult }),
-  }
-))
+}))
