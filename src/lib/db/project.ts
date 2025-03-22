@@ -108,3 +108,12 @@ export const deleteProject = async (id: string): Promise<void> => {
     await db.projects.delete(id)
   })
 }
+
+export const updateProjectOrder = async (newOrder: string[]): Promise<void> => {
+  await db.projectOrders.update('main', order => {
+    if (order) {
+      order.order = newOrder
+      order.updatedAt = new Date()
+    }
+  })
+}

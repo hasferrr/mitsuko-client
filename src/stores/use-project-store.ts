@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import { Project } from "@/types/project"
-import { getAllProjects, createProject as createProjectDB, deleteProject as deleteProjectDB, updateProject as updateProjectDB } from "@/lib/db/project"
+import { getAllProjects, createProject as createProjectDB, deleteProject as deleteProjectDB, updateProject as updateProjectDB, updateProjectOrder } from "@/lib/db/project"
 
 interface ProjectStore {
   currentProject: Project | null
@@ -12,6 +12,7 @@ interface ProjectStore {
   createProject: (name: string) => Promise<Project>
   updateProject: (id: string, name: string) => Promise<void>
   deleteProject: (id: string) => Promise<void>
+  reorderProjects: (newOrder: string[]) => Promise<void>
 }
 
 export const useProjectStore = create<ProjectStore>((set, get) => ({
@@ -85,6 +86,17 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       }))
     } catch (error) {
       set({ error: 'Failed to delete project', loading: false })
+    }
+  },
+
+  reorderProjects: async (newOrder) => {
+    set({ loading: true })
+    try {
+      await updateProjectOrder(newOrder)
+      const projects = await getAllProjects()
+      set({ projects, loading: false })
+    } catch (error) {
+      set({ error: 'Failed to reorder projects', loading: false })
     }
   }
 }))

@@ -10,6 +10,7 @@ import {
   Layers,
   Clock,
   ChevronUp,
+  GripVertical
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Project } from "@/types/project"
@@ -21,10 +22,92 @@ import { DEFAULT_SUBTITLES, DEFAULT_TITLE } from "@/constants/default"
 import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/use-extraction-data-store"
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 interface WelcomeViewProps {
   projects: Project[]
   setCurrentProject: (project: Project) => void
+}
+
+interface SortableProjectItemProps {
+  project: Project
+  setCurrentProject: (project: Project) => void
+}
+
+const SortableProjectItem = ({ project, setCurrentProject }: SortableProjectItemProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: project.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 1 : 0,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-card/80 transition-colors ${isDragging ? 'opacity-50' : ''}`}
+    >
+      <div className="flex items-center justify-between">
+        <div
+          className="flex-1 cursor-pointer"
+          onClick={() => setCurrentProject(project)}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            {project.transcriptions.length > project.translations.length &&
+              project.transcriptions.length > project.extractions.length ? (
+              <Headphones className="h-4 w-4 text-green-500" />
+            ) : (
+              <FileText className="h-4 w-4 text-blue-500" />
+            )}
+            <span className="text-sm font-medium truncate">{project.name}</span>
+          </div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-muted-foreground">Multiple</span>
+            <span className="text-xs text-muted-foreground">
+              {project.transcriptions.length > project.translations.length &&
+                project.transcriptions.length > project.extractions.length ? "AAC/WAV" : "SRT/ASS"}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Clock className="h-3 w-3" />
+            <span>{project.updatedAt.toLocaleDateString()}</span>
+          </div>
+        </div>
+        <div
+          {...attributes}
+          {...listeners}
+          className="ml-2 cursor-grab active:cursor-grabbing p-1 hover:bg-accent rounded-md"
+        >
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) => {
@@ -33,6 +116,7 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
   const [showAllProjects, setShowAllProjects] = useState(false)
   const createProject = useProjectStore(state => state.createProject)
   const loadProjects = useProjectStore(state => state.loadProjects)
+  const reorderProjects = useProjectStore(state => state.reorderProjects)
 
   // Get setCurrentId functions from data stores
   const setCurrentTranslationId = useTranslationDataStore(state => state.setCurrentId)
@@ -41,6 +125,24 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
   const upsertTranslationData = useTranslationDataStore(state => state.upsertData)
   const upsertTranscriptionData = useTranscriptionDataStore(state => state.upsertData)
   const upsertExtractionData = useExtractionDataStore(state => state.upsertData)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      const oldIndex = projects.findIndex((p) => p.id === active.id)
+      const newIndex = projects.findIndex((p) => p.id === over.id)
+      const newOrder = arrayMove(projects.map(p => p.id), oldIndex, newIndex)
+      reorderProjects(newOrder)
+    }
+  }
 
   const handleOptionClick = async (option: string) => {
     setSelectedOption(option)
@@ -341,37 +443,26 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
             </Button>
           </div>
 
-          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${showAllProjects ? 'max-h-[60vh] overflow-y-auto pr-2' : ''
-            }`}>
-            {(showAllProjects ? projects : projects.slice(0, 4)).map((project) => (
-              <div
-                key={project.id}
-                className="border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-card/80 transition-colors cursor-pointer"
-                onClick={() => setCurrentProject(project)}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${showAllProjects ? 'max-h-[60vh] overflow-y-auto pr-2' : ''}`}>
+              <SortableContext
+                items={projects.map(p => p.id)}
+                strategy={verticalListSortingStrategy}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  {project.transcriptions.length > project.translations.length &&
-                    project.transcriptions.length > project.extractions.length ? (
-                    <Headphones className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <FileText className="h-4 w-4 text-blue-500" />
-                  )}
-                  <span className="text-sm font-medium truncate">{project.name}</span>
-                </div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Multiple</span>
-                  <span className="text-xs text-muted-foreground">
-                    {project.transcriptions.length > project.translations.length &&
-                      project.transcriptions.length > project.extractions.length ? "AAC/WAV" : "SRT/ASS"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
-                  <span>{project.updatedAt.toLocaleDateString()}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+                {(showAllProjects ? projects : projects.slice(0, 4)).map((project) => (
+                  <SortableProjectItem
+                    key={project.id}
+                    project={project}
+                    setCurrentProject={setCurrentProject}
+                  />
+                ))}
+              </SortableContext>
+            </div>
+          </DndContext>
         </div>
       </div>
     </div>
