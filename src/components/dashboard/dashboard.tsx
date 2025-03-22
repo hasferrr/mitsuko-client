@@ -14,8 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Translation, Transcription, Extraction } from "@/types/project"
 import { DashboardItemList } from "./dashboard-item-list"
 import { useProjectStore } from "@/stores/use-project-store"
-import { EditDialogue } from "./ui-custom/edit-dialogue"
-import { DeleteDialogue } from "./ui-custom/delete-dialogue"
+import { EditDialogue } from "../ui-custom/edit-dialogue"
+import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { db } from "@/lib/db/db"
 import { createTranslation, deleteTranslation, updateTranslation } from "@/lib/db/translation"
 import { createTranscription, deleteTranscription, updateTranscription } from "@/lib/db/transcription"
@@ -23,7 +23,7 @@ import { createExtraction, deleteExtraction, updateExtraction } from "@/lib/db/e
 import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/use-extraction-data-store"
-import { WelcomeView } from "./dashboard/welcome-view"
+import { WelcomeView } from "./welcome-view"
 
 export const Dashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
