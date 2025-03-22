@@ -21,7 +21,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn(noto.className, "dark")}>
       <head>
-        <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+        {process.env.NODE_ENV === "development" && (
+          <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+        )}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="192x192" href="icon.png" />
       </head>
