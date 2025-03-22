@@ -24,17 +24,15 @@ import { Model } from "@/types/types"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { FREE_MODELS } from "@/constants/model"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
-import { UseBoundStore, StoreApi } from "zustand"
-import { TranslationDataStore } from "@/stores/use-translation-data-store"
-import { ExtractionDataStore } from "@/stores/use-extraction-data-store"
+import { ProjectType } from "@/types/project"
 
 interface ModelSelectorProps extends PopoverProps {
-  store: UseBoundStore<StoreApi<TranslationDataStore | ExtractionDataStore>>
+  type: ProjectType
   disabled?: boolean
 }
 
 export function ModelSelector({
-  store,
+  type,
   disabled,
   ...props
 }: ModelSelectorProps) {
@@ -46,7 +44,7 @@ export function ModelSelector({
   const setIsUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
 
   const handleSelect = (model: Model) => {
-    setModelDetail(model, store)
+    setModelDetail(model, type)
     setIsUseStructuredOutput(model.structuredOutput)
     setOpen(false)
   }

@@ -24,7 +24,7 @@ import { LANGUAGES } from "@/constants/lang"
 import { ComboBox } from "./ui-custom/combo-box"
 import { useInitRefStore } from "@/stores/use-init-store"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Store } from "@/types/store"
+import { ProjectType } from "@/types/project"
 
 export const LanguageSelection = memo(() => {
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -56,7 +56,7 @@ export const LanguageSelection = memo(() => {
   )
 })
 
-export const ModelSelection = memo(({ store }: { store: Store }) => {
+export const ModelSelection = memo(({ type }: { type: ProjectType }) => {
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
   const setIsUseCustomModel = useSettingsStore((state) => state.setIsUseCustomModel)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
@@ -72,10 +72,10 @@ export const ModelSelection = memo(({ store }: { store: Store }) => {
     <>
       <div className="space-y-2">
         <label className="text-sm font-medium">Model</label>
-        <ModelSelector disabled={isUseCustomModel} store={store} />
+        <ModelSelector disabled={isUseCustomModel} type={type} />
       </div>
       <div className="flex items-center space-x-2">
-        <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={(checked) => setIsUseCustomModel(checked, store)} />
+        <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={(checked) => setIsUseCustomModel(checked, type)} />
         <label htmlFor="custom-model" className="text-sm font-medium">
           Use Custom Model
         </label>
@@ -359,7 +359,7 @@ export const SplitSizeInput = memo(() => {
   )
 })
 
-export const MaxCompletionTokenInput = memo(({ store }: { store: Store }) => {
+export const MaxCompletionTokenInput = memo(({ type }: { type: ProjectType }) => {
   const modelDetail = useSettingsStore((state) => state.getModelDetail())
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
@@ -377,13 +377,13 @@ export const MaxCompletionTokenInput = memo(({ store }: { store: Store }) => {
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10) // Prevent NaN
       num = Math.min(num, maxToken)
-      setMaxCompletionTokens(value === "" ? 0 : num, store)
+      setMaxCompletionTokens(value === "" ? 0 : num, type)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setMaxCompletionTokens(Math.min(Math.max(parseInt(value, 10), MAX_COMPLETION_TOKENS_MIN), maxToken), store)
+    setMaxCompletionTokens(Math.min(Math.max(parseInt(value, 10), MAX_COMPLETION_TOKENS_MIN), maxToken), type)
   }
 
   return (
@@ -392,7 +392,7 @@ export const MaxCompletionTokenInput = memo(({ store }: { store: Store }) => {
         <label className="text-sm font-medium">Max Completion Token</label>
         <Switch
           checked={!isMaxCompletionTokensAuto}
-          onCheckedChange={(checked) => setIsMaxCompletionTokensAuto(!checked, store)}
+          onCheckedChange={(checked) => setIsMaxCompletionTokensAuto(!checked, type)}
         />
       </div>
       <Input

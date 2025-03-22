@@ -1,11 +1,11 @@
 import { create } from "zustand"
-import { AdvancedSettings } from "@/types/project"
+import { AdvancedSettings, ProjectType } from "@/types/project"
 import { persist } from "zustand/middleware"
 import { useTranslationDataStore } from "./use-translation-data-store"
 import { createAdvancedSettings, updateAdvancedSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "./use-settings-store"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
-import { Store } from "@/types/store"
+import { useExtractionDataStore } from "./use-extraction-data-store"
 
 interface AdvancedSettingsStore {
   data: Record<string, AdvancedSettings>
@@ -27,11 +27,11 @@ interface AdvancedSettingsStore {
   setStartIndex: (value: number) => void
   setEndIndex: (value: number) => void
   setSplitSize: (value: number) => void
-  setMaxCompletionTokens: (value: number, store: Store) => void
+  setMaxCompletionTokens: (value: number, type: ProjectType) => void
   setIsUseStructuredOutput: (value: boolean) => void
   setIsUseFullContextMemory: (value: boolean) => void
   setIsBetterContextCaching: (value: boolean) => void
-  setIsMaxCompletionTokensAuto: (value: boolean, store: Store) => void
+  setIsMaxCompletionTokensAuto: (value: boolean, type: ProjectType) => void
   resetIndex: (s?: number, e?: number) => void
   resetAdvancedSettings: () => void
 }
@@ -39,8 +39,9 @@ interface AdvancedSettingsStore {
 const updateSettings = async <K extends keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>>(
   field: K,
   value: AdvancedSettings[K],
-  store: Store = useTranslationDataStore
+  type: ProjectType = 'translation'
 ) => {
+  const store = type === 'translation' ? useTranslationDataStore : useExtractionDataStore
   const currentId = store.getState().currentId
   if (!currentId) return
   const data = store.getState().data[currentId]
@@ -166,11 +167,11 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         updateSettings("splitSize", value)
       },
       // Method for both translation and extraction
-      setMaxCompletionTokens: (value, store) => {
+      setMaxCompletionTokens: (value, type) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("maxCompletionTokens", value)
-        updateSettings("maxCompletionTokens", value, store)
+        updateSettings("maxCompletionTokens", value, type)
       },
       setIsUseStructuredOutput: (value) => {
         const id = get().currentId
@@ -191,11 +192,11 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         updateSettings("isBetterContextCaching", value)
       },
       // Method for both translation and extraction
-      setIsMaxCompletionTokensAuto: (value, store) => {
+      setIsMaxCompletionTokensAuto: (value, type) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isMaxCompletionTokensAuto", value)
-        updateSettings("isMaxCompletionTokensAuto", value, store)
+        updateSettings("isMaxCompletionTokensAuto", value, type)
       },
       resetIndex: (s?: number, e?: number) => {
         const id = get().currentId

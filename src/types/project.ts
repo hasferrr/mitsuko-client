@@ -1,5 +1,7 @@
 import { SubtitleTranslated, Parsed, Subtitle, Model, SubOnlyTranslated } from "./types"
 
+export type ProjectType = 'translation' | 'transcription' | 'extraction'
+
 export interface ProjectOrder {
   id: string
   order: string[] // Array of Project IDs

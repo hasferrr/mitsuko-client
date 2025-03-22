@@ -1,11 +1,11 @@
 import { create } from "zustand"
 import { Model } from "@/types/types"
-import { BasicSettings } from "@/types/project"
+import { BasicSettings, ProjectType } from "@/types/project"
 import { persist } from "zustand/middleware"
 import { createBasicSettings, updateBasicSettings, getBasicSettings } from "@/lib/db/settings"
 import { DEFAULT_BASIC_SETTINGS } from "@/constants/default"
 import { useTranslationDataStore } from "./use-translation-data-store"
-import { Store } from "@/types/store"
+import { useExtractionDataStore } from "./use-extraction-data-store"
 
 interface SettingsStore {
   data: Record<string, BasicSettings>
@@ -25,8 +25,8 @@ interface SettingsStore {
   getContextDocument: () => string
   setSourceLanguage: (language: string) => void
   setTargetLanguage: (language: string) => void
-  setModelDetail: (model: Model | null, store: Store) => void
-  setIsUseCustomModel: (value: boolean, store: Store) => void
+  setModelDetail: (model: Model | null, type: ProjectType) => void
+  setIsUseCustomModel: (value: boolean, type: ProjectType) => void
   setContextDocument: (doc: string) => void
   // local storage persist state
   setApiKey: (key: string) => void
@@ -37,8 +37,9 @@ interface SettingsStore {
 const updateSettings = async <K extends keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>>(
   field: K,
   value: BasicSettings[K],
-  store: Store = useTranslationDataStore
+  type: ProjectType = 'translation'
 ) => {
+  const store = type === 'translation' ? useTranslationDataStore : useExtractionDataStore
   const currentId = store.getState().currentId
   if (!currentId) return
   const data = store.getState().data[currentId]
@@ -141,17 +142,17 @@ export const useSettingsStore = create<SettingsStore>()(
         updateSettings("targetLanguage", language)
       },
       // Method for updating the model detail for the current id for both translation and extraction
-      setModelDetail: (model, store) => {
+      setModelDetail: (model, type) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("modelDetail", model)
-        updateSettings("modelDetail", model, store)
+        updateSettings("modelDetail", model, type)
       },
-      setIsUseCustomModel: (value, store) => {
+      setIsUseCustomModel: (value, type) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isUseCustomModel", value)
-        updateSettings("isUseCustomModel", value, store)
+        updateSettings("isUseCustomModel", value, type)
       },
       setApiKey: (key) => set({ apiKey: key }),
       setCustomBaseUrl: (url) => set({ customBaseUrl: url }),

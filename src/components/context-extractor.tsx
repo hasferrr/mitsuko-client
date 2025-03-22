@@ -501,8 +501,8 @@ export const ContextExtractor = () => {
           <TabsContent value="settings" className="flex-grow space-y-4 mt-4">
             <Card className="border border-border bg-card text-card-foreground">
               <CardContent className="p-4 space-y-4">
-                <ModelSelection store={useExtractionDataStore} />
-                <MaxCompletionTokenInput store={useExtractionDataStore} />
+                <ModelSelection type="extraction" />
+                <MaxCompletionTokenInput type="extraction" />
               </CardContent>
             </Card>
           </TabsContent>

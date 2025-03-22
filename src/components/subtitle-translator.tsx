@@ -911,7 +911,7 @@ export default function SubtitleTranslator() {
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
                   <LanguageSelection />
-                  <ModelSelection store={useTranslationDataStore} />
+                  <ModelSelection type="translation" />
                   {/* Wrap ContextDocumentInput with DragAndDrop */}
                   <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
                     <ContextDocumentInput />
@@ -928,7 +928,7 @@ export default function SubtitleTranslator() {
                   <StartIndexInput />
                   <EndIndexInput />
                   <SplitSizeInput />
-                  <MaxCompletionTokenInput store={useTranslationDataStore} />
+                  <MaxCompletionTokenInput type="translation" />
                   <StructuredOutputSwitch />
                   <FullContextMemorySwitch />
                   <BetterContextCachingSwitch />
