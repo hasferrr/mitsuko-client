@@ -80,7 +80,7 @@ export function Navbar() {
         </div>
         <Breadcrumb>
           <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block text-foreground hover:underline">
+            <BreadcrumbItem className="text-foreground hover:underline">
               <Link href="/" className="flex items-center gap-2" onClick={() => setCurrentProject(null)}>
                 <img
                   width={4 * 6}
@@ -94,7 +94,7 @@ export function Navbar() {
             </BreadcrumbItem>
             {currentProject && (
               <>
-                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbPage className="line-clamp-1 hover:underline">
                     <Link href="/">
@@ -106,9 +106,9 @@ export function Navbar() {
             )}
             {currentProject && pathname && (
               <>
-                <BreadcrumbSeparator className="block" />
+                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="line-clamp-1 hover:underline">
+                  <BreadcrumbPage className="line-clamp-1 hover:underline hidden md:block">
                     {pathname}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
