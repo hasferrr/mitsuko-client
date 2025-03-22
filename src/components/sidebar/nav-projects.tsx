@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  Forward,
   MoreHorizontal,
   PlusCircle,
   Trash2,
@@ -72,10 +71,6 @@ export function NavProjects({
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem disabled>
-                  <Forward className="text-muted-foreground" />
-                  <span>Share Project</span>
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {
                   setIdToDelete(project.id)
                   setIsDeleteModalOpen(true)

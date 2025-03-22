@@ -10,9 +10,29 @@ import {
   Layers,
   Clock,
   ChevronUp,
-  GripVertical
+  GripVertical,
+  Trash2,
+  MoreHorizontal,
+  LayoutGrid,
+  LayoutList
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Project } from "@/types/project"
 import { useProjectStore } from "@/stores/use-project-store"
 import { createTranslation } from "@/lib/db/translation"
@@ -39,6 +59,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { cn } from "@/lib/utils"
 
 interface WelcomeViewProps {
   projects: Project[]
@@ -49,9 +70,11 @@ interface SortableProjectItemProps {
   project: Project
   setCurrentProject: (project: Project) => void
   isHorizontal: boolean
+  onDelete: (projectId: string) => Promise<void>
 }
 
-const SortableProjectItem = ({ project, setCurrentProject, isHorizontal }: SortableProjectItemProps) => {
+const SortableProjectItem = ({ project, setCurrentProject, isHorizontal, onDelete }: SortableProjectItemProps) => {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const {
     attributes,
     listeners,
@@ -67,40 +90,28 @@ const SortableProjectItem = ({ project, setCurrentProject, isHorizontal }: Sorta
     zIndex: isDragging ? 1 : 0,
   }
 
+  const handleDelete = async () => {
+    await onDelete(project.id)
+    setIsDeleteDialogOpen(false)
+  }
+
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-card/80 transition-colors ${isDragging ? 'opacity-50' : ''}`}
-    >
-      <div className="flex items-center justify-between">
-        <div
-          className="flex-1 cursor-pointer"
-          onClick={() => setCurrentProject(project)}
-        >
-          {isHorizontal ? (
-            <div className="flex items-center gap-2">
-              {project.transcriptions.length > project.translations.length &&
-                project.transcriptions.length > project.extractions.length ? (
-                <Headphones className="h-4 w-4 text-green-500" />
-              ) : (
-                <FileText className="h-4 w-4 text-blue-500" />
-              )}
-              <span className="text-sm font-medium truncate">{project.name}</span>
-              <span className="text-xs text-muted-foreground mx-2">•</span>
-              <span className="text-xs text-muted-foreground">Multiple</span>
-              <span className="text-xs text-muted-foreground mx-2">•</span>
-              <span className="text-xs text-muted-foreground">
-                {project.transcriptions.length > project.translations.length &&
-                  project.transcriptions.length > project.extractions.length ? "AAC/WAV" : "SRT/ASS"}
-              </span>
-              <span className="text-xs text-muted-foreground ml-auto">
-                {project.updatedAt.toLocaleDateString()}
-              </span>
-            </div>
-          ) : (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
+    <>
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={cn(
+          "border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-card/80 transition-colors",
+          isDragging && "opacity-50"
+        )}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div
+            className="flex-1 cursor-pointer"
+            onClick={() => setCurrentProject(project)}
+          >
+            {isHorizontal ? (
+              <div className="flex items-center gap-2">
                 {project.transcriptions.length > project.translations.length &&
                   project.transcriptions.length > project.extractions.length ? (
                   <Headphones className="h-4 w-4 text-green-500" />
@@ -108,30 +119,90 @@ const SortableProjectItem = ({ project, setCurrentProject, isHorizontal }: Sorta
                   <FileText className="h-4 w-4 text-blue-500" />
                 )}
                 <span className="text-sm font-medium truncate">{project.name}</span>
-              </div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-muted-foreground">Multiple</span>
+                <span className="text-xs text-muted-foreground mx-2">•</span>
                 <span className="text-xs text-muted-foreground">
                   {project.transcriptions.length > project.translations.length &&
                     project.transcriptions.length > project.extractions.length ? "AAC/WAV" : "SRT/ASS"}
                 </span>
+                <span className="text-xs text-muted-foreground ml-auto">
+                  {project.updatedAt.toLocaleDateString()}
+                </span>
               </div>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                <span>{project.updatedAt.toLocaleDateString()}</span>
+            ) : (
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  {project.transcriptions.length > project.translations.length &&
+                    project.transcriptions.length > project.extractions.length ? (
+                    <Headphones className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <FileText className="h-4 w-4 text-blue-500" />
+                  )}
+                  <span className="text-sm font-medium truncate">{project.name}</span>
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">
+                    {project.transcriptions.length > project.translations.length &&
+                      project.transcriptions.length > project.extractions.length ? "AAC/WAV" : "SRT/ASS"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  <span>{project.updatedAt.toLocaleDateString()}</span>
+                </div>
               </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="h-8 w-8 p-0 hover:bg-accent"
+                >
+                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Project
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <div
+              {...attributes}
+              {...listeners}
+              className="cursor-grab active:cursor-grabbing p-1 hover:bg-accent rounded-md"
+            >
+              <GripVertical className="h-4 w-4 text-muted-foreground" />
             </div>
-          )}
-        </div>
-        <div
-          {...attributes}
-          {...listeners}
-          className="ml-2 cursor-grab active:cursor-grabbing p-1 hover:bg-accent rounded-md"
-        >
-          <GripVertical className="h-4 w-4 text-muted-foreground" />
+          </div>
         </div>
       </div>
-    </div>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Project</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{project.name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }
 
@@ -143,6 +214,7 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
   const createProject = useProjectStore(state => state.createProject)
   const loadProjects = useProjectStore(state => state.loadProjects)
   const reorderProjects = useProjectStore(state => state.reorderProjects)
+  const deleteProject = useProjectStore(state => state.deleteProject)
 
   // Get setCurrentId functions from data stores
   const setCurrentTranslationId = useTranslationDataStore(state => state.setCurrentId)
@@ -447,36 +519,40 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
         {/* Recent Projects Section */}
         <div className="mt-12 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-medium">
-                {showAllProjects ? "All Projects" : "Recent Projects"}
-                <span className="text-muted-foreground ml-2 text-sm">
-                  ({showAllProjects ? projects.length : Math.min(projects.length, 4)} of {projects.length})
-                </span>
-              </h3>
+            <h3 className="text-lg font-medium">
+              {showAllProjects ? "All Projects" : "Recent Projects"}
+              <span className="text-muted-foreground ml-2 text-sm">
+                ({showAllProjects ? projects.length : Math.min(projects.length, 4)} of {projects.length})
+              </span>
+            </h3>
+            <div className="flex items-center gap-2">
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="px-2"
                 onClick={() => setIsHorizontal(!isHorizontal)}
               >
-                <Layers className="h-4 w-4 text-muted-foreground" />
+                {isHorizontal ? (
+                  <LayoutGrid className="h-4 w-4" />
+                ) : (
+                  <LayoutList className="h-4 w-4" />
+                )}
+                {isHorizontal ? "Grid View" : "List View"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAllProjects(!showAllProjects)}
+              >
+                {showAllProjects ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    Show Less
+                  </>
+                ) : (
+                  "View All"
+                )}
               </Button>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowAllProjects(!showAllProjects)}
-            >
-              {showAllProjects ? (
-                <>
-                  Show Less
-                  <ChevronUp className="h-4 w-4 ml-2" />
-                </>
-              ) : (
-                "View All"
-              )}
-            </Button>
           </div>
 
           <DndContext
@@ -484,7 +560,10 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <div className={`${isHorizontal ? 'flex flex-col space-y-2' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'} ${showAllProjects ? 'max-h-[60vh] overflow-y-auto pr-2' : ''}`}>
+            <div className={cn(
+              isHorizontal ? 'flex flex-col space-y-2' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4',
+              showAllProjects && 'max-h-[60vh] overflow-y-auto pr-2',
+            )}>
               <SortableContext
                 items={projects.map(p => p.id)}
                 strategy={isHorizontal ? verticalListSortingStrategy : undefined}
@@ -495,6 +574,7 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
                     project={project}
                     setCurrentProject={setCurrentProject}
                     isHorizontal={isHorizontal}
+                    onDelete={deleteProject}
                   />
                 ))}
               </SortableContext>
