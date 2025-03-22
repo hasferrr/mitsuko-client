@@ -472,22 +472,24 @@ export const BetterContextCachingSwitch = memo(() => {
   const setIsBetterContextCaching = useAdvancedSettingsStore((state) => state.setIsBetterContextCaching)
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
 
+  const isMinimalContextMode = !isBetterContextCaching
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">Better Context Caching</label>
+        <label className="text-sm font-medium">Minimal Context Mode</label>
         <Switch
-          checked={isBetterContextCaching || isUseFullContextMemory}
-          onCheckedChange={setIsBetterContextCaching}
+          checked={isMinimalContextMode}
+          onCheckedChange={(value) => setIsBetterContextCaching(!value)}
           disabled={isUseFullContextMemory}
         />
       </div>
       <p className="text-xs text-muted-foreground">
-        Hit the cache to reduce input token cost significantly.
+        Uses minimal context to significantly reduce token usage and cost.
         When <span className="font-semibold">Full Context Memory</span> is disabled
-        AND when <span className="font-semibold">Better Context Caching</span> is enabled,
-        it will use the last previous chunk as a context.
-        Otherwise, it's only take the last 5 dialogues from the previous chunk.
+        AND when <span className="font-semibold">Minimal Context Mode</span> is enabled,
+        it will only use 5 dialogues from the previous chunk as context.
+        When disabled, it maintains a balanced approach using single previous chunk.
       </p>
     </div>
   )
