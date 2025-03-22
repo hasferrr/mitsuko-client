@@ -95,6 +95,7 @@ import { createContextMemory } from "@/lib/context-memory"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import { getAdvancedSettings, getBasicSettings } from "@/lib/db/settings"
+import { useProjectStore } from "@/stores/use-project-store"
 
 
 type DownloadOption = "original" | "translated" | "both"
@@ -203,6 +204,10 @@ export default function SubtitleTranslator() {
   const subName = parsed.type === "ass" ? "SSA" : "SRT"
 
   useEffect(() => {
+    if (translationData[currentId].projectId !== useProjectStore.getState().currentProject?.id) {
+      useProjectStore.getState().setCurrentProject(translationData[currentId].projectId)
+    }
+
     if (!translationData[currentId]) return
     setSettingsCurrentId(translationData[currentId].basicSettingsId)
     setAdvancedSettingsCurrentId(translationData[currentId].advancedSettingsId)

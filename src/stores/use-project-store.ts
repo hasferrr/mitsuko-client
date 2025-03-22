@@ -7,7 +7,7 @@ interface ProjectStore {
   projects: Project[]
   loading: boolean
   error: string | null
-  setCurrentProject: (project: Project | null) => void
+  setCurrentProject: (project: Project | string | null) => void
   loadProjects: () => Promise<void>
   createProject: (name: string) => Promise<Project>
   updateProject: (id: string, name: string) => Promise<void>
@@ -21,7 +21,16 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   loading: false,
   error: null,
 
-  setCurrentProject: (project) => set({ currentProject: project }),
+  setCurrentProject: (project: Project | string | null) => {
+    if (typeof project === 'string') {
+      const foundProject = get().projects.find((p) => p.id === project)
+      if (foundProject) {
+        set({ currentProject: foundProject })
+      }
+    } else {
+      set({ currentProject: project })
+    }
+  },
 
   loadProjects: async () => {
     set({ loading: true, error: null })

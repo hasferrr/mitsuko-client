@@ -48,6 +48,7 @@ import {
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
+import { useProjectStore } from "@/stores/use-project-store"
 
 const languages = [
   { value: "auto", label: "Auto-detect" },
@@ -68,6 +69,7 @@ export default function Transcription() {
   const audioRef = useRef<HTMLAudioElement>(null)
 
   // Get data store getters and setters
+  const transcriptionData = useTranscriptionDataStore(state => state.data)
   const transcriptionText = useTranscriptionDataStore(state => state.getTranscriptionText())
   const transcriptSubtitles = useTranscriptionDataStore(state => state.getTranscriptSubtitles())
   const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)
@@ -99,6 +101,10 @@ export default function Transcription() {
   const isExceeded = file ? file.size > 20 * 1024 * 1024 : false
 
   useEffect(() => {
+    if (transcriptionData[currentId].projectId !== useProjectStore.getState().currentProject?.id) {
+      useProjectStore.getState().setCurrentProject(transcriptionData[currentId].projectId)
+    }
+
     return () => {
       saveData(currentId)
     }

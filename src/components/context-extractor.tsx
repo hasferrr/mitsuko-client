@@ -27,6 +27,7 @@ import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useExtractionDataStore } from "@/stores/use-extraction-data-store"
 import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
+import { useProjectStore } from "@/stores/use-project-store"
 
 
 interface FileItem {
@@ -103,6 +104,10 @@ export const ContextExtractor = () => {
   }, [contextResultRef])
 
   useEffect(() => {
+    if (extractionData[currentId].projectId !== useProjectStore.getState().currentProject?.id) {
+      useProjectStore.getState().setCurrentProject(extractionData[currentId].projectId)
+    }
+
     if (!extractionData[currentId]) return
     setSettingsCurrentId(extractionData[currentId].basicSettingsId)
     setAdvancedSettingsCurrentId(extractionData[currentId].advancedSettingsId)
