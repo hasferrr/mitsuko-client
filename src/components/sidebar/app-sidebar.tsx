@@ -26,7 +26,6 @@ import { useProjectStore } from "@/stores/use-project-store"
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const projects = useProjectStore((state) => state.projects)
   const createProject = useProjectStore((state) => state.createProject)
-  const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
 
   const data = {
     navMain: [
@@ -34,7 +33,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Dashboard",
         url: "/",
         icon: House,
-        onClick: () => setCurrentProject(null),
       },
       {
         title: "Translate",

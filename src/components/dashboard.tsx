@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import {
   Globe,
   Headphones,
@@ -9,13 +8,10 @@ import {
   FileText,
   Edit,
   Trash,
-  ArrowRight,
-  Layers,
-  Clock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Translation, Transcription, Extraction, Project } from "@/types/project"
+import { Translation, Transcription, Extraction } from "@/types/project"
 import { DashboardItemList } from "./dashboard-item-list"
 import { useProjectStore } from "@/stores/use-project-store"
 import { EditDialogue } from "./ui-custom/edit-dialogue"

@@ -13,6 +13,14 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Project } from "@/types/project"
+import { useProjectStore } from "@/stores/use-project-store"
+import { createTranslation } from "@/lib/db/translation"
+import { createTranscription } from "@/lib/db/transcription"
+import { createExtraction } from "@/lib/db/extraction"
+import { DEFAULT_SUBTITLES, DEFAULT_TITLE } from "@/constants/default"
+import { useTranslationDataStore } from "@/stores/use-translation-data-store"
+import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
+import { useExtractionDataStore } from "@/stores/use-extraction-data-store"
 
 interface WelcomeViewProps {
   projects: Project[]
@@ -23,9 +31,71 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
   const router = useRouter()
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   const [showAllProjects, setShowAllProjects] = useState(false)
+  const createProject = useProjectStore(state => state.createProject)
+  const loadProjects = useProjectStore(state => state.loadProjects)
 
-  const handleOptionClick = (option: string) => {
+  // Get setCurrentId functions from data stores
+  const setCurrentTranslationId = useTranslationDataStore(state => state.setCurrentId)
+  const setCurrentTranscriptionId = useTranscriptionDataStore(state => state.setCurrentId)
+  const setCurrentExtractionId = useExtractionDataStore(state => state.setCurrentId)
+  const upsertTranslationData = useTranslationDataStore(state => state.upsertData)
+  const upsertTranscriptionData = useTranscriptionDataStore(state => state.upsertData)
+  const upsertExtractionData = useExtractionDataStore(state => state.upsertData)
+
+  const handleOptionClick = async (option: string) => {
     setSelectedOption(option)
+
+    // Find or create default project
+    let defaultProject = projects.find(p => p.name === "Default")
+    if (!defaultProject) {
+      defaultProject = await createProject("Default")
+    }
+
+    // Create new item based on option
+    switch (option) {
+      case "translate": {
+        const translation = await createTranslation(defaultProject.id, {
+          title: DEFAULT_TITLE,
+          subtitles: DEFAULT_SUBTITLES,
+          parsed: {
+            type: "srt",
+            data: null
+          }
+        })
+        setCurrentTranslationId(translation.id)
+        upsertTranslationData(translation.id, translation)
+        break
+      }
+      case "transcribe": {
+        const transcription = await createTranscription(defaultProject.id, {
+          title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
+          transcriptionText: "",
+          transcriptSubtitles: []
+        })
+        setCurrentTranscriptionId(transcription.id)
+        upsertTranscriptionData(transcription.id, transcription)
+        break
+      }
+      case "extract-context": {
+        const extraction = await createExtraction(defaultProject.id, {
+          episodeNumber: "",
+          subtitleContent: "",
+          previousContext: "",
+          contextResult: ""
+        })
+        setCurrentExtractionId(extraction.id)
+        upsertExtractionData(extraction.id, extraction)
+        break
+      }
+    }
+
+    // Set as current project
+    setCurrentProject(defaultProject)
+
+    // Refresh project list
+    await loadProjects()
+
+    // Navigate to the appropriate page
     router.push(`/${option}`)
   }
 
@@ -33,7 +103,7 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
     <div className="flex-1 p-6">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold mb-3">What would you like to do?</h2>
+          <h2 className="text-2xl font-medium mb-3">What would you like to do?</h2>
           <p className="text-muted-foreground text-sm mx-auto">
             Select one of the options below to get started with Mitsuko's AI-powered tools
           </p>
@@ -43,8 +113,8 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
           {/* Translation Option */}
           <div
             className={`border rounded-xl p-6 transition-all cursor-pointer ${selectedOption === "translate"
-                ? "border-primary bg-primary/5 shadow-md"
-                : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
+              ? "border-primary bg-primary/5 shadow-md"
+              : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
               }`}
             onClick={() => handleOptionClick("translate")}
           >
@@ -53,7 +123,7 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
                 <div className="h-14 w-14 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
                   <Globe className="h-7 w-7 text-blue-500" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Translation</h3>
+                <h3 className="text-xl font-medium mb-2">Translation</h3>
                 <p className="text-muted-foreground text-sm mb-6">
                   Translate subtitles between 100+ languages with context-aware AI for natural, accurate
                   results.
@@ -112,8 +182,8 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
           {/* Transcription Option */}
           <div
             className={`border rounded-xl p-6 transition-all cursor-pointer ${selectedOption === "transcribe"
-                ? "border-primary bg-primary/5 shadow-md"
-                : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
+              ? "border-primary bg-primary/5 shadow-md"
+              : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
               }`}
             onClick={() => handleOptionClick("transcribe")}
           >
@@ -122,7 +192,7 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
                 <div className="h-14 w-14 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center mb-4">
                   <Headphones className="h-7 w-7 text-green-500" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Transcription</h3>
+                <h3 className="text-xl font-medium mb-2">Transcription</h3>
                 <p className="text-muted-foreground text-sm mb-6">
                   Convert audio to perfectly timed subtitles with automatic speaker detection and timestamps.
                 </p>
@@ -180,8 +250,8 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
           {/* Extraction Option */}
           <div
             className={`border rounded-xl p-6 transition-all cursor-pointer ${selectedOption === "extract-context"
-                ? "border-primary bg-primary/5 shadow-md"
-                : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
+              ? "border-primary bg-primary/5 shadow-md"
+              : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
               }`}
             onClick={() => handleOptionClick("extract-context")}
           >
@@ -190,7 +260,7 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
                 <div className="h-14 w-14 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4">
                   <Layers className="h-7 w-7 text-purple-500" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Context Extraction</h3>
+                <h3 className="text-xl font-medium mb-2">Context Extraction</h3>
                 <p className="text-muted-foreground text-sm mb-6">
                   Extract character profiles and context from subtitles to improve translation accuracy.
                 </p>
@@ -271,9 +341,8 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
             </Button>
           </div>
 
-          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${
-            showAllProjects ? 'max-h-[60vh] overflow-y-auto pr-2' : ''
-          }`}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${showAllProjects ? 'max-h-[60vh] overflow-y-auto pr-2' : ''
+            }`}>
             {(showAllProjects ? projects : projects.slice(0, 4)).map((project) => (
               <div
                 key={project.id}
@@ -282,7 +351,7 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
               >
                 <div className="flex items-center gap-2 mb-2">
                   {project.transcriptions.length > project.translations.length &&
-                   project.transcriptions.length > project.extractions.length ? (
+                    project.transcriptions.length > project.extractions.length ? (
                     <Headphones className="h-4 w-4 text-green-500" />
                   ) : (
                     <FileText className="h-4 w-4 text-blue-500" />
@@ -293,7 +362,7 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
                   <span className="text-xs text-muted-foreground">Multiple</span>
                   <span className="text-xs text-muted-foreground">
                     {project.transcriptions.length > project.translations.length &&
-                     project.transcriptions.length > project.extractions.length ? "AAC/WAV" : "SRT/ASS"}
+                      project.transcriptions.length > project.extractions.length ? "AAC/WAV" : "SRT/ASS"}
                   </span>
                 </div>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
