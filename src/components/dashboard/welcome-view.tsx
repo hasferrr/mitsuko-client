@@ -303,8 +303,8 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
     <div className="flex-1 p-6">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl font-medium mb-3">What would you like to do?</h2>
-          <p className="text-muted-foreground text-sm mx-auto">
+          <h2 className="text-3xl font-medium mb-3">What would you like to do?</h2>
+          <p className="text-muted-foreground mx-auto">
             Select one of the options below to get started with Mitsuko's AI-powered tools
           </p>
         </div>
