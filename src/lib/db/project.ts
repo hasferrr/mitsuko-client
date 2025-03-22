@@ -66,7 +66,7 @@ export const updateProject = async (id: string, update: Pick<Project, "name">): 
 }
 
 export const deleteProject = async (id: string): Promise<void> => {
-  return db.transaction('rw', [db.projects, db.translations, db.transcriptions, db.extractions, db.projectOrders], async () => {
+  return db.transaction('rw', [db.projects, db.translations, db.transcriptions, db.extractions, db.projectOrders, db.basicSettings, db.advancedSettings], async () => {
     const project = await db.projects.get(id)
     if (!project) return
 
@@ -81,11 +81,27 @@ export const deleteProject = async (id: string): Promise<void> => {
       })
     }
 
+    // Get all translations and extractions to access their settings IDs
+    const translations = await db.translations.bulkGet(project.translations)
+    const extractions = await db.extractions.bulkGet(project.extractions)
+
+    // Collect all settings IDs to delete
+    const basicSettingsIds = [
+      ...translations.filter(t => t).map(t => t!.basicSettingsId),
+      ...extractions.filter(e => e).map(e => e!.basicSettingsId)
+    ]
+    const advancedSettingsIds = [
+      ...translations.filter(t => t).map(t => t!.advancedSettingsId),
+      ...extractions.filter(e => e).map(e => e!.advancedSettingsId)
+    ]
+
     // Delete all related entities in single operations
     await Promise.all([
       db.translations.bulkDelete(project.translations),
       db.transcriptions.bulkDelete(project.transcriptions),
       db.extractions.bulkDelete(project.extractions),
+      db.basicSettings.bulkDelete(basicSettingsIds),
+      db.advancedSettings.bulkDelete(advancedSettingsIds),
       filterOrders(),
     ])
 
