@@ -288,14 +288,27 @@ export default function SubtitleTranslator() {
     // Prepare context for the first chunk
     let context: ContextCompletion[] = []
 
-    // TODO: split by number of split size
+    // Split by number of split size
     if (startIndex > 1) {
-      const limitedContext = Math.max(0, adjustedStartIndex - limitedContextMemorySize)
+      // Calculate the proper context range based on context strategy
+      let contextStartIndex: number
+
+      if (isUseFullContextMemory) {
+        // Use all subtitles from beginning
+        contextStartIndex = 0
+      } else if (isBetterContextCaching) {
+        // Use split size for context
+        contextStartIndex = Math.max(0, adjustedStartIndex - size)
+      } else {
+        // Use limited context memory size (5)
+        contextStartIndex = Math.max(0, adjustedStartIndex - limitedContextMemorySize)
+      }
+
       context.push({
         role: "user",
         content: createContextMemory(subtitles
           .slice(
-            isUseFullContextMemory ? 0 : limitedContext,
+            contextStartIndex,
             adjustedStartIndex,
           )
           .map((chunk) => ({
@@ -309,7 +322,7 @@ export default function SubtitleTranslator() {
         role: "assistant",
         content: createContextMemory(subtitles
           .slice(
-            isUseFullContextMemory ? 0 : limitedContext,
+            contextStartIndex,
             adjustedStartIndex,
           )
           .map((chunk) => ({
