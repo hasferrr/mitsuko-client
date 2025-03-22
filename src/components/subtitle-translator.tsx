@@ -375,10 +375,10 @@ export default function SubtitleTranslator() {
 
       // Update the parsed json
       appendJsonResponse(currentId, tlChunk)
-      await saveData(currentId)
 
       // Merge translated chunk with original subtitles
-      const merged: SubtitleTranslated[] = [...subtitles]
+      const currentSubtitles = useTranslationDataStore.getState().data[currentId].subtitles
+      const merged: SubtitleTranslated[] = [...currentSubtitles]
       for (let j = 0; j < tlChunk.length; j++) {
         const index = tlChunk[j].index - 1
         merged[index] = {
