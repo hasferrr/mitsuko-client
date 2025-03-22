@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   Globe,
   Headphones,
@@ -8,10 +9,13 @@ import {
   FileText,
   Edit,
   Trash,
+  ArrowRight,
+  Layers,
+  Clock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Translation, Transcription, Extraction } from "@/types/project"
+import { Translation, Transcription, Extraction, Project } from "@/types/project"
 import { DashboardItemList } from "./dashboard-item-list"
 import { useProjectStore } from "@/stores/use-project-store"
 import { EditDialogue } from "./ui-custom/edit-dialogue"
@@ -23,6 +27,7 @@ import { createExtraction, deleteExtraction, updateExtraction } from "@/lib/db/e
 import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/use-extraction-data-store"
+import { WelcomeView } from "./dashboard/welcome-view"
 
 export const Dashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -32,6 +37,8 @@ export const Dashboard = () => {
   const currentProject = useProjectStore((state) => state.currentProject)
   const updateProject = useProjectStore((state) => state.updateProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
+  const projects = useProjectStore((state) => state.projects)
+  const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
 
   const [translations, setTranslations] = useState<Translation[]>([])
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
@@ -61,7 +68,7 @@ export const Dashboard = () => {
 
 
   if (!currentProject) {
-    return <div className="p-6">No Project Selected</div>
+    return <WelcomeView projects={projects} setCurrentProject={setCurrentProject} />
   }
 
   const handleSave = async (newName: string) => {
