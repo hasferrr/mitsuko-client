@@ -9,7 +9,7 @@ interface ProjectStore {
   error: string | null
   setCurrentProject: (project: Project | null) => void
   loadProjects: () => Promise<void>
-  createProject: (name: string) => Promise<void>
+  createProject: (name: string) => Promise<Project>
   updateProject: (id: string, name: string) => Promise<void>
   deleteProject: (id: string) => Promise<void>
 }
@@ -47,8 +47,10 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
         projects: [newProject, ...state.projects],
         loading: false
       }))
+      return newProject
     } catch (error) {
       set({ error: 'Failed to create project', loading: false })
+      throw error
     }
   },
 
