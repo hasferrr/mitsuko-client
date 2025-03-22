@@ -29,12 +29,6 @@ export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export function abortedAbortController() {
-  const controller = new AbortController()
-  controller.abort()
-  return controller
-}
-
 export function capitalize(s: string): string {
   if (!s) return s
   const arr = s.split(" ")

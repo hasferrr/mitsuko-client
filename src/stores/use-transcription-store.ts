@@ -3,38 +3,39 @@ import { isSRT } from "@/lib/subtitle-utils"
 import { generateSRT } from "@/lib/srt/generate"
 import { parseSRT } from "@/lib/srt/parse"
 import { handleStream } from "@/lib/stream"
-import { abortedAbortController, sleep } from "@/lib/utils"
 import { Subtitle } from "@/types/types"
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { RefObject } from "react"
+import { keepOnlyWrapped } from "@/lib/parser"
 
 interface TranscriptionStore {
   file: File | null
   audioUrl: string | null
-  isTranscribing: boolean
-  abortControllerRef: React.RefObject<AbortController>
-  transcriptionText: string
-  transcriptSubtitles: Subtitle[]
+  isTranscribingSet: Set<string>
+  abortControllerMap: Map<string, RefObject<AbortController>>
   setFileAndUrl: (file: File | null) => void
   setAudioUrl: (audioUrl: string | null) => void
-  setIsTranscribing: (isTranscribing: boolean) => void
-  setTranscriptionText: (transcriptionText: string) => void
-  setTranscriptSubtitles: (subtitles: Subtitle[]) => void
-  startTranscription: () => Promise<void>
-  stopTranscription: () => void
-  parseTranscription: () => void
-  exportTranscription: () => void
+  setIsTranscribing: (id: string, isTranscribing: boolean) => void
+  stopTranscription: (id: string) => void
+  startTranscription: (
+    id: string,
+    setTranscriptionText: (text: string) => void,
+    setTranscriptSubtitles: (subtitles: Subtitle[]) => void
+  ) => Promise<{ text: string, parsed: Subtitle[] }>
+  parseTranscription: (
+    transcriptionText: string,
+    setTranscriptSubtitles: (subtitles: Subtitle[]) => void,
+  ) => Subtitle[]
+  exportTranscription: (transcriptSubtitles: Subtitle[]) => void
 }
 
 export const useTranscriptionStore = create<TranscriptionStore>()(
-  persist(
-    (set, get) => ({
+  (set, get) => {
+    return ({
       file: null,
       audioUrl: null,
-      isTranscribing: false,
-      abortControllerRef: { current: abortedAbortController() },
-      transcriptionText: "",
-      transcriptSubtitles: [],
+      isTranscribingSet: new Set(),
+      abortControllerMap: new Map(),
       setFileAndUrl: (file) => {
         if (file) {
           const url = URL.createObjectURL(file)
@@ -43,37 +44,52 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
           set({ file: null, audioUrl: null })
         }
       },
-      setIsTranscribing: (isTranscribing) => set({ isTranscribing }),
-      setTranscriptionText: (transcriptionText) => set({ transcriptionText }),
-      setTranscriptSubtitles: (subtitles) => set({ transcriptSubtitles: subtitles }),
       setAudioUrl: (audioUrl) => set({ audioUrl }),
-      startTranscription: async () => {
+      setIsTranscribing: (id, isTranscribing) => {
+        if (isTranscribing) {
+          get().isTranscribingSet.add(id)
+        } else {
+          get().isTranscribingSet.delete(id)
+        }
+      },
+      stopTranscription: (id) => {
+        get().isTranscribingSet.delete(id)
+        get().abortControllerMap.get(id)?.current?.abort()
+        get().abortControllerMap.delete(id)
+      },
+      startTranscription: async (id, setTranscriptionText, setTranscriptSubtitles) => {
         const file = get().file
-        if (!file) return
-        if (file.size > 20 * 1024 * 1024) return
+        if (!file) throw new Error("No file selected")
+        if (file.size > 20 * 1024 * 1024) throw new Error("File size must be less than 20MB")
 
-        set({ transcriptionText: "", transcriptSubtitles: [] })
+        setTranscriptionText("")
+        setTranscriptSubtitles([])
 
         const formData = new FormData()
         formData.append("audio", file)
 
-        await handleStream({
-          setResponse: get().setTranscriptionText,
-          abortControllerRef: get().abortControllerRef,
+        const abortControllerRef = { current: new AbortController() }
+        get().abortControllerMap.set(id, abortControllerRef)
+
+        const transcriptionText = await handleStream({
+          setResponse: setTranscriptionText,
+          abortControllerRef,
           isFree: true,
           apiKey: "",
           requestUrl: TRANSCRIPT_URL,
           requestHeader: {},
           requestBody: formData,
         })
+        get().abortControllerMap.delete(id)
 
-        get().parseTranscription()
+        return {
+          text: transcriptionText,
+          parsed: get().parseTranscription(transcriptionText, setTranscriptSubtitles)
+        }
       },
-      stopTranscription: () => {
-        get().abortControllerRef.current.abort()
-      },
-      parseTranscription: () => {
-        const text = get().transcriptionText.trim()
+      parseTranscription: (transcriptionText, setTranscriptSubtitles) => {
+        let text = transcriptionText.trim()
+        text = keepOnlyWrapped(text, "```", "```") || text
         const lines = text.split("\n").filter((line) => line.trim() !== "")
 
         const check = (i: number) => lines.length > 0 && (
@@ -130,13 +146,14 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         }
 
         console.log(srt)
-        set({ transcriptSubtitles: parseSRT(srt) })
+        const parsed = parseSRT(srt)
+        setTranscriptSubtitles(parsed)
+        return parsed
       },
-      exportTranscription: () => {
-        const subtitles = get().transcriptSubtitles
-        if (!subtitles.length) return
+      exportTranscription: (transcriptSubtitles) => {
+        if (!transcriptSubtitles.length) return
 
-        const srtContent = generateSRT(subtitles)
+        const srtContent = generateSRT(transcriptSubtitles)
         if (!srtContent) return
 
         const blob = new Blob([srtContent], { type: "text/plain" })
@@ -149,13 +166,6 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         document.body.removeChild(a)
         URL.revokeObjectURL(url)
       },
-    }),
-    {
-      name: "transcription-storage",
-      partialize: (state) => ({
-        transcriptionText: state.transcriptionText,
-        transcriptSubtitles: state.transcriptSubtitles,
-      } as TranscriptionStore),
-    }
-  )
+    })
+  }
 )

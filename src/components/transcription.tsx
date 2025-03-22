@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, type ChangeEvent } from "react"
+import { useState, useRef, type ChangeEvent, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Download,
@@ -47,7 +47,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSessionStore } from "@/stores/use-session-store"
-
+import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
 
 const languages = [
   { value: "auto", label: "Auto-detect" },
@@ -58,25 +58,32 @@ const models = [
 ]
 
 export default function Transcription() {
+  const currentId = useTranscriptionDataStore(state => state.currentId)
+  if (!currentId) {
+    return <div className="p-4">No transcription project selected</div>
+  }
+
   const transcriptionAreaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
 
-  const {
-    file,
-    isTranscribing,
-    transcriptionText,
-    transcriptSubtitles,
-    audioUrl,
-    setFileAndUrl,
-    setIsTranscribing,
-    startTranscription,
-    stopTranscription,
-    exportTranscription,
-    parseTranscription,
-    setTranscriptionText,
-    setTranscriptSubtitles,
-  } = useTranscriptionStore()
+  // Get data store getters and setters
+  const transcriptionText = useTranscriptionDataStore(state => state.getTranscriptionText())
+  const transcriptSubtitles = useTranscriptionDataStore(state => state.getTranscriptSubtitles())
+  const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)
+  const setTranscriptSubtitles = useTranscriptionDataStore(state => state.setTranscriptSubtitles)
+  const saveData = useTranscriptionDataStore(state => state.saveData)
+
+  const file = useTranscriptionStore((state) => state.file)
+  const isTranscribingSet = useTranscriptionStore((state) => state.isTranscribingSet)
+  const audioUrl = useTranscriptionStore((state) => state.audioUrl)
+  const setFileAndUrl = useTranscriptionStore((state) => state.setFileAndUrl)
+  const setIsTranscribing = useTranscriptionStore((state) => state.setIsTranscribing)
+  const startTranscription = useTranscriptionStore((state) => state.startTranscription)
+  const stopTranscription = useTranscriptionStore((state) => state.stopTranscription)
+  const exportTranscription = useTranscriptionStore((state) => state.exportTranscription)
+  const parseTranscription = useTranscriptionStore((state) => state.parseTranscription)
+  const isTranscribing = isTranscribingSet.has(currentId)
 
   const session = useSessionStore((state) => state.session)
 
@@ -90,6 +97,12 @@ export default function Transcription() {
   const { setHasChanges } = useUnsavedChanges()
 
   const isExceeded = file ? file.size > 20 * 1024 * 1024 : false
+
+  useEffect(() => {
+    return () => {
+      saveData(currentId)
+    }
+  }, [])
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -111,35 +124,47 @@ export default function Transcription() {
   }
 
   const handleStartTranscription = async () => {
+    setIsTranscribing(currentId, true)
+    setHasChanges(true)
+    await saveData(currentId)
+
     setTimeout(() => {
       window.scrollTo({
         top: 0,
         behavior: "smooth",
       })
     }, 300)
-    setIsTranscribing(true)
-    setHasChanges(true)
+
     try {
-      await startTranscription()
-      handleStopTranscription()
+      const { text, parsed } = await startTranscription(
+        currentId,
+        (text) => setTranscriptionText(currentId, text),
+        (subtitles) => setTranscriptSubtitles(currentId, subtitles)
+      )
+      setTranscriptionText(currentId, text)
+      setTranscriptSubtitles(currentId, parsed)
+      await saveData(currentId)
     } catch (error) {
-      handleStopTranscription()
+      console.error(error)
+    } finally {
+      setIsTranscribing(currentId, false)
+      stopTranscription(currentId)
     }
   }
 
   const handleStopTranscription = () => {
-    setIsTranscribing(false)
-    stopTranscription()
+    setIsTranscribing(currentId, false)
+    stopTranscription(currentId)
   }
 
   const handleTranscriptionTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setTranscriptionText(e.target.value)
+    setTranscriptionText(currentId, e.target.value)
     setHasChanges(true)
   }
 
-  const handleParse = () => {
+  const handleParse = async () => {
     try {
-      parseTranscription()
+      parseTranscription(transcriptionText, (subtitles) => setTranscriptSubtitles(currentId, subtitles))
       toast.success("Parse Success!")
     } catch (error) {
       toast.error(
@@ -153,10 +178,11 @@ export default function Transcription() {
       )
       throw error
     }
+    await saveData(currentId)
   }
 
   const handleExport = () => {
-    exportTranscription()
+    exportTranscription(transcriptSubtitles)
   }
 
   const handleIsEditing = () => {
@@ -172,8 +198,8 @@ export default function Transcription() {
 
   const handleConfirmClear = () => {
     setIsEditing(false)
-    setTranscriptionText("")
-    setTranscriptSubtitles([])
+    setTranscriptionText(currentId, "")
+    setTranscriptSubtitles(currentId, [])
     setIsClearDialogOpen(false)
   }
 
