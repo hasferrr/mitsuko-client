@@ -200,7 +200,7 @@ export const DashboardItemList = ({
       <EditDialogue
         isOpen={isEditOpen}
         onOpenChange={setIsEditOpen}
-        initialValue={title}
+        initialValue={type === "extraction" && title.startsWith("Episode ") ? title.substring(8) : title}
         onSave={async (newValue) => {
           setIsProcessing(true)
           try {
