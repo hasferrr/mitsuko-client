@@ -26,6 +26,7 @@ import { MaxCompletionTokenInput, ModelSelection } from "./settings-inputs"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useExtractionDataStore } from "@/stores/use-extraction-data-store"
+import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
 
 
 interface FileItem {
@@ -50,12 +51,17 @@ export const ContextExtractor = () => {
   const apiKey = useSettingsStore((state) => state.apiKey)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
   const customModel = useSettingsStore((state) => state.customModel)
+  const setSettingsCurrentId = useSettingsStore((state) => state.setCurrentId)
+  const upsertSettingsData = useSettingsStore((state) => state.upsertData)
 
   // Advanced Settings Store
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
   const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())
+  const setAdvancedSettingsCurrentId = useAdvancedSettingsStore((state) => state.setCurrentId)
+  const upsertAdvancedSettingsData = useAdvancedSettingsStore((state) => state.upsertData)
 
   // Extraction Data Store
+  const extractionData = useExtractionDataStore((state) => state.data)
   const episodeNumber = useExtractionDataStore((state) => state.getEpisodeNumber())
   const subtitleContent = useExtractionDataStore((state) => state.getSubtitleContent())
   const previousContext = useExtractionDataStore((state) => state.getPreviousContext())
@@ -97,6 +103,30 @@ export const ContextExtractor = () => {
   }, [contextResultRef])
 
   useEffect(() => {
+    if (!extractionData[currentId]) return
+    setSettingsCurrentId(extractionData[currentId].basicSettingsId)
+    setAdvancedSettingsCurrentId(extractionData[currentId].advancedSettingsId)
+
+    // Fetch settings data if available
+    if (extractionData[currentId].basicSettingsId) {
+      getBasicSettings(extractionData[currentId].basicSettingsId)
+        .then(settings => {
+          if (settings) {
+            upsertSettingsData(settings.id, settings)
+          }
+        })
+    }
+
+    // Fetch advanced settings data if available
+    if (extractionData[currentId].advancedSettingsId) {
+      getAdvancedSettings(extractionData[currentId].advancedSettingsId)
+        .then(advancedSettings => {
+          if (advancedSettings) {
+            upsertAdvancedSettingsData(advancedSettings.id, advancedSettings)
+          }
+        })
+    }
+
     return () => {
       saveData(currentId)
     }
@@ -471,8 +501,8 @@ export const ContextExtractor = () => {
           <TabsContent value="settings" className="flex-grow space-y-4 mt-4">
             <Card className="border border-border bg-card text-card-foreground">
               <CardContent className="p-4 space-y-4">
-                <ModelSelection />
-                <MaxCompletionTokenInput />
+                <ModelSelection store={useExtractionDataStore} />
+                <MaxCompletionTokenInput store={useExtractionDataStore} />
               </CardContent>
             </Card>
           </TabsContent>

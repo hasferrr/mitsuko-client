@@ -3,7 +3,7 @@ import { Translation } from "@/types/project"
 import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/types"
 import { updateTranslation } from "@/lib/db/translation"
 
-interface TranslationDataStore {
+export interface TranslationDataStore {
   currentId: string | null
   data: Record<string, Translation>
   // Existing methods

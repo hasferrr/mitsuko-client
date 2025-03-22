@@ -5,6 +5,7 @@ import { useTranslationDataStore } from "./use-translation-data-store"
 import { createAdvancedSettings, updateAdvancedSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "./use-settings-store"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import { Store } from "@/types/store"
 
 interface AdvancedSettingsStore {
   data: Record<string, AdvancedSettings>
@@ -26,29 +27,33 @@ interface AdvancedSettingsStore {
   setStartIndex: (value: number) => void
   setEndIndex: (value: number) => void
   setSplitSize: (value: number) => void
-  setMaxCompletionTokens: (value: number) => void
+  setMaxCompletionTokens: (value: number, store: Store) => void
   setIsUseStructuredOutput: (value: boolean) => void
   setIsUseFullContextMemory: (value: boolean) => void
   setIsBetterContextCaching: (value: boolean) => void
-  setIsMaxCompletionTokensAuto: (value: boolean) => void
+  setIsMaxCompletionTokensAuto: (value: boolean, store: Store) => void
   resetIndex: (s?: number, e?: number) => void
   resetAdvancedSettings: () => void
 }
 
-const updateSettings = async <K extends keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>>(field: K, value: AdvancedSettings[K]) => {
-  const currentId = useTranslationDataStore.getState().currentId
+const updateSettings = async <K extends keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>>(
+  field: K,
+  value: AdvancedSettings[K],
+  store: Store = useTranslationDataStore
+) => {
+  const currentId = store.getState().currentId
   if (!currentId) return
-  const translationData = useTranslationDataStore.getState().data[currentId]
-  if (!translationData) return
+  const data = store.getState().data[currentId]
+  if (!data) return
 
   // Get or create advanced settings
-  let advancedSettings = translationData.advancedSettingsId
-    ? await getAdvancedSettings(translationData.advancedSettingsId)
+  let advancedSettings = data.advancedSettingsId
+    ? await getAdvancedSettings(data.advancedSettingsId)
     : null
 
   if (!advancedSettings) {
     advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
-    useTranslationDataStore.getState().mutateData(currentId, "advancedSettingsId", advancedSettings.id)
+    store.getState().mutateData(currentId, "advancedSettingsId", advancedSettings.id)
   }
 
   // Update the settings
@@ -160,11 +165,12 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         get().mutateData("splitSize", value)
         updateSettings("splitSize", value)
       },
-      setMaxCompletionTokens: (value) => {
+      // Method for both translation and extraction
+      setMaxCompletionTokens: (value, store) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("maxCompletionTokens", value)
-        updateSettings("maxCompletionTokens", value)
+        updateSettings("maxCompletionTokens", value, store)
       },
       setIsUseStructuredOutput: (value) => {
         const id = get().currentId
@@ -184,11 +190,12 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         get().mutateData("isBetterContextCaching", value)
         updateSettings("isBetterContextCaching", value)
       },
-      setIsMaxCompletionTokensAuto: (value) => {
+      // Method for both translation and extraction
+      setIsMaxCompletionTokensAuto: (value, store) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isMaxCompletionTokensAuto", value)
-        updateSettings("isMaxCompletionTokensAuto", value)
+        updateSettings("isMaxCompletionTokensAuto", value, store)
       },
       resetIndex: (s?: number, e?: number) => {
         const id = get().currentId

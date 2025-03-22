@@ -12,7 +12,7 @@ class MyDatabase extends Dexie {
 
   constructor() {
     super('myDatabase')
-    this.version(4).stores({
+    this.version(6).stores({
       projects: 'id, name, createdAt, updatedAt',
       translations: 'id, projectId, title, createdAt, updatedAt',
       transcriptions: 'id, projectId, title, createdAt, updatedAt',

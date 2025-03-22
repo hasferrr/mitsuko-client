@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { Extraction } from "@/types/project"
 import { updateExtraction } from "@/lib/db/extraction"
 
-interface ExtractionDataStore {
+export interface ExtractionDataStore {
   currentId: string | null
   data: Record<string, Extraction>
   // getters

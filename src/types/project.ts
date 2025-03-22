@@ -49,6 +49,8 @@ export interface Extraction {
   createdAt: Date
   updatedAt: Date
   projectId: string
+  basicSettingsId: string
+  advancedSettingsId: string
 }
 
 export interface BasicSettings {

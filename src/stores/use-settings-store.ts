@@ -2,9 +2,10 @@ import { create } from "zustand"
 import { Model } from "@/types/types"
 import { BasicSettings } from "@/types/project"
 import { persist } from "zustand/middleware"
-import { useTranslationDataStore } from "./use-translation-data-store"
 import { createBasicSettings, updateBasicSettings, getBasicSettings } from "@/lib/db/settings"
 import { DEFAULT_BASIC_SETTINGS } from "@/constants/default"
+import { useTranslationDataStore } from "./use-translation-data-store"
+import { Store } from "@/types/store"
 
 interface SettingsStore {
   data: Record<string, BasicSettings>
@@ -24,8 +25,8 @@ interface SettingsStore {
   getContextDocument: () => string
   setSourceLanguage: (language: string) => void
   setTargetLanguage: (language: string) => void
-  setModelDetail: (model: Model | null) => void
-  setIsUseCustomModel: (value: boolean) => void
+  setModelDetail: (model: Model | null, store: Store) => void
+  setIsUseCustomModel: (value: boolean, store: Store) => void
   setContextDocument: (doc: string) => void
   // local storage persist state
   setApiKey: (key: string) => void
@@ -33,20 +34,24 @@ interface SettingsStore {
   setCustomModel: (model: string) => void
 }
 
-const updateSettings = async <K extends keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>>(field: K, value: BasicSettings[K]) => {
-  const currentId = useTranslationDataStore.getState().currentId
+const updateSettings = async <K extends keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>>(
+  field: K,
+  value: BasicSettings[K],
+  store: Store = useTranslationDataStore
+) => {
+  const currentId = store.getState().currentId
   if (!currentId) return
-  const translationData = useTranslationDataStore.getState().data[currentId]
-  if (!translationData) return
+  const data = store.getState().data[currentId]
+  if (!data) return
 
   // Get or create basic settings
-  let basicSettings = translationData.basicSettingsId
-    ? await getBasicSettings(translationData.basicSettingsId)
+  let basicSettings = data.basicSettingsId
+    ? await getBasicSettings(data.basicSettingsId)
     : null
 
   if (!basicSettings) {
     basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
-    useTranslationDataStore.getState().mutateData(currentId, "basicSettingsId", basicSettings.id)
+    store.getState().mutateData(currentId, "basicSettingsId", basicSettings.id)
   }
 
   // Update the settings
@@ -135,17 +140,18 @@ export const useSettingsStore = create<SettingsStore>()(
         get().mutateData("targetLanguage", language)
         updateSettings("targetLanguage", language)
       },
-      setModelDetail: (model) => {
+      // Method for updating the model detail for the current id for both translation and extraction
+      setModelDetail: (model, store) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("modelDetail", model)
-        updateSettings("modelDetail", model)
+        updateSettings("modelDetail", model, store)
       },
-      setIsUseCustomModel: (value) => {
+      setIsUseCustomModel: (value, store) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isUseCustomModel", value)
-        updateSettings("isUseCustomModel", value)
+        updateSettings("isUseCustomModel", value, store)
       },
       setApiKey: (key) => set({ apiKey: key }),
       setCustomBaseUrl: (url) => set({ customBaseUrl: url }),

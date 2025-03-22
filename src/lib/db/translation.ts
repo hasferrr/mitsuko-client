@@ -4,7 +4,6 @@ import {
   DEFAULT_BASIC_SETTINGS,
   DEFAULT_ADVANCED_SETTINGS,
 } from "@/constants/default"
-import { FREE_MODELS } from "@/constants/model"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
 
 // Translation CRUD
@@ -15,10 +14,7 @@ export const createTranslation = async (
   return db.transaction('rw', db.projects, db.translations, db.basicSettings, db.advancedSettings, async () => {
     const id = crypto.randomUUID()
 
-    // Create basic settings
     const basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
-
-    // Create advanced settings
     const advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
 
     const translation: Translation = {
@@ -69,18 +65,13 @@ export const updateTranslation = async (
 
 export const deleteTranslation = async (projectId: string, translationId: string): Promise<void> => {
   return db.transaction('rw', db.projects, db.translations, db.basicSettings, db.advancedSettings, async () => {
-    // Get translation to find settings IDs
     const translation = await db.translations.get(translationId)
     if (!translation) return
 
-    // Delete associated settings
     await db.basicSettings.delete(translation.basicSettingsId)
     await db.advancedSettings.delete(translation.advancedSettingsId)
-
-    // Delete translation
     await db.translations.delete(translationId)
 
-    // Update project
     await db.projects.update(projectId, project => {
       if (!project) return
       project.translations = project.translations.filter(tId => tId !== translationId)
