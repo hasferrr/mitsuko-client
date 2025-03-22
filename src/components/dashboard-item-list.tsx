@@ -3,15 +3,18 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "./ui/button"
-import { Edit, Trash } from "lucide-react"
+import { Edit, Trash, SquareArrowOutUpRight } from "lucide-react"
 import { DeleteDialogue } from "./ui-custom/delete-dialogue"
 import { EditDialogue } from "./ui-custom/edit-dialogue"
+import { MoveDialogue } from "./ui-custom/move-dialogue"
 import { getExtraction } from "@/lib/db/extraction"
 import { getTranslation } from "@/lib/db/translation"
 import { getTranscription } from "@/lib/db/transcription"
 import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/use-extraction-data-store"
+import { useProjectStore } from "@/stores/use-project-store"
+import { db } from "@/lib/db/db"
 
 interface DashboardItemListProps {
   id: string
@@ -37,6 +40,8 @@ export const DashboardItemList = ({
   handleDelete,
 }: DashboardItemListProps) => {
   const router = useRouter()
+  const projects = useProjectStore((state) => state.projects)
+  const loadProjects = useProjectStore((state) => state.loadProjects)
 
   const {
     setCurrentId: setCurrentTranslationId,
@@ -56,6 +61,7 @@ export const DashboardItemList = ({
 
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [isMoveOpen, setIsMoveOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
 
   const handleTitleClick = async () => {
@@ -103,6 +109,45 @@ export const DashboardItemList = ({
     }
   }
 
+  const handleMove = async (targetProjectId: string) => {
+    setIsProcessing(true)
+    try {
+      await db.transaction('rw', [db.projects, db.translations, db.transcriptions, db.extractions], async () => {
+        // Remove from current project
+        await db.projects.update(projectId, project => {
+          if (!project) return
+          project[`${type}s`] = project[`${type}s`].filter(itemId => itemId !== id)
+          project.updatedAt = new Date()
+        })
+
+        // Add to target project
+        await db.projects.update(targetProjectId, project => {
+          if (!project) return
+          project[`${type}s`].push(id)
+          project.updatedAt = new Date()
+        })
+
+        // Update item's projectId
+        switch (type) {
+          case "translation":
+            await db.translations.update(id, { projectId: targetProjectId, updatedAt: new Date() })
+            break
+          case "transcription":
+            await db.transcriptions.update(id, { projectId: targetProjectId, updatedAt: new Date() })
+            break
+          case "extraction":
+            await db.extractions.update(id, { projectId: targetProjectId, updatedAt: new Date() })
+            break
+        }
+      })
+
+      await loadProjects()
+      setIsMoveOpen(false)
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
   return (
     <div className="border border-border rounded-lg p-3">
       <div className="flex items-center justify-between">
@@ -122,6 +167,15 @@ export const DashboardItemList = ({
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground">{date}</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 min-w-6 p-0"
+            onClick={() => setIsMoveOpen(true)}
+            disabled={isProcessing}
+          >
+            <SquareArrowOutUpRight className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="sm"
@@ -162,6 +216,15 @@ export const DashboardItemList = ({
         handleDelete={handleConfirmDelete}
         isDeleteModalOpen={isDeleteOpen}
         setIsDeleteModalOpen={setIsDeleteOpen}
+        isProcessing={isProcessing}
+      />
+
+      <MoveDialogue
+        isOpen={isMoveOpen}
+        onOpenChange={setIsMoveOpen}
+        projects={projects}
+        currentProjectId={projectId}
+        onMove={handleMove}
         isProcessing={isProcessing}
       />
     </div>
