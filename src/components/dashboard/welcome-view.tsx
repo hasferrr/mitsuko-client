@@ -48,9 +48,10 @@ interface WelcomeViewProps {
 interface SortableProjectItemProps {
   project: Project
   setCurrentProject: (project: Project) => void
+  isHorizontal: boolean
 }
 
-const SortableProjectItem = ({ project, setCurrentProject }: SortableProjectItemProps) => {
+const SortableProjectItem = ({ project, setCurrentProject, isHorizontal }: SortableProjectItemProps) => {
   const {
     attributes,
     listeners,
@@ -77,26 +78,50 @@ const SortableProjectItem = ({ project, setCurrentProject }: SortableProjectItem
           className="flex-1 cursor-pointer"
           onClick={() => setCurrentProject(project)}
         >
-          <div className="flex items-center gap-2 mb-2">
-            {project.transcriptions.length > project.translations.length &&
-              project.transcriptions.length > project.extractions.length ? (
-              <Headphones className="h-4 w-4 text-green-500" />
-            ) : (
-              <FileText className="h-4 w-4 text-blue-500" />
-            )}
-            <span className="text-sm font-medium truncate">{project.name}</span>
-          </div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-muted-foreground">Multiple</span>
-            <span className="text-xs text-muted-foreground">
+          {isHorizontal ? (
+            <div className="flex items-center gap-2">
               {project.transcriptions.length > project.translations.length &&
-                project.transcriptions.length > project.extractions.length ? "AAC/WAV" : "SRT/ASS"}
-            </span>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            <span>{project.updatedAt.toLocaleDateString()}</span>
-          </div>
+                project.transcriptions.length > project.extractions.length ? (
+                <Headphones className="h-4 w-4 text-green-500" />
+              ) : (
+                <FileText className="h-4 w-4 text-blue-500" />
+              )}
+              <span className="text-sm font-medium truncate">{project.name}</span>
+              <span className="text-xs text-muted-foreground mx-2">•</span>
+              <span className="text-xs text-muted-foreground">Multiple</span>
+              <span className="text-xs text-muted-foreground mx-2">•</span>
+              <span className="text-xs text-muted-foreground">
+                {project.transcriptions.length > project.translations.length &&
+                  project.transcriptions.length > project.extractions.length ? "AAC/WAV" : "SRT/ASS"}
+              </span>
+              <span className="text-xs text-muted-foreground ml-auto">
+                {project.updatedAt.toLocaleDateString()}
+              </span>
+            </div>
+          ) : (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                {project.transcriptions.length > project.translations.length &&
+                  project.transcriptions.length > project.extractions.length ? (
+                  <Headphones className="h-4 w-4 text-green-500" />
+                ) : (
+                  <FileText className="h-4 w-4 text-blue-500" />
+                )}
+                <span className="text-sm font-medium truncate">{project.name}</span>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-muted-foreground">Multiple</span>
+                <span className="text-xs text-muted-foreground">
+                  {project.transcriptions.length > project.translations.length &&
+                    project.transcriptions.length > project.extractions.length ? "AAC/WAV" : "SRT/ASS"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                <span>{project.updatedAt.toLocaleDateString()}</span>
+              </div>
+            </div>
+          )}
         </div>
         <div
           {...attributes}
@@ -114,6 +139,7 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
   const router = useRouter()
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   const [showAllProjects, setShowAllProjects] = useState(false)
+  const [isHorizontal, setIsHorizontal] = useState(false)
   const createProject = useProjectStore(state => state.createProject)
   const loadProjects = useProjectStore(state => state.loadProjects)
   const reorderProjects = useProjectStore(state => state.reorderProjects)
@@ -133,14 +159,14 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
     })
   )
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
 
     if (over && active.id !== over.id) {
       const oldIndex = projects.findIndex((p) => p.id === active.id)
       const newIndex = projects.findIndex((p) => p.id === over.id)
       const newOrder = arrayMove(projects.map(p => p.id), oldIndex, newIndex)
-      reorderProjects(newOrder)
+      await reorderProjects(newOrder)
     }
   }
 
@@ -421,12 +447,22 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
         {/* Recent Projects Section */}
         <div className="mt-12 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium">
-              {showAllProjects ? "All Projects" : "Recent Projects"}
-              <span className="text-muted-foreground ml-2 text-sm">
-                ({showAllProjects ? projects.length : Math.min(projects.length, 4)} of {projects.length})
-              </span>
-            </h3>
+            <div className="flex items-center gap-4">
+              <h3 className="text-lg font-medium">
+                {showAllProjects ? "All Projects" : "Recent Projects"}
+                <span className="text-muted-foreground ml-2 text-sm">
+                  ({showAllProjects ? projects.length : Math.min(projects.length, 4)} of {projects.length})
+                </span>
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="px-2"
+                onClick={() => setIsHorizontal(!isHorizontal)}
+              >
+                <Layers className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            </div>
             <Button
               variant="outline"
               size="sm"
@@ -448,16 +484,17 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${showAllProjects ? 'max-h-[60vh] overflow-y-auto pr-2' : ''}`}>
+            <div className={`${isHorizontal ? 'flex flex-col space-y-2' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'} ${showAllProjects ? 'max-h-[60vh] overflow-y-auto pr-2' : ''}`}>
               <SortableContext
                 items={projects.map(p => p.id)}
-                strategy={verticalListSortingStrategy}
+                strategy={isHorizontal ? verticalListSortingStrategy : undefined}
               >
                 {(showAllProjects ? projects : projects.slice(0, 4)).map((project) => (
                   <SortableProjectItem
                     key={project.id}
                     project={project}
                     setCurrentProject={setCurrentProject}
+                    isHorizontal={isHorizontal}
                   />
                 ))}
               </SortableContext>
