@@ -5,6 +5,7 @@ import {
   AudioWaveform,
   BookOpen,
   Disc,
+  Folder,
   HistoryIcon,
   House,
   Languages,
@@ -33,6 +34,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Dashboard",
         url: "/",
         icon: House,
+      },
+      {
+        title: "Project",
+        url: "/project",
+        icon: Folder,
       },
       {
         title: "Translate",

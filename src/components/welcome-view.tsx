@@ -61,20 +61,16 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
 
-interface WelcomeViewProps {
-  projects: Project[]
-  setCurrentProject: (project: Project) => void
-}
-
 interface SortableProjectItemProps {
   project: Project
-  setCurrentProject: (project: Project) => void
   isHorizontal: boolean
   onDelete: (projectId: string) => Promise<void>
 }
 
-const SortableProjectItem = ({ project, setCurrentProject, isHorizontal, onDelete }: SortableProjectItemProps) => {
+const SortableProjectItem = ({ project, isHorizontal, onDelete }: SortableProjectItemProps) => {
+  const router = useRouter()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const setCurrentProject = useProjectStore(state => state.setCurrentProject)
   const {
     attributes,
     listeners,
@@ -95,6 +91,11 @@ const SortableProjectItem = ({ project, setCurrentProject, isHorizontal, onDelet
     setIsDeleteDialogOpen(false)
   }
 
+  const handleProjectClick = () => {
+    setCurrentProject(project)
+    router.push("/project")
+  }
+
   return (
     <>
       <div
@@ -108,7 +109,7 @@ const SortableProjectItem = ({ project, setCurrentProject, isHorizontal, onDelet
         <div className="flex items-center justify-between gap-2">
           <div
             className="flex-1 cursor-pointer"
-            onClick={() => setCurrentProject(project)}
+            onClick={handleProjectClick}
           >
             {isHorizontal ? (
               <div className="flex items-center gap-2">
@@ -206,15 +207,18 @@ const SortableProjectItem = ({ project, setCurrentProject, isHorizontal, onDelet
   )
 }
 
-export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) => {
+export const WelcomeView = () => {
   const router = useRouter()
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   const [showAllProjects, setShowAllProjects] = useState(false)
   const [isHorizontal, setIsHorizontal] = useState(false)
+
+  const projects = useProjectStore(state => state.projects)
   const createProject = useProjectStore(state => state.createProject)
   const loadProjects = useProjectStore(state => state.loadProjects)
   const reorderProjects = useProjectStore(state => state.reorderProjects)
   const deleteProject = useProjectStore(state => state.deleteProject)
+  const setCurrentProject = useProjectStore(state => state.setCurrentProject)
 
   // Get setCurrentId functions from data stores
   const setCurrentTranslationId = useTranslationDataStore(state => state.setCurrentId)
@@ -572,7 +576,6 @@ export const WelcomeView = ({ projects, setCurrentProject }: WelcomeViewProps) =
                   <SortableProjectItem
                     key={project.id}
                     project={project}
-                    setCurrentProject={setCurrentProject}
                     isHorizontal={isHorizontal}
                     onDelete={deleteProject}
                   />

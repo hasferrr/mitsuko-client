@@ -55,7 +55,7 @@ export function NavProjects({
           <SidebarMenuItem key={project.id}>
             <SidebarMenuButton onClick={() => {
               setCurrentProject(project)
-              redirect("/")
+              redirect("/project")
             }}>
               <span>{project.name}</span>
             </SidebarMenuButton>
