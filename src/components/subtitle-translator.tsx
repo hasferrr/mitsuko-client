@@ -199,6 +199,7 @@ export default function SubtitleTranslator() {
   const [toolsOpen, setToolsOpen] = useState(false)
   const [progressOpen, setProgressOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isASSGuidanceDialogOpen, setIsASSGuidanceDialogOpen] = useState(false)
 
   // Other
   const { setHasChanges } = useUnsavedChanges()
@@ -525,16 +526,21 @@ export default function SubtitleTranslator() {
 
     try {
       const text = await pendingFile.text()
-      const type = pendingFile.name.endsWith(".srt") ? "srt" : "ass"
+      let type: "srt" | "ass" | null = null
 
       let parsedSubs: Subtitle[] = []
-      if (type === "srt" && isSRT(text)) {
+      if (isSRT(text)) {
+        type = "srt"
         parsedSubs = parseSRT(text)
         setParsed(currentId, { type, data: null })
-      } else if (type === "ass" && isASS(text)) {
+      } else if (isASS(text)) {
+        type = "ass"
         const data = parseASS(text)
         parsedSubs = data.subtitles
         setParsed(currentId, { type, data })
+
+        // Flag to show ASS guidance dialog
+        setIsASSGuidanceDialogOpen(true)
       } else {
         console.error("Invalid file type")
         toast.error("Invalid file type")
@@ -1006,6 +1012,37 @@ export default function SubtitleTranslator() {
             </AlertDialogCancel>
             <AlertDialogAction onClick={processContextFile}>
               Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* ASS Subtitle Guidance Dialog */}
+      <AlertDialog open={isASSGuidanceDialogOpen} onOpenChange={setIsASSGuidanceDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>ASS Subtitle Guidelines</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                <p>For best translation results:</p>
+                <ul className="list-disc pl-6 space-y-1">
+                  <li>Remove/Comment out karaoke effects</li>
+                  <li>Remove/Comment out signs</li>
+                  <li>Include only dialogue text</li>
+                </ul>
+                <p className="pt-2">
+                  If you need to <span className="font-bold">translate signs</span>,
+                  we recommend translating them <span className="font-bold">separately</span> to ensure better quality.
+                </p>
+                <p className="pt-1 text-sm text-muted-foreground">
+                  You may need to <span className="font-bold">re-upload</span> your subtitle after making these changes.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>
+              I understand
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
