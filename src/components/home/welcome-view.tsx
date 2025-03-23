@@ -5,35 +5,13 @@ import { useRouter } from "next/navigation"
 import {
   Globe,
   Headphones,
-  FileText,
   ArrowRight,
   Layers,
-  Clock,
   ChevronUp,
-  GripVertical,
-  Trash2,
-  MoreHorizontal,
   LayoutGrid,
   LayoutList
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Project } from "@/types/project"
 import { useProjectStore } from "@/stores/use-project-store"
 import { createTranslation } from "@/lib/db/translation"
 import { createTranscription } from "@/lib/db/transcription"
@@ -418,14 +396,13 @@ export const WelcomeView = () => {
             onDragEnd={handleDragEnd}
           >
             <div className={cn(
-              isHorizontal ? 'flex flex-col space-y-2' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4',
-              showAllProjects && 'max-h-[60vh] overflow-y-auto pr-2',
+              isHorizontal ? 'flex flex-col space-y-2' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4',
             )}>
               <SortableContext
                 items={projects.map(p => p.id)}
                 strategy={isHorizontal ? verticalListSortingStrategy : undefined}
               >
-                {(showAllProjects ? projects : projects.slice(0, 4)).map((project) => (
+                {(showAllProjects ? projects : projects.slice(0, 6)).map((project) => (
                   <SortableProjectItem
                     key={project.id}
                     project={project}
@@ -435,6 +412,17 @@ export const WelcomeView = () => {
                 ))}
               </SortableContext>
             </div>
+
+            {!showAllProjects && projects.length > 6 && (
+              <div className="flex justify-center mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAllProjects(true)}
+                >
+                  View All Projects ({projects.length})
+                </Button>
+              </div>
+            )}
           </DndContext>
         </div>
       </div>
