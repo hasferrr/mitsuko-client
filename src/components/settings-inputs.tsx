@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
-import { ChevronsRight, Eye, EyeOff } from "lucide-react"
+import { ChevronsRight, Eye, EyeOff, BookOpen, FolderDown } from "lucide-react"
 import { Button } from "./ui/button"
 import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import {
@@ -25,6 +25,10 @@ import { ComboBox } from "./ui-custom/combo-box"
 import { useInitRefStore } from "@/stores/use-init-store"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ProjectType } from "@/types/project"
+import { useProjectStore } from "@/stores/use-project-store"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Extraction } from "@/types/project"
+import { db } from "@/lib/db/db"
 
 export const LanguageSelection = memo(() => {
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -128,6 +132,20 @@ export const ContextDocumentInput = memo(() => {
   const contextDocument = useSettingsStore((state) => state.getContextDocument())
   const setContextDocument = useSettingsStore((state) => state.setContextDocument)
   const { setHasChanges } = useUnsavedChanges()
+  const [isContextDialogOpen, setIsContextDialogOpen] = useState(false)
+  const currentProject = useProjectStore((state) => state.currentProject)
+  const [projectExtractions, setProjectExtractions] = useState<Extraction[]>([])
+
+  useEffect(() => {
+    if (!currentProject) return
+
+    const loadExtractions = async () => {
+      const extractionsData = await db.extractions.bulkGet(currentProject.extractions)
+      setProjectExtractions(extractionsData.filter((e): e is Extraction => !!e))
+    }
+
+    loadExtractions()
+  }, [currentProject])
 
   const handleContextDocumentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
@@ -136,13 +154,30 @@ export const ContextDocumentInput = memo(() => {
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
   }
 
+  const handleContextSelect = (contextResult: string) => {
+    setHasChanges(true)
+    setContextDocument(contextResult)
+    setIsContextDialogOpen(false)
+  }
+
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">Context Document</label>
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium">Context Document</label>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsContextDialogOpen(true)}
+          className="h-8 px-2"
+        >
+          <FolderDown className="h-4 w-4" />
+          Import
+        </Button>
+      </div>
       <Textarea
         value={contextDocument}
         onChange={handleContextDocumentChange}
-        className="min-h-[150px] h-[150px] max-h-[80vh] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+        className="min-h-[150px] h-[150px] max-h-[70vh] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
         placeholder="Add context about the video..."
         onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
       />
@@ -150,6 +185,39 @@ export const ContextDocumentInput = memo(() => {
         Provide context from previous episodes (can be generated using the
         <span className="font-semibold"> Extract Context</span> feature). This improves accuracy and relevance.
       </p>
+
+      <Dialog open={isContextDialogOpen} onOpenChange={setIsContextDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Select Context Document</DialogTitle>
+            <DialogDescription>
+              Choose a context document from your project extractions
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[400px] overflow-y-auto">
+            {projectExtractions.length === 0 ? (
+              <div className="py-6 text-center text-muted-foreground">
+                No context documents found in this project
+              </div>
+            ) : (
+              <div className="space-y-2 mr-1">
+                {projectExtractions.map((extraction) => (
+                  <div
+                    key={extraction.id}
+                    className="p-3 border rounded-md cursor-pointer hover:bg-muted"
+                    onClick={() => handleContextSelect(extraction.contextResult)}
+                  >
+                    <div className="font-medium">Episode {extraction.episodeNumber || "X"}</div>
+                    <div className="text-sm text-muted-foreground line-clamp-2">
+                      {extraction.contextResult.length ? extraction.contextResult.substring(0, 150) + "..." : "No content"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 })
