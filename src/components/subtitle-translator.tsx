@@ -22,6 +22,8 @@ import {
   Box,
   SquareChartGantt,
   SaveIcon,
+  Eye,
+  EyeOff,
 } from "lucide-react"
 import { SubtitleList } from "./subtitle-list"
 import {
@@ -200,10 +202,19 @@ export default function SubtitleTranslator() {
   const [progressOpen, setProgressOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isASSGuidanceDialogOpen, setIsASSGuidanceDialogOpen] = useState(false)
+  const [subtitlesHidden, setSubtitlesHidden] = useState(true)
 
   // Other
   const { setHasChanges } = useUnsavedChanges()
   const subName = parsed.type === "ass" ? "SSA" : "SRT"
+
+  // Auto-show subtitles if count is less than 1000
+  const maxSubtitles = 1000
+  useEffect(() => {
+    if (subtitles.length < maxSubtitles) {
+      setSubtitlesHidden(false)
+    }
+  }, [subtitles.length])
 
   useEffect(() => {
     if (translationData[currentId].projectId !== useProjectStore.getState().currentProject?.id) {
@@ -730,8 +741,8 @@ export default function SubtitleTranslator() {
       >
         {/* Left Column - Subtitles */}
         <div className="space-y-4">
-          <div className="flex items-center mb-4 justify-between mr-4">
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center mb-4 justify-between mr-4 gap-[6px]">
+            <div className="flex flex-wrap items-center gap-[6px]">
               <Badge variant="secondary" className="gap-1">
                 <Globe2 className="h-4 w-4" />
                 {sourceLanguage} → {targetLanguage}
@@ -743,7 +754,17 @@ export default function SubtitleTranslator() {
                 {subName}
               </Badge>
             </div>
-            <div className="flex flex-wrap items-center gap-2 justify-end">
+            <div className="flex flex-wrap items-center gap-[6px] justify-end">
+              {subtitles.length >= maxSubtitles && (
+                <Badge
+                  variant="outline"
+                  className="gap-1 cursor-pointer hover:bg-secondary select-none rounded-lg"
+                  onClick={() => setSubtitlesHidden(!subtitlesHidden)}
+                >
+                  {subtitlesHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  {subtitlesHidden ? "Show" : "Hide"}
+                </Badge>
+              )}
               <SubtitleProgress isOpen={progressOpen} setIsOpen={setProgressOpen}>
                 <Badge
                   variant="outline"
@@ -767,7 +788,7 @@ export default function SubtitleTranslator() {
 
           {/* Wrap SubtitleList with DragAndDrop */}
           <DragAndDrop onDropFiles={handleFileUpload} disabled={isTranslating}>
-            <SubtitleList />
+            <SubtitleList hidden={subtitlesHidden} />
           </DragAndDrop>
 
           <div className="grid grid-cols-2 gap-4 mt-4">
