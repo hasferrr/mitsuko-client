@@ -554,12 +554,13 @@ export const ContextExtractor = () => {
           Stop
         </Button>
 
-        <div className="flex items-center space-x-2">
+        {/* Batch Mode is disabled for now */}
+        {/* <div className="flex items-center space-x-2">
           <Switch id="batch-mode" checked={isBatchMode} onCheckedChange={setIsBatchMode} />
           <label htmlFor="batch-mode" className="text-sm font-medium">
             Batch Mode
           </label>
-        </div>
+        </div> */}
 
         <Button variant="outline" className="gap-2" onClick={handleSaveToFile}>
           <Save className="h-4 w-4" />
