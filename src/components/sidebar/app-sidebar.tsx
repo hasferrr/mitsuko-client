@@ -11,9 +11,9 @@ import {
   Languages,
 } from "lucide-react"
 
-import { NavMain } from "@/components/sidebar/nav-main"
-import { NavProjects } from "@/components/sidebar/nav-projects"
-import { NavUser } from "@/components/sidebar/nav-user"
+import { AppSidebarMain } from "@/components/sidebar/app-sidebar-main"
+import { AppSidebarProjects } from "@/components/sidebar/app-sidebar-projects"
+import { AppSidebarUser } from "@/components/sidebar/app-sidebar-user"
 import {
   Sidebar,
   SidebarContent,
@@ -76,17 +76,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" variant="floating" {...props}>
       <SidebarHeader></SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects
+        <AppSidebarMain items={data.navMain} />
+        <AppSidebarProjects
           projects={projects}
           addButtonFn={() => {
             createProject("Project " + crypto.randomUUID().slice(0, 3))
           }}
         />
-        <NavMain items={data.links} label="Links" />
+        <AppSidebarMain items={data.links} label="Links" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <AppSidebarUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

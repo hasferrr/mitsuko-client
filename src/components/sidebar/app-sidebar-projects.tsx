@@ -27,19 +27,19 @@ import { redirect } from "next/navigation"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { useState } from "react"
 
-interface NavProjectsProps {
+interface AppSidebarProjectsProps {
   projects: Project[],
   label?: string,
   addButton?: boolean,
   addButtonFn?: () => void,
 }
 
-export function NavProjects({
+export function AppSidebarProjects({
   projects,
   label,
   addButton,
   addButtonFn,
-}: NavProjectsProps) {
+}: AppSidebarProjectsProps) {
   const { isMobile } = useSidebar()
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)

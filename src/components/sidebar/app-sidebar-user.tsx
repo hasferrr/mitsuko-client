@@ -32,7 +32,7 @@ import {
 import { useSessionStore } from "@/stores/use-session-store"
 import { supabase } from "@/services/supabase"
 
-export function NavUser() {
+export function AppSidebarUser() {
   const { isMobile } = useSidebar()
   const session = useSessionStore((state) => state.session)
   const setSession = useSessionStore((state) => state.setSession)

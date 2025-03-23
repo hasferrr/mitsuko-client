@@ -1,4 +1,4 @@
-import { WelcomeView } from "@/components/welcome-view"
+import { WelcomeView } from "@/components/home/welcome-view"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
 import { Metadata } from "next"
 

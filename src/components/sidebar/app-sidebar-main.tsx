@@ -20,15 +20,15 @@ interface Item {
   onClick?: () => void
 }
 
-interface NavMainProps {
+interface AppSidebarMainProps {
   items: Item[],
   label?: string
 }
 
-export function NavMain({
+export function AppSidebarMain({
   items,
   label,
-}: NavMainProps) {
+}: AppSidebarMainProps) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>
