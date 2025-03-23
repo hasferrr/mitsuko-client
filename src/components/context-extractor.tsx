@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { File, XCircle, ArrowUpCircle, ArrowDownCircle, Upload, Save, Play, Square, Loader2, ArrowUpDown, Trash2 } from "lucide-react"
+import { File, XCircle, ArrowUpCircle, ArrowDownCircle, Upload, Save, Play, Square, Loader2, ArrowUpDown, Trash2, Check, Edit, ArrowRight, StepForward } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Subtitle, SubtitleNoTime } from "@/types/types"
@@ -47,6 +47,7 @@ export const ContextExtractor = () => {
   const [activeTab, setActiveTab] = useState("result")
   const [isEpisodeNumberValid, setIsEpisodeNumberValid] = useState(true)
   const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
+  const [isEditingResult, setIsEditingResult] = useState(false)
 
   // Settings Store
   const modelDetail = useSettingsStore((state) => state.getModelDetail())
@@ -146,6 +147,13 @@ export const ContextExtractor = () => {
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
   }, [setHasChanges, setSubtitleContent])
 
+  const handleResultChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setHasChanges(true)
+    setContextResult(currentId, e.target.value)
+    e.target.style.height = "auto"
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 416)}px`
+  }, [setHasChanges, setContextResult, currentId])
+
   const handlePreviousContextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
     setPreviousContext(currentId, e.target.value)
@@ -226,7 +234,7 @@ export const ContextExtractor = () => {
     setSelectedFiles([])
   }
 
-  const handleStartExtraction = async () => {
+  const handleStartExtraction = async (isContinuation: boolean = false) => {
     setTimeout(() => {
       window.scrollTo({
         top: 0,
@@ -248,6 +256,7 @@ export const ContextExtractor = () => {
     setIsExtracting(currentId, true)
     setHasChanges(true)
     setActiveTab("result")
+    setIsEditingResult(false)
 
     let parsed: Subtitle[]
     if (subtitleContent.trim() === "") {
@@ -261,12 +270,18 @@ export const ContextExtractor = () => {
     }
     const subtitles: SubtitleNoTime[] = removeTimestamp(parsed)
 
+    const result: string[] | undefined = isContinuation
+      ? [contextResult]
+      : undefined
+
     const requestBody = {
       input: {
         episode: Number(episodeNumber),
         subtitles: subtitles,
         previous_context: previousContext,
       },
+      isContinuation: isContinuation ? true : undefined,
+      continuationMessage: isContinuation ? result : undefined,
       baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
       model: isUseCustomModel ? customModel : modelDetail?.name || "",
       maxCompletionTokens: isMaxCompletionTokensAuto ? undefined : minMax(
@@ -282,7 +297,8 @@ export const ContextExtractor = () => {
         isUseCustomModel ? apiKey : "",
         !isUseCustomModel,
         currentId,
-        (response) => setContextResult(currentId, response)
+        (response) => setContextResult(currentId, response),
+        isContinuation ? contextResult : "",
       )
     } catch (error) {
       console.error(error)
@@ -290,6 +306,10 @@ export const ContextExtractor = () => {
       setIsExtracting(currentId, false)
       await saveData(currentId)
     }
+  }
+
+  const handleContinueGeneration = async () => {
+    await handleStartExtraction(true)
   }
 
   const handleStopExtraction = async () => {
@@ -312,6 +332,22 @@ export const ContextExtractor = () => {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+  }
+
+  const handleToggleEditMode = async () => {
+    const newEditingState = !isEditingResult
+    setIsEditingResult(newEditingState)
+
+    // Focus on the textarea when entering edit mode
+    if (newEditingState && contextResultRef.current) {
+      contextResultRef.current?.focus()
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    } else {
+      await saveData(currentId)
+    }
   }
 
   return (
@@ -517,9 +553,10 @@ export const ContextExtractor = () => {
             <div className="space-y-2">
               <Textarea
                 ref={contextResultRef}
-                value={contextResult.trim()}
-                readOnly
-                className="h-[416px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                value={contextResult}
+                onChange={isEditingResult ? handleResultChange : undefined}
+                readOnly={!isEditingResult}
+                className="min-h-[412px] h-[412px] max-h-[412px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
                 placeholder="Extracted context will appear here..."
               />
             </div>
@@ -531,7 +568,7 @@ export const ContextExtractor = () => {
       <div className="lg:col-span-2 flex items-center justify-center gap-4 flex-wrap">
         <Button
           className="gap-2 w-[152px]"
-          onClick={handleStartExtraction}
+          onClick={() => handleStartExtraction(false)}
           disabled={isExtracting || isBatchMode || !session}
         >
           {isExtracting ? (
@@ -565,6 +602,44 @@ export const ContextExtractor = () => {
         <Button variant="outline" className="gap-2" onClick={handleSaveToFile}>
           <Save className="h-4 w-4" />
           Save to File
+        </Button>
+
+        <Button
+          variant={isEditingResult ? "default" : "outline"}
+          className="gap-2"
+          onClick={handleToggleEditMode}
+          disabled={isExtracting}
+        >
+          {isEditingResult ? (
+            <>
+              <Check className="h-4 w-4" />
+              Done Editing
+            </>
+          ) : (
+            <>
+              <Edit className="h-4 w-4" />
+              Edit Result
+            </>
+          )}
+        </Button>
+
+        <Button
+          variant="outline"
+          className="gap-2"
+          onClick={handleContinueGeneration}
+          disabled={isExtracting || !session || contextResult.trim() === ""}
+        >
+          {isExtracting ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Continuing...
+            </>
+          ) : (
+            <>
+              <StepForward className="h-4 w-4" />
+              Continue Extraction
+            </>
+          )}
         </Button>
       </div>
     </div>

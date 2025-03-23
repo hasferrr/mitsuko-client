@@ -10,6 +10,7 @@ interface handleStreamParams {
   requestHeader: Record<string, string>,
   requestBody: BodyInit,
   attempt?: number,
+  previousResponse?: string,
 }
 
 export const handleStream = async (params: handleStreamParams): Promise<string> => {
@@ -22,11 +23,12 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
     requestHeader,
     requestBody,
     attempt = 0,
+    previousResponse = "",
   } = params
 
   const accessToken = useSessionStore.getState().session?.access_token
 
-  setResponse("")
+  setResponse(previousResponse)
 
   if (!abortControllerRef.current.signal.aborted) {
     abortControllerRef.current.abort()
@@ -34,7 +36,7 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
   }
   abortControllerRef.current = new AbortController()
 
-  let buffer = ""
+  let buffer = previousResponse ? previousResponse + "\n\n" : ""
   try {
     const res = await fetch(requestUrl, {
       method: "POST",

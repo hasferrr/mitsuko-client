@@ -13,7 +13,8 @@ interface ExtractionStore {
     apiKey: string,
     isFree: boolean,
     extractionId: string,
-    setResponse: (response: string) => void
+    setResponse: (response: string) => void,
+    previousResponse: string
   ) => Promise<void>
 }
 
@@ -33,7 +34,8 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
     apiKey: string,
     isFree: boolean,
     extractionId: string,
-    setResponse: (response: string) => void
+    setResponse: (response: string) => void,
+    previousResponse: string
   ) => {
     const abortControllerRef = { current: new AbortController() }
     get().abortControllerMap.set(extractionId, abortControllerRef)
@@ -48,6 +50,7 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
         "Content-Type": "application/json"
       },
       requestBody: JSON.stringify(requestBody),
+      previousResponse,
     })
 
     get().abortControllerMap.delete(extractionId)
