@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
-import { ChevronsRight, Eye, EyeOff, BookOpen, FolderDown } from "lucide-react"
+import { ChevronsRight, Eye, EyeOff, FolderDown } from "lucide-react"
 import { Button } from "./ui/button"
 import { useTranslationDataStore } from "@/stores/use-translation-data-store"
 import {
@@ -242,7 +242,9 @@ export const TemperatureSlider = memo(() => {
         className="py-2"
       />
       <p className="text-xs text-muted-foreground">
-        Controls the randomness of the output. Higher values produce more diverse results, lower values produce more consistent results.
+        Controls the randomness of the output.
+        Higher values produce more diverse (creative) results,
+        lower values produce more consistent (accurate) results.
       </p>
     </div>
   )
@@ -420,8 +422,8 @@ export const SplitSizeInput = memo(() => {
       <p className="text-xs text-muted-foreground">
         Determines the number of dialogues to process in each chunk.
         Smaller chunks can help with context management and reliability.
-        Larger chunks increase efficiency but may result in truncation
-        due to the model output token limit. ({SPLIT_SIZE_MIN}-{SPLIT_SIZE_MAX})
+        Larger chunks increase efficiency but may result in response quality degradation.
+        ({SPLIT_SIZE_MIN}-{SPLIT_SIZE_MAX})
       </p>
     </div>
   )
@@ -475,13 +477,10 @@ export const MaxCompletionTokenInput = memo(({ type }: { type: ProjectType }) =>
         inputMode="numeric"
         disabled={isMaxCompletionTokensAuto}
       />
-      {isMaxCompletionTokensAuto
-        ? <p className="text-xs text-muted-foreground">
-          Maximum number of tokens the model can generate for each subtitle chunk is set to auto.
-        </p>
-        : <p className="text-xs text-muted-foreground">
-          Sets the maximum number of tokens the model can generate for each subtitle chunk. ({MAX_COMPLETION_TOKENS_MIN}-{maxToken})
-        </p>}
+      <p className="text-xs text-muted-foreground">
+        Maximum number of tokens the model can generate for each subtitle chunk.
+        {isMaxCompletionTokensAuto ? " Currently set to auto." : ` Manual range: ${MAX_COMPLETION_TOKENS_MIN}-${maxToken}.`}
+      </p>
     </div>
   )
 })
@@ -528,7 +527,7 @@ export const FullContextMemorySwitch = memo(() => {
       <p className="text-xs text-muted-foreground">
         When enabled, it's using all previous chunks to improve translation
         consistency and accuracy, but increases token usage and the risk of hitting
-        input token limits. Best for models with large context windows (64k+ tokens).
+        input token limits. Best for models with large context windows (128k+ tokens).
         When disabled, it's only including the last previous chunk.
       </p>
     </div>
@@ -547,17 +546,15 @@ export const BetterContextCachingSwitch = memo(() => {
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium">Minimal Context Mode</label>
         <Switch
-          checked={isMinimalContextMode}
+          checked={isUseFullContextMemory ? false : isMinimalContextMode}
           onCheckedChange={(value) => setIsBetterContextCaching(!value)}
           disabled={isUseFullContextMemory}
         />
       </div>
       <p className="text-xs text-muted-foreground">
         Uses minimal context to significantly reduce token usage and cost.
-        When <span className="font-semibold">Full Context Memory</span> is disabled
-        AND when <span className="font-semibold">Minimal Context Mode</span> is enabled,
-        it will only use 5 dialogues from the previous chunk as context.
-        When disabled, it maintains a balanced approach using single previous chunk.
+        When enabled, it will only use 5 dialogues from the previous chunk as context.
+        When disabled, it maintains a balanced approach using the last previous chunk.
       </p>
     </div>
   )

@@ -1,13 +1,14 @@
 import { SubtitleTranslated } from "@/types/types"
 import { FREE_MODELS } from "./model"
+import { AdvancedSettings, BasicSettings } from "@/types/project"
 
 const DEFAULT_SOURCE_LANGUAGE = "Japanese"
 const DEFAULT_TARGET_LANGUAGE = "Indonesian"
 const DEFAULT_TEMPERATURE = 0.6
-const DEFAULT_SPLIT_SIZE = 150
+const DEFAULT_SPLIT_SIZE = 100
 const DEFAULT_MAX_COMPLETION_TOKENS = 8129
 
-export const DEFAULT_BASIC_SETTINGS = {
+export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> = {
   sourceLanguage: DEFAULT_SOURCE_LANGUAGE,
   targetLanguage: DEFAULT_TARGET_LANGUAGE,
   modelDetail: Object.values(FREE_MODELS)[0]?.[0] || null,
@@ -15,7 +16,7 @@ export const DEFAULT_BASIC_SETTINGS = {
   contextDocument: "",
 }
 
-export const DEFAULT_ADVANCED_SETTINGS = {
+export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {
   temperature: DEFAULT_TEMPERATURE,
   startIndex: 1,
   endIndex: 100000,
@@ -23,7 +24,7 @@ export const DEFAULT_ADVANCED_SETTINGS = {
   maxCompletionTokens: DEFAULT_MAX_COMPLETION_TOKENS,
   isUseStructuredOutput: true,
   isUseFullContextMemory: false,
-  isBetterContextCaching: true,
+  isBetterContextCaching: true, // true means it is NOT using Minimal Context Mode
   isMaxCompletionTokensAuto: true,
 }
 
