@@ -92,11 +92,11 @@ export function ModelSelector({
         <PopoverContent
           align="start"
           side="bottom"
-          className="w-full max-h-[19rem] p-0 overflow-y-auto"
+          className="w-full p-0 overflow-y-auto"
         >
           <Command loop>
             <CommandList
-              className="h-[var(--cmdk-list-height)] max-h-[400px] overflow-y-auto"
+              className="h-[var(--cmdk-list-height)] overflow-y-auto"
             >
               <CommandInput placeholder="Search Models..." />
               <CommandEmpty>No Models found.</CommandEmpty>
