@@ -227,7 +227,15 @@ export const ContextExtractor = () => {
   }
 
   const handleStartExtraction = async () => {
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, 300)
+
     await saveData(currentId)
+
     if (episodeNumber.trim() === "") {
       setIsEpisodeNumberValid(false)
       return
@@ -240,14 +248,6 @@ export const ContextExtractor = () => {
     setIsExtracting(currentId, true)
     setHasChanges(true)
     setActiveTab("result")
-
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }, 300)
-
 
     let parsed: Subtitle[]
     if (subtitleContent.trim() === "") {
