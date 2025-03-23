@@ -11,7 +11,7 @@ export interface ExtractionDataStore {
   getPreviousContext: () => string
   getContextResult: () => string
   // setters and other methods
-  setCurrentId: (id: string) => void
+  setCurrentId: (id: string | null) => void
   setEpisodeNumber: (id: string, episodeNumber: string) => void
   setSubtitleContent: (id: string, subtitleContent: string) => void
   setPreviousContext: (id: string, previousContext: string) => void
@@ -99,5 +99,8 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
       delete newData[id]
       return { data: newData }
     })
+    if (get().currentId === id) {
+      set({ currentId: null })
+    }
   }
 }))

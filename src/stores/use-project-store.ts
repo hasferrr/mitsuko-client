@@ -1,6 +1,9 @@
 import { create } from "zustand"
 import { Project } from "@/types/project"
 import { getAllProjects, createProject as createProjectDB, deleteProject as deleteProjectDB, updateProject as updateProjectDB, updateProjectOrder } from "@/lib/db/project"
+import { useTranscriptionDataStore } from "./use-transcription-data-store"
+import { useTranslationDataStore } from "./use-translation-data-store"
+import { useExtractionDataStore } from "./use-extraction-data-store"
 
 interface ProjectStore {
   currentProject: Project | null
@@ -86,6 +89,25 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     set({ loading: true })
     try {
       await deleteProjectDB(id)
+
+      const transcriptionStore = useTranscriptionDataStore.getState()
+      const extractionStore = useExtractionDataStore.getState()
+      const translationStore = useTranslationDataStore.getState()
+
+      // Remove data for deleted project from all stores
+      const deletedProject = get().projects.find((p: { id: string }) => p.id === id)
+      if (deletedProject) {
+        deletedProject.transcriptions.forEach((transcriptionId: string) => {
+          transcriptionStore.removeData(transcriptionId)
+        })
+        deletedProject.extractions.forEach((extractionId: string) => {
+          extractionStore.removeData(extractionId)
+        })
+        deletedProject.translations.forEach((translationId: string) => {
+          translationStore.removeData(translationId)
+        })
+      }
+
       set((state) => ({
         projects: state.projects.filter(p => p.id !== id),
         currentProject: state.currentProject?.id === id
@@ -93,6 +115,10 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
           : state.currentProject,
         loading: false
       }))
+
+      if (get().currentProject?.id === id) {
+        set({ currentProject: null })
+      }
     } catch (error) {
       set({ error: 'Failed to delete project', loading: false })
     }

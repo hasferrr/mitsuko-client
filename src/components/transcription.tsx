@@ -60,7 +60,9 @@ const models = [
 
 export default function Transcription() {
   const currentId = useTranscriptionDataStore(state => state.currentId)
-  if (!currentId) {
+  const transcriptionData = useTranscriptionDataStore(state => state.data)
+  
+  if (!currentId || !transcriptionData[currentId]) {
     return <div className="p-4">No transcription project selected</div>
   }
 
@@ -69,7 +71,6 @@ export default function Transcription() {
   const audioRef = useRef<HTMLAudioElement>(null)
 
   // Get data store getters and setters
-  const transcriptionData = useTranscriptionDataStore(state => state.data)
   const transcriptionText = useTranscriptionDataStore(state => state.getTranscriptionText())
   const transcriptSubtitles = useTranscriptionDataStore(state => state.getTranscriptSubtitles())
   const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)

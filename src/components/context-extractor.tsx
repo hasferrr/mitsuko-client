@@ -38,7 +38,9 @@ interface FileItem {
 
 export const ContextExtractor = () => {
   const currentId = useExtractionDataStore((state) => state.currentId)
-  if (!currentId) {
+  const extractionData = useExtractionDataStore((state) => state.data)
+
+  if (!currentId || !extractionData[currentId]) {
     return <div className="p-4">No extraction project selected</div>
   }
 
@@ -62,7 +64,6 @@ export const ContextExtractor = () => {
   const upsertAdvancedSettingsData = useAdvancedSettingsStore((state) => state.upsertData)
 
   // Extraction Data Store
-  const extractionData = useExtractionDataStore((state) => state.data)
   const episodeNumber = useExtractionDataStore((state) => state.getEpisodeNumber())
   const subtitleContent = useExtractionDataStore((state) => state.getSubtitleContent())
   const previousContext = useExtractionDataStore((state) => state.getPreviousContext())

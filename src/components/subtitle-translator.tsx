@@ -103,12 +103,13 @@ type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
 
 export default function SubtitleTranslator() {
   const currentId = useTranslationDataStore((state) => state.currentId)
-  if (!currentId) {
+  const translationData = useTranslationDataStore((state) => state.data)
+
+  if (!currentId || !translationData[currentId]) {
     return <div className="p-4">No translation project selected</div>
   }
 
   // Get translation data and functions from store
-  const translationData = useTranslationDataStore((state) => state.data)
   const {
     setTitle,
     setSubtitles,

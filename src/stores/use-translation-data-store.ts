@@ -7,7 +7,7 @@ export interface TranslationDataStore {
   currentId: string | null
   data: Record<string, Translation>
   // Existing methods
-  setCurrentId: (id: string) => void
+  setCurrentId: (id: string | null) => void
   mutateData: (id: string, key: keyof Translation, value: any) => void
   saveData: (id: string) => Promise<void>
   upsertData: (id: string, value: Translation) => void
@@ -66,6 +66,9 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       delete newData[id]
       return { data: newData }
     })
+    if (get().currentId === id) {
+      set({ currentId: null })
+    }
   },
   // Subtitle methods
   setTitle: (id, title) => {

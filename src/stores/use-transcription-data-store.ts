@@ -11,7 +11,7 @@ interface TranscriptionDataStore {
   getTranscriptionText: () => string
   getTranscriptSubtitles: () => Subtitle[]
   // setters
-  setCurrentId: (id: string) => void
+  setCurrentId: (id: string | null) => void
   setTitle: (id: string, title: string) => void
   setTranscriptionText: (id: string, transcriptionText: string) => void
   setTranscriptSubtitles: (id: string, subtitles: Subtitle[]) => void
@@ -86,5 +86,8 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
       delete newData[id]
       return { data: newData }
     })
+    if (get().currentId === id) {
+      set({ currentId: null })
+    }
   }
 }))
