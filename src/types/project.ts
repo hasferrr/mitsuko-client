@@ -1,5 +1,6 @@
+import { advancedSettingsSchema } from "@/lib/zod"
 import { SubtitleTranslated, Parsed, Subtitle, Model, SubOnlyTranslated } from "./types"
-
+import { z } from "zod"
 export type ProjectType = 'translation' | 'transcription' | 'extraction'
 
 export interface ProjectOrder {
@@ -66,20 +67,7 @@ export interface BasicSettings {
   updatedAt: Date
 }
 
-export interface AdvancedSettings {
-  id: string
-  temperature: number
-  startIndex: number
-  endIndex: number
-  splitSize: number
-  maxCompletionTokens: number
-  isUseStructuredOutput: boolean
-  isUseFullContextMemory: boolean
-  isBetterContextCaching: boolean
-  isMaxCompletionTokensAuto: boolean
-  createdAt: Date
-  updatedAt: Date
-}
+export type AdvancedSettings = z.infer<typeof advancedSettingsSchema>
 
 export interface ResponseTranslation {
   response: string

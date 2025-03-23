@@ -25,6 +25,7 @@ import { useSettingsStore } from "@/stores/use-settings-store"
 import { FREE_MODELS } from "@/constants/model"
 import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
 import { ProjectType } from "@/types/project"
+import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 
 interface ModelSelectorProps extends PopoverProps {
   type: ProjectType
@@ -39,14 +40,36 @@ export function ModelSelector({
   const models = FREE_MODELS
   const [open, setOpen] = React.useState(false)
 
+  // Settings Store
   const modelDetail = useSettingsStore((state) => state.getModelDetail())
   const setModelDetail = useSettingsStore((state) => state.setModelDetail)
+
+  // Advanced Settings Store
   const setIsUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
+  const setIsMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.setIsMaxCompletionTokensAuto)
+  const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
 
   const handleSelect = (model: Model) => {
     setModelDetail(model, type)
-    setIsUseStructuredOutput(model.structuredOutput)
     setOpen(false)
+
+    if (model.default?.isUseStructuredOutput !== undefined) {
+      setIsUseStructuredOutput(model.default.isUseStructuredOutput)
+    } else {
+      setIsUseStructuredOutput(model.structuredOutput)
+    }
+
+    if (model.default?.isMaxCompletionTokensAuto !== undefined) {
+      setIsMaxCompletionTokensAuto(model.default.isMaxCompletionTokensAuto, type)
+    } else {
+      setIsMaxCompletionTokensAuto(DEFAULT_ADVANCED_SETTINGS.isMaxCompletionTokensAuto, type)
+    }
+
+    if (model.default?.maxCompletionTokens !== undefined) {
+      setMaxCompletionTokens(model.default.maxCompletionTokens, type)
+    } else {
+      setMaxCompletionTokens(DEFAULT_ADVANCED_SETTINGS.maxCompletionTokens, type)
+    }
   }
 
   return (

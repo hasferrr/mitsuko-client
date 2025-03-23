@@ -221,19 +221,30 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         const id = get().currentId
         if (!id) return
 
-        const translationData = useTranslationDataStore.getState().data[id]
-        const subtitles = translationData?.subtitles ?? []
-
         const settingsCurrentId = useSettingsStore.getState().currentId
         const settingsData = useSettingsStore.getState().data
         const modelDetail = settingsCurrentId ? settingsData[settingsCurrentId]?.modelDetail ?? null : null
         const isUseCustomModel = settingsCurrentId ? settingsData[settingsCurrentId]?.isUseCustomModel ?? false : false
 
-        const newSettings = {
+        // Start with DEFAULT_ADVANCED_SETTINGS
+        const newSettings: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'> = {
           ...DEFAULT_ADVANCED_SETTINGS,
           isUseStructuredOutput: isUseCustomModel
             ? true
             : modelDetail?.structuredOutput ?? true,
+        }
+
+        // Apply model defaults if available
+        if (modelDetail?.default) {
+          if (modelDetail.default.maxCompletionTokens !== undefined) {
+            newSettings.maxCompletionTokens = modelDetail.default.maxCompletionTokens
+          }
+          if (modelDetail.default.isMaxCompletionTokensAuto !== undefined) {
+            newSettings.isMaxCompletionTokensAuto = modelDetail.default.isMaxCompletionTokensAuto
+          }
+          if (modelDetail.default.isUseStructuredOutput !== undefined) {
+            newSettings.isUseStructuredOutput = modelDetail.default.isUseStructuredOutput
+          }
         }
 
         const store = get()
