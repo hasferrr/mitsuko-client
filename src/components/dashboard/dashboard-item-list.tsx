@@ -111,41 +111,56 @@ export const DashboardItemList = ({
 
   const handleMove = async (targetProjectId: string) => {
     setIsProcessing(true)
-    try {
-      await db.transaction('rw', [db.projects, db.translations, db.transcriptions, db.extractions], async () => {
-        // Remove from current project
-        await db.projects.update(projectId, project => {
-          if (!project) return
-          project[`${type}s`] = project[`${type}s`].filter(itemId => itemId !== id)
-          project.updatedAt = new Date()
-        })
-
-        // Add to target project
-        await db.projects.update(targetProjectId, project => {
-          if (!project) return
-          project[`${type}s`].push(id)
-          project.updatedAt = new Date()
-        })
-
-        // Update item's projectId
-        switch (type) {
-          case "translation":
-            await db.translations.update(id, { projectId: targetProjectId, updatedAt: new Date() })
-            break
-          case "transcription":
-            await db.transcriptions.update(id, { projectId: targetProjectId, updatedAt: new Date() })
-            break
-          case "extraction":
-            await db.extractions.update(id, { projectId: targetProjectId, updatedAt: new Date() })
-            break
-        }
+    await db.transaction('rw', [db.projects, db.translations, db.transcriptions, db.extractions], async () => {
+      // Remove from current project
+      await db.projects.update(projectId, project => {
+        if (!project) return
+        project[`${type}s`] = project[`${type}s`].filter(itemId => itemId !== id)
+        project.updatedAt = new Date()
       })
 
-      await loadProjects()
-      setIsMoveOpen(false)
-    } finally {
-      setIsProcessing(false)
+      // Add to target project
+      await db.projects.update(targetProjectId, project => {
+        if (!project) return
+        project[`${type}s`].push(id)
+        project.updatedAt = new Date()
+      })
+
+      // Update item's projectId
+      switch (type) {
+        case "translation":
+          await db.translations.update(id, { projectId: targetProjectId, updatedAt: new Date() })
+          break
+        case "transcription":
+          await db.transcriptions.update(id, { projectId: targetProjectId, updatedAt: new Date() })
+          break
+        case "extraction":
+          await db.extractions.update(id, { projectId: targetProjectId, updatedAt: new Date() })
+          break
+      }
+    })
+
+    // Update data in the store based on item type
+    if (type === "translation") {
+      if (translationData[id]) {
+        const updatedData = { ...translationData[id], projectId: targetProjectId }
+        upsertTranslationData(id, updatedData)
+      }
+    } else if (type === "transcription") {
+      if (transcriptionData[id]) {
+        const updatedData = { ...transcriptionData[id], projectId: targetProjectId }
+        upsertTranscriptionData(id, updatedData)
+      }
+    } else if (type === "extraction") {
+      if (extractionData[id]) {
+        const updatedData = { ...extractionData[id], projectId: targetProjectId }
+        upsertExtractionData(id, updatedData)
+      }
     }
+
+    await loadProjects()
+    setIsMoveOpen(false)
+    setIsProcessing(false)
   }
 
   return (
