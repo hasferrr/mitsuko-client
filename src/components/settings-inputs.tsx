@@ -22,7 +22,6 @@ import {
 import { ModelSelector } from "@/components/model-selector"
 import { LANGUAGES } from "@/constants/lang"
 import { ComboBox } from "./ui-custom/combo-box"
-import { useInitRefStore } from "@/stores/use-init-store"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ProjectType } from "@/types/project"
 import { useProjectStore } from "@/stores/use-project-store"
