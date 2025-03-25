@@ -43,21 +43,17 @@ export const DashboardItemList = ({
   const projects = useProjectStore((state) => state.projects)
   const loadProjects = useProjectStore((state) => state.loadProjects)
 
-  const {
-    setCurrentId: setCurrentTranslationId,
-    data: translationData,
-    upsertData: upsertTranslationData,
-  } = useTranslationDataStore()
-  const {
-    setCurrentId: setCurrentTranscriptionId,
-    data: transcriptionData,
-    upsertData: upsertTranscriptionData,
-  } = useTranscriptionDataStore()
-  const {
-    setCurrentId: setCurrentExtractionId,
-    data: extractionData,
-    upsertData: upsertExtractionData,
-  } = useExtractionDataStore()
+  const translationData = useTranslationDataStore((state) => state.data)
+  const setCurrentTranslationId = useTranslationDataStore((state) => state.setCurrentId)
+  const upsertTranslationData = useTranslationDataStore((state) => state.upsertData)
+
+  const transcriptionData = useTranscriptionDataStore((state) => state.data)
+  const setCurrentTranscriptionId = useTranscriptionDataStore((state) => state.setCurrentId)
+  const upsertTranscriptionData = useTranscriptionDataStore((state) => state.upsertData)
+
+  const extractionData = useExtractionDataStore((state) => state.data)
+  const setCurrentExtractionId = useExtractionDataStore((state) => state.setCurrentId)
+  const upsertExtractionData = useExtractionDataStore((state) => state.upsertData)
 
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
@@ -101,12 +97,9 @@ export const DashboardItemList = ({
 
   const handleConfirmDelete = async () => {
     setIsProcessing(true)
-    try {
-      await handleDelete()
-      setIsDeleteOpen(false)
-    } finally {
-      setIsProcessing(false)
-    }
+    await handleDelete()
+    setIsDeleteOpen(false)
+    setIsProcessing(false)
   }
 
   const handleMove = async (targetProjectId: string) => {
