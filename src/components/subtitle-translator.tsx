@@ -563,6 +563,10 @@ export default function SubtitleTranslator() {
         translated: "",
       }))
 
+      if (parsedSubtitles.length >= maxSubtitles) {
+        setSubtitlesHidden(true)
+      }
+
       setSubtitles(currentId, parsedSubtitles)
       resetIndex(1, parsedSubtitles.length)
 
