@@ -478,7 +478,7 @@ export const MaxCompletionTokenInput = memo(({ type }: { type: ProjectType }) =>
       />
       <p className="text-xs text-muted-foreground">
         Maximum number of tokens the model can generate for each subtitle chunk.
-        {isMaxCompletionTokensAuto ? " Currently set to auto." : ` Manual range: ${MAX_COMPLETION_TOKENS_MIN}-${maxToken}.`}
+        {isMaxCompletionTokensAuto ? " Currently set to auto." : ` (${MAX_COMPLETION_TOKENS_MIN}-${maxToken}).`}
       </p>
     </div>
   )
