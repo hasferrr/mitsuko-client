@@ -9,6 +9,8 @@ export function mergeSubtitles(events: SubtitleEvent[], subtitles: Subtitle[]): 
     if (event.format === 'Dialogue') {
       if (subtitleIndex < subtitles.length) {
         mergedEvent.text = subtitles[subtitleIndex].content
+        mergedEvent.start = formatAssTimestamp(subtitles[subtitleIndex].timestamp.start)
+        mergedEvent.end = formatAssTimestamp(subtitles[subtitleIndex].timestamp.end)
         subtitleIndex++
       } else {
         console.warn("More Dialogue events than Subtitles.")
@@ -46,6 +48,21 @@ function parseTimestamp(timestampStr: string): Timestamp {
     s: parseInt(s),
     ms: parseInt(ms.padEnd(3, '0')), // Pad milliseconds to 3 digits
   }
+}
+
+function formatAssTimestamp(timestamp: Timestamp): string {
+  const h = timestamp.h.toString().padStart(2, '0')
+  const m = timestamp.m.toString().padStart(2, '0')
+  const s = timestamp.s.toString().padStart(2, '0')
+
+  // Round ms if it has more than 2 digits
+  let msValue = timestamp.ms
+  if (msValue > 99) {
+    msValue = Math.round(msValue / 10)
+  }
+  const ms = msValue.toString().padStart(2, '0')
+
+  return `${h}:${m}:${s}.${ms}`
 }
 
 export function convertSubtitleEventsToSubtitles(events: SubtitleEvent[]): Subtitle[] {
