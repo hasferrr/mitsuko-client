@@ -88,7 +88,7 @@ export function Navbar() {
                   alt="Logo"
                   className="w-6 h-6 object-cover"
                 />
-                Mitsuko
+                Mitsuko (Beta)
               </Link>
             </BreadcrumbItem>
             {currentProject && (
