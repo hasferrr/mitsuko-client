@@ -22,7 +22,7 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
   endIndex: 100000,
   splitSize: DEFAULT_SPLIT_SIZE,
   maxCompletionTokens: DEFAULT_MAX_COMPLETION_TOKENS,
-  isUseStructuredOutput: true,
+  isUseStructuredOutput: false,
   isUseFullContextMemory: false,
   isBetterContextCaching: true, // true means it is NOT using Minimal Context Mode
   isMaxCompletionTokensAuto: true,
