@@ -2,6 +2,8 @@ import { SubtitleTranslated } from "@/types/types"
 import { FREE_MODELS } from "./model"
 import { AdvancedSettings, BasicSettings } from "@/types/project"
 
+export const MAX_TRANSCRIPTION_SIZE = 1024 * 1024 * 100
+
 const DEFAULT_SOURCE_LANGUAGE = "Japanese"
 const DEFAULT_TARGET_LANGUAGE = "Indonesian"
 const DEFAULT_TEMPERATURE = 0.6

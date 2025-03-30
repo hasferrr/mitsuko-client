@@ -49,7 +49,7 @@ import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
 import { useProjectStore } from "@/stores/use-project-store"
-
+import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
 const languages = [
   { value: "auto", label: "Auto-detect" },
 ]
@@ -99,7 +99,8 @@ export default function Transcription() {
   useAutoScroll(transcriptionText, transcriptionAreaRef)
   const { setHasChanges } = useUnsavedChanges()
 
-  const isExceeded = file ? file.size > 20 * 1024 * 1024 : false
+  const isExceeded = file ? file.size > MAX_TRANSCRIPTION_SIZE : false
+  const maxMB = MAX_TRANSCRIPTION_SIZE / (1024 * 1024)
 
   useEffect(() => {
     if (transcriptionData[currentId].projectId !== useProjectStore.getState().currentProject?.id) {
@@ -240,7 +241,7 @@ export default function Transcription() {
                 >
                   <Upload className="h-10 w-10 text-muted-foreground mb-3" />
                   <p className="text-muted-foreground text-sm mb-1">Click to upload or drag and drop</p>
-                  <p className="text-muted-foreground text-xs">AAC, FLAC, MP3, and more (max 20MB)</p>
+                  <p className="text-muted-foreground text-xs">AAC, FLAC, MP3, and more (max {maxMB}MB)</p>
                 </div>
               </DragAndDrop>
             ) : (
@@ -267,7 +268,7 @@ export default function Transcription() {
                     {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
                   </p>
                   {isExceeded &&
-                    <p className="text-red-500">File size exceeds 20MB</p>}
+                    <p className="text-red-500">File size exceeds {maxMB}MB</p>}
                 </div>
               </div>
             )}

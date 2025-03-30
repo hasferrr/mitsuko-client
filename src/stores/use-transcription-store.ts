@@ -7,7 +7,7 @@ import { Subtitle } from "@/types/types"
 import { create } from "zustand"
 import { RefObject } from "react"
 import { keepOnlyWrapped } from "@/lib/parser"
-
+import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
 interface TranscriptionStore {
   file: File | null
   audioUrl: string | null
@@ -60,7 +60,9 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
       startTranscription: async (id, setTranscriptionText, setTranscriptSubtitles) => {
         const file = get().file
         if (!file) throw new Error("No file selected")
-        if (file.size > 20 * 1024 * 1024) throw new Error("File size must be less than 20MB")
+        if (file.size > MAX_TRANSCRIPTION_SIZE) {
+          throw new Error(`File size must be less than ${MAX_TRANSCRIPTION_SIZE / (1024 * 1024)}MB`)
+        }
 
         setTranscriptionText("")
         setTranscriptSubtitles([])
