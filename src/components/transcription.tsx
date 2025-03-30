@@ -51,6 +51,7 @@ import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store
 import { useProjectStore } from "@/stores/use-project-store"
 import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
 import { generateSRT } from "@/lib/srt/generate"
+import { parseTranscription } from "@/lib/parser"
 
 const languages = [
   { value: "auto", label: "Auto-detect" },
@@ -86,7 +87,6 @@ export default function Transcription() {
   const setIsTranscribing = useTranscriptionStore((state) => state.setIsTranscribing)
   const startTranscription = useTranscriptionStore((state) => state.startTranscription)
   const stopTranscription = useTranscriptionStore((state) => state.stopTranscription)
-  const parseTranscription = useTranscriptionStore((state) => state.parseTranscription)
   const isTranscribing = isTranscribingSet.has(currentId)
 
   const session = useSessionStore((state) => state.session)
@@ -145,13 +145,13 @@ export default function Transcription() {
     }, 300)
 
     try {
-      const { text, parsed } = await startTranscription(
+      const text = await startTranscription(
         currentId,
         (text) => setTranscriptionText(currentId, text),
         (subtitles) => setTranscriptSubtitles(currentId, subtitles)
       )
       setTranscriptionText(currentId, text)
-      setTranscriptSubtitles(currentId, parsed)
+      setTranscriptSubtitles(currentId, parseTranscription(text))
       await saveData(currentId)
     } catch (error) {
       console.error(error)
@@ -173,7 +173,8 @@ export default function Transcription() {
 
   const handleParse = async () => {
     try {
-      parseTranscription(transcriptionText, (subtitles) => setTranscriptSubtitles(currentId, subtitles))
+      const subtitles = parseTranscription(transcriptionText)
+      setTranscriptSubtitles(currentId, subtitles)
       toast.success("Parse Success!")
     } catch (error) {
       toast.error(
