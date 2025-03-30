@@ -26,7 +26,6 @@ interface TranscriptionStore {
     transcriptionText: string,
     setTranscriptSubtitles: (subtitles: Subtitle[]) => void,
   ) => Subtitle[]
-  exportTranscription: (transcriptSubtitles: Subtitle[]) => void
 }
 
 export const useTranscriptionStore = create<TranscriptionStore>()(
@@ -151,22 +150,6 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         const parsed = parseSRT(srt)
         setTranscriptSubtitles(parsed)
         return parsed
-      },
-      exportTranscription: (transcriptSubtitles) => {
-        if (!transcriptSubtitles.length) return
-
-        const srtContent = generateSRT(transcriptSubtitles)
-        if (!srtContent) return
-
-        const blob = new Blob([srtContent], { type: "text/plain" })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = "transcription.srt"
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
       },
     })
   }

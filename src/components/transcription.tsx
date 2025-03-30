@@ -50,6 +50,8 @@ import { useSessionStore } from "@/stores/use-session-store"
 import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
 import { useProjectStore } from "@/stores/use-project-store"
 import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
+import { generateSRT } from "@/lib/srt/generate"
+
 const languages = [
   { value: "auto", label: "Auto-detect" },
 ]
@@ -84,7 +86,6 @@ export default function Transcription() {
   const setIsTranscribing = useTranscriptionStore((state) => state.setIsTranscribing)
   const startTranscription = useTranscriptionStore((state) => state.startTranscription)
   const stopTranscription = useTranscriptionStore((state) => state.stopTranscription)
-  const exportTranscription = useTranscriptionStore((state) => state.exportTranscription)
   const parseTranscription = useTranscriptionStore((state) => state.parseTranscription)
   const isTranscribing = isTranscribingSet.has(currentId)
 
@@ -190,7 +191,20 @@ export default function Transcription() {
   }
 
   const handleExport = () => {
-    exportTranscription(transcriptSubtitles)
+    if (!transcriptSubtitles.length) return
+
+    const srtContent = generateSRT(transcriptSubtitles)
+    if (!srtContent) return
+
+    const blob = new Blob([srtContent], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "transcription.srt"
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   const handleIsEditing = () => {
