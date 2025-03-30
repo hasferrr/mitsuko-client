@@ -4,26 +4,20 @@ import { AdvancedSettings, BasicSettings } from "@/types/project"
 
 export const MAX_TRANSCRIPTION_SIZE = 1024 * 1024 * 100
 
-const DEFAULT_SOURCE_LANGUAGE = "Japanese"
-const DEFAULT_TARGET_LANGUAGE = "Indonesian"
-const DEFAULT_TEMPERATURE = 0.6
-const DEFAULT_SPLIT_SIZE = 100
-const DEFAULT_MAX_COMPLETION_TOKENS = 8129
-
 export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> = {
-  sourceLanguage: DEFAULT_SOURCE_LANGUAGE,
-  targetLanguage: DEFAULT_TARGET_LANGUAGE,
+  sourceLanguage: "Japanese",
+  targetLanguage: "Indonesian",
   modelDetail: Object.values(FREE_MODELS)[0]?.[0] || null,
   isUseCustomModel: false,
   contextDocument: "",
 }
 
 export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {
-  temperature: DEFAULT_TEMPERATURE,
+  temperature: 0.6,
   startIndex: 1,
   endIndex: 100000,
-  splitSize: DEFAULT_SPLIT_SIZE,
-  maxCompletionTokens: DEFAULT_MAX_COMPLETION_TOKENS,
+  splitSize: 100,
+  maxCompletionTokens: 8129,
   isUseStructuredOutput: false,
   isUseFullContextMemory: false,
   isBetterContextCaching: true, // true means it is NOT using Minimal Context Mode
