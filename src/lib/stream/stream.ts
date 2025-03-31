@@ -1,5 +1,5 @@
 import { useSessionStore } from "@/stores/use-session-store"
-import { sleep } from "./utils"
+import { sleep } from "../utils"
 
 interface handleStreamParams {
   setResponse: (buffer: string) => void,

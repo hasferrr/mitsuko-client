@@ -1,5 +1,5 @@
 import { TRANSCRIPT_URL } from "@/constants/api"
-import { handleStream } from "@/lib/stream"
+import { handleStream } from "@/lib/stream/stream"
 import { create } from "zustand"
 import { RefObject } from "react"
 interface TranscriptionStore {
