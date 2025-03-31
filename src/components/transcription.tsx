@@ -51,7 +51,7 @@ import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
 import { generateSRT } from "@/lib/srt/generate"
-import { parseTranscription } from "@/lib/parser"
+import { parseTranscription } from "@/lib/parser/parser"
 
 const languages = [
   { value: "auto", label: "Auto-detect" },

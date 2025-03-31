@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import { SubOnlyTranslated } from "@/types/types"
-import { parseTranslationJson } from "@/lib/parser"
+import { parseTranslationJson } from "@/lib/parser/parser"
 import { TRANSLATE_URL, TRANSLATE_URL_FREE } from "@/constants/api"
 import { handleStream } from "@/lib/stream"
 import { RefObject } from "react"

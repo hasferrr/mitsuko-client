@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { keepOnlyWrapped } from '@/lib/parser'
+import { keepOnlyWrapped } from '@/lib/parser/cleaner'
 import { TERMS_LINK } from '@/constants/external-links'
 import Markdown from 'react-markdown'
 

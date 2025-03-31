@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test"
-import { isEscaped, repairJson } from "@/lib/parser"
+import { isEscaped, repairJson } from "@/lib/parser/repairer"
 import { SubtitleNoTimeNoActorTranslated } from "@/types/types"
 
 function parseAndRepair(input: string): any {
