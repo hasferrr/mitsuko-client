@@ -1,4 +1,4 @@
-import { supabase } from '@/services/supabase'
+import { supabase } from '@/lib/supabase'
 import { useSessionStore } from '@/stores/use-session-store'
 import { createContext, PropsWithChildren, useEffect } from 'react'
 

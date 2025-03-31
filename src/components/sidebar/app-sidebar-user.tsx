@@ -30,7 +30,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useSessionStore } from "@/stores/use-session-store"
-import { supabase } from "@/services/supabase"
+import { supabase } from "@/lib/supabase"
 
 export function AppSidebarUser() {
   const { isMobile } = useSidebar()
