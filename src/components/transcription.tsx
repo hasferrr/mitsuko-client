@@ -80,6 +80,7 @@ export default function Transcription() {
   const setTranscriptSubtitles = useTranscriptionDataStore(state => state.setTranscriptSubtitles)
   const saveData = useTranscriptionDataStore(state => state.saveData)
 
+  // Transcription store
   const file = useTranscriptionStore((state) => state.file)
   const isTranscribingSet = useTranscriptionStore((state) => state.isTranscribingSet)
   const audioUrl = useTranscriptionStore((state) => state.audioUrl)
@@ -133,10 +134,6 @@ export default function Transcription() {
   }
 
   const handleStartTranscription = async () => {
-    setIsTranscribing(currentId, true)
-    setHasChanges(true)
-    await saveData(currentId)
-
     setTimeout(() => {
       window.scrollTo({
         top: 0,
@@ -144,20 +141,31 @@ export default function Transcription() {
       })
     }, 300)
 
+    await saveData(currentId)
+
+    if (!file) throw new Error("No file selected")
+    if (file.size > MAX_TRANSCRIPTION_SIZE) {
+      throw new Error(`File size must be less than ${MAX_TRANSCRIPTION_SIZE / (1024 * 1024)}MB`)
+    }
+
+    setIsTranscribing(currentId, true)
+    setHasChanges(true)
+
+    const formData = new FormData()
+    formData.append("audio", file)
+
     try {
       const text = await startTranscription(
         currentId,
+        formData,
         (text) => setTranscriptionText(currentId, text),
-        (subtitles) => setTranscriptSubtitles(currentId, subtitles)
       )
-      setTranscriptionText(currentId, text)
       setTranscriptSubtitles(currentId, parseTranscription(text))
-      await saveData(currentId)
     } catch (error) {
       console.error(error)
     } finally {
       setIsTranscribing(currentId, false)
-      stopTranscription(currentId)
+      await saveData(currentId)
     }
   }
 
