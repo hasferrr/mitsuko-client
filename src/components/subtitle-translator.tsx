@@ -47,10 +47,10 @@ import {
   SubtitleTranslated,
   SubtitleNoTime,
 } from "@/types/types"
-import { parseSRT } from "@/lib/srt/parse"
-import { parseASS } from "@/lib/ass/parse"
-import { generateSRT } from "@/lib/srt/generate"
-import { mergeASSback } from "@/lib/ass/merge"
+import { parseSRT } from "@/lib/subtitles/srt/parse"
+import { parseASS } from "@/lib/subtitles/ass/parse"
+import { generateSRT } from "@/lib/subtitles/srt/generate"
+import { mergeASSback } from "@/lib/subtitles/ass/merge"
 import { cn, minMax, sleep } from "@/lib/utils"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
@@ -87,7 +87,7 @@ import {
 } from "@/components/ui/select"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ModelDetail } from "./model-detail"
-import { isASS, isSRT } from "@/lib/subtitle-utils"
+import { isASS, isSRT } from "@/lib/subtitles/is"
 import { toast } from "sonner"
 import { SubtitleTools } from "./subtitle-tools"
 import { SubtitleProgress } from "./subtitle-progress"

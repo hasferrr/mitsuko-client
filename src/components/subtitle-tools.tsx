@@ -30,8 +30,8 @@ import {
 import {
   removeAllLineBreaks,
   removeContentBetween,
-  shiftSubtitles
-} from "@/lib/subtitle-utils"
+} from "@/lib/subtitles/content"
+import { shiftSubtitles } from "@/lib/subtitles/timestamp"
 import { SubtitleTranslated } from "@/types/types"
 
 interface SubtitleToolsProps {

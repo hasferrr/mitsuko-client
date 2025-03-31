@@ -1,4 +1,4 @@
-import type { Subtitle, ASSParseOutput } from "../../types/types"
+import type { Subtitle, ASSParseOutput } from "../../../types/types"
 import { mergeSubtitles, reconstructAssSubtitle } from "./helper"
 
 export function mergeASSback(subtitles: Subtitle[], parsed: ASSParseOutput): string {

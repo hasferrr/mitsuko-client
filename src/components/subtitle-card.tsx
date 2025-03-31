@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Timer } from "lucide-react"
 import { SubtitleTranslated } from "@/types/types"
-import { timestampToString } from "@/lib/utils"
+import { timestampToString } from "@/lib/subtitles/timestamp"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 

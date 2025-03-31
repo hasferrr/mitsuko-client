@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { timestampToString } from "@/lib/utils"
+import { timestampToString } from "@/lib/subtitles/timestamp"
 
 interface HistoryItemDetailsProps {
   parsed: Parsed

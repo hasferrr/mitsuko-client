@@ -1,4 +1,4 @@
-import type { SubtitleEvent, Subtitle, Timestamp } from "../../types/types"
+import type { SubtitleEvent, Subtitle, Timestamp } from "../../../types/types"
 
 export function mergeSubtitles(events: SubtitleEvent[], subtitles: Subtitle[]): SubtitleEvent[] {
   const mergedEvents: SubtitleEvent[] = []

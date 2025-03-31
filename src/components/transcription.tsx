@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { timestampToString } from "@/lib/utils"
+import { timestampToString } from "@/lib/subtitles/timestamp"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { DragAndDrop } from "./ui-custom/drag-and-drop"
 import { toast } from "sonner"
@@ -50,7 +50,7 @@ import { useSessionStore } from "@/stores/use-session-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
-import { generateSRT } from "@/lib/srt/generate"
+import { generateSRT } from "@/lib/subtitles/srt/generate"
 import { parseTranscription } from "@/lib/parser/parser"
 
 const languages = [
