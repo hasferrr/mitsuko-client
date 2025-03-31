@@ -4,8 +4,8 @@ import { BasicSettings, ProjectType } from "@/types/project"
 import { persist } from "zustand/middleware"
 import { createBasicSettings, updateBasicSettings, getBasicSettings } from "@/lib/db/settings"
 import { DEFAULT_BASIC_SETTINGS } from "@/constants/default"
-import { useTranslationDataStore } from "./use-translation-data-store"
-import { useExtractionDataStore } from "./use-extraction-data-store"
+import { useTranslationDataStore } from "../data/use-translation-data-store"
+import { useExtractionDataStore } from "../data/use-extraction-data-store"
 
 interface SettingsStore {
   data: Record<string, BasicSettings>

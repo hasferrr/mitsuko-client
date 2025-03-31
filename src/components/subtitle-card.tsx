@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Timer } from "lucide-react"
 import { SubtitleTranslated } from "@/types/types"
 import { timestampToString } from "@/lib/utils"
-import { useTranslationDataStore } from "@/stores/use-translation-data-store"
+import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 
 interface SubtitleCardProps {

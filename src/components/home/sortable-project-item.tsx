@@ -31,7 +31,7 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
 import { Project } from "@/types/project"
-import { useProjectStore } from "@/stores/use-project-store"
+import { useProjectStore } from "@/stores/data/use-project-store"
 
 export interface SortableProjectItemProps {
   project: Project

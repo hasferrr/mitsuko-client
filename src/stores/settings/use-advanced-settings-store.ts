@@ -1,11 +1,11 @@
 import { create } from "zustand"
 import { AdvancedSettings, ProjectType } from "@/types/project"
 import { persist } from "zustand/middleware"
-import { useTranslationDataStore } from "./use-translation-data-store"
+import { useTranslationDataStore } from "../data/use-translation-data-store"
 import { createAdvancedSettings, updateAdvancedSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "./use-settings-store"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
-import { useExtractionDataStore } from "./use-extraction-data-store"
+import { useExtractionDataStore } from "../data/use-extraction-data-store"
 
 interface AdvancedSettingsStore {
   data: Record<string, AdvancedSettings>

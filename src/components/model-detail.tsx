@@ -1,4 +1,4 @@
-import { useSettingsStore } from '../stores/use-settings-store'
+import { useSettingsStore } from '../stores/settings/use-settings-store'
 
 export function ModelDetail() {
   const modelDetail = useSettingsStore((state) => state.getModelDetail())

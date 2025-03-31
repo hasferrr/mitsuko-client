@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { memo, useState } from "react"
-import { useTranslationDataStore } from "@/stores/use-translation-data-store"
+import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"

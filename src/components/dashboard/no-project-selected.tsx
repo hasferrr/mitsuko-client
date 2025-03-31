@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useProjectStore } from "@/stores/use-project-store"
+import { useProjectStore } from "@/stores/data/use-project-store"
 
 export const NoProjectSelected = () => {
   const createProject = useProjectStore((state) => state.createProject)

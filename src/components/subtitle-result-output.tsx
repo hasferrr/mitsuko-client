@@ -6,8 +6,8 @@ import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { Button } from "./ui/button"
 import { parseTranslationArrayStrict } from "@/lib/parser"
 import { cn } from "@/lib/utils"
-import { useTranslationDataStore } from "@/stores/use-translation-data-store"
-import { useTranslationStore } from "@/stores/use-translation-store"
+import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+import { useTranslationStore } from "@/stores/services/use-translation-store"
 
 export const SubtitleResultOutput = memo(() => {
   const currentId = useTranslationDataStore((state) => state.currentId)

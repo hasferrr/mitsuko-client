@@ -22,7 +22,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { CHANGE_LOG_LINK, DISCORD_LINK } from "@/constants/external-links"
-import { useProjectStore } from "@/stores/use-project-store"
+import { useProjectStore } from "@/stores/data/use-project-store"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const projects = useProjectStore((state) => state.projects)

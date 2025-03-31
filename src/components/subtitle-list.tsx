@@ -1,7 +1,7 @@
 import { memo } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { SubtitleCard } from "./subtitle-card"
-import { useTranslationDataStore } from "@/stores/use-translation-data-store"
+import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 
 interface SubtitleListProps {
   hidden?: boolean

@@ -12,14 +12,14 @@ import {
   LayoutList
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useProjectStore } from "@/stores/use-project-store"
+import { useProjectStore } from "@/stores/data/use-project-store"
 import { createTranslation } from "@/lib/db/translation"
 import { createTranscription } from "@/lib/db/transcription"
 import { createExtraction } from "@/lib/db/extraction"
 import { DEFAULT_SUBTITLES, DEFAULT_TITLE } from "@/constants/default"
-import { useTranslationDataStore } from "@/stores/use-translation-data-store"
-import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
-import { useExtractionDataStore } from "@/stores/use-extraction-data-store"
+import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
+import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import {
   DndContext,
   closestCenter,

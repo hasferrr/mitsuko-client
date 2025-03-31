@@ -21,7 +21,7 @@ import {
 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useTranscriptionStore } from "@/stores/use-transcription-store"
+import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import {
   Select,
   SelectContent,
@@ -47,8 +47,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSessionStore } from "@/stores/use-session-store"
-import { useTranscriptionDataStore } from "@/stores/use-transcription-data-store"
-import { useProjectStore } from "@/stores/use-project-store"
+import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
+import { useProjectStore } from "@/stores/data/use-project-store"
 import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
 import { generateSRT } from "@/lib/srt/generate"
 import { parseTranscription } from "@/lib/parser"

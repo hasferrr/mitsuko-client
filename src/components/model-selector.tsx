@@ -21,9 +21,9 @@ import {
 } from "@/components/ui/popover"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { Model } from "@/types/types"
-import { useSettingsStore } from "@/stores/use-settings-store"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { FREE_MODELS } from "@/constants/model"
-import { useAdvancedSettingsStore } from "@/stores/use-advanced-settings-store"
+import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { ProjectType } from "@/types/project"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 

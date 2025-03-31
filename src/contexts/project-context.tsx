@@ -1,4 +1,4 @@
-import { useProjectStore } from '@/stores/use-project-store'
+import { useProjectStore } from '@/stores/data/use-project-store'
 import { createContext, PropsWithChildren, useEffect } from 'react'
 
 const ProjectStoreContext = createContext(undefined)

@@ -22,7 +22,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Project } from "@/types/project"
-import { useProjectStore } from "@/stores/use-project-store"
+import { useProjectStore } from "@/stores/data/use-project-store"
 import { redirect } from "next/navigation"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { useState } from "react"
