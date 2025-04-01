@@ -1,11 +1,16 @@
 import { create } from "zustand"
 import { Transcription } from "@/types/project"
-import { updateTranscription } from "@/lib/db/transcription"
+import { updateTranscription, createTranscription, getTranscription, deleteTranscription } from "@/lib/db/transcription"
 import { Subtitle } from "@/types/types"
 
 interface TranscriptionDataStore {
   currentId: string | null
   data: Record<string, Transcription>
+  // CRUD methods
+  createTranscriptionDb: (projectId: string, data: Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles">) => Promise<Transcription>
+  getTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<Transcription | undefined>
+  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles">>) => Promise<Transcription>
+  deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
   // getters
   getTitle: () => string
   getTranscriptionText: () => string
@@ -25,7 +30,35 @@ interface TranscriptionDataStore {
 export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, get) => ({
   currentId: null,
   data: {},
-
+  // CRUD methods
+  createTranscriptionDb: async (projectId, data) => {
+    const transcription = await createTranscription(projectId, data)
+    set(state => ({ data: { ...state.data, [transcription.id]: transcription } }))
+    return transcription
+  },
+  getTranscriptionDb: async (projectId, transcriptionId) => {
+    const transcription = await getTranscription(projectId, transcriptionId)
+    if (transcription) {
+      set(state => ({ data: { ...state.data, [transcriptionId]: transcription } }))
+    }
+    return transcription
+  },
+  updateTranscriptionDb: async (transcriptionId, changes) => {
+    const transcription = await updateTranscription(transcriptionId, changes)
+    set(state => ({ data: { ...state.data, [transcriptionId]: transcription } }))
+    return transcription
+  },
+  deleteTranscriptionDb: async (projectId, transcriptionId) => {
+    await deleteTranscription(projectId, transcriptionId)
+    set(state => {
+      const newData = { ...state.data }
+      delete newData[transcriptionId]
+      return { data: newData }
+    })
+    if (get().currentId === transcriptionId) {
+      set({ currentId: null })
+    }
+  },
   // getters implementation
   getTitle: () => {
     const id = get().currentId

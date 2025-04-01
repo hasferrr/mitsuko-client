@@ -1,11 +1,16 @@
 import { create } from "zustand"
 import { Translation } from "@/types/project"
 import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/types"
-import { updateTranslation } from "@/lib/db/translation"
+import { updateTranslation, createTranslation, getTranslation, deleteTranslation } from "@/lib/db/translation"
 
 export interface TranslationDataStore {
   currentId: string | null
   data: Record<string, Translation>
+  // CRUD methods
+  createTranslationDb: (projectId: string, data: Pick<Translation, "title" | "subtitles" | "parsed">) => Promise<Translation>
+  getTranslationDb: (projectId: string, translationId: string) => Promise<Translation | undefined>
+  updateTranslationDb: (translationId: string, changes: Partial<Pick<Translation, "title" | "subtitles" | "parsed">>) => Promise<Translation>
+  deleteTranslationDb: (projectId: string, translationId: string) => Promise<void>
   // Existing methods
   setCurrentId: (id: string | null) => void
   mutateData: <T extends keyof Translation>(id: string, key: T, value: Translation[T]) => void
@@ -27,6 +32,36 @@ export interface TranslationDataStore {
 export const useTranslationDataStore = create<TranslationDataStore>((set, get) => ({
   currentId: null,
   data: {},
+  // CRUD methods
+  createTranslationDb: async (projectId, data) => {
+    const translation = await createTranslation(projectId, data)
+    set(state => ({ data: { ...state.data, [translation.id]: translation } }))
+    return translation
+  },
+  getTranslationDb: async (projectId, translationId) => {
+    const translation = await getTranslation(projectId, translationId)
+    if (translation) {
+      set(state => ({ data: { ...state.data, [translationId]: translation } }))
+    }
+    return translation
+  },
+  updateTranslationDb: async (translationId, changes) => {
+    const translation = await updateTranslation(translationId, changes)
+    set(state => ({ data: { ...state.data, [translationId]: translation } }))
+    return translation
+  },
+  deleteTranslationDb: async (projectId, translationId) => {
+    await deleteTranslation(projectId, translationId)
+    set(state => {
+      const newData = { ...state.data }
+      delete newData[translationId]
+      return { data: newData }
+    })
+    if (get().currentId === translationId) {
+      set({ currentId: null })
+    }
+  },
+  // Existing methods
   setCurrentId: (id) => set({ currentId: id }),
   mutateData: (id, key, value) => {
     set(state => {

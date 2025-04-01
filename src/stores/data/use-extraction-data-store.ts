@@ -1,10 +1,15 @@
 import { create } from "zustand"
 import { Extraction } from "@/types/project"
-import { updateExtraction } from "@/lib/db/extraction"
+import { updateExtraction, createExtraction, getExtraction, deleteExtraction } from "@/lib/db/extraction"
 
 export interface ExtractionDataStore {
   currentId: string | null
   data: Record<string, Extraction>
+  // CRUD methods
+  createExtractionDb: (projectId: string, data: Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">) => Promise<Extraction>
+  getExtractionDb: (projectId: string, extractionId: string) => Promise<Extraction | undefined>
+  updateExtractionDb: (extractionId: string, changes: Partial<Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext">>) => Promise<Extraction>
+  deleteExtractionDb: (projectId: string, extractionId: string) => Promise<void>
   // getters
   getEpisodeNumber: () => string
   getSubtitleContent: () => string
@@ -26,7 +31,35 @@ export interface ExtractionDataStore {
 export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => ({
   currentId: null,
   data: {},
-
+  // CRUD methods
+  createExtractionDb: async (projectId, data) => {
+    const extraction = await createExtraction(projectId, data)
+    set(state => ({ data: { ...state.data, [extraction.id]: extraction } }))
+    return extraction
+  },
+  getExtractionDb: async (projectId, extractionId) => {
+    const extraction = await getExtraction(projectId, extractionId)
+    if (extraction) {
+      set(state => ({ data: { ...state.data, [extractionId]: extraction } }))
+    }
+    return extraction
+  },
+  updateExtractionDb: async (extractionId, changes) => {
+    const extraction = await updateExtraction(extractionId, changes)
+    set(state => ({ data: { ...state.data, [extractionId]: extraction } }))
+    return extraction
+  },
+  deleteExtractionDb: async (projectId, extractionId) => {
+    await deleteExtraction(projectId, extractionId)
+    set(state => {
+      const newData = { ...state.data }
+      delete newData[extractionId]
+      return { data: newData }
+    })
+    if (get().currentId === extractionId) {
+      set({ currentId: null })
+    }
+  },
   // getters implementation
   getEpisodeNumber: () => {
     const id = get().currentId
