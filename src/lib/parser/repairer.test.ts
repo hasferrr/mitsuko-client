@@ -2,11 +2,11 @@ import { test, expect, describe } from "bun:test"
 import { isEscaped, repairJson } from "@/lib/parser/repairer"
 import { SubtitleNoTimeNoActorTranslated } from "@/types/types"
 
-function parseAndRepair(input: string): any {
+function parseAndRepair(input: string): unknown {
   try {
     const repaired = repairJson(input)
     return JSON.parse(repaired)
-  } catch (error) {
+  } catch {
     return "error parsing"
   }
 }

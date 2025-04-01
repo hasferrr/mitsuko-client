@@ -561,7 +561,7 @@ export const BetterContextCachingSwitch = memo(() => {
 
 export const SystemPromptInput = memo(() => {
   const prompt = ""
-  const setPrompt = (val: string) => { }
+  const setPrompt = (val: string) => console.log(val)
   const { setHasChanges } = useUnsavedChanges()
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

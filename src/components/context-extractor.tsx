@@ -5,8 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { File, XCircle, ArrowUpCircle, ArrowDownCircle, Upload, Save, Play, Square, Loader2, ArrowUpDown, Trash2, Check, Edit, ArrowRight, StepForward } from "lucide-react"
+import { File, XCircle, ArrowUpCircle, ArrowDownCircle, Upload, Save, Play, Square, Loader2, ArrowUpDown, Trash2, Check, Edit, StepForward } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Subtitle, SubtitleNoTime } from "@/types/types"
@@ -87,7 +86,7 @@ export const ContextExtractor = () => {
   const selectedFiles = useExtractionInputStore((state) => state.selectedFiles)
   const isBatchMode = useExtractionInputStore((state) => state.isBatchMode)
   const setSelectedFiles = useExtractionInputStore((state) => state.setSelectedFiles)
-  const setIsBatchMode = useExtractionInputStore((state) => state.setIsBatchMode)
+  // const setIsBatchMode = useExtractionInputStore((state) => state.setIsBatchMode)
 
   // Other Store
   const session = useSessionStore((state) => state.session)

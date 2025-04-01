@@ -9,7 +9,7 @@ interface ExtractionStore {
   setIsExtracting: (extractionId: string, isExtracting: boolean) => void
   stopExtraction: (id: string) => void
   extractContext: (
-    requestBody: any,
+    requestBody: Record<string, unknown>,
     apiKey: string,
     isFree: boolean,
     extractionId: string,
@@ -30,7 +30,7 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
   },
   stopExtraction: (id) => get().abortControllerMap.get(id)?.current.abort(),
   extractContext: async (
-    requestBody: any,
+    requestBody: Record<string, unknown>,
     apiKey: string,
     isFree: boolean,
     extractionId: string,

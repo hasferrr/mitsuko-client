@@ -8,7 +8,7 @@ export interface TranslationDataStore {
   data: Record<string, Translation>
   // Existing methods
   setCurrentId: (id: string | null) => void
-  mutateData: (id: string, key: keyof Translation, value: any) => void
+  mutateData: <T extends keyof Translation>(id: string, key: T, value: Translation[T]) => void
   saveData: (id: string) => Promise<void>
   upsertData: (id: string, value: Translation) => void
   removeData: (id: string) => void
@@ -17,7 +17,7 @@ export interface TranslationDataStore {
   setSubtitles: (id: string, subtitles: SubtitleTranslated[]) => void
   setParsed: (id: string, parsed: Parsed) => void
   resetParsed: (id: string) => void
-  updateSubtitle: (id: string, index: number, field: keyof SubtitleTranslated, value: any) => void
+  updateSubtitle: <T extends keyof SubtitleTranslated>(id: string, index: number, field: T, value: SubtitleTranslated[T]) => void
   // Response methods
   setResponse: (id: string, response: string) => void
   setJsonResponse: (id: string, jsonResponse: SubOnlyTranslated[]) => void

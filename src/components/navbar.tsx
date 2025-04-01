@@ -17,6 +17,7 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useEffect, useState } from "react"
+import Image from "next/image"
 
 export function Navbar() {
   const _pathname = usePathname()
@@ -81,7 +82,7 @@ export function Navbar() {
           <BreadcrumbList>
             <BreadcrumbItem className="text-foreground hover:underline">
               <Link href="/" className="flex items-center gap-2">
-                <img
+                <Image
                   width={4 * 6}
                   height={4 * 6}
                   src={NAVBAR_IMG_LINK}

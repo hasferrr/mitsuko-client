@@ -12,7 +12,7 @@ interface AdvancedSettingsStore {
   currentId: string | null
   setCurrentId: (id: string) => void
   upsertData: (id: string, value: AdvancedSettings) => void
-  mutateData: (key: keyof AdvancedSettings, value: any) => void
+  mutateData: <T extends keyof AdvancedSettings>(key: T, value: AdvancedSettings[T]) => void
   saveData: () => Promise<void>
   getTemperature: () => number
   getMaxCompletionTokens: () => number
@@ -42,6 +42,8 @@ const updateSettings = async <K extends keyof Omit<AdvancedSettings, 'id' | 'cre
   type: ProjectType = 'translation'
 ) => {
   const store = type === 'translation' ? useTranslationDataStore : useExtractionDataStore
+
+  // Get the current transcription or extraction id
   const currentId = store.getState().currentId
   if (!currentId) return
   const data = store.getState().data[currentId]
@@ -54,7 +56,11 @@ const updateSettings = async <K extends keyof Omit<AdvancedSettings, 'id' | 'cre
 
   if (!advancedSettings) {
     advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
-    store.getState().mutateData(currentId, "advancedSettingsId", advancedSettings.id)
+    if (type === 'translation') {
+      useTranslationDataStore.getState().mutateData(currentId, "advancedSettingsId", advancedSettings.id)
+    } else {
+      useExtractionDataStore.getState().mutateData(currentId, "advancedSettingsId", advancedSettings.id)
+    }
   }
 
   // Update the settings

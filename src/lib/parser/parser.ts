@@ -44,7 +44,7 @@ export function parseTranscription(response: string): Subtitle[] {
   while (check(0)) lines.shift()
 
   let i = 1
-  let srtArr: string[] = []
+  const srtArr: string[] = []
 
   /**
    * Format:

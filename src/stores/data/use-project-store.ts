@@ -48,6 +48,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
         loading: false,
       }))
     } catch (error) {
+      console.error('Failed to load projects', error)
       set({ error: 'Failed to load projects', loading: false })
     }
   },
@@ -81,6 +82,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
         loading: false
       }))
     } catch (error) {
+      console.error('Failed to update project', error)
       set({ error: 'Failed to update project', loading: false })
     }
   },
@@ -120,6 +122,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
         set({ currentProject: null })
       }
     } catch (error) {
+      console.error('Failed to delete project', error)
       set({ error: 'Failed to delete project', loading: false })
     }
   },
@@ -131,6 +134,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       const projects = await getAllProjects()
       set({ projects, loading: false })
     } catch (error) {
+      console.error('Failed to reorder projects', error)
       set({ error: 'Failed to reorder projects', loading: false })
     }
   }

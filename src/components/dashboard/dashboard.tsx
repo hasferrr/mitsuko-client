@@ -33,8 +33,6 @@ export const Dashboard = () => {
   const currentProject = useProjectStore((state) => state.currentProject)
   const updateProject = useProjectStore((state) => state.updateProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
-  const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
-  const createProject = useProjectStore((state) => state.createProject)
 
   const [translations, setTranslations] = useState<Translation[]>([])
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])

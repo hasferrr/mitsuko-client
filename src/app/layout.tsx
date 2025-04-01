@@ -22,6 +22,7 @@ export default function RootLayout({
     <html lang="en" className={cn(noto.className, "dark")}>
       <head>
         {process.env.NODE_ENV === "development" && (
+          // eslint-disable-next-line @next/next/no-sync-scripts
           <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
         )}
         <link rel="icon" href="/favicon.ico" sizes="any" />

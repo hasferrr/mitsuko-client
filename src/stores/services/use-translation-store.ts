@@ -11,7 +11,7 @@ interface TranslationStore {
   setIsTranslating: (translationId: string, isTranslating: boolean) => void
   stopTranslation: (id: string) => void
   translateSubtitles: (
-    requestBody: any,
+    requestBody: Record<string, unknown>,
     apiKey: string,
     isFree: boolean,
     id: string,
@@ -38,7 +38,7 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
   },
 
   translateSubtitles: async (
-    requestBody: any,
+    requestBody: Record<string, unknown>,
     apiKey: string,
     isFree: boolean,
     id: string,

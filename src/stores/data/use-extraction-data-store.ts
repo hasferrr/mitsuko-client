@@ -17,7 +17,7 @@ export interface ExtractionDataStore {
   setPreviousContext: (id: string, previousContext: string) => void
   setContextResult: (id: string, contextResult: string) => void
   // data manipulation methods
-  mutateData: (id: string, key: keyof Extraction, value: any) => void
+  mutateData: <T extends keyof Extraction>(id: string, key: T, value: Extraction[T]) => void
   saveData: (id: string) => Promise<void>
   upsertData: (id: string, value: Extraction) => void
   removeData: (id: string) => void

@@ -25,7 +25,6 @@ import {
 import { CheckCircle, FileJson, Trash, XCircle } from "lucide-react"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { SubtitleTranslated } from "@/types/types"
 
 interface HistoryPanelProps {
   isHistoryOpen: boolean

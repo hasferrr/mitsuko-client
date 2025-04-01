@@ -16,7 +16,7 @@ interface TranscriptionDataStore {
   setTranscriptionText: (id: string, transcriptionText: string) => void
   setTranscriptSubtitles: (id: string, subtitles: Subtitle[]) => void
   // data manipulation methods
-  mutateData: (id: string, key: keyof Transcription, value: any) => void
+  mutateData: <T extends keyof Transcription>(id: string, key: T, value: Transcription[T]) => void
   saveData: (id: string) => Promise<void>
   upsertData: (id: string, value: Transcription) => void
   removeData: (id: string) => void

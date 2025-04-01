@@ -15,7 +15,7 @@ interface SettingsStore {
   customModel: string
   setCurrentId: (id: string) => void
   upsertData: (id: string, value: BasicSettings) => void
-  mutateData: (key: keyof BasicSettings, value: any) => void
+  mutateData: <T extends keyof BasicSettings>(key: T, value: BasicSettings[T]) => void
   saveData: () => Promise<void>
   // db state
   getSourceLanguage: () => string
@@ -40,6 +40,8 @@ const updateSettings = async <K extends keyof Omit<BasicSettings, 'id' | 'create
   type: ProjectType = 'translation'
 ) => {
   const store = type === 'translation' ? useTranslationDataStore : useExtractionDataStore
+
+  // Get the current transcription or extraction id
   const currentId = store.getState().currentId
   if (!currentId) return
   const data = store.getState().data[currentId]
@@ -52,7 +54,11 @@ const updateSettings = async <K extends keyof Omit<BasicSettings, 'id' | 'create
 
   if (!basicSettings) {
     basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
-    store.getState().mutateData(currentId, "basicSettingsId", basicSettings.id)
+    if (type === 'translation') {
+      useTranslationDataStore.getState().mutateData(currentId, "basicSettingsId", basicSettings.id)
+    } else {
+      useExtractionDataStore.getState().mutateData(currentId, "basicSettingsId", basicSettings.id)
+    }
   }
 
   // Update the settings
