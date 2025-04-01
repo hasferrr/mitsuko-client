@@ -7,9 +7,6 @@ import { Edit, Trash, SquareArrowOutUpRight } from "lucide-react"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { EditDialogue } from "../ui-custom/edit-dialogue"
 import { MoveDialogue } from "../ui-custom/move-dialogue"
-import { getExtraction } from "@/lib/db/extraction"
-import { getTranslation } from "@/lib/db/translation"
-import { getTranscription } from "@/lib/db/transcription"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
@@ -55,6 +52,10 @@ export const DashboardItemList = ({
   const setCurrentExtractionId = useExtractionDataStore((state) => state.setCurrentId)
   const upsertExtractionData = useExtractionDataStore((state) => state.upsertData)
 
+  const getTranslationDb = useTranslationDataStore((state) => state.getTranslationDb)
+  const getExtractionDb = useExtractionDataStore((state) => state.getExtractionDb)
+  const getTranscriptionDb = useTranscriptionDataStore((state) => state.getTranscriptionDb)
+
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isMoveOpen, setIsMoveOpen] = useState(false)
@@ -64,7 +65,7 @@ export const DashboardItemList = ({
     switch (type) {
       case "translation":
         if (!(id in translationData)) {
-          const translation = await getTranslation(projectId, id)
+          const translation = await getTranslationDb(projectId, id)
           if (translation) {
             upsertTranslationData(id, translation)
           }
@@ -74,7 +75,7 @@ export const DashboardItemList = ({
         break
       case "transcription":
         if (!(id in transcriptionData)) {
-          const transcription = await getTranscription(projectId, id)
+          const transcription = await getTranscriptionDb(projectId, id)
           if (transcription) {
             upsertTranscriptionData(id, transcription)
           }
@@ -84,7 +85,7 @@ export const DashboardItemList = ({
         break
       case "extraction":
         if (!(id in extractionData)) {
-          const extraction = await getExtraction(projectId, id)
+          const extraction = await getExtractionDb(projectId, id)
           if (extraction) {
             upsertExtractionData(id, extraction)
           }

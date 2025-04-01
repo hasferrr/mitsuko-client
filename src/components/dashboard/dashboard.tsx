@@ -17,9 +17,6 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { EditDialogue } from "../ui-custom/edit-dialogue"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { db } from "@/lib/db/db"
-import { createTranslation, deleteTranslation, updateTranslation } from "@/lib/db/translation"
-import { createTranscription, deleteTranscription, updateTranscription } from "@/lib/db/transcription"
-import { createExtraction, deleteExtraction, updateExtraction } from "@/lib/db/extraction"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
@@ -41,6 +38,18 @@ export const Dashboard = () => {
   const { mutateData: mutateTranslationData, removeData: removeTranslationData } = useTranslationDataStore()
   const { mutateData: mutateTranscriptionData, removeData: removeTranscriptionData } = useTranscriptionDataStore()
   const { mutateData: mutateExtractionData, removeData: removeExtractionData } = useExtractionDataStore()
+
+  const createTranslationDb = useTranslationDataStore((state) => state.createTranslationDb)
+  const updateTranslationDb = useTranslationDataStore((state) => state.updateTranslationDb)
+  const deleteTranslationDb = useTranslationDataStore((state) => state.deleteTranslationDb)
+
+  const createExtractionDb = useExtractionDataStore((state) => state.createExtractionDb)
+  const updateExtractionDb = useExtractionDataStore((state) => state.updateExtractionDb)
+  const deleteExtractionDb = useExtractionDataStore((state) => state.deleteExtractionDb)
+
+  const createTranscriptionDb = useTranscriptionDataStore((state) => state.createTranscriptionDb)
+  const updateTranscriptionDb = useTranscriptionDataStore((state) => state.updateTranscriptionDb)
+  const deleteTranscriptionDb = useTranscriptionDataStore((state) => state.deleteTranscriptionDb)
 
   useEffect(() => {
     if (!currentProject) return
@@ -86,12 +95,12 @@ export const Dashboard = () => {
       description={`${translation.parsed.type.toUpperCase()} • ${translation.subtitles.length} Lines`}
       date={translation.updatedAt.toLocaleDateString()}
       handleEdit={async (newName) => {
-        await updateTranslation(translation.id, { title: newName })
+        await updateTranslationDb(translation.id, { title: newName })
         mutateTranslationData(translation.id, "title", newName)
         loadProjects()
       }}
       handleDelete={async () => {
-        await deleteTranslation(currentProject.id, translation.id)
+        await deleteTranslationDb(currentProject.id, translation.id)
         removeTranslationData(translation.id)
         loadProjects()
       }}
@@ -109,12 +118,12 @@ export const Dashboard = () => {
       description={`${transcription.transcriptSubtitles.length} segments`}
       date={transcription.createdAt.toLocaleDateString()}
       handleEdit={async (newName) => {
-        await updateTranscription(transcription.id, { title: newName })
+        await updateTranscriptionDb(transcription.id, { title: newName })
         mutateTranscriptionData(transcription.id, "title", newName)
         loadProjects()
       }}
       handleDelete={async () => {
-        await deleteTranscription(currentProject.id, transcription.id)
+        await deleteTranscriptionDb(currentProject.id, transcription.id)
         removeTranscriptionData(transcription.id)
         loadProjects()
       }}
@@ -132,12 +141,12 @@ export const Dashboard = () => {
       description={extraction.contextResult}
       date={extraction.updatedAt.toLocaleDateString()}
       handleEdit={async (newName) => {
-        await updateExtraction(extraction.id, { episodeNumber: newName })
+        await updateExtractionDb(extraction.id, { episodeNumber: newName })
         mutateExtractionData(extraction.id, "episodeNumber", newName)
         loadProjects()
       }}
       handleDelete={async () => {
-        await deleteExtraction(currentProject.id, extraction.id)
+        await deleteExtractionDb(currentProject.id, extraction.id)
         removeExtractionData(extraction.id)
         loadProjects()
       }}
@@ -150,7 +159,7 @@ export const Dashboard = () => {
       variant="outline"
       className="line-clamp-2"
       onClick={async () => {
-        await createTranslation(currentProject.id, {
+        await createTranslationDb(currentProject.id, {
           title: `Subtitle ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
           subtitles: [],
           parsed: {
@@ -171,7 +180,7 @@ export const Dashboard = () => {
       variant="outline"
       className="line-clamp-2"
       onClick={async () => {
-        await createTranscription(currentProject.id, {
+        await createTranscriptionDb(currentProject.id, {
           title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
           transcriptionText: "",
           transcriptSubtitles: []
@@ -189,7 +198,7 @@ export const Dashboard = () => {
       variant="outline"
       className="line-clamp-2"
       onClick={async () => {
-        await createExtraction(currentProject.id, {
+        await createExtractionDb(currentProject.id, {
           episodeNumber: "",
           subtitleContent: "",
           previousContext: "",

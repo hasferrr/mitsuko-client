@@ -13,9 +13,6 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { createTranslation } from "@/lib/db/translation"
-import { createTranscription } from "@/lib/db/transcription"
-import { createExtraction } from "@/lib/db/extraction"
 import { DEFAULT_SUBTITLES, DEFAULT_TITLE } from "@/constants/default"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
@@ -38,8 +35,13 @@ import {
 import { SortableProjectItem } from "./sortable-project-item"
 import { cn } from "@/lib/utils"
 
-export const WelcomeView = () => {
+export function WelcomeView() {
   const router = useRouter()
+
+  const createTranslationDb = useTranslationDataStore((state) => state.createTranslationDb)
+  const createExtractionDb = useExtractionDataStore((state) => state.createExtractionDb)
+  const createTranscriptionDb = useTranscriptionDataStore((state) => state.createTranscriptionDb)
+
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   const [showAllProjects, setShowAllProjects] = useState(false)
   const [isHorizontal, setIsHorizontal] = useState(false)
@@ -89,7 +91,7 @@ export const WelcomeView = () => {
     // Create new item based on option
     switch (option) {
       case "translate": {
-        const translation = await createTranslation(defaultProject.id, {
+        const translation = await createTranslationDb(defaultProject.id, {
           title: DEFAULT_TITLE,
           subtitles: DEFAULT_SUBTITLES,
           parsed: {
@@ -102,7 +104,7 @@ export const WelcomeView = () => {
         break
       }
       case "transcribe": {
-        const transcription = await createTranscription(defaultProject.id, {
+        const transcription = await createTranscriptionDb(defaultProject.id, {
           title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
           transcriptionText: "",
           transcriptSubtitles: []
@@ -112,7 +114,7 @@ export const WelcomeView = () => {
         break
       }
       case "extract-context": {
-        const extraction = await createExtraction(defaultProject.id, {
+        const extraction = await createExtractionDb(defaultProject.id, {
           episodeNumber: "",
           subtitleContent: "",
           previousContext: "",
