@@ -92,7 +92,7 @@ import { toast } from "sonner"
 import { SubtitleTools } from "./subtitle-tools"
 import { SubtitleProgress } from "./subtitle-progress"
 import { SubtitleResultOutput } from "./subtitle-result-output"
-import { getContent } from "@/lib/parser/parser"
+import { getContent, parseTranslationJson } from "@/lib/parser/parser"
 import { createContextMemory } from "@/lib/stream/context-memory"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
@@ -386,6 +386,7 @@ export default function SubtitleTranslator() {
 
       let tlChunk: SubOnlyTranslated[] = []
       let rawResponse = ""
+
       try {
         const result = await translateSubtitles(
           requestBody,
@@ -396,29 +397,47 @@ export default function SubtitleTranslator() {
         )
         tlChunk = result.parsed
         rawResponse = result.raw
-        allRawResponses.push(useTranslationDataStore.getState().data[currentId].response.response)
-        console.log("result: ", tlChunk)
+
       } catch {
         setIsTranslating(currentId, false)
-        allRawResponses.push(useTranslationDataStore.getState().data[currentId].response.response)
-        break
-      }
 
-      // Update the parsed json
-      appendJsonResponse(currentId, tlChunk)
-
-      // Merge translated chunk with original subtitles
-      const currentSubtitles = useTranslationDataStore.getState().data[currentId].subtitles
-      const merged: SubtitleTranslated[] = [...currentSubtitles]
-      for (let j = 0; j < tlChunk.length; j++) {
-        const index = tlChunk[j].index - 1
-        merged[index] = {
-          ...merged[index],
-          translated: tlChunk[j].translated || merged[index].translated,
+        rawResponse = useTranslationDataStore.getState().data[currentId].response.response.trim()
+        const rawResponseArr = rawResponse.split("\n")
+        if (rawResponseArr[rawResponseArr.length - 1].startsWith("[")) {
+          rawResponseArr.pop()
         }
+        rawResponse = rawResponseArr.join("\n")
+
+        // TODO: Refactor to separate function
+        try {
+          tlChunk = parseTranslationJson(rawResponse)
+        } catch (error) {
+          console.error("Error: ", error)
+          console.log("Failed to parse: ", rawResponse)
+          setResponse(currentId, rawResponse + "\n\n[Failed to parse]")
+          break
+        }
+
+      } finally {
+        console.log("result: ", tlChunk)
+        allRawResponses.push(useTranslationDataStore.getState().data[currentId].response.response)
+
+        // Update the parsed json
+        appendJsonResponse(currentId, tlChunk)
+
+        // Merge translated chunk with original subtitles
+        const currentSubtitles = useTranslationDataStore.getState().data[currentId].subtitles
+        const merged: SubtitleTranslated[] = [...currentSubtitles]
+        for (let j = 0; j < tlChunk.length; j++) {
+          const index = tlChunk[j].index - 1
+          merged[index] = {
+            ...merged[index],
+            translated: tlChunk[j].translated || merged[index].translated,
+          }
+        }
+        setSubtitles(currentId, merged)
+        await saveData(currentId)
       }
-      setSubtitles(currentId, merged)
-      await saveData(currentId)
 
       // Break if translation is stopped
       const translatingStatus = useTranslationStore.getState().isTranslatingSet.has(currentId)

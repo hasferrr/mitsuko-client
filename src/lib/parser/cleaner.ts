@@ -20,7 +20,22 @@ export function cleanUpJsonResponse(response: string): string {
   const removedThink = removeWrapped(response, '<think>', '</think>')
   const jsonString = keepOnlyWrapped(removedThink, a, b).replace(a, '').replace(b, '')
     || keepOnlyWrapped(removedThink, b, b).replaceAll(b, '')
+
+  if (jsonString) {
+    return jsonString
+  }
+
+  const jsonStringArr = removedThink.split("\n")
+  while (jsonStringArr.length > 0) {
+    if (jsonStringArr[0].startsWith(b)) {
+      jsonStringArr.shift()
+      break
+    } else {
+      jsonStringArr.shift()
+    }
+  }
+
+  return jsonStringArr.join("\n")
     || removedThink.replaceAll(a, '').replaceAll(b, '')
     || `{"subtitles":[]}`
-  return jsonString
 }
