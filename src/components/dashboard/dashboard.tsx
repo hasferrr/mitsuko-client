@@ -35,9 +35,12 @@ export const Dashboard = () => {
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
   const [extractions, setExtractions] = useState<Extraction[]>([])
 
-  const { mutateData: mutateTranslationData, removeData: removeTranslationData } = useTranslationDataStore()
-  const { mutateData: mutateTranscriptionData, removeData: removeTranscriptionData } = useTranscriptionDataStore()
-  const { mutateData: mutateExtractionData, removeData: removeExtractionData } = useExtractionDataStore()
+  const mutateTranslationData = useTranslationDataStore((state) => state.mutateData)
+  const removeTranslationData = useTranslationDataStore((state) => state.removeData)
+  const mutateTranscriptionData = useTranscriptionDataStore((state) => state.mutateData)
+  const removeTranscriptionData = useTranscriptionDataStore((state) => state.removeData)
+  const mutateExtractionData = useExtractionDataStore((state) => state.mutateData)
+  const removeExtractionData = useExtractionDataStore((state) => state.removeData)
 
   const createTranslationDb = useTranslationDataStore((state) => state.createTranslationDb)
   const updateTranslationDb = useTranslationDataStore((state) => state.updateTranslationDb)
