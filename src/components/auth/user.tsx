@@ -4,14 +4,22 @@ import { capitalize, cn } from "@/lib/utils"
 import { RefreshCw } from "lucide-react"
 import { Button } from "../ui/button"
 import { UserData } from "@/types/user"
+import { Transaction } from "@/types/transaction"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserData } from "@/lib/api/user"
+import { fetchTransactions } from "@/lib/api/transaction"
 
 export function User() {
   const session = useSessionStore((state) => state.session)
 
-  const { data: user, isLoading, isError, isFetching, refetch } = useQuery<UserData>({
+  const {
+    data: user,
+    isLoading: isUserLoading,
+    isError: isUserError,
+    isFetching: isUserFetching,
+    refetch: refetchUser
+  } = useQuery<UserData>({
     queryKey: ["user", session?.user?.id],
     queryFn: fetchUserData,
     enabled: !!session?.user?.id,
@@ -22,58 +30,27 @@ export function User() {
     refetchOnReconnect: false,
   })
 
-  const transactions = [
-    {
-      time: new Date("2025-04-02T06:55:23"),
-      amount: 1000000,
-      event: "Purchase tokens",
-    },
-    {
-      time: new Date("2025-03-26T12:17:41"),
-      amount: 1000000,
-      event: "Purchase tokens",
-    },
-    {
-      time: new Date("2025-03-25T04:07:13"),
-      amount: -36000,
-      event: "Translation Request",
-    },
-    {
-      time: new Date("2025-03-16T09:45:52"),
-      amount: -15916,
-      event: "Translation Request",
-    },
-    {
-      time: new Date("2025-03-16T09:39:45"),
-      amount: -14284,
-      event: "Translation Request",
-    },
-    {
-      time: new Date("2025-03-16T09:36:20"),
-      amount: -13060,
-      event: "Translation Request",
-    },
-    {
-      time: new Date("2025-03-16T09:34:20"),
-      amount: -19608,
-      event: "Translation Request",
-    },
-    {
-      time: new Date("2025-03-16T09:00:13"),
-      amount: -9406.26,
-      event: "Translation Request",
-    },
-    {
-      time: new Date("2025-03-16T09:00:13"),
-      amount: 1000000,
-      event: "Purchase tokens",
-    },
-    {
-      time: new Date("2025-03-16T09:00:13"),
-      amount: -10042.46,
-      event: "Translation Request",
-    },
-  ]
+  const {
+    data: transactions = [],
+    isLoading: isTransactionsLoading,
+    isError: isTransactionsError,
+    isFetching: isTransactionsFetching,
+    refetch: refetchTransactions
+  } = useQuery<Transaction[]>({
+    queryKey: ["transactions", session?.user?.id],
+    queryFn: fetchTransactions,
+    enabled: !!session?.user?.id,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 60 * 60 * 1000, // 1 hour
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+  })
+
+  const handleRefresh = () => {
+    refetchUser()
+    refetchTransactions()
+  }
 
   return (
     <div className="w-full max-w-lg mx-auto">
@@ -84,10 +61,10 @@ export function User() {
             <Button
               variant="ghost"
               size="sm"
-              className={cn("p-2", isFetching && "opacity-50")}
-              onClick={() => refetch()}
+              className={cn("p-2", (isUserFetching || isTransactionsFetching) && "opacity-50")}
+              onClick={handleRefresh}
             >
-              <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
+              <RefreshCw className={cn("h-4 w-4", (isUserFetching || isTransactionsFetching) && "animate-spin")} />
               <span className="text-sm">Refresh</span>
             </Button>
           </div>
@@ -102,9 +79,9 @@ export function User() {
             <tr className="border-b">
               <td className="px-4 py-2">Credits</td>
               <td className="px-4 py-2 text-right">
-                {isLoading ? (
+                {isUserLoading ? (
                   <span className="italic text-muted-foreground">Loading...</span>
-                ) : isError ? (
+                ) : isUserError ? (
                   <span className="italic text-red-500">Error</span>
                 ) : (
                   <span className={cn((user?.credit ?? 0) < 0 && "text-red-500")}>
@@ -116,9 +93,9 @@ export function User() {
             <tr className="border-b last:border-0">
               <td className="px-4 py-2">Account Tier</td>
               <td className="px-4 py-2 text-right">
-                {isLoading ? (
+                {isUserLoading ? (
                   <span className="italic text-muted-foreground">Loading...</span>
-                ) : isError ? (
+                ) : isUserError ? (
                   <span className="italic text-red-500">Error</span>
                 ) : (
                   capitalize(user?.tier ?? "unknown")
@@ -139,23 +116,37 @@ export function User() {
             </tr>
           </thead>
           <tbody>
-            {transactions.length === 0 ? (
+            {isTransactionsLoading ? (
+              <tr>
+                <td colSpan={3} className="p-4 text-center text-muted-foreground">
+                  Loading transactions...
+                </td>
+              </tr>
+            ) : isTransactionsError ? (
+              <tr>
+                <td colSpan={3} className="p-4 text-center text-red-500">
+                  Error loading transactions
+                </td>
+              </tr>
+            ) : transactions.length === 0 ? (
               <tr>
                 <td colSpan={3} className="p-4 text-center text-muted-foreground">
                   No transaction history
                 </td>
               </tr>
             ) : (
-              transactions.map((transaction, index) => (
-                <tr key={index} className="border-b last:border-0">
+              transactions.map((transaction) => (
+                <tr key={transaction.id} className="border-b last:border-0">
                   <td className="px-4 py-2">
-                    {transaction.time.toLocaleString()}
+                    {new Date(transaction.created_at).toLocaleString()}
                   </td>
                   <td className={cn("px-4 py-2", transaction.amount >= 0 ? "text-foreground" : "text-red-500")}>
                     {transaction.amount >= 0 ? "+" : ""}
                     {Math.round(transaction.amount).toLocaleString()}
                   </td>
-                  <td className="px-4 py-2">{transaction.event}</td>
+                  <td className="px-4 py-2">
+                    {capitalize(transaction.event.replace(/_/g, " ").toLocaleLowerCase())}
+                  </td>
                 </tr>
               ))
             )}
