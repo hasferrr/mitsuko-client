@@ -4,6 +4,8 @@ import { supabase } from "@/lib/supabase"
 import { useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { useSessionStore } from "@/stores/use-session-store"
+import { User } from "./user"
+import { LogOutIcon } from "lucide-react"
 
 export function Login() {
   const session = useSessionStore((state) => state.session)
@@ -31,16 +33,21 @@ export function Login() {
 
   if (!mounted) return null
 
-  return (
-    <div className="mx-auto flex flex-col gap-4 items-center justify-center">
-      {!session ? (
+  if (!session) {
+    return (
+      <div className="mx-auto flex flex-col gap-4 items-center justify-center">
         <Button onClick={signUp}>Sign in with Google</Button>
-      ) : (
-        <>
-          <h2>Welcome, {session.user?.email}</h2>
-          <Button onClick={signOut} className="w-fit">Sign out</Button>
-        </>
-      )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-w-xl max-w-5xl flex flex-col gap-4 p-4 m-auto">
+      <User />
+      <Button onClick={signOut} className="w-fit" variant="outline">
+        <LogOutIcon className="h-4 w-4" />
+        Sign out
+      </Button>
     </div>
   )
 }
