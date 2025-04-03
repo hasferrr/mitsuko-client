@@ -1,5 +1,5 @@
-import { useSessionStore } from "@/stores/use-session-store"
 import { sleep } from "../utils"
+import { supabase } from "../supabase"
 
 interface handleStreamParams {
   setResponse: (buffer: string) => void,
@@ -26,7 +26,11 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
     previousResponse = "",
   } = params
 
-  const accessToken = useSessionStore.getState().session?.access_token
+  const { data: { session } } = await supabase.auth.getSession()
+  const accessToken = session?.access_token
+  if (!accessToken) {
+    throw new Error("No access token found")
+  }
 
   setResponse(previousResponse)
 
