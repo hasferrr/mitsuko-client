@@ -3,11 +3,12 @@
 import { Toaster } from "sonner"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
-import { PropsWithChildren } from "react"
+import { PropsWithChildren, useState } from "react"
 import SessionStoreProvider from "@/contexts/session-context"
 import ProjectStoreProvider from "@/contexts/project-context"
 import UnsavedChangesProvider from "@/contexts/unsaved-changes-context"
 import { AppSidebarWrapper } from "@/components/sidebar/app-sidebar-wrapper"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 export default function Layout({ children }: PropsWithChildren) {
   return (
@@ -28,13 +29,17 @@ export default function Layout({ children }: PropsWithChildren) {
 }
 
 function Providers({ children }: PropsWithChildren) {
+  const [queryClient] = useState(() => new QueryClient())
+
   return (
-    <SessionStoreProvider>
-      <ProjectStoreProvider>
-        <UnsavedChangesProvider>
-          {children}
-        </UnsavedChangesProvider>
-      </ProjectStoreProvider>
-    </SessionStoreProvider>
+    <QueryClientProvider client={queryClient}>
+      <SessionStoreProvider>
+        <ProjectStoreProvider>
+          <UnsavedChangesProvider>
+            {children}
+          </UnsavedChangesProvider>
+        </ProjectStoreProvider>
+      </SessionStoreProvider>
+    </QueryClientProvider>
   )
 }
