@@ -141,7 +141,7 @@ export function User() {
                     {new Date(transaction.created_at).toLocaleString()}
                   </td>
                   <td className={cn("px-4 py-2", transaction.amount >= 0 ? "text-foreground" : "text-red-500")}>
-                    {transaction.amount >= 0 ? "+" : ""}
+                    {transaction.amount > 0 ? "+" : ""}
                     {Math.round(transaction.amount).toLocaleString()}
                   </td>
                   <td className="px-4 py-2">
