@@ -52,6 +52,9 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
 import { generateSRT } from "@/lib/subtitles/srt/generate"
 import { parseTranscription } from "@/lib/parser/parser"
+import { useQuery } from "@tanstack/react-query"
+import { fetchUserData } from "@/lib/api/user"
+import { UserData } from "@/types/user"
 
 const languages = [
   { value: "auto", label: "Auto-detect" },
@@ -91,6 +94,14 @@ export default function Transcription() {
   const isTranscribing = isTranscribingSet.has(currentId)
 
   const session = useSessionStore((state) => state.session)
+
+  // Add lazy user data query that only executes manually
+  const { refetch: refetchUserData } = useQuery<UserData>({
+    queryKey: ["user", session?.user?.id],
+    queryFn: fetchUserData,
+    enabled: false, // Lazy query - won't run automatically
+    staleTime: 0, // Always refetch when requested
+  })
 
   const [selectedLanguage, setSelectedLanguage] = useState(languages[0].value)
   const [selectedModel, setSelectedModel] = useState(models[0].value)
@@ -165,6 +176,10 @@ export default function Transcription() {
       console.error(error)
     } finally {
       setIsTranscribing(currentId, false)
+
+      // Refetch user data after transcription completes to update credits
+      refetchUserData()
+
       await saveData(currentId)
     }
   }

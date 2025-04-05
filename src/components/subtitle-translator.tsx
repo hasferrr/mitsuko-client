@@ -98,6 +98,9 @@ import { useSessionStore } from "@/stores/use-session-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { getAdvancedSettings, getBasicSettings } from "@/lib/db/settings"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { fetchUserData } from "@/lib/api/user"
+import { UserData } from "@/types/user"
+import { useQuery } from "@tanstack/react-query"
 
 
 type DownloadOption = "original" | "translated" | "both"
@@ -189,6 +192,14 @@ export default function SubtitleTranslator() {
 
   // Other Store
   const session = useSessionStore((state) => state.session)
+
+  // Add lazy user data query that only executes manually
+  const { refetch: refetchUserData } = useQuery<UserData>({
+    queryKey: ["user", session?.user?.id],
+    queryFn: fetchUserData,
+    enabled: false, // Lazy query - won't run automatically
+    staleTime: 0, // Always refetch when requested
+  })
 
   // Other State
   const [activeTab, setActiveTab] = useState(isTranslating ? "result" : "basic")
@@ -519,6 +530,9 @@ export default function SubtitleTranslator() {
         useTranslationDataStore.getState().data[currentId].parsed,
       )
     }
+
+    // Refetch user data after translation completes to update credits
+    refetchUserData()
 
     await saveData(currentId)
   }

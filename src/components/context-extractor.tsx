@@ -28,6 +28,9 @@ import { useSessionStore } from "@/stores/use-session-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { fetchUserData } from "@/lib/api/user"
+import { UserData } from "@/types/user"
+import { useQuery } from "@tanstack/react-query"
 
 
 interface FileItem {
@@ -90,6 +93,14 @@ export const ContextExtractor = () => {
 
   // Other Store
   const session = useSessionStore((state) => state.session)
+
+  // Add lazy user data query that only executes manually
+  const { refetch: refetchUserData } = useQuery<UserData>({
+    queryKey: ["user", session?.user?.id],
+    queryFn: fetchUserData,
+    enabled: false, // Lazy query - won't run automatically
+    staleTime: 0, // Always refetch when requested
+  })
 
   const episodeNumberInputRef = useRef<HTMLInputElement | null>(null)
   const subtitleContentRef = useRef<HTMLTextAreaElement | null>(null)
@@ -304,6 +315,10 @@ export const ContextExtractor = () => {
       console.error(error)
     } finally {
       setIsExtracting(currentId, false)
+
+      // Refetch user data after extraction completes to update credits
+      refetchUserData()
+
       await saveData(currentId)
     }
   }
