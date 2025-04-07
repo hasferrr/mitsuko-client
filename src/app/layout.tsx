@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Noto_Sans } from 'next/font/google'
+import { Geist } from 'next/font/google'
 import './globals.css'
 import { META_DESCRIPTION, META_TITLE } from '@/constants/metadata'
 import { cn } from '@/lib/utils'
@@ -9,8 +9,9 @@ export const metadata: Metadata = {
   description: META_DESCRIPTION,
 }
 
-const noto = Noto_Sans({
-  subsets: ['latin'],
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
 })
 
 export default function RootLayout({
@@ -19,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={cn(noto.className, "dark")}>
+    <html lang="en" className={cn(geistSans.className, "dark")}>
       <head>
         {process.env.NODE_ENV === "development" && (
           // eslint-disable-next-line @next/next/no-sync-scripts
