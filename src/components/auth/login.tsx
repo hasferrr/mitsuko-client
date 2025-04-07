@@ -42,7 +42,7 @@ export function Login() {
   }
 
   return (
-    <div className="min-w-xl max-w-5xl flex flex-col gap-4 p-4 m-auto">
+    <div className="max-w-6xl flex flex-col gap-4 p-4 m-auto">
       <User />
       <Button onClick={signOut} className="w-fit" variant="outline">
         <LogOutIcon className="h-4 w-4" />

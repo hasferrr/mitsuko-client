@@ -53,7 +53,7 @@ export function User() {
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto">
+    <div className="w-full mx-auto">
       <div className="rounded-md overflow-hidden border mb-6">
         <div className="px-4 py-2 border-b">
           <div className="flex justify-between items-center">
