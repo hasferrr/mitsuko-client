@@ -8,7 +8,7 @@ export interface DatabaseExport {
   translations: Translation[]
   transcriptions: Transcription[]
   extractions: Extraction[]
-  projectOrders: ProjectOrder[]
+  projectOrders: ProjectOrder[] // Only contains one item or empty array
   basicSettings: BasicSettings[]
   advancedSettings: AdvancedSettings[]
 }
@@ -124,15 +124,17 @@ function generateNewIds(data: DatabaseExport): DatabaseExport {
   const newBasicSettings = Array.from(basicSettings.values())
   const newAdvancedSettings = Array.from(advancedSettings.values())
 
-  const newProjectOrders = data.projectOrders[0]
-  newProjectOrders.order = newProjects.map(project => project.id)
+  const newProjectOrders = data.projectOrders.at(0)
+  if (newProjectOrders) {
+    newProjectOrders.order = newProjects.map(project => project.id)
+  }
 
   return {
     projects: newProjects,
     translations: newTranslations,
     transcriptions: newTranscriptions,
     extractions: newExtractions,
-    projectOrders: [newProjectOrders],
+    projectOrders: newProjectOrders ? [newProjectOrders] : [],
     basicSettings: newBasicSettings,
     advancedSettings: newAdvancedSettings
   }
@@ -225,13 +227,15 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
         convertedData.advancedSettings = dataWithNewIds.advancedSettings
 
         // Upadate current project order
-        let currentProjectOrder = await db.projectOrders.get(convertedData.projectOrders[0].id)
+        let currentProjectOrder = await db.projectOrders.get(convertedData.projectOrders.at(0)?.id ?? "")
         if (currentProjectOrder) {
           currentProjectOrder.order = [...convertedData.projects.map(project => project.id), ...currentProjectOrder.order]
         } else {
-          currentProjectOrder = dataWithNewIds.projectOrders[0]
+          currentProjectOrder = dataWithNewIds.projectOrders.at(0)
         }
-        const projectOrderPromise = db.projectOrders.put(currentProjectOrder)
+        if (currentProjectOrder) {
+          await db.projectOrders.put(currentProjectOrder)
+        }
 
         // Import data into each table
         await Promise.all([
@@ -239,7 +243,6 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
           db.translations.bulkAdd(convertedData.translations),
           db.transcriptions.bulkAdd(convertedData.transcriptions),
           db.extractions.bulkAdd(convertedData.extractions),
-          projectOrderPromise,
           db.basicSettings.bulkAdd(convertedData.basicSettings),
           db.advancedSettings.bulkAdd(convertedData.advancedSettings),
         ])
