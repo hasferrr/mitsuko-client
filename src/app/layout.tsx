@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
-import { Geist } from 'next/font/google'
+import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { META_DESCRIPTION, META_TITLE } from '@/constants/metadata'
 import { cn } from '@/lib/utils'
+import Providers from '@/contexts/providers'
 
 export const metadata: Metadata = {
   title: META_TITLE,
@@ -10,8 +11,13 @@ export const metadata: Metadata = {
 }
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
   subsets: ["latin"],
+  variable: '--font-geist-sans',
+})
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: '--font-geist-mono',
 })
 
 export default function RootLayout({
@@ -20,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={cn(geistSans.className, "dark")}>
+    <html lang="en" className={cn(geistSans.variable, geistMono.variable, "dark scroll-smooth")}>
       <head>
         {process.env.NODE_ENV === "development" && (
           // eslint-disable-next-line @next/next/no-sync-scripts
@@ -29,7 +35,11 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="192x192" href="icon.png" />
       </head>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <Providers>
+          {children}
+        </Providers>
+      </body>
     </html>
   )
 }

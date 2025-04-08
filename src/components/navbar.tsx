@@ -77,14 +77,6 @@ export function Navbar() {
     }
   }, [_pathname, tlId, tsId, exId, tlData, tsData, exData])
 
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [isDarkMode])
-
   const handleToggle = () => {
     setIsDarkMode(!isDarkMode)
   }
@@ -99,7 +91,7 @@ export function Navbar() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="text-foreground hover:underline">
-              <Link href="/" className="flex items-center gap-2">
+              <Link href="/dashboard" className="flex items-center gap-2">
                 <Image
                   width={4 * 6}
                   height={4 * 6}

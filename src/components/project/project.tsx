@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Translation, Transcription, Extraction } from "@/types/project"
-import { DashboardItemList } from "./dashboard-item-list"
+import { ProjectItemList } from "./project-item-list"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { EditDialogue } from "../ui-custom/edit-dialogue"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
@@ -22,7 +22,7 @@ import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { NoProjectSelected } from "./no-project-selected"
 
-export const Dashboard = () => {
+export const Project = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
@@ -88,7 +88,7 @@ export const Dashboard = () => {
   }
 
   const translationComponentList = translations.map((translation) => (
-    <DashboardItemList
+    <ProjectItemList
       key={translation.id}
       id={translation.id}
       projectId={currentProject.id}
@@ -111,7 +111,7 @@ export const Dashboard = () => {
   ))
 
   const transcriptionComponentList = transcriptions.map((transcription) => (
-    <DashboardItemList
+    <ProjectItemList
       key={transcription.id}
       id={transcription.id}
       projectId={currentProject.id}
@@ -134,7 +134,7 @@ export const Dashboard = () => {
   ))
 
   const extractionComponentList = extractions.map((extraction) => (
-    <DashboardItemList
+    <ProjectItemList
       key={extraction.id}
       id={extraction.id}
       projectId={currentProject.id}
