@@ -99,7 +99,7 @@ export function Navbar() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="text-foreground hover:underline">
-              <Link href="/" className="flex items-center gap-2">
+              <Link href="/dashboard" className="flex items-center gap-2">
                 <Image
                   width={4 * 6}
                   height={4 * 6}

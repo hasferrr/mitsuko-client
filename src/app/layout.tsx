@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { META_DESCRIPTION, META_TITLE } from '@/constants/metadata'
 import { cn } from '@/lib/utils'
+import Providers from '@/contexts/providers'
 
 export const metadata: Metadata = {
   title: META_TITLE,
@@ -34,7 +35,11 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="192x192" href="icon.png" />
       </head>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <Providers>
+          {children}
+        </Providers>
+      </body>
     </html>
   )
 }

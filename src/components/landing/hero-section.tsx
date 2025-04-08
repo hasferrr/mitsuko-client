@@ -21,14 +21,14 @@ export default function HeroSection() {
         </p>
         <div className="flex gap-4">
           <Link
-            href="#"
+            href="/dashboard"
             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-md flex items-center gap-2 transition-colors"
           >
             Get Started
             <ArrowRight size={18} />
           </Link>
           <Link
-            href="#"
+            href="/auth/login"
             className="border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 text-gray-900 dark:text-white px-6 py-3 rounded-md transition-colors"
           >
             Sign In

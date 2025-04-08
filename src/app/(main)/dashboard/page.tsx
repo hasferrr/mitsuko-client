@@ -4,11 +4,11 @@ import { Metadata } from "next"
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: DEPLOYMENT_URL + '/',
+    canonical: DEPLOYMENT_URL + '/dashboard',
   },
 }
 
-export default function Home() {
+export default function DashboardPage() {
   return (
     <div className="container">
       <WelcomeView />

@@ -88,7 +88,7 @@ export default function Navbar() {
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
           <Link
-            href="#"
+            href="/auth/login"
             className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors"
           >
             Sign In
