@@ -14,16 +14,16 @@ const comparisonCategoriesData = [
     mtlLevel: "Limited",
   },
   {
-    id: "cultural" as ComparisonCategory,
-    label: "Cultural Adaptation",
-    mitsukoLevel: "Excellent",
-    mtlLevel: "Poor",
-  },
-  {
     id: "idiomatic" as ComparisonCategory,
     label: "Idiomatic Expressions",
     mitsukoLevel: "Preserved",
     mtlLevel: "Literal",
+  },
+  {
+    id: "cultural" as ComparisonCategory,
+    label: "Cultural Adaptation",
+    mitsukoLevel: "Excellent",
+    mtlLevel: "Poor",
   },
   {
     id: "content" as ComparisonCategory,
@@ -76,8 +76,8 @@ const comparisonDetailsTextData: Record<ComparisonCategory, ComparisonDetailText
   timestamp: [
     {
       original: { label: "Audio Segment", content: "Audio waveform visualization showing speech." }, // Placeholder for visual concept
-      mitsuko: { label: "Mitsuko Transcription (Perfect Timing)", content: ["00:01:15,250 --> 00:01:17,800 - We need to activate the device now!", "00:01:18,100 --> 00:01:19,500 - But is it stable?"] }, // Precise timing
-      generic: { label: "Generic Transcription (Approximate Timing)", content: "00:01:14 --> 00:01:20 - We need to activate the device now! But is it stable?" }, // Less precise, potential overlap
+      mitsuko: { label: "Mitsuko Transcription (Perfect Timing)", content: ["00:01:15,250 --> 00:01:17,800\nWe need to activate the device now!", "00:01:18,100 --> 00:01:19,500\nBut is it stable?"] }, // Precise timing
+      generic: { label: "Generic Transcription (Approximate Timing)", content: "00:01:14 --> 00:01:20\nWe need to activate the device now! But is it stable?" }, // Less precise, potential overlap
       advantage: {
         title: "Timestamp Accuracy Advantage:",
         description: "Generates perfectly timed subtitles directly from audio, ensuring perfect synchronization with speech, crucial for viewing experience.",
@@ -107,6 +107,19 @@ const comparisonDetailsTextData: Record<ComparisonCategory, ComparisonDetailText
           "Prioritizes translating the *meaning* of idiomatic or figurative expressions over literal words.",
           "Researches and references local idioms in the target language to convey the same sense.",
           "Avoids awkward or nonsensical literal interpretations.",
+        ],
+      },
+    },
+    {
+      original: { label: "Original Subtitle (English Idiom & Numbers)", content: "How about we divide and conquer?\nSakamoto 15M, Shin 10M, Lu 5M, Total: 30M" },
+      mitsuko: { label: "Mitsuko Translation (Meaning & Formatting)", content: "Bagaimana kalau kita bagi tugas?\nSakamoto 15Jt, Shin 10Jt, Lu 5Jt, Total: 30Jt" }, // Translates idiom meaning ("bagi tugas" = divide tasks) and adapts number format (M -> Jt)
+      generic: { label: "Generic Translation (Literal)", content: "Bagaimana kalau kita membagi dan menaklukkan?\nSakamoto 15Jt, Shin 10Jt, Lu 5Jt, Total: 30Jt" }, // Translates idiom literally ("membagi dan menaklukkan" = divide and conquer)
+      advantage: {
+        title: "Idiomatic Expressions & Formatting Advantage:",
+        description: [
+          "Accurately translates the intended meaning of idioms, not just the words.",
+          "Adapts formatting conventions (like number abbreviations) to the target language.",
+          "Ensures natural and culturally appropriate phrasing.",
         ],
       },
     },
@@ -245,7 +258,7 @@ export default function ComparisonSection() {
                       {details.original.label}
                     </span>
                   </div>
-                  <div className="p-4 rounded-md bg-gray-100 dark:bg-gray-900">
+                  <div className="p-4 rounded-md bg-gray-100 dark:bg-gray-900 whitespace-pre-line"> {/* Added whitespace-pre-line */}
                     {/* Special handling for timestamp visual placeholder */}
                     {hoveredCategory === "timestamp" ? (
                       <div className="italic text-gray-600 dark:text-gray-400">
@@ -269,7 +282,7 @@ export default function ComparisonSection() {
                     </span>
                   </div>
                 </div>
-                <div className="p-4 rounded-md bg-gray-100 dark:bg-gray-900">
+                <div className="p-4 rounded-md bg-gray-100 dark:bg-gray-900 whitespace-pre-line"> {/* Added whitespace-pre-line */}
                   {Array.isArray(details.mitsuko.content) ? (
                     // Handle array content (e.g., timestamp list)
                     <div className="space-y-1">
@@ -296,7 +309,7 @@ export default function ComparisonSection() {
                     </span>
                   </div>
                 </div>
-                <div className="p-4 rounded-md bg-gray-100 dark:bg-gray-900">
+                <div className="p-4 rounded-md bg-gray-100 dark:bg-gray-900 whitespace-pre-line"> {/* Added whitespace-pre-line */}
                   {/* Special handling for timestamp generic content */}
                   {hoveredCategory === "timestamp" ? (
                     <p className="text-gray-800 dark:text-gray-200 font-mono text-sm">
