@@ -1,4 +1,5 @@
-export const DEPLOYMENT_URL = "https://translator.mitsuko.web.id"
+const url = process.env.NEXT_PUBLIC_DEPLOYMENT_URL || "https://mitsuko.app"
+export const DEPLOYMENT_URL = url?.endsWith("/") ? url.slice(0, url.length - 1) : url
 export const NAVBAR_IMG_LINK = "https://i.imgur.com/b9gRjVi.jpeg"
 export const DISCORD_LINK = "https://discord.gg/8PaGWY6FdZ"
 export const GITHUB_LINK = "https://github.com/hasferrr"
