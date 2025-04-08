@@ -4,6 +4,7 @@ import {
   MoreHorizontal,
   PlusCircle,
   Trash2,
+  Upload,
 } from "lucide-react"
 
 import {
@@ -25,6 +26,7 @@ import { Project } from "@/types/project"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { redirect } from "next/navigation"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
+import { ExportImportDialogue } from "../ui-custom/export-import-dialogue"
 import { useState } from "react"
 
 interface AppSidebarProjectsProps {
@@ -45,6 +47,7 @@ export function AppSidebarProjects({
   const deleteProject = useProjectStore((state) => state.deleteProject)
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isExportImportModalOpen, setIsExportImportModalOpen] = useState(false)
   const [idToDelete, setIdToDelete] = useState("")
 
   return (
@@ -83,15 +86,26 @@ export function AppSidebarProjects({
           </SidebarMenuItem>
         ))}
         {!addButton && (
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              className="text-sidebar-foreground/70"
-              onClick={addButtonFn}
-            >
-              <PlusCircle className="text-sidebar-foreground/70" />
-              <span>Add Project</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          <>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                className="text-sidebar-foreground/70"
+                onClick={addButtonFn}
+              >
+                <PlusCircle className="text-sidebar-foreground/70" />
+                <span>Add Project</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                className="text-sidebar-foreground/70"
+                onClick={() => setIsExportImportModalOpen(true)}
+              >
+                <Upload className="text-sidebar-foreground/70" />
+                <span>Export/Import</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </>
         )}
         <DeleteDialogue
           handleDelete={() => {
@@ -100,6 +114,10 @@ export function AppSidebarProjects({
           }}
           isDeleteModalOpen={isDeleteModalOpen}
           setIsDeleteModalOpen={setIsDeleteModalOpen}
+        />
+        <ExportImportDialogue
+          isOpen={isExportImportModalOpen}
+          setIsOpen={setIsExportImportModalOpen}
         />
       </SidebarMenu>
     </SidebarGroup>
