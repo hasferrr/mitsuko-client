@@ -1,22 +1,8 @@
-"use client"
-
 import Link from "next/link"
-import { ChevronDown, Moon, Sun } from "lucide-react"
-import { useEffect } from "react"
-import { useThemeStore } from "@/stores/use-theme-store"
+import { ChevronDown } from "lucide-react"
+import { ThemeToggle } from "@/components/landing/theme-toggle"
 
 export default function Navbar() {
-  const isDarkMode = useThemeStore(state => state.isDarkMode)
-  const setIsDarkMode = useThemeStore(state => state.setIsDarkMode)
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [isDarkMode])
-
   return (
     <header
       className="sticky top-0 z-50 w-full bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800"
@@ -81,12 +67,7 @@ export default function Navbar() {
 
         {/* Right Side - Theme Toggle & Auth Buttons */}
         <div className="flex items-center gap-6">
-          <button
-            className="text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
-            onClick={() => setIsDarkMode(!isDarkMode)}
-          >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
+          <ThemeToggle />
           <Link
             href="/auth/login"
             className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors"

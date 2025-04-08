@@ -77,14 +77,6 @@ export function Navbar() {
     }
   }, [_pathname, tlId, tsId, exId, tlData, tsData, exData])
 
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [isDarkMode])
-
   const handleToggle = () => {
     setIsDarkMode(!isDarkMode)
   }
