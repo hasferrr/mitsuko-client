@@ -38,7 +38,7 @@ export default function PricingSection() {
   ]
 
   return (
-    <div className="bg-gray-50 dark:bg-black py-16">
+    <div id="pricing" className="bg-gray-50 dark:bg-black py-16">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">

@@ -2,7 +2,7 @@ import { Languages, AudioWaveform, Layers } from "lucide-react"
 
 export default function KeyFeatures() {
   return (
-    <div className="mt-24 mb-12">
+    <div id="features" className="mt-24 mb-12">
       <div className="text-center">
         <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
           Key Features
@@ -13,7 +13,7 @@ export default function KeyFeatures() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8">
             <div className="text-[#3B82F6] mb-6">
               <Languages size={40} />
@@ -184,7 +184,7 @@ export default function KeyFeatures() {
                   <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300">
-                  Improve translation accuracy and quality
+                  Improve translation quality
                 </p>
               </div>
             </div>

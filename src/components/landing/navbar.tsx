@@ -5,18 +5,23 @@ import { ThemeToggle } from "@/components/landing/theme-toggle"
 export default function Navbar() {
   return (
     <header
-      className="sticky top-0 z-50 w-full bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800"
+      className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-gray-200 dark:border-gray-800"
     >
       <div className="max-w-6xl mx-auto px-4 flex h-16 items-center justify-between">
         <div className="flex items-center gap-8">
           {/* Logo */}
-          <span className="text-xl font-medium text-gray-900 dark:text-white">Mitsuko</span>
+          <Link
+            href="#top"
+            className="text-xl font-medium text-gray-900 dark:text-white"
+          >
+            Mitsuko
+          </Link>
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link
-              href="#"
-              className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors"
+              href="#features"
+              className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors scroll-smooth"
             >
               Features
             </Link>
@@ -51,14 +56,14 @@ export default function Navbar() {
               </div>
             </div>
             <Link
-              href="#"
-              className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors"
+              href="#pricing"
+              className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors scroll-smooth"
             >
               Pricing
             </Link>
             <Link
-              href="#"
-              className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors"
+              href="#faq"
+              className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors scroll-smooth"
             >
               FAQ
             </Link>

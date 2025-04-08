@@ -21,7 +21,7 @@ const faqData = [
     question: "How does the context extraction feature work?",
     answer: [
       "It analyzes subtitles to track characters, settings, and relationships, creating reusable context documents. You can use this context document to inform the translation of the next episode.",
-      "To use the context document, you need to create a context document for the first episode. Then, you can use the context document to inform the translation of the second episode."
+      "To use this feature, you need to extract context from the first episode. Then, you can use this context document to inform the translation of the second episode."
     ],
   },
   {
@@ -44,7 +44,7 @@ const faqData = [
 
 export default function FAQSection() {
   return (
-    <section className="w-full py-16 bg-white dark:bg-black transition-colors">
+    <section id="faq" className="w-full py-16 bg-white dark:bg-black transition-colors">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">

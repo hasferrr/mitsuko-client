@@ -9,7 +9,7 @@ import HeroSection from "./hero-section"
 
 export default function MainLandingPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white flex flex-col">
+    <div className="min-h-screen text-gray-900 dark:text-white flex flex-col">
       <Navbar />
       <HeroSection />
       <KeyFeatures />

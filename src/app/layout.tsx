@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={cn(geistSans.variable, geistMono.variable, "dark")}>
+    <html lang="en" className={cn(geistSans.variable, geistMono.variable, "dark scroll-smooth")}>
       <head>
         {process.env.NODE_ENV === "development" && (
           // eslint-disable-next-line @next/next/no-sync-scripts
