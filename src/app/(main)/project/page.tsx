@@ -1,4 +1,4 @@
-import { Dashboard } from "@/components/dashboard/dashboard"
+import { Project } from "@/components/project/project"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
 import { Metadata } from "next"
 
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function ProjectPage() {
-  return <Dashboard />
+  return <Project />
 }

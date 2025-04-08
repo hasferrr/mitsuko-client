@@ -13,7 +13,7 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { db } from "@/lib/db/db"
 
-interface DashboardItemListProps {
+interface ProjectItemListProps {
   id: string
   projectId: string
   type: "translation" | "transcription" | "extraction"
@@ -25,7 +25,7 @@ interface DashboardItemListProps {
   handleDelete: () => Promise<void>
 }
 
-export const DashboardItemList = ({
+export const ProjectItemList = ({
   id,
   projectId,
   type,
@@ -35,7 +35,7 @@ export const DashboardItemList = ({
   date,
   handleEdit,
   handleDelete,
-}: DashboardItemListProps) => {
+}: ProjectItemListProps) => {
   const router = useRouter()
   const projects = useProjectStore((state) => state.projects)
   const loadProjects = useProjectStore((state) => state.loadProjects)
