@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react"
+import Link from "next/link"
 import {
   AudioWaveform,
   BookOpen,
@@ -10,7 +10,6 @@ import {
   House,
   Languages,
 } from "lucide-react"
-
 import { AppSidebarMain } from "@/components/sidebar/app-sidebar-main"
 import { AppSidebarProjects } from "@/components/sidebar/app-sidebar-projects"
 import { AppSidebarUser } from "@/components/sidebar/app-sidebar-user"
@@ -23,6 +22,7 @@ import {
 } from "@/components/ui/sidebar"
 import { CHANGE_LOG_LINK, DISCORD_LINK } from "@/constants/external-links"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { SidebarHeaderIcon } from "./sidebar-header-icon"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const projects = useProjectStore((state) => state.projects)
@@ -74,7 +74,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" variant="floating" {...props}>
-      <SidebarHeader></SidebarHeader>
+      <SidebarHeader>
+        <Link href="/">
+          <SidebarHeaderIcon />
+        </Link>
+      </SidebarHeader>
       <SidebarContent>
         <AppSidebarMain items={data.navMain} />
         <AppSidebarProjects

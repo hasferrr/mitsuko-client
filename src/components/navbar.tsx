@@ -7,7 +7,6 @@ import { Moon, Sun, Loader2, CircleDollarSign, AlertCircle } from "lucide-react"
 import { useThemeStore } from "@/stores/use-theme-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
-import { NAVBAR_IMG_LINK } from "@/constants/external-links"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { SidebarTrigger } from "./ui/sidebar"
 import { Separator } from "./ui/separator"
@@ -17,7 +16,6 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useEffect, useState } from "react"
-import Image from "next/image"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserData } from "@/lib/api/user"
@@ -92,14 +90,7 @@ export function Navbar() {
           <BreadcrumbList>
             <BreadcrumbItem className="text-foreground hover:underline">
               <Link href="/dashboard" className="flex items-center gap-2">
-                <Image
-                  width={4 * 6}
-                  height={4 * 6}
-                  src={NAVBAR_IMG_LINK}
-                  alt="Logo"
-                  className="w-6 h-6 object-cover"
-                />
-                Mitsuko (Beta)
+                Dashboard
               </Link>
             </BreadcrumbItem>
             {currentProject && (
