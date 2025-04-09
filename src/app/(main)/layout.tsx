@@ -3,6 +3,12 @@ import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 import { PropsWithChildren } from "react"
 import { AppSidebarWrapper } from "@/components/sidebar/app-sidebar-wrapper"
+import { Metadata } from "next"
+import { META_TITLE } from "@/constants/metadata"
+
+export const metadata: Metadata = {
+  title: META_TITLE,
+}
 
 export default function Layout({ children }: PropsWithChildren) {
   return (

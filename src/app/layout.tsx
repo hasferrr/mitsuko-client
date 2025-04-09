@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import { META_DESCRIPTION, META_TITLE } from '@/constants/metadata'
+import { META_DESCRIPTION, META_TITLE_LONG } from '@/constants/metadata'
 import { cn } from '@/lib/utils'
 import Providers from '@/contexts/providers'
 
 export const metadata: Metadata = {
-  title: META_TITLE,
+  title: META_TITLE_LONG,
   description: META_DESCRIPTION,
 }
 
