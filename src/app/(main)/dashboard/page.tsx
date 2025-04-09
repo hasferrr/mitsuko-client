@@ -1,6 +1,7 @@
 import { WelcomeView } from "@/components/dashboard/welcome-view"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
 import { Metadata } from "next"
+import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
   alternates: {
@@ -9,6 +10,8 @@ export const metadata: Metadata = {
 }
 
 export default function DashboardPage() {
+  return redirect("/")
+
   return (
     <div className="container">
       <WelcomeView />

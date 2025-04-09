@@ -1,6 +1,6 @@
 import { Metadata } from "next"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
-import MainLandingPage from "@/components/landing/main"
+import { MigratePage } from "@/components/dashboard/migrate-page"
 
 export const metadata: Metadata = {
   alternates: {
@@ -10,6 +10,6 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <MainLandingPage />
+    <MigratePage />
   )
 }
