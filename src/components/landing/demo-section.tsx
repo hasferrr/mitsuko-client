@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Play } from "lucide-react"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 
@@ -34,10 +35,13 @@ export default function DemoSection() {
         </div>
 
         <div className="flex justify-center mt-10">
-          <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-md flex items-center gap-2 transition-colors">
+          <Link
+            href="/dashboard"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-md flex items-center gap-2 transition-colors"
+          >
             Try Mitsuko Now
             <Play size={16} className="ml-1" />
-          </button>
+          </Link>
         </div>
       </div>
     </div>

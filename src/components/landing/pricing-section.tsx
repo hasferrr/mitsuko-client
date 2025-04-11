@@ -385,6 +385,11 @@ export default function PricingSection() {
             ))}
           </div>
         </div>
+
+        {/* Credit Usage Transparency Note */}
+        <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-8">
+          <p>Credit usage transparency will be available soon.</p>
+        </div>
       </div>
     </div>
   )
