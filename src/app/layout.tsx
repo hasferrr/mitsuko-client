@@ -6,10 +6,40 @@ import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { cn } from '@/lib/utils'
 import Providers from '@/contexts/providers'
 
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Mitsuko",
+  "url": DEPLOYMENT_URL,
+  "logo": `${DEPLOYMENT_URL}/android-chrome-512x512.png`,
+}
+
 export const metadata: Metadata = {
   title: META_TITLE_LONG,
   description: META_DESCRIPTION,
   metadataBase: new URL(DEPLOYMENT_URL),
+  openGraph: {
+    title: META_TITLE_LONG,
+    description: META_DESCRIPTION,
+    url: DEPLOYMENT_URL,
+    siteName: 'Mitsuko',
+    images: [
+      {
+        url: `${DEPLOYMENT_URL}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Mitsuko Application Preview',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: META_TITLE_LONG,
+    description: META_DESCRIPTION,
+    images: [`${DEPLOYMENT_URL}/og-image.png`],
+  },
 }
 
 export const viewport: Viewport = {
@@ -41,6 +71,10 @@ export default function RootLayout({
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
         {process.env.NODE_ENV === "development" && (
           // eslint-disable-next-line @next/next/no-sync-scripts
           <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
