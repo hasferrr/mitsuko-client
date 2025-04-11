@@ -5,7 +5,21 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { File, XCircle, ArrowUpCircle, ArrowDownCircle, Upload, Save, Play, Square, Loader2, ArrowUpDown, Trash2, Check, Edit, StepForward } from "lucide-react"
+import {
+  File,
+  XCircle,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  Upload,
+  Save,
+  Play,
+  Square,
+  Loader2,
+  ArrowUpDown,
+  Trash2,
+  Check,
+  Edit,
+} from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Subtitle, SubtitleNoTime } from "@/types/types"
@@ -323,9 +337,9 @@ export const ContextExtractor = () => {
     }
   }
 
-  const handleContinueGeneration = async () => {
-    await handleStartExtraction(true)
-  }
+  // const handleContinueGeneration = async () => {
+  //   await handleStartExtraction(true)
+  // }
 
   const handleStopExtraction = async () => {
     stopExtraction(currentId)
@@ -638,7 +652,8 @@ export const ContextExtractor = () => {
           )}
         </Button>
 
-        <Button
+        {/* Continue Extraction is disabled for now */}
+        {/* <Button
           variant="outline"
           className="gap-2"
           onClick={handleContinueGeneration}
@@ -655,7 +670,7 @@ export const ContextExtractor = () => {
               Continue Extraction
             </>
           )}
-        </Button>
+        </Button> */}
       </div>
     </div>
   )
