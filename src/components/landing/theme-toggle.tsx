@@ -11,6 +11,7 @@ export function ThemeToggle() {
     <button
       className="text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
       onClick={() => setIsDarkMode(!isDarkMode)}
+      aria-label="Toggle dark mode"
     >
       {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
     </button>

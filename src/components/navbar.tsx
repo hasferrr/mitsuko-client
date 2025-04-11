@@ -148,7 +148,13 @@ export function Navbar() {
             </div>
           )}
 
-          <Button variant="ghost" size="icon" onClick={handleToggle} className="transition-none">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleToggle}
+            className="transition-none"
+            aria-label="Toggle dark mode"
+          >
             {isDarkMode ? (
               <Sun className="h-5 w-5" />
             ) : (
