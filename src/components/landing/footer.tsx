@@ -1,3 +1,4 @@
+import { DISCORD_LINK, GITHUB_LINK } from "@/constants/external-links"
 import Link from "next/link"
 
 export default function Footer() {
@@ -22,7 +23,7 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/pricing" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <Link href="#pricing" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                 Pricing
               </Link>
             </li>
@@ -43,8 +44,8 @@ export default function Footer() {
           <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Legal</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-                Terms of Use
+              <Link href="/terms" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                Terms of Service
               </Link>
             </li>
             <li>
@@ -59,12 +60,22 @@ export default function Footer() {
           <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Other Sites</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <Link
+                href={DISCORD_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
                 Discord
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <Link
+                href={GITHUB_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
                 GitHub
               </Link>
             </li>
