@@ -20,7 +20,7 @@ const faqData = [
   {
     question: "How does the context extraction feature work?",
     answer: [
-      "It analyzes subtitles to track characters, settings, and relationships, creating reusable context documents. You can use this context document to inform the translation of the next episode.",
+      "It analyzes subtitles to track characters, settings, and relationships, creating reusable context documents. You can use this context document to inform the translation.",
       "To use this feature, you need to extract context from the first episode. Then, you can use this context document to inform the translation of the second episode."
     ],
   },
@@ -34,7 +34,7 @@ const faqData = [
   },
   {
     question: "Is there a limit to how much content I can process?",
-    answer: "As long as credits are available, you can process as much content as you want. For free tiers, you can use free models available.",
+    answer: "As long as credits are available, you can process as much content as you want. If you have no credits, you can use the limited free models available.",
   },
   {
     question: "Will Mitsuko add more features in the future?",
