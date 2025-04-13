@@ -41,14 +41,16 @@ import {
 } from "@/components/ui/sidebar"
 import { useSessionStore } from "@/stores/use-session-store"
 import { supabase } from "@/lib/supabase"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 
 export function AppSidebarUser() {
   const { isMobile } = useSidebar()
   const session = useSessionStore((state) => state.session)
   const setSession = useSessionStore((state) => state.setSession)
+
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const user = {
     name: session?.user.user_metadata.name ?? "",
@@ -64,11 +66,13 @@ export function AppSidebarUser() {
     return (s[0][0] + s[1][0]).toUpperCase()
   })()
 
-  const signOut = async () => {
-    await supabase.auth.signOut()
-    setSession(null)
-    setIsConfirmOpen(false)
-    setIsDropdownOpen(false)
+  const signOut = () => {
+    startTransition(async () => {
+      await supabase.auth.signOut()
+      setSession(null)
+      setIsConfirmOpen(false)
+      setIsDropdownOpen(false)
+    })
   }
 
   return (
@@ -150,7 +154,11 @@ export function AppSidebarUser() {
                 </Link>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()} onClick={() => setIsConfirmOpen(true)}>
+              <DropdownMenuItem
+                disabled={isPending}
+                onSelect={(e) => e.preventDefault()}
+                onClick={() => setIsConfirmOpen(true)}
+              >
                 <LogOutIcon />
                 Log out
               </DropdownMenuItem>
@@ -170,7 +178,7 @@ export function AppSidebarUser() {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button onClick={signOut}>Sign out</Button>
+            <Button disabled={isPending} onClick={signOut}>Sign out</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

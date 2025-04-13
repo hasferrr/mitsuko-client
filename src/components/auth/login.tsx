@@ -1,7 +1,7 @@
 "use client"
 
 import { supabase } from "@/lib/supabase"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { Button } from "../ui/button"
 import { useSessionStore } from "@/stores/use-session-store"
 import { User } from "./user"
@@ -23,6 +23,7 @@ export function Login() {
 
   const [mounted, setMounted] = useState(false)
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
     setMounted(true)
@@ -37,10 +38,12 @@ export function Login() {
     })
   }
 
-  const signOut = async () => {
-    await supabase.auth.signOut()
-    setSession(null)
-    setIsConfirmOpen(false)
+  const signOut = () => {
+    startTransition(async () => {
+      await supabase.auth.signOut()
+      setSession(null)
+      setIsConfirmOpen(false)
+    })
   }
 
   if (!mounted) return null
@@ -58,7 +61,7 @@ export function Login() {
       <User />
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogTrigger asChild>
-          <Button className="w-fit" variant="outline">
+          <Button disabled={isPending} className="w-fit" variant="outline">
             <LogOutIcon className="h-4 w-4 mr-2" />
             Sign out
           </Button>
@@ -74,7 +77,7 @@ export function Login() {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button onClick={signOut}>Sign out</Button>
+            <Button disabled={isPending} onClick={signOut}>Sign out</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
