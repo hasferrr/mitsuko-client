@@ -113,7 +113,7 @@ export default function KeyFeatures() {
                   <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300">
-                  Accurate timestamp generation
+                  Accurate audio to text transcription
                 </p>
               </div>
               <div className="flex items-start gap-3">
