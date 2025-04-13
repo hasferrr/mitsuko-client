@@ -1,22 +1,30 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { keepOnlyWrapped } from '@/lib/parser/cleaner'
-import { TERMS_LINK } from '@/constants/external-links'
+import { useQuery } from '@tanstack/react-query'
+import { fetchTerms } from '@/lib/api/terms'
 import Markdown from 'react-markdown'
 
 export const Terms = () => {
-  const [terms, setTerms] = useState("")
+  const { data: terms, isLoading, error } = useQuery({
+    queryKey: ['terms'],
+    queryFn: fetchTerms,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+  })
 
-  useEffect(() => {
-    fetch(TERMS_LINK)
-      .then((res) => res.text())
-      .then((text) => {
-        const b64 = keepOnlyWrapped(text, "[[", "]]")
-        const mail = Buffer.from(b64, "base64").toString("utf-8")
-        setTerms(text.replace(b64, mail))
-      })
-  }, [])
+  if (isLoading) return (
+    <div className="p-4 max-w-5xl text-justify">
+      Loading...
+    </div>
+  )
+
+  if (error) return (
+    <div className="p-4 max-w-5xl text-justify">
+      Error loading terms: {error.message}
+    </div>
+  )
 
   return (
     <div className="p-4 max-w-5xl grid mx-auto text-justify">
