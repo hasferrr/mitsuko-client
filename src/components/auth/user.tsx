@@ -4,14 +4,33 @@ import { capitalize, cn } from "@/lib/utils"
 import { RefreshCw } from "lucide-react"
 import { Button } from "../ui/button"
 import { UserData } from "@/types/user"
-import { Transaction } from "@/types/transaction"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserData } from "@/lib/api/user"
-import { fetchTransactions } from "@/lib/api/transaction"
+import { fetchTransactions, PaginatedTransactions, AmountFilter } from "@/lib/api/transaction"
+import { useState } from "react"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../ui/pagination"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select"
 
 export function User() {
   const session = useSessionStore((state) => state.session)
+  const [page, setPage] = useState(1)
+  const [amountFilter, setAmountFilter] = useState<AmountFilter>("all")
+  const pageSize = 10
 
   const {
     data: user,
@@ -31,14 +50,14 @@ export function User() {
   })
 
   const {
-    data: transactions = [],
+    data: paginatedTransactions,
     isLoading: isTransactionsLoading,
     isError: isTransactionsError,
     isFetching: isTransactionsFetching,
     refetch: refetchTransactions
-  } = useQuery<Transaction[]>({
-    queryKey: ["transactions", session?.user?.id],
-    queryFn: fetchTransactions,
+  } = useQuery<PaginatedTransactions>({
+    queryKey: ["transactions", session?.user?.id, page, pageSize, amountFilter],
+    queryFn: () => fetchTransactions(page, pageSize, amountFilter),
     enabled: !!session?.user?.id,
     staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // 1 hour
@@ -47,13 +66,27 @@ export function User() {
     refetchOnReconnect: false,
   })
 
+  const transactions = paginatedTransactions?.data || []
+  const totalCount = paginatedTransactions?.count || 0
+  const totalPages = Math.ceil(totalCount / pageSize)
+
   const handleRefresh = () => {
+    setPage(1)
     refetchUser()
     refetchTransactions()
   }
 
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+  }
+
+  const handleAmountFilterChange = (value: AmountFilter) => {
+    setAmountFilter(value)
+    setPage(1)
+  }
+
   return (
-    <div className="w-full mx-auto">
+    <div className="w-[42rem] max-w-xl mx-auto">
       <div className="rounded-md overflow-hidden border mb-6">
         <div className="px-4 py-2 border-b">
           <div className="flex justify-between items-center">
@@ -107,6 +140,27 @@ export function User() {
       </div>
 
       <div className="rounded-md overflow-hidden border">
+        <div className="px-4 py-2 border-b flex justify-between items-center gap-4">
+          <h2 className="font-medium">Transaction History</h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Amount:</span>
+            <Select
+              value={amountFilter}
+              onValueChange={(value) => handleAmountFilterChange(value as AmountFilter)}
+            >
+              <SelectTrigger className="w-[100px] h-8">
+                <SelectValue placeholder="Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="positive">Positive</SelectItem>
+                <SelectItem value="negative">Negative</SelectItem>
+                <SelectItem value="zero">Zero</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <table className="w-full">
           <thead>
             <tr className="border-b">
@@ -152,6 +206,78 @@ export function User() {
             )}
           </tbody>
         </table>
+
+        {totalPages > 1 && (
+          <div className="py-4 border-t">
+            <Pagination>
+              <PaginationContent>
+                {page > 1 && (
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => handlePageChange(page - 1)}
+                      className="cursor-pointer"
+                    />
+                  </PaginationItem>
+                )}
+
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  // Logic to show pages around current page
+                  let pageNum
+                  if (totalPages <= 5) {
+                    // Show all pages if 5 or fewer
+                    pageNum = i + 1
+                  } else if (page <= 3) {
+                    // Near start
+                    pageNum = i + 1
+                  } else if (page >= totalPages - 2) {
+                    // Near end
+                    pageNum = totalPages - 4 + i
+                  } else {
+                    // Middle
+                    pageNum = page - 2 + i
+                  }
+
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        isActive={pageNum === page}
+                        onClick={() => handlePageChange(pageNum)}
+                        className="cursor-pointer"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                })}
+
+                {totalPages > 5 && page < totalPages - 2 && (
+                  <>
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink
+                        onClick={() => handlePageChange(totalPages)}
+                        className="cursor-pointer"
+                      >
+                        {totalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  </>
+                )}
+
+                {page < totalPages && (
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => handlePageChange(page + 1)}
+                      className="cursor-pointer"
+                    />
+                  </PaginationItem>
+                )}
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   )
