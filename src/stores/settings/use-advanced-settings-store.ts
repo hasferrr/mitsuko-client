@@ -1,6 +1,5 @@
 import { create } from "zustand"
 import { AdvancedSettings, ProjectType } from "@/types/project"
-import { persist } from "zustand/middleware"
 import { useTranslationDataStore } from "../data/use-translation-data-store"
 import { createAdvancedSettings, updateAdvancedSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "./use-settings-store"
@@ -68,8 +67,8 @@ const updateSettings = async <K extends keyof Omit<AdvancedSettings, 'id' | 'cre
 }
 
 export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
-  persist(
-    (set, get) => ({
+  (set, get) => (
+    {
       data: {},
       currentId: null,
       setCurrentId: (id) => set({ currentId: id }),
@@ -265,9 +264,6 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
           updateSettings(key as keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>, value)
         })
       },
-    }),
-    {
-      name: "advanced-settings-storage",
     }
   )
 )

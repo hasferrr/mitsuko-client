@@ -19,6 +19,12 @@ export default function Providers({ children }: PropsWithChildren) {
     }
   }, [isDarkMode])
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("advanced-settings-storage")
+    }
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
       <SessionStoreProvider>
