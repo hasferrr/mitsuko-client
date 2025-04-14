@@ -86,7 +86,7 @@ export function User() {
   }
 
   return (
-    <div className="w-[42rem] max-w-xl mx-auto">
+    <div className="w-[min(42rem,90vw)] mx-auto">
       <div className="rounded-md overflow-hidden border mb-6">
         <div className="px-4 py-2 border-b">
           <div className="flex justify-between items-center">
