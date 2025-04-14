@@ -1,3 +1,5 @@
+"use client"
+
 import { createContext, PropsWithChildren, useContext, useEffect, useRef } from 'react'
 
 interface UnsavedChangesType {

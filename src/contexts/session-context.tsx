@@ -1,3 +1,5 @@
+"use client"
+
 import { supabase } from '@/lib/supabase'
 import { useSessionStore } from '@/stores/use-session-store'
 import { createContext, PropsWithChildren, useEffect } from 'react'
