@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:scan": "REACT_SCAN_ENABLED=true next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
