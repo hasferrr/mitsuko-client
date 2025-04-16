@@ -3,8 +3,10 @@ import { DEPLOYMENT_URL } from "@/constants/external-links"
 import { Privacy } from "@/components/privacy"
 import fs from "fs/promises"
 import path from "path"
+import { META_TITLE } from "@/constants/metadata"
 
 export const metadata: Metadata = {
+  title: `Privacy Policy - ${META_TITLE}`,
   alternates: {
     canonical: DEPLOYMENT_URL + '/privacy',
   },
