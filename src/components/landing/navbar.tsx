@@ -12,7 +12,7 @@ export default function Navbar() {
         <div className="flex items-center gap-8">
           {/* Logo */}
           <Link
-            href="#top"
+            href="/#top"
             className="text-xl font-medium text-gray-900 dark:text-white"
           >
             Mitsuko
@@ -21,7 +21,7 @@ export default function Navbar() {
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link
-              href="#features"
+              href="/#features"
               className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors scroll-smooth"
             >
               Features
@@ -63,13 +63,13 @@ export default function Navbar() {
               </div>
             </div>
             <Link
-              href="#pricing"
+              href="/#pricing"
               className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors scroll-smooth"
             >
               Pricing
             </Link>
             <Link
-              href="#faq"
+              href="/#faq"
               className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors scroll-smooth"
             >
               FAQ
