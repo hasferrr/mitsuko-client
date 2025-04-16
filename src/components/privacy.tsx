@@ -22,12 +22,12 @@ export const Privacy = ({ privacy }: PrivacyProps) => {
       <div>
         <Markdown
           components={{
-            h1: ({ children }) => <h1 className="text-lg font-bold">{children}</h1>,
-            h2: ({ children }) => <h2 className="mt-4 text-base font-semibold mb-4">{children}</h2>,
-            p: ({ children }) => <p className="my-4 text-sm">{children}</p>,
+            h1: ({ children }) => <h1 className="text-2xl font-bold">{children}</h1>,
+            h2: ({ children }) => <h2 className="mt-4 text-lg font-semibold mb-4">{children}</h2>,
+            p: ({ children }) => <p className="my-4 text-base">{children}</p>,
             ul: ({ children }) => <ul className="list-disc pl-4 my-4">{children}</ul>,
             ol: ({ children }) => <ol className="list-decimal pl-4 my-4">{children}</ol>,
-            li: ({ children }) => <li className="text-sm mb-2">{children}</li>,
+            li: ({ children }) => <li className="text-base mb-2">{children}</li>,
           }}
         >
           {privacyContent.replace("[[]]", "")}
