@@ -1,30 +1,21 @@
 "use client"
 
-import { useQuery } from '@tanstack/react-query'
-import { fetchTerms } from '@/lib/api/terms'
+import { CONTACT_LINK } from '@/constants/external-links'
+import { useEffect } from 'react'
+import { useState } from 'react'
 import Markdown from 'react-markdown'
 
-export const Terms = () => {
-  const { data: terms, isLoading, error } = useQuery({
-    queryKey: ['terms'],
-    queryFn: fetchTerms,
-    staleTime: Infinity,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-  })
+interface TermsProps {
+  terms: string
+}
 
-  if (isLoading) return (
-    <div className="p-4 max-w-5xl text-justify">
-      Loading...
-    </div>
-  )
+export const Terms = ({ terms }: TermsProps) => {
+  const [termsContent, setTermsContent] = useState(terms)
 
-  if (error) return (
-    <div className="p-4 max-w-5xl text-justify">
-      Error loading terms: {error.message}
-    </div>
-  )
+  useEffect(() => {
+    const text = terms.replace("[[]]", atob(atob(CONTACT_LINK)))
+    setTermsContent(text)
+  }, [])
 
   return (
     <div className="p-4 max-w-5xl grid mx-auto text-justify">
@@ -39,7 +30,7 @@ export const Terms = () => {
             li: ({ children }) => <li className="text-sm mb-2">{children}</li>,
           }}
         >
-          {terms}
+          {termsContent.replace("[[]]", "")}
         </Markdown>
       </div>
     </div>
