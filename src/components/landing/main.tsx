@@ -4,6 +4,7 @@ import DemoSection from "./demo-section"
 import ComparisonSection from "./comparison-section"
 import PricingSection from "./pricing-section"
 import FAQSection from "./faq-section"
+import ContactUsSection from "./contact-us-section"
 import Footer from "./footer"
 import HeroSection from "./hero-section"
 
@@ -17,6 +18,7 @@ export default function MainLandingPage() {
       <ComparisonSection />
       <PricingSection />
       <FAQSection />
+      <ContactUsSection />
       <Footer />
     </div>
   )
