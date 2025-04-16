@@ -1,5 +1,6 @@
 import { Check, X } from "lucide-react"
-
+import { Button } from "../ui/button"
+import Link from "next/link"
 export default function PricingSection() {
   const pricingData = {
     free: {
@@ -62,9 +63,11 @@ export default function PricingSection() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 Access to most features with some limitations. Purchase credits as needed.
               </p>
-              <button className="w-full py-2 px-4 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors mb-6">
-                Get Started
-              </button>
+              <Link href="/dashboard">
+                <Button className="w-full py-2 px-4 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors mb-6">
+                  Get Started
+                </Button>
+              </Link>
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 flex-shrink-0" />
@@ -111,9 +114,12 @@ export default function PricingSection() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 Fewer limitations and monthly credit grant. Email support included.
               </p>
-              <button className="w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6">
-                Subscribe Now
-              </button>
+              <div className="cursor-not-allowed">
+                <Button disabled className="w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6">
+                  {/* Subscribe Now */}
+                  Coming Soon
+                </Button>
+              </div>
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
@@ -160,9 +166,12 @@ export default function PricingSection() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 Maximum features with priority support and cloud saving.
               </p>
-              <button className="w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6">
-                Go Pro
-              </button>
+              <div className="cursor-not-allowed">
+                <Button disabled className="w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6">
+                  {/* Go Pro */}
+                  Coming Soon
+                </Button>
+              </div>
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
@@ -378,9 +387,12 @@ export default function PricingSection() {
                 {pack.discount && (
                   <div className="text-xs text-green-600 dark:text-green-400">Save ${pack.discount}</div>
                 )}
-                <button className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm">
-                  Purchase
-                </button>
+                <div className="cursor-not-allowed">
+                  <Button disabled className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm">
+                    {/* Purchase */}
+                    Coming Soon
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
