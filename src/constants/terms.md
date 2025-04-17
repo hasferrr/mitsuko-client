@@ -1,6 +1,6 @@
 # Terms of Service
 
-Last Updated: 20/03/2025
+Last Updated: 17/04/2025
 
 ## 1.  Acceptance of Terms
 
@@ -27,30 +27,34 @@ You agree to use Mitsuko only for lawful purposes and in a way that does not inf
 
 The Mitsuko software is open-source and licensed under the GNU GPLv3, which allows you to freely use, modify, and share the code (available on GitHub) as long as you follow the license terms. When you upload content (like subtitle files), you keep ownership but grant Mitsuko a non-exclusive, worldwide license to process and translate it solely to operate the service. You are responsible for ensuring that your use of Mitsuko and any uploaded content complies with applicable laws.
 
-## 5.  Disclaimer of Warranties
+## 5. Refund Policy
+
+Purchases of subscription plans and credits are final and non-refundable. Credits are consumed based on usage within the application as described in the service documentation. Subscription plans provide access for the agreed billing cycle. We currently do not offer refunds for any purchased credits or active/past subscription periods.
+
+## 6.  Disclaimer of Warranties
 
 Mitsuko is provided “as is” with no guarantees of accuracy, reliability, or uninterrupted service. We explicitly disclaim all warranties, including fitness for a specific purpose or non-infringement. Translations are AI-generated and may contain errors; you’re responsible for verifying their correctness. We do not promise the service will be secure, error-free, or free of harmful components like viruses.
 
-## 6.  Limitation of Liability
+## 7.  Limitation of Liability
 
 Mitsuko and its team will not be held liable for any damages (direct, indirect, or consequential) arising from your use of the service, including losses from errors, interruptions, or reliance on translations. This applies even if we’ve been advised of potential risks. Some jurisdictions limit liability exclusions, so this section may not apply fully in your region.
 
-## 7.  Privacy
+## 8.  Privacy
 
 Your use of Mitsuko is also governed by our Privacy Policy. Please review our Privacy Policy to understand our practices regarding the collection, use, and disclosure of your information.
 
-## 8.  Modifications to Terms
+## 9.  Modifications to Terms
 
 We reserve the right to modify these Terms at any time. We will post the updated Terms on the Mitsuko website, and the "Last Updated" date at the top of these Terms will be revised. Your continued use of Mitsuko after any such changes constitutes your acceptance of the new Terms.
 
-## 9.  Termination
+## 10. Termination
 
 We may terminate or suspend your access to Mitsuko immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach these Terms.
 
-## 10. Governing Law
+## 11. Governing Law
 
 These Terms are governed by the laws of the service provider’s jurisdiction, and any legal disputes will be resolved under those laws.
 
-## 11. Contact Us
+## 12. Contact Us
 
 If you have any questions about these Terms, please contact us at [[]].

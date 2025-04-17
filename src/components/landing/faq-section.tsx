@@ -29,12 +29,12 @@ const faqData = [
     answer: "100+ languages, including major global languages and regional dialects. Regularly updated. You can request new languages through Discord server.",
   },
   {
-    question: "Can I edit the translations or transcriptions?",
-    answer: "Yes. Includes an editing interface to refine results before exporting.",
-  },
-  {
     question: "Is there a limit to how much content I can process?",
     answer: "As long as credits are available, you can process as much content as you want. If you have no credits, you can use the limited free models available.",
+  },
+  {
+    question: "What is the refund policy?",
+    answer: "We currently do not offer refunds for purchased credits and plans. However, this might change in the future.",
   },
   {
     question: "Will Mitsuko add more features in the future?",
