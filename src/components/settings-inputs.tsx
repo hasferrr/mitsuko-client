@@ -25,7 +25,7 @@ import { ComboBox } from "./ui-custom/combo-box"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ProjectType } from "@/types/project"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Extraction } from "@/types/project"
 import { db } from "@/lib/db/db"
 
@@ -513,6 +513,20 @@ export const StructuredOutputSwitch = memo(() => {
 export const FullContextMemorySwitch = memo(() => {
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
   const setIsUseFullContextMemory = useAdvancedSettingsStore((state) => state.setIsUseFullContextMemory)
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
+
+  const handleCheckedChange = (checked: boolean) => {
+    if (checked) {
+      setIsConfirmDialogOpen(true)
+    } else {
+      setIsUseFullContextMemory(false)
+    }
+  }
+
+  const handleConfirm = () => {
+    setIsUseFullContextMemory(true)
+    setIsConfirmDialogOpen(false)
+  }
 
   return (
     <div className="space-y-2">
@@ -520,15 +534,31 @@ export const FullContextMemorySwitch = memo(() => {
         <label className="text-sm font-medium">Full Context Memory</label>
         <Switch
           checked={isUseFullContextMemory}
-          onCheckedChange={setIsUseFullContextMemory}
+          onCheckedChange={handleCheckedChange}
         />
       </div>
       <p className="text-xs text-muted-foreground">
         When enabled, it's using all previous chunks to improve translation
-        consistency and accuracy, but increases token usage and the risk of hitting
-        input token limits. Best for models with large context windows (128k+ tokens).
+        consistency and accuracy, but drastically increases token usage and the risk of hitting
+        input token limits. Only for models with large context windows (128k+ tokens).
         When disabled, it's only including the last previous chunk.
       </p>
+
+      <Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enable Full Context Memory?</DialogTitle>
+            <DialogDescription className="pt-2">
+              Warning: This feature uses all previous chunks for context,
+              which significantly increases token usage and costs. Are you sure you want to proceed?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsConfirmDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleConfirm}>Confirm</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 })
