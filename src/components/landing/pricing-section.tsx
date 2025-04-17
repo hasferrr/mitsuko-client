@@ -1,18 +1,41 @@
+"use client"
+
+import Link from "next/link"
 import { Check, X } from "lucide-react"
 import { Button } from "../ui/button"
-import Link from "next/link"
+import { useEffect, useState } from "react"
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
+
+interface Currency {
+  symbol: string
+  rate: number
+}
+
+const USD = { symbol: "$", rate: 1 }
+const IDR = { symbol: "Rp", rate: 16800 }
+
 export default function PricingSection() {
+  const [currency, setCurrency] = useState<Currency>(USD)
+
+  useEffect(() => {
+    setCurrency(IDR)
+  }, [])
+
+  const handleCurrencyChange = (value: string) => {
+    setCurrency(value === "$" ? USD : IDR)
+  }
+
   const pricingData = {
     free: {
-      price: 0,
+      price: (0 * currency.rate).toLocaleString(),
       credits: "0",
     },
     basic: {
-      price: 5,
+      price: (5 * currency.rate).toLocaleString(),
       credits: "5,000,000",
     },
     pro: {
-      price: 20,
+      price: (20 * currency.rate).toLocaleString(),
       credits: "22,000,000",
     },
   }
@@ -20,21 +43,21 @@ export default function PricingSection() {
   const creditPacks = [
     {
       credits: "2,000,000",
-      price: 2,
+      price: (2 * currency.rate).toLocaleString(),
     },
     {
       credits: "10,000,000",
-      price: 10,
+      price: (10 * currency.rate).toLocaleString(),
     },
     {
       credits: "20,000,000",
-      price: 19,
-      discount: 1,
+      price: (19 * currency.rate).toLocaleString(),
+      discount: (1 * currency.rate).toLocaleString(),
     },
     {
       credits: "50,000,000",
-      price: 45,
-      discount: 5,
+      price: (45 * currency.rate).toLocaleString(),
+      discount: (5 * currency.rate).toLocaleString(),
     },
   ]
 
@@ -50,6 +73,22 @@ export default function PricingSection() {
           </p>
         </div>
 
+        {/* Currency Tabs */}
+        <div className="flex justify-center items-center mb-8">
+          <span className="text-gray-600 dark:text-gray-400 mr-2">Show currency in</span>
+          <Tabs
+            defaultValue={USD.symbol}
+            value={currency.symbol}
+            onValueChange={handleCurrencyChange}
+            className="w-auto"
+          >
+            <TabsList className="bg-gray-200 dark:bg-muted text-primary">
+              <TabsTrigger value={USD.symbol}>USD</TabsTrigger>
+              <TabsTrigger value={IDR.symbol}>IDR</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
           {/* Free Tier */}
@@ -57,7 +96,7 @@ export default function PricingSection() {
             <div className="p-6">
               <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Free</h3>
               <div className="flex items-end gap-1 mb-6">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">${pricingData.free.price}</span>
+                <span className="text-3xl font-bold text-gray-900 dark:text-white">{currency.symbol}{pricingData.free.price}</span>
                 <span className="text-gray-500 dark:text-gray-400 mb-1">/month</span>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
@@ -108,7 +147,7 @@ export default function PricingSection() {
             <div className="p-6">
               <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Basic</h3>
               <div className="flex items-end gap-1 mb-6">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">${pricingData.basic.price}</span>
+                <span className="text-3xl font-bold text-gray-900 dark:text-white">{currency.symbol}{pricingData.basic.price}</span>
                 <span className="text-gray-500 dark:text-gray-400 mb-1">/month</span>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
@@ -160,7 +199,7 @@ export default function PricingSection() {
             <div className="p-6">
               <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Pro</h3>
               <div className="flex items-end gap-1 mb-6">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">${pricingData.pro.price}</span>
+                <span className="text-3xl font-bold text-gray-900 dark:text-white">{currency.symbol}{pricingData.pro.price}</span>
                 <span className="text-gray-500 dark:text-gray-400 mb-1">/month</span>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
@@ -226,10 +265,10 @@ export default function PricingSection() {
                     Free
                   </th>
                   <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Basic (${pricingData.basic.price}/mo)
+                    Basic ({currency.symbol}{pricingData.basic.price}/mo)
                   </th>
                   <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Pro (${pricingData.pro.price}/mo)
+                    Pro ({currency.symbol}{pricingData.pro.price}/mo)
                   </th>
                 </tr>
               </thead>
@@ -371,21 +410,23 @@ export default function PricingSection() {
             Credit Pack Prices
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Need more credits? Purchase additional credit packs starting at just $2. Available to all tiers, these
+            Need more credits? Purchase additional credit packs starting at just {currency.symbol}{creditPacks[0].price}. Available to all tiers, these
             credit packs provide flexibility for your usage needs. <strong>Credits purchased do not expire.</strong>
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
             {creditPacks.map((pack, index) => (
               <div key={index} className="flex flex-col gap-1 justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800">
-                <div className="flex justify-between items-center">
+                <div className="flex gap-2 justify-between items-center">
                   <span className="font-medium text-gray-900 dark:text-white">
                     {pack.credits} credits
                   </span>
-                  <span className="text-gray-900 dark:text-white font-bold">${pack.price}</span>
+                  <span className="text-gray-900 dark:text-white font-bold">
+                    {currency.symbol}{pack.price}
+                  </span>
                 </div>
                 {pack.discount && (
-                  <div className="text-xs text-green-600 dark:text-green-400">Save ${pack.discount}</div>
+                  <div className="text-xs text-green-600 dark:text-green-400">Save {currency.symbol}{pack.discount}</div>
                 )}
                 <div className="cursor-not-allowed">
                   <Button disabled className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm">
