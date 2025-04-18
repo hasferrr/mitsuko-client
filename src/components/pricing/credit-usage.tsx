@@ -90,6 +90,11 @@ export default function CreditUsage() {
       <p className="text-xs text-gray-500 dark:text-gray-500 mt-4">
         * These are estimated costs and limits, and are subject to change. Input/Output token costs may vary. Refer to the dashboard for precise figures.
       </p>
+      <div className="mt-6 text-sm space-y-2">
+        <p>Token: A unit of text processed by the LLM. Roughly 4 characters or 0.75 words.</p>
+        <p>Context Length: The maximum number of tokens (input + output history) the model can consider at once.</p>
+        <p>Max Completion: The maximum number of tokens the model can generate in a single response.</p>
+      </div>
     </div>
   )
 }
