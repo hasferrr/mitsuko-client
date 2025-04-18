@@ -1,4 +1,5 @@
 import Link from "next/link"
+import CreditUsage from "./credit-usage"
 
 export default function PricingDescription() {
   return (
@@ -50,52 +51,7 @@ export default function PricingDescription() {
         </div>
 
         {/* Credit Usage */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8">
-          <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-            Credit Usage
-          </h3>
-          <p className="mb-6">
-            Credit costs vary based on the AI model used and the resources required.
-            Costs depend on text length and AI model complexity.
-            See estimates below. We're building a credit tracker for your account.
-          </p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-50 dark:bg-gray-900/30">
-                  <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Feature</th>
-                  <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Unit</th>
-                  <th className="px-4 py-2 text-right font-medium text-gray-700 dark:text-gray-300">Example Credit Cost</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-                <tr className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                  <td className="px-4 py-2 text-gray-700 dark:text-gray-300">Subtitle Translation</td>
-                  <td className="px-4 py-2 text-gray-600 dark:text-gray-400">Based on processed text length (input & output)</td>
-                  <td className="px-4 py-2 text-right text-gray-600 dark:text-gray-400">~1,000 credits</td>
-                </tr>
-                <tr className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                  <td className="px-4 py-2 text-gray-700 dark:text-gray-300">Audio Transcription</td>
-                  <td className="px-4 py-2 text-gray-600 dark:text-gray-400">Per Minute of Audio</td>
-                  <td className="px-4 py-2 text-right text-gray-600 dark:text-gray-400">~5,000 credits</td>
-                </tr>
-                <tr className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                  <td className="px-4 py-2 text-gray-700 dark:text-gray-300">Extract Context</td>
-                  <td className="px-4 py-2 text-gray-600 dark:text-gray-400">Per 1,000 Characters Analyzed</td>
-                  <td className="px-4 py-2 text-right text-gray-600 dark:text-gray-400">~500 credits</td>
-                </tr>
-                <tr className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                  <td className="px-4 py-2 text-gray-700 dark:text-gray-300">Custom Model Usage</td>
-                  <td className="px-4 py-2 text-gray-600 dark:text-gray-400">Varies (Input/Output Tokens)</td>
-                  <td className="px-4 py-2 text-right text-gray-600 dark:text-gray-400">Model Specific</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p className="text-xs text-gray-500 dark:text-gray-500 mt-4">
-            * These are estimated costs and are subject to change. Refer to the upcoming credit usage dashboard for precise figures.
-          </p>
-        </div>
+        <CreditUsage />
 
       </div>
     </div>
