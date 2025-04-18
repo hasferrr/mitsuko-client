@@ -5,3 +5,4 @@ export const TRANSLATE_URL_FREE = `${BASE_URL}/api/stream/translate-free`
 export const EXTRACT_CONTEXT_URL = `${BASE_URL}/api/stream/extract-context`
 export const EXTRACT_CONTEXT_URL_FREE = `${BASE_URL}/api/stream/extract-context-free`
 export const TRANSCRIPT_URL = `${BASE_URL}/api/stream/transcript`
+export const SUBTITLE_LOG_URL = `${BASE_URL}/api/subtitle-log`

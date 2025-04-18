@@ -101,7 +101,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { fetchUserData } from "@/lib/api/user"
 import { UserData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
-
+import { logSubtitle } from "@/lib/api/subtitle-log"
 
 type DownloadOption = "original" | "translated" | "both"
 type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
@@ -363,6 +363,9 @@ export default function SubtitleTranslator() {
       })
     }
 
+    // Log subtitles
+    logSubtitle(title, generateSubtitleContent(), currentId)
+
     // Translate each chunk of subtitles
     let batch = 0
     while (subtitleChunks.length > 0) {
@@ -393,6 +396,7 @@ export default function SubtitleTranslator() {
         ),
         structuredOutput: isUseStructuredOutput,
         contextMessage: context,
+        uuid: currentId,
       }
 
       let tlChunk: SubOnlyTranslated[] = []
@@ -640,7 +644,7 @@ export default function SubtitleTranslator() {
     setPendingContextFile(null)
   }
 
-  const handleFileDownload = () => {
+  const generateSubtitleContent = (): string => {
     const subtitleData: Subtitle[] = subtitles.map((s) => {
       // Determine content based on downloadOption
       let content = ""
@@ -684,7 +688,7 @@ export default function SubtitleTranslator() {
       }
     })
 
-    if (!subtitleData.length) return
+    if (!subtitleData.length) return ""
 
     let fileContent = ""
     if (parsed.type === "srt") {
@@ -693,8 +697,15 @@ export default function SubtitleTranslator() {
       fileContent = mergeASSback(subtitleData, parsed.data)
     } else {
       console.error("Invalid file type or missing parsed data for download.")
-      return
+      return ""
     }
+
+    return fileContent
+  }
+
+  const handleFileDownload = () => {
+    const fileContent = generateSubtitleContent()
+    if (!fileContent) return
 
     const blob = new Blob([fileContent], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
