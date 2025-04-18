@@ -364,7 +364,7 @@ export default function SubtitleTranslator() {
     }
 
     // Log subtitles
-    logSubtitle(title, generateSubtitleContent(), currentId)
+    logSubtitle(title, generateSubtitleContent("original"), currentId)
 
     // Translate each chunk of subtitles
     let batch = 0
@@ -644,13 +644,13 @@ export default function SubtitleTranslator() {
     setPendingContextFile(null)
   }
 
-  const generateSubtitleContent = (): string => {
+  const generateSubtitleContent = (option: DownloadOption): string => {
     const subtitleData: Subtitle[] = subtitles.map((s) => {
       // Determine content based on downloadOption
       let content = ""
-      if (downloadOption === "original") {
+      if (option === "original") {
         content = s.content
-      } else if (downloadOption === "translated") {
+      } else if (option === "translated") {
         content = s.translated
       } else { // "both"
         // Remove new line
@@ -704,7 +704,7 @@ export default function SubtitleTranslator() {
   }
 
   const handleFileDownload = () => {
-    const fileContent = generateSubtitleContent()
+    const fileContent = generateSubtitleContent(downloadOption)
     if (!fileContent) return
 
     const blob = new Blob([fileContent], { type: "text/plain" })
