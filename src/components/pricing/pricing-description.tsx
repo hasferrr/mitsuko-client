@@ -22,7 +22,7 @@ export default function PricingDescription() {
           <div className="flex flex-col gap-4">
             <p>
               Credits used for AI features like Subtitle Translation, Audio Transcription, and Context Extraction.
-              The cost in credits depends on the feature and how much processing is needed. See "Credit Usage" below for details.
+              Using these features will deduct credits from your balance based on the specific action. See "Credit Usage" below for details.
             </p>
             <p>
               You can receive credits monthly by <a href="#pricing-cards" className="text-blue-500 hover:text-blue-600">subscribing</a>{" "}

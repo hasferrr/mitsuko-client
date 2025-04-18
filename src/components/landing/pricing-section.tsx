@@ -140,9 +140,9 @@ export default function PricingSection({
     {
       feature: "Support",
       free: "Community",
-      basic: "Email",
+      basic: "Priority Email",
       pro: "Priority Email",
-      description: "Access support resources. Free tier relies on community forums, Basic gets email support, Pro gets prioritized email support."
+      description: "Access support resources. Free tier relies on our Discord server, Basic and Pro gets priority email support."
     }
   ]
 
@@ -261,7 +261,7 @@ export default function PricingSection({
                 <div className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
                   <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Email Support
+                    Priority Email Support
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
