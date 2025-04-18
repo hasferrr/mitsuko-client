@@ -4,7 +4,7 @@ import PricingSection from "../landing/pricing-section"
 export default function Pricing() {
   return (
     <>
-      <PricingSection showLink={false} />
+      <PricingSection showLink={false} showDescription={true} />
       <PricingDescription />
     </>
   )
