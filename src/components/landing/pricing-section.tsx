@@ -1,25 +1,44 @@
 "use client"
 
 import Link from "next/link"
-import { Check, X } from "lucide-react"
+import { Check, Info, X } from "lucide-react"
 import { Button } from "../ui/button"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 
 interface Currency {
   symbol: string
   rate: number
 }
 
+interface Feature {
+  feature: string
+  free: React.ReactNode
+  basic: React.ReactNode
+  pro: React.ReactNode
+  description: string
+}
+
+interface PricingSectionProps {
+  showDescription?: boolean
+  showLink?: boolean
+}
+
 const USD = { symbol: "$", rate: 1 }
 const IDR = { symbol: "Rp", rate: 16800 }
 
-export default function PricingSection() {
-  const [currency, setCurrency] = useState<Currency>(USD)
-
-  useEffect(() => {
-    setCurrency(IDR)
-  }, [])
+export default function PricingSection({
+  showDescription = false,
+  showLink = true,
+}: PricingSectionProps) {
+  const [currency, setCurrency] = useState<Currency>(IDR)
 
   const handleCurrencyChange = (value: string) => {
     setCurrency(value === "$" ? USD : IDR)
@@ -61,6 +80,72 @@ export default function PricingSection() {
     },
   ]
 
+  const featuresData: Feature[] = [
+    {
+      feature: "Included Credits (Per Month)",
+      free: "0",
+      basic: pricingData.basic.credits,
+      pro: pricingData.pro.credits,
+      description: "Credits included in your monthly subscription."
+    },
+    {
+      feature: "Credits Expiration",
+      free: "Never Expire",
+      basic: "Never Expire",
+      pro: "Never Expire",
+      description: "Monthly and credit packs never expire, even if the subscription ends."
+    },
+    {
+      feature: "Subtitle Translation",
+      free: <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />,
+      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      description: "Translate subtitle (SRT & ASS) using any AI models available."
+    },
+    {
+      feature: "Extract Context Feature",
+      free: <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />,
+      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      description: "Analyze content to extract characters, settings, plot, and relationships."
+    },
+    {
+      feature: "Audio Transcription",
+      free: "Limited",
+      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      description: "Convert into subtitle text. Free tier supports up to 100MB (1 file at a time). Basic & Pro tiers up to 1GB file (5 files at a time). Basic & Pro tiers supports background processing."
+    },
+    {
+      feature: "Supported Languages",
+      free: "100+ Languages",
+      basic: "100+ Languages",
+      pro: "100+ Languages",
+      description: "Support translation for over 100+ languages."
+    },
+    {
+      feature: "Custom Model Integration",
+      free: <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />,
+      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      description: "Use your own LLM API within the Mitsuko platform."
+    },
+    {
+      feature: "Save to Cloud",
+      free: <X className="w-5 h-5 mx-auto text-gray-400 dark:text-gray-500" />,
+      basic: <X className="w-5 h-5 mx-auto text-gray-400 dark:text-gray-500" />,
+      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      description: "Securely save your projects, translated files, extraction, and audio transcription file to cloud."
+    },
+    {
+      feature: "Support",
+      free: "Community",
+      basic: "Priority Email",
+      pro: "Priority Email",
+      description: "Access support resources. Free tier relies on our Discord server, Basic and Pro gets priority email support."
+    }
+  ]
+
   return (
     <div id="pricing" className="bg-gray-50 dark:bg-black py-16">
       <div className="max-w-6xl mx-auto px-4">
@@ -69,7 +154,7 @@ export default function PricingSection() {
             Simple, Transparent <span className="text-blue-400">Pricing</span>
           </h2>
           <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Find the perfect plan for your needs. All plans include core features, with extra perks for paid tiers.
+            Find the perfect plan for your needs. We offer monthly subscription and credit packs.
           </p>
         </div>
 
@@ -90,7 +175,8 @@ export default function PricingSection() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+        <div className="relative grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+          <div id="pricing-cards" className="absolute -top-24" />
           {/* Free Tier */}
           <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden">
             <div className="p-6">
@@ -175,7 +261,7 @@ export default function PricingSection() {
                 <div className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
                   <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Email Support
+                    Priority Email Support
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
@@ -270,143 +356,58 @@ export default function PricingSection() {
                   <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
                     Pro ({currency.symbol}{pricingData.pro.price}/mo)
                   </th>
+                  {showDescription && (
+                    <th className="w-72 px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Description
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y">
-                <tr>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    Included Credits (Per Month)
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    0
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    {pricingData.basic.credits}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    {pricingData.pro.credits}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    Credits Expiration
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    Never Expire
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    Never Expire
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    Never Expire
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    Subtitle Translation
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-blue-500" />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-blue-500" />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    Extract Context Feature
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-blue-500" />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-blue-500" />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    Audio Transcription
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    Limited
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-blue-500" />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-blue-500" />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    Supported Languages
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    100+ Languages
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    100+ Languages
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    100+ Languages
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    Custom Model Integration
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-blue-500" />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-blue-500" />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    Save to Cloud
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <X className="w-5 h-5 mx-auto text-gray-400 dark:text-gray-500" />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <X className="w-5 h-5 mx-auto text-gray-400 dark:text-gray-500" />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Check className="w-5 h-5 mx-auto text-blue-500" />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    Support
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    Community
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    Email
-                  </td>
-                  <td className="px-4 py-3 text-sm text-center text-gray-600 dark:text-gray-400">
-                    Priority Email
-                  </td>
-                </tr>
+                {featuresData.map((item, index) => (
+                  <tr key={index}>
+                    <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
+                      <div className="flex items-center gap-1.5">
+                        {item.feature}
+                        {!showDescription && (
+                          <TooltipProvider delayDuration={50}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="max-w-xs">
+                                <p>{item.description}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+                      </div>
+                    </td>
+                    <td className={cn("px-4 py-3 text-sm text-center", typeof item.free !== "string" && "text-gray-600 dark:text-gray-400")}>
+                      {item.free}
+                    </td>
+                    <td className={cn("px-4 py-3 text-sm text-center", typeof item.basic !== "string" && "text-gray-600 dark:text-gray-400")}>
+                      {item.basic}
+                    </td>
+                    <td className={cn("px-4 py-3 text-sm text-center", typeof item.pro !== "string" && "text-gray-600 dark:text-gray-400")}>
+                      {item.pro}
+                    </td>
+                    {showDescription && (
+                      <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 text-left align-top">
+                        <p>{item.description}</p>
+                      </td>
+                    )}
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
 
         {/* Credit Pack Prices */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6">
-          <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">
+        <div className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6">
+          <div id="credit-packs" className="absolute -top-24" />
+          <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
             Credit Pack Prices
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -439,10 +440,14 @@ export default function PricingSection() {
           </div>
         </div>
 
-        {/* Credit Usage Transparency Note */}
-        <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-8">
-          <p>Credit usage transparency will be available soon.</p>
-        </div>
+        {/* More Information */}
+        {showLink && (
+          <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-8">
+            <Link href="/pricing" className="hover:underline hover:text-primary">
+              Click here to learn more about credits and pricing.
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )

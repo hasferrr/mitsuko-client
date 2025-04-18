@@ -63,7 +63,7 @@ export default function Navbar() {
               </div>
             </div>
             <Link
-              href="/#pricing"
+              href="/pricing"
               className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors scroll-smooth"
             >
               Pricing
