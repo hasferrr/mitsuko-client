@@ -14,7 +14,11 @@ interface Currency {
 const USD = { symbol: "$", rate: 1 }
 const IDR = { symbol: "Rp", rate: 16800 }
 
-export default function PricingSection() {
+interface PricingSectionProps {
+  showLink?: boolean
+}
+
+export default function PricingSection({ showLink = true }: PricingSectionProps) {
   const [currency, setCurrency] = useState<Currency>(USD)
 
   useEffect(() => {
@@ -69,7 +73,7 @@ export default function PricingSection() {
             Simple, Transparent <span className="text-blue-400">Pricing</span>
           </h2>
           <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Find the perfect plan for your needs. All plans include core features, with extra perks for paid tiers.
+            Find the perfect plan for your needs. We offer monthly subscription and credit packs.
           </p>
         </div>
 
@@ -90,7 +94,8 @@ export default function PricingSection() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+        <div className="relative grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+          <div id="pricing-cards" className="absolute -top-24" />
           {/* Free Tier */}
           <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden">
             <div className="p-6">
@@ -405,7 +410,8 @@ export default function PricingSection() {
         </div>
 
         {/* Credit Pack Prices */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6">
+        <div className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6">
+          <div id="credit-packs" className="absolute -top-24" />
           <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">
             Credit Pack Prices
           </h3>
@@ -439,10 +445,14 @@ export default function PricingSection() {
           </div>
         </div>
 
-        {/* Credit Usage Transparency Note */}
-        <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-8">
-          <p>Credit usage transparency will be available soon.</p>
-        </div>
+        {/* More Information */}
+        {showLink && (
+          <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-8">
+            <Link href="/pricing" className="hover:underline hover:text-primary">
+              Click here to learn more about credits and pricing.
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )
