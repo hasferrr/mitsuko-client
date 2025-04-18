@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Check, Info, X } from "lucide-react"
 import { Button } from "../ui/button"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import {
   Tooltip,
@@ -38,11 +38,7 @@ export default function PricingSection({
   showDescription = false,
   showLink = true,
 }: PricingSectionProps) {
-  const [currency, setCurrency] = useState<Currency>(USD)
-
-  useEffect(() => {
-    setCurrency(IDR)
-  }, [])
+  const [currency, setCurrency] = useState<Currency>(IDR)
 
   const handleCurrencyChange = (value: string) => {
     setCurrency(value === "$" ? USD : IDR)
