@@ -28,6 +28,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Extraction } from "@/types/project"
 import { db } from "@/lib/db/db"
+import { getContent } from "@/lib/parser/parser"
 
 export const LanguageSelection = memo(() => {
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -155,7 +156,7 @@ export const ContextDocumentInput = memo(() => {
 
   const handleContextSelect = (contextResult: string) => {
     setHasChanges(true)
-    setContextDocument(contextResult)
+    setContextDocument(getContent(contextResult).trim())
     setIsContextDialogOpen(false)
   }
 
