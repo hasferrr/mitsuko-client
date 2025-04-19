@@ -22,7 +22,7 @@ import {
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { Model } from "@/types/model"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { FREE_MODELS } from "@/constants/model"
+import { FREE_MODELS } from "@/constants/model-collection"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { ProjectType } from "@/types/project"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"

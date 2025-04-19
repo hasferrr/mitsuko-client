@@ -1,5 +1,5 @@
 import { SubtitleTranslated } from "@/types/types"
-import { FREE_MODELS } from "./model"
+import { FREE_MODELS } from "./model-collection"
 import { AdvancedSettings, BasicSettings } from "@/types/project"
 
 export const MAX_TRANSCRIPTION_SIZE = 1024 * 1024 * 100
