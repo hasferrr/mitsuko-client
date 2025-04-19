@@ -1,6 +1,95 @@
-import { modelCost } from "@/constants/model-cost"
+import { PAID_MODELS } from "@/constants/model-collection"
+import { getModelPrices } from "@/lib/api/model-prices"
+import { formatTokens } from "@/lib/utils"
 
-export default function CreditUsage() {
+interface ModelCost {
+  name: string
+  creditPerInputToken: string
+  creditPerOutputToken: string
+  contextLength: string
+  maxCompletion: string
+  score: string
+}
+
+const getModelCostSSG = async (): Promise<ModelCost[]> => {
+  const modelCost: ModelCost[] = []
+
+  try {
+    const data = await getModelPrices()
+
+    const paidModelsMap = new Map<string, { maxInput?: number, maxOutput?: number }>()
+    Object.values(PAID_MODELS).flat().forEach(model => {
+      paidModelsMap.set(model.name, { maxInput: model.maxInput, maxOutput: model.maxOutput })
+    })
+
+    const paidModelEntries = data.paid.map((model) => {
+      const paidModelInfo = paidModelsMap.get(model.name)
+      return {
+        name: model.name,
+        creditPerInputToken: model.creditPerInputToken.toString(),
+        creditPerOutputToken: model.creditPerOutputToken.toString(),
+        contextLength: formatTokens(paidModelInfo?.maxInput),
+        maxCompletion: formatTokens(paidModelInfo?.maxOutput),
+        score: "-"
+      }
+    })
+    modelCost.push(...paidModelEntries)
+
+  } catch {
+    console.error("Failed to fetch model prices during build")
+    modelCost.push(
+      {
+        name: 'DeepSeek R1',
+        creditPerInputToken: '0.715',
+        creditPerOutputToken: '2.847',
+        contextLength: '128k tokens',
+        maxCompletion: '128k tokens',
+        score: '-',
+      },
+      {
+        name: 'DeepSeek V3',
+        creditPerInputToken: '0.65',
+        creditPerOutputToken: '1.95',
+        contextLength: '128k tokens',
+        maxCompletion: '128k tokens',
+        score: '-',
+      },
+      {
+        name: 'Gemini 2.5 Pro',
+        creditPerInputToken: '1.625',
+        creditPerOutputToken: '13',
+        contextLength: '1M tokens',
+        maxCompletion: '65k tokens',
+        score: '-',
+      },
+    )
+  }
+
+  modelCost.push(
+    {
+      name: 'Free Models',
+      creditPerInputToken: '0',
+      creditPerOutputToken: '0',
+      contextLength: 'Varies',
+      maxCompletion: 'Varies',
+      score: '-',
+    },
+    {
+      name: 'Custom API',
+      creditPerInputToken: '0',
+      creditPerOutputToken: '0',
+      contextLength: 'Unknown',
+      maxCompletion: 'Unknown',
+      score: '-',
+    }
+  )
+
+  return modelCost
+}
+
+export default async function CreditUsage() {
+  const modelCost = await getModelCostSSG()
+
   return (
     <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8">
       <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
@@ -16,8 +105,8 @@ export default function CreditUsage() {
           <thead>
             <tr className="bg-gray-50 dark:bg-gray-900/30">
               <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Model</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Credit per <br/> Input Token</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Credit per <br/> Output Token</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Credit per <br /> Input Token</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Credit per <br /> Output Token</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Context Length</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Max Completion</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Score</th>

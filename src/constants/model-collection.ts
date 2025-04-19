@@ -63,3 +63,58 @@ export const FREE_MODELS: ModelCollection = {
     }
   ]
 }
+
+export const PAID_MODELS: ModelCollection = {
+  OpenAI: [
+    {
+      name: "OpenAI o4-mini",
+      maxInput: 1_047_576,
+      maxOutput: 32_768,
+      structuredOutput: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "OpenAI o3-mini",
+      maxInput: 1_047_576,
+      maxOutput: 32_768,
+      structuredOutput: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "GPT-4.1",
+      maxInput: 1_047_576,
+      maxOutput: 32_768,
+      structuredOutput: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "GPT-4.1 mini",
+      maxInput: 1_047_576,
+      maxOutput: 32_768,
+      structuredOutput: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "GPT-4.1 nano",
+      maxInput: 1_047_576,
+      maxOutput: 32_768,
+      structuredOutput: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+  ]
+}
