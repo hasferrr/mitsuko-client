@@ -20,7 +20,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
-import { Model } from "@/types/types"
+import { Model } from "@/types/model"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { FREE_MODELS } from "@/constants/model"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"

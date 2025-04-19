@@ -1,4 +1,4 @@
-import { ModelCollection } from "@/types/types"
+import { ModelCollection } from "@/types/model"
 
 export const FREE_MODELS: ModelCollection = {
   "Limited": [

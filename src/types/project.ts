@@ -1,6 +1,8 @@
-import { advancedSettingsSchema } from "@/lib/zod"
-import { SubtitleTranslated, Parsed, Subtitle, Model, SubOnlyTranslated } from "./types"
+import { advancedSettingsSchema } from "@/types/zod"
+import { SubtitleTranslated, Parsed, Subtitle, SubOnlyTranslated } from "./types"
+import { Model } from "./model"
 import { z } from "zod"
+
 export type ProjectType = 'translation' | 'transcription' | 'extraction'
 
 export interface ProjectOrder {

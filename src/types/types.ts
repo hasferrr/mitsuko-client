@@ -1,6 +1,3 @@
-import { z } from "zod"
-import { modelSchema, modelCollectionSchema } from "@/lib/zod"
-
 export interface Timestamp {
   h: number
   m: number
@@ -54,22 +51,7 @@ export interface SubtitleEvent {
   text: string
 }
 
-export interface CompletionUser {
-  role: "user"
-  content: string
-}
-
-export interface CompletionAssistant {
-  role: "assistant"
-  content: string
-}
-
-export type ContextCompletion = CompletionUser | CompletionAssistant
-
 export interface Parsed {
   type: "srt" | "ass"
   data: ASSParseOutput | null
 }
-
-export type Model = z.infer<typeof modelSchema>
-export type ModelCollection = z.infer<typeof modelCollectionSchema>

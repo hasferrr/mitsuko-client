@@ -41,12 +41,12 @@ import {
   BetterContextCachingSwitch,
 } from "./settings-inputs"
 import {
-  ContextCompletion,
   Subtitle,
   SubOnlyTranslated,
   SubtitleTranslated,
   SubtitleNoTime,
 } from "@/types/types"
+import { ContextCompletion } from "@/types/completion"
 import { parseSRT } from "@/lib/subtitles/srt/parse"
 import { parseASS } from "@/lib/subtitles/ass/parse"
 import { generateSRT } from "@/lib/subtitles/srt/generate"

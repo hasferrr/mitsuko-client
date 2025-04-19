@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { Model } from "@/types/types"
+import { Model } from "@/types/model"
 import { BasicSettings, ProjectType } from "@/types/project"
 import { persist } from "zustand/middleware"
 import { createBasicSettings, updateBasicSettings, getBasicSettings } from "@/lib/db/settings"
