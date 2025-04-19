@@ -20,6 +20,7 @@ export const modelSchema = z.object({
   maxInput: z.number(),
   maxOutput: z.number(),
   structuredOutput: z.boolean(),
+  isPaid: z.boolean(),
   default: advancedSettingsSchema
     .pick({
       isUseStructuredOutput: true,

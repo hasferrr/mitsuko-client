@@ -21,6 +21,19 @@ class MyDatabase extends Dexie {
       basicSettings: 'id, createdAt, updatedAt',
       advancedSettings: 'id, createdAt, updatedAt',
     })
+    this.version(7).stores({
+      // No schema changes needed for basicSettings regarding indexing modelDetail.isPaid,
+      // as Dexie doesn't directly support indexing nested properties easily in the stores() definition.
+      // The structure itself allows storing the nested object.
+    }).upgrade(async tx => {
+      // Migrate basicSettings: add isPaid: false to modelDetail if it exists
+      await tx.table('basicSettings').toCollection().modify(setting => {
+        if (setting.modelDetail && typeof setting.modelDetail === 'object') {
+          // Ensure isPaid is set to false, even if modelDetail already existed
+          setting.modelDetail.isPaid = false
+        }
+      })
+    })
   }
 }
 

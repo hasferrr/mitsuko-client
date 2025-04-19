@@ -7,6 +7,7 @@ export const FREE_MODELS: ModelCollection = {
       maxInput: 128000,
       maxOutput: 128000,
       structuredOutput: true,
+      isPaid: false,
       default: {
         isMaxCompletionTokensAuto: true,
         isUseStructuredOutput: false
@@ -17,6 +18,7 @@ export const FREE_MODELS: ModelCollection = {
       maxInput: 163840,
       maxOutput: 163840,
       structuredOutput: true,
+      isPaid: false,
       default: {
         isMaxCompletionTokensAuto: false,
         maxCompletionTokens: 163840,
@@ -28,6 +30,7 @@ export const FREE_MODELS: ModelCollection = {
       maxInput: 163840,
       maxOutput: 163840,
       structuredOutput: true,
+      isPaid: false,
       default: {
         isMaxCompletionTokensAuto: true,
         isUseStructuredOutput: false
@@ -37,7 +40,8 @@ export const FREE_MODELS: ModelCollection = {
       name: "DeepSeek V3",
       maxInput: 128000,
       maxOutput: 128000,
-      structuredOutput: true
+      structuredOutput: true,
+      isPaid: false,
     }
   ],
   "Free Gemini Experimental": [
@@ -45,19 +49,22 @@ export const FREE_MODELS: ModelCollection = {
       name: "Gemini 2.5 Pro Experimental 03-25",
       maxInput: 1000000,
       maxOutput: 65536,
-      structuredOutput: true
+      structuredOutput: true,
+      isPaid: false,
     },
     {
       name: "Gemini 2.0 Flash Thinking Experimental 01-21",
       maxInput: 1000000,
       maxOutput: 65536,
-      structuredOutput: false
+      structuredOutput: false,
+      isPaid: false,
     },
     {
       name: "Gemini 2.0 Flash Experimental",
       maxInput: 1000000,
       maxOutput: 8192,
-      structuredOutput: true
+      structuredOutput: true,
+      isPaid: false,
     }
   ],
 }
@@ -69,6 +76,7 @@ export const PAID_MODELS: ModelCollection = {
       maxInput: 1_047_576,
       maxOutput: 32_768,
       structuredOutput: true,
+      isPaid: true,
       default: {
         isMaxCompletionTokensAuto: true,
         isUseStructuredOutput: true
@@ -79,6 +87,7 @@ export const PAID_MODELS: ModelCollection = {
       maxInput: 1_047_576,
       maxOutput: 32_768,
       structuredOutput: true,
+      isPaid: true,
       default: {
         isMaxCompletionTokensAuto: true,
         isUseStructuredOutput: true
@@ -89,6 +98,7 @@ export const PAID_MODELS: ModelCollection = {
       maxInput: 1_047_576,
       maxOutput: 32_768,
       structuredOutput: true,
+      isPaid: true,
       default: {
         isMaxCompletionTokensAuto: true,
         isUseStructuredOutput: true
@@ -99,6 +109,7 @@ export const PAID_MODELS: ModelCollection = {
       maxInput: 1_047_576,
       maxOutput: 32_768,
       structuredOutput: true,
+      isPaid: true,
       default: {
         isMaxCompletionTokensAuto: true,
         isUseStructuredOutput: true
@@ -109,6 +120,7 @@ export const PAID_MODELS: ModelCollection = {
       maxInput: 1_047_576,
       maxOutput: 32_768,
       structuredOutput: true,
+      isPaid: true,
       default: {
         isMaxCompletionTokensAuto: true,
         isUseStructuredOutput: true
@@ -121,6 +133,7 @@ export const PAID_MODELS: ModelCollection = {
       maxInput: 163840,
       maxOutput: 163840,
       structuredOutput: true,
+      isPaid: true,
       default: {
         isMaxCompletionTokensAuto: false,
         maxCompletionTokens: 163840,
@@ -131,7 +144,8 @@ export const PAID_MODELS: ModelCollection = {
       name: "DeepSeek V3",
       maxInput: 128000,
       maxOutput: 128000,
-      structuredOutput: true
+      structuredOutput: true,
+      isPaid: true,
     },
   ],
 }
