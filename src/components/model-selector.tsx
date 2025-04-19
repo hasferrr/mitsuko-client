@@ -94,7 +94,7 @@ export function ModelSelector({
           side="bottom"
           className="w-full p-0 overflow-y-auto"
         >
-          <Command loop>
+          <Command loop defaultValue={modelDetail?.name}>
             <CommandList
               className="h-[var(--cmdk-list-height)] overflow-y-auto"
             >

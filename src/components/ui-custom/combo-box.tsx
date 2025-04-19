@@ -48,7 +48,7 @@ export function ComboBox({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
-        <Command>
+        <Command defaultValue={value}>
           <CommandInput placeholder={`Search ${name}...`} className="h-9" />
           <CommandList>
             <CommandEmpty>{name ? `No ${name} found.` : "Not found."}</CommandEmpty>
