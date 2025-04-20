@@ -806,7 +806,7 @@ export default function SubtitleTranslator() {
               {subtitles.length >= maxSubtitles && (
                 <Badge
                   variant="outline"
-                  className="gap-1 cursor-pointer hover:bg-secondary select-none rounded-lg"
+                  className="gap-1 cursor-pointer hover:bg-secondary select-none"
                   onClick={() => setSubtitlesHidden(!subtitlesHidden)}
                 >
                   {subtitlesHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
@@ -816,7 +816,7 @@ export default function SubtitleTranslator() {
               <SubtitleProgress isOpen={progressOpen} setIsOpen={setProgressOpen}>
                 <Badge
                   variant="outline"
-                  className="gap-1 cursor-pointer hover:bg-secondary select-none rounded-lg"
+                  className="gap-1 cursor-pointer hover:bg-secondary select-none"
                 >
                   <SquareChartGantt className="h-4 w-4" />
                   Progress
@@ -825,7 +825,7 @@ export default function SubtitleTranslator() {
               <SubtitleTools isOpen={toolsOpen} setIsOpen={setToolsOpen}>
                 <Badge
                   variant="outline"
-                  className="gap-1 cursor-pointer hover:bg-secondary select-none rounded-lg"
+                  className="gap-1 cursor-pointer hover:bg-secondary select-none"
                 >
                   <Box className="h-4 w-4" />
                   Tools
