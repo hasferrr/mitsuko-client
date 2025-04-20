@@ -1,10 +1,9 @@
 "use client"
 
-import * as React from "react"
+import { useState } from "react"
 import { PopoverProps } from "@radix-ui/react-popover"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useMutationObserver } from "@/hooks/use-mutation-observer"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -27,7 +26,6 @@ import { MODEL_COLLECTION } from "@/constants/model-collection"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { ProjectType } from "@/types/project"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
-
 interface ModelSelectorProps extends PopoverProps {
   type: ProjectType
   disabled?: boolean
@@ -39,7 +37,7 @@ export function ModelSelector({
   ...props
 }: ModelSelectorProps) {
   const models = MODEL_COLLECTION
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = useState(false)
 
   // Settings Store
   const modelDetail = useSettingsStore((state) => state.getModelDetail())
@@ -106,10 +104,8 @@ export function ModelSelector({
           className="w-full p-0 overflow-y-auto"
         >
           <Command loop defaultValue={`${modelDetail?.name}-${modelDetail?.isPaid ? "paid" : "free"}`}>
-            <CommandList
-              className="h-[var(--cmdk-list-height)] overflow-y-auto"
-            >
-              <CommandInput placeholder="Search Models..." />
+            <CommandInput placeholder="Search Models..." />
+            <CommandList>
               <CommandEmpty>No Models found.</CommandEmpty>
               {Object.entries(models).map(([key, value]) => (
                 <CommandGroup key={key} heading={key}>
@@ -143,26 +139,12 @@ interface ModelItemProps {
 }
 
 function ModelItem({ model, isSelected, onSelect }: ModelItemProps) {
-  const ref = React.useRef<HTMLDivElement>(null)
-
-  useMutationObserver(ref, (mutations) => {
-    mutations.forEach((mutation) => {
-      if (
-        mutation.type === "attributes" &&
-        mutation.attributeName === "aria-selected" &&
-        ref.current?.getAttribute("aria-selected") === "true"
-      ) {
-      }
-    })
-  })
-
   return (
     <HoverCard openDelay={0} closeDelay={0}>
       <HoverCardTrigger asChild>
         <div>
           <CommandItem
             onSelect={onSelect}
-            ref={ref}
             value={`${model.name}-${model.isPaid ? "paid" : "free"}`}
           >
             {model.name}
