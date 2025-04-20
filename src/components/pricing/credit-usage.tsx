@@ -6,27 +6,26 @@ import { formatTokens } from "@/lib/utils"
 export default async function CreditUsage() {
   const fetchedCreditCostsMap = await getModelCostData()
 
-  const paidModelsMap = new Map<string, { maxInput?: number, maxOutput?: number }>()
-  Object.values(PAID_MODELS).flat().forEach(model => {
-    paidModelsMap.set(model.name, { maxInput: model.maxInput, maxOutput: model.maxOutput })
-  })
+  const paidModelCostArray: ModelCost[] = Object.values(PAID_MODELS)
+    .flat()
+    .map((paidModel) => {
+      const costs = fetchedCreditCostsMap.get(paidModel.name)
 
-  const modelCostArray: ModelCost[] = Array.from(fetchedCreditCostsMap.entries()).map(([name, costs]) => {
-    const paidModelInfo = paidModelsMap.get(name)
-    const maxInput = paidModelInfo?.maxInput
-    const maxOutput = paidModelInfo?.maxOutput
-    return {
-      name,
-      creditPerInputToken: costs.creditPerInputToken,
-      creditPerOutputToken: costs.creditPerOutputToken,
-      contextLength: maxInput !== undefined ? formatTokens(maxInput) : "N/A",
-      maxCompletion: maxOutput !== undefined ? formatTokens(maxOutput) : "N/A",
-      score: "-"
-    }
-  })
+      const contextLength = paidModel.maxInput !== undefined ? formatTokens(paidModel.maxInput) : "N/A"
+      const maxCompletion = paidModel.maxOutput !== undefined ? formatTokens(paidModel.maxOutput) : "N/A"
+
+      return {
+        name: paidModel.name,
+        creditPerInputToken: costs?.creditPerInputToken ?? 0,
+        creditPerOutputToken: costs?.creditPerOutputToken ?? 0,
+        contextLength: contextLength,
+        maxCompletion: maxCompletion,
+        score: "-"
+      }
+    })
 
   const modelCosts: ModelCost[] = [
-    ...modelCostArray,
+    ...paidModelCostArray,
     {
       name: 'Free Models',
       creditPerInputToken: 0,
