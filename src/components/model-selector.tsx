@@ -26,6 +26,10 @@ import { MODEL_COLLECTION } from "@/constants/model-collection"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { ProjectType } from "@/types/project"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import { useModelCosts } from "@/contexts/model-cost-context"
+import { ModelCreditCost } from "@/types/model-cost"
+import Link from "next/link"
+
 interface ModelSelectorProps extends PopoverProps {
   type: ProjectType
   disabled?: boolean
@@ -47,6 +51,9 @@ export function ModelSelector({
   const setIsUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
   const setIsMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.setIsMaxCompletionTokensAuto)
   const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
+
+  // Get model costs Map from context
+  const modelCostsMap = useModelCosts()
 
   const handleSelect = (model: Model) => {
     setModelDetail(model, type)
@@ -113,6 +120,7 @@ export function ModelSelector({
                     <ModelItem
                       key={`${model.name}-${model.isPaid ? "paid" : "free"}`}
                       model={model}
+                      cost={model.isPaid ? modelCostsMap.get(model.name) : undefined}
                       isSelected={
                         modelDetail?.name === model.name &&
                         modelDetail.isPaid === model.isPaid
@@ -134,11 +142,12 @@ export function ModelSelector({
 
 interface ModelItemProps {
   model: Model
+  cost?: ModelCreditCost
   isSelected: boolean
   onSelect: () => void
 }
 
-function ModelItem({ model, isSelected, onSelect }: ModelItemProps) {
+function ModelItem({ model, cost, isSelected, onSelect }: ModelItemProps) {
   return (
     <HoverCard openDelay={0} closeDelay={0}>
       <HoverCardTrigger asChild>
@@ -160,7 +169,7 @@ function ModelItem({ model, isSelected, onSelect }: ModelItemProps) {
         className="w-[260px] text-sm"
         animate={false}
       >
-        <ModelDescription model={model} isSelected={isSelected} />
+        <ModelDescription model={model} cost={cost} isSelected={isSelected} />
       </HoverCardContent>
     </HoverCard>
   )
@@ -168,27 +177,42 @@ function ModelItem({ model, isSelected, onSelect }: ModelItemProps) {
 
 interface ModelDescriptionProps {
   model: Model | null
+  cost?: ModelCreditCost
   isSelected?: boolean
 }
 
-function ModelDescription({ model, isSelected }: ModelDescriptionProps) {
+function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
   return model ? (
-    <div className="bg-popover text-popover-foreground">
+    <div className="bg-popover text-popover-foreground text-sm">
       {isSelected && (
         <div className="text-xs text-muted-foreground mb-1">
           Currently Selected Model
         </div>
       )}
       <h4 className="font-semibold mb-1">{model.name}</h4>
-      <p className="text-sm">
-        Context Length: {model.maxInput.toLocaleString()}
-      </p>
-      <p className="text-sm">
-        Max Completion: {model.maxOutput.toLocaleString()}
-      </p>
-      <p className="text-sm">
-        Structured Output: {model.structuredOutput ? "Yes" : <span className="font-semibold">No</span>}
-      </p>
+      <div>
+        <p>Context Length: {model.maxInput.toLocaleString()}</p>
+        <p>Max Completion: {model.maxOutput.toLocaleString()}</p>
+        <p>Structured Output: {model.structuredOutput ? "Yes" : "No"}</p>
+      </div>
+      {cost && (
+        <div className="flex flex-col gap-2">
+          <div>
+            <p className="mt-2 font-medium">Estimated Cost</p>
+            <p>Input: {cost.creditPerInputToken} credits/token</p>
+            <p>Output: {cost.creditPerOutputToken} credits/token</p>
+          </div>
+          <div>
+            <Link
+              href="/pricing#credit-usage"
+              target="_blank"
+              className="hover:underline text-popover-foreground/80"
+            >
+              See full comparison
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   ) : (
     <p className="text-sm">No model selected</p>

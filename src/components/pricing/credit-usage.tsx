@@ -1,94 +1,49 @@
+import { getModelCostData } from '@/lib/api/get-model-cost-data'
+import { ModelCost } from '@/types/model-cost'
 import { PAID_MODELS } from "@/constants/model-collection"
-import { getModelPrices } from "@/lib/api/model-prices"
 import { formatTokens } from "@/lib/utils"
 
-interface ModelCost {
-  name: string
-  creditPerInputToken: string
-  creditPerOutputToken: string
-  contextLength: string
-  maxCompletion: string
-  score: string
-}
+export default async function CreditUsage() {
+  const fetchedCreditCostsMap = await getModelCostData()
 
-const getModelCostSSG = async (): Promise<ModelCost[]> => {
-  const modelCost: ModelCost[] = []
+  const paidModelsMap = new Map<string, { maxInput?: number, maxOutput?: number }>()
+  Object.values(PAID_MODELS).flat().forEach(model => {
+    paidModelsMap.set(model.name, { maxInput: model.maxInput, maxOutput: model.maxOutput })
+  })
 
-  try {
-    const data = await getModelPrices()
+  const modelCostArray: ModelCost[] = Array.from(fetchedCreditCostsMap.entries()).map(([name, costs]) => {
+    const paidModelInfo = paidModelsMap.get(name)
+    const maxInput = paidModelInfo?.maxInput
+    const maxOutput = paidModelInfo?.maxOutput
+    return {
+      name,
+      creditPerInputToken: costs.creditPerInputToken,
+      creditPerOutputToken: costs.creditPerOutputToken,
+      contextLength: maxInput !== undefined ? formatTokens(maxInput) : "N/A",
+      maxCompletion: maxOutput !== undefined ? formatTokens(maxOutput) : "N/A",
+      score: "-"
+    }
+  })
 
-    const paidModelsMap = new Map<string, { maxInput?: number, maxOutput?: number }>()
-    Object.values(PAID_MODELS).flat().forEach(model => {
-      paidModelsMap.set(model.name, { maxInput: model.maxInput, maxOutput: model.maxOutput })
-    })
-
-    const paidModelEntries = data.paid.map((model) => {
-      const paidModelInfo = paidModelsMap.get(model.name)
-      return {
-        name: model.name,
-        creditPerInputToken: model.creditPerInputToken.toString(),
-        creditPerOutputToken: model.creditPerOutputToken.toString(),
-        contextLength: formatTokens(paidModelInfo?.maxInput),
-        maxCompletion: formatTokens(paidModelInfo?.maxOutput),
-        score: "-"
-      }
-    })
-    modelCost.push(...paidModelEntries)
-
-  } catch {
-    console.error("Failed to fetch model prices during build")
-    modelCost.push(
-      {
-        name: 'DeepSeek R1',
-        creditPerInputToken: '0.715',
-        creditPerOutputToken: '2.847',
-        contextLength: '128k tokens',
-        maxCompletion: '128k tokens',
-        score: '-',
-      },
-      {
-        name: 'DeepSeek V3',
-        creditPerInputToken: '0.65',
-        creditPerOutputToken: '1.95',
-        contextLength: '128k tokens',
-        maxCompletion: '128k tokens',
-        score: '-',
-      },
-      {
-        name: 'Gemini 2.5 Pro',
-        creditPerInputToken: '1.625',
-        creditPerOutputToken: '13',
-        contextLength: '1M tokens',
-        maxCompletion: '65k tokens',
-        score: '-',
-      },
-    )
-  }
-
-  modelCost.push(
+  const modelCosts: ModelCost[] = [
+    ...modelCostArray,
     {
       name: 'Free Models',
-      creditPerInputToken: '0',
-      creditPerOutputToken: '0',
+      creditPerInputToken: 0,
+      creditPerOutputToken: 0,
       contextLength: 'Varies',
       maxCompletion: 'Varies',
       score: '-',
     },
     {
       name: 'Custom API',
-      creditPerInputToken: '0',
-      creditPerOutputToken: '0',
+      creditPerInputToken: 0,
+      creditPerOutputToken: 0,
       contextLength: 'Unknown',
       maxCompletion: 'Unknown',
       score: '-',
     }
-  )
-
-  return modelCost
-}
-
-export default async function CreditUsage() {
-  const modelCost = await getModelCostSSG()
+  ]
 
   return (
     <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8">
@@ -113,7 +68,7 @@ export default async function CreditUsage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-            {modelCost.map((model) => (
+            {modelCosts.map((model) => (
               <tr key={model.name} className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
                 <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">{model.name}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.creditPerInputToken}</td>
