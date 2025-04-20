@@ -320,7 +320,9 @@ export const ContextExtractor = () => {
       await extractContext(
         requestBody,
         isUseCustomModel ? apiKey : "",
-        !isUseCustomModel,
+        (isUseCustomModel || modelDetail === null)
+          ? "custom"
+          : (modelDetail.isPaid ? "paid" : "free"),
         currentId,
         (response) => setContextResult(currentId, response),
         isContinuation ? contextResult : "",

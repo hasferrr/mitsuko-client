@@ -1,7 +1,8 @@
-import { EXTRACT_CONTEXT_URL, EXTRACT_CONTEXT_URL_FREE } from "@/constants/api"
+import { EXTRACT_CONTEXT_URL, EXTRACT_CONTEXT_URL_FREE, EXTRACT_CONTEXT_URL_PAID } from "@/constants/api"
 import { handleStream } from "@/lib/stream/stream"
 import { create } from "zustand"
 import { RefObject } from "react"
+import { RequestType } from "@/types/request"
 
 interface ExtractionStore {
   isExtractingSet: Set<string>
@@ -11,7 +12,7 @@ interface ExtractionStore {
   extractContext: (
     requestBody: Record<string, unknown>,
     apiKey: string,
-    isFree: boolean,
+    requestType: RequestType,
     extractionId: string,
     setResponse: (response: string) => void,
     previousResponse: string
@@ -32,7 +33,7 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
   extractContext: async (
     requestBody: Record<string, unknown>,
     apiKey: string,
-    isFree: boolean,
+    requestType: RequestType,
     extractionId: string,
     setResponse: (response: string) => void,
     previousResponse: string
@@ -40,12 +41,19 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
     const abortControllerRef = { current: new AbortController() }
     get().abortControllerMap.set(extractionId, abortControllerRef)
 
+    let requestUrl = EXTRACT_CONTEXT_URL
+    if (requestType === "free") {
+      requestUrl = EXTRACT_CONTEXT_URL_FREE
+    } else if (requestType === "paid") {
+      requestUrl = EXTRACT_CONTEXT_URL_PAID
+    }
+
     await handleStream({
       setResponse,
       abortControllerRef,
-      isFree,
+      isUseApiKey: requestType === "custom",
       apiKey,
-      requestUrl: isFree ? EXTRACT_CONTEXT_URL_FREE : EXTRACT_CONTEXT_URL,
+      requestUrl,
       requestHeader: {
         "Content-Type": "application/json"
       },

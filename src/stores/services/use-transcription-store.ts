@@ -58,7 +58,7 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         const transcriptionText = await handleStream({
           setResponse,
           abortControllerRef,
-          isFree: true,
+          isUseApiKey: false,
           apiKey: "",
           requestUrl: TRANSCRIPT_URL,
           requestHeader: {},

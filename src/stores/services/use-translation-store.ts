@@ -1,10 +1,10 @@
 import { create } from "zustand"
 import { SubOnlyTranslated } from "@/types/types"
 import { parseTranslationJson } from "@/lib/parser/parser"
-import { TRANSLATE_URL, TRANSLATE_URL_FREE } from "@/constants/api"
+import { TRANSLATE_URL, TRANSLATE_URL_FREE, TRANSLATE_URL_PAID } from "@/constants/api"
 import { handleStream } from "@/lib/stream/stream"
 import { RefObject } from "react"
-
+import { RequestType } from "@/types/request"
 interface TranslationStore {
   isTranslatingSet: Set<string>
   abortControllerMap: Map<string, RefObject<AbortController>>
@@ -13,7 +13,7 @@ interface TranslationStore {
   translateSubtitles: (
     requestBody: Record<string, unknown>,
     apiKey: string,
-    isFree: boolean,
+    requestType: RequestType,
     id: string,
     setResponse: (response: string) => void
   ) => Promise<{ parsed: SubOnlyTranslated[], raw: string }>
@@ -40,19 +40,26 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
   translateSubtitles: async (
     requestBody: Record<string, unknown>,
     apiKey: string,
-    isFree: boolean,
+    requestType: RequestType,
     id: string,
     setResponse: (response: string) => void
   ): Promise<{ parsed: SubOnlyTranslated[], raw: string }> => {
     const abortControllerRef = { current: new AbortController() }
     get().abortControllerMap.set(id, abortControllerRef)
 
+    let requestUrl = TRANSLATE_URL
+    if (requestType === "free") {
+      requestUrl = TRANSLATE_URL_FREE
+    } else if (requestType === "paid") {
+      requestUrl = TRANSLATE_URL_PAID
+    }
+
     const buffer: string = await handleStream({
       setResponse,
       abortControllerRef,
-      isFree,
+      isUseApiKey: requestType === "custom",
       apiKey,
-      requestUrl: isFree ? TRANSLATE_URL_FREE : TRANSLATE_URL,
+      requestUrl,
       requestHeader: {
         "Content-Type": "application/json"
       },

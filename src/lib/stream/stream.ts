@@ -4,7 +4,7 @@ import { supabase } from "../supabase"
 interface handleStreamParams {
   setResponse: (buffer: string) => void,
   abortControllerRef: React.RefObject<AbortController>,
-  isFree: boolean,
+  isUseApiKey: boolean,
   apiKey: string,
   requestUrl: string,
   requestHeader: Record<string, string>,
@@ -17,7 +17,7 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
   const {
     setResponse,
     abortControllerRef,
-    isFree,
+    isUseApiKey,
     apiKey,
     requestUrl,
     requestHeader,
@@ -47,7 +47,7 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
       headers: {
         ...requestHeader,
         Authorization: accessToken ? `Bearer ${accessToken}` : "",
-        "api-key": !isFree ? `Bearer ${apiKey}` : "",
+        "api-key": isUseApiKey ? `Bearer ${apiKey}` : "",
       },
       body: requestBody,
       signal: abortControllerRef.current.signal,

@@ -406,7 +406,9 @@ export default function SubtitleTranslator() {
         const result = await translateSubtitles(
           requestBody,
           isUseCustomModel ? apiKey : "",
-          !isUseCustomModel,
+          (isUseCustomModel || modelDetail === null)
+            ? "custom"
+            : (modelDetail.isPaid ? "paid" : "free"),
           currentId,
           (response) => setResponse(currentId, response)
         )
