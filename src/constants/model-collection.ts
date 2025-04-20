@@ -149,3 +149,8 @@ export const PAID_MODELS: ModelCollection = {
     },
   ],
 }
+
+export const MODEL_COLLECTION: ModelCollection = {
+  ...PAID_MODELS,
+  ...FREE_MODELS,
+}

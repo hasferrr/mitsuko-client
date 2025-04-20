@@ -6,6 +6,7 @@ import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useMutationObserver } from "@/hooks/use-mutation-observer"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import {
   Command,
   CommandEmpty,
@@ -22,7 +23,7 @@ import {
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { Model } from "@/types/model"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { FREE_MODELS } from "@/constants/model-collection"
+import { MODEL_COLLECTION } from "@/constants/model-collection"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { ProjectType } from "@/types/project"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
@@ -37,7 +38,7 @@ export function ModelSelector({
   disabled,
   ...props
 }: ModelSelectorProps) {
-  const models = FREE_MODELS
+  const models = MODEL_COLLECTION
   const [open, setOpen] = React.useState(false)
 
   // Settings Store
@@ -84,7 +85,17 @@ export function ModelSelector({
             className="w-full justify-between"
             disabled={disabled}
           >
-            {modelDetail ? modelDetail.name : "Select a model..."}
+            <div className="flex items-center gap-2">
+              {modelDetail ? modelDetail.name : "Select a model..."}
+              {modelDetail && (
+                <Badge
+                  variant={modelDetail.isPaid ? "default" : "secondary"}
+                  className="text-xs px-2 h-[1.125rem]"
+                >
+                  {modelDetail.isPaid ? "Paid" : "Free"}
+                </Badge>
+              )}
+            </div>
             <ChevronsUpDown className="opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -94,7 +105,7 @@ export function ModelSelector({
           side="bottom"
           className="w-full p-0 overflow-y-auto"
         >
-          <Command loop defaultValue={modelDetail?.name}>
+          <Command loop defaultValue={`${modelDetail?.name}-${modelDetail?.isPaid ? "paid" : "free"}`}>
             <CommandList
               className="h-[var(--cmdk-list-height)] overflow-y-auto"
             >
@@ -104,9 +115,12 @@ export function ModelSelector({
                 <CommandGroup key={key} heading={key}>
                   {value.map((model) => (
                     <ModelItem
-                      key={model.name}
+                      key={`${model.name}-${model.isPaid ? "paid" : "free"}`}
                       model={model}
-                      isSelected={modelDetail?.name === model.name}
+                      isSelected={
+                        modelDetail?.name === model.name &&
+                        modelDetail.isPaid === model.isPaid
+                      }
                       onSelect={() => {
                         handleSelect(model)
                       }}
@@ -149,6 +163,7 @@ function ModelItem({ model, isSelected, onSelect }: ModelItemProps) {
           <CommandItem
             onSelect={onSelect}
             ref={ref}
+            value={`${model.name}-${model.isPaid ? "paid" : "free"}`}
           >
             {model.name}
             <Check
