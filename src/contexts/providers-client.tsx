@@ -31,6 +31,29 @@ export default function ProvidersClient({ children, modelCosts }: ProvidersProps
     }
   }, [])
 
+  useEffect(() => {
+    const midtransScriptUrl = process.env.NODE_ENV === 'production'
+      ? 'https://app.midtrans.com/snap/snap.js'
+      : 'https://app.sandbox.midtrans.com/snap/snap.js'
+
+    const scriptTag = document.createElement('script')
+    scriptTag.src = midtransScriptUrl
+
+    const myMidtransClientKey = process.env.NODE_ENV === 'production'
+      ? process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
+      : process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY_TEST
+
+    if (myMidtransClientKey) {
+      scriptTag.setAttribute('data-client-key', myMidtransClientKey)
+    }
+
+    document.body.appendChild(scriptTag)
+
+    return () => {
+      document.body.removeChild(scriptTag)
+    }
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
       <SessionStoreProvider>

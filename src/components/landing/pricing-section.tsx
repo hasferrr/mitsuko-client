@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Check, Info, X } from "lucide-react"
 import { Button } from "../ui/button"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import {
   Tooltip,
@@ -11,8 +11,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
-
+import { cn, sleep } from "@/lib/utils"
+import { createSnapPayment } from "@/lib/api/create-snap-payment"
+import { ProductId } from "@/types/product"
+import { useSnapStore } from "@/stores/use-snap-store"
+import { supabase } from "@/lib/supabase"
 interface Currency {
   symbol: string
   rate: number
@@ -39,6 +42,7 @@ export default function PricingSection({
   showLink = true,
 }: PricingSectionProps) {
   const [currency, setCurrency] = useState<Currency>(IDR)
+  const [isPending, startTransition] = useTransition()
 
   const handleCurrencyChange = (value: string) => {
     setCurrency(value === "$" ? USD : IDR)
@@ -61,19 +65,23 @@ export default function PricingSection({
 
   const creditPacks = [
     {
+      productId: "credit_pack_2m" as const,
       credits: "2,000,000",
       price: (2 * currency.rate).toLocaleString(),
     },
     {
+      productId: "credit_pack_10m" as const,
       credits: "10,000,000",
       price: (10 * currency.rate).toLocaleString(),
     },
     {
+      productId: "credit_pack_20m" as const,
       credits: "20,000,000",
       price: (19 * currency.rate).toLocaleString(),
       discount: (1 * currency.rate).toLocaleString(),
     },
     {
+      productId: "credit_pack_50m" as const,
       credits: "50,000,000",
       price: (45 * currency.rate).toLocaleString(),
       discount: (5 * currency.rate).toLocaleString(),
@@ -145,6 +153,54 @@ export default function PricingSection({
       description: "Access support resources. Free tier relies on our Discord server, Basic and Pro gets priority email support."
     }
   ]
+
+  const handleShowSnap = async (token: string) => {
+    if (!window.snap) {
+      console.error('Snap.js script is not loaded yet.')
+      return
+    }
+
+    window.snap.pay(token, {
+      language: "en",
+      onSuccess: (result) => {
+        console.log("payment success!", result)
+      },
+      onPending: (result) => {
+        console.log("wating your payment!", result)
+      },
+      onError: (result) => {
+        console.error("payment failed!", result)
+      },
+      onClose: () => {
+        console.log('you closed the popup without finishing the payment')
+      }
+    })
+  }
+
+  const handlePurchase = async (productId: ProductId) => {
+    const { getSnapData, setSnapData, clearSnapData } = useSnapStore.getState()
+    startTransition(async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        clearSnapData()
+        console.error("User not found")
+        return
+      }
+
+      const snapData = getSnapData(user.id, productId)
+
+      if (!snapData || snapData.expiresAt < new Date()) {
+        const { data: newData } = await createSnapPayment(productId)
+        setSnapData(user.id, productId, newData)
+        handleShowSnap(newData.token)
+        await sleep(2000)
+        return
+      }
+
+      handleShowSnap(snapData.token)
+      await sleep(2000)
+    })
+  }
 
   return (
     <div id="pricing" className="bg-gray-50 dark:bg-black py-16">
@@ -429,12 +485,13 @@ export default function PricingSection({
                 {pack.discount && (
                   <div className="text-xs text-green-600 dark:text-green-400">Save {currency.symbol}{pack.discount}</div>
                 )}
-                <div className="cursor-not-allowed">
-                  <Button disabled className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm">
-                    {/* Purchase */}
-                    Coming Soon
-                  </Button>
-                </div>
+                <Button
+                  className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
+                  onClick={() => handlePurchase(pack.productId)}
+                  disabled={isPending}
+                >
+                  Purchase
+                </Button>
               </div>
             ))}
           </div>
