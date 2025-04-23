@@ -10,6 +10,7 @@ interface SnapStore {
   snapData: Record<UserId, Record<ProductId, SnapData | undefined>>
   getSnapData: (userId: UserId, productId: ProductId) => SnapData | undefined
   setSnapData: (userId: UserId, productId: ProductId, value: SnapPaymentResult) => void
+  removeSnapData: (userId: UserId, productId: ProductId) => void
   clearSnapData: () => void
 }
 
@@ -26,6 +27,14 @@ export const useSnapStore = create<SnapStore>()(
               ...value,
               expiresAt: new Date(Date.now() + 23 * 60 * 60 * 1000)
             }
+          }
+        }
+      }),
+      removeSnapData: (userId: UserId, productId: ProductId) => set({
+        snapData: {
+          [userId]: {
+            ...get().snapData[userId],
+            [productId]: undefined
           }
         }
       }),

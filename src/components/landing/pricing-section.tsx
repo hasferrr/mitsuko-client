@@ -11,11 +11,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { cn, sleep } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { createSnapPayment } from "@/lib/api/create-snap-payment"
 import { ProductId } from "@/types/product"
 import { useSnapStore } from "@/stores/use-snap-store"
 import { supabase } from "@/lib/supabase"
+import { PaymentOptionsDialog } from "./payment-options-dialog"
+
 interface Currency {
   symbol: string
   rate: number
@@ -43,6 +45,13 @@ export default function PricingSection({
 }: PricingSectionProps) {
   const [currency, setCurrency] = useState<Currency>(IDR)
   const [isPending, startTransition] = useTransition()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [dialogData, setDialogData] = useState<{
+    token: string
+    redirectUrl: string
+    userId: string
+    productId: ProductId
+  } | null>(null)
 
   const handleCurrencyChange = (value: string) => {
     setCurrency(value === "$" ? USD : IDR)
@@ -154,29 +163,6 @@ export default function PricingSection({
     }
   ]
 
-  const handleShowSnap = async (token: string) => {
-    if (!window.snap) {
-      console.error('Snap.js script is not loaded yet.')
-      return
-    }
-
-    window.snap.pay(token, {
-      language: "en",
-      onSuccess: (result) => {
-        console.log("payment success!", result)
-      },
-      onPending: (result) => {
-        console.log("wating your payment!", result)
-      },
-      onError: (result) => {
-        console.error("payment failed!", result)
-      },
-      onClose: () => {
-        console.log('you closed the popup without finishing the payment')
-      }
-    })
-  }
-
   const handlePurchase = async (productId: ProductId) => {
     const { getSnapData, setSnapData, clearSnapData } = useSnapStore.getState()
     startTransition(async () => {
@@ -187,18 +173,32 @@ export default function PricingSection({
         return
       }
 
-      const snapData = getSnapData(user.id, productId)
+      let currentSnapData = getSnapData(user.id, productId) ?? null
 
-      if (!snapData || snapData.expiresAt < new Date()) {
-        const { data: newData } = await createSnapPayment(productId)
-        setSnapData(user.id, productId, newData)
-        handleShowSnap(newData.token)
-        await sleep(2000)
-        return
+      if (!currentSnapData || currentSnapData.expiresAt < new Date()) {
+        console.log("Fetching new Snap data for", productId)
+        try {
+          const { data: apiResult } = await createSnapPayment(productId)
+          const expiresAt = new Date(Date.now() + 60 * 60 * 1000)
+          const newDataToStore = { ...apiResult, expiresAt }
+
+          setSnapData(user.id, productId, newDataToStore)
+          currentSnapData = newDataToStore
+        } catch (error) {
+          console.error("Failed to create payment link:", error)
+          return
+        }
+      } else {
+        console.log("Using existing Snap data for", productId)
       }
 
-      handleShowSnap(snapData.token)
-      await sleep(2000)
+      setDialogData({
+        token: currentSnapData.token,
+        redirectUrl: currentSnapData.redirect_url,
+        userId: user.id,
+        productId: productId
+      })
+      setIsDialogOpen(true)
     })
   }
 
@@ -506,6 +506,18 @@ export default function PricingSection({
           </div>
         )}
       </div>
+
+      {/* Render the Dialog */}
+      {dialogData && (
+        <PaymentOptionsDialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          token={dialogData.token}
+          redirectUrl={dialogData.redirectUrl}
+          userId={dialogData.userId}
+          productId={dialogData.productId}
+        />
+      )}
     </div>
   )
 }
