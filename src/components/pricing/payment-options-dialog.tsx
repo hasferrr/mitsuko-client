@@ -209,10 +209,6 @@ export function PaymentOptionsDialog({
     }
   }, [])
 
-  if (!isOpen) {
-    return null
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col">
