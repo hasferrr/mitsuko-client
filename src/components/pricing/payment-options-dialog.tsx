@@ -67,12 +67,12 @@ export function PaymentOptionsDialog({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Continue Payment</DialogTitle>
+          <DialogTitle>Payment</DialogTitle>
           <DialogDescription>
             Please select a payment method to continue.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-4">
+        <div className="space-y-4">
           <button
             onClick={handlePopup}
             className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150"
@@ -97,12 +97,12 @@ export function PaymentOptionsDialog({
             <div className="flex-grow">
               <div className="font-medium text-sm mb-1">Open Payment Link</div>
               <p className="text-xs text-muted-foreground">
-                Open the Midtrans payment page directly in a new browser tab.
+                Open the Midtrans payment page in a new tab.
               </p>
             </div>
           </button>
         </div>
-        <DialogFooter className="flex flex-row justify-between w-full pt-2 sm:justify-between">
+        <DialogFooter className="flex flex-row justify-between w-full sm:justify-between">
           <Button onClick={handleReset} variant="destructive" size="sm" disabled={isPending}>
             {isPending ? (
               <>

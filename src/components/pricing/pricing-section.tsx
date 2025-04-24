@@ -11,13 +11,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { cn, sleep } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { createSnapPayment } from "@/lib/api/create-snap-payment"
 import { ProductId } from "@/types/product"
 import { useSnapStore } from "@/stores/use-snap-store"
 import { supabase } from "@/lib/supabase"
 import { PaymentOptionsDialog } from "./payment-options-dialog"
-import { useSnapPayment } from "@/hooks/use-snap-payment"
 import { useRouter } from "next/navigation"
 import { ComingSoonTooltipWrapper } from "@/components/ui/coming-soon-tooltip-wrapper"
 
@@ -60,8 +59,6 @@ export default function PricingSection({
     userId: string
     productId: ProductId
   } | null>(null)
-
-  const { initiatePaymentPopup } = useSnapPayment()
 
   const router = useRouter()
 
@@ -182,6 +179,10 @@ export default function PricingSection({
 
     setLoadingProductId(productId)
     startTransition(async () => {
+      let token: string | null = null
+      let redirectUrl: string | null = null
+      let userId: string | null = null
+
       try {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
@@ -189,23 +190,16 @@ export default function PricingSection({
           console.error("User not found")
           return
         }
+        userId = user.id
 
         const existingData = getSnapData(user.id, productId)
         const isDataValid = !!existingData && existingData.expiresAt >= new Date()
 
         if (isDataValid) {
-          // Valid data exists -> Open Dialog
           console.log("Using existing valid Snap data for", productId)
-          setDialogData({
-            token: existingData.token,
-            redirectUrl: existingData.redirect_url,
-            userId: user.id,
-            productId: productId
-          })
-          setIsDialogOpen(true)
-
+          token = existingData.token
+          redirectUrl = existingData.redirect_url
         } else {
-          // No data or expired -> Fetch new & Open Popup
           if (existingData) {
             console.log("Existing Snap data expired for", productId)
             removeSnapData(user.id, productId)
@@ -214,15 +208,30 @@ export default function PricingSection({
           try {
             const { data: apiResult } = await createSnapPayment(productId)
             setSnapData(user.id, productId, apiResult)
-            initiatePaymentPopup(apiResult.token, user.id, productId)
-            await sleep(1000)
-
+            token = apiResult.token
+            redirectUrl = apiResult.redirect_url
           } catch (error) {
             console.error("Failed to create payment link:", error)
             return
           }
         }
-      } finally {
+
+        if (token && redirectUrl && userId) {
+          setDialogData({
+            token: token,
+            redirectUrl: redirectUrl,
+            userId: userId,
+            productId: productId
+          })
+          setIsDialogOpen(true)
+        } else {
+          console.error("Failed to prepare data for payment dialog.")
+        }
+
+      } catch (error) {
+        console.error("Error during purchase process:", error)
+      }
+      finally {
         setLoadingProductId(null)
       }
     })
