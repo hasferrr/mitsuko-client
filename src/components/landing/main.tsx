@@ -3,8 +3,8 @@ import DemoSection from "./demo-section"
 import ComparisonSection from "./comparison-section"
 import PricingSection from "../pricing/pricing-section"
 import FAQSection from "./faq-section"
-import ContactUsSection from "./contact-us-section"
 import HeroSection from "./hero-section"
+import CreditValueShowcase from "../pricing/credit-value-showcase"
 
 export default function MainLandingPage() {
   return (
@@ -15,7 +15,9 @@ export default function MainLandingPage() {
       <ComparisonSection />
       <PricingSection redirectToPricingPage />
       <FAQSection />
-      <ContactUsSection />
+      <section className="pt-12 pb-24 px-4">
+        <CreditValueShowcase />
+      </section>
     </>
   )
 }
