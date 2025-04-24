@@ -57,6 +57,8 @@ export default function PricingSection({
     redirectUrl: string | null
     userId: string
     productId: ProductId
+    price: number
+    credits: number
   } | null>(null)
 
   const router = useRouter()
@@ -85,25 +87,27 @@ export default function PricingSection({
   const creditPacks = [
     {
       productId: "credit_pack_2m" as const,
-      credits: "2,000,000",
-      price: (2 * currency.rate).toLocaleString(),
+      baseCredits: 2_000_000,
+      basePriceUSD: 2,
+      discountUSD: 0,
     },
     {
       productId: "credit_pack_10m" as const,
-      credits: "10,000,000",
-      price: (10 * currency.rate).toLocaleString(),
+      baseCredits: 10_000_000,
+      basePriceUSD: 10,
+      discountUSD: 0,
     },
     {
       productId: "credit_pack_20m" as const,
-      credits: "20,000,000",
-      price: (19 * currency.rate).toLocaleString(),
-      discount: (1 * currency.rate).toLocaleString(),
+      baseCredits: 20_000_000,
+      basePriceUSD: 19, // Discounted price
+      discountUSD: 1,
     },
     {
       productId: "credit_pack_50m" as const,
-      credits: "50,000,000",
-      price: (45 * currency.rate).toLocaleString(),
-      discount: (5 * currency.rate).toLocaleString(),
+      baseCredits: 50_000_000,
+      basePriceUSD: 45, // Discounted price
+      discountUSD: 5,
     },
   ]
 
@@ -208,12 +212,20 @@ export default function PricingSection({
           redirectUrl = null
         }
 
+        const packData = creditPacks.find(p => p.productId === productId)
+        if (!packData) {
+          console.error(`Product data not found for productId: ${productId}`)
+          return
+        }
+
         if (userId) {
           setDialogData({
             token: token,
             redirectUrl: redirectUrl,
             userId: userId,
-            productId: productId
+            productId: productId,
+            price: packData.basePriceUSD,
+            credits: packData.baseCredits,
           })
           setIsDialogOpen(true)
         } else {
@@ -533,7 +545,7 @@ export default function PricingSection({
             Credit Pack Prices
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Need more credits? Purchase additional credit packs starting at just {currency.symbol}{creditPacks[0].price}. Available to all tiers, these
+            Need more credits? Purchase additional credit packs starting at just {currency.symbol}{(creditPacks[0].basePriceUSD * currency.rate).toLocaleString()}. Available to all tiers, these
             credit packs provide flexibility for your usage needs. <strong>Credits purchased do not expire.</strong>
           </p>
 
@@ -542,14 +554,14 @@ export default function PricingSection({
               <div key={index} className="flex flex-col gap-1 justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800">
                 <div className="flex gap-2 justify-between items-center">
                   <span className="font-medium text-gray-900 dark:text-white">
-                    {pack.credits} credits
+                    {pack.baseCredits.toLocaleString()} credits
                   </span>
                   <span className="text-gray-900 dark:text-white font-bold">
-                    {currency.symbol}{pack.price}
+                    {currency.symbol}{(pack.basePriceUSD * currency.rate).toLocaleString()}
                   </span>
                 </div>
-                {pack.discount && (
-                  <div className="text-xs text-green-600 dark:text-green-400">Save {currency.symbol}{pack.discount}</div>
+                {pack.discountUSD > 0 && (
+                  <div className="text-xs text-green-600 dark:text-green-400">Save {currency.symbol}{(pack.discountUSD * currency.rate).toLocaleString()}</div>
                 )}
                 {redirectToPricingPage ? (
                   <Button
@@ -594,10 +606,10 @@ export default function PricingSection({
         <PaymentOptionsDialog
           isOpen={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
-          token={dialogData.token}
-          redirectUrl={dialogData.redirectUrl}
           userId={dialogData.userId}
           productId={dialogData.productId}
+          price={dialogData.price}
+          credits={dialogData.credits}
         />
       )}
     </div>
