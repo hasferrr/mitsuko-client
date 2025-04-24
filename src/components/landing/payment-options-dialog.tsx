@@ -72,7 +72,7 @@ export function PaymentOptionsDialog({
             <CreditCard className="w-6 h-6 mr-4 text-blue-500 flex-shrink-0 mt-1" />
             <div className="flex-grow">
               <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-sm">Pay with Midtrans Snap</span>
+                <span className="font-medium text-sm">Pay in Popup Window</span>
                 <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700">RECOMMENDED</Badge>
               </div>
               <p className="text-xs text-muted-foreground">
@@ -95,7 +95,7 @@ export function PaymentOptionsDialog({
           </button>
         </div>
         <DialogFooter className="flex flex-row justify-between w-full pt-2 sm:justify-between">
-          <Button onClick={handleReset} variant="destructive" size="sm">Reset Link</Button>
+          <Button onClick={handleReset} variant="destructive" size="sm">Reset Payment</Button>
           <Button onClick={onClose} variant="ghost" size="sm">Cancel</Button>
         </DialogFooter>
       </DialogContent>
