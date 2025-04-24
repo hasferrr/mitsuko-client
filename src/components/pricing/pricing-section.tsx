@@ -60,6 +60,8 @@ export default function PricingSection({
     productId: ProductId
     price: number
     credits: number
+    currencySymbol: string
+    currencyRate: number
   } | null>(null)
 
   const router = useRouter()
@@ -231,6 +233,8 @@ export default function PricingSection({
           productId: productId,
           price: packData.basePriceUSD,
           credits: packData.baseCredits,
+          currencySymbol: currency.symbol,
+          currencyRate: currency.rate,
         })
         setIsDialogOpen(true)
 
@@ -613,6 +617,8 @@ export default function PricingSection({
           productId={dialogData.productId}
           price={dialogData.price}
           credits={dialogData.credits}
+          currencySymbol={dialogData.currencySymbol}
+          currencyRate={dialogData.currencyRate}
         />
       )}
     </div>

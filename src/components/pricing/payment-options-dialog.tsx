@@ -28,6 +28,8 @@ interface PaymentOptionsDialogProps {
   productId: ProductId
   price: number
   credits: number
+  currencySymbol: string
+  currencyRate: number
 }
 
 export function PaymentOptionsDialog({
@@ -37,6 +39,8 @@ export function PaymentOptionsDialog({
   productId,
   price,
   credits,
+  currencySymbol,
+  currencyRate,
 }: PaymentOptionsDialogProps) {
   const [isResetting, startResetTransition] = useTransition()
   const [isFetchingPayment, startFetchingPayment] = useTransition()
@@ -54,8 +58,10 @@ export function PaymentOptionsDialog({
   const setSnapData = useSnapStore((state) => state.setSnapData)
 
   const snapData = !!userId ? getSnapData(userId, productId) : undefined
-  const totalCost = price * (snapData?.quantity ?? inputQuantity)
-  const totalCredits = credits * (snapData?.quantity ?? inputQuantity)
+  const currentQuantity = snapData?.quantity ?? inputQuantity
+  const basePriceInCurrency = price * currencyRate
+  const totalCost = basePriceInCurrency * currentQuantity
+  const totalCredits = credits * currentQuantity
 
   useEffect(() => {
     setPaymentError(null)
@@ -266,7 +272,12 @@ export function PaymentOptionsDialog({
             <h3 className="text-lg font-semibold mb-3">Order Summary</h3>
             <div className="space-y-2">
               <p className="text-sm font-medium">{credits.toLocaleString()} Credit Pack</p>
-              <p className="text-xs text-muted-foreground">Base Price: ${price.toFixed(2)} / {credits.toLocaleString()} Credits per pack</p>
+              <p className="text-xs text-muted-foreground">
+                Base Price: {currencySymbol}{(basePriceInCurrency).toLocaleString(undefined, {
+                  minimumFractionDigits: currencySymbol === '$' ? 2 : 0,
+                  maximumFractionDigits: currencySymbol === '$' ? 2 : 0
+                })} / {credits.toLocaleString()} Credits per pack
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="quantity">Quantity</Label>
@@ -313,7 +324,12 @@ export function PaymentOptionsDialog({
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Total Cost:</span>
-                <span className="font-semibold">${totalCost.toFixed(2)}</span>
+                <span className="font-semibold">
+                  {currencySymbol}{(totalCost).toLocaleString(undefined, {
+                    minimumFractionDigits: currencySymbol === '$' ? 2 : 0,
+                    maximumFractionDigits: currencySymbol === '$' ? 2 : 0
+                  })}
+                </span>
               </div>
             </div>
           </div>
