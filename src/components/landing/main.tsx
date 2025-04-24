@@ -13,7 +13,7 @@ export default function MainLandingPage() {
       <KeyFeatures />
       <DemoSection />
       <ComparisonSection />
-      <PricingSection />
+      <PricingSection redirectToPricingPage />
       <FAQSection />
       <ContactUsSection />
     </>

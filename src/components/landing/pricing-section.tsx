@@ -18,6 +18,7 @@ import { useSnapStore } from "@/stores/use-snap-store"
 import { supabase } from "@/lib/supabase"
 import { PaymentOptionsDialog } from "./payment-options-dialog"
 import { useSnapPayment } from "@/hooks/use-snap-payment"
+import { useRouter } from "next/navigation"
 
 interface Currency {
   symbol: string
@@ -33,6 +34,7 @@ interface Feature {
 }
 
 interface PricingSectionProps {
+  redirectToPricingPage?: boolean
   showDescription?: boolean
   showLink?: boolean
 }
@@ -41,10 +43,11 @@ const USD = { symbol: "$", rate: 1 }
 const IDR = { symbol: "Rp", rate: 17000 }
 
 export default function PricingSection({
+  redirectToPricingPage = false,
   showDescription = false,
   showLink = true,
 }: PricingSectionProps) {
-  const [currency, setCurrency] = useState<Currency>(IDR)
+  const [currency, setCurrency] = useState<Currency>(USD)
   const [isPending, startTransition] = useTransition()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [dialogData, setDialogData] = useState<{
@@ -56,6 +59,8 @@ export default function PricingSection({
 
   const { initiatePaymentPopup } = useSnapPayment()
 
+  const router = useRouter()
+
   const handleCurrencyChange = (value: string) => {
     setCurrency(value === "$" ? USD : IDR)
   }
@@ -66,10 +71,12 @@ export default function PricingSection({
       credits: "0",
     },
     basic: {
+      productId: "basic_monthly" as const,
       price: (5 * currency.rate).toLocaleString(),
       credits: "5,000,000",
     },
     pro: {
+      productId: "pro_monthly" as const,
       price: (20 * currency.rate).toLocaleString(),
       credits: "22,000,000",
     },
@@ -304,12 +311,22 @@ export default function PricingSection({
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 Fewer limitations and monthly credit grant. Email support included.
               </p>
-              <div className="cursor-not-allowed">
-                <Button disabled className="w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6">
-                  {/* Subscribe Now */}
-                  Coming Soon
-                </Button>
-              </div>
+              <Button
+                disabled={!redirectToPricingPage}
+                className={cn(
+                  "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6",
+                )}
+                onClick={() => {
+                  if (redirectToPricingPage) {
+                    router.push("/pricing")
+                  } else {
+                    // TODO: Handle purchase
+                  }
+                }}
+              >
+                {/* Subscribe Now */}
+                {redirectToPricingPage ? "Go to Pricing Page" : "Coming Soon"}
+              </Button>
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
@@ -356,12 +373,22 @@ export default function PricingSection({
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 Maximum features with priority support and cloud saving.
               </p>
-              <div className="cursor-not-allowed">
-                <Button disabled className="w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6">
-                  {/* Go Pro */}
-                  Coming Soon
-                </Button>
-              </div>
+              <Button
+                disabled={!redirectToPricingPage}
+                className={cn(
+                  "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6",
+                )}
+                onClick={() => {
+                  if (redirectToPricingPage) {
+                    router.push("/pricing")
+                  } else {
+                    // TODO: Handle purchase
+                  }
+                }}
+              >
+                {/* Go Pro */}
+                {redirectToPricingPage ? "Go to Pricing Page" : "Coming Soon"}
+              </Button>
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
@@ -496,10 +523,16 @@ export default function PricingSection({
                 )}
                 <Button
                   className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
-                  onClick={() => handlePurchase(pack.productId)}
+                  onClick={() => {
+                    if (redirectToPricingPage) {
+                      router.push("/pricing")
+                    } else {
+                      handlePurchase(pack.productId)
+                    }
+                  }}
                   disabled={isPending}
                 >
-                  Purchase
+                  {redirectToPricingPage ? "Go to Pricing Page" : "Purchase"}
                 </Button>
               </div>
             ))}
