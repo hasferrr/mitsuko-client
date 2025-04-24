@@ -14,7 +14,7 @@ import { useSnapStore } from "@/stores/use-snap-store"
 import { ProductId } from "@/types/product"
 import { CreditCard, ExternalLink } from "lucide-react"
 import { useSnapPayment } from "@/hooks/use-snap-payment"
-
+import { toast } from "sonner"
 interface PaymentOptionsDialogProps {
   isOpen: boolean
   onClose: () => void
@@ -49,6 +49,7 @@ export function PaymentOptionsDialog({
     removeSnapData(userId, productId)
     console.log(`Cleared payment data for user ${userId}, product ${productId}`)
     onClose()
+    toast.dismiss()
   }
 
   if (!isOpen) {

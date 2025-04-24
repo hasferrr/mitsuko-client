@@ -1,4 +1,3 @@
-import { Toaster } from "sonner"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 import { PropsWithChildren } from "react"
@@ -20,7 +19,6 @@ export default function Layout({ children }: PropsWithChildren) {
           </div>
           <Footer />
         </div>
-        <Toaster />
       </AppSidebarWrapper>
     </div>
   )
