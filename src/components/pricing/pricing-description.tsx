@@ -3,7 +3,7 @@ import CreditUsage from "./credit-usage"
 
 export default function PricingDescription() {
   return (
-    <div id="pricing" className="bg-gray-50 dark:bg-black py-4">
+    <div id="pricing" className="py-4">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-semibold mb-4 text-gray-900 dark:text-white">
@@ -15,7 +15,7 @@ export default function PricingDescription() {
         </div>
 
         {/* Description of Credits */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8">
+        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
           <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
             What are Credits?
           </h3>
@@ -40,7 +40,7 @@ export default function PricingDescription() {
         </div>
 
         {/* Track Your Credits Section */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8">
+        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
           <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
             Where Can I See My Credits?
           </h3>
@@ -54,7 +54,7 @@ export default function PricingDescription() {
         <CreditUsage />
 
         {/* Background Processing */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8">
+        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
           <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
             Background Processing
           </h3>

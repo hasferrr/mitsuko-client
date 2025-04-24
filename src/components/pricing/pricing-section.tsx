@@ -227,7 +227,7 @@ export default function PricingSection({
   }
 
   return (
-    <div id="pricing" className="bg-gray-50 dark:bg-black py-16">
+    <div id="pricing" className="py-16">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
@@ -258,7 +258,7 @@ export default function PricingSection({
         <div className="relative grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
           <div id="pricing-cards" className="absolute -top-24" />
           {/* Free Tier */}
-          <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
             <div className="p-6">
               <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Free</h3>
               <div className="flex items-end gap-1 mb-6">
@@ -309,7 +309,7 @@ export default function PricingSection({
           </div>
 
           {/* Basic Tier */}
-          <div className="rounded-xl bg-white dark:bg-gray-900/30 border-2 border-blue-400 dark:border-blue-500 overflow-hidden">
+          <div className="rounded-xl bg-white dark:bg-gray-900/30 border-2 border-blue-400 dark:border-blue-500 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
             <div className="p-6">
               <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Basic</h3>
               <div className="flex items-end gap-1 mb-6">
@@ -378,7 +378,7 @@ export default function PricingSection({
           </div>
 
           {/* Pro Tier */}
-          <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
             <div className="p-6">
               <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Pro</h3>
               <div className="flex items-end gap-1 mb-6">
@@ -448,7 +448,7 @@ export default function PricingSection({
         </div>
 
         {/* Feature Comparison Table */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto">
+        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto shadow-sm">
           <div className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 p-4">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
               Feature Comparison
@@ -519,7 +519,7 @@ export default function PricingSection({
         </div>
 
         {/* Credit Pack Prices */}
-        <div className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6">
+        <div className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-sm">
           <div id="credit-packs" className="absolute -top-24" />
           <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
             Credit Pack Prices
