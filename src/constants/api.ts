@@ -13,3 +13,5 @@ export const TRANSCRIPT_URL = `${BASE_URL}/api/stream/transcript`
 
 export const SUBTITLE_LOG_URL = `${BASE_URL}/api/subtitle-log`
 export const MODEL_PRICES_URL = `${BASE_URL}/api/model-prices`
+
+export const PAYMENT_CREATE_SNAP_URL = `${BASE_URL}/api/payment/create-snap`
