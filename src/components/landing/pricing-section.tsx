@@ -38,7 +38,7 @@ interface PricingSectionProps {
 }
 
 const USD = { symbol: "$", rate: 1 }
-const IDR = { symbol: "Rp", rate: 16800 }
+const IDR = { symbol: "Rp", rate: 17000 }
 
 export default function PricingSection({
   showDescription = false,
