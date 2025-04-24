@@ -12,10 +12,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useSnapStore } from "@/stores/use-snap-store"
 import { ProductId } from "@/types/product"
-import { CreditCard, ExternalLink, Loader2 } from "lucide-react"
+import { CreditCard, ExternalLink, Loader2, Minus, Plus } from "lucide-react"
 import { useSnapPayment } from "@/hooks/use-snap-payment"
 import { toast } from "sonner"
-import { useTransition, useState, useEffect } from "react"
+import { useTransition, useState, useEffect, useRef } from "react"
 import { sleep } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -42,6 +42,10 @@ export function PaymentOptionsDialog({
   const [isFetchingPayment, startFetchingPayment] = useTransition()
   const [paymentError, setPaymentError] = useState<string | null>(null)
   const [inputQuantity, setInputQuantity] = useState(1)
+
+  const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const incrementIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const decrementIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const { initiatePaymentPopup } = useSnapPayment()
 
@@ -108,22 +112,83 @@ export function PaymentOptionsDialog({
       removeSnapData(userId, productId)
       console.log(`Cleared payment data for user ${userId}, product ${productId}`)
       setInputQuantity(1)
-      onClose()
       toast.info("Payment session reset.")
     })
   }
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuantity = parseInt(e.target.value, 10)
+    const value = e.target.value
+    if (value === '') {
+      setInputQuantity(1)
+      setPaymentError(null)
+      return
+    }
+    const newQuantity = parseInt(value, 10)
     if (!isNaN(newQuantity) && newQuantity >= 1 && newQuantity <= 20) {
       setInputQuantity(newQuantity)
       setPaymentError(null)
-    } else if (e.target.value === '') {
+    } else if (newQuantity < 1) {
       setInputQuantity(1)
     } else if (newQuantity > 20) {
       setInputQuantity(20)
     }
   }
+
+  const handleDecrement = () => {
+    setInputQuantity((prev) => Math.max(1, prev - 1))
+    setPaymentError(null)
+  }
+
+  const handleIncrement = () => {
+    setInputQuantity((prev) => Math.min(20, prev + 1))
+    setPaymentError(null)
+  }
+
+  const clearTimers = () => {
+    if (holdTimeoutRef.current) {
+      clearTimeout(holdTimeoutRef.current)
+      holdTimeoutRef.current = null
+    }
+    if (incrementIntervalRef.current) {
+      clearInterval(incrementIntervalRef.current)
+      incrementIntervalRef.current = null
+    }
+    if (decrementIntervalRef.current) {
+      clearInterval(decrementIntervalRef.current)
+      decrementIntervalRef.current = null
+    }
+  }
+
+  const handleMouseDownDecrement = () => {
+    clearTimers()
+    handleDecrement() // Decrement once immediately
+    holdTimeoutRef.current = setTimeout(() => {
+      decrementIntervalRef.current = setInterval(() => {
+        handleDecrement()
+      }, 50) // Decrement every 100ms after initial hold
+    }, 300) // Initial hold delay
+  }
+
+  const handleMouseDownIncrement = () => {
+    clearTimers()
+    handleIncrement() // Increment once immediately
+    holdTimeoutRef.current = setTimeout(() => {
+      incrementIntervalRef.current = setInterval(() => {
+        handleIncrement()
+      }, 50) // Increment every 100ms after initial hold
+    }, 300) // Initial hold delay
+  }
+
+  const handleMouseUpOrLeave = () => {
+    clearTimers()
+  }
+
+  // Cleanup timers on unmount or close
+  useEffect(() => {
+    return () => {
+      clearTimers()
+    }
+  }, [])
 
   if (!isOpen) {
     return null
@@ -192,15 +257,41 @@ export function PaymentOptionsDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="quantity">Quantity</Label>
-              <Input
-                id="quantity"
-                type="number"
-                min="1"
-                value={snapData ? snapData.quantity : inputQuantity}
-                onChange={snapData ? undefined : handleQuantityChange}
-                className="w-24"
-                disabled={isFetchingPayment || isResetting || !!snapData}
-              />
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onMouseDown={handleMouseDownDecrement}
+                  onMouseUp={handleMouseUpOrLeave}
+                  onMouseLeave={handleMouseUpOrLeave}
+                  disabled={inputQuantity <= 1 || isFetchingPayment || isResetting || !!snapData}
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <Input
+                  id="quantity"
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={snapData ? snapData.quantity : inputQuantity}
+                  onChange={snapData ? undefined : handleQuantityChange}
+                  className="w-16 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  disabled={isFetchingPayment || isResetting || !!snapData}
+                  aria-live="polite"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onMouseDown={handleMouseDownIncrement}
+                  onMouseUp={handleMouseUpOrLeave}
+                  onMouseLeave={handleMouseUpOrLeave}
+                  disabled={inputQuantity >= 20 || isFetchingPayment || isResetting || !!snapData}
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <div className="space-y-2 pt-4 border-t border-border">
               <div className="flex justify-between items-center">
@@ -226,7 +317,7 @@ export function PaymentOptionsDialog({
               "Reset Payment"
             )}
           </Button>
-          <Button onClick={onClose} variant="ghost" size="sm">Cancel</Button>
+          <Button onClick={onClose} variant="outline" size="sm">Cancel</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
