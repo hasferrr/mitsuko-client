@@ -24,7 +24,7 @@ import { createSnapPayment } from "@/lib/api/create-snap-payment"
 interface PaymentOptionsDialogProps {
   isOpen: boolean
   onClose: () => void
-  userId: string
+  userId: string | null
   productId: ProductId
   price: number
   credits: number
@@ -53,7 +53,7 @@ export function PaymentOptionsDialog({
   const removeSnapData = useSnapStore((state) => state.removeSnapData)
   const setSnapData = useSnapStore((state) => state.setSnapData)
 
-  const snapData = getSnapData(userId, productId)
+  const snapData = !!userId ? getSnapData(userId, productId) : undefined
   const totalCost = price * (snapData?.quantity ?? inputQuantity)
   const totalCredits = credits * (snapData?.quantity ?? inputQuantity)
 
@@ -62,6 +62,10 @@ export function PaymentOptionsDialog({
   }, [isOpen, productId])
 
   const fetchAndProceed = (action: 'popup' | 'newTab') => {
+    if (!userId) {
+      toast.error("Please sign in to proceed.")
+      return
+    }
     setPaymentError(null)
     startFetchingPayment(async () => {
       try {
@@ -87,6 +91,10 @@ export function PaymentOptionsDialog({
   }
 
   const handlePopup = () => {
+    if (!userId) {
+      toast.error("Please sign in to proceed.")
+      return
+    }
     if (snapData) {
       console.log("Using existing token for popup (Qty: 1).")
       onClose()
@@ -97,6 +105,10 @@ export function PaymentOptionsDialog({
   }
 
   const handleNewTab = () => {
+    if (!userId) {
+      toast.error("Please sign in to proceed.")
+      return
+    }
     if (snapData) {
       console.log("Using existing redirect URL for new tab.")
       window.open(snapData.redirect_url, '_blank')
@@ -107,6 +119,7 @@ export function PaymentOptionsDialog({
   }
 
   const handleReset = () => {
+    if (!userId) return
     startResetTransition(async () => {
       await sleep(250)
       removeSnapData(userId, productId)

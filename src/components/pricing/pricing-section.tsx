@@ -18,6 +18,7 @@ import { supabase } from "@/lib/supabase"
 import { PaymentOptionsDialog } from "./payment-options-dialog"
 import { useRouter } from "next/navigation"
 import { ComingSoonTooltipWrapper } from "@/components/ui/coming-soon-tooltip-wrapper"
+import { toast } from "sonner"
 
 interface Currency {
   symbol: string
@@ -55,7 +56,7 @@ export default function PricingSection({
   const [dialogData, setDialogData] = useState<{
     token: string | null
     redirectUrl: string | null
-    userId: string
+    userId: string | null
     productId: ProductId
     price: number
     credits: number
@@ -178,7 +179,9 @@ export default function PricingSection({
   ]
 
   const handlePurchase = async (productId: ProductId) => {
-    const { getSnapData, clearSnapData, removeSnapData } = useSnapStore.getState()
+    const getSnapData = useSnapStore.getState().getSnapData
+    const removeSnapData = useSnapStore.getState().removeSnapData
+    const clearSnapData = useSnapStore.getState().clearSnapData
 
     setLoadingProductId(productId)
     startTransition(async () => {
@@ -188,52 +191,52 @@ export default function PricingSection({
 
       try {
         const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
-          clearSnapData()
-          console.error("User not found")
-          return
-        }
-        userId = user.id
-
-        const existingData = getSnapData(user.id, productId)
-        const isDataValid = !!existingData && existingData.expiresAt >= new Date()
-
-        if (isDataValid) {
-          console.log("Using existing valid Snap data for", productId)
-          token = existingData.token
-          redirectUrl = existingData.redirect_url
-        } else {
-          if (existingData) {
-            console.log("Existing Snap data expired for", productId)
-            removeSnapData(user.id, productId)
-          }
-          console.log("No valid Snap data found for", productId, ". Dialog will fetch.")
-          token = null
-          redirectUrl = null
-        }
+        userId = user?.id ?? null
 
         const packData = creditPacks.find(p => p.productId === productId)
         if (!packData) {
           console.error(`Product data not found for productId: ${productId}`)
+          toast.error("Product information not available. Please try again later.")
           return
         }
 
         if (userId) {
-          setDialogData({
-            token: token,
-            redirectUrl: redirectUrl,
-            userId: userId,
-            productId: productId,
-            price: packData.basePriceUSD,
-            credits: packData.baseCredits,
-          })
-          setIsDialogOpen(true)
+          const existingData = getSnapData(userId, productId)
+          const isDataValid = !!existingData && existingData.expiresAt >= new Date()
+
+          if (isDataValid) {
+            console.log("Using existing valid Snap data for", productId)
+            token = existingData.token
+            redirectUrl = existingData.redirect_url
+          } else {
+            if (existingData) {
+              console.log("Existing Snap data expired for", productId)
+              removeSnapData(userId, productId)
+            }
+            console.log("No valid Snap data found for", productId, ". Dialog will fetch.")
+            token = null
+            redirectUrl = null
+          }
         } else {
-          console.error("User ID not available to open payment dialog.")
+          clearSnapData()
+          console.log("User not authenticated, skipping snap data check.")
+          token = null
+          redirectUrl = null
         }
+
+        setDialogData({
+          token: token,
+          redirectUrl: redirectUrl,
+          userId: userId,
+          productId: productId,
+          price: packData.basePriceUSD,
+          credits: packData.baseCredits,
+        })
+        setIsDialogOpen(true)
 
       } catch (error) {
         console.error("Error during purchase preparation:", error)
+        toast.error("An error occurred while preparing your purchase. Please try again.")
       } finally {
         setLoadingProductId(null)
       }
