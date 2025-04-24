@@ -1,5 +1,5 @@
 import PricingDescription from "./pricing-description"
-import PricingSection from "../landing/pricing-section"
+import PricingSection from "./pricing-section"
 import ContactUsSection from "../landing/contact-us-section"
 
 export default function Pricing() {
