@@ -12,9 +12,12 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useSnapStore } from "@/stores/use-snap-store"
 import { ProductId } from "@/types/product"
-import { CreditCard, ExternalLink } from "lucide-react"
+import { CreditCard, ExternalLink, Loader2 } from "lucide-react"
 import { useSnapPayment } from "@/hooks/use-snap-payment"
 import { toast } from "sonner"
+import { useTransition } from "react"
+import { sleep } from "@/lib/utils"
+
 interface PaymentOptionsDialogProps {
   isOpen: boolean
   onClose: () => void
@@ -32,6 +35,7 @@ export function PaymentOptionsDialog({
   userId,
   productId,
 }: PaymentOptionsDialogProps) {
+  const [isPending, startTransition] = useTransition()
   const removeSnapData = useSnapStore((state) => state.removeSnapData)
   const { initiatePaymentPopup } = useSnapPayment()
 
@@ -46,10 +50,13 @@ export function PaymentOptionsDialog({
   }
 
   const handleReset = () => {
-    removeSnapData(userId, productId)
-    console.log(`Cleared payment data for user ${userId}, product ${productId}`)
-    onClose()
-    toast.dismiss()
+    startTransition(async () => {
+      removeSnapData(userId, productId)
+      console.log(`Cleared payment data for user ${userId}, product ${productId}`)
+      toast.dismiss()
+      await sleep(250)
+      onClose()
+    })
   }
 
   if (!isOpen) {
@@ -96,7 +103,16 @@ export function PaymentOptionsDialog({
           </button>
         </div>
         <DialogFooter className="flex flex-row justify-between w-full pt-2 sm:justify-between">
-          <Button onClick={handleReset} variant="destructive" size="sm">Reset Payment</Button>
+          <Button onClick={handleReset} variant="destructive" size="sm" disabled={isPending}>
+            {isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Resetting...
+              </>
+            ) : (
+              "Reset Payment"
+            )}
+          </Button>
           <Button onClick={onClose} variant="ghost" size="sm">Cancel</Button>
         </DialogFooter>
       </DialogContent>
