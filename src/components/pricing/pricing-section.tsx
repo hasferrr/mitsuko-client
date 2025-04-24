@@ -35,6 +35,7 @@ interface Feature {
 }
 
 interface PricingSectionProps {
+  useH1Title?: boolean
   redirectToPricingPage?: boolean
   showDescription?: boolean
   showLink?: boolean
@@ -44,6 +45,7 @@ const USD = { symbol: "$", rate: 1 }
 const IDR = { symbol: "Rp", rate: 17000 }
 
 export default function PricingSection({
+  useH1Title = false,
   redirectToPricingPage = false,
   showDescription = false,
   showLink = true,
@@ -230,9 +232,15 @@ export default function PricingSection({
     <div id="pricing" className="py-16">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-            Simple, Transparent <span className="text-blue-400">Pricing</span>
-          </h2>
+          {useH1Title ? (
+            <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+              Simple, Transparent <span className="text-blue-400">Pricing</span>
+            </h1>
+          ) : (
+            <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+              Simple, Transparent <span className="text-blue-400">Pricing</span>
+            </h2>
+          )}
           <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Find the perfect plan for your needs. We offer monthly subscription and credit packs.
           </p>
