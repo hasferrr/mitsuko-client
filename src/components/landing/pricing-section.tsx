@@ -17,6 +17,7 @@ import { ProductId } from "@/types/product"
 import { useSnapStore } from "@/stores/use-snap-store"
 import { supabase } from "@/lib/supabase"
 import { PaymentOptionsDialog } from "./payment-options-dialog"
+import { useSnapPayment } from "@/hooks/use-snap-payment"
 
 interface Currency {
   symbol: string
@@ -52,6 +53,8 @@ export default function PricingSection({
     userId: string
     productId: ProductId
   } | null>(null)
+
+  const { initiatePaymentPopup } = useSnapPayment()
 
   const handleCurrencyChange = (value: string) => {
     setCurrency(value === "$" ? USD : IDR)
@@ -164,7 +167,8 @@ export default function PricingSection({
   ]
 
   const handlePurchase = async (productId: ProductId) => {
-    const { getSnapData, setSnapData, clearSnapData } = useSnapStore.getState()
+    const { getSnapData, setSnapData, clearSnapData, removeSnapData } = useSnapStore.getState()
+
     startTransition(async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
@@ -173,32 +177,37 @@ export default function PricingSection({
         return
       }
 
-      let currentSnapData = getSnapData(user.id, productId) ?? null
+      const existingData = getSnapData(user.id, productId)
+      const isDataValid = !!existingData && existingData.expiresAt >= new Date()
 
-      if (!currentSnapData || currentSnapData.expiresAt < new Date()) {
+      if (isDataValid) {
+        // Valid data exists -> Open Dialog
+        console.log("Using existing valid Snap data for", productId)
+        setDialogData({
+          token: existingData.token,
+          redirectUrl: existingData.redirect_url,
+          userId: user.id,
+          productId: productId
+        })
+        setIsDialogOpen(true)
+
+      } else {
+        // No data or expired -> Fetch new & Open Popup
+        if (existingData) {
+          console.log("Existing Snap data expired for", productId)
+          removeSnapData(user.id, productId)
+        }
         console.log("Fetching new Snap data for", productId)
         try {
           const { data: apiResult } = await createSnapPayment(productId)
-          const expiresAt = new Date(Date.now() + 60 * 60 * 1000)
-          const newDataToStore = { ...apiResult, expiresAt }
+          setSnapData(user.id, productId, apiResult)
+          initiatePaymentPopup(apiResult.token, user.id, productId)
 
-          setSnapData(user.id, productId, newDataToStore)
-          currentSnapData = newDataToStore
         } catch (error) {
           console.error("Failed to create payment link:", error)
           return
         }
-      } else {
-        console.log("Using existing Snap data for", productId)
       }
-
-      setDialogData({
-        token: currentSnapData.token,
-        redirectUrl: currentSnapData.redirect_url,
-        userId: user.id,
-        productId: productId
-      })
-      setIsDialogOpen(true)
     })
   }
 

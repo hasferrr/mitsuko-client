@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useSnapStore } from "@/stores/use-snap-store"
 import { ProductId } from "@/types/product"
-import { SnapTransactionResult } from "@/types/snap"
 import { CreditCard, ExternalLink } from "lucide-react"
+import { useSnapPayment } from "@/hooks/use-snap-payment"
 
 interface PaymentOptionsDialogProps {
   isOpen: boolean
@@ -33,34 +33,11 @@ export function PaymentOptionsDialog({
   productId,
 }: PaymentOptionsDialogProps) {
   const removeSnapData = useSnapStore((state) => state.removeSnapData)
+  const { initiatePaymentPopup } = useSnapPayment()
 
   const handlePopup = () => {
-    if (!window.snap) {
-      console.error('Snap.js script is not loaded yet.')
-      // TODO: Show error toast
-      return
-    }
     onClose()
-    window.snap.pay(token, {
-      language: "en",
-      onSuccess: (result: SnapTransactionResult) => {
-        console.log("payment success!", result)
-        // TODO: Add success feedback / redirection
-        removeSnapData(userId, productId)
-      },
-      onPending: (result: SnapTransactionResult) => {
-        console.log("waiting your payment!", result)
-        // TODO: Add pending feedback
-      },
-      onError: (result: SnapTransactionResult) => {
-        console.error("payment failed!", result)
-        // TODO: Add error feedback
-        removeSnapData(userId, productId)
-      },
-      onClose: () => {
-        console.log('you closed the popup without finishing the payment')
-      }
-    })
+    initiatePaymentPopup(token, userId, productId)
   }
 
   const handleNewTab = () => {
@@ -71,7 +48,6 @@ export function PaymentOptionsDialog({
   const handleReset = () => {
     removeSnapData(userId, productId)
     console.log(`Cleared payment data for user ${userId}, product ${productId}`)
-    // TODO: Show confirmation toast
     onClose()
   }
 
