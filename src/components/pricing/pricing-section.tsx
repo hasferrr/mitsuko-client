@@ -19,6 +19,7 @@ import { supabase } from "@/lib/supabase"
 import { PaymentOptionsDialog } from "./payment-options-dialog"
 import { useSnapPayment } from "@/hooks/use-snap-payment"
 import { useRouter } from "next/navigation"
+import { ComingSoonTooltipWrapper } from "@/components/ui/coming-soon-tooltip-wrapper"
 
 interface Currency {
   symbol: string
@@ -311,22 +312,29 @@ export default function PricingSection({
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 Fewer limitations and monthly credit grant. Email support included.
               </p>
-              <Button
-                disabled={!redirectToPricingPage}
-                className={cn(
-                  "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6",
-                )}
-                onClick={() => {
-                  if (redirectToPricingPage) {
-                    router.push("/pricing")
-                  } else {
-                    // TODO: Handle purchase
-                  }
-                }}
-              >
-                {/* Subscribe Now */}
-                {redirectToPricingPage ? "Go to Pricing Page" : "Coming Soon"}
-              </Button>
+              {redirectToPricingPage ? (
+                <Button
+                  className={cn(
+                    "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6",
+                  )}
+                  onClick={() => router.push("/pricing")}
+                >
+                  Go to Pricing Page
+                </Button>
+              ) : (
+                <ComingSoonTooltipWrapper>
+                  <Button
+                    disabled
+                    className={cn(
+                      "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors",
+                      "cursor-not-allowed opacity-50"
+                    )}
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    Coming Soon
+                  </Button>
+                </ComingSoonTooltipWrapper>
+              )}
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
@@ -373,22 +381,29 @@ export default function PricingSection({
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 Maximum features with priority support and cloud saving.
               </p>
-              <Button
-                disabled={!redirectToPricingPage}
-                className={cn(
-                  "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6",
-                )}
-                onClick={() => {
-                  if (redirectToPricingPage) {
-                    router.push("/pricing")
-                  } else {
-                    // TODO: Handle purchase
-                  }
-                }}
-              >
-                {/* Go Pro */}
-                {redirectToPricingPage ? "Go to Pricing Page" : "Coming Soon"}
-              </Button>
+              {redirectToPricingPage ? (
+                <Button
+                  className={cn(
+                    "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6",
+                  )}
+                  onClick={() => router.push("/pricing")}
+                >
+                  Go to Pricing Page
+                </Button>
+              ) : (
+                <ComingSoonTooltipWrapper>
+                  <Button
+                    disabled
+                    className={cn(
+                      "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors",
+                      "cursor-not-allowed opacity-50"
+                    )}
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    Coming Soon
+                  </Button>
+                </ComingSoonTooltipWrapper>
+              )}
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
