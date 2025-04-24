@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Check, Info, X } from "lucide-react"
+import { Check, Info, X, Loader2 } from "lucide-react"
 import { Button } from "../ui/button"
 import { useState, useTransition } from "react"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
+import { cn, sleep } from "@/lib/utils"
 import { createSnapPayment } from "@/lib/api/create-snap-payment"
 import { ProductId } from "@/types/product"
 import { useSnapStore } from "@/stores/use-snap-store"
@@ -51,6 +51,7 @@ export default function PricingSection({
   const [currency, setCurrency] = useState<Currency>(USD)
   const [isPending, startTransition] = useTransition()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [loadingProductId, setLoadingProductId] = useState<ProductId | null>(null)
   const [dialogData, setDialogData] = useState<{
     token: string
     redirectUrl: string
@@ -177,44 +178,50 @@ export default function PricingSection({
   const handlePurchase = async (productId: ProductId) => {
     const { getSnapData, setSnapData, clearSnapData, removeSnapData } = useSnapStore.getState()
 
+    setLoadingProductId(productId)
     startTransition(async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        clearSnapData()
-        console.error("User not found")
-        return
-      }
-
-      const existingData = getSnapData(user.id, productId)
-      const isDataValid = !!existingData && existingData.expiresAt >= new Date()
-
-      if (isDataValid) {
-        // Valid data exists -> Open Dialog
-        console.log("Using existing valid Snap data for", productId)
-        setDialogData({
-          token: existingData.token,
-          redirectUrl: existingData.redirect_url,
-          userId: user.id,
-          productId: productId
-        })
-        setIsDialogOpen(true)
-
-      } else {
-        // No data or expired -> Fetch new & Open Popup
-        if (existingData) {
-          console.log("Existing Snap data expired for", productId)
-          removeSnapData(user.id, productId)
-        }
-        console.log("Fetching new Snap data for", productId)
-        try {
-          const { data: apiResult } = await createSnapPayment(productId)
-          setSnapData(user.id, productId, apiResult)
-          initiatePaymentPopup(apiResult.token, user.id, productId)
-
-        } catch (error) {
-          console.error("Failed to create payment link:", error)
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          clearSnapData()
+          console.error("User not found")
           return
         }
+
+        const existingData = getSnapData(user.id, productId)
+        const isDataValid = !!existingData && existingData.expiresAt >= new Date()
+
+        if (isDataValid) {
+          // Valid data exists -> Open Dialog
+          console.log("Using existing valid Snap data for", productId)
+          setDialogData({
+            token: existingData.token,
+            redirectUrl: existingData.redirect_url,
+            userId: user.id,
+            productId: productId
+          })
+          setIsDialogOpen(true)
+
+        } else {
+          // No data or expired -> Fetch new & Open Popup
+          if (existingData) {
+            console.log("Existing Snap data expired for", productId)
+            removeSnapData(user.id, productId)
+          }
+          console.log("Fetching new Snap data for", productId)
+          try {
+            const { data: apiResult } = await createSnapPayment(productId)
+            setSnapData(user.id, productId, apiResult)
+            initiatePaymentPopup(apiResult.token, user.id, productId)
+            await sleep(1000)
+
+          } catch (error) {
+            console.error("Failed to create payment link:", error)
+            return
+          }
+        }
+      } finally {
+        setLoadingProductId(null)
       }
     })
   }
@@ -536,19 +543,29 @@ export default function PricingSection({
                 {pack.discount && (
                   <div className="text-xs text-green-600 dark:text-green-400">Save {currency.symbol}{pack.discount}</div>
                 )}
-                <Button
-                  className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
-                  onClick={() => {
-                    if (redirectToPricingPage) {
-                      router.push("/pricing")
-                    } else {
-                      handlePurchase(pack.productId)
-                    }
-                  }}
-                  disabled={isPending}
-                >
-                  {redirectToPricingPage ? "Go to Pricing Page" : "Purchase"}
-                </Button>
+                {redirectToPricingPage ? (
+                  <Button
+                    className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
+                    onClick={() => router.push("/pricing")}
+                  >
+                    Go to Pricing Page
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
+                    onClick={() => handlePurchase(pack.productId)}
+                    disabled={isPending}
+                  >
+                    {isPending && loadingProductId === pack.productId ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Purchasing...
+                      </>
+                    ) : (
+                      "Purchase"
+                    )}
+                  </Button>
+                )}
               </div>
             ))}
           </div>

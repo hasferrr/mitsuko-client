@@ -60,7 +60,7 @@ export function PaymentOptionsDialog({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Mitsuko Payment</DialogTitle>
+          <DialogTitle>Continue Payment</DialogTitle>
           <DialogDescription>
             Please select a payment method to continue.
           </DialogDescription>
