@@ -12,7 +12,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
-import { createSnapPayment } from "@/lib/api/create-snap-payment"
 import { ProductId } from "@/types/product"
 import { useSnapStore } from "@/stores/use-snap-store"
 import { supabase } from "@/lib/supabase"
@@ -54,8 +53,8 @@ export default function PricingSection({
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [loadingProductId, setLoadingProductId] = useState<ProductId | null>(null)
   const [dialogData, setDialogData] = useState<{
-    token: string
-    redirectUrl: string
+    token: string | null
+    redirectUrl: string | null
     userId: string
     productId: ProductId
   } | null>(null)
@@ -175,7 +174,7 @@ export default function PricingSection({
   ]
 
   const handlePurchase = async (productId: ProductId) => {
-    const { getSnapData, setSnapData, clearSnapData, removeSnapData } = useSnapStore.getState()
+    const { getSnapData, clearSnapData, removeSnapData } = useSnapStore.getState()
 
     setLoadingProductId(productId)
     startTransition(async () => {
@@ -204,19 +203,12 @@ export default function PricingSection({
             console.log("Existing Snap data expired for", productId)
             removeSnapData(user.id, productId)
           }
-          console.log("Fetching new Snap data for", productId)
-          try {
-            const { data: apiResult } = await createSnapPayment(productId)
-            setSnapData(user.id, productId, apiResult)
-            token = apiResult.token
-            redirectUrl = apiResult.redirect_url
-          } catch (error) {
-            console.error("Failed to create payment link:", error)
-            return
-          }
+          console.log("No valid Snap data found for", productId, ". Dialog will fetch.")
+          token = null
+          redirectUrl = null
         }
 
-        if (token && redirectUrl && userId) {
+        if (userId) {
           setDialogData({
             token: token,
             redirectUrl: redirectUrl,
@@ -225,13 +217,12 @@ export default function PricingSection({
           })
           setIsDialogOpen(true)
         } else {
-          console.error("Failed to prepare data for payment dialog.")
+          console.error("User ID not available to open payment dialog.")
         }
 
       } catch (error) {
-        console.error("Error during purchase process:", error)
-      }
-      finally {
+        console.error("Error during purchase preparation:", error)
+      } finally {
         setLoadingProductId(null)
       }
     })
