@@ -14,11 +14,11 @@ import {
 import { cn } from "@/lib/utils"
 import { ProductId } from "@/types/product"
 import { useSnapStore } from "@/stores/use-snap-store"
-import { supabase } from "@/lib/supabase"
 import { PaymentOptionsDialog } from "./payment-options-dialog"
 import { useRouter } from "next/navigation"
 import { ComingSoonTooltipWrapper } from "@/components/ui/coming-soon-tooltip-wrapper"
 import { toast } from "sonner"
+import { useSessionStore } from "@/stores/use-session-store"
 
 interface Currency {
   symbol: string
@@ -65,6 +65,8 @@ export default function PricingSection({
   } | null>(null)
 
   const router = useRouter()
+
+  const session = useSessionStore((state) => state.session)
 
   const handleCurrencyChange = (value: string) => {
     setCurrency(value === "$" ? USD : IDR)
@@ -192,8 +194,7 @@ export default function PricingSection({
       let userId: string | null = null
 
       try {
-        const { data: { user } } = await supabase.auth.getUser()
-        userId = user?.id ?? null
+        userId = session?.user.id ?? null
 
         const packData = creditPacks.find(p => p.productId === productId)
         if (!packData) {
