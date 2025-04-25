@@ -5,10 +5,12 @@ import PricingSection from "../pricing/pricing-section"
 import FAQSection from "./faq-section"
 import HeroSection from "./hero-section"
 import CreditValueShowcase from "../pricing/credit-value-showcase"
+import AnnouncementHeadline from "./announcement-headline"
 
 export default function MainLandingPage() {
   return (
     <>
+      <AnnouncementHeadline />
       <HeroSection />
       <KeyFeatures />
       <DemoSection />
