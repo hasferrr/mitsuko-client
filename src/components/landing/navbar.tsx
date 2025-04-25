@@ -1,9 +1,15 @@
+"use client"
+
 import Link from "next/link"
 import { ChevronDown } from "lucide-react"
 import { ThemeToggle } from "@/components/landing/theme-toggle"
 import { Button } from "../ui/button"
+import { useSessionStore } from "@/stores/use-session-store"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 
 export default function Navbar() {
+  const session = useSessionStore((state) => state.session)
+
   return (
     <header
       className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-gray-200 dark:border-gray-800"
@@ -84,7 +90,24 @@ export default function Navbar() {
             href="/auth/login"
             className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors"
           >
-            Sign In
+            {session ? (
+              <div className="group relative">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={session.user?.user_metadata?.avatar_url} />
+                  <AvatarFallback>{session.user?.email?.[0].toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div className="absolute right-0 mt-2 w-48 p-2 bg-white dark:bg-gray-800 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {session.user?.user_metadata?.full_name}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                    {session.user?.email}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              "Sign In"
+            )}
           </Link>
         </div>
       </div>
