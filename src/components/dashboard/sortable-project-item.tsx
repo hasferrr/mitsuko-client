@@ -75,6 +75,7 @@ export const SortableProjectItem = ({ project, isHorizontal, onDelete }: Sortabl
         ref={setNodeRef}
         style={style}
         className={cn(
+          "dark:bg-[#111111]",
           "border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-card/80 transition-colors",
           isDragging && "opacity-50"
         )}

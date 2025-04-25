@@ -149,10 +149,12 @@ export function WelcomeView() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Translation Option */}
           <div
-            className={`border rounded-xl p-6 transition-all cursor-pointer ${selectedOption === "translate"
-              ? "border-primary bg-primary/5 shadow-md"
-              : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
-              }`}
+            className={cn(
+              "dark:bg-[#111111] border rounded-xl p-6 transition-all cursor-pointer",
+              selectedOption === "translate"
+                ? "border-primary bg-primary/5 shadow-md"
+                : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
+            )}
             onClick={() => handleOptionClick("translate")}
           >
             <div className="flex flex-col h-full">
@@ -218,10 +220,12 @@ export function WelcomeView() {
 
           {/* Transcription Option */}
           <div
-            className={`border rounded-xl p-6 transition-all cursor-pointer ${selectedOption === "transcribe"
-              ? "border-primary bg-primary/5 shadow-md"
-              : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
-              }`}
+            className={cn(
+              "dark:bg-[#111111] border rounded-xl p-6 transition-all cursor-pointer",
+              selectedOption === "transcribe"
+                ? "border-primary bg-primary/5 shadow-md"
+                : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
+            )}
             onClick={() => handleOptionClick("transcribe")}
           >
             <div className="flex flex-col h-full">
@@ -286,10 +290,12 @@ export function WelcomeView() {
 
           {/* Extraction Option */}
           <div
-            className={`border rounded-xl p-6 transition-all cursor-pointer ${selectedOption === "extract-context"
-              ? "border-primary bg-primary/5 shadow-md"
-              : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
-              }`}
+            className={cn(
+              "dark:bg-[#111111] border rounded-xl p-6 transition-all cursor-pointer",
+              selectedOption === "extract-context"
+                ? "border-primary bg-primary/5 shadow-md"
+                : "border-border bg-card hover:border-primary/50 hover:bg-card/80"
+            )}
             onClick={() => handleOptionClick("extract-context")}
           >
             <div className="flex flex-col h-full">
