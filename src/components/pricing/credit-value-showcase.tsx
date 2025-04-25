@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { DISCORD_LINK } from "@/constants/external-links"
 import { Sparkles, Mail, MessageSquare } from "lucide-react"
 import { useEmailLink } from "@/hooks/use-email-link"
@@ -11,14 +12,22 @@ interface CreditValueShowcaseProps {
 
 export default function CreditValueShowcase({ showGetCreditsButton = false }: CreditValueShowcaseProps) {
   const { emailHref, eventHandlers } = useEmailLink()
+  const [isMinimalContext, setIsMinimalContext] = useState(false)
 
   const example1Credits = 112_731
   const example1Minutes = 100
-  const example1CreditsPerMinute = example1Credits / example1Minutes
+  const baseExample1CreditsPerMinute = example1Credits / example1Minutes
 
   const example2Credits = 119_458
   const example2Minutes = 26
-  const example2CreditsPerMinute = example2Credits / example2Minutes
+  const baseExample2CreditsPerMinute = example2Credits / example2Minutes
+
+  const contextMultiplier = isMinimalContext ? 0.5 : 1
+  const example1CreditsPerMinute = baseExample1CreditsPerMinute * contextMultiplier
+  const example2CreditsPerMinute = baseExample2CreditsPerMinute * contextMultiplier
+
+  const displayedExample1Credits = example1Credits * contextMultiplier
+  const displayedExample2Credits = example2Credits * contextMultiplier
 
   const averageCreditsPerMinute = (example1CreditsPerMinute + example2CreditsPerMinute) / 2
 
@@ -27,6 +36,11 @@ export default function CreditValueShowcase({ showGetCreditsButton = false }: Cr
   const totalHours = Math.floor(totalMinutes / 60)
   const remainingMinutes = Math.round(totalMinutes % 60)
 
+  const handleContextToggle = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    setIsMinimalContext(!isMinimalContext)
+  }
+
   return (
     <div className="relative rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 border border-blue-700 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-lg text-white">
       <div className="absolute top-0 left-0 -ml-12 -mt-12 w-48 h-48 bg-white/10 rounded-full opacity-50"></div>
@@ -34,18 +48,33 @@ export default function CreditValueShowcase({ showGetCreditsButton = false }: Cr
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
         <div className="flex-1">
           <h3 className="text-2xl font-semibold mb-3 flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-yellow-300" />
-            Unlock Massive Translation Power!
+            <div className="w-6 h-6">
+              <Sparkles className="w-6 h-6 text-yellow-300" />
+            </div>
+              Unlock Massive Translation Power!
           </h3>
           <p className="text-lg text-blue-100 mb-4">
-            Ever wondered what <strong>2 Million Credits</strong> can get you? Hours of subtitle translation using powerful DeepSeek R1 with context-memory enabled!
+            Ever wondered what <strong>2 Million Credits</strong> can get you? Hours of subtitle translation using powerful DeepSeek R1 with{' '}
+            <span
+              onClick={handleContextToggle}
+              className="relative inline-block group cursor-pointer font-medium text-white hover:text-blue-800 transition-colors duration-300"
+            >
+              <span className="relative z-10 underline decoration-dotted decoration-slate-300 underline-offset-4 group-hover:no-underline">
+                {isMinimalContext ? "minimal context" : "context-memory"}
+              </span>
+              <span className="absolute bottom-0 left-0 inline-block h-full w-0 bg-yellow-300 transition-all duration-300 ease-out group-hover:w-full -z-10"></span>
+            </span>
+            {' '}enabled!
           </p>
           <p className="text-sm text-blue-200">
-            *Credit cost varies (e.g., Example 1: {example1Credits.toLocaleString()} credits ≈ {example1Minutes} min, ~{Math.round(example1CreditsPerMinute)}/min; up to Example 2: {example2Credits.toLocaleString()} credits ≈ {example2Minutes} min, ~{Math.round(example2CreditsPerMinute)}/min).
-            The time shown (~{totalHours}h {remainingMinutes > 0 ? `${remainingMinutes}m ` : ''}) uses an average rate (~{Math.round(averageCreditsPerMinute)} credits/min).
+            *Credit cost varies (e.g., Example 1: {Math.round(displayedExample1Credits).toLocaleString()} credits ≈ {example1Minutes} min, ~{Math.round(example1CreditsPerMinute)}/min; up to Example 2: {Math.round(displayedExample2Credits).toLocaleString()} credits ≈ {example2Minutes} min, ~{Math.round(example2CreditsPerMinute)}/min).
+            The time shown (~{totalHours}h {remainingMinutes > 0 ? `${remainingMinutes}m` : ''}) uses an average rate (~{Math.round(averageCreditsPerMinute)} credits/min).
           </p>
         </div>
-        <div className="bg-white/20 rounded-lg p-6 text-center shadow-md backdrop-blur-sm border border-white/30 min-w-[200px]">
+        <button
+          className="relative md:top-5 bg-white/20 rounded-lg p-6 text-center shadow-md backdrop-blur-sm border border-white/30 min-w-[200px] transition-transform duration-200 hover:scale-105"
+          onClick={() => setIsMinimalContext(!isMinimalContext)}
+        >
           <div className="text-5xl font-bold text-yellow-300 mb-2">
             ~{totalHours} hrs
           </div>
@@ -57,9 +86,12 @@ export default function CreditValueShowcase({ showGetCreditsButton = false }: Cr
           <div className="text-sm font-medium text-blue-100 uppercase tracking-wider">
             Subtitle Translation
           </div>
-        </div>
+          <div className="text-xs text-blue-200 mt-1">
+            ({isMinimalContext ? "Minimal Context" : "Context-Memory"})
+          </div>
+        </button>
       </div>
-      <div className="relative z-10 mt-6 flex flex-wrap items-center md:justify-start justify-center gap-6">
+      <div className="relative z-10 mt-4 mb-1 flex flex-wrap items-center md:justify-start justify-center gap-6">
         {showGetCreditsButton ? (
           <a
             href="#credit-packs"
