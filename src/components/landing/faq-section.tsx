@@ -34,7 +34,7 @@ const faqData = [
   },
   {
     question: "What is the refund policy?",
-    answer: "We currently do not offer refunds for purchased credits and plans. However, this might change in the future.",
+    answer: "We currently do not offer refunds for purchased credits and plans. However, this might change in the future. Contact us if you have any questions.",
   },
   {
     question: "Will Mitsuko add more features in the future?",
