@@ -10,7 +10,7 @@ export default function Pricing() {
       <PricingSection showLink={false} showDescription useH1Title />
       <PricingDescription />
       <section className="pt-12 pb-24 px-4">
-        <CreditValueShowcase />
+        <CreditValueShowcase showGetCreditsButton />
       </section>
     </>
   )

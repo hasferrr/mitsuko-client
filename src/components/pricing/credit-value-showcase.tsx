@@ -5,7 +5,11 @@ import { DISCORD_LINK } from "@/constants/external-links"
 import { Sparkles, Mail, MessageSquare } from "lucide-react"
 import { useEmailLink } from "@/hooks/use-email-link"
 
-export default function CreditValueShowcase() {
+interface CreditValueShowcaseProps {
+  showGetCreditsButton?: boolean
+}
+
+export default function CreditValueShowcase({ showGetCreditsButton = false }: CreditValueShowcaseProps) {
   const { emailHref, eventHandlers } = useEmailLink()
 
   const example1Credits = 112_731
@@ -56,12 +60,21 @@ export default function CreditValueShowcase() {
         </div>
       </div>
       <div className="relative z-10 mt-6 flex flex-wrap items-center md:justify-start justify-center gap-6">
-        <a
-          href="#credit-packs"
-          className="inline-block bg-yellow-400 hover:bg-yellow-500 text-purple-800 font-bold py-3 px-6 rounded-lg shadow-md transition-colors duration-300"
-        >
-          Get Credits Now!
-        </a>
+        {showGetCreditsButton ? (
+          <a
+            href="#credit-packs"
+            className="inline-block bg-yellow-400 hover:bg-yellow-500 text-purple-800 font-bold py-3 px-6 rounded-lg shadow-md transition-colors duration-300"
+          >
+            Get Credits Now!
+          </a>
+        ) : (
+          <Link
+            href="/dashboard"
+            className="inline-block bg-yellow-400 hover:bg-yellow-500 text-purple-800 font-bold py-3 px-6 rounded-lg shadow-md transition-colors duration-300"
+          >
+            Get Started for Free!
+          </Link>
+        )}
         <div className="flex items-center gap-6">
           <Link
             {...eventHandlers}
