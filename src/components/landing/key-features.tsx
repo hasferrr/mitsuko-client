@@ -2,8 +2,9 @@ import { Languages, AudioWaveform, Layers } from "lucide-react"
 
 export default function KeyFeatures() {
   return (
-    <div id="features" className="mt-24 mb-12">
-      <div className="text-center">
+    <div className="mt-24 mb-12">
+      <div className="relative text-center">
+        <div id="features" className="absolute -top-24" />
         <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
           Key Features
         </h2>
@@ -14,7 +15,7 @@ export default function KeyFeatures() {
 
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
             <div className="text-[#3B82F6] mb-6">
               <Languages size={40} />
             </div>
@@ -25,7 +26,7 @@ export default function KeyFeatures() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
             <div className="text-red-500 mb-6">
               <div className="w-10 h-10 rounded-md bg-red-500 flex items-center justify-center">
                 <AudioWaveform size={24} className="text-white" />
@@ -37,7 +38,7 @@ export default function KeyFeatures() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
             <div className="text-purple-500 mb-6">
               <Layers size={40} />
             </div>
@@ -50,7 +51,7 @@ export default function KeyFeatures() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mx-auto">
           {/* Context-aware translation component */}
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
             <div className="flex items-center gap-2 text-[#3B82F6] mb-6">
               <Languages size={20} />
               <span>Subtitle Translation</span>
@@ -97,7 +98,7 @@ export default function KeyFeatures() {
           </div>
 
           {/* Audio Transcription Component */}
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
             <div className="flex items-center gap-2 text-red-500 mb-6">
               <AudioWaveform size={20} />
               <span>Audio Transcription</span>
@@ -144,7 +145,7 @@ export default function KeyFeatures() {
           </div>
 
           {/* Context Extractor Component */}
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
             <div className="flex items-center gap-2 text-purple-500 mb-6">
               <Layers size={20} />
               <span>Context Extractor</span>

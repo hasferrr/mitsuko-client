@@ -44,8 +44,9 @@ const faqData = [
 
 export default function FAQSection() {
   return (
-    <section id="faq" className="w-full py-16 bg-white dark:bg-black transition-colors">
-      <div className="max-w-6xl mx-auto px-4">
+    <section className="w-full py-16 bg-white dark:bg-black transition-colors">
+      <div className="relative max-w-6xl mx-auto px-4">
+        <div id="faq" className="absolute -top-24" />
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <h2 className="text-4xl font-bold tracking-tighter text-gray-900 dark:text-white">
