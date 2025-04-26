@@ -18,9 +18,9 @@ export default function AnnouncementHeadline() {
     <section className="py-1 text-center bg-gradient-to-r from-blue-500 to-purple-600 relative">
       <div className="container mx-auto flex items-center justify-center gap-2 relative">
         <span className="text-sm md:text-lg">✨</span>
-        <h2 className="text-xs md:text-base font-medium text-white">
+        <p className="text-xs md:text-base font-medium text-white">
           Featuring OpenAI GPT Models & Credit Packs Now Available!
-        </h2>
+        </p>
         <span className="text-sm md:text-lg">📦</span>
 
         <button
