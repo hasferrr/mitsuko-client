@@ -1,3 +1,7 @@
+"use client"
+
+import { useRef } from "react"
+import { motion, useInView } from "framer-motion"
 import ComparisonInteractive from "./comparison-interactive"
 
 type ComparisonCategory = "context" | "cultural" | "timestamp" | "idiomatic" | "content"
@@ -138,20 +142,35 @@ const comparisonDetailsTextData: Record<ComparisonCategory, ComparisonDetailText
 }
 
 export default function ComparisonSection() {
-  return (
-    <div className="bg-white dark:bg-black py-16">
-      <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-4 text-gray-900 dark:text-white">
-          Why Choose Mitsuko
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 text-center max-w-3xl mx-auto mb-12">
-          See how Mitsuko outperforms machine translator and is comparable to human translation
-        </p>
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true })
 
-        <ComparisonInteractive
-          comparisonCategoriesData={comparisonCategoriesData}
-          comparisonDetailsTextData={comparisonDetailsTextData}
-        />
+  return (
+    <div ref={ref} className="bg-white dark:bg-black py-16">
+      <div className="max-w-6xl mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <h2 className="text-4xl font-bold text-center mb-4 text-gray-900 dark:text-white">
+            Why Choose Mitsuko
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 text-center max-w-3xl mx-auto mb-12">
+            See how Mitsuko outperforms machine translator and is comparable to human translation
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <ComparisonInteractive
+            comparisonCategoriesData={comparisonCategoriesData}
+            comparisonDetailsTextData={comparisonDetailsTextData}
+          />
+        </motion.div>
       </div>
     </div>
   )

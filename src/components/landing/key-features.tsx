@@ -1,9 +1,21 @@
+"use client"
+
 import { Languages, AudioWaveform, Layers } from "lucide-react"
+import { useRef } from "react"
+import { motion, useInView } from "framer-motion"
 
 export default function KeyFeatures() {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true })
+
   return (
-    <div className="mt-24 mb-12">
-      <div className="relative text-center">
+    <div ref={ref} className="mt-24 mb-12">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="relative text-center"
+      >
         <div id="features" className="absolute -top-24" />
         <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
           Key Features
@@ -11,10 +23,15 @@ export default function KeyFeatures() {
         <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
           Everything you need for high-quality translation and transcription.
         </p>
-      </div>
+      </motion.div>
 
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"
+        >
           <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
             <div className="text-[#3B82F6] mb-6">
               <Languages size={40} />
@@ -47,9 +64,14 @@ export default function KeyFeatures() {
               Maintain context across episodes and scenes for consistent, accurate, and high-quality translations.
             </p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6 mx-auto"
+        >
           {/* Context-aware translation component */}
           <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
             <div className="flex items-center gap-2 text-[#3B82F6] mb-6">
@@ -190,7 +212,7 @@ export default function KeyFeatures() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   )

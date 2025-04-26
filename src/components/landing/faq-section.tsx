@@ -1,3 +1,7 @@
+"use client"
+
+import { useRef } from "react"
+import { motion, useInView } from "framer-motion"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 // FAQ data structure
@@ -43,11 +47,19 @@ const faqData = [
 ]
 
 export default function FAQSection() {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true })
+
   return (
-    <section className="w-full py-16 bg-white dark:bg-black transition-colors">
+    <section ref={ref} className="w-full py-16 bg-white dark:bg-black transition-colors">
       <div className="relative max-w-6xl mx-auto px-4">
         <div id="faq" className="absolute -top-24" />
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="flex flex-col items-center justify-center space-y-4 text-center"
+        >
           <div className="space-y-2">
             <h2 className="text-4xl font-bold tracking-tighter text-gray-900 dark:text-white">
               Frequently Asked Questions
@@ -56,8 +68,13 @@ export default function FAQSection() {
               Find answers to common questions about Mitsuko and its features.
             </p>
           </div>
-        </div>
-        <div className="mx-auto max-w-3xl mt-12">
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mx-auto max-w-3xl mt-12"
+        >
           <Accordion type="single" collapsible className="w-full">
             {faqData.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 dark:border-gray-800">
@@ -78,7 +95,7 @@ export default function FAQSection() {
               </AccordionItem>
             ))}
           </Accordion>
-        </div>
+        </motion.div>
       </div>
     </section>
   )

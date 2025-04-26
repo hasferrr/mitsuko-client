@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useRef } from "react"
+import { motion, useInView } from "framer-motion"
 import { DISCORD_LINK } from "@/constants/external-links"
 import { Sparkles, Mail, MessageSquare } from "lucide-react"
 import { useEmailLink } from "@/hooks/use-email-link"
@@ -13,6 +14,8 @@ interface CreditValueShowcaseProps {
 export default function CreditValueShowcase({ showGetCreditsButton = false }: CreditValueShowcaseProps) {
   const { emailHref, eventHandlers } = useEmailLink()
   const [isMinimalContext, setIsMinimalContext] = useState(false)
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true })
 
   const example1Credits = 112_731
   const example1Minutes = 100
@@ -42,7 +45,13 @@ export default function CreditValueShowcase({ showGetCreditsButton = false }: Cr
   }
 
   return (
-    <div className="relative rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 border border-blue-700 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-lg text-white">
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.5 }}
+      className="relative rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 border border-blue-700 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-lg text-white"
+    >
       <div className="absolute top-0 left-0 -ml-12 -mt-12 w-48 h-48 bg-white/10 rounded-full opacity-50"></div>
       <div className="absolute bottom-0 right-0 mr-4 mb-4 w-32 h-32 bg-white/10 rounded-full opacity-30"></div>
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
@@ -127,6 +136,6 @@ export default function CreditValueShowcase({ showGetCreditsButton = false }: Cr
           </Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

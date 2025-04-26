@@ -3,7 +3,8 @@
 import Link from "next/link"
 import { Check, Info, X, Loader2 } from "lucide-react"
 import { Button } from "../ui/button"
-import { useState, useTransition } from "react"
+import { useState, useTransition, useRef } from "react"
+import { motion, useInView } from "framer-motion"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import {
   Tooltip,
@@ -67,6 +68,9 @@ export default function PricingSection({
   const router = useRouter()
 
   const session = useSessionStore((state) => state.session)
+
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true })
 
   const handleCurrencyChange = (value: string) => {
     setCurrency(value === "$" ? USD : IDR)
@@ -249,9 +253,14 @@ export default function PricingSection({
   }
 
   return (
-    <div id="pricing" className="py-16">
+    <div id="pricing" ref={ref} className="py-16">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-center mb-12"
+        >
           {useH1Title ? (
             <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
               Simple, Transparent <span className="text-blue-400">Pricing</span>
@@ -264,10 +273,15 @@ export default function PricingSection({
           <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Find the perfect plan for your needs. We offer monthly subscription and credit packs.
           </p>
-        </div>
+        </motion.div>
 
         {/* Currency Tabs */}
-        <div className="flex justify-center items-center mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="flex justify-center items-center mb-8"
+        >
           <span className="text-gray-600 dark:text-gray-400 mr-2">Show currency in</span>
           <Tabs
             defaultValue={USD.symbol}
@@ -280,10 +294,15 @@ export default function PricingSection({
               <TabsTrigger value={IDR.symbol}>IDR</TabsTrigger>
             </TabsList>
           </Tabs>
-        </div>
+        </motion.div>
 
         {/* Pricing Cards */}
-        <div className="relative grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="relative grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16"
+        >
           <div id="pricing-cards" className="absolute -top-24" />
           {/* Free Tier */}
           <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
@@ -473,10 +492,15 @@ export default function PricingSection({
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Feature Comparison Table */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto shadow-sm"
+        >
           <div className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 p-4">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
               Feature Comparison
@@ -544,10 +568,15 @@ export default function PricingSection({
               </tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
 
         {/* Credit Pack Prices */}
-        <div className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-sm"
+        >
           <div id="credit-packs" className="absolute -top-24" />
           <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
             Credit Pack Prices
@@ -597,7 +626,7 @@ export default function PricingSection({
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* More Information */}
         {showLink && (
