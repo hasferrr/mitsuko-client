@@ -1,5 +1,4 @@
 import KeyFeatures from "./key-features"
-import DemoSection from "./demo-section"
 import ComparisonSection from "./comparison-section"
 import PricingSection from "../pricing/pricing-section"
 import FAQSection from "./faq-section"
@@ -13,7 +12,6 @@ export default function MainLandingPage() {
       <AnnouncementHeadline />
       <HeroSection />
       <KeyFeatures />
-      <DemoSection />
       <ComparisonSection />
       <PricingSection redirectToPricingPage />
       <FAQSection />

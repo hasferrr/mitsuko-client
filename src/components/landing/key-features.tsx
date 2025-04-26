@@ -34,7 +34,7 @@ export default function KeyFeatures() {
             </div>
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Audio Transcriber</h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Generate perfectly timed subtitles from audio files with custom instructions for precise and flexible results.
+              Generate perfectly timed subtitles from audio files with custom instructions for precise results.
             </p>
           </div>
 

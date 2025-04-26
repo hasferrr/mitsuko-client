@@ -11,20 +11,17 @@ export default function HeroSection() {
         </span>
       </div>
 
-      <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-        <h1 className="text-4xl md:text-6xl sm:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
-          AI Subtitle Translator Mitsuko: Fast & Accurate Translations.
-          {/* AI Subtitle Translator Mitsuko: <span className="inline-block">
-            <span className="relative inline-block group">
-              <span className="relative z-10">Fast & Accurate</span>
-              <span className="absolute bottom-0 left-0 h-full w-0 group-hover:w-full rounded-md bg-blue-500 transition-all duration-500 ease-out -z-10"></span>
-            </span>
-          </span> Translations. */}
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-8 text-sm md:text-lg sm:text-base">
-          Get accurate SRT/ASS translations & precise audio transcription by Mitsuko.
-          Experience natural, context-aware results in 100+ languages. Try it now!
-        </p>
+      <div className="flex flex-col items-center text-center max-w-3xl mx-auto px-4">
+        <h1 className="sr-only">AI Subtitle Translator Mitsuko: Fast & Accurate Translations.</h1>
+        <div className="flex flex-col-reverse">
+          <p className="text-gray-600 dark:text-gray-400 mb-8 text-sm md:text-lg sm:text-base">
+            Get accurate SRT/ASS translations & precise audio transcription by Mitsuko.
+            Experience natural, context-aware results in 100+ languages. Try it now!
+          </p>
+          <p className="text-4xl md:text-6xl sm:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
+            Effortlessly translate subtitles with high-quality results using AI
+          </p>
+        </div>
         <div className="flex gap-4">
           <Link
             href="/dashboard"
