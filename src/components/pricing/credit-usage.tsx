@@ -2,6 +2,12 @@ import { getModelCostData } from '@/lib/api/get-model-cost-data'
 import { ModelCost } from '@/types/model-cost'
 import { PAID_MODELS } from "@/constants/model-collection"
 import { formatTokens } from "@/lib/utils"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export default async function CreditUsage() {
   const fetchedCreditCostsMap = await getModelCostData()
@@ -24,8 +30,26 @@ export default async function CreditUsage() {
       }
     })
 
+  let i = 0
+  const priorityModels = new Map<string, number>([
+    ["DeepSeek R1", i++],
+    ["DeepSeek V3", i++],
+  ])
+
+  const favoriteModels = new Set([
+    "DeepSeek R1",
+  ])
+
+  const sortedPriorityModels = paidModelCostArray
+    .filter(model => priorityModels.has(model.name))
+    .sort((a, b) => priorityModels.get(a.name)! - priorityModels.get(b.name)!)
+
+  const nonPriorityModels = paidModelCostArray
+    .filter(model => !priorityModels.has(model.name))
+
   const modelCosts: ModelCost[] = [
-    ...paidModelCostArray,
+    ...sortedPriorityModels,
+    ...nonPriorityModels,
     {
       name: 'Free Models',
       creditPerInputToken: 0,
@@ -69,7 +93,21 @@ export default async function CreditUsage() {
           <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
             {modelCosts.map((model) => (
               <tr key={model.name} className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">{model.name}</td>
+                <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">
+                  {model.name}
+                  {favoriteModels.has(model.name) && (
+                    <TooltipProvider>
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <span className="text-blue-500 cursor-default ml-1 text-[1rem]">★</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Favorite Model</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.creditPerInputToken}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.creditPerOutputToken}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.contextLength}</td>
