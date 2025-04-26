@@ -9,19 +9,8 @@ export const FREE_MODELS: ModelCollection = {
       structuredOutput: true,
       isPaid: false,
       default: {
-        isMaxCompletionTokensAuto: true,
-        isUseStructuredOutput: false
-      }
-    },
-    {
-      name: "DeepSeek R1",
-      maxInput: 163840,
-      maxOutput: 163840,
-      structuredOutput: true,
-      isPaid: false,
-      default: {
         isMaxCompletionTokensAuto: false,
-        maxCompletionTokens: 163840,
+        maxCompletionTokens: 128000,
         isUseStructuredOutput: false
       }
     },
@@ -50,13 +39,6 @@ export const FREE_MODELS: ModelCollection = {
       maxInput: 1000000,
       maxOutput: 65536,
       structuredOutput: true,
-      isPaid: false,
-    },
-    {
-      name: "Gemini 2.0 Flash Thinking Experimental 01-21",
-      maxInput: 1000000,
-      maxOutput: 65536,
-      structuredOutput: false,
       isPaid: false,
     },
     {
