@@ -53,7 +53,7 @@ export default function CreditValueShowcase({ showGetCreditsButton = false }: Cr
             </div>
               Unlock Massive Translation Power!
           </h3>
-          <p className="text-lg text-blue-100 mb-4">
+          <p className="text-base sm:text-lg text-blue-100 mb-4">
             Ever wondered what <strong>2 Million Credits</strong> can get you? Hours of subtitle translation using powerful DeepSeek R1 with{' '}
             <span
               onClick={handleContextToggle}
@@ -66,7 +66,7 @@ export default function CreditValueShowcase({ showGetCreditsButton = false }: Cr
             </span>
             {' '}enabled!
           </p>
-          <p className="text-sm text-blue-200">
+          <p className="text-xs sm:text-sm text-blue-200">
             *Credit cost varies (e.g., Example 1: {Math.round(displayedExample1Credits).toLocaleString()} credits ≈ {example1Minutes} min, ~{Math.round(example1CreditsPerMinute)}/min; up to Example 2: {Math.round(displayedExample2Credits).toLocaleString()} credits ≈ {example2Minutes} min, ~{Math.round(example2CreditsPerMinute)}/min).
             The time shown (~{totalHours}h {remainingMinutes > 0 ? `${remainingMinutes}m` : ''}) uses an average rate (~{Math.round(averageCreditsPerMinute)} credits/min).
           </p>
