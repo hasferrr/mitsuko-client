@@ -216,7 +216,7 @@ function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
             <Link
               href="/pricing#credit-usage"
               target="_blank"
-              className="hover:underline text-popover-foreground/80"
+              className="hover:underline text-blue-500/80"
             >
               See full comparison
             </Link>
