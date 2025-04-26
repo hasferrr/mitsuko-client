@@ -97,7 +97,7 @@ export function ModelSelector({
                   variant={modelDetail.isPaid ? "default" : "secondary"}
                   className="text-xs px-2 h-[1.125rem]"
                 >
-                  {modelDetail.isPaid ? "Paid" : "Free"}
+                  {modelDetail.isPaid ? "Premium" : "Free"}
                 </Badge>
               )}
             </div>
@@ -115,7 +115,17 @@ export function ModelSelector({
             <CommandList>
               <CommandEmpty>No Models found.</CommandEmpty>
               {Object.entries(models).map(([key, value]) => (
-                <CommandGroup key={key} heading={key}>
+                <CommandGroup key={key} heading={(
+                  <div className="flex items-center gap-2">
+                    {key}
+                    <Badge
+                      variant={value[0]?.isPaid ? "default" : "secondary"}
+                      className={cn("text-xs px-[6px] h-[1rem]", "text-[11px]")}
+                    >
+                      {value[0]?.isPaid ? "Premium" : "Free"}
+                    </Badge>
+                  </div>
+                )}>
                   {value.map((model) => (
                     <ModelItem
                       key={`${model.name}-${model.isPaid ? "paid" : "free"}`}
