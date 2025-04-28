@@ -4,9 +4,10 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { motion, useInView } from "framer-motion"
 import { useRef } from "react"
-import HeroSignIn from "./hero-sign-in"
+import { useSessionStore } from "@/stores/use-session-store"
 
 export default function HeroSection() {
+  const session = useSessionStore((state) => state.session)
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true })
 
@@ -52,7 +53,12 @@ export default function HeroSection() {
             Get Started
             <ArrowRight size={18} />
           </Link>
-          <HeroSignIn />
+          <Link
+            href="/auth/login"
+            className="border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 text-gray-900 dark:text-white px-6 py-3 rounded-md transition-colors"
+          >
+            {session ? "My Account" : "Sign In"}
+          </Link>
         </motion.div>
       </div>
     </div>
