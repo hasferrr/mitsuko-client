@@ -34,6 +34,19 @@ class MyDatabase extends Dexie {
         }
       })
     })
+    this.version(8).stores({
+      // No schema changes needed in stores() for adding 'customInstructions'
+      // as it's not indexed. Dexie handles adding new unindexed properties automatically.
+    }).upgrade(async tx => {
+      // Migrate basicSettings: add customInstructions: ''
+      await tx.table('basicSettings').toCollection().modify(setting => {
+        // Add the customInstructions field with a default empty string value
+        // if it doesn't already exist.
+        if (typeof setting.customInstructions === 'undefined') {
+          setting.customInstructions = ''
+        }
+      })
+    })
   }
 }
 

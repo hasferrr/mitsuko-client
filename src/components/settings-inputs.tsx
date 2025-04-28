@@ -151,7 +151,7 @@ export const ContextDocumentInput = memo(() => {
     setHasChanges(true)
     setContextDocument(e.target.value)
     e.target.style.height = "auto"
-    e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`
   }
 
   const handleContextSelect = (contextResult: string) => {
@@ -177,9 +177,9 @@ export const ContextDocumentInput = memo(() => {
       <Textarea
         value={contextDocument}
         onChange={handleContextDocumentChange}
-        className="min-h-[150px] h-[150px] max-h-[70vh] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+        className="min-h-[120px] h-[120px] max-h-[300px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
         placeholder="Add context about the video..."
-        onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
+        onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`)}
       />
       <p className="text-xs text-muted-foreground">
         Provide context from previous episodes (can be generated using the
@@ -218,6 +218,33 @@ export const ContextDocumentInput = memo(() => {
           </div>
         </DialogContent>
       </Dialog>
+    </div>
+  )
+})
+
+export const CustomInstructionsInput = memo(() => {
+  const customInstructions = useSettingsStore((state) => state.getCustomInstructions())
+  const setCustomInstructions = useSettingsStore((state) => state.setCustomInstructions)
+
+  const handleCustomInstructionsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCustomInstructions(e.target.value)
+    e.target.style.height = "auto"
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`
+  }
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium">Additional Instructions</label>
+      <Textarea
+        value={customInstructions}
+        onChange={handleCustomInstructionsChange}
+        className="min-h-[120px] h-[120px] max-h-[300px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+        placeholder="Provide specific instructions to guide the translation model..."
+        onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`)}
+      />
+      <p className="text-xs text-muted-foreground">
+        Guide the model's translation style, tone, or specific terminology usage. This is passed directly to the system prompt.
+      </p>
     </div>
   )
 })

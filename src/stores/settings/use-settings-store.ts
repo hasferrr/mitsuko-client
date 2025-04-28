@@ -23,11 +23,13 @@ interface SettingsStore {
   getModelDetail: () => Model | null
   getIsUseCustomModel: () => boolean
   getContextDocument: () => string
+  getCustomInstructions: () => string
   setSourceLanguage: (language: string) => void
   setTargetLanguage: (language: string) => void
   setModelDetail: (model: Model | null, type: ProjectType) => void
   setIsUseCustomModel: (value: boolean, type: ProjectType) => void
   setContextDocument: (doc: string) => void
+  setCustomInstructions: (instructions: string) => void
   // local storage persist state
   setApiKey: (key: string) => void
   setCustomBaseUrl: (url: string) => void
@@ -93,6 +95,10 @@ export const useSettingsStore = create<SettingsStore>()(
       getContextDocument: () => {
         const id = get().currentId
         return id ? get().data[id]?.contextDocument : DEFAULT_BASIC_SETTINGS.contextDocument
+      },
+      getCustomInstructions: () => {
+        const id = get().currentId
+        return id ? get().data[id]?.customInstructions : DEFAULT_BASIC_SETTINGS.customInstructions
       },
       upsertData: (id, value) => {
         set(state => ({
@@ -168,6 +174,12 @@ export const useSettingsStore = create<SettingsStore>()(
         if (!id) return
         get().mutateData("contextDocument", doc)
         updateSettings("contextDocument", doc)
+      },
+      setCustomInstructions: (instructions) => {
+        const id = get().currentId
+        if (!id) return
+        get().mutateData("customInstructions", instructions)
+        updateSettings("customInstructions", instructions)
       },
     }),
     {

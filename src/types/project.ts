@@ -65,6 +65,7 @@ export interface BasicSettings {
   modelDetail: Model | null
   isUseCustomModel: boolean
   contextDocument: string
+  customInstructions: string
   createdAt: Date
   updatedAt: Date
 }

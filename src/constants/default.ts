@@ -10,6 +10,7 @@ export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "u
   modelDetail: Object.values(FREE_MODELS)[0]?.[0] || null,
   isUseCustomModel: false,
   contextDocument: "",
+  customInstructions: "",
 }
 
 export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {

@@ -39,6 +39,7 @@ import {
   FullContextMemorySwitch,
   AdvancedSettingsResetButton,
   BetterContextCachingSwitch,
+  CustomInstructionsInput,
 } from "./settings-inputs"
 import {
   Subtitle,
@@ -139,6 +140,7 @@ export default function SubtitleTranslator() {
     getModelDetail,
     getIsUseCustomModel,
     getContextDocument,
+    getCustomInstructions,
     customBaseUrl,
     customModel,
     apiKey,
@@ -152,6 +154,7 @@ export default function SubtitleTranslator() {
   const modelDetail = getModelDetail()
   const isUseCustomModel = getIsUseCustomModel()
   const contextDocument = getContextDocument()
+  const customInstructions = getCustomInstructions()
 
   // Advanced Settings Store
   const {
@@ -386,6 +389,7 @@ export default function SubtitleTranslator() {
         sourceLanguage,
         targetLanguage,
         contextDocument,
+        customInstructions,
         baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
         model: isUseCustomModel ? customModel : modelDetail?.name || "",
         temperature: minMax(temperature, TEMPERATURE_MIN, TEMPERATURE_MAX),
@@ -1008,10 +1012,12 @@ export default function SubtitleTranslator() {
                 <CardContent className="p-4 space-y-4">
                   <LanguageSelection />
                   <ModelSelection type="translation" />
-                  {/* Wrap ContextDocumentInput with DragAndDrop */}
                   <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
                     <ContextDocumentInput />
                   </DragAndDrop>
+                  <div className="m-[2px]">
+                    <CustomInstructionsInput />
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
