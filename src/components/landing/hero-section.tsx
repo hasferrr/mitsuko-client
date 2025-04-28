@@ -3,13 +3,20 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { motion, useInView } from "framer-motion"
-import { useRef } from "react"
+import { useLayoutEffect, useRef } from "react"
 import { useSessionStore } from "@/stores/use-session-store"
 
 export default function HeroSection() {
   const session = useSessionStore((state) => state.session)
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true })
+  const headingRef = useRef<HTMLHeadingElement>(null)
+
+  useLayoutEffect(() => {
+    if (headingRef.current) {
+      headingRef.current.textContent = "Effortlessly translate subtitles with high-quality results using AI"
+    }
+  }, [])
 
   return (
     <div ref={ref} className="max-w-6xl mx-auto px-4 py-12 flex flex-col h-full">
@@ -25,19 +32,17 @@ export default function HeroSection() {
       </motion.div>
 
       <div className="flex flex-col items-center text-center max-w-3xl mx-auto px-4">
-        <h1 className="sr-only">AI Subtitle Translator Mitsuko: Fast & Accurate Translations.</h1>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex flex-col-reverse"
         >
+          <h1 ref={headingRef} className="text-4xl md:text-6xl sm:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
+            AI Subtitle Translator Mitsuko: Fast & Accurate Translations.
+          </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-8 text-sm md:text-lg sm:text-base">
             Get accurate SRT/ASS translations & precise audio transcription by Mitsuko.
             Experience natural, context-aware results in 100+ languages. Try it now!
-          </p>
-          <p className="text-4xl md:text-6xl sm:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
-            Effortlessly translate subtitles with high-quality results using AI
           </p>
         </motion.div>
         <motion.div
