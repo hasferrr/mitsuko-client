@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
-import { ChevronsRight, Eye, EyeOff, FolderDown } from "lucide-react"
+import { ChevronsRight, Eye, EyeOff, FolderDown, List } from "lucide-react"
 import { Button } from "./ui/button"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import {
@@ -29,6 +29,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Extraction } from "@/types/project"
 import { db } from "@/lib/db/db"
 import { getContent } from "@/lib/parser/parser"
+import { customInstructionPresets } from "@/constants/custom-instructions"
 
 export const LanguageSelection = memo(() => {
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -225,16 +226,36 @@ export const ContextDocumentInput = memo(() => {
 export const CustomInstructionsInput = memo(() => {
   const customInstructions = useSettingsStore((state) => state.getCustomInstructions())
   const setCustomInstructions = useSettingsStore((state) => state.setCustomInstructions)
+  const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
+  const { setHasChanges } = useUnsavedChanges()
 
   const handleCustomInstructionsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setHasChanges(true)
     setCustomInstructions(e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`
   }
 
+  const handlePresetSelect = (instruction: string) => {
+    setHasChanges(true)
+    setCustomInstructions(instruction)
+    setIsPresetsDialogOpen(false)
+  }
+
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">Additional Instructions</label>
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium">Additional Instructions</label>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsPresetsDialogOpen(true)}
+          className="h-8 px-2"
+        >
+          <List className="h-4 w-4" />
+          Presets
+        </Button>
+      </div>
       <Textarea
         value={customInstructions}
         onChange={handleCustomInstructionsChange}
@@ -245,6 +266,33 @@ export const CustomInstructionsInput = memo(() => {
       <p className="text-xs text-muted-foreground">
         Guide the model's translation style, tone, or specific terminology usage. This is passed directly to the system prompt.
       </p>
+
+      <Dialog open={isPresetsDialogOpen} onOpenChange={setIsPresetsDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Select Custom Instruction Preset</DialogTitle>
+            <DialogDescription>
+              Choose a preset to guide the translation model.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[400px] overflow-y-auto">
+            <div className="space-y-2 mr-1">
+              {customInstructionPresets.map((preset) => (
+                <div
+                  key={preset.title}
+                  className="p-3 border rounded-md cursor-pointer hover:bg-muted"
+                  onClick={() => handlePresetSelect(preset.instruction)}
+                >
+                  <div className="font-medium">{preset.title}</div>
+                  <div className="text-sm text-muted-foreground line-clamp-2">
+                    {preset.instruction}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 })
