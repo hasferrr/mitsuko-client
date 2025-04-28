@@ -1,16 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
 import { ThemeToggle } from "@/components/landing/theme-toggle"
 import { useSessionStore } from "@/stores/use-session-store"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import NavLinks from "./nav-links"
+import { usePathname } from "next/navigation"
 
 export default function Navbar() {
   const session = useSessionStore((state) => state.session)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isRoot, setIsRoot] = useState(false)
+
+  const pathname = usePathname()
+
+  useEffect(() => {
+    setIsRoot(pathname === "/")
+  }, [pathname])
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-gray-200 dark:border-gray-800">
@@ -24,12 +32,21 @@ export default function Navbar() {
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
-          <Link
-            href="/#top"
-            className="text-xl font-medium text-gray-900 dark:text-white"
-          >
-            Mitsuko
-          </Link>
+          {isRoot ? (
+            <a
+              href="#"
+              className="text-xl font-medium text-gray-900 dark:text-white"
+            >
+              Mitsuko
+            </a>
+          ) : (
+            <Link
+              href="/"
+              className="text-xl font-medium text-gray-900 dark:text-white"
+            >
+              Mitsuko
+            </Link>
+          )}
 
           <nav className="hidden md:flex items-center space-x-8">
             <NavLinks />
