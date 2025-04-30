@@ -51,17 +51,25 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
       }),
 
       setIsTranscribing: (id, isTranscribing) => {
-        if (isTranscribing) {
-          get().isTranscribingSet.add(id)
-        } else {
-          get().isTranscribingSet.delete(id)
-        }
+        set(state => {
+          const newSet = new Set(state.isTranscribingSet)
+          if (isTranscribing) {
+            newSet.add(id)
+          } else {
+            newSet.delete(id)
+          }
+          return { isTranscribingSet: newSet }
+        })
       },
 
       stopTranscription: (id) => {
-        get().isTranscribingSet.delete(id)
-        get().abortControllerMap.get(id)?.current?.abort()
-        get().abortControllerMap.delete(id)
+        set(state => {
+          const newSet = new Set(state.isTranscribingSet)
+          newSet.delete(id)
+          state.abortControllerMap.get(id)?.current?.abort()
+          state.abortControllerMap.delete(id)
+          return { isTranscribingSet: newSet }
+        })
       },
 
       startTranscription: async (id, formData, setResponse) => {

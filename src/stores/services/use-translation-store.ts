@@ -24,17 +24,25 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
   abortControllerMap: new Map(),
 
   setIsTranslating: (translationId, isTranslating) => {
-    if (isTranslating) {
-      get().isTranslatingSet.add(translationId)
-    } else {
-      get().isTranslatingSet.delete(translationId)
-    }
+    set(state => {
+      const newSet = new Set(state.isTranslatingSet)
+      if (isTranslating) {
+        newSet.add(translationId)
+      } else {
+        newSet.delete(translationId)
+      }
+      return { isTranslatingSet: newSet }
+    })
   },
 
   stopTranslation: (id: string) => {
-    get().isTranslatingSet.delete(id)
-    get().abortControllerMap.get(id)?.current.abort()
-    get().abortControllerMap.delete(id)
+    set(state => {
+      const newSet = new Set(state.isTranslatingSet)
+      newSet.delete(id)
+      state.abortControllerMap.get(id)?.current.abort()
+      state.abortControllerMap.delete(id)
+      return { isTranslatingSet: newSet }
+    })
   },
 
   translateSubtitles: async (

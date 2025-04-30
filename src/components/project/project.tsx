@@ -23,6 +23,7 @@ import {
   FileText,
   Edit,
   Trash,
+  Loader2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -36,6 +37,9 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { NoProjectSelected } from "./no-project-selected"
+import { useTranslationStore } from "@/stores/services/use-translation-store"
+import { useExtractionStore } from "@/stores/services/use-extraction-store"
+import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 
 export const Project = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -69,6 +73,10 @@ export const Project = () => {
   const createTranscriptionDb = useTranscriptionDataStore((state) => state.createTranscriptionDb)
   const updateTranscriptionDb = useTranscriptionDataStore((state) => state.updateTranscriptionDb)
   const deleteTranscriptionDb = useTranscriptionDataStore((state) => state.deleteTranscriptionDb)
+
+  const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
+  const isExtractingSet = useExtractionStore(state => state.isExtractingSet)
+  const isTranscribingSet = useTranscriptionStore(state => state.isTranscribingSet)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -149,7 +157,9 @@ export const Project = () => {
       id={translation.id}
       projectId={currentProject.id}
       type="translation"
-      icon={<Globe className="h-5 w-5 text-blue-500" />}
+      icon={isTranslatingSet.has(translation.id)
+        ? <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
+        : <Globe className="h-5 w-5 text-blue-500" />}
       title={translation.title}
       description={`${translation.parsed.type.toUpperCase()} • ${translation.subtitles.length} Lines`}
       date={translation.updatedAt.toLocaleDateString()}
@@ -172,7 +182,9 @@ export const Project = () => {
       id={transcription.id}
       projectId={currentProject.id}
       type="transcription"
-      icon={<Headphones className="h-5 w-5 text-green-500" />}
+      icon={isTranscribingSet.has(transcription.id)
+        ? <Loader2 className="h-5 w-5 text-green-500 animate-spin" />
+        : <Headphones className="h-5 w-5 text-green-500" />}
       title={transcription.title}
       description={`${transcription.transcriptSubtitles.length} segments`}
       date={transcription.createdAt.toLocaleDateString()}
@@ -195,7 +207,9 @@ export const Project = () => {
       id={extraction.id}
       projectId={currentProject.id}
       type="extraction"
-      icon={<FileText className="h-5 w-5 text-purple-500" />}
+      icon={isExtractingSet.has(extraction.id)
+        ? <Loader2 className="h-5 w-5 text-purple-500 animate-spin" />
+        : <FileText className="h-5 w-5 text-purple-500" />}
       title={`Episode ${extraction.episodeNumber || "X"}`}
       description={extraction.contextResult}
       date={extraction.updatedAt.toLocaleDateString()}
