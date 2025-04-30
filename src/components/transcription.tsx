@@ -209,11 +209,18 @@ export default function Transcription() {
     const srtContent = generateSRT(transcriptSubtitles)
     if (!srtContent) return
 
+    let fileName = title.trim()
+    if (fileName) {
+      fileName = fileName.endsWith(".srt") ? fileName : fileName + ".srt"
+    } else {
+      fileName = "transcription.srt"
+    }
+
     const blob = new Blob([srtContent], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = "transcription.srt"
+    a.download = fileName
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
