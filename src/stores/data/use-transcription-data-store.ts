@@ -9,7 +9,7 @@ interface TranscriptionDataStore {
   // CRUD methods
   createTranscriptionDb: (projectId: string, data: Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles">) => Promise<Transcription>
   getTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<Transcription | undefined>
-  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models">>) => Promise<Transcription>
+  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "isOverOneHour">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
   // getters
   getTitle: () => string
@@ -18,6 +18,7 @@ interface TranscriptionDataStore {
   getSelectedMode: () => Transcription["selectedMode"]
   getCustomInstructions: () => string
   getModels: () => Transcription["models"]
+  getIsOverOneHour: () => boolean
   // setters
   setCurrentId: (id: string | null) => void
   setTitle: (id: string, title: string) => void
@@ -26,6 +27,7 @@ interface TranscriptionDataStore {
   setSelectedMode: (id: string, selectedMode: Transcription["selectedMode"]) => void
   setCustomInstructions: (id: string, customInstructions: string) => void
   setModels: (id: string, models: Transcription["models"]) => void
+  setIsOverOneHour: (id: string, isOverOneHour: boolean) => void
   // data manipulation methods
   mutateData: <T extends keyof Transcription>(id: string, key: T, value: Transcription[T]) => void
   saveData: (id: string) => Promise<void>
@@ -90,6 +92,10 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     const id = get().currentId
     return id ? get().data[id]?.models : "free"
   },
+  getIsOverOneHour: () => {
+    const id = get().currentId
+    return id ? get().data[id]?.isOverOneHour ?? false : false
+  },
   // setters implementation
   setCurrentId: (id) => set({ currentId: id }),
   setTitle: (id, title) => {
@@ -109,6 +115,9 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   },
   setModels: (id, models) => {
     get().mutateData(id, "models", models)
+  },
+  setIsOverOneHour: (id, isOverOneHour) => {
+    get().mutateData(id, "isOverOneHour", isOverOneHour)
   },
   // data manipulation methods
   mutateData: (id, key, value) => {
@@ -136,6 +145,7 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
         selectedMode: transcription.selectedMode,
         customInstructions: transcription.customInstructions,
         models: transcription.models,
+        isOverOneHour: transcription.isOverOneHour,
       })
       set({ data: { ...get().data, [id]: result } })
     } catch (error) {

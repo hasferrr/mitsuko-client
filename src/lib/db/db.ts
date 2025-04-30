@@ -51,7 +51,7 @@ class MyDatabase extends Dexie {
       // No schema changes needed in stores() for adding 'selectedMode' and 'customInstructions'
       // to the 'transcriptions' table as they are not indexed.
     }).upgrade(async tx => {
-      // Migrate transcriptions: add selectedMode: 'clause' and customInstructions: ''
+      // Migrate transcriptions: add selectedMode, customInstructions, models, isOverOneHour
       await tx.table('transcriptions').toCollection().modify(transcription => {
         // Add selectedMode with default 'clause' if it doesn't exist
         if (typeof transcription.selectedMode === 'undefined') {
@@ -64,6 +64,10 @@ class MyDatabase extends Dexie {
         // Add models with default 'free' if it doesn't exist
         if (typeof transcription.models === 'undefined') {
           transcription.models = 'free'
+        }
+        // Add isOverOneHour with default false if it doesn't exist
+        if (typeof transcription.isOverOneHour === 'undefined') {
+          transcription.isOverOneHour = false
         }
       })
     })

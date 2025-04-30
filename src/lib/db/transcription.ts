@@ -15,6 +15,7 @@ export const createTranscription = async (
       selectedMode: "clause",
       customInstructions: "",
       models: "free",
+      isOverOneHour: false,
       createdAt: new Date(),
       updatedAt: new Date()
     }
@@ -40,7 +41,7 @@ export const getTranscription = async (projectId: string, transcriptionId: strin
 
 export const updateTranscription = async (
   transcriptionId: string,
-  changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models">>
+  changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "isOverOneHour">>
 ): Promise<Transcription> => {
   await db.transcriptions.update(transcriptionId, {
     ...changes,

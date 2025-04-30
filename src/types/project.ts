@@ -43,6 +43,7 @@ export interface Transcription {
   selectedMode: "clause" | "sentence"
   customInstructions: string
   models: "free" | "premium"
+  isOverOneHour: boolean
   createdAt: Date
   updatedAt: Date
   projectId: string
