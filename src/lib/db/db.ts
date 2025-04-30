@@ -47,6 +47,22 @@ class MyDatabase extends Dexie {
         }
       })
     })
+    this.version(9).stores({
+      // No schema changes needed in stores() for adding 'selectedMode' and 'customInstructions'
+      // to the 'transcriptions' table as they are not indexed.
+    }).upgrade(async tx => {
+      // Migrate transcriptions: add selectedMode: 'clause' and customInstructions: ''
+      await tx.table('transcriptions').toCollection().modify(transcription => {
+        // Add selectedMode with default 'clause' if it doesn't exist
+        if (typeof transcription.selectedMode === 'undefined') {
+          transcription.selectedMode = 'clause'
+        }
+        // Add customInstructions with default '' if it doesn't exist
+        if (typeof transcription.customInstructions === 'undefined') {
+          transcription.customInstructions = ''
+        }
+      })
+    })
   }
 }
 

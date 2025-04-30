@@ -9,17 +9,21 @@ interface TranscriptionDataStore {
   // CRUD methods
   createTranscriptionDb: (projectId: string, data: Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles">) => Promise<Transcription>
   getTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<Transcription | undefined>
-  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles">>) => Promise<Transcription>
+  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
   // getters
   getTitle: () => string
   getTranscriptionText: () => string
   getTranscriptSubtitles: () => Subtitle[]
+  getSelectedMode: () => "clause" | "sentence"
+  getCustomInstructions: () => string
   // setters
   setCurrentId: (id: string | null) => void
   setTitle: (id: string, title: string) => void
   setTranscriptionText: (id: string, transcriptionText: string) => void
   setTranscriptSubtitles: (id: string, subtitles: Subtitle[]) => void
+  setSelectedMode: (id: string, selectedMode: "clause" | "sentence") => void
+  setCustomInstructions: (id: string, customInstructions: string) => void
   // data manipulation methods
   mutateData: <T extends keyof Transcription>(id: string, key: T, value: Transcription[T]) => void
   saveData: (id: string) => Promise<void>
@@ -72,7 +76,14 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     const id = get().currentId
     return id ? get().data[id]?.transcriptSubtitles : []
   },
-
+  getSelectedMode: () => {
+    const id = get().currentId
+    return id ? get().data[id]?.selectedMode : "clause"
+  },
+  getCustomInstructions: () => {
+    const id = get().currentId
+    return id ? get().data[id]?.customInstructions : ""
+  },
   // setters implementation
   setCurrentId: (id) => set({ currentId: id }),
   setTitle: (id, title) => {
@@ -84,7 +95,12 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   setTranscriptSubtitles: (id, subtitles) => {
     get().mutateData(id, "transcriptSubtitles", subtitles)
   },
-
+  setSelectedMode: (id, selectedMode) => {
+    get().mutateData(id, "selectedMode", selectedMode)
+  },
+  setCustomInstructions: (id, customInstructions) => {
+    get().mutateData(id, "customInstructions", customInstructions)
+  },
   // data manipulation methods
   mutateData: (id, key, value) => {
     set(state => ({

@@ -40,6 +40,8 @@ export interface Transcription {
   title: string
   transcriptionText: string
   transcriptSubtitles: Subtitle[]
+  selectedMode: "clause" | "sentence"
+  customInstructions: string
   createdAt: Date
   updatedAt: Date
   projectId: string
