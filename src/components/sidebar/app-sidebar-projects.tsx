@@ -28,7 +28,8 @@ import { redirect } from "next/navigation"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { ExportImportDialogue } from "../ui-custom/export-import-dialogue"
 import { useState } from "react"
-
+import { useRouter } from "next/navigation"
+import { sleep } from "@/lib/utils"
 interface AppSidebarProjectsProps {
   projects: Project[],
   label?: string,
@@ -42,13 +43,28 @@ export function AppSidebarProjects({
   addButton,
   addButtonFn,
 }: AppSidebarProjectsProps) {
+  const router = useRouter()
+
   const { isMobile } = useSidebar()
+  const currentProject = useProjectStore((state) => state.currentProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isExportImportModalOpen, setIsExportImportModalOpen] = useState(false)
   const [idToDelete, setIdToDelete] = useState("")
+
+  const handleDeleteProject = async () => {
+    if (currentProject?.id === idToDelete) {
+      router.push("/dashboard")
+      setIsDeleteModalOpen(false)
+      await sleep(1000)
+      await deleteProject(idToDelete)
+    } else {
+      setIsDeleteModalOpen(false)
+      await deleteProject(idToDelete)
+    }
+  }
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -108,10 +124,7 @@ export function AppSidebarProjects({
           </>
         )}
         <DeleteDialogue
-          handleDelete={() => {
-            deleteProject(idToDelete)
-            setIsDeleteModalOpen(false)
-          }}
+          handleDelete={handleDeleteProject}
           isDeleteModalOpen={isDeleteModalOpen}
           setIsDeleteModalOpen={setIsDeleteModalOpen}
         />

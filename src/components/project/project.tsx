@@ -40,8 +40,12 @@ import { NoProjectSelected } from "./no-project-selected"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
+import { useRouter } from "next/navigation"
+import { sleep } from "@/lib/utils"
 
 export const Project = () => {
+  const router = useRouter()
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
@@ -146,9 +150,11 @@ export const Project = () => {
     setIsEditModalOpen(false)
   }
 
-  const handleDelete = () => {
-    deleteProject(currentProject.id)
+  const handleDelete = async () => {
+    router.push("/dashboard")
+    await sleep(1000)
     setIsDeleteModalOpen(false)
+    await deleteProject(currentProject.id)
   }
 
   const translationComponentList = translations.map((translation) => (
