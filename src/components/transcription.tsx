@@ -203,7 +203,7 @@ export default function Transcription() {
     try {
       const subtitles = parseTranscription(transcriptionText)
       setTranscriptSubtitles(currentId, subtitles)
-      toast.success("Subtitles saved successfully!")
+      toast.success("Subtitles parsed successfully!")
     } catch (error) {
       toast.error(
         <div className="select-none">
@@ -418,7 +418,7 @@ export default function Transcription() {
                   <h2 className="text-lg font-medium">Transcription Result</h2>
 
                   {(transcriptionText || isEditing) && (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 justify-end">
                       <AlertDialog open={isClearDialogOpen} onOpenChange={setIsClearDialogOpen}>
                         <AlertDialogTrigger asChild>
                           <Button
@@ -498,7 +498,7 @@ export default function Transcription() {
                   <h2 className="text-lg font-medium">Subtitles with Timestamps</h2>
 
                   {transcriptSubtitles.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 justify-end">
                       <AlertDialog open={isClearDialogOpen} onOpenChange={setIsClearDialogOpen}>
                         <AlertDialogTrigger asChild>
                           <Button
@@ -532,7 +532,7 @@ export default function Transcription() {
                         className="text-xs border-border"
                         onClick={handleParse}
                       >
-                        <ClipboardPaste className="h-3 w-3" /> Set Subtitle
+                        <ClipboardPaste className="h-3 w-3" /> Parse Subtitle
                       </Button>
                       <Button
                         size="sm"
