@@ -29,7 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 import { timestampToString } from "@/lib/subtitles/timestamp"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { DragAndDrop } from "./ui-custom/drag-and-drop"
@@ -105,7 +104,6 @@ export default function Transcription() {
 
   const [selectedLanguage, setSelectedLanguage] = useState(languages[0].value)
   const [selectedModel, setSelectedModel] = useState(models[0].value)
-  const [isSpeakerDetection, setIsSpeakerDetection] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false)
 
@@ -198,7 +196,7 @@ export default function Transcription() {
     try {
       const subtitles = parseTranscription(transcriptionText)
       setTranscriptSubtitles(currentId, subtitles)
-      toast.success("Parse Success!")
+      toast.success("Subtitles saved successfully!")
     } catch (error) {
       toast.error(
         <div className="select-none">
@@ -258,7 +256,7 @@ export default function Transcription() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[350px_1fr_1fr] gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] lg:grid-cols-[400px_1fr_1fr] gap-8">
         {/* Left Column - Upload & Controls */}
         <div className="md:col-span-1 space-y-6">
           {/* File Upload */}
@@ -351,16 +349,6 @@ export default function Transcription() {
                 </Select>
               </div>
 
-              {/* Speaker Detection Switch */}
-              <div className="flex items-center justify-between pt-2">
-                <label className="text-sm">Speaker Detection</label>
-                <Switch
-                  disabled
-                  checked={isSpeakerDetection}
-                  onCheckedChange={setIsSpeakerDetection}
-                />
-              </div>
-
               <div className="pt-4 flex gap-2">
                 {/* Start Button */}
                 <Button
@@ -416,11 +404,11 @@ export default function Transcription() {
 
             <TabsContent value="transcript" className="mt-4">
               <div className="bg-card border border-border rounded-lg p-6">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-4 gap-2">
                   <h2 className="text-lg font-medium">Transcription Result</h2>
 
                   {(transcriptionText || isEditing) && (
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <AlertDialog open={isClearDialogOpen} onOpenChange={setIsClearDialogOpen}>
                         <AlertDialogTrigger asChild>
                           <Button
@@ -496,11 +484,11 @@ export default function Transcription() {
 
             <TabsContent value="subtitles" className="mt-4">
               <div className="bg-card border border-border rounded-lg p-6">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-4 gap-2">
                   <h2 className="text-lg font-medium">Subtitles with Timestamps</h2>
 
                   {transcriptSubtitles.length > 0 && (
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <AlertDialog open={isClearDialogOpen} onOpenChange={setIsClearDialogOpen}>
                         <AlertDialogTrigger asChild>
                           <Button
@@ -534,7 +522,7 @@ export default function Transcription() {
                         className="text-xs border-border"
                         onClick={handleParse}
                       >
-                        <ClipboardPaste className="h-3 w-3" /> Parse Subtitle
+                        <ClipboardPaste className="h-3 w-3" /> Set Subtitle
                       </Button>
                       <Button
                         size="sm"
@@ -592,7 +580,7 @@ export default function Transcription() {
           <div className="bg-card border border-border rounded-lg p-6">
             <h2 className="text-lg font-medium mb-4">What's Next?</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="p-4 border border-border rounded-md">
                 <div className="flex items-start gap-3 mb-2">
                   <Globe className="h-5 w-5 text-blue-500 mt-0.5" />
