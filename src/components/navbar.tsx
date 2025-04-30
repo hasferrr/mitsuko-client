@@ -11,6 +11,7 @@ import { useTranscriptionStore } from "@/stores/services/use-transcription-store
 import { SidebarTrigger } from "./ui/sidebar"
 import { Separator } from "./ui/separator"
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, BreadcrumbPage } from "./ui/breadcrumb"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
@@ -25,6 +26,7 @@ import { cn } from "@/lib/utils"
 export function Navbar() {
   const _pathname = usePathname()
   const [pathname, setPathname] = useState("")
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false)
 
   // User data
   const session = useSessionStore(state => state.session)
@@ -75,6 +77,12 @@ export function Navbar() {
     }
   }, [_pathname, tlId, tsId, exId, tlData, tsData, exData])
 
+  useEffect(() => {
+    if (!isProcessing) {
+      setIsPopoverOpen(false)
+    }
+  }, [isProcessing])
+
   const handleToggle = () => {
     setIsDarkMode(!isDarkMode)
   }
@@ -119,10 +127,58 @@ export function Navbar() {
         </Breadcrumb>
         <div className="flex items-center gap-2 ml-auto">
           {isProcessing && (
-            <div className="flex items-center gap-2 text-sm text-foreground/80 mr-4">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="hidden md:block">Processing...</span>
-            </div>
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <PopoverTrigger asChild>
+                <div className="flex items-center gap-2 text-sm text-foreground/80 mr-4 cursor-pointer hover:underline">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="hidden md:block">Processing...</span>
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <div className="grid gap-2">
+                  <div className="space-y-2">
+                    <h4 className="font-medium leading-none">Currently Processing</h4>
+                    <p className="text-sm text-muted-foreground">
+                      List of items currently being processed.
+                    </p>
+                  </div>
+                  {isPopoverOpen && (
+                    <div className="grid gap-2 max-h-60 overflow-y-auto text-sm">
+                      {isTranslatingSet.size > 0 && (
+                        <div>
+                          <p className="font-semibold mb-1">Translate:</p>
+                          {Array.from(isTranslatingSet).map(id => (
+                            <div key={`tl-${id}`} className="truncate">
+                              - {tlData[id]?.title || `Item ${id}`}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {isTranscribingSet.size > 0 && (
+                        <div className="mt-2">
+                          <p className="font-semibold mb-1">Transcribe:</p>
+                          {Array.from(isTranscribingSet).map(id => (
+                            <div key={`ts-${id}`} className="truncate">
+                              - {tsData[id]?.title || `Item ${id}`}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {isExtractingSet.size > 0 && (
+                        <div className="mt-2">
+                          <p className="font-semibold mb-1">Extract:</p>
+                          {Array.from(isExtractingSet).map(id => (
+                            <div key={`ex-${id}`} className="truncate">
+                              - {exData[id] ? `Episode ${exData[id].episodeNumber}` : `Item ${id}`}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
           )}
 
           {isFetching || isLoading ? (
