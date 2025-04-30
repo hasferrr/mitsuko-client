@@ -389,7 +389,7 @@ export default function Transcription() {
                             onClick={handleClear}
                             disabled={isTranscribing}
                           >
-                            <Trash className="h-3 w-3 mr-1" /> Clear
+                            <Trash className="h-3 w-3" /> Clear
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
