@@ -7,6 +7,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { transcriptionInstructionPresets } from "@/constants/custom-instructions"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { Transcription } from "@/types/project"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 
 const languages = [
   { value: "auto", label: "Auto-detect" },
@@ -34,9 +36,11 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
   const selectedModel = useTranscriptionDataStore((state) => state.getModels())
   const selectedMode = useTranscriptionDataStore((state) => state.getSelectedMode())
   const customInstructions = useTranscriptionDataStore((state) => state.getCustomInstructions())
+  const isOverOneHour = useTranscriptionDataStore((state) => state.getIsOverOneHour())
   const _setModels = useTranscriptionDataStore((state) => state.setModels)
   const _setSelectedMode = useTranscriptionDataStore((state) => state.setSelectedMode)
   const _setCustomInstructions = useTranscriptionDataStore((state) => state.setCustomInstructions)
+  const _setIsOverOneHour = useTranscriptionDataStore((state) => state.setIsOverOneHour)
 
   const setSelectedModel = (model: Transcription["models"]) => {
     _setModels(transcriptionId, model)
@@ -48,6 +52,11 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
   }
   const setCustomInstructions = (instructions: string) => {
     _setCustomInstructions(transcriptionId, instructions)
+  }
+
+  const handleIsOverOneHourChange = (checked: boolean) => {
+    _setIsOverOneHour(transcriptionId, checked)
+    saveData(transcriptionId)
   }
 
   const handlePresetSelect = (instruction: string) => {
@@ -111,6 +120,18 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      {/* Over One Hour Toggle */}
+      <div className="flex items-center space-x-2 py-2">
+        <Switch
+          id="is-over-one-hour"
+          checked={isOverOneHour}
+          onCheckedChange={handleIsOverOneHourChange}
+        />
+        <Label htmlFor="is-over-one-hour" className="text-sm text-muted-foreground">
+          Audio is Over One Hour {"(>= 1 hour)"}
+        </Label>
       </div>
 
       {/* Custom Instructions */}
