@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import { META_DESCRIPTION, META_TITLE_LONG } from '@/constants/metadata'
+import { META_DESCRIPTION, META_KEYWORDS, META_TITLE_LONG } from '@/constants/metadata'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { cn } from '@/lib/utils'
 import Providers from '@/contexts/providers'
@@ -17,6 +17,7 @@ const schema = {
 export const metadata: Metadata = {
   title: META_TITLE_LONG,
   description: META_DESCRIPTION,
+  keywords: META_KEYWORDS,
   metadataBase: new URL(DEPLOYMENT_URL),
   openGraph: {
     title: META_TITLE_LONG,
