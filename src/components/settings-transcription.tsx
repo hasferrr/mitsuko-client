@@ -1,6 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { useState, type Dispatch, type SetStateAction } from "react"
+import { useState } from "react"
 import { Button } from "./ui/button"
 import { List } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -11,8 +11,8 @@ const languages = [
 ]
 
 const models = [
-  { value: "free", label: "Mitsuko (Free)" },
-  { value: "premium", label: "Mitsuko (Premium)" },
+  { value: "free", label: "Mitsuko (Free Limited)" },
+  // { value: "premium", label: "Mitsuko (Premium)" },
 ]
 
 const modes = [
@@ -20,27 +20,11 @@ const modes = [
   { value: "sentence", label: "Mode 2: Sentences" },
 ]
 
-interface SettingsTranscriptionProps {
-  selectedLanguage: string
-  setSelectedLanguage: Dispatch<SetStateAction<string>>
-  selectedModel: string
-  setSelectedModel: Dispatch<SetStateAction<string>>
-  selectedMode: string
-  setSelectedMode: Dispatch<SetStateAction<string>>
-  customInstructions: string
-  setCustomInstructions: Dispatch<SetStateAction<string>>
-}
-
-export function SettingsTranscription({
-  selectedLanguage,
-  setSelectedLanguage,
-  selectedModel,
-  setSelectedModel,
-  selectedMode,
-  setSelectedMode,
-  customInstructions,
-  setCustomInstructions,
-}: SettingsTranscriptionProps) {
+export function SettingsTranscription() {
+  const [selectedLanguage, setSelectedLanguage] = useState("auto")
+  const [selectedModel, setSelectedModel] = useState("free")
+  const [selectedMode, setSelectedMode] = useState("clause")
+  const [customInstructions, setCustomInstructions] = useState("")
   const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
 
   const handlePresetSelect = (instruction: string) => {

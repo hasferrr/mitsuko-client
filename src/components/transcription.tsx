@@ -91,10 +91,6 @@ export default function Transcription() {
     staleTime: 0, // Always refetch when requested
   })
 
-  const [selectedLanguage, setSelectedLanguage] = useState("auto")
-  const [selectedModel, setSelectedModel] = useState("free")
-  const [selectedMode, setSelectedMode] = useState("clause")
-  const [customInstructions, setCustomInstructions] = useState("")
   const [isEditing, setIsEditing] = useState(false)
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false)
 
@@ -313,16 +309,8 @@ export default function Transcription() {
             <h2 className="text-lg font-medium mb-4">Transcription Settings</h2>
 
             <div className="space-y-4">
-              <SettingsTranscription
-                selectedLanguage={selectedLanguage}
-                setSelectedLanguage={setSelectedLanguage}
-                selectedModel={selectedModel}
-                setSelectedModel={setSelectedModel}
-                selectedMode={selectedMode}
-                setSelectedMode={setSelectedMode}
-                customInstructions={customInstructions}
-                setCustomInstructions={setCustomInstructions}
-              />
+              {/* Transcription Settings */}
+              <SettingsTranscription />
 
               {/* Buttons */}
               <div className="pt-4 flex gap-2">
