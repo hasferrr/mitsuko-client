@@ -55,7 +55,7 @@ export const getAllProjects = async (): Promise<Project[]> => {
     .toArray()
 }
 
-export const updateProject = async (id: string, update: Pick<Project, "name">): Promise<Project> => {
+export const renameProject = async (id: string, update: Pick<Project, "name">): Promise<Project> => {
   const changes = {
     name: update.name,
     updatedAt: new Date()

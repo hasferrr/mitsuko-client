@@ -43,7 +43,7 @@ export const Project = () => {
 
   const loadProjects = useProjectStore((state) => state.loadProjects)
   const currentProject = useProjectStore((state) => state.currentProject)
-  const updateProject = useProjectStore((state) => state.updateProject)
+  const renameProject = useProjectStore((state) => state.renameProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
 
@@ -134,7 +134,7 @@ export const Project = () => {
   }
 
   const handleSave = async (newName: string) => {
-    updateProject(currentProject.id, newName.trim())
+    renameProject(currentProject.id, newName.trim())
     setIsEditModalOpen(false)
   }
 

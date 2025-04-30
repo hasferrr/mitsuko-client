@@ -4,7 +4,7 @@ import {
   getAllProjects,
   createProject as createProjectDB,
   deleteProject as deleteProjectDB,
-  updateProject as updateProjectDB,
+  renameProject as renameProjectDB,
   updateProjectOrder,
   updateProjectItems as updateProjectItemsDB,
 } from "@/lib/db/project"
@@ -20,7 +20,7 @@ interface ProjectStore {
   setCurrentProject: (project: Project | string | null) => void
   loadProjects: () => Promise<void>
   createProject: (name: string) => Promise<Project>
-  updateProject: (id: string, name: string) => Promise<void>
+  renameProject: (id: string, name: string) => Promise<void>
   updateProjectItems: (id: string, items: string[], type: 'translations' | 'transcriptions' | 'extractions' | ProjectType) => Promise<Project | null>
   deleteProject: (id: string) => Promise<void>
   reorderProjects: (newOrder: string[]) => Promise<void>
@@ -76,10 +76,10 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     }
   },
 
-  updateProject: async (id, name) => {
+  renameProject: async (id, name) => {
     set({ loading: true })
     try {
-      const updatedProject = await updateProjectDB(id, { name })
+      const updatedProject = await renameProjectDB(id, { name })
       set((state) => ({
         projects: state.projects.map(p =>
           p.id === id ? updatedProject : p
