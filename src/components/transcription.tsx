@@ -22,13 +22,6 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { timestampToString } from "@/lib/subtitles/timestamp"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { DragAndDrop } from "./ui-custom/drag-and-drop"
@@ -55,14 +48,7 @@ import { useQuery } from "@tanstack/react-query"
 import { fetchUserData } from "@/lib/api/user"
 import { UserData } from "@/types/user"
 import { Input } from "./ui/input"
-
-const languages = [
-  { value: "auto", label: "Auto-detect" },
-]
-
-const models = [
-  { value: "default", label: "Mitsuko (Default)" },
-]
+import { SettingsTranscription } from "./settings-transcription"
 
 export default function Transcription() {
   const currentId = useTranscriptionDataStore(state => state.currentId)
@@ -105,8 +91,10 @@ export default function Transcription() {
     staleTime: 0, // Always refetch when requested
   })
 
-  const [selectedLanguage, setSelectedLanguage] = useState(languages[0].value)
-  const [selectedModel, setSelectedModel] = useState(models[0].value)
+  const [selectedLanguage, setSelectedLanguage] = useState("auto")
+  const [selectedModel, setSelectedModel] = useState("free")
+  const [selectedMode, setSelectedMode] = useState("clause")
+  const [customInstructions, setCustomInstructions] = useState("")
   const [isEditing, setIsEditing] = useState(false)
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false)
 
@@ -325,40 +313,18 @@ export default function Transcription() {
             <h2 className="text-lg font-medium mb-4">Transcription Settings</h2>
 
             <div className="space-y-4">
-              {/* Language Selection */}
-              <div>
-                <label className="text-sm text-muted-foreground block mb-1">Language</label>
-                <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {languages.map((lang) => (
-                      <SelectItem key={lang.value} value={lang.value}>
-                        {lang.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <SettingsTranscription
+                selectedLanguage={selectedLanguage}
+                setSelectedLanguage={setSelectedLanguage}
+                selectedModel={selectedModel}
+                setSelectedModel={setSelectedModel}
+                selectedMode={selectedMode}
+                setSelectedMode={setSelectedMode}
+                customInstructions={customInstructions}
+                setCustomInstructions={setCustomInstructions}
+              />
 
-              {/* Model Selection */}
-              <div>
-                <label className="text-sm text-muted-foreground block mb-1">Model</label>
-                <Select value={selectedModel} onValueChange={setSelectedModel}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a model" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {models.map((model) => (
-                      <SelectItem key={model.value} value={model.value}>
-                        {model.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
+              {/* Buttons */}
               <div className="pt-4 flex gap-2">
                 {/* Start Button */}
                 <Button

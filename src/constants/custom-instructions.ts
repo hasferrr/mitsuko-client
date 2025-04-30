@@ -30,3 +30,103 @@ export const customInstructionPresets = [
       "Translate Japanese names without including common honorifics (e.g., -san, -kun, -chan, -sama, -dono, -sensei). Use the base name only or adapt to natural forms of address in the target language (e.g., using titles like Mr./Ms. or first/last names as appropriate for the context and relationship between characters), unless the honorific itself is crucial for plot or characterization (rare).",
   },
 ]
+
+export const transcriptionInstructionPresets = [
+  {
+    title: "High Accuracy Focus",
+    instruction: "Prioritize word-for-word accuracy above all else. Capture every utterance, including fillers like 'uh' and 'um'. Punctuate strictly based on speech pauses."
+  },
+  {
+    title: "Readability Focus",
+    instruction: "Produce a clean, readable transcript. Remove filler words and false starts. Use standard punctuation for clarity, even if speech pauses differ slightly."
+  },
+  {
+    title: "Direct Translation",
+    instruction: `After transcribing the audio, translate the text to Romaji using this format:
+
+\`\`\`
+original text
+(translated text)
+\`\`\`
+
+e.g.,
+\`\`\`
+こんにちは
+(Konnichiwa)
+\`\`\`
+`.trim()
+  },
+  {
+    title: "Provide Lyrics",
+    instruction: `Transcribe using the lyrics provided. After transcribing the audio, translate the text to Romaji using this format:
+
+\`\`\`
+original text
+(translated text)
+\`\`\`
+
+e.g.,
+\`\`\`
+こんにちは
+(Konnichiwa)
+\`\`\`
+
+Lyrics:
+月影揺れる夜の小道
+ヒラリ舞い散る花の香り
+カラカラと鳴る風鈴の音
+淡い夢がそっと囁く
+
+影絵の中で踊る影
+ゆらゆら揺れる灯りの下
+彩り豊かな夕焼け空
+キラリと光る星の砂
+
+過ぎゆく季節、音もなく
+心の奥に響く声
+
+カゲロウの調べに乗せて
+君との記憶　消えないように
+結び合う手が伝うぬくもり
+この瞬間を永久に刻む
+ひらひらと舞う、夜風に乗せ
+共に歩んだ日々を感じて
+未来を描く　君と二人で
+今宵もまた　光の中へ
+
+朝露に濡れる緑の葉
+静寂の中に潜む息吹
+コトコトと鳴る川の流れ
+優しい声が風に溶ける
+
+木漏れ日の中　微笑む君
+さらさら流れる時間の中
+色とりどりの風景映し
+キラリと光る未来へと
+
+過ぎゆく時を抱きしめて
+心の奥に眠る願い
+
+カゲロウの調べに乗せて
+君との夢を忘れないように
+重ね合う手が伝う想い
+この瞬間を永遠に歌う
+ふわふわ浮かぶ、淡い想い
+共に刻んだ日々を感じて
+未来を見据え　君と二人で
+今宵もまた　光の中へ
+
+触れるたび溢れる想い
+未来へと続くこの道を　光の中へ
+
+カゲロウの調べに乗せて
+君との記憶　忘れぬように
+結び合う手が示すしるべ
+この瞬間を永遠に刻む
+そよ風揺れる　柔らかな夢
+共に見上げた星を感じて
+未来を描く　君と二人で
+明日もまた　光の中へ
+`.trim()
+  }
+].slice(2)
