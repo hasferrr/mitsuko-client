@@ -534,7 +534,11 @@ export default function Transcription() {
                             {timestampToString(subtitle.timestamp.start)} → {timestampToString(subtitle.timestamp.end)}
                           </span>
                         </div>
-                        <p className="text-sm">{subtitle.content}</p>
+                        {subtitle.content.split("\n").map((line, index) => (
+                          <p key={`transcript-subtitle-${subtitle.index}-${index}`} className="text-sm">
+                            {line}
+                          </p>
+                        ))}
                       </div>
                     ))}
 
