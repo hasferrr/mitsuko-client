@@ -86,9 +86,9 @@ export default function Transcription() {
   const saveData = useTranscriptionDataStore(state => state.saveData)
 
   // Transcription store
-  const file = useTranscriptionStore((state) => state.file)
+  const file = useTranscriptionStore((state) => state.files[currentId])
+  const audioUrl = useTranscriptionStore((state) => state.audioUrls[currentId])
   const isTranscribingSet = useTranscriptionStore((state) => state.isTranscribingSet)
-  const audioUrl = useTranscriptionStore((state) => state.audioUrl)
   const setFileAndUrl = useTranscriptionStore((state) => state.setFileAndUrl)
   const setIsTranscribing = useTranscriptionStore((state) => state.setIsTranscribing)
   const startTranscription = useTranscriptionStore((state) => state.startTranscription)
@@ -129,7 +129,7 @@ export default function Transcription() {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
-      setFileAndUrl(file)
+      setFileAndUrl(currentId, file)
       setTitle(currentId, file.name)
     }
     e.target.value = ""
@@ -138,7 +138,7 @@ export default function Transcription() {
   const handleDropFiles = (files: FileList) => {
     if (files.length > 0) {
       const file = files[0]
-      setFileAndUrl(file)
+      setFileAndUrl(currentId, file)
       setTitle(currentId, file.name)
     }
   }
@@ -255,7 +255,7 @@ export default function Transcription() {
   }
 
   return (
-    <div className="mx-auto py-8 px-4 max-w-6xl">
+    <div className="mx-auto py-8 px-4 max-w-5xl">
       <div className="mb-6">
         <Input
           type="text"
@@ -294,13 +294,13 @@ export default function Transcription() {
               <div className="border border-border rounded-lg p-4">
                 <div className="flex items-center mb-3">
                   <File className="h-6 w-6 text-blue-500 mr-2" />
-                  <div className="flex-1 truncate text-sm">{file.name}</div>
+                  <div className="flex-1 line-clamp-3 text-sm">{file.name}</div>
                   <Button
                     variant="ghost"
                     size="sm"
                     className="h-6 w-6 p-0"
                     onClick={() => {
-                      setFileAndUrl(null)
+                      setFileAndUrl(currentId, null)
                     }}
                   >
                     <X className="h-4 w-4" />

@@ -2,13 +2,14 @@ import { TRANSCRIPT_URL } from "@/constants/api"
 import { handleStream } from "@/lib/stream/stream"
 import { create } from "zustand"
 import { RefObject } from "react"
+
 interface TranscriptionStore {
-  file: File | null
-  audioUrl: string | null
+  files: Record<string, File | null>
+  audioUrls: Record<string, string | null>
   isTranscribingSet: Set<string>
   abortControllerMap: Map<string, RefObject<AbortController>>
-  setFileAndUrl: (file: File | null) => void
-  setAudioUrl: (audioUrl: string | null) => void
+  setFileAndUrl: (id: string, file: File | null) => void
+  setAudioUrl: (id: string, audioUrl: string | null) => void
   setIsTranscribing: (id: string, isTranscribing: boolean) => void
   stopTranscription: (id: string) => void
   startTranscription: (
@@ -21,21 +22,33 @@ interface TranscriptionStore {
 export const useTranscriptionStore = create<TranscriptionStore>()(
   (set, get) => {
     return ({
-      file: null,
-      audioUrl: null,
+      files: {},
+      audioUrls: {},
       isTranscribingSet: new Set(),
       abortControllerMap: new Map(),
 
-      setFileAndUrl: (file) => {
+      setFileAndUrl: (id, file) => {
         if (file) {
           const url = URL.createObjectURL(file)
-          set({ file, audioUrl: url })
+          set({
+            files: { ...get().files, [id]: file },
+            audioUrls: { ...get().audioUrls, [id]: url }
+          })
         } else {
-          set({ file: null, audioUrl: null })
+          const currentFiles = { ...get().files }
+          const currentUrls = { ...get().audioUrls }
+          delete currentFiles[id]
+          delete currentUrls[id]
+          set({
+            files: currentFiles,
+            audioUrls: currentUrls
+          })
         }
       },
 
-      setAudioUrl: (audioUrl) => set({ audioUrl }),
+      setAudioUrl: (id, audioUrl) => set({
+        audioUrls: { ...get().audioUrls, [id]: audioUrl }
+      }),
 
       setIsTranscribing: (id, isTranscribing) => {
         if (isTranscribing) {
@@ -69,5 +82,5 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         return transcriptionText
       },
     })
-  }
+  },
 )
