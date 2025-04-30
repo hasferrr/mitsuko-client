@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "../ui/button"
-import { Edit, Trash, SquareArrowOutUpRight } from "lucide-react"
+import { Edit, Trash, SquareArrowOutUpRight, GripVertical } from "lucide-react"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { EditDialogue } from "../ui-custom/edit-dialogue"
 import { MoveDialogue } from "../ui-custom/move-dialogue"
@@ -12,6 +12,8 @@ import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { db } from "@/lib/db/db"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 interface ProjectItemListProps {
   id: string
@@ -55,6 +57,21 @@ export const ProjectItemList = ({
   const getTranslationDb = useTranslationDataStore((state) => state.getTranslationDb)
   const getExtractionDb = useExtractionDataStore((state) => state.getExtractionDb)
   const getTranscriptionDb = useTranscriptionDataStore((state) => state.getTranscriptionDb)
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
 
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
@@ -158,9 +175,16 @@ export const ProjectItemList = ({
   }
 
   return (
-    <div className="border border-border rounded-lg p-3">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="border border-border rounded-lg p-3 bg-background touch-none"
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
+          <button {...attributes} {...listeners} className="cursor-grab">
+            <GripVertical className="h-5 w-5 text-muted-foreground" />
+          </button>
           <div className="bg-secondary p-2 rounded-lg">{icon}</div>
           <div>
             <h4

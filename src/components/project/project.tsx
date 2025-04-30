@@ -2,6 +2,21 @@
 
 import { useEffect, useState } from "react"
 import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import {
   Globe,
   Headphones,
   LayoutDashboard,
@@ -30,6 +45,7 @@ export const Project = () => {
   const currentProject = useProjectStore((state) => state.currentProject)
   const updateProject = useProjectStore((state) => state.updateProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
+  const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
 
   const [translations, setTranslations] = useState<Translation[]>([])
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
@@ -54,6 +70,13 @@ export const Project = () => {
   const updateTranscriptionDb = useTranscriptionDataStore((state) => state.updateTranscriptionDb)
   const deleteTranscriptionDb = useTranscriptionDataStore((state) => state.deleteTranscriptionDb)
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
   useEffect(() => {
     if (!currentProject) return
 
@@ -72,6 +95,39 @@ export const Project = () => {
     loadData()
   }, [currentProject])
 
+  // Drag and drop handlers
+  function handleDragEnd(event: DragEndEvent, type: 'translation' | 'transcription' | 'extraction') {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      const updateOrder = <T extends { id: string }>(
+        items: T[],
+        setItems: React.Dispatch<React.SetStateAction<T[]>>
+      ) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id)
+        const newIndex = items.findIndex((item) => item.id === over.id)
+        if (oldIndex !== -1 && newIndex !== -1) { // Ensure items are found
+          const newOrder = arrayMove(items, oldIndex, newIndex)
+          setItems(newOrder)
+          if (currentProject) {
+            updateProjectItems(currentProject.id, newOrder.map((item) => item.id).toReversed(), type)
+          }
+        }
+      }
+
+      switch (type) {
+        case 'translation':
+          updateOrder(translations, setTranslations)
+          break
+        case 'transcription':
+          updateOrder(transcriptions, setTranscriptions)
+          break
+        case 'extraction':
+          updateOrder(extractions, setExtractions)
+          break
+      }
+    }
+  }
 
   if (!currentProject) {
     return <NoProjectSelected />
@@ -273,9 +329,20 @@ export const Project = () => {
                 <h3 className="text-sm font-medium">Translations</h3>
                 {NewTranslationButton}
               </div>
-              <div className="space-y-3">
-                {translationComponentList}
-              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={(e) => handleDragEnd(e, 'translation')}
+              >
+                <SortableContext
+                  items={translations.map((t) => t.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-3">
+                    {translationComponentList}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </div>
 
             <div className="bg-card border border-border rounded-lg p-4">
@@ -283,9 +350,20 @@ export const Project = () => {
                 <h3 className="text-sm font-medium">Transcriptions</h3>
                 {NewTranscriptionButton}
               </div>
-              <div className="space-y-3">
-                {transcriptionComponentList}
-              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={(e) => handleDragEnd(e, 'transcription')}
+              >
+                <SortableContext
+                  items={transcriptions.map((t) => t.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-3">
+                    {transcriptionComponentList}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </div>
 
             <div className="bg-card border border-border rounded-lg p-4">
@@ -293,9 +371,20 @@ export const Project = () => {
                 <h3 className="text-sm font-medium">Extractions</h3>
                 {NewExtractionButton}
               </div>
-              <div className="space-y-3">
-                {extractionComponentList}
-              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={(e) => handleDragEnd(e, 'extraction')}
+              >
+                <SortableContext
+                  items={extractions.map((e) => e.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-3">
+                    {extractionComponentList}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </div>
 
           </div>
@@ -308,9 +397,20 @@ export const Project = () => {
               <h3 className="text-sm font-medium">All Translations</h3>
               {NewTranslationButton}
             </div>
-            <div className="space-y-3">
-              {translationComponentList}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(e) => handleDragEnd(e, 'translation')}
+            >
+              <SortableContext
+                items={translations.map((t) => t.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-3">
+                  {translationComponentList}
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
         </TabsContent>
 
@@ -321,9 +421,20 @@ export const Project = () => {
               <h3 className="text-sm font-medium">All Transcriptions</h3>
               {NewTranscriptionButton}
             </div>
-            <div className="space-y-3">
-              {transcriptionComponentList}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(e) => handleDragEnd(e, 'transcription')}
+            >
+              <SortableContext
+                items={transcriptions.map((t) => t.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-3">
+                  {transcriptionComponentList}
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
         </TabsContent>
 
@@ -334,9 +445,20 @@ export const Project = () => {
               <h3 className="text-sm font-medium">All Extractions</h3>
               {NewExtractionButton}
             </div>
-            <div className="space-y-3">
-              {extractionComponentList}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(e) => handleDragEnd(e, 'extraction')}
+            >
+              <SortableContext
+                items={extractions.map((e) => e.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-3">
+                  {extractionComponentList}
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
         </TabsContent>
       </Tabs>

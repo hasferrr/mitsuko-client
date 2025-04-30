@@ -1,6 +1,13 @@
 import { create } from "zustand"
-import { Project } from "@/types/project"
-import { getAllProjects, createProject as createProjectDB, deleteProject as deleteProjectDB, updateProject as updateProjectDB, updateProjectOrder } from "@/lib/db/project"
+import { Project, ProjectType } from "@/types/project"
+import {
+  getAllProjects,
+  createProject as createProjectDB,
+  deleteProject as deleteProjectDB,
+  updateProject as updateProjectDB,
+  updateProjectOrder,
+  updateProjectItems as updateProjectItemsDB,
+} from "@/lib/db/project"
 import { useTranscriptionDataStore } from "./use-transcription-data-store"
 import { useTranslationDataStore } from "./use-translation-data-store"
 import { useExtractionDataStore } from "./use-extraction-data-store"
@@ -14,6 +21,7 @@ interface ProjectStore {
   loadProjects: () => Promise<void>
   createProject: (name: string) => Promise<Project>
   updateProject: (id: string, name: string) => Promise<void>
+  updateProjectItems: (id: string, items: string[], type: 'translations' | 'transcriptions' | 'extractions' | ProjectType) => Promise<Project | null>
   deleteProject: (id: string) => Promise<void>
   reorderProjects: (newOrder: string[]) => Promise<void>
 }
@@ -84,6 +92,28 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     } catch (error) {
       console.error('Failed to update project', error)
       set({ error: 'Failed to update project', loading: false })
+    }
+  },
+
+  updateProjectItems: async (id, items, type) => {
+    set({ loading: true })
+    if (type === 'translation') type = 'translations'
+    if (type === 'transcription') type = 'transcriptions'
+    if (type === 'extraction') type = 'extractions'
+    try {
+      const updatedProject = await updateProjectItemsDB(id, items, type)
+      if (!updatedProject) return null
+      set((state) => ({
+        projects: state.projects.map(p =>
+          p.id === id ? updatedProject : p
+        ),
+        loading: false
+      }))
+      return updatedProject
+    } catch (error) {
+      console.error('Failed to update project items', error)
+      set({ error: 'Failed to update project items', loading: false })
+      return null
     }
   },
 

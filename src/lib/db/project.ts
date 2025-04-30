@@ -65,6 +65,17 @@ export const updateProject = async (id: string, update: Pick<Project, "name">): 
   return (await db.projects.get(id)) as Project
 }
 
+export const updateProjectItems = async (id: string, items: string[], type: 'translations' | 'transcriptions' | 'extractions'): Promise<Project | null> => {
+  const project = await db.projects.get(id)
+  if (!project) return null
+
+  await db.projects.update(id, (projectToUpdate) => {
+    projectToUpdate[type] = items
+    projectToUpdate.updatedAt = new Date()
+  })
+  return (await db.projects.get(id)) as Project
+}
+
 export const deleteProject = async (id: string): Promise<void> => {
   return db.transaction('rw', [db.projects, db.translations, db.transcriptions, db.extractions, db.projectOrders, db.basicSettings, db.advancedSettings], async () => {
     const project = await db.projects.get(id)
