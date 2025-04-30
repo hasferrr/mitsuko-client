@@ -26,12 +26,6 @@ export default function ProvidersClient({ children, modelCosts }: ProvidersProps
   }, [isDarkMode])
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("advanced-settings-storage")
-    }
-  }, [])
-
-  useEffect(() => {
     const midtransScriptUrl = process.env.NODE_ENV === 'production'
       ? 'https://app.midtrans.com/snap/snap.js'
       : 'https://app.sandbox.midtrans.com/snap/snap.js'
