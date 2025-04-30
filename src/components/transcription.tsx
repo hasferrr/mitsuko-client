@@ -66,6 +66,9 @@ export default function Transcription() {
   const title = useTranscriptionDataStore(state => state.getTitle())
   const transcriptionText = useTranscriptionDataStore(state => state.getTranscriptionText())
   const transcriptSubtitles = useTranscriptionDataStore(state => state.getTranscriptSubtitles())
+  const selectedMode = useTranscriptionDataStore(state => state.getSelectedMode())
+  const customInstructions = useTranscriptionDataStore(state => state.getCustomInstructions())
+  const models = useTranscriptionDataStore(state => state.getModels())
   const setTitle = useTranscriptionDataStore(state => state.setTitle)
   const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)
   const setTranscriptSubtitles = useTranscriptionDataStore(state => state.setTranscriptSubtitles)
@@ -153,6 +156,9 @@ export default function Transcription() {
 
     const formData = new FormData()
     formData.append("audio", file)
+    formData.append("selectedMode", selectedMode)
+    formData.append("customInstructions", customInstructions)
+    formData.append("models", models)
 
     try {
       const text = await startTranscription(
