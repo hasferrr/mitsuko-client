@@ -48,8 +48,8 @@ import { UserData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { db } from "@/lib/db/db"
-import { Extraction } from "@/types/project"
-
+import { Extraction, Translation } from "@/types/project"
+import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 
 interface FileItem {
   id: string
@@ -71,6 +71,8 @@ export const ContextExtractor = () => {
   const [isEditingResult, setIsEditingResult] = useState(false)
   const [isPreviousContextDialogOpen, setIsPreviousContextDialogOpen] = useState(false)
   const [projectExtractions, setProjectExtractions] = useState<Extraction[]>([])
+  const [isSubtitleImportDialogOpen, setIsSubtitleImportDialogOpen] = useState(false)
+  const [projectTranslations, setProjectTranslations] = useState<Translation[]>([])
 
   // Settings Store
   const modelDetail = useSettingsStore((state) => state.getModelDetail())
@@ -171,6 +173,8 @@ export const ContextExtractor = () => {
     }
   }, [])
 
+  // Content Change Handlers
+
   const handleSubtitleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
     setSubtitleContent(currentId, e.target.value)
@@ -193,6 +197,20 @@ export const ContextExtractor = () => {
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
   }, [setHasChanges, setPreviousContext])
 
+  // Import Select Handlers
+
+  const handleSubtitleSelect = (content: string) => {
+    setHasChanges(true)
+    setSubtitleContent(currentId, content)
+    setIsSubtitleContentValid(true)
+    setIsSubtitleImportDialogOpen(false)
+    if (subtitleContentRef.current) {
+      subtitleContentRef.current.style.height = "auto"
+      subtitleContentRef.current.style.height = `${Math.min(subtitleContentRef.current.scrollHeight, 900)}px`
+    }
+    saveData(currentId)
+  }
+
   const handlePreviousContextSelect = (contextResult: string) => {
     setHasChanges(true)
     setPreviousContext(currentId, getContent(contextResult).trim())
@@ -203,6 +221,17 @@ export const ContextExtractor = () => {
     }
     saveData(currentId)
   }
+
+  const handleSelectAndGenerateSubtitle = (translation: Translation) => {
+    const generatedContent = mergeSubtitle({
+      subtitles: translation.subtitles,
+      type: translation.parsed.type,
+      parsed: translation.parsed.data,
+    })
+    handleSubtitleSelect(generatedContent)
+  }
+
+  // File Upload Handlers
 
   const handleFileUploadSingle = async (
     files: FileList | null,
@@ -276,6 +305,8 @@ export const ContextExtractor = () => {
   const handleClearFiles = () => {
     setSelectedFiles([])
   }
+
+  // Extraction Handlers
 
   const handleStartExtraction = async (isContinuation: boolean = false) => {
     setTimeout(() => {
@@ -399,10 +430,18 @@ export const ContextExtractor = () => {
     }
   }
 
+  // Project Handlers
+
   const loadProjectExtractions = useCallback(async () => {
     if (!currentProject) return
     const extractionsData = await db.extractions.bulkGet(currentProject.extractions)
     setProjectExtractions(extractionsData.filter((e): e is Extraction => !!e && e.id !== currentId).toReversed())
+  }, [currentProject, currentId])
+
+  const loadProjectTranslations = useCallback(async () => {
+    if (!currentProject) return
+    const translationsData = await db.translations.bulkGet(currentProject.translations)
+    setProjectTranslations(translationsData.filter((t): t is Translation => !!t).toReversed())
   }, [currentProject])
 
   return (
@@ -456,6 +495,19 @@ export const ContextExtractor = () => {
                   <Upload className="h-4 w-4" />
                   Upload
                 </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    loadProjectTranslations()
+                    setIsSubtitleImportDialogOpen(true)
+                  }}
+                  className="h-2 py-3 px-2"
+                  disabled={isExtracting}
+                >
+                  <FolderDown className="h-4 w-4" />
+                  Import
+                </Button>
               </div>
               <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, (text) => setSubtitleContent(currentId, text), subtitleContentRef.current)} disabled={isExtracting}>
                 <Textarea
@@ -463,7 +515,7 @@ export const ContextExtractor = () => {
                   value={subtitleContent}
                   onChange={handleSubtitleContentChange}
                   className={cn(
-                    "min-h-[181px] h-[181px] max-h-[181px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
+                    "min-h-[181px] h-[181px] max-h-[250px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
                     !isSubtitleContentValid && "outline outline-red-500"
                   )}
                   placeholder="Paste subtitle content here..."
@@ -714,6 +766,51 @@ export const ContextExtractor = () => {
         </Button> */}
       </div>
 
+      {/* Subtitle Import Dialog */}
+      <Dialog open={isSubtitleImportDialogOpen} onOpenChange={setIsSubtitleImportDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Select Subtitle Document</DialogTitle>
+            <DialogDescription>
+              Choose a subtitle document from your project translations.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[400px] overflow-y-auto">
+            {projectTranslations.length === 0 ? (
+              <div className="py-6 text-center text-muted-foreground">
+                No subtitle documents found in this project
+              </div>
+            ) : isSubtitleImportDialogOpen ? (
+              <div className="space-y-2 mr-1">
+                {projectTranslations.map((translation) => {
+                  const previewContent = translation.subtitles
+                    .slice(0, 5)
+                    .map(sub => sub.content)
+                    .join("\n")
+
+                  return (
+                    <div
+                      key={translation.id}
+                      className="p-3 border rounded-md cursor-pointer hover:bg-muted"
+                      onClick={() => handleSelectAndGenerateSubtitle(translation)}
+                    >
+                      <div className="font-medium">{translation.title || "Untitled Subtitle"}</div>
+                      <div className="text-sm text-muted-foreground line-clamp-2">
+                        {previewContent.length
+                          ? previewContent.substring(0, 150) + (previewContent.length > 150 || translation.subtitles.length > 5 ? "..." : "")
+                          : "No content"}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              null
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Previous Context Dialog */}
       <Dialog open={isPreviousContextDialogOpen} onOpenChange={setIsPreviousContextDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
@@ -728,7 +825,7 @@ export const ContextExtractor = () => {
               <div className="py-6 text-center text-muted-foreground">
                 No context documents found in this project
               </div>
-            ) : (
+            ) : isPreviousContextDialogOpen ? (
               <div className="space-y-2 mr-1">
                 {projectExtractions.map((extraction) => (
                   <div
@@ -743,6 +840,8 @@ export const ContextExtractor = () => {
                   </div>
                 ))}
               </div>
+            ) : (
+              null
             )}
           </div>
         </DialogContent>
