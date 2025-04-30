@@ -29,7 +29,7 @@ import {
 export function User() {
   const session = useSessionStore((state) => state.session)
   const [page, setPage] = useState(1)
-  const [amountFilter, setAmountFilter] = useState<AmountFilter>("all")
+  const [amountFilter, setAmountFilter] = useState<AmountFilter>("non-zero")
   const pageSize = 10
 
   const {
@@ -148,13 +148,14 @@ export function User() {
               value={amountFilter}
               onValueChange={(value) => handleAmountFilterChange(value as AmountFilter)}
             >
-              <SelectTrigger className="w-[100px] h-8">
+              <SelectTrigger className="w-[105px] h-8">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
                 <SelectItem value="positive">Positive</SelectItem>
                 <SelectItem value="negative">Negative</SelectItem>
+                <SelectItem value="non-zero">Non-zero</SelectItem>
                 <SelectItem value="zero">Zero</SelectItem>
               </SelectContent>
             </Select>

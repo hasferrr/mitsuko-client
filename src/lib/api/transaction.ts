@@ -1,7 +1,7 @@
 import { supabase } from "../supabase"
 import { Transaction } from "@/types/transaction"
 
-export type AmountFilter = "all" | "positive" | "negative" | "zero"
+export type AmountFilter = "all" | "positive" | "negative" | "zero" | "non-zero"
 
 export type PaginatedTransactions = {
   data: Transaction[]
@@ -34,6 +34,8 @@ export async function fetchTransactions(
     query = query.lt('amount', 0)
   } else if (amountFilter === "zero") {
     query = query.eq('amount', 0)
+  } else if (amountFilter === "non-zero") {
+    query = query.neq('amount', 0)
   }
 
   const { data, error, count } = await query
