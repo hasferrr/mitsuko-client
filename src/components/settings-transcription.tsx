@@ -28,15 +28,20 @@ interface SettingsTranscriptionProps {
 
 export function SettingsTranscription({ transcriptionId }: SettingsTranscriptionProps) {
   const [selectedLanguage, setSelectedLanguage] = useState("auto")
-  const [selectedModel, setSelectedModel] = useState("free")
   const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
 
   const saveData = useTranscriptionDataStore((state) => state.saveData)
+  const selectedModel = useTranscriptionDataStore((state) => state.getModels())
   const selectedMode = useTranscriptionDataStore((state) => state.getSelectedMode())
   const customInstructions = useTranscriptionDataStore((state) => state.getCustomInstructions())
+  const _setModels = useTranscriptionDataStore((state) => state.setModels)
   const _setSelectedMode = useTranscriptionDataStore((state) => state.setSelectedMode)
   const _setCustomInstructions = useTranscriptionDataStore((state) => state.setCustomInstructions)
 
+  const setSelectedModel = (model: Transcription["models"]) => {
+    _setModels(transcriptionId, model)
+    saveData(transcriptionId)
+  }
   const setSelectedMode = (mode: Transcription["selectedMode"]) => {
     _setSelectedMode(transcriptionId, mode)
     saveData(transcriptionId)

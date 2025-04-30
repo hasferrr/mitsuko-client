@@ -9,7 +9,7 @@ interface TranscriptionDataStore {
   // CRUD methods
   createTranscriptionDb: (projectId: string, data: Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles">) => Promise<Transcription>
   getTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<Transcription | undefined>
-  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions">>) => Promise<Transcription>
+  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
   // getters
   getTitle: () => string
@@ -17,6 +17,7 @@ interface TranscriptionDataStore {
   getTranscriptSubtitles: () => Subtitle[]
   getSelectedMode: () => Transcription["selectedMode"]
   getCustomInstructions: () => string
+  getModels: () => Transcription["models"]
   // setters
   setCurrentId: (id: string | null) => void
   setTitle: (id: string, title: string) => void
@@ -24,6 +25,7 @@ interface TranscriptionDataStore {
   setTranscriptSubtitles: (id: string, subtitles: Subtitle[]) => void
   setSelectedMode: (id: string, selectedMode: Transcription["selectedMode"]) => void
   setCustomInstructions: (id: string, customInstructions: string) => void
+  setModels: (id: string, models: Transcription["models"]) => void
   // data manipulation methods
   mutateData: <T extends keyof Transcription>(id: string, key: T, value: Transcription[T]) => void
   saveData: (id: string) => Promise<void>
@@ -84,6 +86,10 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     const id = get().currentId
     return id ? get().data[id]?.customInstructions : ""
   },
+  getModels: () => {
+    const id = get().currentId
+    return id ? get().data[id]?.models : "free"
+  },
   // setters implementation
   setCurrentId: (id) => set({ currentId: id }),
   setTitle: (id, title) => {
@@ -100,6 +106,9 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   },
   setCustomInstructions: (id, customInstructions) => {
     get().mutateData(id, "customInstructions", customInstructions)
+  },
+  setModels: (id, models) => {
+    get().mutateData(id, "models", models)
   },
   // data manipulation methods
   mutateData: (id, key, value) => {
@@ -120,7 +129,14 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
       return
     }
     try {
-      const result = await updateTranscription(id, transcription)
+      const result = await updateTranscription(id, {
+        title: transcription.title,
+        transcriptionText: transcription.transcriptionText,
+        transcriptSubtitles: transcription.transcriptSubtitles,
+        selectedMode: transcription.selectedMode,
+        customInstructions: transcription.customInstructions,
+        models: transcription.models,
+      })
       set({ data: { ...get().data, [id]: result } })
     } catch (error) {
       console.error("Failed to save transcription data:", error)

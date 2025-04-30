@@ -42,6 +42,7 @@ export interface Transcription {
   transcriptSubtitles: Subtitle[]
   selectedMode: "clause" | "sentence"
   customInstructions: string
+  models: "free" | "premium"
   createdAt: Date
   updatedAt: Date
   projectId: string

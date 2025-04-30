@@ -61,6 +61,10 @@ class MyDatabase extends Dexie {
         if (typeof transcription.customInstructions === 'undefined') {
           transcription.customInstructions = ''
         }
+        // Add models with default 'free' if it doesn't exist
+        if (typeof transcription.models === 'undefined') {
+          transcription.models = 'free'
+        }
       })
     })
   }
