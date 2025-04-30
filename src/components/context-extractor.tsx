@@ -19,6 +19,7 @@ import {
   Trash2,
   Check,
   Edit,
+  FolderDown,
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
@@ -45,6 +46,9 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { fetchUserData } from "@/lib/api/user"
 import { UserData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { db } from "@/lib/db/db"
+import { Extraction } from "@/types/project"
 
 
 interface FileItem {
@@ -65,6 +69,8 @@ export const ContextExtractor = () => {
   const [isEpisodeNumberValid, setIsEpisodeNumberValid] = useState(true)
   const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
   const [isEditingResult, setIsEditingResult] = useState(false)
+  const [isPreviousContextDialogOpen, setIsPreviousContextDialogOpen] = useState(false)
+  const [projectExtractions, setProjectExtractions] = useState<Extraction[]>([])
 
   // Settings Store
   const modelDetail = useSettingsStore((state) => state.getModelDetail())
@@ -122,6 +128,7 @@ export const ContextExtractor = () => {
   const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
 
   const { setHasChanges } = useUnsavedChanges()
+  const currentProject = useProjectStore((state) => state.currentProject)
   useAutoScroll(contextResult, contextResultRef)
 
   useEffect(() => {
@@ -185,6 +192,17 @@ export const ContextExtractor = () => {
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
   }, [setHasChanges, setPreviousContext])
+
+  const handlePreviousContextSelect = (contextResult: string) => {
+    setHasChanges(true)
+    setPreviousContext(currentId, getContent(contextResult).trim())
+    setIsPreviousContextDialogOpen(false)
+    if (previousContextRef.current) {
+      previousContextRef.current.style.height = "auto"
+      previousContextRef.current.style.height = `${Math.min(previousContextRef.current.scrollHeight, 900)}px`
+    }
+    saveData(currentId)
+  }
 
   const handleFileUploadSingle = async (
     files: FileList | null,
@@ -381,6 +399,12 @@ export const ContextExtractor = () => {
     }
   }
 
+  const loadProjectExtractions = useCallback(async () => {
+    if (!currentProject) return
+    const extractionsData = await db.extractions.bulkGet(currentProject.extractions)
+    setProjectExtractions(extractionsData.filter((e): e is Extraction => !!e && e.id !== currentId).toReversed())
+  }, [currentProject])
+
   return (
     <div className="grid md:grid-cols-2 gap-6 container mx-auto py-2 px-4 mt-2 mb-6 max-w-5xl">
       {/* Left Pane */}
@@ -424,7 +448,8 @@ export const ContextExtractor = () => {
 
                 <Button
                   variant="outline"
-                  className="gap-2 h-2 p-3"
+                  size="sm"
+                  className="h-2 py-3 px-2"
                   onClick={() => document.getElementById("subtitle-content-upload")?.click()}
                   disabled={isExtracting}
                 >
@@ -462,12 +487,26 @@ export const ContextExtractor = () => {
                 />
                 <Button
                   variant="outline"
-                  className="gap-2 h-2 p-3"
+                  size="sm"
+                  className="h-2 py-3 px-2"
                   onClick={() => document.getElementById("previous-context-upload")?.click()}
                   disabled={isExtracting}
                 >
                   <Upload className="h-4 w-4" />
                   Upload
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    loadProjectExtractions()
+                    setIsPreviousContextDialogOpen(true)
+                  }}
+                  className="h-2 py-3 px-2"
+                  disabled={isExtracting}
+                >
+                  <FolderDown className="h-4 w-4" />
+                  Import
                 </Button>
               </div>
               <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, (text) => setPreviousContext(currentId, text), previousContextRef.current)} disabled={isExtracting}>
@@ -475,7 +514,7 @@ export const ContextExtractor = () => {
                   ref={previousContextRef}
                   value={previousContext}
                   onChange={handlePreviousContextChange}
-                  className="min-h-[130px] h-[130px] max-h-[130px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                  className="min-h-[130px] h-[130px] max-h-[250px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
                   placeholder="Paste previous context here..."
                   onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
                 />
@@ -674,6 +713,40 @@ export const ContextExtractor = () => {
           )}
         </Button> */}
       </div>
+
+      {/* Previous Context Dialog */}
+      <Dialog open={isPreviousContextDialogOpen} onOpenChange={setIsPreviousContextDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Select Previous Context Document</DialogTitle>
+            <DialogDescription>
+              Choose a context document from your project extractions to use as previous context.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[400px] overflow-y-auto">
+            {projectExtractions.length === 0 ? (
+              <div className="py-6 text-center text-muted-foreground">
+                No context documents found in this project
+              </div>
+            ) : (
+              <div className="space-y-2 mr-1">
+                {projectExtractions.map((extraction) => (
+                  <div
+                    key={extraction.id}
+                    className="p-3 border rounded-md cursor-pointer hover:bg-muted"
+                    onClick={() => handlePreviousContextSelect(extraction.contextResult)}
+                  >
+                    <div className="font-medium">Episode {extraction.episodeNumber || "X"}</div>
+                    <div className="text-sm text-muted-foreground line-clamp-2">
+                      {extraction.contextResult.length ? extraction.contextResult.substring(0, 150) + "..." : "No content"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
