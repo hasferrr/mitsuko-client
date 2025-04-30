@@ -54,6 +54,7 @@ import { parseTranscription } from "@/lib/parser/parser"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserData } from "@/lib/api/user"
 import { UserData } from "@/types/user"
+import { Input } from "./ui/input"
 
 const languages = [
   { value: "auto", label: "Auto-detect" },
@@ -76,8 +77,10 @@ export default function Transcription() {
   const audioRef = useRef<HTMLAudioElement>(null)
 
   // Get data store getters and setters
+  const title = useTranscriptionDataStore(state => state.getTitle())
   const transcriptionText = useTranscriptionDataStore(state => state.getTranscriptionText())
   const transcriptSubtitles = useTranscriptionDataStore(state => state.getTranscriptSubtitles())
+  const setTitle = useTranscriptionDataStore(state => state.setTitle)
   const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)
   const setTranscriptSubtitles = useTranscriptionDataStore(state => state.setTranscriptSubtitles)
   const saveData = useTranscriptionDataStore(state => state.saveData)
@@ -125,20 +128,24 @@ export default function Transcription() {
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFileAndUrl(e.target.files[0])
+      const file = e.target.files[0]
+      setFileAndUrl(file)
+      setTitle(currentId, file.name)
     }
     e.target.value = ""
+  }
+
+  const handleDropFiles = (files: FileList) => {
+    if (files.length > 0) {
+      const file = files[0]
+      setFileAndUrl(file)
+      setTitle(currentId, file.name)
+    }
   }
 
   const handleUploadClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click()
-    }
-  }
-
-  const handleDropFiles = (files: FileList) => {
-    if (files.length > 0) {
-      setFileAndUrl(files[0])
     }
   }
 
@@ -249,11 +256,14 @@ export default function Transcription() {
 
   return (
     <div className="mx-auto py-8 px-4 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-medium mb-2">Audio Transcription (Experimental)</h1>
-        <p className="text-muted-foreground">
-          Upload your audio file and get accurate transcriptions with timestamps
-        </p>
+      <div className="mb-6">
+        <Input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(currentId, e.target.value)}
+          className="text-base md:text-base font-semibold h-12"
+          placeholder="Enter title..."
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] lg:grid-cols-[400px_1fr_1fr] gap-8">
