@@ -5,6 +5,8 @@ import { Button } from "./ui/button"
 import { List } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { transcriptionInstructionPresets } from "@/constants/custom-instructions"
+import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
+import { Transcription } from "@/types/project"
 
 const languages = [
   { value: "auto", label: "Auto-detect" },
@@ -20,12 +22,28 @@ const modes = [
   { value: "sentence", label: "Mode 2: Sentences" },
 ]
 
-export function SettingsTranscription() {
+interface SettingsTranscriptionProps {
+  transcriptionId: string
+}
+
+export function SettingsTranscription({ transcriptionId }: SettingsTranscriptionProps) {
   const [selectedLanguage, setSelectedLanguage] = useState("auto")
   const [selectedModel, setSelectedModel] = useState("free")
-  const [selectedMode, setSelectedMode] = useState("clause")
-  const [customInstructions, setCustomInstructions] = useState("")
   const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
+
+  const saveData = useTranscriptionDataStore((state) => state.saveData)
+  const selectedMode = useTranscriptionDataStore((state) => state.getSelectedMode())
+  const customInstructions = useTranscriptionDataStore((state) => state.getCustomInstructions())
+  const _setSelectedMode = useTranscriptionDataStore((state) => state.setSelectedMode)
+  const _setCustomInstructions = useTranscriptionDataStore((state) => state.setCustomInstructions)
+
+  const setSelectedMode = (mode: Transcription["selectedMode"]) => {
+    _setSelectedMode(transcriptionId, mode)
+    saveData(transcriptionId)
+  }
+  const setCustomInstructions = (instructions: string) => {
+    _setCustomInstructions(transcriptionId, instructions)
+  }
 
   const handlePresetSelect = (instruction: string) => {
     setCustomInstructions(instruction)
@@ -109,14 +127,17 @@ export function SettingsTranscription() {
           onChange={(e) => {
             setCustomInstructions(e.target.value)
             e.target.style.height = "auto"
-            e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`
+            e.target.style.height = `${Math.min(e.target.scrollHeight, 250)}px`
           }}
           onFocus={(e: React.FocusEvent<HTMLTextAreaElement>) => {
             e.target.style.height = "auto"
-            e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`
+            e.target.style.height = `${Math.min(e.target.scrollHeight, 250)}px`
+          }}
+          onBlur={() => {
+            saveData(transcriptionId)
           }}
           placeholder="Enter custom instructions for transcription..."
-          className="min-h-[150px] h-[150px] max-h-[300px] resize-none overflow-y-auto"
+          className="min-h-[150px] h-[150px] max-h-[250px] resize-none overflow-y-auto"
         />
       </div>
 

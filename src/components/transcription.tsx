@@ -310,7 +310,7 @@ export default function Transcription() {
 
             <div className="space-y-4">
               {/* Transcription Settings */}
-              <SettingsTranscription />
+              <SettingsTranscription transcriptionId={currentId} />
 
               {/* Buttons */}
               <div className="pt-4 flex gap-2">

@@ -15,14 +15,14 @@ interface TranscriptionDataStore {
   getTitle: () => string
   getTranscriptionText: () => string
   getTranscriptSubtitles: () => Subtitle[]
-  getSelectedMode: () => "clause" | "sentence"
+  getSelectedMode: () => Transcription["selectedMode"]
   getCustomInstructions: () => string
   // setters
   setCurrentId: (id: string | null) => void
   setTitle: (id: string, title: string) => void
   setTranscriptionText: (id: string, transcriptionText: string) => void
   setTranscriptSubtitles: (id: string, subtitles: Subtitle[]) => void
-  setSelectedMode: (id: string, selectedMode: "clause" | "sentence") => void
+  setSelectedMode: (id: string, selectedMode: Transcription["selectedMode"]) => void
   setCustomInstructions: (id: string, customInstructions: string) => void
   // data manipulation methods
   mutateData: <T extends keyof Transcription>(id: string, key: T, value: Transcription[T]) => void
