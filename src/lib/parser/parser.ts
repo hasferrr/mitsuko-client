@@ -48,6 +48,8 @@ export function parseTranscription(response: string): Subtitle[] {
 
   /**
    * Format:
+   * hh:mm:ss:ms --> hh:mm:ss:ms
+   * or
    * mm:ss:ms --> mm:ss:ms
    * Transcribed Text
    */
@@ -59,12 +61,41 @@ export function parseTranscription(response: string): Subtitle[] {
       start = start.trim()
       end = end.trim()
 
-      const [startMinuteStr, startSecondStr, startMillisecondStr] = start.split(":")
-      const [endMinuteStr, endSecondStr, endMillisecondStr] = end.split(":")
+      let startHourStr: string | undefined
+      let startMinuteStr: string | undefined
+      let startSecondStr: string | undefined
+      let startMillisecondStr: string | undefined
 
+      let endHourStr: string | undefined
+      let endMinuteStr: string | undefined
+      let endSecondStr: string | undefined
+      let endMillisecondStr: string | undefined
+
+      const startSplit = start.split(":")
+      const endSplit = end.split(":")
+
+      if (startSplit.length === 4) {
+        [startHourStr, startMinuteStr, startSecondStr, startMillisecondStr] = startSplit
+      } else if (startSplit.length === 3) {
+        [startMinuteStr, startSecondStr, startMillisecondStr] = startSplit
+      } else {
+        throw new Error("Invalid time format in transcription text")
+      }
+
+      if (endSplit.length === 4) {
+        [endHourStr, endMinuteStr, endSecondStr, endMillisecondStr] = endSplit
+      } else if (endSplit.length === 3) {
+        [endMinuteStr, endSecondStr, endMillisecondStr] = endSplit
+      } else {
+        throw new Error("Invalid time format in transcription text")
+      }
+
+      const startHour = startHourStr ? parseInt(startHourStr, 10) : 0
       const startMinute = parseInt(startMinuteStr, 10)
       const startSecond = parseInt(startSecondStr, 10)
       const startMillisecond = parseInt(startMillisecondStr, 10)
+
+      const endHour = endHourStr ? parseInt(endHourStr, 10) : 0
       const endMinute = parseInt(endMinuteStr, 10)
       const endSecond = parseInt(endSecondStr, 10)
       const endMillisecond = parseInt(endMillisecondStr, 10)
@@ -74,8 +105,8 @@ export function parseTranscription(response: string): Subtitle[] {
         throw new Error("Invalid time format in transcription text")
       }
 
-      const s = `00:${startMinute.toString().padStart(2, '0')}:${startSecond.toString().padStart(2, '0')},${startMillisecond.toString().padStart(3, '0')}`
-      const e = `00:${endMinute.toString().padStart(2, '0')}:${endSecond.toString().padStart(2, '0')},${endMillisecond.toString().padStart(3, '0')}`
+      const s = `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}:${startSecond.toString().padStart(2, '0')},${startMillisecond.toString().padStart(3, '0')}`
+      const e = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}:${endSecond.toString().padStart(2, '0')},${endMillisecond.toString().padStart(3, '0')}`
 
       srtArr.push(`\n${i}\n${s} --> ${e}`)
       i++

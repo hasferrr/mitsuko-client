@@ -199,6 +199,8 @@ export default function Transcription() {
         <div className="select-none">
           <div>Parse Error! Please follow this format:</div>
           <div className="font-mono">
+            <div>hh:mm:ss:ms {"-->"} hh:mm:ss:ms</div>
+            <div>or</div>
             <div>mm:ss:ms {"-->"} mm:ss:ms</div>
             <div>transcription text</div>
           </div>
