@@ -22,8 +22,8 @@ export default async function CreditUsage() {
 
       return {
         name: paidModel.name,
-        creditPerInputToken: costs?.creditPerInputToken ?? 0,
-        creditPerOutputToken: costs?.creditPerOutputToken ?? 0,
+        creditPerInputToken: costs?.creditPerInputToken ?? -69,
+        creditPerOutputToken: costs?.creditPerOutputToken ?? -69,
         contextLength: contextLength,
         maxCompletion: maxCompletion,
         score: "-"
@@ -108,8 +108,8 @@ export default async function CreditUsage() {
                     </TooltipProvider>
                   )}
                 </td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.creditPerInputToken}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.creditPerOutputToken}</td>
+                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.creditPerInputToken === -69 ? "N/A" : model.creditPerInputToken}</td>
+                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.creditPerOutputToken === -69 ? "N/A" : model.creditPerOutputToken}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.contextLength}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.maxCompletion}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.score}</td>

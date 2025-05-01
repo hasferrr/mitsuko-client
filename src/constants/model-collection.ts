@@ -31,7 +31,29 @@ export const FREE_MODELS: ModelCollection = {
       maxOutput: 128000,
       structuredOutput: true,
       isPaid: false,
-    }
+    },
+    {
+      name: "Qwen3 235B A22B",
+      maxInput: 40000,
+      maxOutput: 40000,
+      structuredOutput: true,
+      isPaid: false,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: false,
+      }
+    },
+    {
+      name: "Meta: Llama 4 Maverick",
+      maxInput: 256000,
+      maxOutput: 256000,
+      structuredOutput: true,
+      isPaid: false,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: false,
+      }
+    },
   ],
   "Free Gemini Experimental": [
     {
@@ -106,6 +128,19 @@ export const PAID_MODELS: ModelCollection = {
       default: {
         isMaxCompletionTokensAuto: true,
         isUseStructuredOutput: true
+      }
+    },
+  ],
+  Qwen: [
+    {
+      name: "Qwen3 235B A22B",
+      maxInput: 40000,
+      maxOutput: 40000,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: false,
       }
     },
   ],
