@@ -1,0 +1,75 @@
+"use client"
+
+import { motion } from "framer-motion"
+import { Check } from "lucide-react"
+
+const generalFeaturesList = [
+  {
+    feature: "Flexible Credit System",
+    description: "Utilize credits for various features, available through plans or purchased separately.",
+  },
+  {
+    feature: "Subtitle Translation",
+    description: "Translate subtitles (SRT & ASS) using all available AI models for over 100+ languages.",
+  },
+  {
+    feature: "Extract Context Feature",
+    description: "Analyze content to extract characters, settings, plot, and relationships.",
+  },
+  {
+    feature: "Audio Transcription",
+    description: "Convert audio into subtitle text. Supports large files and background processing.",
+  },
+  {
+    feature: "Project Management",
+    description: "Efficiently manage and organize your translation projects, subtitles, and related assets locally.",
+  },
+  {
+    feature: "Project Backup & Transfer",
+    description: "Conveniently export your project data for backup or transfer, and import projects to continue your work seamlessly.",
+  },
+  {
+    feature: "Custom Model Integration",
+    description: "Use your own LLM API within the Mitsuko platform.",
+  },
+  {
+    feature: "Support Options",
+    description: "Access Discord community and email support resources.",
+  },
+]
+
+interface GeneralFeaturesSectionProps {
+  isInView: boolean
+}
+
+export function GeneralFeaturesSection({ isInView }: GeneralFeaturesSectionProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.5, delay: 0.6 }}
+      className="mt-8 rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto shadow-sm"
+    >
+      <div className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 p-4">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+          Key Platform Features
+        </h3>
+      </div>
+      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {generalFeaturesList.map((item) => (
+          <div key={item.feature} className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Check className="w-5 h-5 text-blue-500 flex-shrink-0" />
+              <span className="text-base font-medium text-gray-800 dark:text-gray-200">
+                {item.feature}
+              </span>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 pl-7">
+              {item.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  )
+}

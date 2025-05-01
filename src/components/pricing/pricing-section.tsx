@@ -13,6 +13,7 @@ import { useSessionStore } from "@/stores/use-session-store"
 import { PricingCards } from "./pricing-cards"
 import { FeatureComparisonTable } from "./feature-comparison-table"
 import { CreditPackPrices } from "./credit-pack-prices"
+import { GeneralFeaturesSection } from "./general-features-section"
 
 interface Currency {
   symbol: string
@@ -38,10 +39,10 @@ const USD = { symbol: "$", rate: 1 }
 const IDR = { symbol: "Rp", rate: 17000 }
 
 export default function PricingSection({
-  useH1Title = false,
-  redirectToPricingPage = false,
-  showDescription = false,
-  showLink = true,
+  useH1Title,
+  redirectToPricingPage,
+  showDescription,
+  showLink,
 }: PricingSectionProps) {
   const [currency, setCurrency] = useState<Currency>(USD)
   const [isPending, startTransition] = useTransition()
@@ -288,21 +289,21 @@ export default function PricingSection({
         </motion.div>
 
         {/* Pricing Cards */}
-        <PricingCards
+        {false && <PricingCards
           currency={currency}
           pricingData={pricingData}
           redirectToPricingPage={redirectToPricingPage}
           isInView={isInView}
-        />
+        />}
 
         {/* Feature Comparison Table */}
-        <FeatureComparisonTable
+        {false && <FeatureComparisonTable
           currency={currency}
           pricingData={pricingData}
           featuresData={featuresData}
           showDescription={showDescription}
           isInView={isInView}
-        />
+        />}
 
         {/* Credit Pack Prices */}
         <CreditPackPrices
@@ -314,6 +315,9 @@ export default function PricingSection({
           redirectToPricingPage={redirectToPricingPage}
           isInView={isInView}
         />
+
+        {/* Use the new GeneralFeaturesSection component */}
+        <GeneralFeaturesSection isInView={isInView} />
 
         {/* More Information */}
         {showLink && (

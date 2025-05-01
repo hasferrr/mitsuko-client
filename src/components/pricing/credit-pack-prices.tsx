@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { Button } from "../ui/button"
 import { useRouter } from "next/navigation"
 import { ProductId } from "@/types/product"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
 interface Currency {
   symbol: string
@@ -47,53 +48,78 @@ export function CreditPackPrices({
       className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-sm"
     >
       <div id="credit-packs" className="absolute -top-24" />
-      <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-        Credit Pack Prices
-      </h3>
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Need more credits? Purchase additional credit packs starting at just {currency.symbol}{(creditPacks[0].basePriceUSD * currency.rate).toLocaleString()}. Available to all tiers, these
-        credit packs provide flexibility for your usage needs. <strong>Credits purchased do not expire.</strong>
+
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+        Need more credits? Purchase additional credit packs starting at just{" "}
+        {currency.symbol}
+        {(creditPacks[0]?.basePriceUSD * currency.rate || 0).toLocaleString()}
+        . Available to all tiers, these credit packs provide flexibility for your
+        usage needs. <strong>Credits purchased do not expire.</strong>
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-        {creditPacks.map((pack, index) => (
-          <div key={index} className="flex flex-col gap-1 justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800">
-            <div className="flex gap-2 justify-between items-center">
-              <span className="font-medium text-gray-900 dark:text-white">
-                {pack.baseCredits.toLocaleString()} credits
-              </span>
-              <span className="text-gray-900 dark:text-white font-bold">
-                {currency.symbol}{(pack.basePriceUSD * currency.rate).toLocaleString()}
-              </span>
-            </div>
-            {pack.discountUSD > 0 && (
-              <div className="text-xs text-green-600 dark:text-green-400">Save {currency.symbol}{(pack.discountUSD * currency.rate).toLocaleString()}</div>
-            )}
-            {redirectToPricingPage ? (
-              <Button
-                className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
-                onClick={() => router.push("/pricing")}
-              >
-                Go to Pricing Page
-              </Button>
-            ) : (
-              <Button
-                className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
-                onClick={() => handlePurchase(pack.productId)}
-                disabled={isPending}
-              >
-                {isPending && loadingProductId === pack.productId ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Purchasing...
-                  </>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {creditPacks.map((pack) => {
+          const price = pack.basePriceUSD * currency.rate
+          const savings = pack.discountUSD * currency.rate
+          const isCurrentCardLoading = isPending && loadingProductId === pack.productId
+
+          return (
+            <Card
+              key={pack.productId}
+              className="relative flex flex-col h-full transition-all duration-200 hover:border-primary/50 hover:shadow-md dark:hover:border-primary/70 border dark:border-gray-800 bg-white dark:bg-gray-900/20"
+            >
+              <CardHeader className="pb-1">
+                <div className="text-lg font-bold text-gray-900 dark:text-white">
+                  {pack.baseCredits.toLocaleString()}
+                  {" "}
+                  <span className="text-muted-foreground text-sm">credits</span>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-grow pb-4">
+                <div className="flex flex-wrap items-end gap-1 mb-1">
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {currency.symbol}
+                    {price.toLocaleString()}
+                  </span>
+                  {savings > 0 && (
+                    <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium mb-1">
+                      Save {currency.symbol}
+                      {savings.toLocaleString()}
+                    </span>
+                  )}
+                </div>
+                <div className="text-muted-foreground text-xs">
+                  No expiration date!
+                </div>
+              </CardContent>
+              <CardFooter>
+                {redirectToPricingPage ? (
+                  <Button
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                    onClick={() => router.push("/pricing")}
+                  >
+                    See Details
+                  </Button>
                 ) : (
-                  "Purchase"
+                  <Button
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                    onClick={() => handlePurchase(pack.productId)}
+                    disabled={isPending}
+                  >
+                    {isCurrentCardLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Purchasing...
+                      </>
+                    ) : (
+                      "Purchase"
+                    )}
+                  </Button>
                 )}
-              </Button>
-            )}
-          </div>
-        ))}
+              </CardFooter>
+            </Card>
+          )
+        })}
       </div>
     </motion.div>
   )

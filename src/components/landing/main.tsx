@@ -13,7 +13,7 @@ export default function MainLandingPage() {
       <HeroSection />
       <KeyFeatures />
       <ComparisonSection />
-      <PricingSection redirectToPricingPage />
+      <PricingSection redirectToPricingPage showLink />
       <FAQSection />
       <section className="pt-12 pb-24 px-4">
         <CreditValueShowcase />

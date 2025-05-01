@@ -73,7 +73,7 @@ export default function CreditValueShowcase({ showGetCreditsButton = false }: Cr
               </span>
               <span className="absolute bottom-0 left-0 inline-block h-full w-0 bg-yellow-300 transition-all duration-300 ease-out group-hover:w-full -z-10"></span>
             </span>
-            {' '}enabled!
+            {' '}{isMinimalContext ? "mode" : "enabled"}!
           </p>
           <p className="text-xs sm:text-sm text-blue-200">
             *Credit cost varies (e.g., Example 1: {Math.round(displayedExample1Credits).toLocaleString()} credits ≈ {example1Minutes} min, ~{Math.round(example1CreditsPerMinute)}/min; up to Example 2: {Math.round(displayedExample2Credits).toLocaleString()} credits ≈ {example2Minutes} min, ~{Math.round(example2CreditsPerMinute)}/min).

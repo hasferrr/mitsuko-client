@@ -61,7 +61,8 @@ export default function PricingDescription() {
           <p>
             Background processing allows certain tasks, like audio transcriptions, to run on our servers even if you close the browser tab.
             <br />
-            This means you don't have to wait for the process to finish. This feature is available for Basic and Pro user.
+            This means you don't have to wait for the process to finish. This feature will be available soon.
+            {/* This feature is available for Basic and Pro user. */}
           </p>
         </div>
 

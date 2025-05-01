@@ -7,7 +7,11 @@ export default function Pricing() {
   return (
     <>
       <AnnouncementHeadline />
-      <PricingSection showLink={false} showDescription useH1Title />
+      <PricingSection
+        showLink={false}
+        showDescription
+        useH1Title
+      />
       <PricingDescription />
       <section className="pt-12 pb-24 px-4">
         <CreditValueShowcase showGetCreditsButton />
