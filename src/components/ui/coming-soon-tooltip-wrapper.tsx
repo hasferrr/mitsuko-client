@@ -12,7 +12,7 @@ export const ComingSoonTooltipWrapper: React.FC<{ children: React.ReactNode }> =
   return (
     <TooltipProvider delayDuration={50}>
       <Tooltip>
-        <TooltipTrigger asChild className="w-full mb-6">
+        <TooltipTrigger asChild className="w-full">
           <span tabIndex={0} className="inline-block w-full">
             {children}
           </span>

@@ -1,25 +1,18 @@
 "use client"
 
 import Link from "next/link"
-import { Check, Info, X, Loader2 } from "lucide-react"
-import { Button } from "../ui/button"
+import { Check, X } from "lucide-react"
 import { useState, useTransition, useRef } from "react"
 import { motion, useInView } from "framer-motion"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
 import { ProductId } from "@/types/product"
 import { useSnapStore } from "@/stores/use-snap-store"
 import { PaymentOptionsDialog } from "./payment-options-dialog"
-import { useRouter } from "next/navigation"
-import { ComingSoonTooltipWrapper } from "@/components/ui/coming-soon-tooltip-wrapper"
 import { toast } from "sonner"
 import { useSessionStore } from "@/stores/use-session-store"
+import { PricingCards } from "./pricing-cards"
+import { FeatureComparisonTable } from "./feature-comparison-table"
+import { CreditPackPrices } from "./credit-pack-prices"
 
 interface Currency {
   symbol: string
@@ -64,8 +57,6 @@ export default function PricingSection({
     currencySymbol: string
     currencyRate: number
   } | null>(null)
-
-  const router = useRouter()
 
   const session = useSessionStore((state) => state.session)
 
@@ -297,336 +288,32 @@ export default function PricingSection({
         </motion.div>
 
         {/* Pricing Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="relative grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16"
-        >
-          <div id="pricing-cards" className="absolute -top-24" />
-          {/* Free Tier */}
-          <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <div className="p-6">
-              <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Free</h3>
-              <div className="flex items-end gap-1 mb-6">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">{currency.symbol}{pricingData.free.price}</span>
-                <span className="text-gray-500 dark:text-gray-400 mb-1">/month</span>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                Access to most features with some limitations. Purchase credits as needed.
-              </p>
-              <Link href="/dashboard">
-                <Button className="w-full py-2 px-4 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors mb-6">
-                  Get Started
-                </Button>
-              </Link>
-              <div className="space-y-3">
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Subtitle Translation
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Limited Audio Transcription
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Extract Context Feature
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Custom Model Integration
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <X className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {pricingData.free.credits} Monthly Credits
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Basic Tier */}
-          <div className="rounded-xl bg-white dark:bg-gray-900/30 border-2 border-blue-400 dark:border-blue-500 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <div className="p-6">
-              <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Basic</h3>
-              <div className="flex items-end gap-1 mb-6">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">{currency.symbol}{pricingData.basic.price}</span>
-                <span className="text-gray-500 dark:text-gray-400 mb-1">/month</span>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                Fewer limitations and monthly credit grant. Email support included.
-              </p>
-              {redirectToPricingPage ? (
-                <Button
-                  className={cn(
-                    "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6",
-                  )}
-                  onClick={() => router.push("/pricing")}
-                >
-                  Go to Pricing Page
-                </Button>
-              ) : (
-                <ComingSoonTooltipWrapper>
-                  <Button
-                    disabled
-                    className={cn(
-                      "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors",
-                      "cursor-not-allowed opacity-50"
-                    )}
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    Coming Soon
-                  </Button>
-                </ComingSoonTooltipWrapper>
-              )}
-              <div className="space-y-3">
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    <strong>{pricingData.basic.credits}</strong> Monthly Credits
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Full Audio Transcription
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Priority Email Support
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Custom Model Integration
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <X className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    Save to Cloud
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Pro Tier */}
-          <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <div className="p-6">
-              <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Pro</h3>
-              <div className="flex items-end gap-1 mb-6">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">{currency.symbol}{pricingData.pro.price}</span>
-                <span className="text-gray-500 dark:text-gray-400 mb-1">/month</span>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                Maximum features with priority support and cloud saving.
-              </p>
-              {redirectToPricingPage ? (
-                <Button
-                  className={cn(
-                    "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6",
-                  )}
-                  onClick={() => router.push("/pricing")}
-                >
-                  Go to Pricing Page
-                </Button>
-              ) : (
-                <ComingSoonTooltipWrapper>
-                  <Button
-                    disabled
-                    className={cn(
-                      "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors",
-                      "cursor-not-allowed opacity-50"
-                    )}
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    Coming Soon
-                  </Button>
-                </ComingSoonTooltipWrapper>
-              )}
-              <div className="space-y-3">
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    <strong>{pricingData.pro.credits}</strong> Monthly Credits
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Full Audio Transcription
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Priority Email Support
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Custom Model Integration
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Save to Cloud
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        <PricingCards
+          currency={currency}
+          pricingData={pricingData}
+          redirectToPricingPage={redirectToPricingPage}
+          isInView={isInView}
+        />
 
         {/* Feature Comparison Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto shadow-sm"
-        >
-          <div className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 p-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Feature Comparison
-            </h3>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50 dark:bg-gray-900/30">
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Feature/Limit
-                  </th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Free
-                  </th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Basic ({currency.symbol}{pricingData.basic.price}/mo)
-                  </th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Pro ({currency.symbol}{pricingData.pro.price}/mo)
-                  </th>
-                  {showDescription && (
-                    <th className="w-72 px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Description
-                    </th>
-                  )}
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {featuresData.map((item, index) => (
-                  <tr key={index}>
-                    <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
-                      <div className="flex items-center gap-1.5">
-                        {item.feature}
-                        {!showDescription && (
-                          <TooltipProvider delayDuration={50}>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Info className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
-                              </TooltipTrigger>
-                              <TooltipContent side="top" className="max-w-xs">
-                                <p>{item.description}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        )}
-                      </div>
-                    </td>
-                    <td className={cn("px-4 py-3 text-sm text-center", typeof item.free !== "string" && "text-gray-600 dark:text-gray-400")}>
-                      {item.free}
-                    </td>
-                    <td className={cn("px-4 py-3 text-sm text-center", typeof item.basic !== "string" && "text-gray-600 dark:text-gray-400")}>
-                      {item.basic}
-                    </td>
-                    <td className={cn("px-4 py-3 text-sm text-center", typeof item.pro !== "string" && "text-gray-600 dark:text-gray-400")}>
-                      {item.pro}
-                    </td>
-                    {showDescription && (
-                      <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 text-left align-top">
-                        <p>{item.description}</p>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
+        <FeatureComparisonTable
+          currency={currency}
+          pricingData={pricingData}
+          featuresData={featuresData}
+          showDescription={showDescription}
+          isInView={isInView}
+        />
 
         {/* Credit Pack Prices */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-sm"
-        >
-          <div id="credit-packs" className="absolute -top-24" />
-          <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-            Credit Pack Prices
-          </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Need more credits? Purchase additional credit packs starting at just {currency.symbol}{(creditPacks[0].basePriceUSD * currency.rate).toLocaleString()}. Available to all tiers, these
-            credit packs provide flexibility for your usage needs. <strong>Credits purchased do not expire.</strong>
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-            {creditPacks.map((pack, index) => (
-              <div key={index} className="flex flex-col gap-1 justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800">
-                <div className="flex gap-2 justify-between items-center">
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    {pack.baseCredits.toLocaleString()} credits
-                  </span>
-                  <span className="text-gray-900 dark:text-white font-bold">
-                    {currency.symbol}{(pack.basePriceUSD * currency.rate).toLocaleString()}
-                  </span>
-                </div>
-                {pack.discountUSD > 0 && (
-                  <div className="text-xs text-green-600 dark:text-green-400">Save {currency.symbol}{(pack.discountUSD * currency.rate).toLocaleString()}</div>
-                )}
-                {redirectToPricingPage ? (
-                  <Button
-                    className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
-                    onClick={() => router.push("/pricing")}
-                  >
-                    Go to Pricing Page
-                  </Button>
-                ) : (
-                  <Button
-                    className="w-full mt-2 py-1.5 px-3 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors text-sm"
-                    onClick={() => handlePurchase(pack.productId)}
-                    disabled={isPending}
-                  >
-                    {isPending && loadingProductId === pack.productId ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Purchasing...
-                      </>
-                    ) : (
-                      "Purchase"
-                    )}
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-        </motion.div>
+        <CreditPackPrices
+          currency={currency}
+          creditPacks={creditPacks}
+          handlePurchase={handlePurchase}
+          isPending={isPending}
+          loadingProductId={loadingProductId}
+          redirectToPricingPage={redirectToPricingPage}
+          isInView={isInView}
+        />
 
         {/* More Information */}
         {showLink && (
