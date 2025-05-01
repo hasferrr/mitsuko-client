@@ -1,5 +1,6 @@
 import Link from "next/link"
 import CreditUsage from "./credit-usage"
+import TranscriptionUsage from "./transcription-usage"
 
 export default function PricingDescription() {
   return (
@@ -52,6 +53,9 @@ export default function PricingDescription() {
 
         {/* Credit Usage */}
         <CreditUsage />
+
+        {/* Transcription Usage */}
+        <TranscriptionUsage />
 
         {/* Background Processing */}
         <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
