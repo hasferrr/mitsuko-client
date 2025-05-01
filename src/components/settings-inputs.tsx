@@ -1,6 +1,6 @@
 "use client"
 
-import { memo, useEffect, useRef, useState } from "react"
+import { memo, useEffect, useRef, useState, useCallback } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Slider } from "@/components/ui/slider"
@@ -137,15 +137,10 @@ export const ContextDocumentInput = memo(() => {
   const currentProject = useProjectStore((state) => state.currentProject)
   const [projectExtractions, setProjectExtractions] = useState<Extraction[]>([])
 
-  useEffect(() => {
+  const loadProjectExtractions = useCallback(async () => {
     if (!currentProject) return
-
-    const loadExtractions = async () => {
-      const extractionsData = await db.extractions.bulkGet(currentProject.extractions)
-      setProjectExtractions(extractionsData.filter((e): e is Extraction => !!e))
-    }
-
-    loadExtractions()
+    const extractionsData = await db.extractions.bulkGet(currentProject.extractions)
+    setProjectExtractions(extractionsData.filter((e): e is Extraction => !!e).toReversed())
   }, [currentProject])
 
   const handleContextDocumentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -168,7 +163,10 @@ export const ContextDocumentInput = memo(() => {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setIsContextDialogOpen(true)}
+          onClick={() => {
+            loadProjectExtractions()
+            setIsContextDialogOpen(true)
+          }}
           className="h-8 px-2"
         >
           <FolderDown className="h-4 w-4" />
@@ -200,7 +198,7 @@ export const ContextDocumentInput = memo(() => {
               <div className="py-6 text-center text-muted-foreground">
                 No context documents found in this project
               </div>
-            ) : (
+            ) : isContextDialogOpen ? (
               <div className="space-y-2 mr-1">
                 {projectExtractions.map((extraction) => (
                   <div
@@ -215,7 +213,7 @@ export const ContextDocumentInput = memo(() => {
                   </div>
                 ))}
               </div>
-            )}
+            ) : (null)}
           </div>
         </DialogContent>
       </Dialog>

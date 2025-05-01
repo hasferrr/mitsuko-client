@@ -804,9 +804,7 @@ export const ContextExtractor = () => {
                   )
                 })}
               </div>
-            ) : (
-              null
-            )}
+            ) : (null)}
           </div>
         </DialogContent>
       </Dialog>
@@ -840,9 +838,7 @@ export const ContextExtractor = () => {
                   </div>
                 ))}
               </div>
-            ) : (
-              null
-            )}
+            ) : (null)}
           </div>
         </DialogContent>
       </Dialog>
