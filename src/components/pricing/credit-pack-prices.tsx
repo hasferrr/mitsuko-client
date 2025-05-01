@@ -69,27 +69,31 @@ export function CreditPackPrices({
               className="relative flex flex-col h-full transition-all duration-200 hover:border-primary/50 hover:shadow-md dark:hover:border-primary/70 border dark:border-gray-800 bg-white dark:bg-gray-900/20"
             >
               <CardHeader className="pb-1">
-                <div className="text-lg font-bold text-gray-900 dark:text-white">
+                <div className="text-lg font-medium text-gray-900 dark:text-white">
                   {pack.baseCredits.toLocaleString()}
                   {" "}
                   <span className="text-muted-foreground text-sm">credits</span>
                 </div>
               </CardHeader>
               <CardContent className="flex-grow pb-4">
-                <div className="flex flex-wrap items-end gap-1 mb-1">
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="flex items-end gap-1 mb-1">
+                  <span className="text-2xl font-semibold text-gray-900 dark:text-white">
                     {currency.symbol}
                     {price.toLocaleString()}
                   </span>
                   {savings > 0 && (
-                    <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium mb-1">
-                      Save {currency.symbol}
-                      {savings.toLocaleString()}
+                    <span className="text-emerald-600 dark:text-emerald-400 text-xs font-medium mb-1">
+                      Save {currency.symbol}{(() => {
+                        if (savings > 1000) {
+                          return (savings / 1000) + 'k'
+                        }
+                        return savings.toLocaleString()
+                      })()}
                     </span>
                   )}
                 </div>
                 <div className="text-muted-foreground text-xs">
-                  No expiration date!
+                  Credits never expire!
                 </div>
               </CardContent>
               <CardFooter>
