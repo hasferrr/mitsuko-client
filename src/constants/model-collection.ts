@@ -31,7 +31,14 @@ export const FREE_MODELS: ModelCollection = {
       maxOutput: 128000,
       structuredOutput: true,
       isPaid: false,
+      default: {
+        isMaxCompletionTokensAuto: false,
+        maxCompletionTokens: 128000,
+        isUseStructuredOutput: true
+      }
     },
+  ],
+  "Free Multilingual Model": [
     {
       name: "Qwen3 235B A22B",
       maxInput: 40000,
@@ -49,10 +56,6 @@ export const FREE_MODELS: ModelCollection = {
       maxOutput: 256000,
       structuredOutput: true,
       isPaid: false,
-      default: {
-        isMaxCompletionTokensAuto: true,
-        isUseStructuredOutput: false,
-      }
     },
   ],
   "Free Gemini Experimental": [
@@ -131,6 +134,32 @@ export const PAID_MODELS: ModelCollection = {
       }
     },
   ],
+  Meta: [
+    {
+      name: "Meta: Llama 4 Maverick",
+      maxInput: 1_048_576,
+      maxOutput: 1_048_576,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        maxCompletionTokens: 1_000_000,
+        isUseStructuredOutput: true,
+      }
+    },
+    {
+      name: "Meta: Llama 4 Scout",
+      maxInput: 1_048_576,
+      maxOutput: 1_048_576,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        maxCompletionTokens: 1_000_000,
+        isUseStructuredOutput: true,
+      }
+    },
+  ],
   Qwen: [
     {
       name: "Qwen3 235B A22B",
@@ -147,13 +176,13 @@ export const PAID_MODELS: ModelCollection = {
   DeepSeek: [
     {
       name: "DeepSeek R1",
-      maxInput: 163840,
-      maxOutput: 163840,
+      maxInput: 128000,
+      maxOutput: 128000,
       structuredOutput: true,
       isPaid: true,
       default: {
         isMaxCompletionTokensAuto: false,
-        maxCompletionTokens: 163840,
+        maxCompletionTokens: 128000,
         isUseStructuredOutput: false
       }
     },
@@ -163,6 +192,11 @@ export const PAID_MODELS: ModelCollection = {
       maxOutput: 128000,
       structuredOutput: true,
       isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: false,
+        maxCompletionTokens: 128000,
+        isUseStructuredOutput: true
+      }
     },
   ],
 }
