@@ -142,7 +142,7 @@ export const PAID_MODELS: ModelCollection = {
       structuredOutput: true,
       isPaid: true,
       default: {
-        isMaxCompletionTokensAuto: true,
+        isMaxCompletionTokensAuto: false,
         maxCompletionTokens: 1_000_000,
         isUseStructuredOutput: true,
       }
@@ -154,7 +154,7 @@ export const PAID_MODELS: ModelCollection = {
       structuredOutput: true,
       isPaid: true,
       default: {
-        isMaxCompletionTokensAuto: true,
+        isMaxCompletionTokensAuto: false,
         maxCompletionTokens: 1_000_000,
         isUseStructuredOutput: true,
       }
