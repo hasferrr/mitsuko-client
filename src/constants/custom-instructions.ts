@@ -10,6 +10,11 @@ export const customInstructionPresets = [
       "Maintain a consistently formal and precise tone throughout the translation, suitable for [e.g., historical documentary, scientific explanation, legal proceedings]. Avoid colloquialisms, slang, contractions, and overly casual phrasing. Use formal address terms and precise technical vocabulary (cross-referencing the Glossary) appropriate for the target language and context. Prioritize clarity and accuracy over stylistic flair.",
   },
   {
+    title: "Emphasize Target Language Localization",
+    instruction:
+      "Adapt cultural references, idioms, measurements, and formats (e.g., dates, currency) to be natural and easily understood by the target audience in [Target Language/Region]. Avoid overly literal translations that might sound awkward or lose meaning. Ensure names, places, and concepts are localized appropriately unless specifically instructed otherwise (e.g., keep original character names). The goal is seamless cultural integration.",
+  },
+  {
     title: "Strict Handling of Specific Terminology",
     instruction:
       "Handle the following specific terms exactly as indicated, overriding any general guidelines or glossary entries if they conflict:\n- '[Source Term 1]': MUST always be translated as '[Target Translation 1]'. Do not use synonyms.\n- '[Source Term 2]': MUST remain in the original language '[Source Term 2]' (e.g., brand name, proper noun). Do not translate.\n- '[Source Phrase 3]': Translate this recurring phrase consistently as '[Target Phrase 3]'.\n- '[Ambiguous Term 4]': In this specific content, always interpret this term as meaning '[Specific Meaning]' and translate accordingly.",
