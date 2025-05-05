@@ -194,7 +194,7 @@ export function parseASSEvents(assSubtitle: string): SubtitleEvent[] {
         start: rawEvent.Start,
         end: rawEvent.End,
         style: rawEvent.Style,
-        name: rawEvent.Name,
+        name: rawEvent.Name || rawEvent.Actor || '',
         marginL: rawEvent.MarginL,
         marginR: rawEvent.MarginR,
         marginV: rawEvent.MarginV,
