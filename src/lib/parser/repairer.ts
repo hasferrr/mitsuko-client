@@ -20,9 +20,18 @@ export function repairJson(input: string): string {
   map.set("[", "]")
 
   let lastBalancedIndex = 0
+  let inString = false
 
   for (let i = 0; i < input.length; i++) {
     const char = input[i]
+
+    if (char === '"' && !isEscaped(input, i)) {
+      inString = !inString
+      continue
+    }
+
+    if (inString) continue
+
     if (candidate.has(char) && isEscaped(input, i)) continue
 
     if (char === "{") {
@@ -30,12 +39,12 @@ export function repairJson(input: string): string {
     } else if (char === "[") {
       stack.push([char, i])
     } else if (char === "}") {
-      if (stack[stack.length - 1][0] === "{") {
+      if (stack.length > 0 && stack[stack.length - 1][0] === "{") {
         stack.pop()
         lastBalancedIndex = i + 1
       }
     } else if (char === "]") {
-      if (stack[stack.length - 1][0] === "[") {
+      if (stack.length > 0 && stack[stack.length - 1][0] === "[") {
         stack.pop()
         lastBalancedIndex = i + 1
       }

@@ -157,6 +157,85 @@ const testData = [
     input: `{"`,
     expected: wrapSub([]),
   },
+  // Bracket in string tests
+  {
+    name: "bracket in string 1",
+    input: `{"subtitles":[ {"index":1,"content":"hello { [ world ] } ","translated":"test"} ]}`,
+    expected: wrapSub([{
+      index: 1,
+      content: "hello { [ world ] } ",
+      translated: "test"
+    }]),
+  },
+  {
+    name: "bracket in string 2",
+    input: `{"subtitles":[ {"index":1,"content":"hello { [ world ] } ","translated":"test"}`,
+    expected: wrapSub([{
+      index: 1,
+      content: "hello { [ world ] } ",
+      translated: "test"
+    }]),
+  },
+  {
+    name: "bracket in string 3",
+    input: `{"subtitles":[ {"index":1,"content":"hello { [ world ] } ","translated":"test`,
+    expected: wrapSub([]),
+  },
+  {
+    name: "bracket in string 4",
+    input: `{"subtitles":[ {"index":1,"content":"hello { [ world ] } ","translated":"test"}`,
+    expected: wrapSub([{
+      index: 1,
+      content: "hello { [ world ] } ",
+      translated: "test"
+    }]),
+  },
+  {
+    name: "bracket in string 5",
+    input: `{"subtitles":[ {"index":1,"content":"hello { [ world ]","translated":"test"}`,
+    expected: wrapSub([{
+      index: 1,
+      content: "hello { [ world ]",
+      translated: "test"
+    }]),
+  },
+  // Quote in string tests
+  {
+    name: "quote in string 1",
+    input: `{"subtitles":[ {"index":1,"content":"hello \\"{ [ world ] }\\" ","translated":"test"} ]}`,
+    expected: wrapSub([{
+      index: 1,
+      content: 'hello \"{ [ world ] }\" ',
+      translated: "test"
+    }]),
+  },
+  {
+    name: "quote in string 2",
+    input: `{"subtitles":[ {"index":1,"content":"hello { \\"world ]","translated":"test"}`,
+    expected: wrapSub([{
+      index: 1,
+      content: "hello { \"world ]",
+      translated: "test"
+    }]),
+  },
+  {
+    name: "quote in string 3",
+    input: `{"subtitles":[ {"index":1,"content":"{{\\"\\\\\\"{}{(||)([[]]){\\"]{{{{]]]]","translated":"test"}`,
+    expected: wrapSub([{
+      index: 1,
+      content: `{{\"\\\"{}{(||)([[]]){\"]{{{{]]]]`,
+      translated: "test"
+    }]),
+  },
+  {
+    name: "quote in string 4",
+    input: `{"subtitles":[ {"index":1,"content":"\\"\\"\\"","translated":""}`,
+    expected: wrapSub([{
+      index: 1,
+      content: `\"\"\"`,
+      translated: ""
+    }]),
+  },
 ]
 
 describe("isEscaped", () => {
@@ -172,8 +251,8 @@ describe("isEscaped", () => {
 })
 
 describe("parse & repair json", () => {
-  testData.forEach(({ input, expected }, i) => {
-    test(`Input: ${i}`, () => {
+  testData.forEach(({ input, expected, name }, i) => {
+    test(`Input: ${i}` + (name ? ` [${name}]` : ""), () => {
       expect(parseAndRepair(input)).toEqual(expected)
     })
   })
