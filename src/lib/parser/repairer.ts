@@ -14,7 +14,6 @@ export function repairJson(input: string): string {
   type Index = number
 
   const stack: [OpenBracket, Index][] = []
-  const candidate = new Set(["{", "[", "}", "]"])
   const map = new Map<OpenBracket, CloseBracket>()
   map.set("{", "}")
   map.set("[", "]")
@@ -31,8 +30,6 @@ export function repairJson(input: string): string {
     }
 
     if (inString) continue
-
-    if (candidate.has(char) && isEscaped(input, i)) continue
 
     if (char === "{") {
       stack.push([char, i])
