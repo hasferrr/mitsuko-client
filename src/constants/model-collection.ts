@@ -37,6 +37,20 @@ export const FREE_MODELS: ModelCollection = {
         isUseStructuredOutput: true
       }
     },
+    {
+      name: "Gemini 2.5 Pro Experimental 03-25",
+      maxInput: 1000000,
+      maxOutput: 65536,
+      structuredOutput: true,
+      isPaid: false,
+    },
+    {
+      name: "Gemini 2.0 Flash Experimental",
+      maxInput: 1000000,
+      maxOutput: 8192,
+      structuredOutput: true,
+      isPaid: false,
+    }
   ],
   "Free Multilingual Model": [
     {
@@ -57,22 +71,6 @@ export const FREE_MODELS: ModelCollection = {
       structuredOutput: true,
       isPaid: false,
     },
-  ],
-  "Free Gemini Experimental": [
-    {
-      name: "Gemini 2.5 Pro Experimental 03-25",
-      maxInput: 1000000,
-      maxOutput: 65536,
-      structuredOutput: true,
-      isPaid: false,
-    },
-    {
-      name: "Gemini 2.0 Flash Experimental",
-      maxInput: 1000000,
-      maxOutput: 8192,
-      structuredOutput: true,
-      isPaid: false,
-    }
   ],
 }
 
