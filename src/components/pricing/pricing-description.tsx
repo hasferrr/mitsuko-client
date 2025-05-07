@@ -60,7 +60,7 @@ export default function PricingDescription() {
         {/* Background Processing */}
         <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
           <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-            Background Processing
+            Background Processing (Soon)
           </h3>
           <p>
             Background processing allows certain tasks, like audio transcriptions, to run on our servers even if you close the browser tab.

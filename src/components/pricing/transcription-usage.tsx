@@ -20,7 +20,7 @@ export default async function TranscriptionUsage() {
   return (
     <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
       <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-        Transcription Usage
+        Transcription (Experimental)
       </h3>
       <div className="flex flex-col gap-4">
         <p>
@@ -59,13 +59,13 @@ export default async function TranscriptionUsage() {
                 <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Premium ({"<="} {MINUTE_THRESHOLD} minutes)</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{INPUT_CREDITS_PER_MINUTE_LOW}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{costsTier115?.creditPerOutputToken ?? 'N/A'}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">1 GB</td>
+                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400"></td>
               </tr>
               <tr className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
                 <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Premium ({">"} {MINUTE_THRESHOLD} minutes)</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{INPUT_CREDITS_PER_MINUTE_HIGH}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{costsTier215?.creditPerOutputToken ?? 'N/A'}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">1 GB</td>
+                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400"></td>
               </tr>
             </tbody>
           </table>
