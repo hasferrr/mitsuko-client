@@ -34,10 +34,16 @@ export default async function CreditUsage() {
   const priorityModels = new Map<string, number>([
     ["DeepSeek R1", i++],
     ["DeepSeek V3", i++],
+    ["Gemini 2.5 Pro Preview 05-06", i++],
+    ["Gemini 2.5 Flash Preview 04-17", i++],
   ])
 
   const favoriteModels = new Set([
     "DeepSeek R1",
+  ])
+
+  const bestModels = new Set([
+    "Gemini 2.5 Pro Preview 05-06",
   ])
 
   const sortedPriorityModels = paidModelCostArray
@@ -99,10 +105,22 @@ export default async function CreditUsage() {
                     <TooltipProvider>
                       <Tooltip delayDuration={0}>
                         <TooltipTrigger asChild>
-                          <span className="text-blue-500 cursor-default ml-1 text-[1rem]">★</span>
+                          <span className="cursor-default ml-1 text-[1rem]">💙</span>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Favorite Model</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                  {bestModels.has(model.name) && (
+                    <TooltipProvider>
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <span className="cursor-default ml-1 text-[1rem]">⭐</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Best & Highest Quality Result</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>

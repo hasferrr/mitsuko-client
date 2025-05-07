@@ -77,6 +77,30 @@ export const FREE_MODELS: ModelCollection = {
 }
 
 export const PAID_MODELS: ModelCollection = {
+  Gemini: [
+    {
+      name: "Gemini 2.5 Pro Preview 05-06",
+      maxInput: 1_048_576,
+      maxOutput: 65536,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "Gemini 2.5 Flash Preview 04-17",
+      maxInput: 1_048_576,
+      maxOutput: 65536,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    }
+  ],
   OpenAI: [
     {
       name: "OpenAI o4-mini",
