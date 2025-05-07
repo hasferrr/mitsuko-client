@@ -48,9 +48,9 @@ export function parseTranscription(response: string): Subtitle[] {
 
   /**
    * Format:
-   * hh:mm:ss:ms --> hh:mm:ss:ms
+   * hh:mm:ss,ms --> hh:mm:ss,ms
    * or
-   * mm:ss:ms --> mm:ss:ms
+   * mm:ss,ms --> mm:ss,ms
    * Transcribed Text
    */
   for (let line of lines) {
@@ -74,18 +74,30 @@ export function parseTranscription(response: string): Subtitle[] {
       const startSplit = start.split(":")
       const endSplit = end.split(":")
 
-      if (startSplit.length === 4) {
-        [startHourStr, startMinuteStr, startSecondStr, startMillisecondStr] = startSplit
-      } else if (startSplit.length === 3) {
-        [startMinuteStr, startSecondStr, startMillisecondStr] = startSplit
+      if (startSplit.length === 3) {
+        [startHourStr, startMinuteStr, startSecondStr] = startSplit
+        const [second, ms] = startSecondStr.split(",")
+        startSecondStr = second
+        startMillisecondStr = ms
+      } else if (startSplit.length === 2) {
+        [startMinuteStr, startSecondStr] = startSplit
+        const [second, ms] = startSecondStr.split(",")
+        startSecondStr = second
+        startMillisecondStr = ms
       } else {
         throw new Error("Invalid time format in transcription text")
       }
 
-      if (endSplit.length === 4) {
-        [endHourStr, endMinuteStr, endSecondStr, endMillisecondStr] = endSplit
-      } else if (endSplit.length === 3) {
-        [endMinuteStr, endSecondStr, endMillisecondStr] = endSplit
+      if (endSplit.length === 3) {
+        [endHourStr, endMinuteStr, endSecondStr] = endSplit
+        const [second, ms] = endSecondStr.split(",")
+        endSecondStr = second
+        endMillisecondStr = ms
+      } else if (endSplit.length === 2) {
+        [endMinuteStr, endSecondStr] = endSplit
+        const [second, ms] = endSecondStr.split(",")
+        endSecondStr = second
+        endMillisecondStr = ms
       } else {
         throw new Error("Invalid time format in transcription text")
       }

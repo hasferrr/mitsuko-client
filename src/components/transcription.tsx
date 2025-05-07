@@ -161,6 +161,7 @@ export default function Transcription() {
     formData.append("customInstructions", customInstructions)
     formData.append("models", models)
     formData.append("isOverOneHour", isOverOneHour.toString())
+    console.log({ file, selectedMode, customInstructions, models, isOverOneHour })
 
     try {
       const text = await startTranscription(
@@ -201,9 +202,9 @@ export default function Transcription() {
         <div className="select-none">
           <div>Parse Error! Please follow this format:</div>
           <div className="font-mono">
-            <div>hh:mm:ss:ms {"-->"} hh:mm:ss:ms</div>
+            <div>hh:mm:ss,ms {"-->"} hh:mm:ss,ms</div>
             <div>or</div>
-            <div>mm:ss:ms {"-->"} mm:ss:ms</div>
+            <div>mm:ss,ms {"-->"} mm:ss,ms</div>
             <div>transcription text</div>
           </div>
         </div>
