@@ -16,11 +16,11 @@ const languages = [
 
 const models = [
   { value: "free", label: "Mitsuko (Free Limited)" },
-  // { value: "premium", label: "Mitsuko (Premium)" },
+  { value: "premium", label: "Mitsuko (Premium)" },
 ]
 
 const modes = [
-  // { value: "clause", label: "Mode 1: Clauses and sentences" },
+  { value: "clause", label: "Mode 1: Clauses and sentences (Experimental)" },
   { value: "sentence", label: "Mode 2: Sentences" },
 ]
 
