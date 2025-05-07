@@ -1,5 +1,6 @@
 import { Transcription } from "@/types/project"
 import { db } from "./db"
+import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
 
 // Transcription CRUD functions
 export const createTranscription = async (
@@ -12,10 +13,7 @@ export const createTranscription = async (
       id,
       projectId,
       ...data,
-      selectedMode: "clause",
-      customInstructions: "",
-      models: "free",
-      isOverOneHour: false,
+      ...DEFAULT_TRANSCTIPTION_SETTINGS,
       createdAt: new Date(),
       updatedAt: new Date()
     }

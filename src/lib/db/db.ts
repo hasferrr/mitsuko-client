@@ -53,9 +53,9 @@ class MyDatabase extends Dexie {
     }).upgrade(async tx => {
       // Migrate transcriptions: add selectedMode, customInstructions, models, isOverOneHour
       await tx.table('transcriptions').toCollection().modify(transcription => {
-        // Add selectedMode with default 'clause' if it doesn't exist
+        // Add selectedMode with default 'sentence' if it doesn't exist
         if (typeof transcription.selectedMode === 'undefined') {
-          transcription.selectedMode = 'clause'
+          transcription.selectedMode = 'sentence'
         }
         // Add customInstructions with default '' if it doesn't exist
         if (typeof transcription.customInstructions === 'undefined') {

@@ -2,6 +2,7 @@ import { create } from "zustand"
 import { Transcription } from "@/types/project"
 import { updateTranscription, createTranscription, getTranscription, deleteTranscription } from "@/lib/db/transcription"
 import { Subtitle } from "@/types/types"
+import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
 
 interface TranscriptionDataStore {
   currentId: string | null
@@ -82,19 +83,19 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   },
   getSelectedMode: () => {
     const id = get().currentId
-    return id ? get().data[id]?.selectedMode : "clause"
+    return id ? get().data[id]?.selectedMode : DEFAULT_TRANSCTIPTION_SETTINGS.selectedMode
   },
   getCustomInstructions: () => {
     const id = get().currentId
-    return id ? get().data[id]?.customInstructions : ""
+    return id ? get().data[id]?.customInstructions : DEFAULT_TRANSCTIPTION_SETTINGS.customInstructions
   },
   getModels: () => {
     const id = get().currentId
-    return id ? get().data[id]?.models : "free"
+    return id ? get().data[id]?.models : DEFAULT_TRANSCTIPTION_SETTINGS.models
   },
   getIsOverOneHour: () => {
     const id = get().currentId
-    return id ? get().data[id]?.isOverOneHour ?? false : false
+    return id ? get().data[id]?.isOverOneHour : DEFAULT_TRANSCTIPTION_SETTINGS.isOverOneHour
   },
   // setters implementation
   setCurrentId: (id) => set({ currentId: id }),

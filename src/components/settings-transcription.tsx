@@ -20,7 +20,7 @@ const models = [
 ]
 
 const modes = [
-  { value: "clause", label: "Mode 1: Clauses and sentences" },
+  // { value: "clause", label: "Mode 1: Clauses and sentences" },
   { value: "sentence", label: "Mode 2: Sentences" },
 ]
 

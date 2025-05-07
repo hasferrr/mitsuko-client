@@ -1,6 +1,6 @@
 import { SubtitleTranslated } from "@/types/types"
 import { FREE_MODELS } from "./model-collection"
-import { AdvancedSettings, BasicSettings } from "@/types/project"
+import { AdvancedSettings, BasicSettings, Transcription } from "@/types/project"
 
 export const MAX_TRANSCRIPTION_SIZE = 1024 * 1024 * 100
 
@@ -23,6 +23,13 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
   isUseFullContextMemory: false,
   isBetterContextCaching: true, // true means it is NOT using Minimal Context Mode
   isMaxCompletionTokensAuto: true,
+}
+
+export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models" | "isOverOneHour"> = {
+  selectedMode: "sentence",
+  customInstructions: "",
+  models: "free",
+  isOverOneHour: false,
 }
 
 export const DEFAULT_TITLE = "Blue.Box.S01E16 (example)"
