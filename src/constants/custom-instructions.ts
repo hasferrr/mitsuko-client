@@ -47,34 +47,20 @@ export const transcriptionInstructionPresets = [
   },
   {
     title: "Direct Translation",
-    instruction: `After transcribing the audio, translate the text to Romaji using this format:
+    instruction: `For each transcribed Japanese sentence, also provide its Romaji translation.
+The format for the text portion of each timestamped entry should be:
 
-\`\`\`
-original text
-(translated text)
-\`\`\`
-
-e.g.,
-\`\`\`
-こんにちは
-(Konnichiwa)
-\`\`\`
+Original Japanese Text
+(Romaji Translation)
 `.trim()
   },
   {
     title: "Provide Lyrics",
-    instruction: `Transcribe using the lyrics provided. After transcribing the audio, translate the text to Romaji using this format:
+    instruction: `The audio is a song. Please transcribe it using the lyrics provided below.
+For each timestamped sentence, provide the original Japanese text from the lyrics, and on the next line, its Romaji translation in parentheses, like this:
 
-\`\`\`
-original text
-(translated text)
-\`\`\`
-
-e.g.,
-\`\`\`
-こんにちは
-(Konnichiwa)
-\`\`\`
+Original Sentence
+(Romaji Translation)
 
 Lyrics:
 月影揺れる夜の小道
@@ -122,7 +108,8 @@ Lyrics:
 今宵もまた　光の中へ
 
 触れるたび溢れる想い
-未来へと続くこの道を　光の中へ
+未来へと続くこの道を
+光の中へ
 
 カゲロウの調べに乗せて
 君との記憶　忘れぬように
