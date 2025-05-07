@@ -28,7 +28,7 @@ export default function AnnouncementHeadline() {
       <div className="container mx-auto flex items-center justify-center gap-2 relative">
         <span className="text-sm md:text-lg">✨</span>
         <p className="text-xs md:text-base font-medium text-white">
-          Featuring OpenAI GPT Models & Credit Packs Now Available!
+          Featuring Gemini 2.5 Pro, OpenAI GPT, and Credit Packs Now Available!
         </p>
         <span className="text-sm md:text-lg">📦</span>
 
