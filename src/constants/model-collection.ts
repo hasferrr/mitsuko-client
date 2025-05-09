@@ -97,7 +97,29 @@ export const PAID_MODELS: ModelCollection = {
         isMaxCompletionTokensAuto: true,
         isUseStructuredOutput: true
       }
-    }
+    },
+    {
+      name: "Gemini 2.0 Flash",
+      maxInput: 1_048_576,
+      maxOutput: 8192,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "Gemini 1.5 Flash-8B",
+      maxInput: 1_000_000,
+      maxOutput: 8192,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
   ],
   OpenAI: [
     {

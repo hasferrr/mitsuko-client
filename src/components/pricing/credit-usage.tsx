@@ -46,6 +46,10 @@ export default async function CreditUsage() {
     "Gemini 2.5 Pro Preview 05-06",
   ])
 
+  const costEffectiveModels = new Set([
+    "Gemini 1.5 Flash-8B",
+  ])
+
   const sortedPriorityModels = paidModelCostArray
     .filter(model => priorityModels.has(model.name))
     .sort((a, b) => priorityModels.get(a.name)! - priorityModels.get(b.name)!)
@@ -121,6 +125,18 @@ export default async function CreditUsage() {
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Best & Highest Quality Result</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                  {costEffectiveModels.has(model.name) && (
+                    <TooltipProvider>
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <span className="cursor-default ml-1 text-[1rem]">💰</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Cost Effective Model</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
