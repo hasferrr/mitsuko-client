@@ -1,6 +1,6 @@
 "use client"
 
-import React, { memo, useRef } from "react"
+import React, { memo, useEffect, useRef } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Timer } from "lucide-react"
@@ -24,14 +24,50 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
   const subtitleUpdate = (e: React.ChangeEvent<HTMLTextAreaElement>, field: keyof SubtitleTranslated) => {
     if (!currentId) return
     setHasChanges(true)
-    handleResize(e)
     updateSubtitle(currentId, subtitle.index, field, e.target.value)
   }
 
-  const handleResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    e.target.style.height = "auto"
-    e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
+  const handleResize = (element: HTMLTextAreaElement) => {
+    element.style.height = "auto"
+    element.style.height = `${Math.min(element.scrollHeight, 900)}px`
   }
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.target instanceof HTMLTextAreaElement) {
+            handleResize(entry.target)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      {
+        root: null,
+        threshold: 0.1,
+      }
+    )
+
+    const contentEl = contentRef.current
+    const translatedEl = translatedRef.current
+
+    if (contentEl) {
+      observer.observe(contentEl)
+    }
+    if (translatedEl) {
+      observer.observe(translatedEl)
+    }
+
+    return () => {
+      if (contentEl) {
+        observer.unobserve(contentEl)
+      }
+      if (translatedEl) {
+        observer.unobserve(translatedEl)
+      }
+      observer.disconnect()
+    }
+  }, [])
 
   return (
     <Card className="border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow">
@@ -57,16 +93,22 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
             <Textarea
               ref={contentRef}
               value={subtitle.content}
-              onFocus={handleResize}
-              onChange={(e) => subtitleUpdate(e, "content")}
+              onFocus={(e) => handleResize(e.target)}
+              onChange={(e) => {
+                subtitleUpdate(e, "content")
+                handleResize(e.target)
+              }}
               className="md:min-h-[36px] md:h-[36px] min-h-[40px] h-[40px] max-h-[120px] bg-muted/50 dark:bg-muted/30 resize-none overflow-y-hidden"
               rows={1}
             />
             <Textarea
               ref={translatedRef}
               value={subtitle.translated}
-              onFocus={handleResize}
-              onChange={(e) => subtitleUpdate(e, "translated")}
+              onFocus={(e) => handleResize(e.target)}
+              onChange={(e) => {
+                subtitleUpdate(e, "translated")
+                handleResize(e.target)
+              }}
               className="md:min-h-[36px] md:h-[36px] min-h-[40px] h-[40px] max-h-[120px] resize-none overflow-y-hidden"
               rows={1}
             />
