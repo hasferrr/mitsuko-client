@@ -118,16 +118,14 @@ export default function SubtitleTranslator() {
   }
 
   // Get translation data and functions from store
-  const {
-    setTitle,
-    setSubtitles,
-    setParsed,
-    resetParsed,
-    setResponse,
-    setJsonResponse,
-    appendJsonResponse,
-    saveData
-  } = useTranslationDataStore()
+  const setTitle = useTranslationDataStore((state) => state.setTitle)
+  const setSubtitles = useTranslationDataStore((state) => state.setSubtitles)
+  const setParsed = useTranslationDataStore((state) => state.setParsed)
+  const resetParsed = useTranslationDataStore((state) => state.resetParsed)
+  const setResponse = useTranslationDataStore((state) => state.setResponse)
+  const setJsonResponse = useTranslationDataStore((state) => state.setJsonResponse)
+  const appendJsonResponse = useTranslationDataStore((state) => state.appendJsonResponse)
+  const saveData = useTranslationDataStore((state) => state.saveData)
 
   // Get current translation data
   const translation = translationData[currentId]
@@ -135,56 +133,34 @@ export default function SubtitleTranslator() {
   const subtitles = translation?.subtitles ?? []
   const parsed = translation?.parsed ?? { type: "srt", data: null }
 
-  // Settings Store
-  const {
-    getSourceLanguage,
-    getTargetLanguage,
-    getModelDetail,
-    getIsUseCustomModel,
-    getContextDocument,
-    getCustomInstructions,
-    getFewShot,
-    customBaseUrl,
-    customModel,
-    apiKey,
-    setCurrentId: setSettingsCurrentId,
-    upsertData: upsertSettingsData,
-    setContextDocument,
-  } = useSettingsStore()
-
-  const sourceLanguage = getSourceLanguage()
-  const targetLanguage = getTargetLanguage()
-  const modelDetail = getModelDetail()
-  const isUseCustomModel = getIsUseCustomModel()
-  const contextDocument = getContextDocument()
-  const customInstructions = getCustomInstructions()
-  const fewShot = getFewShot()
+  // Basic Settings Store
+  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
+  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage())
+  const modelDetail = useSettingsStore((state) => state.getModelDetail())
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
+  const contextDocument = useSettingsStore((state) => state.getContextDocument())
+  const customInstructions = useSettingsStore((state) => state.getCustomInstructions())
+  const fewShot = useSettingsStore((state) => state.getFewShot())
+  const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
+  const customModel = useSettingsStore((state) => state.customModel)
+  const apiKey = useSettingsStore((state) => state.apiKey)
+  const setSettingsCurrentId = useSettingsStore((state) => state.setCurrentId)
+  const upsertSettingsData = useSettingsStore((state) => state.upsertData)
+  const setContextDocument = useSettingsStore((state) => state.setContextDocument)
 
   // Advanced Settings Store
-  const {
-    getTemperature,
-    getMaxCompletionTokens,
-    getIsMaxCompletionTokensAuto,
-    getSplitSize,
-    getStartIndex,
-    getEndIndex,
-    getIsUseStructuredOutput,
-    getIsUseFullContextMemory,
-    getIsBetterContextCaching,
-    setCurrentId: setAdvancedSettingsCurrentId,
-    upsertData: upsertAdvancedSettingsData,
-    resetIndex,
-  } = useAdvancedSettingsStore()
-
-  const temperature = getTemperature()
-  const maxCompletionTokens = getMaxCompletionTokens()
-  const isMaxCompletionTokensAuto = getIsMaxCompletionTokensAuto()
-  const splitSize = getSplitSize()
-  const startIndex = getStartIndex()
-  const endIndex = getEndIndex()
-  const isUseStructuredOutput = getIsUseStructuredOutput()
-  const isUseFullContextMemory = getIsUseFullContextMemory()
-  const isBetterContextCaching = getIsBetterContextCaching()
+  const temperature = useAdvancedSettingsStore((state) => state.getTemperature())
+  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
+  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())
+  const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize())
+  const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex())
+  const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex())
+  const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput())
+  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
+  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching())
+  const setAdvancedSettingsCurrentId = useAdvancedSettingsStore((state) => state.setCurrentId)
+  const upsertAdvancedSettingsData = useAdvancedSettingsStore((state) => state.upsertData)
+  const resetIndex = useAdvancedSettingsStore((state) => state.resetIndex)
 
   // Translation Store
   const isTranslatingSet = useTranslationStore((state) => state.isTranslatingSet)
