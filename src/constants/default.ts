@@ -11,6 +11,14 @@ export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "u
   isUseCustomModel: false,
   contextDocument: "",
   customInstructions: "",
+  fewShot: {
+    isEnabled: false,
+    value: "",
+    linkedId: "",
+    type: 'linked',
+    fewShotStartIndex: undefined,
+    fewShotEndIndex: undefined,
+  },
 }
 
 export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {

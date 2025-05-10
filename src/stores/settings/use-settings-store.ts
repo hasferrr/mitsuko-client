@@ -24,12 +24,25 @@ interface SettingsStore {
   getIsUseCustomModel: () => boolean
   getContextDocument: () => string
   getCustomInstructions: () => string
+  getFewShot: () => BasicSettings['fewShot']
+  getFewShotIsEnabled: () => boolean
+  getFewShotValue: () => string
+  getFewShotLinkedId: () => string
+  getFewShotType: () => 'manual' | 'linked'
+  getFewShotStartIndex: () => number | undefined
+  getFewShotEndIndex: () => number | undefined
   setSourceLanguage: (language: string) => void
   setTargetLanguage: (language: string) => void
   setModelDetail: (model: Model | null, type: ProjectType) => void
   setIsUseCustomModel: (value: boolean, type: ProjectType) => void
   setContextDocument: (doc: string) => void
   setCustomInstructions: (instructions: string) => void
+  setIsFewShotEnabled: (isEnabled: boolean) => void
+  setFewShotValue: (value: string) => void
+  setFewShotLinkedId: (id: string) => void
+  setFewShotType: (type: 'manual' | 'linked') => void
+  setFewShotStartIndex: (index?: number) => void
+  setFewShotEndIndex: (index?: number) => void
   // local storage persist state
   setApiKey: (key: string) => void
   setCustomBaseUrl: (url: string) => void
@@ -99,6 +112,34 @@ export const useSettingsStore = create<SettingsStore>()(
       getCustomInstructions: () => {
         const id = get().currentId
         return id ? get().data[id]?.customInstructions : DEFAULT_BASIC_SETTINGS.customInstructions
+      },
+      getFewShot: () => {
+        const id = get().currentId
+        return id ? get().data[id]?.fewShot : DEFAULT_BASIC_SETTINGS.fewShot
+      },
+      getFewShotIsEnabled: () => {
+        const id = get().currentId
+        return id ? get().data[id]?.fewShot?.isEnabled ?? DEFAULT_BASIC_SETTINGS.fewShot.isEnabled : DEFAULT_BASIC_SETTINGS.fewShot.isEnabled
+      },
+      getFewShotValue: () => {
+        const id = get().currentId
+        return id ? get().data[id]?.fewShot?.value ?? DEFAULT_BASIC_SETTINGS.fewShot.value : DEFAULT_BASIC_SETTINGS.fewShot.value
+      },
+      getFewShotLinkedId: () => {
+        const id = get().currentId
+        return id ? get().data[id]?.fewShot?.linkedId ?? DEFAULT_BASIC_SETTINGS.fewShot.linkedId : DEFAULT_BASIC_SETTINGS.fewShot.linkedId
+      },
+      getFewShotType: () => {
+        const id = get().currentId
+        return id ? get().data[id]?.fewShot?.type ?? DEFAULT_BASIC_SETTINGS.fewShot.type : DEFAULT_BASIC_SETTINGS.fewShot.type
+      },
+      getFewShotStartIndex: () => {
+        const id = get().currentId
+        return id ? get().data[id]?.fewShot?.fewShotStartIndex : DEFAULT_BASIC_SETTINGS.fewShot.fewShotStartIndex
+      },
+      getFewShotEndIndex: () => {
+        const id = get().currentId
+        return id ? get().data[id]?.fewShot?.fewShotEndIndex : DEFAULT_BASIC_SETTINGS.fewShot.fewShotEndIndex
       },
       upsertData: (id, value) => {
         set(state => ({
@@ -180,6 +221,54 @@ export const useSettingsStore = create<SettingsStore>()(
         if (!id) return
         get().mutateData("customInstructions", instructions)
         updateSettings("customInstructions", instructions)
+      },
+      setIsFewShotEnabled: (isEnabled) => {
+        const id = get().currentId
+        if (!id) return
+        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        const newFewShot = { ...currentFewShot, isEnabled }
+        get().mutateData("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot)
+      },
+      setFewShotValue: (value) => {
+        const id = get().currentId
+        if (!id) return
+        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        const newFewShot = { ...currentFewShot, value }
+        get().mutateData("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot)
+      },
+      setFewShotLinkedId: (linkedId) => {
+        const id = get().currentId
+        if (!id) return
+        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        const newFewShot = { ...currentFewShot, linkedId }
+        get().mutateData("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot)
+      },
+      setFewShotType: (type) => {
+        const id = get().currentId
+        if (!id) return
+        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        const newFewShot = { ...currentFewShot, type }
+        get().mutateData("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot)
+      },
+      setFewShotStartIndex: (index) => {
+        const id = get().currentId
+        if (!id) return
+        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        const newFewShot = { ...currentFewShot, fewShotStartIndex: index }
+        get().mutateData("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot)
+      },
+      setFewShotEndIndex: (index) => {
+        const id = get().currentId
+        if (!id) return
+        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        const newFewShot = { ...currentFewShot, fewShotEndIndex: index }
+        get().mutateData("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot)
       },
     }),
     {

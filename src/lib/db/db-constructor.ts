@@ -1,3 +1,4 @@
+import { DEFAULT_BASIC_SETTINGS } from '@/constants/default'
 import {
   Project,
   Translation,
@@ -215,6 +216,7 @@ function basicSettingsConstructor(basicSettings: Partial<BasicSettings>): BasicS
     isUseCustomModel: basicSettings.isUseCustomModel ?? false,
     contextDocument: basicSettings.contextDocument ?? "",
     customInstructions: basicSettings.customInstructions ?? "",
+    fewShot: basicSettings.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot,
     createdAt: basicSettings.createdAt ?? new Date(),
     updatedAt: basicSettings.updatedAt ?? new Date(),
   }

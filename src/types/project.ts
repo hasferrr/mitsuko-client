@@ -70,6 +70,14 @@ export interface BasicSettings {
   isUseCustomModel: boolean
   contextDocument: string
   customInstructions: string
+  fewShot: {
+    isEnabled: boolean
+    value: string
+    linkedId: string
+    type: 'manual' | 'linked'
+    fewShotStartIndex?: number
+    fewShotEndIndex?: number
+  }
   createdAt: Date
   updatedAt: Date
 }

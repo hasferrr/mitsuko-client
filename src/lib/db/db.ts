@@ -1,3 +1,4 @@
+import { DEFAULT_BASIC_SETTINGS } from '@/constants/default'
 import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
 import Dexie, { Table } from 'dexie'
 
@@ -68,6 +69,16 @@ class MyDatabase extends Dexie {
         // Add isOverOneHour with default false if it doesn't exist
         if (typeof transcription.isOverOneHour === 'undefined') {
           transcription.isOverOneHour = false
+        }
+      })
+    })
+    this.version(10).stores({}).upgrade(async tx => {
+      // Migrate basicSettings: add fewShot object
+      await tx.table('basicSettings').toCollection().modify(setting => {
+        if (typeof setting.fewShot === 'undefined') {
+          setting.fewShot = {
+            ...DEFAULT_BASIC_SETTINGS.fewShot
+          }
         }
       })
     })

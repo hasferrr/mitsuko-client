@@ -40,6 +40,7 @@ import {
   AdvancedSettingsResetButton,
   BetterContextCachingSwitch,
   CustomInstructionsInput,
+  FewShotInput,
 } from "./settings-inputs"
 import {
   Subtitle,
@@ -103,6 +104,7 @@ import { fetchUserData } from "@/lib/api/user"
 import { UserData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
 import { logSubtitle } from "@/lib/api/subtitle-log"
+import { z } from "zod"
 
 type DownloadOption = "original" | "translated" | "both"
 type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
@@ -141,6 +143,7 @@ export default function SubtitleTranslator() {
     getIsUseCustomModel,
     getContextDocument,
     getCustomInstructions,
+    getFewShot,
     customBaseUrl,
     customModel,
     apiKey,
@@ -155,6 +158,7 @@ export default function SubtitleTranslator() {
   const isUseCustomModel = getIsUseCustomModel()
   const contextDocument = getContextDocument()
   const customInstructions = getCustomInstructions()
+  const fewShot = getFewShot()
 
   // Advanced Settings Store
   const {
@@ -292,6 +296,44 @@ export default function SubtitleTranslator() {
     setJsonResponse(currentId, [])
     await saveData(currentId)
 
+    // Validate few shot
+    const fewShotSchema = z.object({
+      content: z.string(),
+      translated: z.string()
+    })
+
+    // Few shot examples
+    let usedFewShot: z.infer<typeof fewShotSchema>[] = []
+
+    if (fewShot.isEnabled) {
+      if (fewShot.type === "manual") {
+        try {
+          usedFewShot = fewShotSchema.array().parse(JSON.parse(fewShot.value.trim() || "[]"))
+        } catch {
+          toast.error(
+            <div className="select-none">
+              <div>Few shot format is invalid! Please follow this format:</div>
+              <div className="font-mono">
+                <pre>{"[" + JSON.stringify({ content: "string", translated: "string" }, null, 2) + "]"}</pre>
+              </div>
+            </div>
+          )
+          setActiveTab("basic")
+          setIsTranslating(currentId, false)
+          return
+        }
+      } else if (fewShot.type === "linked") {
+        const linkedTranslation = await useTranslationDataStore.getState().getTranslationDb(translationData[currentId].projectId, fewShot.linkedId)
+        if (linkedTranslation) {
+          usedFewShot = linkedTranslation.subtitles
+            .slice(fewShot.fewShotStartIndex, (fewShot.fewShotEndIndex ?? 0) + 1)
+            .map((s) => ({ content: s.content, translated: s.translated }))
+        }
+      }
+      usedFewShot = usedFewShot?.filter((s) => s.content && s.translated)
+    }
+    console.log("usedFewShot: ", usedFewShot)
+
     setTimeout(() => {
       window.scrollTo({
         top: 0,
@@ -400,6 +442,7 @@ export default function SubtitleTranslator() {
         ),
         structuredOutput: isUseStructuredOutput,
         contextMessage: context,
+        fewShotExamples: usedFewShot,
         uuid: currentId,
       }
 
@@ -1017,6 +1060,9 @@ export default function SubtitleTranslator() {
                   </DragAndDrop>
                   <div className="m-[2px]">
                     <CustomInstructionsInput />
+                  </div>
+                  <div className="m-[2px]">
+                    <FewShotInput />
                   </div>
                 </CardContent>
               </Card>
