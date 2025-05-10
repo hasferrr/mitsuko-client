@@ -242,18 +242,6 @@ export default function SubtitleTranslator() {
     return () => { saveData(currentId) }
   }, [])
 
-  const fixedSplit = (size: number, s: number, e: number) => {
-    const subtitleChunks: SubtitleNoTime[][] = []
-    for (let i = s; i <= e; i += size) {
-      subtitleChunks.push(subtitles.slice(i, Math.min(i + size, e + 1)).map((s) => ({
-        index: s.index,
-        actor: s.actor,
-        content: s.content,
-      })))
-    }
-    return subtitleChunks
-  }
-
   const firstChunk = (size: number, s: number, e: number) => {
     const subtitleChunks: SubtitleNoTime[][] = []
     subtitleChunks.push(subtitles.slice(s, Math.min(s + size, e + 1)).map((s) => ({
@@ -325,12 +313,7 @@ export default function SubtitleTranslator() {
     const adjustedStartIndex = minMax(startIndex - 1, 0, subtitles.length - 1)
     const adjustedEndIndex = minMax(endIndex - 1, adjustedStartIndex, subtitles.length - 1)
 
-    const isAutoContinue = true
-
-    // NOTE: isAutoContinue is ALYWAYS true
-    const subtitleChunks = isAutoContinue
-      ? firstChunk(size, adjustedStartIndex, adjustedEndIndex)
-      : fixedSplit(size, adjustedStartIndex, adjustedEndIndex)
+    const subtitleChunks = firstChunk(size, adjustedStartIndex, adjustedEndIndex)
 
     // Set Limited Context Memory size
     const limitedContextMemorySize = 5
@@ -529,17 +512,15 @@ export default function SubtitleTranslator() {
       }
 
       // Process the next chunk
-      if (isAutoContinue) {
-        const nextIndex = tlChunk[tlChunk.length - 1].index + 1
+      const nextIndex = tlChunk[tlChunk.length - 1].index + 1
 
-        const s = nextIndex - 1
-        const e = minMax(adjustedEndIndex, s, subtitles.length - 1)
-        if (s > adjustedEndIndex) break
+      const s = nextIndex - 1
+      const e = minMax(adjustedEndIndex, s, subtitles.length - 1)
+      if (s > adjustedEndIndex) break
 
-        const nextChunk = firstChunk(size, s, e)[0]
-        if (nextChunk.length) {
-          subtitleChunks.push(nextChunk)
-        }
+      const nextChunk = firstChunk(size, s, e)[0]
+      if (nextChunk.length) {
+        subtitleChunks.push(nextChunk)
       }
 
       // Delay between each chunk
