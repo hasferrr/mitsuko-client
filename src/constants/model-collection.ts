@@ -121,6 +121,77 @@ export const PAID_MODELS: ModelCollection = {
       }
     },
   ],
+  Anthropic: [
+    {
+      name: "Claude 3.7 Sonnet (thinking)",
+      maxInput: 200_000,
+      maxOutput: 64_000,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "Claude 3.7 Sonnet",
+      maxInput: 200_000,
+      maxOutput: 64_000,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "Claude 3.5 Sonnet",
+      maxInput: 200_000,
+      maxOutput: 8_129,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "Claude 3.5 Haiku",
+      maxInput: 200_000,
+      maxOutput: 8_129,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    }
+  ],
+  xAI: [
+    {
+      name: "Grok 3 Beta",
+      maxInput: 131_072,
+      maxOutput: 131_072,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "Grok 3 Mini Beta",
+      maxInput: 131_072,
+      maxOutput: 131_072,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    }
+
+  ],
   OpenAI: [
     {
       name: "OpenAI o4-mini",
