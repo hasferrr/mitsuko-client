@@ -203,7 +203,6 @@ function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
       <div>
         <p>Context Length: {model.maxInput.toLocaleString()}</p>
         <p>Max Completion: {model.maxOutput.toLocaleString()}</p>
-        <p>Structured Output: {model.structuredOutput ? "Yes" : "No"}</p>
       </div>
       {cost && (
         <div className="flex flex-col gap-2">

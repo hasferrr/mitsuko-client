@@ -869,8 +869,7 @@ export const StructuredOutputSwitch = memo(() => {
         />
       </div>
       <p className="text-xs text-muted-foreground">
-        Enables structured JSON output. You can turn this option off if you want
-        to see the thinking process of reasoning model or if the model doesn't support it.
+        Enables structured JSON output. You can turn this option off if the model doesn't support it.
       </p>
     </div>
   )
