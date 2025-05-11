@@ -68,11 +68,47 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
       return ""
     }
 
+    // Reasoning tags
+    const rStart = "<r>"
+    const rEnd = "</r>"
+
+    let reasoning = ""
+    let result = ""
+
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
-      const chunk = new TextDecoder().decode(value)
-      buffer += chunk
+      let chunk = new TextDecoder().decode(value)
+
+      while (chunk.length > 0) {
+        const rStartIndex = chunk.indexOf(rStart)
+        if (rStartIndex === -1) {
+          result += chunk
+          chunk = ""
+          continue
+        }
+        if (rStartIndex > 0) {
+          result += chunk.slice(0, rStartIndex)
+        }
+        const rEndIndex = chunk.indexOf(rEnd, rStartIndex + rStart.length)
+        if (rEndIndex === -1) {
+          result += chunk.slice(rStartIndex)
+          chunk = ""
+          continue
+        }
+
+        const extractedReasoning = chunk.slice(rStartIndex + rStart.length, rEndIndex)
+        reasoning += extractedReasoning
+
+        chunk = chunk.slice(rEndIndex + rEnd.length)
+      }
+
+      if (reasoning.length > 0) {
+        buffer = `<think>\n${reasoning}\n</think>\n\n${result}`
+      } else {
+        buffer = result
+      }
+
       setResponse(buffer)
     }
 
