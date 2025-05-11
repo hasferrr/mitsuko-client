@@ -1,7 +1,7 @@
 import { ModelCollection } from "@/types/model"
 
 export const FREE_MODELS: ModelCollection = {
-  "Free Limited": [
+  "Limited": [
     {
       name: "DeepSeek R1 (Base)",
       maxInput: 128000,
@@ -36,7 +36,9 @@ export const FREE_MODELS: ModelCollection = {
         maxCompletionTokens: 128000,
         isUseStructuredOutput: true
       }
-    },
+    }
+  ],
+  "Gemini Experimental": [
     {
       name: "Gemini 2.5 Pro Experimental 03-25",
       maxInput: 1000000,
@@ -52,7 +54,7 @@ export const FREE_MODELS: ModelCollection = {
       isPaid: false,
     }
   ],
-  "Free Multilingual Model": [
+  "Multilingual Model": [
     {
       name: "Qwen3 235B A22B",
       maxInput: 40000,
