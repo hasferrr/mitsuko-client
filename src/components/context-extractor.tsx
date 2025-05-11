@@ -308,6 +308,7 @@ export const ContextExtractor = () => {
 
   // Extraction Handlers
 
+  // TODO: Remove isContinuation and continueGeneration completely
   const handleStartExtraction = async (isContinuation: boolean = false) => {
     setTimeout(() => {
       window.scrollTo({

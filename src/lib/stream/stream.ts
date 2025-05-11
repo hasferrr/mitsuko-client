@@ -10,7 +10,6 @@ interface handleStreamParams {
   requestHeader: Record<string, string>,
   requestBody: BodyInit,
   attempt?: number,
-  previousResponse?: string,
 }
 
 export const handleStream = async (params: handleStreamParams): Promise<string> => {
@@ -23,7 +22,6 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
     requestHeader,
     requestBody,
     attempt = 0,
-    previousResponse = "",
   } = params
 
   const { data: { session } } = await supabase.auth.getSession()
@@ -32,7 +30,7 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
     throw new Error("No access token found")
   }
 
-  setResponse(previousResponse)
+  setResponse("")
 
   if (!abortControllerRef.current.signal.aborted) {
     abortControllerRef.current.abort()
@@ -40,7 +38,7 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
   }
   abortControllerRef.current = new AbortController()
 
-  let buffer = previousResponse ? previousResponse + "\n\n" : ""
+  let buffer = ""
   try {
     const res = await fetch(requestUrl, {
       method: "POST",

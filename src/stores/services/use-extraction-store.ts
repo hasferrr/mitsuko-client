@@ -49,7 +49,7 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
     requestType: RequestType,
     extractionId: string,
     setResponse: (response: string) => void,
-    previousResponse: string
+    // previousResponse: string
   ) => {
     const abortControllerRef = { current: new AbortController() }
     get().abortControllerMap.set(extractionId, abortControllerRef)
@@ -71,7 +71,7 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
         "Content-Type": "application/json"
       },
       requestBody: JSON.stringify(requestBody),
-      previousResponse,
+      // previousResponse,
     })
 
     get().abortControllerMap.delete(extractionId)
