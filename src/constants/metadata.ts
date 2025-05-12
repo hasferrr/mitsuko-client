@@ -1,6 +1,6 @@
 export const META_TITLE = "Mitsuko"
 export const META_TITLE_LONG = "Mitsuko - AI Subtitle Translator and Audio Transcription"
-export const META_DESCRIPTION = "AI Subtitle Translator Mitsuko: Get accurate SRT/ASS translations & precise audio transcription. Experience natural, context-aware results in 100+ languages. Try it now!"
+export const META_DESCRIPTION = "AI Subtitle Translator Mitsuko: Get accurate SRT/ASS translations & precise audio transcription. Experience natural, context-aware results in 100+ languages."
 
 export const META_KEYWORDS = [
   "AI Subtitle Translator",
