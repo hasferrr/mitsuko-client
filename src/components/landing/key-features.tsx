@@ -39,7 +39,7 @@ export default function KeyFeatures() {
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Subtitle Translator</h3>
             <p className="text-gray-600 dark:text-gray-400">
               {/* Translate SRT and ASS subtitles with context-aware AI that captures both literal meaning and idiomatic expressions. */}
-              Translate SRT and ASS subtitles with frontier AI models like DeepSeek, Gemini, and Claude.
+              Translate SRT and ASS subtitles with frontier AI models like Gemini, Claude, Grok, and GPT by OpenAI.
             </p>
           </div>
 
@@ -105,7 +105,7 @@ export default function KeyFeatures() {
                   <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300">
-                  Consider the cultural context and idiomatic usage
+                  Adapt the cultural nuance and idiomatic usage
                 </p>
               </div>
               <div className="flex items-start gap-3">

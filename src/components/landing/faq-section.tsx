@@ -8,7 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 const faqData = [
   {
     question: "What is Mitsuko?",
-    answer: "An AI-powered app for translating subtitles (SRT/ASS formats) and transcribing audio, considering the context of the content for accuracy.",
+    answer: "An AI-powered app for translating subtitles and transcribing audio, considering the context of the content for accuracy.",
   },
   {
     question: "What file formats does Mitsuko support?",
@@ -19,7 +19,7 @@ const faqData = [
   },
   {
     question: "How accurate is the AI translation?",
-    answer: "High accuracy with context-aware AI that retains original meaning, idioms, and cultural references. It uses frontier AI models like DeepSeek, Gemini, Claude, and OpenAI.",
+    answer: "High accuracy with context-aware AI that retains and adapt original meaning, idioms, and cultural references. It uses frontier AI models like Gemini, Claude, Grok, and OpenAI.",
   },
   {
     question: "How does the context extraction feature work?",

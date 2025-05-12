@@ -50,7 +50,7 @@ export default function ComparisonInteractive({
     <div className="grid md:grid-cols-2 gap-8">
       {/* Left Column - Comparison Table (Interactive) */}
       <div
-        className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg p-8"
+        className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm"
       >
         <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
           Mitsuko vs. Generic Translation
@@ -107,7 +107,7 @@ export default function ComparisonInteractive({
 
       {/* Right Column - See the Difference (Displays based on state) */}
       <div
-        className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg p-8"
+        className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm"
       >
         {/* Heading with Next Example Button */}
         <div className="flex justify-between items-center mb-6">
