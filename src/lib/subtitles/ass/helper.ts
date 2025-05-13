@@ -51,16 +51,10 @@ function parseTimestamp(timestampStr: string): Timestamp {
 }
 
 function formatAssTimestamp(timestamp: Timestamp): string {
-  const h = timestamp.h.toString().padStart(2, '0')
+  const h = timestamp.h.toString().padStart(1, '0')
   const m = timestamp.m.toString().padStart(2, '0')
   const s = timestamp.s.toString().padStart(2, '0')
-
-  // Round ms if it has more than 2 digits
-  let msValue = timestamp.ms
-  if (msValue > 99) {
-    msValue = Math.round(msValue / 10)
-  }
-  const ms = msValue.toString().padStart(2, '0')
+  const ms = timestamp.ms.toString().padStart(3, '0').slice(0, 2)
 
   return `${h}:${m}:${s}.${ms}`
 }
