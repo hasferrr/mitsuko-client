@@ -241,6 +241,9 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
 
         // Apply model defaults if available
         if (modelDetail?.default) {
+          if (modelDetail.default.temperature !== undefined) {
+            newSettings.temperature = modelDetail.default.temperature
+          }
           if (modelDetail.default.maxCompletionTokens !== undefined) {
             newSettings.maxCompletionTokens = modelDetail.default.maxCompletionTokens
           }

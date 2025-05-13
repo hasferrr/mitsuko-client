@@ -48,6 +48,7 @@ export function ModelSelector({
   const setModelDetail = useSettingsStore((state) => state.setModelDetail)
 
   // Advanced Settings Store
+  const setTemperature = useAdvancedSettingsStore((state) => state.setTemperature)
   const setIsUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
   const setIsMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.setIsMaxCompletionTokensAuto)
   const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
@@ -58,6 +59,12 @@ export function ModelSelector({
   const handleSelect = (model: Model) => {
     setModelDetail(model, type)
     setOpen(false)
+
+    if (model.default?.temperature !== undefined) {
+      setTemperature(model.default.temperature)
+    } else {
+      setTemperature(DEFAULT_ADVANCED_SETTINGS.temperature)
+    }
 
     if (model.default?.isUseStructuredOutput !== undefined) {
       setIsUseStructuredOutput(model.default.isUseStructuredOutput)

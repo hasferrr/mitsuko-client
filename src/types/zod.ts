@@ -23,6 +23,7 @@ export const modelSchema = z.object({
   isPaid: z.boolean(),
   default: advancedSettingsSchema
     .pick({
+      temperature: true,
       isUseStructuredOutput: true,
       isMaxCompletionTokensAuto: true,
       maxCompletionTokens: true
