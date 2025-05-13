@@ -19,7 +19,6 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent as AlertDialogContentInner,
   AlertDialogDescription as AlertDialogDescriptionInner,
@@ -33,6 +32,7 @@ import {
 } from "@/lib/subtitles/content"
 import { shiftSubtitles } from "@/lib/subtitles/timestamp"
 import { SubtitleTranslated } from "@/types/types"
+import { sleep } from "@/lib/utils"
 
 interface SubtitleToolsProps {
   isOpen: boolean
@@ -55,6 +55,7 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
     open: false,
     action: () => { },
   })
+  const [isLoading, setIsLoading] = useState(false)
 
   const translation = currentId ? translationData[currentId] : null
   const subtitles = translation?.subtitles ?? []
@@ -230,9 +231,19 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
           </AlertDialogHeaderInner>
           <AlertDialogFooterInner>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => alertDialog.action()}>
+            <Button
+              onClick={async () => {
+                setIsLoading(true)
+                await sleep(0)
+                alertDialog.action()
+                setAlertDialog({ open: false, action: () => { } })
+                await sleep(500)
+                setIsLoading(false)
+              }}
+              disabled={isLoading}
+            >
               Continue
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooterInner>
         </AlertDialogContentInner>
       </AlertDialog>
