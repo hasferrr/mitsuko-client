@@ -17,6 +17,7 @@ import { motion, useInView } from "framer-motion"
 import { useRef } from "react"
 import { useSessionStore } from "@/stores/use-session-store"
 import ImageLogo from "@/static/waifu.jpg"
+import { cn } from "@/lib/utils"
 
 export default function HeroSection() {
   const session = useSessionStore((state) => state.session)
@@ -26,12 +27,14 @@ export default function HeroSection() {
   return (
     <div ref={ref} className="w-full flex items-center justify-center px-4 py-12 lg:px-16 relative">
       <div className="absolute top-0 left-0 w-full h-full bg-grid-white/[0.2] bg-grid-8 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
-      <div className="
-      w-full max-w-6xl flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-12
-      bg-gradient-to-br from-indigo-600 via-purple-600 to-red-400 dark:bg-gradient-to-br dark:from-gray-900 dark:via-purple-900 dark:to-gray-900
-      rounded-2xl border border-white/20 dark:border-gray-800 transition-colors
-      p-8 md:p-12 overflow-hidden shadow-2xl relative z-10
-      ">
+      <div className={cn(
+        "w-full max-w-6xl flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-12",
+        "bg-gradient-to-br dark:bg-gradient-to-br",
+        "from-indigo-600 via-purple-600 to-red-500",
+        "dark:from-indigo-600 dark:via-purple-700 dark:to-purple-800",
+        "rounded-2xl border border-white/20 dark:border-gray-800 transition-colors",
+        "p-8 md:p-12 overflow-hidden shadow-2xl relative z-10"
+      )}>
         {/* Text content on the left */}
         <div className="flex flex-col items-center lg:items-start text-center lg:text-left max-w-xl gap-6">
           <motion.div
@@ -43,7 +46,7 @@ export default function HeroSection() {
             <p className="text-4xl md:text-5xl lg:text-6xl font-medium text-white drop-shadow-md mb-6">
               Easily translate subtitles and transcribe audio with high quality results
             </p>
-            <div className="text-gray-200 dark:text-gray-300 mb-8 text-sm md:text-lg sm:text-base">
+            <div className="text-gray-200 mb-8 text-sm md:text-lg sm:text-base drop-shadow-md">
               <h1>AI-Powered Subtitle Translator & Audio Transcription.</h1>
               <p>Get SRT/ASS translation with high-quality and context-aware results.</p>
             </div>
@@ -56,14 +59,14 @@ export default function HeroSection() {
           >
             <Link
               href="/dashboard"
-              className="bg-blue-700 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-white px-6 py-3 rounded-md flex items-center gap-2 transition-colors"
+              className="bg-blue-700 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-white px-6 py-3 rounded-md flex items-center gap-2 transition-colors drop-shadow-sm"
             >
               Try for Free
               <ArrowRight size={18} />
             </Link>
             <Link
               href="/auth/login"
-              className="bg-white/10 hover:bg-gray-100/20 text-white px-6 py-3 rounded-md transition-colors"
+              className="bg-white/10 hover:bg-gray-100/20 text-white px-6 py-3 rounded-md transition-colors drop-shadow-sm"
             >
               {session ? "My Account" : "Sign In"}
             </Link>

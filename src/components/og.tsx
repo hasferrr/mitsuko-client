@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image"
 import {
   ChevronLeft,
@@ -10,10 +12,20 @@ import {
   BookOpen,
 } from "lucide-react"
 import ImageLogo from "@/static/waifu.jpg"
+import { useThemeStore } from "@/stores/use-theme-store"
+import { cn } from "@/lib/utils"
 
 export default function Og() {
+  const isDarkMode = useThemeStore((state) => state.isDarkMode)
+  const setIsDarkMode = useThemeStore((state) => state.setIsDarkMode)
+
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 dark:bg-gradient-to-br dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 flex items-center justify-center px-4 md:px-8 lg:px-16">
+    <div className={cn(
+      "min-h-screen w-full bg-gradient-to-br",
+      "from-indigo-600 via-purple-600 to-red-500",
+      "dark:from-indigo-600 dark:via-purple-700 dark:to-purple-800",
+      "flex items-center justify-center px-4 md:px-8 lg:px-16"
+    )}>
       <div className="absolute top-0 left-0 w-full h-full bg-grid-white/[0.2] bg-grid-8 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
       <div className="w-full max-w-5xl flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-12 relative z-10">
         <div className="flex flex-col max-w-xl gap-6">
@@ -34,7 +46,9 @@ export default function Og() {
               <div className="flex space-x-4">
                 <ChevronLeft className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 <ChevronRight className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                <Clock className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                <button onClick={() => setIsDarkMode(!isDarkMode)}>
+                  <Clock className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                </button>
               </div>
             </div>
 
