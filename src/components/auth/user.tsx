@@ -3,10 +3,10 @@
 import { capitalize, cn } from "@/lib/utils"
 import { RefreshCw } from "lucide-react"
 import { Button } from "../ui/button"
-import { UserData } from "@/types/user"
+import { UserCreditData } from "@/types/user"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useQuery } from "@tanstack/react-query"
-import { fetchUserData } from "@/lib/api/user"
+import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { fetchTransactions, PaginatedTransactions, AmountFilter } from "@/lib/api/transaction"
 import { useState } from "react"
 import {
@@ -38,9 +38,9 @@ export function User() {
     isError: isUserError,
     isFetching: isUserFetching,
     refetch: refetchUser
-  } = useQuery<UserData>({
+  } = useQuery<UserCreditData>({
     queryKey: ["user", session?.user?.id],
-    queryFn: fetchUserData,
+    queryFn: fetchUserCreditData,
     enabled: !!session?.user?.id,
     staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // 1 hour
@@ -131,7 +131,8 @@ export function User() {
                 ) : isUserError ? (
                   <span className="italic text-red-500">Error</span>
                 ) : (
-                  capitalize(user?.tier ?? "unknown")
+                  // capitalize(user?.tier ?? "unknown")
+                  "Basic"
                 )}
               </td>
             </tr>

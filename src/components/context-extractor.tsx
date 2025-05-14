@@ -43,8 +43,8 @@ import { useSessionStore } from "@/stores/use-session-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { fetchUserData } from "@/lib/api/user"
-import { UserData } from "@/types/user"
+import { fetchUserCreditData } from "@/lib/api/user-credit"
+import { UserCreditData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { db } from "@/lib/db/db"
@@ -117,9 +117,9 @@ export const ContextExtractor = () => {
   const session = useSessionStore((state) => state.session)
 
   // Add lazy user data query that only executes manually
-  const { refetch: refetchUserData } = useQuery<UserData>({
+  const { refetch: refetchUserData } = useQuery<UserCreditData>({
     queryKey: ["user", session?.user?.id],
-    queryFn: fetchUserData,
+    queryFn: fetchUserCreditData,
     enabled: false, // Lazy query - won't run automatically
     staleTime: 0, // Always refetch when requested
   })

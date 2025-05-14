@@ -100,8 +100,8 @@ import { useSessionStore } from "@/stores/use-session-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { getAdvancedSettings, getBasicSettings } from "@/lib/db/settings"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { fetchUserData } from "@/lib/api/user"
-import { UserData } from "@/types/user"
+import { fetchUserCreditData } from "@/lib/api/user-credit"
+import { UserCreditData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
 import { logSubtitle } from "@/lib/api/subtitle-log"
 import { z } from "zod"
@@ -177,9 +177,9 @@ export default function SubtitleTranslator() {
   const session = useSessionStore((state) => state.session)
 
   // Add lazy user data query that only executes manually
-  const { refetch: refetchUserData } = useQuery<UserData>({
+  const { refetch: refetchUserData } = useQuery<UserCreditData>({
     queryKey: ["user", session?.user?.id],
-    queryFn: fetchUserData,
+    queryFn: fetchUserCreditData,
     enabled: false, // Lazy query - won't run automatically
     staleTime: 0, // Always refetch when requested
   })

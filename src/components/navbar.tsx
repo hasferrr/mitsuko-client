@@ -19,8 +19,8 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useEffect, useState } from "react"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useQuery } from "@tanstack/react-query"
-import { fetchUserData } from "@/lib/api/user"
-import { UserData } from "@/types/user"
+import { fetchUserCreditData } from "@/lib/api/user-credit"
+import { UserCreditData } from "@/types/user"
 import { cn } from "@/lib/utils"
 
 export function Navbar() {
@@ -30,9 +30,9 @@ export function Navbar() {
 
   // User data
   const session = useSessionStore(state => state.session)
-  const { data: user, isLoading, isFetching, isError, refetch } = useQuery<UserData>({
+  const { data: user, isLoading, isFetching, isError, refetch } = useQuery<UserCreditData>({
     queryKey: ["user", session?.user?.id],
-    queryFn: fetchUserData,
+    queryFn: fetchUserCreditData,
     enabled: !!session?.user?.id,
     staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // 1 hour

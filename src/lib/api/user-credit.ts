@@ -1,7 +1,7 @@
 import { supabase } from "../supabase"
-import { UserData } from "@/types/user"
+import { UserCreditData } from "@/types/user"
 
-export async function fetchUserData(): Promise<UserData> {
+export async function fetchUserCreditData(): Promise<UserCreditData> {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session?.user?.id) {
     throw new Error("No user ID found")
@@ -9,9 +9,9 @@ export async function fetchUserData(): Promise<UserData> {
 
   const { data, error } = await supabase
     .from('users')
-    .select('*')
+    .select('credit')
     .eq('id', session.user.id)
-    .single<UserData>()
+    .single<UserCreditData>()
 
   if (error) {
     throw new Error(error.message)

@@ -45,8 +45,8 @@ import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
 import { generateSRT } from "@/lib/subtitles/srt/generate"
 import { parseTranscription } from "@/lib/parser/parser"
 import { useQuery } from "@tanstack/react-query"
-import { fetchUserData } from "@/lib/api/user"
-import { UserData } from "@/types/user"
+import { fetchUserCreditData } from "@/lib/api/user-credit"
+import { UserCreditData } from "@/types/user"
 import { Input } from "./ui/input"
 import { SettingsTranscription } from "./settings-transcription"
 
@@ -88,9 +88,9 @@ export default function Transcription() {
   const session = useSessionStore((state) => state.session)
 
   // Add lazy user data query that only executes manually
-  const { refetch: refetchUserData } = useQuery<UserData>({
+  const { refetch: refetchUserData } = useQuery<UserCreditData>({
     queryKey: ["user", session?.user?.id],
-    queryFn: fetchUserData,
+    queryFn: fetchUserCreditData,
     enabled: false, // Lazy query - won't run automatically
     staleTime: 0, // Always refetch when requested
   })

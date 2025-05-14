@@ -1,8 +1,3 @@
-export type UserTier = "free" | "basic" | "pro"
-
-export interface UserData {
-  id: string
-  created_at: string
+export interface UserCreditData {
   credit: number
-  tier: UserTier
 }
