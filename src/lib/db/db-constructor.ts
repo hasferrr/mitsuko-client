@@ -39,44 +39,42 @@ export function databaseExportConstructor(data: Partial<DatabaseExport>): Databa
 }
 
 export function generateNewIds(data: DatabaseExport): DatabaseExport {
-  // Create maps of old IDs to new Settings
-  const basicSettings: Map<string, BasicSettings> = new Map()
-  const advancedSettings: Map<string, AdvancedSettings> = new Map()
+  // Create maps of old IDs to new Items
+  const basicSettingsMap: Map<string, BasicSettings> = new Map()
+  const advancedSettingsMap: Map<string, AdvancedSettings> = new Map()
+  const translationsMap: Map<string, Translation> = new Map()
+  const transcriptionsMap: Map<string, Transcription> = new Map()
+  const extractionsMap: Map<string, Extraction> = new Map()
 
-  // Create maps of old IDs to new Settings
   for (const basicSetting of data.basicSettings) {
-    basicSettings.set(basicSetting.id, { ...basicSetting, id: uuidv4() })
+    basicSettingsMap.set(basicSetting.id, { ...basicSetting, id: uuidv4() })
   }
   for (const advancedSetting of data.advancedSettings) {
-    advancedSettings.set(advancedSetting.id, { ...advancedSetting, id: uuidv4() })
+    advancedSettingsMap.set(advancedSetting.id, { ...advancedSetting, id: uuidv4() })
   }
 
-  // Create maps of old IDs to new Items
-  const translations: Map<string, Translation> = new Map()
-  const transcriptions: Map<string, Transcription> = new Map()
-  const extractions: Map<string, Extraction> = new Map()
-
-  // Create maps of old IDs to new Items
   for (const translation of data.translations) {
-    translations.set(translation.id, {
+    translationsMap.set(translation.id, {
       ...translation,
       id: uuidv4(),
-      basicSettingsId: basicSettings.get(translation.basicSettingsId)?.id ?? translation.basicSettingsId,
-      advancedSettingsId: advancedSettings.get(translation.advancedSettingsId)?.id ?? translation.advancedSettingsId,
+      basicSettingsId: basicSettingsMap.get(translation.basicSettingsId)?.id ?? translation.basicSettingsId,
+      advancedSettingsId: advancedSettingsMap.get(translation.advancedSettingsId)?.id ?? translation.advancedSettingsId,
       projectId: "",
     })
   }
+
   for (const extraction of data.extractions) {
-    extractions.set(extraction.id, {
+    extractionsMap.set(extraction.id, {
       ...extraction,
       id: uuidv4(),
-      basicSettingsId: basicSettings.get(extraction.basicSettingsId)?.id ?? extraction.basicSettingsId,
-      advancedSettingsId: advancedSettings.get(extraction.advancedSettingsId)?.id ?? extraction.advancedSettingsId,
+      basicSettingsId: basicSettingsMap.get(extraction.basicSettingsId)?.id ?? extraction.basicSettingsId,
+      advancedSettingsId: advancedSettingsMap.get(extraction.advancedSettingsId)?.id ?? extraction.advancedSettingsId,
       projectId: "",
     })
   }
+
   for (const transcription of data.transcriptions) {
-    transcriptions.set(transcription.id, {
+    transcriptionsMap.set(transcription.id, {
       ...transcription,
       id: uuidv4(),
       projectId: "",
@@ -88,7 +86,7 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
     const newId = uuidv4()
 
     const newTranslationsId = project.translations.map(translationId => {
-      const newTranslation = translations.get(translationId)
+      const newTranslation = translationsMap.get(translationId)
       if (newTranslation) {
         newTranslation.projectId = newId
         return newTranslation.id
@@ -97,7 +95,7 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       }
     })
     const newExtractionsId = project.extractions.map(extractionId => {
-      const newExtraction = extractions.get(extractionId)
+      const newExtraction = extractionsMap.get(extractionId)
       if (newExtraction) {
         newExtraction.projectId = newId
         return newExtraction.id
@@ -106,7 +104,7 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       }
     })
     const newTranscriptionsId = project.transcriptions.map(transcriptionId => {
-      const newTranscription = transcriptions.get(transcriptionId)
+      const newTranscription = transcriptionsMap.get(transcriptionId)
       if (newTranscription) {
         newTranscription.projectId = newId
         return newTranscription.id
@@ -115,20 +113,25 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       }
     })
 
+    const newDefaultBasicSettingsId = basicSettingsMap.get(project.defaultBasicSettingsId)?.id ?? project.defaultBasicSettingsId
+    const newDefaultAdvancedSettingsId = advancedSettingsMap.get(project.defaultAdvancedSettingsId)?.id ?? project.defaultAdvancedSettingsId
+
     return {
       ...project,
       id: newId,
       translations: newTranslationsId,
       transcriptions: newTranscriptionsId,
-      extractions: newExtractionsId
+      extractions: newExtractionsId,
+      defaultBasicSettingsId: newDefaultBasicSettingsId,
+      defaultAdvancedSettingsId: newDefaultAdvancedSettingsId,
     }
   })
 
-  const newTranslations = Array.from(translations.values())
-  const newTranscriptions = Array.from(transcriptions.values())
-  const newExtractions = Array.from(extractions.values())
-  const newBasicSettings = Array.from(basicSettings.values())
-  const newAdvancedSettings = Array.from(advancedSettings.values())
+  const newTranslations = Array.from(translationsMap.values())
+  const newTranscriptions = Array.from(transcriptionsMap.values())
+  const newExtractions = Array.from(extractionsMap.values())
+  const newBasicSettings = Array.from(basicSettingsMap.values())
+  const newAdvancedSettings = Array.from(advancedSettingsMap.values())
 
   const newProjectOrders = data.projectOrders.at(0)
   if (newProjectOrders) {
