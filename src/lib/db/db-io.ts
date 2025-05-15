@@ -48,6 +48,33 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
           db.advancedSettings.clear()
         ])
 
+        // TODO: Move this to db-constructor.ts
+        // Ensure projects have default settings
+        convertedData.projects.forEach((project: Project) => {
+          if (!project.defaultBasicSettingsId) {
+            const basicSettingsId = crypto.randomUUID()
+            const newBasicSettings: BasicSettings = {
+              id: basicSettingsId,
+              ...DEFAULT_BASIC_SETTINGS,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }
+            convertedData.basicSettings.push(newBasicSettings)
+            project.defaultBasicSettingsId = basicSettingsId
+          }
+          if (!project.defaultAdvancedSettingsId) {
+            const advancedSettingsId = crypto.randomUUID()
+            const newAdvancedSettings: AdvancedSettings = {
+              id: advancedSettingsId,
+              ...DEFAULT_ADVANCED_SETTINGS,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }
+            convertedData.advancedSettings.push(newAdvancedSettings)
+            project.defaultAdvancedSettingsId = advancedSettingsId
+          }
+        })
+
         // Add new items
         await Promise.all([
           db.projects.bulkAdd(convertedData.projects),
