@@ -98,7 +98,7 @@ export function WelcomeView() {
             type: "srt",
             data: null
           }
-        })
+        }, {}, {})
         setCurrentTranslationId(translation.id)
         upsertTranslationData(translation.id, translation)
         break
@@ -119,7 +119,7 @@ export function WelcomeView() {
           subtitleContent: "",
           previousContext: "",
           contextResult: ""
-        })
+        }, {}, {})
         setCurrentExtractionId(extraction.id)
         upsertExtractionData(extraction.id, extraction)
         break
