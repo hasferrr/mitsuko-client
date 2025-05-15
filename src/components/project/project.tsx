@@ -24,6 +24,7 @@ import {
   Edit,
   Trash,
   Loader2,
+  Settings,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -42,12 +43,18 @@ import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { useRouter } from "next/navigation"
 import { sleep } from "@/lib/utils"
+import { SettingsDialogue } from "./settings-dialogue"
+import { useSettings } from "@/hooks/use-settings"
+import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
+import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 
 export const Project = () => {
   const router = useRouter()
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
 
   const loadProjects = useProjectStore((state) => state.loadProjects)
   const currentProject = useProjectStore((state) => state.currentProject)
@@ -78,6 +85,11 @@ export const Project = () => {
   const updateTranscriptionDb = useTranscriptionDataStore((state) => state.updateTranscriptionDb)
   const deleteTranscriptionDb = useTranscriptionDataStore((state) => state.deleteTranscriptionDb)
 
+  const getBasicSettings = useSettingsStore((state) => state.getBasicSettings)
+  const getAdvancedSettings = useAdvancedSettingsStore((state) => state.getAdvancedSettings)
+  const applyModelDefaults = useAdvancedSettingsStore((state) => state.applyModelDefaults)
+  const getModelDetail = useSettingsStore((state) => state.getModelDetail)
+
   const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
   const isExtractingSet = useExtractionStore(state => state.isExtractingSet)
   const isTranscribingSet = useTranscriptionStore(state => state.isTranscribingSet)
@@ -88,6 +100,11 @@ export const Project = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  useSettings({
+    basicSettingsId: currentProject?.defaultBasicSettingsId || "",
+    advancedSettingsId: currentProject?.defaultAdvancedSettingsId || ""
+  })
 
   useEffect(() => {
     if (!currentProject) return
@@ -238,14 +255,22 @@ export const Project = () => {
       variant="outline"
       className="line-clamp-2"
       onClick={async () => {
-        await createTranslationDb(currentProject.id, {
-          title: `Subtitle ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
-          subtitles: [],
-          parsed: {
-            type: "srt",
-            data: null
-          }
-        })
+        await createTranslationDb(
+          currentProject.id,
+          {
+            title: `Subtitle ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
+            subtitles: [],
+            parsed: {
+              type: "srt",
+              data: null
+            }
+          },
+          getBasicSettings() ?? {},
+          applyModelDefaults(
+            getAdvancedSettings() ?? DEFAULT_ADVANCED_SETTINGS,
+            getModelDetail() ?? null
+          ),
+        )
         loadProjects()
       }}
     >
@@ -277,12 +302,17 @@ export const Project = () => {
       variant="outline"
       className="line-clamp-2"
       onClick={async () => {
-        await createExtractionDb(currentProject.id, {
-          episodeNumber: "",
-          subtitleContent: "",
-          previousContext: "",
-          contextResult: ""
-        })
+        await createExtractionDb(
+          currentProject.id,
+          {
+            episodeNumber: "",
+            subtitleContent: "",
+            previousContext: "",
+            contextResult: ""
+          },
+          getBasicSettings() ?? {},
+          getAdvancedSettings() ?? {},
+        )
         loadProjects()
       }}
     >
@@ -295,12 +325,29 @@ export const Project = () => {
       <div className="mb-6">
         <div className="text-2xl font-medium mb-2 flex gap-4 items-center">
           <h1>{currentProject.name}</h1>
-          <button onClick={() => setIsEditModalOpen(true)}>
-            <Edit size={4 * 5} />
-          </button>
-          <button onClick={() => setIsDeleteModalOpen(true)}>
-            <Trash size={4 * 5} />
-          </button>
+          <div className="flex flex-wrap gap-4 text-sm">
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="flex items-center gap-2 hover:underline"
+            >
+              <Edit size={4 * 5} />
+              Rename
+            </button>
+            <button
+              onClick={() => setIsSettingsModalOpen(true)}
+              className="flex items-center gap-2 hover:underline"
+            >
+              <Settings size={4 * 5} />
+              Settings (NEW)
+            </button>
+            <button
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="flex items-center gap-2 hover:underline"
+            >
+              <Trash size={4 * 5} />
+              Delete
+            </button>
+          </div>
         </div>
         <p className="text-muted-foreground">
           Last updated: {currentProject.updatedAt.toLocaleDateString()}
@@ -318,6 +365,12 @@ export const Project = () => {
         handleDelete={handleDelete}
         isDeleteModalOpen={isDeleteModalOpen}
         setIsDeleteModalOpen={setIsDeleteModalOpen}
+      />
+
+      <SettingsDialogue
+        isOpen={isSettingsModalOpen}
+        onOpenChange={setIsSettingsModalOpen}
+        projectName={currentProject.name}
       />
 
       <Tabs defaultValue="overview" className="mb-6">

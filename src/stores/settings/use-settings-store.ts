@@ -1,11 +1,12 @@
 import { create } from "zustand"
 import { Model } from "@/types/model"
-import { BasicSettings, ProjectType } from "@/types/project"
+import { BasicSettings, SettingsParentType } from "@/types/project"
 import { persist } from "zustand/middleware"
 import { createBasicSettings, updateBasicSettings, getBasicSettings } from "@/lib/db/settings"
 import { DEFAULT_BASIC_SETTINGS } from "@/constants/default"
 import { useTranslationDataStore } from "../data/use-translation-data-store"
 import { useExtractionDataStore } from "../data/use-extraction-data-store"
+import { useProjectStore } from "../data/use-project-store"
 
 interface SettingsStore {
   data: Record<string, BasicSettings>
@@ -18,6 +19,7 @@ interface SettingsStore {
   mutateData: <T extends keyof BasicSettings>(key: T, value: BasicSettings[T]) => void
   saveData: () => Promise<void>
   // db state
+  getBasicSettings: () => BasicSettings | null
   getSourceLanguage: () => string
   getTargetLanguage: () => string
   getModelDetail: () => Model | null
@@ -31,10 +33,10 @@ interface SettingsStore {
   getFewShotType: () => 'manual' | 'linked'
   getFewShotStartIndex: () => number | undefined
   getFewShotEndIndex: () => number | undefined
-  setSourceLanguage: (language: string) => void
-  setTargetLanguage: (language: string) => void
-  setModelDetail: (model: Model | null, type: ProjectType) => void
-  setIsUseCustomModel: (value: boolean, type: ProjectType) => void
+  setSourceLanguage: (language: string, parent: SettingsParentType) => void
+  setTargetLanguage: (language: string, parent: SettingsParentType) => void
+  setModelDetail: (model: Model | null, parent: SettingsParentType) => void
+  setIsUseCustomModel: (value: boolean, parent: SettingsParentType) => void
   setContextDocument: (doc: string) => void
   setCustomInstructions: (instructions: string) => void
   setIsFewShotEnabled: (isEnabled: boolean) => void
@@ -52,32 +54,57 @@ interface SettingsStore {
 const updateSettings = async <K extends keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>>(
   field: K,
   value: BasicSettings[K],
-  type: ProjectType = 'translation'
+  parent: SettingsParentType,
 ) => {
-  const store = type === 'translation' ? useTranslationDataStore : useExtractionDataStore
+  let basicSettings: BasicSettings | null = null
 
-  // Get the current transcription or extraction id
-  const currentId = store.getState().currentId
-  if (!currentId) return
-  const data = store.getState().data[currentId]
-  if (!data) return
+  if (parent === 'translation') {
+    const store = useTranslationDataStore
+    const currentId = store.getState().currentId
+    if (!currentId) return
+    const data = store.getState().data[currentId]
+    if (!data) return
+    basicSettings = data.basicSettingsId
+      ? await getBasicSettings(data.basicSettingsId) ?? null
+      : null
+    if (!basicSettings) {
+      basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
+      store.getState().mutateData(currentId, "basicSettingsId", basicSettings.id)
+    }
+  }
 
-  // Get or create basic settings
-  let basicSettings = data.basicSettingsId
-    ? await getBasicSettings(data.basicSettingsId)
-    : null
+  if (parent === 'extraction') {
+    const store = useExtractionDataStore
+    const currentId = store.getState().currentId
+    if (!currentId) return
+    const data = store.getState().data[currentId]
+    if (!data) return
+    basicSettings = data.basicSettingsId
+      ? await getBasicSettings(data.basicSettingsId) ?? null
+      : null
+    if (!basicSettings) {
+      basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
+      store.getState().mutateData(currentId, "basicSettingsId", basicSettings.id)
+    }
+  }
 
-  if (!basicSettings) {
-    basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
-    if (type === 'translation') {
-      useTranslationDataStore.getState().mutateData(currentId, "basicSettingsId", basicSettings.id)
-    } else {
-      useExtractionDataStore.getState().mutateData(currentId, "basicSettingsId", basicSettings.id)
+  if (parent === 'project') {
+    const store = useProjectStore
+    const data = store.getState().currentProject
+    if (!data) return
+    basicSettings = data.defaultBasicSettingsId
+      ? await getBasicSettings(data.defaultBasicSettingsId) ?? null
+      : null
+    if (!basicSettings) {
+      basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
+      store.getState().updateProject(data.id, { defaultBasicSettingsId: basicSettings.id })
     }
   }
 
   // Update the settings
-  await updateBasicSettings(basicSettings.id, { [field]: value })
+  if (basicSettings) {
+    await updateBasicSettings(basicSettings.id, { [field]: value })
+  }
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -89,6 +116,10 @@ export const useSettingsStore = create<SettingsStore>()(
       customBaseUrl: "",
       customModel: "",
       setCurrentId: (id) => set({ currentId: id }),
+      getBasicSettings: () => {
+        const id = get().currentId
+        return id ? get().data[id] ?? null : null
+      },
       getSourceLanguage: () => {
         const id = get().currentId
         return id ? get().data[id]?.sourceLanguage : DEFAULT_BASIC_SETTINGS.sourceLanguage
@@ -182,17 +213,17 @@ export const useSettingsStore = create<SettingsStore>()(
           console.error("Failed to save settings data:", error)
         }
       },
-      setSourceLanguage: (language) => {
+      setSourceLanguage: (language, type) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("sourceLanguage", language)
-        updateSettings("sourceLanguage", language)
+        updateSettings("sourceLanguage", language, type)
       },
-      setTargetLanguage: (language) => {
+      setTargetLanguage: (language, type) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("targetLanguage", language)
-        updateSettings("targetLanguage", language)
+        updateSettings("targetLanguage", language, type)
       },
       // Method for updating the model detail for the current id for both translation and extraction
       setModelDetail: (model, type) => {
@@ -214,13 +245,13 @@ export const useSettingsStore = create<SettingsStore>()(
         const id = get().currentId
         if (!id) return
         get().mutateData("contextDocument", doc)
-        updateSettings("contextDocument", doc)
+        updateSettings("contextDocument", doc, "translation")
       },
       setCustomInstructions: (instructions) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("customInstructions", instructions)
-        updateSettings("customInstructions", instructions)
+        updateSettings("customInstructions", instructions, "translation")
       },
       setIsFewShotEnabled: (isEnabled) => {
         const id = get().currentId
@@ -228,7 +259,7 @@ export const useSettingsStore = create<SettingsStore>()(
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, isEnabled }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot, "translation")
       },
       setFewShotValue: (value) => {
         const id = get().currentId
@@ -236,7 +267,7 @@ export const useSettingsStore = create<SettingsStore>()(
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, value }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot, "translation")
       },
       setFewShotLinkedId: (linkedId) => {
         const id = get().currentId
@@ -244,7 +275,7 @@ export const useSettingsStore = create<SettingsStore>()(
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, linkedId }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot, "translation")
       },
       setFewShotType: (type) => {
         const id = get().currentId
@@ -252,7 +283,7 @@ export const useSettingsStore = create<SettingsStore>()(
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, type }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot, "translation")
       },
       setFewShotStartIndex: (index) => {
         const id = get().currentId
@@ -260,7 +291,7 @@ export const useSettingsStore = create<SettingsStore>()(
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, fewShotStartIndex: index }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot, "translation")
       },
       setFewShotEndIndex: (index) => {
         const id = get().currentId
@@ -268,7 +299,7 @@ export const useSettingsStore = create<SettingsStore>()(
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, fewShotEndIndex: index }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot)
+        updateSettings("fewShot", newFewShot, "translation")
       },
     }),
     {

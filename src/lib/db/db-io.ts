@@ -1,5 +1,7 @@
 import { db } from './db'
 import { DatabaseExport, databaseExportConstructor, generateNewIds } from './db-constructor'
+import { Project, BasicSettings, AdvancedSettings } from '@/types/project'
+import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from '@/constants/default'
 
 export async function exportDatabase(): Promise<string> {
   const exportData: DatabaseExport = {
@@ -66,6 +68,33 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
         convertedData.projectOrders = dataWithNewIds.projectOrders
         convertedData.basicSettings = dataWithNewIds.basicSettings
         convertedData.advancedSettings = dataWithNewIds.advancedSettings
+
+        // TODO: Move this to db-constructor.ts
+        // Ensure projects have default settings
+        convertedData.projects.forEach((project: Project) => {
+          if (!project.defaultBasicSettingsId) {
+            const basicSettingsId = crypto.randomUUID()
+            const newBasicSettings: BasicSettings = {
+              id: basicSettingsId,
+              ...DEFAULT_BASIC_SETTINGS,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }
+            convertedData.basicSettings.push(newBasicSettings)
+            project.defaultBasicSettingsId = basicSettingsId
+          }
+          if (!project.defaultAdvancedSettingsId) {
+            const advancedSettingsId = crypto.randomUUID()
+            const newAdvancedSettings: AdvancedSettings = {
+              id: advancedSettingsId,
+              ...DEFAULT_ADVANCED_SETTINGS,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }
+            convertedData.advancedSettings.push(newAdvancedSettings)
+            project.defaultAdvancedSettingsId = advancedSettingsId
+          }
+        })
 
         // Upadate current project order
         let currentProjectOrder = await db.projectOrders.get(convertedData.projectOrders.at(0)?.id ?? "")

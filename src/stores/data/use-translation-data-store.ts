@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { Translation } from "@/types/project"
+import { AdvancedSettings, BasicSettings, Translation } from "@/types/project"
 import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/types"
 import { updateTranslation, createTranslation, getTranslation, deleteTranslation } from "@/lib/db/translation"
 
@@ -7,7 +7,12 @@ export interface TranslationDataStore {
   currentId: string | null
   data: Record<string, Translation>
   // CRUD methods
-  createTranslationDb: (projectId: string, data: Pick<Translation, "title" | "subtitles" | "parsed">) => Promise<Translation>
+  createTranslationDb: (
+    projectId: string,
+    data: Pick<Translation, "title" | "subtitles" | "parsed">,
+    basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
+    advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
+  ) => Promise<Translation>
   getTranslationDb: (projectId: string, translationId: string) => Promise<Translation | undefined>
   updateTranslationDb: (translationId: string, changes: Partial<Pick<Translation, "title" | "subtitles" | "parsed">>) => Promise<Translation>
   deleteTranslationDb: (projectId: string, translationId: string) => Promise<void>
@@ -33,8 +38,8 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
   currentId: null,
   data: {},
   // CRUD methods
-  createTranslationDb: async (projectId, data) => {
-    const translation = await createTranslation(projectId, data)
+  createTranslationDb: async (projectId, data, basicSettingsData, advancedSettingsData) => {
+    const translation = await createTranslation(projectId, data, basicSettingsData, advancedSettingsData)
     set(state => ({ data: { ...state.data, [translation.id]: translation } }))
     return translation
   },

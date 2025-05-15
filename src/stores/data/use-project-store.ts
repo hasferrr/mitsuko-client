@@ -7,6 +7,7 @@ import {
   renameProject as renameProjectDB,
   updateProjectOrder,
   updateProjectItems as updateProjectItemsDB,
+  updateProject as updateProjectDB,
 } from "@/lib/db/project"
 import { useTranscriptionDataStore } from "./use-transcription-data-store"
 import { useTranslationDataStore } from "./use-translation-data-store"
@@ -21,6 +22,7 @@ interface ProjectStore {
   loadProjects: () => Promise<void>
   createProject: (name: string) => Promise<Project>
   renameProject: (id: string, name: string) => Promise<void>
+  updateProject: (id: string, update: Partial<Omit<Project, "id" | "createdAt" | "updatedAt">>) => Promise<Project | null>
   updateProjectItems: (id: string, items: string[], type: 'translations' | 'transcriptions' | 'extractions' | ProjectType) => Promise<Project | null>
   deleteProject: (id: string) => Promise<void>
   reorderProjects: (newOrder: string[]) => Promise<void>
@@ -92,6 +94,24 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     } catch (error) {
       console.error('Failed to update project', error)
       set({ error: 'Failed to update project', loading: false })
+    }
+  },
+
+  updateProject: async (id, update) => {
+    set({ loading: true })
+    try {
+      const updatedProject = await updateProjectDB(id, update)
+      set((state) => ({
+        projects: state.projects.map(p =>
+          p.id === id ? updatedProject : p
+        ),
+        loading: false
+      }))
+      return updatedProject
+    } catch (error) {
+      console.error('Failed to update project', error)
+      set({ error: 'Failed to update project', loading: false })
+      return null
     }
   },
 

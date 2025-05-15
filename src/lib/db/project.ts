@@ -1,16 +1,24 @@
 import { Project } from "@/types/project"
 import { db } from "./db"
+import { createBasicSettings, createAdvancedSettings } from "./settings"
+import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 
 // Project CRUD functions
 export const createProject = async (name: string): Promise<Project> => {
-  return db.transaction('rw', db.projects, db.projectOrders, async () => {
+  return db.transaction('rw', [db.projects, db.projectOrders, db.basicSettings, db.advancedSettings], async () => {
     const id = crypto.randomUUID()
+
+    const basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
+    const advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
+
     const project: Project = {
       id,
       name,
       translations: [],
       transcriptions: [],
       extractions: [],
+      defaultBasicSettingsId: basicSettings.id,
+      defaultAdvancedSettingsId: advancedSettings.id,
       createdAt: new Date(),
       updatedAt: new Date(),
     }
@@ -65,6 +73,16 @@ export const renameProject = async (id: string, update: Pick<Project, "name">): 
   return (await db.projects.get(id)) as Project
 }
 
+export const updateProject = async (id: string, update: Partial<Omit<Project, "id" | "createdAt" | "updatedAt">>): Promise<Project> => {
+  const changes = {
+    ...update,
+    updatedAt: new Date()
+  }
+
+  await db.projects.update(id, changes)
+  return (await db.projects.get(id)) as Project
+}
+
 export const updateProjectItems = async (id: string, items: string[], type: 'translations' | 'transcriptions' | 'extractions'): Promise<Project | null> => {
   const project = await db.projects.get(id)
   if (!project) return null
@@ -101,10 +119,16 @@ export const deleteProject = async (id: string): Promise<void> => {
       ...translations.filter(t => t).map(t => t!.basicSettingsId),
       ...extractions.filter(e => e).map(e => e!.basicSettingsId)
     ]
+    if (project.defaultBasicSettingsId) {
+      basicSettingsIds.push(project.defaultBasicSettingsId)
+    }
     const advancedSettingsIds = [
       ...translations.filter(t => t).map(t => t!.advancedSettingsId),
       ...extractions.filter(e => e).map(e => e!.advancedSettingsId)
     ]
+    if (project.defaultAdvancedSettingsId) {
+      advancedSettingsIds.push(project.defaultAdvancedSettingsId)
+    }
 
     // Delete all related entities in single operations
     await Promise.all([

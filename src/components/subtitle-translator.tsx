@@ -210,6 +210,7 @@ export default function SubtitleTranslator() {
     }
   }, [subtitles.length])
 
+  // TODO: Refactor to use useSettings hook
   useEffect(() => {
     if (translationData[currentId].projectId !== useProjectStore.getState().currentProject?.id) {
       useProjectStore.getState().setCurrentProject(translationData[currentId].projectId)
@@ -1010,7 +1011,7 @@ export default function SubtitleTranslator() {
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
-                  <LanguageSelection />
+                  <LanguageSelection type="translation" />
                   <ModelSelection type="translation" />
                   <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
                     <ContextDocumentInput />

@@ -139,6 +139,7 @@ export const ContextExtractor = () => {
     }
   }, [contextResultRef])
 
+  // TODO: Refactor to use useSettings hook
   useEffect(() => {
     if (extractionData[currentId].projectId !== useProjectStore.getState().currentProject?.id) {
       useProjectStore.getState().setCurrentProject(extractionData[currentId].projectId)

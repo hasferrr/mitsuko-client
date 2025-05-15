@@ -1,12 +1,17 @@
 import { create } from "zustand"
-import { Extraction } from "@/types/project"
+import { Extraction, BasicSettings, AdvancedSettings } from "@/types/project"
 import { updateExtraction, createExtraction, getExtraction, deleteExtraction } from "@/lib/db/extraction"
 
 export interface ExtractionDataStore {
   currentId: string | null
   data: Record<string, Extraction>
   // CRUD methods
-  createExtractionDb: (projectId: string, data: Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">) => Promise<Extraction>
+  createExtractionDb: (
+    projectId: string,
+    data: Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">,
+    basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
+    advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
+  ) => Promise<Extraction>
   getExtractionDb: (projectId: string, extractionId: string) => Promise<Extraction | undefined>
   updateExtractionDb: (extractionId: string, changes: Partial<Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext">>) => Promise<Extraction>
   deleteExtractionDb: (projectId: string, extractionId: string) => Promise<void>
@@ -32,8 +37,8 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
   currentId: null,
   data: {},
   // CRUD methods
-  createExtractionDb: async (projectId, data) => {
-    const extraction = await createExtraction(projectId, data)
+  createExtractionDb: async (projectId, data, basicSettingsData, advancedSettingsData) => {
+    const extraction = await createExtraction(projectId, data, basicSettingsData, advancedSettingsData)
     set(state => ({ data: { ...state.data, [extraction.id]: extraction } }))
     return extraction
   },

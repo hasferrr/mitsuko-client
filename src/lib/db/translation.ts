@@ -1,4 +1,4 @@
-import { Translation } from "@/types/project"
+import { AdvancedSettings, BasicSettings, Translation } from "@/types/project"
 import { db } from "./db"
 import {
   DEFAULT_BASIC_SETTINGS,
@@ -9,13 +9,21 @@ import { createBasicSettings, createAdvancedSettings } from "./settings"
 // Translation CRUD
 export const createTranslation = async (
   projectId: string,
-  data: Pick<Translation, "title" | "subtitles" | "parsed">
+  data: Pick<Translation, "title" | "subtitles" | "parsed">,
+  basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
+  advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
 ): Promise<Translation> => {
   return db.transaction('rw', db.projects, db.translations, db.basicSettings, db.advancedSettings, async () => {
     const id = crypto.randomUUID()
 
-    const basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
-    const advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
+    const basicSettings = await createBasicSettings({
+      ...DEFAULT_BASIC_SETTINGS,
+      ...basicSettingsData,
+    })
+    const advancedSettings = await createAdvancedSettings({
+      ...DEFAULT_ADVANCED_SETTINGS,
+      ...advancedSettingsData,
+    })
 
     const translation: Translation = {
       id,

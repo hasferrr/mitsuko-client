@@ -1,10 +1,12 @@
 import { create } from "zustand"
-import { AdvancedSettings, ProjectType } from "@/types/project"
+import { AdvancedSettings, SettingsParentType } from "@/types/project"
+import { Model } from "@/types/model"
 import { useTranslationDataStore } from "../data/use-translation-data-store"
 import { createAdvancedSettings, updateAdvancedSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "./use-settings-store"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useExtractionDataStore } from "../data/use-extraction-data-store"
+import { useProjectStore } from "../data/use-project-store"
 
 interface AdvancedSettingsStore {
   data: Record<string, AdvancedSettings>
@@ -13,6 +15,7 @@ interface AdvancedSettingsStore {
   upsertData: (id: string, value: AdvancedSettings) => void
   mutateData: <T extends keyof AdvancedSettings>(key: T, value: AdvancedSettings[T]) => void
   saveData: () => Promise<void>
+  getAdvancedSettings: () => AdvancedSettings | null
   getTemperature: () => number
   getMaxCompletionTokens: () => number
   getIsMaxCompletionTokensAuto: () => boolean
@@ -26,44 +29,73 @@ interface AdvancedSettingsStore {
   setStartIndex: (value: number) => void
   setEndIndex: (value: number) => void
   setSplitSize: (value: number) => void
-  setMaxCompletionTokens: (value: number, type: ProjectType) => void
+  setMaxCompletionTokens: (value: number, parent: SettingsParentType) => void
   setIsUseStructuredOutput: (value: boolean) => void
   setIsUseFullContextMemory: (value: boolean) => void
   setIsBetterContextCaching: (value: boolean) => void
-  setIsMaxCompletionTokensAuto: (value: boolean, type: ProjectType) => void
+  setIsMaxCompletionTokensAuto: (value: boolean, parent: SettingsParentType) => void
   resetIndex: (s?: number, e?: number) => void
   resetAdvancedSettings: () => void
+  applyModelDefaults: (
+    newSettingsInput: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>,
+    modelDetail: Model | null
+  ) => Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>
 }
 
 const updateSettings = async <K extends keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>>(
   field: K,
   value: AdvancedSettings[K],
-  type: ProjectType = 'translation'
+  parent: SettingsParentType,
 ) => {
-  const store = type === 'translation' ? useTranslationDataStore : useExtractionDataStore
+  let advancedSettings: AdvancedSettings | null = null
 
-  // Get the current transcription or extraction id
-  const currentId = store.getState().currentId
-  if (!currentId) return
-  const data = store.getState().data[currentId]
-  if (!data) return
+  if (parent === 'translation') {
+    const store = useTranslationDataStore
+    const currentId = store.getState().currentId
+    if (!currentId) return
+    const data = store.getState().data[currentId]
+    if (!data) return
+    advancedSettings = data.advancedSettingsId
+      ? await getAdvancedSettings(data.advancedSettingsId) ?? null
+      : null
+    if (!advancedSettings) {
+      advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
+      store.getState().mutateData(currentId, "advancedSettingsId", advancedSettings.id)
+    }
+  }
 
-  // Get or create advanced settings
-  let advancedSettings = data.advancedSettingsId
-    ? await getAdvancedSettings(data.advancedSettingsId)
-    : null
+  if (parent === 'extraction') {
+    const store = useExtractionDataStore
+    const currentId = store.getState().currentId
+    if (!currentId) return
+    const data = store.getState().data[currentId]
+    if (!data) return
+    advancedSettings = data.advancedSettingsId
+      ? await getAdvancedSettings(data.advancedSettingsId) ?? null
+      : null
+    if (!advancedSettings) {
+      advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
+      store.getState().mutateData(currentId, "advancedSettingsId", advancedSettings.id)
+    }
+  }
 
-  if (!advancedSettings) {
-    advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
-    if (type === 'translation') {
-      useTranslationDataStore.getState().mutateData(currentId, "advancedSettingsId", advancedSettings.id)
-    } else {
-      useExtractionDataStore.getState().mutateData(currentId, "advancedSettingsId", advancedSettings.id)
+  if (parent === 'project') {
+    const store = useProjectStore
+    const data = store.getState().currentProject
+    if (!data) return
+    advancedSettings = data.defaultAdvancedSettingsId
+      ? await getAdvancedSettings(data.defaultAdvancedSettingsId) ?? null
+      : null
+    if (!advancedSettings) {
+      advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
+      store.getState().updateProject(data.id, { defaultAdvancedSettingsId: advancedSettings.id })
     }
   }
 
   // Update the settings
-  await updateAdvancedSettings(advancedSettings.id, { [field]: value })
+  if (advancedSettings) {
+    await updateAdvancedSettings(advancedSettings.id, { [field]: value })
+  }
 }
 
 export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
@@ -72,6 +104,10 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
       data: {},
       currentId: null,
       setCurrentId: (id) => set({ currentId: id }),
+      getAdvancedSettings: () => {
+        const id = get().currentId
+        return id ? get().data[id] ?? null : null
+      },
       getTemperature: () => {
         const id = get().currentId
         return id ? get().data[id]?.temperature : DEFAULT_ADVANCED_SETTINGS.temperature
@@ -151,57 +187,57 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         const id = get().currentId
         if (!id) return
         get().mutateData("temperature", value)
-        updateSettings("temperature", value)
+        updateSettings("temperature", value, "translation")
       },
       setStartIndex: (value) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("startIndex", value)
-        updateSettings("startIndex", value)
+        updateSettings("startIndex", value, "translation")
       },
       setEndIndex: (value) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("endIndex", value)
-        updateSettings("endIndex", value)
+        updateSettings("endIndex", value, "translation")
       },
       setSplitSize: (value) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("splitSize", value)
-        updateSettings("splitSize", value)
+        updateSettings("splitSize", value, "translation")
       },
       // Method for both translation and extraction
-      setMaxCompletionTokens: (value, type) => {
+      setMaxCompletionTokens: (value, parent) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("maxCompletionTokens", value)
-        updateSettings("maxCompletionTokens", value, type)
+        updateSettings("maxCompletionTokens", value, parent)
       },
       setIsUseStructuredOutput: (value) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isUseStructuredOutput", value)
-        updateSettings("isUseStructuredOutput", value)
+        updateSettings("isUseStructuredOutput", value, "translation")
       },
       setIsUseFullContextMemory: (value) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isUseFullContextMemory", value)
-        updateSettings("isUseFullContextMemory", value)
+        updateSettings("isUseFullContextMemory", value, "translation")
       },
       setIsBetterContextCaching: (value) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isBetterContextCaching", value)
-        updateSettings("isBetterContextCaching", value)
+        updateSettings("isBetterContextCaching", value, "translation")
       },
       // Method for both translation and extraction
-      setIsMaxCompletionTokensAuto: (value, type) => {
+      setIsMaxCompletionTokensAuto: (value, parent) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isMaxCompletionTokensAuto", value)
-        updateSettings("isMaxCompletionTokensAuto", value, type)
+        updateSettings("isMaxCompletionTokensAuto", value, parent)
       },
       resetIndex: (s?: number, e?: number) => {
         const id = get().currentId
@@ -219,8 +255,8 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         store.mutateData("endIndex", endIndex)
 
         // Update both indices in the database
-        updateSettings("startIndex", startIndex)
-        updateSettings("endIndex", endIndex)
+        updateSettings("startIndex", startIndex, "translation")
+        updateSettings("endIndex", endIndex, "translation")
       },
       resetAdvancedSettings: () => {
         const id = get().currentId
@@ -232,7 +268,7 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         const isUseCustomModel = settingsCurrentId ? settingsData[settingsCurrentId]?.isUseCustomModel ?? false : false
 
         // Start with DEFAULT_ADVANCED_SETTINGS
-        const newSettings: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'> = {
+        let newSettings: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'> = {
           ...DEFAULT_ADVANCED_SETTINGS,
           isUseStructuredOutput: isUseCustomModel
             ? true
@@ -240,20 +276,7 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         }
 
         // Apply model defaults if available
-        if (modelDetail?.default) {
-          if (modelDetail.default.temperature !== undefined) {
-            newSettings.temperature = modelDetail.default.temperature
-          }
-          if (modelDetail.default.maxCompletionTokens !== undefined) {
-            newSettings.maxCompletionTokens = modelDetail.default.maxCompletionTokens
-          }
-          if (modelDetail.default.isMaxCompletionTokensAuto !== undefined) {
-            newSettings.isMaxCompletionTokensAuto = modelDetail.default.isMaxCompletionTokensAuto
-          }
-          if (modelDetail.default.isUseStructuredOutput !== undefined) {
-            newSettings.isUseStructuredOutput = modelDetail.default.isUseStructuredOutput
-          }
-        }
+        newSettings = get().applyModelDefaults(newSettings, modelDetail)
 
         const store = get()
 
@@ -264,8 +287,29 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
 
         // Update all settings in the database
         Object.entries(newSettings).forEach(([key, value]) => {
-          updateSettings(key as keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>, value)
+          updateSettings(key as keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>, value, "translation")
         })
+      },
+      applyModelDefaults: (
+        newSettingsInput: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>,
+        modelDetail: Model | null
+      ): Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'> => {
+        const updatedSettings = { ...newSettingsInput }
+        if (modelDetail?.default) {
+          if (modelDetail.default.temperature !== undefined) {
+            updatedSettings.temperature = modelDetail.default.temperature
+          }
+          if (modelDetail.default.maxCompletionTokens !== undefined) {
+            updatedSettings.maxCompletionTokens = modelDetail.default.maxCompletionTokens
+          }
+          if (modelDetail.default.isMaxCompletionTokensAuto !== undefined) {
+            updatedSettings.isMaxCompletionTokensAuto = modelDetail.default.isMaxCompletionTokensAuto
+          }
+          if (modelDetail.default.isUseStructuredOutput !== undefined) {
+            updatedSettings.isUseStructuredOutput = modelDetail.default.isUseStructuredOutput
+          }
+        }
+        return updatedSettings
       },
     }
   )

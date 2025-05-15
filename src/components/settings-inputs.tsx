@@ -23,7 +23,7 @@ import { ModelSelector } from "@/components/model-selector"
 import { LANGUAGES } from "@/constants/lang"
 import { ComboBox } from "./ui-custom/combo-box"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ProjectType, Translation } from "@/types/project"
+import { SettingsParentType, Translation } from "@/types/project"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Extraction } from "@/types/project"
@@ -34,7 +34,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
-export const LanguageSelection = memo(() => {
+export const LanguageSelection = memo(({ type }: { type: SettingsParentType }) => {
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
   const setSourceLanguage = useSettingsStore((state) => state.setSourceLanguage)
   const targetLanguage = useSettingsStore((state) => state.getTargetLanguage())
@@ -47,7 +47,7 @@ export const LanguageSelection = memo(() => {
         <ComboBox
           data={LANGUAGES}
           value={sourceLanguage}
-          setValue={setSourceLanguage}
+          setValue={(t) => setSourceLanguage(t, type)}
           name="language"
         />
       </div>
@@ -56,7 +56,7 @@ export const LanguageSelection = memo(() => {
         <ComboBox
           data={LANGUAGES}
           value={targetLanguage}
-          setValue={setTargetLanguage}
+          setValue={(t) => setTargetLanguage(t, type)}
           name="language"
         />
       </div>
@@ -64,7 +64,10 @@ export const LanguageSelection = memo(() => {
   )
 })
 
-export const ModelSelection = memo(({ type }: { type: ProjectType }) => {
+export const ModelSelection = memo(({
+  type,
+  showUseCustomModelSwitch = true
+}: { type: SettingsParentType, showUseCustomModelSwitch?: boolean }) => {
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
   const setIsUseCustomModel = useSettingsStore((state) => state.setIsUseCustomModel)
   const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
@@ -82,12 +85,14 @@ export const ModelSelection = memo(({ type }: { type: ProjectType }) => {
         <label className="text-sm font-medium">Model</label>
         <ModelSelector disabled={isUseCustomModel} type={type} />
       </div>
-      <div className="flex items-center space-x-2">
-        <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={(checked) => setIsUseCustomModel(checked, type)} />
-        <label htmlFor="custom-model" className="text-sm font-medium">
-          Use Custom Model
-        </label>
-      </div>
+      {showUseCustomModelSwitch && (
+        <div className="flex items-center space-x-2">
+          <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={(checked) => setIsUseCustomModel(checked, type)} />
+          <label htmlFor="custom-model" className="text-sm font-medium">
+            Use Custom Model
+          </label>
+        </div>
+      )}
       {isUseCustomModel && (
         <div className="space-y-4 pt-2">
           <Input
@@ -794,7 +799,7 @@ export const SplitSizeInput = memo(() => {
   )
 })
 
-export const MaxCompletionTokenInput = memo(({ type }: { type: ProjectType }) => {
+export const MaxCompletionTokenInput = memo(({ type }: { type: SettingsParentType }) => {
   const modelDetail = useSettingsStore((state) => state.getModelDetail())
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())

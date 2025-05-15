@@ -24,14 +24,14 @@ import { Model } from "@/types/model"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { MODEL_COLLECTION } from "@/constants/model-collection"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { ProjectType } from "@/types/project"
+import { SettingsParentType } from "@/types/project"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useModelCosts } from "@/contexts/model-cost-context"
 import { ModelCreditCost } from "@/types/model-cost"
 import Link from "next/link"
 
 interface ModelSelectorProps extends PopoverProps {
-  type: ProjectType
+  type: SettingsParentType
   disabled?: boolean
 }
 

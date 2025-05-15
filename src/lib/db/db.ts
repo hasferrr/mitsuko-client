@@ -1,4 +1,4 @@
-import { DEFAULT_BASIC_SETTINGS } from '@/constants/default'
+import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS } from '@/constants/default'
 import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
 import Dexie, { Table } from 'dexie'
 
@@ -81,6 +81,44 @@ class MyDatabase extends Dexie {
           }
         }
       })
+    })
+    this.version(11).stores({}).upgrade(async tx => {
+      // Migrate projects: add defaultBasicSettingsId, defaultAdvancedSettingsId
+      const newBasicSettingsList: BasicSettings[] = []
+      const newAdvancedSettingsList: AdvancedSettings[] = []
+
+      await tx.table('projects').toCollection().modify(async (project: Project) => {
+        if (typeof project.defaultBasicSettingsId === 'undefined') {
+          const basicSettingsId = crypto.randomUUID()
+          const newBasicSettings: BasicSettings = {
+            id: basicSettingsId,
+            ...DEFAULT_BASIC_SETTINGS,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+          newBasicSettingsList.push(newBasicSettings)
+          project.defaultBasicSettingsId = basicSettingsId
+        }
+
+        if (typeof project.defaultAdvancedSettingsId === 'undefined') {
+          const advancedSettingsId = crypto.randomUUID()
+          const newAdvancedSettings: AdvancedSettings = {
+            id: advancedSettingsId,
+            ...DEFAULT_ADVANCED_SETTINGS,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+          newAdvancedSettingsList.push(newAdvancedSettings)
+          project.defaultAdvancedSettingsId = advancedSettingsId
+        }
+      })
+
+      if (newBasicSettingsList.length > 0) {
+        await tx.table('basicSettings').bulkAdd(newBasicSettingsList)
+      }
+      if (newAdvancedSettingsList.length > 0) {
+        await tx.table('advancedSettings').bulkAdd(newAdvancedSettingsList)
+      }
     })
   }
 }

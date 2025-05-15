@@ -21,6 +21,11 @@ export interface DatabaseExport {
   advancedSettings: AdvancedSettings[]
 }
 
+
+// TODO: Importing database: Check for every field in the database and make sure it's not null,
+// and if it is, add the default value and also related tables
+// by implementing this approach, we can make sure it is scalable and easy to maintain
+
 export function databaseExportConstructor(data: Partial<DatabaseExport>): DatabaseExport {
   return {
     projects: convertDates(data.projects?.map(projectConstructor) ?? []),
@@ -158,6 +163,8 @@ function projectConstructor(project: Partial<Project>): Project {
     translations: project.translations ?? [],
     transcriptions: project.transcriptions ?? [],
     extractions: project.extractions ?? [],
+    defaultBasicSettingsId: project.defaultBasicSettingsId ?? "",
+    defaultAdvancedSettingsId: project.defaultAdvancedSettingsId ?? "",
   }
 }
 

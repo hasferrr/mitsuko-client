@@ -4,6 +4,7 @@ import { Model } from "./model"
 import { z } from "zod"
 
 export type ProjectType = 'translation' | 'transcription' | 'extraction'
+export type SettingsParentType = 'project' | 'translation' | 'extraction'
 
 export interface ProjectOrder {
   id: string
@@ -18,6 +19,8 @@ export interface Project {
   translations: string[] // Array of Translation IDs
   transcriptions: string[] // Array of Transcription IDs
   extractions: string[] // Array of Extraction IDs
+  defaultBasicSettingsId: string
+  defaultAdvancedSettingsId: string
   createdAt: Date
   updatedAt: Date
 }
