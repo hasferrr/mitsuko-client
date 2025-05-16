@@ -59,13 +59,13 @@ export default async function TranscriptionUsage() {
                 <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Premium ({"<="} {MINUTE_THRESHOLD} minutes)</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{INPUT_CREDITS_PER_MINUTE_LOW}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{costsTier115?.creditPerOutputToken ?? 'N/A'}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400"></td>
+                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Soon</td>
               </tr>
               <tr className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
                 <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Premium ({">"} {MINUTE_THRESHOLD} minutes)</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{INPUT_CREDITS_PER_MINUTE_HIGH}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{costsTier215?.creditPerOutputToken ?? 'N/A'}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400"></td>
+                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Soon</td>
               </tr>
             </tbody>
           </table>

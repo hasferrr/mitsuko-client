@@ -211,14 +211,14 @@ function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
         <p>Context Length: {model.maxInput.toLocaleString()}</p>
         <p>Max Completion: {model.maxOutput.toLocaleString()}</p>
       </div>
-      {cost && (
-        <div className="flex flex-col gap-2">
-          <div>
-            <p className="mt-2 font-medium">Estimated Cost</p>
-            <p>Input: {cost.creditPerInputToken} credits/token</p>
-            <p>Output: {cost.creditPerOutputToken} credits/token</p>
-          </div>
-          <div>
+      <div className="mt-2">
+        {cost && (
+          <>
+            <div className="mb-2">
+              <p className="font-medium">Estimated Cost</p>
+              <p>Input: {cost.creditPerInputToken} credits/token</p>
+              <p>Output: {cost.creditPerOutputToken} credits/token</p>
+            </div>
             <Link
               href="/pricing#credit-usage"
               target="_blank"
@@ -226,10 +226,19 @@ function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
             >
               See full comparison
             </Link>
-          </div>
+          </>
+        )}
+        <div>
+          <Link
+            href="/pricing#which-models"
+            target="_blank"
+            className="hover:underline text-blue-500/80"
+          >
+            Which Models Should I Use?
+          </Link>
         </div>
-      )}
-    </div>
+      </div>
+    </div >
   ) : (
     <p className="text-sm">No model selected</p>
   )

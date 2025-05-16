@@ -1,6 +1,7 @@
 import Link from "next/link"
 import CreditUsage from "./credit-usage"
 import TranscriptionUsage from "./transcription-usage"
+import WhichModels from "./which-models"
 
 export default function PricingDescription() {
   return (
@@ -22,19 +23,18 @@ export default function PricingDescription() {
           </h3>
           <div className="flex flex-col gap-4">
             <p>
-              Credits used for AI features like Subtitle Translation, Audio Transcription, and Context Extraction.
-              Using these features will deduct credits from your balance based on the specific action. See "Credit Usage" below for details.
+              Credits used for features like Translation, Transcription, and Context Extraction.
+              Using these features will deduct credits from your balance. See "Credit Usage" below for details.
             </p>
             <p>
-              You can receive credits monthly by <a href="#pricing-cards" className="text-blue-500 hover:text-blue-600">subscribing</a>{" "}
-              to a plan or purchase <a href="#credit-packs" className="text-blue-500 hover:text-blue-600">credit packs</a>{" "}
+              You can receive credits by purchasing <a href="#credit-packs" className="text-blue-500 hover:text-blue-600">credit packs</a>{" "}
               as needed.
             </p>
             <div className="flex flex-col gap-2">
               <span>Notes:</span>
               <ul className="list-disc pl-4">
-                <li>The credits in your account never expire (even if the subscription ends).</li>
-                <li>We currently do not offer refunds for purchased credits and plans. However, this might change in the future.</li>
+                <li>The credits in your account never expire.</li>
+                <li>We currently do not offer refunds for purchased credits and plans.</li>
               </ul>
             </div>
           </div>
@@ -50,6 +50,9 @@ export default function PricingDescription() {
             <Link href="/auth/login" className="text-blue-500 hover:text-blue-600">User Information</Link> page.
           </p>
         </div>
+
+        {/* Which Models Should I Use? */}
+        <WhichModels />
 
         {/* Credit Usage */}
         <CreditUsage />
