@@ -28,7 +28,7 @@ export function SidebarHeaderIcon() {
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">Mitsuko</span>
-            <span className="truncate text-xs">Beta Version</span>
+            <span className="truncate text-xs">AI-Powered Tools</span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>
