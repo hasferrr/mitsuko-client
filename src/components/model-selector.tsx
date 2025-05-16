@@ -99,11 +99,6 @@ export function ModelSelector({
           >
             <div className="flex items-center gap-2">
               {modelDetail ? modelDetail.name : "Select a model..."}
-              {modelDetail && !!modelCostsMap.get(modelDetail.name)?.discount && (
-                <div className="text-sm text-green-500">
-                  ({(modelCostsMap.get(modelDetail.name)?.discount ?? 0) * 100}% off)
-                </div>
-              )}
               {modelDetail && (
                 <Badge
                   variant={modelDetail.isPaid ? "default" : "secondary"}
