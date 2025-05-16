@@ -1,7 +1,7 @@
 import { getModelCostData } from '@/lib/api/get-model-cost-data'
 import { ModelCost } from '@/types/model-cost'
 import { PAID_MODELS } from "@/constants/model-collection"
-import { formatTokens } from "@/lib/utils"
+import { cn, formatTokens } from "@/lib/utils"
 import {
   Tooltip,
   TooltipContent,
@@ -22,11 +22,12 @@ export default async function CreditUsage() {
 
       return {
         name: paidModel.name,
-        creditPerInputToken: costs?.creditPerInputToken ?? -69,
-        creditPerOutputToken: costs?.creditPerOutputToken ?? -69,
+        creditPerInputToken: costs?.creditPerInputToken ?? -1,
+        creditPerOutputToken: costs?.creditPerOutputToken ?? -1,
         contextLength: contextLength,
         maxCompletion: maxCompletion,
-        score: "-"
+        score: "-",
+        discount: costs?.discount ?? 0,
       }
     })
 
@@ -67,6 +68,7 @@ export default async function CreditUsage() {
       contextLength: 'Varies',
       maxCompletion: 'Varies',
       score: '-',
+      discount: 0,
     },
     {
       name: 'Custom API',
@@ -75,6 +77,7 @@ export default async function CreditUsage() {
       contextLength: 'Unknown',
       maxCompletion: 'Unknown',
       score: '-',
+      discount: 0,
     }
   ]
 
@@ -142,8 +145,32 @@ export default async function CreditUsage() {
                     </TooltipProvider>
                   )}
                 </td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.creditPerInputToken === -69 ? "N/A" : model.creditPerInputToken}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.creditPerOutputToken === -69 ? "N/A" : model.creditPerOutputToken}</td>
+                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">
+                  <span className={cn(model.discount > 0 && "line-through")}>
+                    {model.creditPerInputToken === -1 ? "N/A" : (model.creditPerInputToken / (1 - model.discount)).toLocaleString()}
+                  </span>
+                  {model.discount > 0 && (
+                    <span className="ml-2 text-primary font-medium">
+                      {model.creditPerInputToken === -1 ? "N/A" : model.creditPerInputToken}
+                      <span className="ml-1 text-xs text-green-500">
+                        ({model.discount * 100}% off)
+                      </span>
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">
+                  <span className={cn(model.discount > 0 && "line-through")}>
+                    {model.creditPerOutputToken === -1 ? "N/A" : (model.creditPerOutputToken / (1 - model.discount)).toLocaleString()}
+                  </span>
+                  {model.discount > 0 && (
+                    <span className="ml-2 text-primary font-medium">
+                      {model.creditPerOutputToken === -1 ? "N/A" : model.creditPerOutputToken}
+                      <span className="ml-1 text-xs text-green-500">
+                        ({model.discount * 100}% off)
+                      </span>
+                    </span>
+                  )}
+                </td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.contextLength}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.maxCompletion}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.score}</td>
