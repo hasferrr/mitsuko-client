@@ -4,8 +4,9 @@ export type TransactionEvent =
   | "EXTRACTION_REQUEST"
   | "TRANSCRIPTION_REQUEST"
   | "REFUND"
-  | "ADMIN_ADJUSTMENT"
+  | "ADJUSTMENT"
   | "BETA_TEST"
+  | "EXPIRED"
 
 export interface Transaction {
   id: string
