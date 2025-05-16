@@ -264,6 +264,30 @@ export const PAID_MODELS: ModelCollection = {
         isUseStructuredOutput: true
       }
     },
+    {
+      name: "GPT-4o",
+      maxInput: 128_000,
+      maxOutput: 16_384,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        temperature: 1,
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "GPT-4o mini",
+      maxInput: 128_000,
+      maxOutput: 16_384,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        temperature: 1,
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
   ],
   Meta: [
     {
