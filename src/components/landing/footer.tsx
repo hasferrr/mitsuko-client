@@ -4,7 +4,7 @@ import Link from "next/link"
 export default function Footer() {
   return (
     <footer className="border-t border-gray-200 dark:border-gray-800 py-12 px-4">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
         <div>
           <div className="flex items-center mb-4">
             <span className="text-base font-medium text-gray-900 dark:text-white">Mitsuko</span>
@@ -57,7 +57,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Other Sites</h3>
+          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Community</h3>
           <ul className="space-y-2">
             <li>
               <Link
@@ -78,6 +78,29 @@ export default function Footer() {
               >
                 GitHub
               </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Featured On</h3>
+          <ul className="space-y-2">
+            <li className="mb-4 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href="https://dang.ai/" target="_blank" rel="noopener">
+                <img
+                  src="https://cdn.prod.website-files.com/63d8afd87da01fb58ea3fbcb/6487e2868c6c8f93b4828827_dang-badge.png"
+                  alt="Dang.ai"
+                  style={{ width: '150px', height: '54px' }}
+                  width="150"
+                  height="54"
+                />
+              </a>
+            </li>
+            <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a target="_blank" rel="noopener" title="All The Best AI Tools" href="https://allinai.tools">All in AI Tools</a>
+            </li>
+            <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a target="_blank" rel="noopener" href="https://aistage.net" title="AIStage">AIStage</a>
             </li>
           </ul>
         </div>
