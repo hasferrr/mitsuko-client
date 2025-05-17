@@ -19,13 +19,53 @@ export function removeContentBetween(
   customStart: string,
   customEnd: string
 ): SubtitleTranslated[] {
-  function escapeRegExp(string: string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  }
+  return subtitles.map((subtitle) => {
+    const original = subtitle[field]
+    const result: string[] = []
 
-  const regex = new RegExp(`${escapeRegExp(customStart)}(.*?)${escapeRegExp(customEnd)}`, "g")
-  return subtitles.map((subtitle) => ({
-    ...subtitle,
-    [field]: subtitle[field].replace(regex, "").trim()
-  }))
+    let l = 0
+    let r = 0
+    let skipCount = 0
+
+    while (l < original.length) {
+      if (r >= original.length) {
+        result.push(original[l])
+        l++
+        continue
+      }
+
+      if (skipCount > 0) {
+        if (original.slice(r, r + customStart.length) === customStart) {
+          skipCount += 1
+          r += customStart.length
+          continue
+        }
+        if (original.slice(r, r + customEnd.length) === customEnd) {
+          skipCount -= 1
+          r += customEnd.length
+          if (r < original.length) {
+            l = r
+          }
+          continue
+        }
+        r++
+        continue
+      }
+
+      if (original.slice(l, l + customStart.length) === customStart) {
+        skipCount += 1
+        r += customStart.length
+        continue
+      }
+
+      result.push(original[l])
+      l++
+      r++
+    }
+
+    return {
+      ...subtitle,
+      [field]: result.join("").replace(/\s+/g, " ").trim()
+    }
+  })
 }
