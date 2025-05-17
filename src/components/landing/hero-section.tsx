@@ -61,7 +61,7 @@ export default function HeroSection() {
               href="/dashboard"
               className="bg-blue-700 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-white px-6 py-3 rounded-md flex items-center gap-2 transition-colors drop-shadow-sm"
             >
-              Try for Free
+              Try for Free!
               <ArrowRight size={18} />
             </Link>
             <Link

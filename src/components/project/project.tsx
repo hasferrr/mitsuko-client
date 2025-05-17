@@ -338,7 +338,7 @@ export const Project = () => {
               className="flex items-center gap-2 hover:underline"
             >
               <Settings size={4 * 5} />
-              Settings (NEW)
+              Settings
             </button>
             <button
               onClick={() => setIsDeleteModalOpen(true)}
