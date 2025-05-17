@@ -86,13 +86,24 @@ export default function Footer() {
           <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Featured On</h3>
           <ul className="flex flex-col gap-2">
             <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href="https://fazier.com" target="_blank" rel="noopener">
+                <img
+                  src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=neutral"
+                  alt="Fazier badge"
+                  width="auto"
+                  height="auto"
+                  className="h-[35px] object-contain"
+                />
+              </a>
+            </li>
+            <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               <a href="https://similarlabs.com/?ref=embed" target="_blank" rel="noopener">
                 <img
                   src="https://similarlabs.com/similarlabs-embed-badge-light.svg"
                   alt="SimilarLabs Embed Badge"
                   width="auto"
                   height="auto"
-                  className="h-[45px] object-contain bg-white rounded-sm"
+                  className="h-[35px] object-contain bg-white rounded-sm"
                 />
               </a>
             </li>
@@ -103,7 +114,7 @@ export default function Footer() {
                   alt="Featured on Twelve Tools"
                   width="auto"
                   height="auto"
-                  className="h-[40px] object-contain"
+                  className="h-[35px] object-contain"
                 />
               </a>
             </li>
@@ -114,7 +125,7 @@ export default function Footer() {
                   alt="Dang.ai"
                   width="auto"
                   height="auto"
-                  className="h-[42px] object-contain"
+                  className="h-[35px] object-contain"
                 />
               </a>
             </li>
