@@ -1,6 +1,15 @@
-export default function WhichModels() {
+import { cn } from "@/lib/utils"
+
+interface WhichModelsProps {
+  className?: string
+}
+
+export default function WhichModels({ className }: WhichModelsProps) {
   return (
-    <div className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
+    <div className={cn(
+      "relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm",
+      className
+    )}>
       <div id="which-models" className="absolute -top-24" />
       <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
         Which Models Should I Use?

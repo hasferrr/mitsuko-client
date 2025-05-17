@@ -33,11 +33,13 @@ import Link from "next/link"
 interface ModelSelectorProps extends PopoverProps {
   type: SettingsParentType
   disabled?: boolean
+  className?: string
 }
 
 export function ModelSelector({
   type,
   disabled,
+  className,
   ...props
 }: ModelSelectorProps) {
   const models = MODEL_COLLECTION
@@ -86,7 +88,7 @@ export function ModelSelector({
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn("flex flex-col gap-2", className)}>
       <Popover open={open} onOpenChange={setOpen} {...props}>
         <PopoverTrigger asChild>
           <Button

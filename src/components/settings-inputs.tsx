@@ -33,6 +33,8 @@ import { customInstructionPresets } from "@/constants/custom-instructions"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import WhichModels from "@/components/pricing/which-models"
+import { HelpCircle } from "lucide-react"
 
 export const LanguageSelection = memo(({ type }: { type: SettingsParentType }) => {
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -78,12 +80,30 @@ export const ModelSelection = memo(({
   const setApiKey = useSettingsStore((state) => state.setApiKey)
 
   const [showApiKey, setShowApiKey] = useState(false)
+  const [isWhichModelsDialogOpen, setIsWhichModelsDialogOpen] = useState(false)
 
   return (
     <>
       <div className="space-y-2">
         <label className="text-sm font-medium">Model</label>
-        <ModelSelector disabled={isUseCustomModel} type={type} />
+        <div className="flex items-center gap-2">
+          <div className="flex-grow">
+            <ModelSelector
+              disabled={isUseCustomModel}
+              type={type}
+              className="w-full"
+            />
+          </div>
+          <Button
+            variant="outline"
+            size="default"
+            className="w-10 flex items-center justify-center"
+            onClick={() => setIsWhichModelsDialogOpen(true)}
+            aria-label="Which Models Should I Use?"
+          >
+            <HelpCircle className="w-4 h-4 opacity-70" />
+          </Button>
+        </div>
       </div>
       {showUseCustomModelSwitch && (
         <div className="flex items-center space-x-2">
@@ -133,6 +153,12 @@ export const ModelSelection = memo(({
           </div>
         </div>
       )}
+      <Dialog open={isWhichModelsDialogOpen} onOpenChange={setIsWhichModelsDialogOpen}>
+        <DialogContent className="sm:max-w-2xl pt-2">
+          <DialogTitle></DialogTitle>
+          <WhichModels className="mt-0 p-2 border-0 shadow-none" />
+        </DialogContent>
+      </Dialog>
     </>
   )
 })
