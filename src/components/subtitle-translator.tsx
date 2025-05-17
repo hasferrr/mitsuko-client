@@ -105,6 +105,7 @@ import { UserCreditData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
 import { logSubtitle } from "@/lib/api/subtitle-log"
 import { z } from "zod"
+import { useApiSettingsStore } from "@/stores/settings/use-api-settings-store"
 
 type DownloadOption = "original" | "translated" | "both"
 type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
@@ -133,6 +134,11 @@ export default function SubtitleTranslator() {
   const subtitles = translation?.subtitles ?? []
   const parsed = translation?.parsed ?? { type: "srt", data: null }
 
+  // API Settings Store
+  const apiKey = useApiSettingsStore((state) => state.apiKey)
+  const customBaseUrl = useApiSettingsStore((state) => state.customBaseUrl)
+  const customModel = useApiSettingsStore((state) => state.customModel)
+
   // Basic Settings Store
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
   const targetLanguage = useSettingsStore((state) => state.getTargetLanguage())
@@ -141,9 +147,6 @@ export default function SubtitleTranslator() {
   const contextDocument = useSettingsStore((state) => state.getContextDocument())
   const customInstructions = useSettingsStore((state) => state.getCustomInstructions())
   const fewShot = useSettingsStore((state) => state.getFewShot())
-  const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
-  const customModel = useSettingsStore((state) => state.customModel)
-  const apiKey = useSettingsStore((state) => state.apiKey)
   const setSettingsCurrentId = useSettingsStore((state) => state.setCurrentId)
   const upsertSettingsData = useSettingsStore((state) => state.upsertData)
   const setContextDocument = useSettingsStore((state) => state.setContextDocument)

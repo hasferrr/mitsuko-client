@@ -11,9 +11,6 @@ import { useProjectStore } from "../data/use-project-store"
 interface SettingsStore {
   data: Record<string, BasicSettings>
   currentId: string | null
-  apiKey: string
-  customBaseUrl: string
-  customModel: string
   setCurrentId: (id: string) => void
   upsertData: (id: string, value: BasicSettings) => void
   mutateData: <T extends keyof BasicSettings>(key: T, value: BasicSettings[T]) => void
@@ -45,10 +42,6 @@ interface SettingsStore {
   setFewShotType: (type: 'manual' | 'linked') => void
   setFewShotStartIndex: (index?: number) => void
   setFewShotEndIndex: (index?: number) => void
-  // local storage persist state
-  setApiKey: (key: string) => void
-  setCustomBaseUrl: (url: string) => void
-  setCustomModel: (model: string) => void
 }
 
 const updateSettings = async <K extends keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>>(
@@ -112,9 +105,6 @@ export const useSettingsStore = create<SettingsStore>()(
     (set, get) => ({
       data: {},
       currentId: null,
-      apiKey: "",
-      customBaseUrl: "",
-      customModel: "",
       setCurrentId: (id) => set({ currentId: id }),
       getBasicSettings: () => {
         const id = get().currentId
@@ -238,9 +228,6 @@ export const useSettingsStore = create<SettingsStore>()(
         get().mutateData("isUseCustomModel", value)
         updateSettings("isUseCustomModel", value, type)
       },
-      setApiKey: (key) => set({ apiKey: key }),
-      setCustomBaseUrl: (url) => set({ customBaseUrl: url }),
-      setCustomModel: (model) => set({ customModel: model }),
       setContextDocument: (doc) => {
         const id = get().currentId
         if (!id) return
@@ -304,11 +291,7 @@ export const useSettingsStore = create<SettingsStore>()(
     }),
     {
       name: "settings-storage",
-      partialize: (state) => ({
-        apiKey: state.apiKey,
-        customBaseUrl: state.customBaseUrl,
-        customModel: state.customModel,
-      }),
+      partialize: () => ({}),
     }
   )
 )

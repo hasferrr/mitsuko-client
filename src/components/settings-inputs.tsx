@@ -35,6 +35,7 @@ import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 import WhichModels from "@/components/pricing/which-models"
 import { HelpCircle } from "lucide-react"
+import { useApiSettingsStore } from '@/stores/settings/use-api-settings-store'
 
 export const LanguageSelection = memo(({ type }: { type: SettingsParentType }) => {
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -70,14 +71,17 @@ export const ModelSelection = memo(({
   type,
   showUseCustomModelSwitch = true
 }: { type: SettingsParentType, showUseCustomModelSwitch?: boolean }) => {
+  // Settings Store
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
   const setIsUseCustomModel = useSettingsStore((state) => state.setIsUseCustomModel)
-  const customBaseUrl = useSettingsStore((state) => state.customBaseUrl)
-  const setCustomBaseUrl = useSettingsStore((state) => state.setCustomBaseUrl)
-  const customModel = useSettingsStore((state) => state.customModel)
-  const setCustomModel = useSettingsStore((state) => state.setCustomModel)
-  const apiKey = useSettingsStore((state) => state.apiKey)
-  const setApiKey = useSettingsStore((state) => state.setApiKey)
+
+  // API Settings Store
+  const apiKey = useApiSettingsStore((state) => state.apiKey)
+  const customBaseUrl = useApiSettingsStore((state) => state.customBaseUrl)
+  const customModel = useApiSettingsStore((state) => state.customModel)
+  const setApiKey = useApiSettingsStore((state) => state.setApiKey)
+  const setCustomBaseUrl = useApiSettingsStore((state) => state.setCustomBaseUrl)
+  const setCustomModel = useApiSettingsStore((state) => state.setCustomModel)
 
   const [showApiKey, setShowApiKey] = useState(false)
   const [isWhichModelsDialogOpen, setIsWhichModelsDialogOpen] = useState(false)
