@@ -82,9 +82,16 @@ export const ModelSelection = memo(({
   const setApiKey = useApiSettingsStore((state) => state.setApiKey)
   const setCustomBaseUrl = useApiSettingsStore((state) => state.setCustomBaseUrl)
   const setCustomModel = useApiSettingsStore((state) => state.setCustomModel)
+  const isThirdPartyModelEnabled = useApiSettingsStore((state) => state.isThirdPartyModelEnabled)
 
   const [showApiKey, setShowApiKey] = useState(false)
   const [isWhichModelsDialogOpen, setIsWhichModelsDialogOpen] = useState(false)
+
+  useEffect(() => {
+    if (!isThirdPartyModelEnabled && isUseCustomModel) {
+      setIsUseCustomModel(false, type)
+    }
+  }, [isThirdPartyModelEnabled, isUseCustomModel, setIsUseCustomModel, type])
 
   return (
     <>
@@ -109,7 +116,7 @@ export const ModelSelection = memo(({
           </Button>
         </div>
       </div>
-      {showUseCustomModelSwitch && (
+      {showUseCustomModelSwitch && isThirdPartyModelEnabled && (
         <div className="flex items-center space-x-2">
           <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={(checked) => setIsUseCustomModel(checked, type)} />
           <label htmlFor="custom-model" className="text-sm font-medium">

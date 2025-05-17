@@ -5,6 +5,7 @@ import { useEffect, useState, useTransition } from "react"
 import { Button } from "../ui/button"
 import { useSessionStore } from "@/stores/use-session-store"
 import { User } from "./user"
+import { UserSettings } from "./user-settings"
 import { LogOutIcon } from "lucide-react"
 import {
   Dialog,
@@ -59,6 +60,7 @@ export function Login() {
   return (
     <div className="max-w-6xl flex flex-col gap-4 p-4 m-auto">
       <User />
+      <UserSettings />
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogTrigger asChild>
           <Button disabled={isPending} className="w-fit" variant="outline">
