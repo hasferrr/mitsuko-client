@@ -1,9 +1,6 @@
-import { ASSParseOutput, Subtitle } from "@/types/subtitles";
-
+import { ASSParseOutput, Subtitle, SubtitleType } from "@/types/subtitles";
 import { mergeASSback } from "./ass/merge"
 import { generateSRT } from "./srt/generate"
-
-type SubtitleType = "srt" | "ass"
 
 interface MergeSubtitleOptions {
   subtitles: Subtitle[]

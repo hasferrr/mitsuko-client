@@ -52,6 +52,8 @@ export interface SubtitleEvent {
 }
 
 export interface Parsed {
-  type: "srt" | "ass"
+  type: SubtitleType
   data: ASSParseOutput | null
 }
+
+export type SubtitleType = "srt" | "ass"

@@ -23,10 +23,7 @@ import {
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
-import { Subtitle, SubtitleNoTime } from "@/types/subtitles"
-import { isASS, isSRT } from "@/lib/subtitles/is"
-import { parseASS } from "@/lib/subtitles/ass/parse"
-import { parseSRT } from "@/lib/subtitles/srt/parse"
+import { SubtitleNoTime } from "@/types/subtitles"
 import { removeTimestamp } from "@/lib/subtitles/timestamp"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
@@ -51,6 +48,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { db } from "@/lib/db/db"
 import { Extraction, Translation } from "@/types/project"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
+import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 
 interface FileItem {
   id: string
@@ -337,17 +335,12 @@ export const ContextExtractor = () => {
     setActiveTab("result")
     setIsEditingResult(false)
 
-    let parsed: Subtitle[]
     if (subtitleContent.trim() === "") {
       throw new Error("Empty content")
-    } else if (isASS(subtitleContent)) {
-      parsed = parseASS(subtitleContent).subtitles
-    } else if (isSRT(subtitleContent)) {
-      parsed = parseSRT(subtitleContent)
-    } else {
-      throw new Error("Invalid subtitle content")
     }
-    const subtitles: SubtitleNoTime[] = removeTimestamp(parsed)
+
+    const data = parseSubtitle({ content: subtitleContent })
+    const subtitles: SubtitleNoTime[] = removeTimestamp(data.subtitles)
 
     const result: string[] | undefined = isContinuation
       ? [contextResult]

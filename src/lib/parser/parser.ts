@@ -1,6 +1,5 @@
 import type { SubOnlyTranslated, Subtitle, SubtitleNoTimeNoActorTranslated } from "../../types/subtitles"
-import { isSRT } from "../subtitles/is"
-import { parseSRT } from "../subtitles/srt/parse"
+import { parseSubtitle } from "../subtitles/parse-subtitle"
 import { keepOnlyWrapped, removeWrapped, cleanUpJsonResponse } from "./cleaner"
 import { repairJson } from "./repairer"
 
@@ -127,10 +126,5 @@ export function parseTranscription(response: string): Subtitle[] {
     }
   }
 
-  const srt = srtArr.join("\n")
-  if (!isSRT(srt)) {
-    throw new Error("Invalid SRT format")
-  }
-
-  return parseSRT(srt)
+  return parseSubtitle({ content: srtArr.join("\n") }).subtitles
 }

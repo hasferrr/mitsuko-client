@@ -6,7 +6,7 @@ function parseTimestamp(timestamp: string): Timestamp {
   return { h, m, s, ms: Number(ms) }
 }
 
-export function parseSRT(fileContent: string): Subtitle[] {
+export function _parseSRT(fileContent: string): Subtitle[] {
   const lines = fileContent.trim().split('\n').map(line => line.trim())
   const subtitles: Subtitle[] = []
 

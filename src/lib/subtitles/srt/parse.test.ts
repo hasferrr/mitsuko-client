@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test"
-import { parseSRT } from './parse'
+import { _parseSRT as parseSRT } from './parse'
 import { Subtitle } from "@/types/subtitles"
 
 const expected: Subtitle[] = [

@@ -49,8 +49,6 @@ import {
   SubtitleNoTime,
 } from "@/types/subtitles"
 import { ContextCompletion } from "@/types/completion"
-import { parseSRT } from "@/lib/subtitles/srt/parse"
-import { parseASS } from "@/lib/subtitles/ass/parse"
 import { generateSRT } from "@/lib/subtitles/srt/generate"
 import { mergeASSback } from "@/lib/subtitles/ass/merge"
 import { cn, minMax, sleep } from "@/lib/utils"
@@ -89,7 +87,6 @@ import {
 } from "@/components/ui/select"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ModelDetail } from "./model-detail"
-import { isASS, isSRT } from "@/lib/subtitles/is"
 import { toast } from "sonner"
 import { SubtitleTools } from "./subtitle-tools"
 import { SubtitleProgress } from "./subtitle-progress"
@@ -106,6 +103,7 @@ import { useQuery } from "@tanstack/react-query"
 import { logSubtitle } from "@/lib/api/subtitle-log"
 import { z } from "zod"
 import { useApiSettingsStore } from "@/stores/settings/use-api-settings-store"
+import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 
 type DownloadOption = "original" | "translated" | "both"
 type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
@@ -584,32 +582,17 @@ export default function SubtitleTranslator() {
 
     try {
       const text = await pendingFile.text()
-      let type: "srt" | "ass" | null = null
 
-      let parsedSubs: Subtitle[] = []
-      if (isSRT(text)) {
-        type = "srt"
-        parsedSubs = parseSRT(text)
-        setParsed(currentId, { type, data: null })
-      } else if (isASS(text)) {
-        type = "ass"
-        const data = parseASS(text)
-        parsedSubs = data.subtitles
-        setParsed(currentId, { type, data })
-
-        // Flag to show ASS guidance dialog
-        setIsASSGuidanceDialogOpen(true)
-      } else {
-        console.error("Invalid file type")
-        toast.error("Invalid file type")
-        return
-      }
-
-      const parsedSubtitles: SubtitleTranslated[] = parsedSubs.map((subtitle) => ({
+      const data = parseSubtitle({ content: text })
+      const parsedSubtitles: SubtitleTranslated[] = data.subtitles.map((subtitle) => ({
         ...subtitle,
         translated: "",
       }))
 
+      setParsed(currentId, data.parsed)
+      if (data.parsed.type === "ass") {
+        setIsASSGuidanceDialogOpen(true)
+      }
       if (parsedSubtitles.length >= maxSubtitles) {
         setSubtitlesHidden(true)
       }
