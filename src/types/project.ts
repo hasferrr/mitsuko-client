@@ -1,7 +1,5 @@
-import { advancedSettingsSchema } from "@/types/zod"
 import { SubtitleTranslated, Parsed, Subtitle, SubOnlyTranslated } from "./subtitles"
 import { Model } from "./model"
-import { z } from "zod"
 
 export type ProjectType = 'translation' | 'transcription' | 'extraction'
 export type SettingsParentType = 'project' | 'translation' | 'extraction'
@@ -85,7 +83,20 @@ export interface BasicSettings {
   updatedAt: Date
 }
 
-export type AdvancedSettings = z.infer<typeof advancedSettingsSchema>
+export interface AdvancedSettings {
+  id: string
+  temperature: number
+  startIndex: number
+  endIndex: number
+  splitSize: number
+  maxCompletionTokens: number
+  isUseStructuredOutput: boolean
+  isUseFullContextMemory: boolean
+  isBetterContextCaching: boolean
+  isMaxCompletionTokensAuto: boolean
+  createdAt: Date
+  updatedAt: Date
+}
 
 export interface ResponseTranslation {
   response: string

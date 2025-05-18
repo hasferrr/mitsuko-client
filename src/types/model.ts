@@ -1,5 +1,17 @@
-import { modelCollectionSchema, modelSchema } from "@/types/zod"
-import { z } from "zod"
+import { AdvancedSettings } from "./project"
 
-export type Model = z.infer<typeof modelSchema>
-export type ModelCollection = z.infer<typeof modelCollectionSchema>
+export interface Model {
+  name: string
+  maxInput: number
+  maxOutput: number
+  structuredOutput: boolean
+  isPaid: boolean
+  default?: Partial<Pick<AdvancedSettings,
+    | 'temperature'
+    | 'isUseStructuredOutput'
+    | 'isMaxCompletionTokensAuto'
+    | 'maxCompletionTokens'
+  >>
+}
+
+export type ModelCollection = Record<string, Model[]>
