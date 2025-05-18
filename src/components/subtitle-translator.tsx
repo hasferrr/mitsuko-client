@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -14,7 +13,6 @@ import {
   Square,
   Download,
   Upload,
-  FileText,
   Trash,
   Loader2,
   History as HistoryIcon,
@@ -122,7 +120,6 @@ export default function SubtitleTranslator() {
   const setTitle = useTranslationDataStore((state) => state.setTitle)
   const setSubtitles = useTranslationDataStore((state) => state.setSubtitles)
   const setParsed = useTranslationDataStore((state) => state.setParsed)
-  const resetParsed = useTranslationDataStore((state) => state.resetParsed)
   const setResponse = useTranslationDataStore((state) => state.setResponse)
   const setJsonResponse = useTranslationDataStore((state) => state.setJsonResponse)
   const appendJsonResponse = useTranslationDataStore((state) => state.appendJsonResponse)
@@ -784,9 +781,12 @@ export default function SubtitleTranslator() {
     URL.revokeObjectURL(url)
   }
 
-  const handleDelete = async () => {
-    setSubtitles(currentId, [])
-    resetParsed(currentId)
+  const handleClearAllTranslations = async () => {
+    const updatedSubtitles = subtitles.map(subtitle => ({
+      ...subtitle,
+      translated: "",
+    }))
+    setSubtitles(currentId, updatedSubtitles)
     await saveData(currentId)
   }
 
@@ -949,15 +949,6 @@ export default function SubtitleTranslator() {
             Continue and Fill Missing Translations
           </Button>
 
-          <Link
-            href="/extract-context"
-            className="w-full mt-2 gap-2 inline-flex items-center justify-center"
-          >
-            <Button variant="outline" className="w-full gap-2">
-              <FileText className="h-4 w-4" />
-              Extract Context from Subtitle
-            </Button>
-          </Link>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
@@ -966,19 +957,19 @@ export default function SubtitleTranslator() {
                 disabled={isTranslating}
               >
                 <Trash className="h-4 w-4" />
-                Remove All Subtitles
+                Clear All Translations
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action will remove all subtitles.
+                  This action will clear all translated text from the subtitles. The original text will remain.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>
+                <AlertDialogAction onClick={handleClearAllTranslations}>
                   Continue
                 </AlertDialogAction>
               </AlertDialogFooter>
