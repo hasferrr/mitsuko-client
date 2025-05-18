@@ -24,6 +24,7 @@ import {
   SaveIcon,
   Eye,
   EyeOff,
+  FastForward,
 } from "lucide-react"
 import { SubtitleList } from "./subtitle-list"
 import {
@@ -103,6 +104,8 @@ import { z } from "zod"
 import { useApiSettingsStore } from "@/stores/settings/use-api-settings-store"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
+import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
+import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-gap"
 
 type DownloadOption = "original" | "translated" | "both"
 type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
@@ -153,8 +156,6 @@ export default function SubtitleTranslator() {
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
   const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())
   const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize())
-  const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex())
-  const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex())
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput())
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
   const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching())
@@ -253,12 +254,26 @@ export default function SubtitleTranslator() {
     return subtitleChunks
   }
 
-  const handleStartTranslation = async () => {
+  const handleStartTranslation = async (
+    overrideStartIndexParam?: number,
+    overrideEndIndexParam?: number,
+    partOfBatch?: boolean
+  ) => {
     if (!subtitles.length) return
     setIsTranslating(currentId, true)
     setHasChanges(true)
-    setActiveTab("result")
-    setJsonResponse(currentId, [])
+
+    if (!partOfBatch) {
+      setActiveTab("result")
+      setJsonResponse(currentId, [])
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        })
+      }, 300)
+    }
+
     await saveData(currentId)
 
     // Validate few shot
@@ -299,20 +314,26 @@ export default function SubtitleTranslator() {
     }
     console.log("usedFewShot: ", usedFewShot)
 
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }, 300)
-
     // Accumulate raw responses
     const allRawResponses: string[] = []
 
     // Split subtitles into chunks, starting from startIndex - 1
+    const storeStartIndex = useAdvancedSettingsStore.getState().getStartIndex()
+    const storeEndIndex = useAdvancedSettingsStore.getState().getEndIndex()
+
+    const sIndexToUse = overrideStartIndexParam !== undefined
+      ? overrideStartIndexParam
+      : storeStartIndex
+
+    const eIndexToUse = overrideEndIndexParam !== undefined
+      ? overrideEndIndexParam
+      : storeEndIndex
+
     const size = minMax(splitSize, SPLIT_SIZE_MIN, SPLIT_SIZE_MAX)
-    const adjustedStartIndex = minMax(startIndex - 1, 0, subtitles.length - 1)
-    const adjustedEndIndex = minMax(endIndex - 1, adjustedStartIndex, subtitles.length - 1)
+    // adjustedStartIndex and adjustedEndIndex are 0-based for slicing
+    // Ensure subtitles.length - 1 is not negative if subtitles.length is 0 (already handled by early return)
+    const adjustedStartIndex = minMax(sIndexToUse - 1, 0, subtitles.length - 1)
+    const adjustedEndIndex = minMax(eIndexToUse - 1, adjustedStartIndex, subtitles.length - 1)
 
     const subtitleChunks = firstChunk(size, adjustedStartIndex, adjustedEndIndex)
 
@@ -323,7 +344,7 @@ export default function SubtitleTranslator() {
     let context: ContextCompletion[] = []
 
     // Split by number of split size
-    if (startIndex > 1) {
+    if (sIndexToUse > 1) {
       // Calculate the proper context range based on context strategy
       let contextStartIndex: number
 
@@ -439,6 +460,11 @@ export default function SubtitleTranslator() {
           console.error("Error: ", error)
           console.log("Failed to parse: ", rawResponse)
           setResponse(currentId, rawResponse + "\n\n[Failed to parse]")
+          // If part of a batch, don't set isTranslating to false here, let the batch handler do it.
+          // The error is logged, and the loop in handleContinueTranslation should ideally break.
+          if (!partOfBatch) {
+            setIsTranslating(currentId, false)
+          }
           break
         }
 
@@ -529,7 +555,15 @@ export default function SubtitleTranslator() {
       batch++
     }
 
-    setIsTranslating(currentId, false)
+    // Only set isTranslating to false if not part of a batch operation,
+    // or if it was stopped (in which case it would already be false or will be set by stopTranslation)
+    if (!partOfBatch) {
+      // Check if it was stopped during the process by looking at the store state
+      const stillTranslating = useTranslationStore.getState().isTranslatingSet.has(currentId)
+      if (stillTranslating) {
+        setIsTranslating(currentId, false)
+      }
+    }
 
     // Add to history *after* translation is complete, including subtitles and parsed
     if (allRawResponses.length > 0) {
@@ -543,7 +577,9 @@ export default function SubtitleTranslator() {
     }
 
     // Refetch user data after translation completes to update credits
-    refetchUserData()
+    if (!partOfBatch) {
+      refetchUserData()
+    }
 
     await saveData(currentId)
   }
@@ -552,6 +588,49 @@ export default function SubtitleTranslator() {
     stopTranslation(currentId)
     setIsTranslating(currentId, false)
     saveData(currentId)
+  }
+
+  const handleContinueTranslation = async () => {
+    const { untranslated: initialUntranslated } = countUntranslatedLines(subtitles)
+    const untranslated = mergeIntervalsWithGap(initialUntranslated, 5)
+    console.log(JSON.stringify(untranslated))
+
+    if (untranslated.length === 0) return
+
+    setIsTranslating(currentId, true)
+    setHasChanges(true)
+    setActiveTab("result")
+    setJsonResponse(currentId, [])
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, 300)
+
+    for (const block of untranslated) {
+      if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) {
+        console.log("Continue Translation: Operation stopped by user before processing a block.")
+        break
+      }
+
+      const [startIdx, endIdx] = block
+      console.log(`Continue Translation: Processing block from index ${startIdx} to ${endIdx}.`)
+
+      try {
+        await handleStartTranslation(startIdx, endIdx, true)
+        if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) {
+          console.log("Continue Translation: Operation stopped by user during processing of a block.")
+          break
+        }
+      } catch (error) {
+        console.error(`Continue Translation: Error processing block ${startIdx}-${endIdx}:`, error)
+        break
+      }
+    }
+
+    setIsTranslating(currentId, false)
+    refetchUserData()
   }
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement> | FileList) => {
@@ -826,11 +905,13 @@ export default function SubtitleTranslator() {
             <SubtitleList hidden={subtitlesHidden} />
           </DragAndDrop>
 
+          {/* Grid for Start and Stop buttons */}
           <div className="grid grid-cols-2 gap-4 mt-4">
+            {/* Start Translation Button */}
             <Button
               className="gap-2"
-              onClick={handleStartTranslation}
-              disabled={isTranslating || !session}
+              onClick={() => handleStartTranslation()} // Uses store's startIndex/endIndex
+              disabled={isTranslating || !session || subtitles.length === 0}
             >
               {isTranslating ? (
                 <>
@@ -844,6 +925,8 @@ export default function SubtitleTranslator() {
                 </>
               )}
             </Button>
+
+            {/* Stop Button */}
             <Button
               variant="outline"
               className="gap-2"
@@ -854,6 +937,17 @@ export default function SubtitleTranslator() {
               Stop
             </Button>
           </div>
+
+          {/* Continue Translation Button - Moved here, full width */}
+          <Button
+            variant="outline"
+            className="gap-2 w-full mt-2 border-primary/25 hover:border-primary/50"
+            onClick={handleContinueTranslation}
+            disabled={isTranslating || !session || subtitles.length === 0}
+          >
+            <FastForward className="h-4 w-4" />
+            Continue and Fill Missing Translations
+          </Button>
 
           <Link
             href="/extract-context"
