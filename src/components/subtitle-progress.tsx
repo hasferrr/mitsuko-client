@@ -11,8 +11,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
 
 interface SubtitleCountProps {
   isOpen: boolean
@@ -30,88 +31,51 @@ export const SubtitleProgress = ({ isOpen, setIsOpen, children }: SubtitleCountP
   const [untranslatedIntervals, setUntranslatedIntervals] = useState<string[]>([])
   const [missingOriginalIntervals, setMissingOriginalIntervals] = useState<string[]>([])
 
-  const handleCountTranslatedLines = () => {
-    let translatedLines = 0
-    let missingOriginalLines = 0
-    const untranslatedIndices: number[] = []
-    const missingOriginalIndices: number[] = []
-
-    // Single pass to count translated lines, missing original lines, and collect indices
-    subtitles.forEach((sub, index) => {
-      if (sub.translated.trim() !== "") {
-        translatedLines++
-      } else {
-        untranslatedIndices.push(index + 1) // +1 to convert to 1-based index
-      }
-
-      if (sub.content.trim() === "") {
-        missingOriginalLines++
-        missingOriginalIndices.push(index + 1) // +1 to convert to 1-based index
-      }
-    })
-
-    setTranslatedCount(translatedLines)
-    setOriginalCount(missingOriginalLines)
-
-    // Calculate untranslated intervals
-    const untranslatedIntervals: string[] = []
-    let start = untranslatedIndices[0]
-    let end = untranslatedIndices[0]
-
-    for (let i = 1; i < untranslatedIndices.length; i++) {
-      if (untranslatedIndices[i] === end + 1) {
-        end = untranslatedIndices[i]
-      } else {
-        untranslatedIntervals.push(start === end ? `${start}` : `${start}-${end}`)
-        start = untranslatedIndices[i]
-        end = untranslatedIndices[i]
-      }
+  const handleCountTranslatedLines = useCallback(() => {
+    if (subtitles.length === 0) {
+      setTranslatedCount(0)
+      setOriginalCount(0)
+      setUntranslatedIntervals([])
+      setMissingOriginalIntervals([])
+      return
     }
 
-    if (untranslatedIndices.length > 0) {
-      untranslatedIntervals.push(start === end ? `${start}` : `${start}-${end}`)
+    const { untranslated, missingOriginal } = countUntranslatedLines(subtitles)
+
+    let totalUntranslated = 0
+    const untranslatedStrings: string[] = []
+    for (const [start, end] of untranslated) {
+      totalUntranslated += (end - start + 1)
+      untranslatedStrings.push(start === end ? `${start}` : `${start}-${end}`)
     }
+    setTranslatedCount(subtitles.length - totalUntranslated)
+    setUntranslatedIntervals(untranslatedStrings)
 
-    setUntranslatedIntervals(untranslatedIntervals)
-
-    // Calculate missing original intervals
-    const missingOriginalIntervals: string[] = []
-    start = missingOriginalIndices[0]
-    end = missingOriginalIndices[0]
-
-    for (let i = 1; i < missingOriginalIndices.length; i++) {
-      if (missingOriginalIndices[i] === end + 1) {
-        end = missingOriginalIndices[i]
-      } else {
-        missingOriginalIntervals.push(start === end ? `${start}` : `${start}-${end}`)
-        start = missingOriginalIndices[i]
-        end = missingOriginalIndices[i]
-      }
+    let totalMissingOriginal = 0
+    const missingOriginalStrings: string[] = []
+    for (const [start, end] of missingOriginal) {
+      totalMissingOriginal += (end - start + 1)
+      missingOriginalStrings.push(start === end ? `${start}` : `${start}-${end}`)
     }
-
-    if (missingOriginalIndices.length > 0) {
-      missingOriginalIntervals.push(start === end ? `${start}` : `${start}-${end}`)
-    }
-
-    setMissingOriginalIntervals(missingOriginalIntervals)
-  }
+    setOriginalCount(totalMissingOriginal)
+    setMissingOriginalIntervals(missingOriginalStrings)
+  }, [subtitles])
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      setTranslatedCount(null) // Reset translatedCount when dialog is closed
-      setOriginalCount(null) // Reset originalCount when dialog is closed
-      setUntranslatedIntervals([]) // Reset untranslated intervals
-      setMissingOriginalIntervals([]) // Reset missing original intervals
+      setTranslatedCount(null)
+      setOriginalCount(null)
+      setUntranslatedIntervals([])
+      setMissingOriginalIntervals([])
     }
     setIsOpen(open)
   }
 
-  // Call handleCountTranslatedLines when the dialog is opened
   useEffect(() => {
     if (isOpen) {
       handleCountTranslatedLines()
     }
-  }, [isOpen])
+  }, [isOpen, handleCountTranslatedLines])
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
