@@ -1,7 +1,7 @@
 import { ModelCollection } from "@/types/model"
 
 export const FREE_MODELS: ModelCollection = {
-  "Limited": [
+  "Free Trial": [
     {
       name: "DeepSeek R1 (Base)",
       maxInput: 128000,
@@ -36,7 +36,25 @@ export const FREE_MODELS: ModelCollection = {
         maxCompletionTokens: 128000,
         isUseStructuredOutput: true
       }
-    }
+    },
+    {
+      name: "Meta: Llama 4 Maverick",
+      maxInput: 256000,
+      maxOutput: 256000,
+      structuredOutput: true,
+      isPaid: false,
+    },
+    {
+      name: "Qwen3 235B A22B",
+      maxInput: 40000,
+      maxOutput: 40000,
+      structuredOutput: true,
+      isPaid: false,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: false,
+      }
+    },
   ],
   "Gemini Experimental": [
     {
@@ -59,26 +77,6 @@ export const FREE_MODELS: ModelCollection = {
         temperature: 1,
       }
     }
-  ],
-  "Multilingual Model": [
-    {
-      name: "Qwen3 235B A22B",
-      maxInput: 40000,
-      maxOutput: 40000,
-      structuredOutput: true,
-      isPaid: false,
-      default: {
-        isMaxCompletionTokensAuto: true,
-        isUseStructuredOutput: false,
-      }
-    },
-    {
-      name: "Meta: Llama 4 Maverick",
-      maxInput: 256000,
-      maxOutput: 256000,
-      structuredOutput: true,
-      isPaid: false,
-    },
   ],
 }
 
