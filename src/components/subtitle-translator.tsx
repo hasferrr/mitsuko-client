@@ -82,7 +82,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ModelDetail } from "./model-detail"
 import { toast } from "sonner"
 import { SubtitleTools } from "./subtitle-tools"
@@ -1043,11 +1043,6 @@ export default function SubtitleTranslator() {
                       Translated Text<br />Original Text
                     </Button>
                   </div>
-                  <DialogClose asChild>
-                    <Button type="button">
-                      Confirm
-                    </Button>
-                  </DialogClose>
                 </DialogContent>
               </Dialog>
             )}
