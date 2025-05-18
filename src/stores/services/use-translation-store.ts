@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { SubOnlyTranslated } from "@/types/types"
+import { SubOnlyTranslated } from "@/types/subtitles"
 import { parseTranslationJson } from "@/lib/parser/parser"
 import { TRANSLATE_URL, TRANSLATE_URL_FREE, TRANSLATE_URL_PAID } from "@/constants/api"
 import { handleStream } from "@/lib/stream/stream"

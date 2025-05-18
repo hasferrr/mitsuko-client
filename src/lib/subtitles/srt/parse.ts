@@ -1,4 +1,4 @@
-import type { Subtitle, Timestamp } from '../../../types/types'
+import type { Subtitle, Timestamp } from '../../../types/subtitles'
 
 function parseTimestamp(timestamp: string): Timestamp {
   const [hms, ms] = timestamp.split(',')

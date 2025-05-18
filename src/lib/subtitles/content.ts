@@ -1,4 +1,4 @@
-import { SubtitleTranslated } from "@/types/types"
+import { SubtitleTranslated } from "@/types/subtitles"
 
 export function removeAllLineBreaks(
   subtitles: SubtitleTranslated[],

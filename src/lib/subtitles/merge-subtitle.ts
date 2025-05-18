@@ -1,4 +1,4 @@
-import { ASSParseOutput, Subtitle } from "@/types/types";
+import { ASSParseOutput, Subtitle } from "@/types/subtitles";
 
 import { mergeASSback } from "./ass/merge"
 import { generateSRT } from "./srt/generate"

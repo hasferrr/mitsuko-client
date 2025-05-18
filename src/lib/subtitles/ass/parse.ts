@@ -1,4 +1,4 @@
-import type { ASSParseOutput } from "../../../types/types"
+import type { ASSParseOutput } from "../../../types/subtitles"
 import { extractAssHeader, extractAssFooter, parseASSEvents, convertSubtitleEventsToSubtitles } from "./helper"
 
 export function parseASS(fileContent: string): ASSParseOutput {

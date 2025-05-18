@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import { AdvancedSettings, BasicSettings, Translation } from "@/types/project"
-import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/types"
+import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/subtitles"
 import { updateTranslation, createTranslation, getTranslation, deleteTranslation } from "@/lib/db/translation"
 
 export interface TranslationDataStore {

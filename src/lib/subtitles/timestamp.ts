@@ -1,4 +1,4 @@
-import { Subtitle, SubtitleNoTime, SubtitleTranslated, Timestamp } from "@/types/types"
+import { Subtitle, SubtitleNoTime, SubtitleTranslated, Timestamp } from "@/types/subtitles"
 
 /**
  * Converts a Timestamp object to a string in the format "HH:MM:SS,MS".

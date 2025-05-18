@@ -1,5 +1,5 @@
 import { advancedSettingsSchema } from "@/types/zod"
-import { SubtitleTranslated, Parsed, Subtitle, SubOnlyTranslated } from "./types"
+import { SubtitleTranslated, Parsed, Subtitle, SubOnlyTranslated } from "./subtitles"
 import { Model } from "./model"
 import { z } from "zod"
 

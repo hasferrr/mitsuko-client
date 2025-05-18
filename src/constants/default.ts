@@ -1,4 +1,4 @@
-import { SubtitleTranslated } from "@/types/types"
+import { SubtitleTranslated } from "@/types/subtitles"
 import { FREE_MODELS } from "./model-collection"
 import { AdvancedSettings, BasicSettings, Transcription } from "@/types/project"
 

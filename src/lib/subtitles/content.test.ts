@@ -1,6 +1,6 @@
 import { test, expect, describe } from "bun:test"
 import { removeContentBetween } from "./content"
-import type { SubtitleTranslated } from "@/types/types"
+import type { SubtitleTranslated } from "@/types/subtitles"
 
 describe("removeContentBetween", () => {
   const createSubtitle = (text: string): SubtitleTranslated => {

@@ -1,5 +1,5 @@
 import { memo } from "react"
-import { Parsed, SubtitleTranslated } from "@/types/types"
+import { Parsed, SubtitleTranslated } from "@/types/subtitles"
 import {
   Table,
   TableBody,

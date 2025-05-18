@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import { Transcription } from "@/types/project"
 import { updateTranscription, createTranscription, getTranscription, deleteTranscription } from "@/lib/db/transcription"
-import { Subtitle } from "@/types/types"
+import { Subtitle } from "@/types/subtitles"
 import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
 
 interface TranscriptionDataStore {

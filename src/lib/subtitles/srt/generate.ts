@@ -1,4 +1,4 @@
-import type { Timestamp, Subtitle } from '../../../types/types'
+import type { Timestamp, Subtitle } from '../../../types/subtitles'
 
 function formatTimestamp(timestamp: Timestamp): string {
   const { h, m, s, ms } = timestamp

@@ -31,7 +31,7 @@ import {
   removeContentBetween,
 } from "@/lib/subtitles/content"
 import { shiftSubtitles } from "@/lib/subtitles/timestamp"
-import { SubtitleTranslated } from "@/types/types"
+import { SubtitleTranslated } from "@/types/subtitles"
 import { sleep } from "@/lib/utils"
 
 interface SubtitleToolsProps {

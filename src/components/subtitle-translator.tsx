@@ -47,7 +47,7 @@ import {
   SubOnlyTranslated,
   SubtitleTranslated,
   SubtitleNoTime,
-} from "@/types/types"
+} from "@/types/subtitles"
 import { ContextCompletion } from "@/types/completion"
 import { parseSRT } from "@/lib/subtitles/srt/parse"
 import { parseASS } from "@/lib/subtitles/ass/parse"

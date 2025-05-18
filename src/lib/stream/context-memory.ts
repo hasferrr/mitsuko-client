@@ -1,4 +1,4 @@
-import { SubtitleNoTime, SubtitleNoTimeNoActorTranslated } from "@/types/types";
+import { SubtitleNoTime, SubtitleNoTimeNoActorTranslated } from "@/types/subtitles";
 
 export const createContextMemory = (
   subtitles:

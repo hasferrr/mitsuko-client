@@ -23,7 +23,7 @@ import {
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
-import { Subtitle, SubtitleNoTime } from "@/types/types"
+import { Subtitle, SubtitleNoTime } from "@/types/subtitles"
 import { isASS, isSRT } from "@/lib/subtitles/is"
 import { parseASS } from "@/lib/subtitles/ass/parse"
 import { parseSRT } from "@/lib/subtitles/srt/parse"

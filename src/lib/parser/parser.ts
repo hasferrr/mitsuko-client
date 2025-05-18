@@ -1,4 +1,4 @@
-import type { SubOnlyTranslated, Subtitle, SubtitleNoTimeNoActorTranslated } from "../../types/types"
+import type { SubOnlyTranslated, Subtitle, SubtitleNoTimeNoActorTranslated } from "../../types/subtitles"
 import { isSRT } from "../subtitles/is"
 import { parseSRT } from "../subtitles/srt/parse"
 import { keepOnlyWrapped, removeWrapped, cleanUpJsonResponse } from "./cleaner"
