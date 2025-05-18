@@ -4,7 +4,7 @@ import Link from "next/link"
 export default function Footer() {
   return (
     <footer className="border-t border-gray-200 dark:border-gray-800 py-12 px-4">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-8">
         <div>
           <div className="flex items-center mb-4">
             <span className="text-base font-medium text-gray-900 dark:text-white">Mitsuko</span>
@@ -83,9 +83,32 @@ export default function Footer() {
         </div>
 
         <div>
-          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Featured On</h3>
+          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Partner links</h3>
           <ul className="flex flex-col gap-2">
             <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a target="_blank" rel="noopener" title="All The Best AI Tools" href="https://allinai.tools">All in AI Tools</a>
+            </li>
+            <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a target="_blank" rel="noopener" href="https://aistage.net" title="AIStage">AIStage</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Featured On</h3>
+          <ul className="flex flex-col gap-2">
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href="https://www.saashub.com/mitsuko-app?utm_source=badge&utm_campaign=badge&utm_content=mitsuko-app&badge_variant=color&badge_kind=approved" target="_blank" rel="noopener">
+                <img
+                  src="https://cdn-b.saashub.com/img/badges/approved-color.png?v=1"
+                  alt="Mitsuko App badge"
+                  width="auto"
+                  height="auto"
+                  className="h-[35px] object-contain"
+                />
+              </a>
+            </li>
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               <a href="https://fazier.com" target="_blank" rel="noopener">
                 <img
                   src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=neutral"
@@ -96,7 +119,7 @@ export default function Footer() {
                 />
               </a>
             </li>
-            <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               <a href="https://similarlabs.com/?ref=embed" target="_blank" rel="noopener">
                 <img
                   src="https://similarlabs.com/similarlabs-embed-badge-light.svg"
@@ -107,7 +130,7 @@ export default function Footer() {
                 />
               </a>
             </li>
-            <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               <a href="https://twelve.tools" target="_blank" rel="noopener">
                 <img
                   src="https://twelve.tools/badge0-white.svg"
@@ -118,7 +141,7 @@ export default function Footer() {
                 />
               </a>
             </li>
-            <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               <a href="https://dang.ai/" target="_blank" rel="noopener">
                 <img
                   src="https://cdn.prod.website-files.com/63d8afd87da01fb58ea3fbcb/6487e2868c6c8f93b4828827_dang-badge.png"
@@ -129,14 +152,9 @@ export default function Footer() {
                 />
               </a>
             </li>
-            <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <a target="_blank" rel="noopener" title="All The Best AI Tools" href="https://allinai.tools">All in AI Tools</a>
-            </li>
-            <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <a target="_blank" rel="noopener" href="https://aistage.net" title="AIStage">AIStage</a>
-            </li>
           </ul>
         </div>
+
       </div>
 
       <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
