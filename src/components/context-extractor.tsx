@@ -227,8 +227,7 @@ export const ContextExtractor = () => {
   const handleSelectAndGenerateSubtitle = (translation: Translation) => {
     const generatedContent = mergeSubtitle({
       subtitles: translation.subtitles,
-      type: translation.parsed.type,
-      parsed: translation.parsed.data,
+      parsed: translation.parsed,
     })
     handleSubtitleSelect(generatedContent)
   }

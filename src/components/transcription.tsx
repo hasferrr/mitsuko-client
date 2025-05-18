@@ -42,13 +42,13 @@ import { useSessionStore } from "@/stores/use-session-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
-import { generateSRT } from "@/lib/subtitles/srt/generate"
 import { parseTranscription } from "@/lib/parser/parser"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { UserCreditData } from "@/types/user"
 import { Input } from "./ui/input"
 import { SettingsTranscription } from "./settings-transcription"
+import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 
 export default function Transcription() {
   const currentId = useTranscriptionDataStore(state => state.currentId)
@@ -217,7 +217,13 @@ export default function Transcription() {
   const handleExport = () => {
     if (!transcriptSubtitles.length) return
 
-    const srtContent = generateSRT(transcriptSubtitles)
+    const srtContent = mergeSubtitle({
+      subtitles: transcriptSubtitles,
+      parsed: {
+        type: "srt",
+        data: null,
+      },
+    })
     if (!srtContent) return
 
     let fileName = title.trim()

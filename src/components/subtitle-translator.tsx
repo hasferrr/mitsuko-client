@@ -49,8 +49,6 @@ import {
   SubtitleNoTime,
 } from "@/types/subtitles"
 import { ContextCompletion } from "@/types/completion"
-import { generateSRT } from "@/lib/subtitles/srt/generate"
-import { mergeASSback } from "@/lib/subtitles/ass/merge"
 import { cn, minMax, sleep } from "@/lib/utils"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
@@ -104,6 +102,7 @@ import { logSubtitle } from "@/lib/api/subtitle-log"
 import { z } from "zod"
 import { useApiSettingsStore } from "@/stores/settings/use-api-settings-store"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
+import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 
 type DownloadOption = "original" | "translated" | "both"
 type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
@@ -683,15 +682,10 @@ export default function SubtitleTranslator() {
 
     if (!subtitleData.length) return ""
 
-    let fileContent = ""
-    if (parsed.type === "srt") {
-      fileContent = generateSRT(subtitleData)
-    } else if (parsed.type === "ass" && parsed.data) {
-      fileContent = mergeASSback(subtitleData, parsed.data)
-    } else {
-      console.error("Invalid file type or missing parsed data for download.")
-      return ""
-    }
+    const fileContent = mergeSubtitle({
+      subtitles: subtitleData,
+      parsed: parsed,
+    })
 
     return fileContent
   }

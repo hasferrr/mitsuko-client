@@ -5,7 +5,7 @@ function formatTimestamp(timestamp: Timestamp): string {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')},${String(ms).padStart(3, '0')}`
 }
 
-export function generateSRT(subtitles: Subtitle[]): string {
+export function _generateSRT(subtitles: Subtitle[]): string {
   let srtContent = ''
 
   for (const subtitle of subtitles) {

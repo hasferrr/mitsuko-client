@@ -1,24 +1,26 @@
-import { ASSParseOutput, Subtitle, SubtitleType } from "@/types/subtitles";
-import { mergeASSback } from "./ass/merge"
-import { generateSRT } from "./srt/generate"
+import { Parsed, Subtitle } from "@/types/subtitles";
+import { _mergeASSback } from "./ass/merge"
+import { _generateSRT } from "./srt/generate"
 
 interface MergeSubtitleOptions {
   subtitles: Subtitle[]
-  type: SubtitleType
-  parsed: ASSParseOutput | null
+  parsed: Parsed
 }
 
 export const mergeSubtitle = ({
   subtitles,
-  type,
   parsed,
 }: MergeSubtitleOptions): string => {
-  if (type === "ass") {
-    if (!parsed) {
+  if (parsed.type === "ass") {
+    if (!parsed.data) {
       throw new Error("Parsed is required for ASS subtitles")
     }
-    return mergeASSback(subtitles, parsed)
-  } else {
-    return generateSRT(subtitles)
+    return _mergeASSback(subtitles, parsed.data)
   }
+
+  if (parsed.type === "srt") {
+    return _generateSRT(subtitles)
+  }
+
+  throw new Error("Invalid subtitle type")
 }
