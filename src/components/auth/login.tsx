@@ -17,10 +17,14 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog"
+import { useApiSettingsStore } from "@/stores/settings/use-api-settings-store"
 
 export function Login() {
   const session = useSessionStore((state) => state.session)
   const setSession = useSessionStore((state) => state.setSession)
+
+  const isThirdPartyModelEnabled = useApiSettingsStore((state) => state.isThirdPartyModelEnabled)
+  const toggleThirdPartyModel = useApiSettingsStore((state) => state.toggleThirdPartyModel)
 
   const [mounted, setMounted] = useState(false)
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
@@ -29,6 +33,12 @@ export function Login() {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (!session && isThirdPartyModelEnabled) {
+      toggleThirdPartyModel()
+    }
+  }, [session, isThirdPartyModelEnabled])
 
   const signUp = async () => {
     await supabase.auth.signInWithOAuth({
