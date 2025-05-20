@@ -4,14 +4,82 @@ import Link from "next/link"
 export default function Footer() {
   return (
     <footer className="border-t border-gray-200 dark:border-gray-800 py-12 px-4">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-8">
-        <div>
-          <div className="flex items-center mb-4">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-8">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center">
             <span className="text-base font-medium text-gray-900 dark:text-white">Mitsuko</span>
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
             High quality AI subtitle translator for SRT/ASS files, audio transcriber, and more.
           </div>
+          <ul className="flex flex-wrap gap-2 mt-2">
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href="https://startupfa.me/s/mitsuko?utm_source=www.mitsuko.app" target="_blank" rel="noopener">
+                <img
+                  src="https://startupfa.me/badges/featured-badge.webp"
+                  alt="Featured on Startup Fame"
+                  width="auto"
+                  height="auto"
+                  className="h-[37px] object-contain"
+                />
+              </a>
+            </li>
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href="https://fazier.com/launches/mitsuko" target="_blank" rel="noopener">
+                <img
+                  src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=4431&badge_type=featured&theme=neutral"
+                  alt="Fazier badge"
+                  width="auto"
+                  height="auto"
+                  className="h-[37px] object-contain"
+                />
+              </a>
+            </li>
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href="https://www.saashub.com/mitsuko-app?utm_source=badge&utm_campaign=badge&utm_content=mitsuko-app&badge_variant=color&badge_kind=approved" target="_blank" rel="noopener">
+                <img
+                  src="https://cdn-b.saashub.com/img/badges/approved-color.png?v=1"
+                  alt="Mitsuko App badge"
+                  width="auto"
+                  height="auto"
+                  className="h-[37px] object-contain"
+                />
+              </a>
+            </li>
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href="https://similarlabs.com/?ref=embed" target="_blank" rel="noopener">
+                <img
+                  src="https://similarlabs.com/similarlabs-embed-badge-light.svg"
+                  alt="SimilarLabs Embed Badge"
+                  width="auto"
+                  height="auto"
+                  className="h-[37px] object-contain bg-white rounded-sm"
+                />
+              </a>
+            </li>
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href="https://twelve.tools/c/translation" target="_blank" rel="noopener">
+                <img
+                  src="https://twelve.tools/badge0-white.svg"
+                  alt="Featured on Twelve Tools"
+                  width="auto"
+                  height="auto"
+                  className="h-[37px] object-contain"
+                />
+              </a>
+            </li>
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href="https://dang.ai/" target="_blank" rel="noopener">
+                <img
+                  src="https://cdn.prod.website-files.com/63d8afd87da01fb58ea3fbcb/6487e2868c6c8f93b4828827_dang-badge.png"
+                  alt="Dang.ai"
+                  width="auto"
+                  height="auto"
+                  className="h-[37px] object-contain"
+                />
+              </a>
+            </li>
+          </ul>
         </div>
 
         <div>
@@ -93,68 +161,6 @@ export default function Footer() {
             </li>
           </ul>
         </div>
-
-        <div>
-          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Featured On</h3>
-          <ul className="flex flex-col gap-2">
-            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <a href="https://www.saashub.com/mitsuko-app?utm_source=badge&utm_campaign=badge&utm_content=mitsuko-app&badge_variant=color&badge_kind=approved" target="_blank" rel="noopener">
-                <img
-                  src="https://cdn-b.saashub.com/img/badges/approved-color.png?v=1"
-                  alt="Mitsuko App badge"
-                  width="auto"
-                  height="auto"
-                  className="h-[35px] object-contain"
-                />
-              </a>
-            </li>
-            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <a href="https://fazier.com" target="_blank" rel="noopener">
-                <img
-                  src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=neutral"
-                  alt="Fazier badge"
-                  width="auto"
-                  height="auto"
-                  className="h-[35px] object-contain"
-                />
-              </a>
-            </li>
-            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <a href="https://similarlabs.com/?ref=embed" target="_blank" rel="noopener">
-                <img
-                  src="https://similarlabs.com/similarlabs-embed-badge-light.svg"
-                  alt="SimilarLabs Embed Badge"
-                  width="auto"
-                  height="auto"
-                  className="h-[35px] object-contain bg-white rounded-sm"
-                />
-              </a>
-            </li>
-            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <a href="https://twelve.tools" target="_blank" rel="noopener">
-                <img
-                  src="https://twelve.tools/badge0-white.svg"
-                  alt="Featured on Twelve Tools"
-                  width="auto"
-                  height="auto"
-                  className="h-[35px] object-contain"
-                />
-              </a>
-            </li>
-            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <a href="https://dang.ai/" target="_blank" rel="noopener">
-                <img
-                  src="https://cdn.prod.website-files.com/63d8afd87da01fb58ea3fbcb/6487e2868c6c8f93b4828827_dang-badge.png"
-                  alt="Dang.ai"
-                  width="auto"
-                  height="auto"
-                  className="h-[35px] object-contain"
-                />
-              </a>
-            </li>
-          </ul>
-        </div>
-
       </div>
 
       <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
