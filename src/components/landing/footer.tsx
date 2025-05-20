@@ -14,24 +14,24 @@ export default function Footer() {
           </div>
           <ul className="flex flex-wrap gap-2 mt-2">
             <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href="https://www.producthunt.com/posts/mitsuko-app?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-mitsuko-app" target="_blank" rel="noopener">
+                <img
+                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=967970&theme=light&t=1747735883893"
+                  alt="Mitsuko App - AI-Powered Subtitle Translator & Audio Transcription | Product Hunt"
+                  width="auto"
+                  height="auto"
+                  className="h-[35px] object-contain"
+                />
+              </a>
+            </li>
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               <a href="https://startupfa.me/s/mitsuko?utm_source=www.mitsuko.app" target="_blank" rel="noopener">
                 <img
                   src="https://startupfa.me/badges/featured-badge.webp"
                   alt="Featured on Startup Fame"
                   width="auto"
                   height="auto"
-                  className="h-[37px] object-contain"
-                />
-              </a>
-            </li>
-            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <a href="https://fazier.com/launches/mitsuko" target="_blank" rel="noopener">
-                <img
-                  src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=4431&badge_type=featured&theme=neutral"
-                  alt="Fazier badge"
-                  width="auto"
-                  height="auto"
-                  className="h-[37px] object-contain"
+                  className="h-[35px] object-contain"
                 />
               </a>
             </li>
@@ -42,7 +42,18 @@ export default function Footer() {
                   alt="Mitsuko App badge"
                   width="auto"
                   height="auto"
-                  className="h-[37px] object-contain"
+                  className="h-[35px] object-contain"
+                />
+              </a>
+            </li>
+            <li className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href="https://fazier.com/launches/mitsuko" target="_blank" rel="noopener">
+                <img
+                  src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=4431&badge_type=featured&theme=neutral"
+                  alt="Fazier badge"
+                  width="auto"
+                  height="auto"
+                  className="h-[35px] object-contain"
                 />
               </a>
             </li>
@@ -53,7 +64,7 @@ export default function Footer() {
                   alt="SimilarLabs Embed Badge"
                   width="auto"
                   height="auto"
-                  className="h-[37px] object-contain bg-white rounded-sm"
+                  className="h-[35px] object-contain bg-white rounded-sm"
                 />
               </a>
             </li>
@@ -64,7 +75,7 @@ export default function Footer() {
                   alt="Featured on Twelve Tools"
                   width="auto"
                   height="auto"
-                  className="h-[37px] object-contain"
+                  className="h-[35px] object-contain"
                 />
               </a>
             </li>
@@ -75,7 +86,7 @@ export default function Footer() {
                   alt="Dang.ai"
                   width="auto"
                   height="auto"
-                  className="h-[37px] object-contain"
+                  className="h-[35px] object-contain"
                 />
               </a>
             </li>
