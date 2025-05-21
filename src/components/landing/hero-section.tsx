@@ -41,15 +41,15 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex flex-col"
+            className="flex flex-col-reverse"
           >
-            <p className="text-4xl md:text-5xl lg:text-6xl font-medium text-white drop-shadow-md mb-6">
-              Easily translate subtitles and transcribe audio with high quality results
-            </p>
             <div className="text-gray-200 mb-8 text-sm md:text-lg sm:text-base drop-shadow-md">
               <h1>AI-Powered Subtitle Translator & Audio Transcription.</h1>
               <p>Get SRT/ASS translation with high-quality and context-aware results.</p>
             </div>
+            <p className="text-4xl md:text-5xl lg:text-6xl font-medium text-white drop-shadow-md mb-6">
+              Easily translate subtitles and transcribe audio with high quality results
+            </p>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
