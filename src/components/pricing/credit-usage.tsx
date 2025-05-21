@@ -36,7 +36,6 @@ export default async function CreditUsage() {
     ["DeepSeek R1", i++],
     ["DeepSeek V3", i++],
     ["Gemini 2.5 Pro Preview 05-06", i++],
-    ["Gemini 2.5 Flash Preview 04-17", i++],
   ])
 
   const favoriteModels = new Set([

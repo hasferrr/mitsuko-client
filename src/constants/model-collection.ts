@@ -95,6 +95,18 @@ export const PAID_MODELS: ModelCollection = {
       }
     },
     {
+      name: "Gemini 2.5 Flash Preview 05-20",
+      maxInput: 1_048_576,
+      maxOutput: 65536,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        temperature: 1,
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
       name: "Gemini 2.5 Flash Preview 04-17",
       maxInput: 1_048_576,
       maxOutput: 65536,
