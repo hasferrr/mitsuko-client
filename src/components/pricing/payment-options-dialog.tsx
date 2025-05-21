@@ -21,6 +21,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createSnapPayment } from "@/lib/api/create-snap-payment"
 
+const MIN_QUANTITY = 1
+const MAX_QUANTITY = 1
+
 interface PaymentOptionsDialogProps {
   isOpen: boolean
   onClose: () => void
@@ -138,28 +141,28 @@ export function PaymentOptionsDialog({
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     if (value === '') {
-      setInputQuantity(1)
+      setInputQuantity(MIN_QUANTITY)
       setPaymentError(null)
       return
     }
     const newQuantity = parseInt(value, 10)
-    if (!isNaN(newQuantity) && newQuantity >= 1 && newQuantity <= 20) {
+    if (!isNaN(newQuantity) && newQuantity >= MIN_QUANTITY && newQuantity <= MAX_QUANTITY) {
       setInputQuantity(newQuantity)
       setPaymentError(null)
-    } else if (newQuantity < 1) {
-      setInputQuantity(1)
-    } else if (newQuantity > 20) {
-      setInputQuantity(20)
+    } else if (newQuantity < MIN_QUANTITY) {
+      setInputQuantity(MIN_QUANTITY)
+    } else if (newQuantity > MAX_QUANTITY) {
+      setInputQuantity(MAX_QUANTITY)
     }
   }
 
   const handleDecrement = () => {
-    setInputQuantity((prev) => Math.max(1, prev - 1))
+    setInputQuantity((prev) => Math.max(MIN_QUANTITY, prev - 1))
     setPaymentError(null)
   }
 
   const handleIncrement = () => {
-    setInputQuantity((prev) => Math.min(20, prev + 1))
+    setInputQuantity((prev) => Math.min(MAX_QUANTITY, prev + 1))
     setPaymentError(null)
   }
 
@@ -284,7 +287,7 @@ export function PaymentOptionsDialog({
                   onMouseDown={handleMouseDownDecrement}
                   onMouseUp={handleMouseUpOrLeave}
                   onMouseLeave={handleMouseUpOrLeave}
-                  disabled={inputQuantity <= 1 || isFetchingPayment || isResetting || !!snapData}
+                  disabled={inputQuantity <= MIN_QUANTITY || isFetchingPayment || isResetting || !!snapData}
                   aria-label="Decrease quantity"
                 >
                   <Minus className="h-4 w-4" />
@@ -292,8 +295,8 @@ export function PaymentOptionsDialog({
                 <Input
                   id="quantity"
                   type="number"
-                  min="1"
-                  max="20"
+                  min={MIN_QUANTITY.toString()}
+                  max={MAX_QUANTITY.toString()}
                   value={snapData ? snapData.quantity : inputQuantity}
                   onChange={snapData ? undefined : handleQuantityChange}
                   className="w-16 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -306,7 +309,7 @@ export function PaymentOptionsDialog({
                   onMouseDown={handleMouseDownIncrement}
                   onMouseUp={handleMouseUpOrLeave}
                   onMouseLeave={handleMouseUpOrLeave}
-                  disabled={inputQuantity >= 20 || isFetchingPayment || isResetting || !!snapData}
+                  disabled={inputQuantity >= MAX_QUANTITY || isFetchingPayment || isResetting || !!snapData}
                   aria-label="Increase quantity"
                 >
                   <Plus className="h-4 w-4" />
