@@ -58,16 +58,6 @@ export const FREE_MODELS: ModelCollection = {
   ],
   "Gemini Experimental": [
     {
-      name: "Gemini 2.5 Pro Experimental 03-25",
-      maxInput: 1000000,
-      maxOutput: 65536,
-      structuredOutput: true,
-      isPaid: false,
-      default: {
-        temperature: 1,
-      }
-    },
-    {
       name: "Gemini 2.0 Flash Experimental",
       maxInput: 1000000,
       maxOutput: 8192,
