@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label"
 import { createSnapPayment } from "@/lib/api/create-snap-payment"
 
 const MIN_QUANTITY = 1
-const MAX_QUANTITY = 1
+const MAX_QUANTITY = 20
 
 interface PaymentOptionsDialogProps {
   isOpen: boolean
