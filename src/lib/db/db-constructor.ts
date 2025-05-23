@@ -194,7 +194,7 @@ function transcriptionConstructor(transcription: Partial<Transcription>): Transc
     transcriptSubtitles: transcription.transcriptSubtitles ?? [],
     selectedMode: transcription.selectedMode ?? "sentence",
     customInstructions: transcription.customInstructions ?? "",
-    models: transcription.models ?? "free",
+    models: transcription.models ?? "premium",
     isOverOneHour: transcription.isOverOneHour ?? false,
     createdAt: transcription.createdAt ?? new Date(),
     updatedAt: transcription.updatedAt ?? new Date(),
