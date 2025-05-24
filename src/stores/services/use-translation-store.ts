@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { SubOnlyTranslated } from "@/types/subtitles"
 import { parseTranslationJson } from "@/lib/parser/parser"
 import { TRANSLATE_URL, TRANSLATE_URL_FREE, TRANSLATE_URL_PAID } from "@/constants/api"
-import { handleStream } from "@/lib/stream/stream"
+import { handleStream } from "@/lib/api/stream"
 import { RefObject } from "react"
 import { RequestType } from "@/types/request"
 interface TranslationStore {

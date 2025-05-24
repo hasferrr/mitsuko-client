@@ -1,5 +1,5 @@
 import { EXTRACT_CONTEXT_URL, EXTRACT_CONTEXT_URL_FREE, EXTRACT_CONTEXT_URL_PAID } from "@/constants/api"
-import { handleStream } from "@/lib/stream/stream"
+import { handleStream } from "@/lib/api/stream"
 import { create } from "zustand"
 import { RefObject } from "react"
 import { RequestType } from "@/types/request"
