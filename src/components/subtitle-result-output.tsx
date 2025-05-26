@@ -4,7 +4,7 @@ import { memo, useEffect, useRef, useState } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { Button } from "./ui/button"
-import { parseTranslationArrayStrict } from "@/lib/parser/parser"
+import { parseTranslationJson } from "@/lib/parser/parser"
 import { cn } from "@/lib/utils"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
@@ -75,7 +75,7 @@ export const SubtitleResultOutput = memo(() => {
   const handleParseAndSave = () => {
     if (!currentId) return
     try {
-      const parsed = parseTranslationArrayStrict(editValue)
+      const parsed = parseTranslationJson(editValue)
       setJsonResponse(currentId, parsed)
       setIsParseError(false)
     } catch {
