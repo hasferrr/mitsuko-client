@@ -168,6 +168,18 @@ export const PAID_MODELS: Record<string, PaidModel[]> = {
         isUseStructuredOutput: true
       }
     },
+    {
+      name: "Gemma 3 27B",
+      maxInput: 110_000,
+      maxOutput: 16_384,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        temperature: 1,
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true,
+      }
+    },
   ],
   Anthropic: [
     {
@@ -366,6 +378,17 @@ export const PAID_MODELS: Record<string, PaidModel[]> = {
   Qwen: [
     {
       name: "Qwen3 235B A22B",
+      maxInput: 40000,
+      maxOutput: 40000,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: false,
+      }
+    },
+    {
+      name: "Qwen3 30B A3B",
       maxInput: 40000,
       maxOutput: 40000,
       structuredOutput: true,
