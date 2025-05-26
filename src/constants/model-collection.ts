@@ -134,6 +134,17 @@ export const PAID_MODELS: ModelCollection = {
   ],
   Anthropic: [
     {
+      name: "Claude Sonnet 4",
+      maxInput: 200_000,
+      maxOutput: 64_000,
+      structuredOutput: true,
+      isPaid: true,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
       name: "Claude 3.7 Sonnet (thinking)",
       maxInput: 200_000,
       maxOutput: 64_000,
