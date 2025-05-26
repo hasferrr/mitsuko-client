@@ -3,6 +3,7 @@ import { handleStream } from "@/lib/api/stream"
 import { create } from "zustand"
 import { RefObject } from "react"
 import { RequestType } from "@/types/request"
+import { useClientIdStore } from "../use-client-id-store"
 
 interface ExtractionStore {
   isExtractingSet: Set<string>
@@ -70,7 +71,7 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
       requestHeader: {
         "Content-Type": "application/json"
       },
-      requestBody: JSON.stringify(requestBody),
+      requestBody: JSON.stringify({ ...requestBody, clientId: useClientIdStore.getState().clientId }),
       // previousResponse,
     })
 

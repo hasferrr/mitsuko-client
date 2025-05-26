@@ -5,6 +5,7 @@ import { TRANSLATE_URL, TRANSLATE_URL_FREE, TRANSLATE_URL_PAID } from "@/constan
 import { handleStream } from "@/lib/api/stream"
 import { RefObject } from "react"
 import { RequestType } from "@/types/request"
+import { useClientIdStore } from "../use-client-id-store"
 interface TranslationStore {
   isTranslatingSet: Set<string>
   abortControllerMap: Map<string, RefObject<AbortController>>
@@ -71,7 +72,7 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
       requestHeader: {
         "Content-Type": "application/json"
       },
-      requestBody: JSON.stringify(requestBody),
+      requestBody: JSON.stringify({ ...requestBody, clientId: useClientIdStore.getState().clientId }),
     })
 
     let parsedResponse: SubOnlyTranslated[] = []

@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useThemeStore } from "@/stores/use-theme-store"
 import { ModelCostProvider } from "@/contexts/model-cost-context"
 import { ModelCreditCost } from "@/types/model-cost"
+import { ClientIdProvider } from "@/contexts/client-id-context"
 
 interface ProvidersProps extends PropsWithChildren {
   modelCosts: Map<string, ModelCreditCost>
@@ -54,7 +55,9 @@ export default function ProvidersClient({ children, modelCosts }: ProvidersProps
         <ProjectStoreProvider>
           <UnsavedChangesProvider>
             <ModelCostProvider value={modelCosts}>
-              {children}
+              <ClientIdProvider>
+                {children}
+              </ClientIdProvider>
             </ModelCostProvider>
           </UnsavedChangesProvider>
         </ProjectStoreProvider>
