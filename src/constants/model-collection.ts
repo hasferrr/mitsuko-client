@@ -90,7 +90,7 @@ export const FREE_MODELS: Record<string, FreeModel[]> = {
       isPaid: false,
       default: {
         isMaxCompletionTokensAuto: true,
-        isUseStructuredOutput: false,
+        isUseStructuredOutput: true,
       }
     },
     {
@@ -164,6 +164,7 @@ export const PAID_MODELS: Record<string, PaidModel[]> = {
       structuredOutput: true,
       isPaid: true,
       default: {
+        temperature: 1,
         isMaxCompletionTokensAuto: true,
         isUseStructuredOutput: true
       }
