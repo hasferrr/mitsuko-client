@@ -60,7 +60,7 @@ export const FREE_MODELS: Record<string, FreeModel[]> = {
       }
     },
   ],
-  "Gemini Experimental": [
+  "Free Limited": [
     {
       name: "Gemini 2.0 Flash Experimental",
       maxInput: 1000000,
@@ -70,12 +70,45 @@ export const FREE_MODELS: Record<string, FreeModel[]> = {
       default: {
         temperature: 1,
       }
-    }
+    },
+    {
+      name: "Gemma 3 27B",
+      maxInput: 94_000,
+      maxOutput: 8192,
+      structuredOutput: true,
+      isPaid: false,
+      default: {
+        temperature: 1,
+        isUseStructuredOutput: true,
+      }
+    },
+    {
+      name: "Qwen3 235B A22B (free)",
+      maxInput: 40000,
+      maxOutput: 40000,
+      structuredOutput: true,
+      isPaid: false,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: false,
+      }
+    },
+    {
+      name: "Qwen3 30B A3B (free)",
+      maxInput: 40000,
+      maxOutput: 40000,
+      structuredOutput: true,
+      isPaid: false,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true,
+      }
+    },
   ],
 }
 
 export const PAID_MODELS: Record<string, PaidModel[]> = {
-  Gemini: [
+  Google: [
     {
       name: "Gemini 2.5 Pro Preview 05-06",
       maxInput: 1_048_576,
