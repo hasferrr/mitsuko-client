@@ -28,9 +28,9 @@ export default function AnnouncementHeadline() {
       <div className="container mx-auto flex items-center justify-center gap-2 relative">
         <span className="text-sm md:text-lg">✨</span>
         <p className="text-xs md:text-base font-medium text-white">
-          Featuring Gemini 2.5 Pro, Grok, Claude and Credit Packs Now Available!
+          <span className="font-semibold">Claude Sonnet 4</span> and <span className="font-semibold">Gemini 2.5 Pro</span> are Now Available!
         </p>
-        <span className="text-sm md:text-lg">📦</span>
+        <span className="text-sm md:text-lg">🧠</span>
 
         <button
           aria-label="Dismiss announcement"

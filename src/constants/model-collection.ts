@@ -145,7 +145,7 @@ export const PAID_MODELS: ModelCollection = {
       }
     },
     {
-      name: "Claude 3.7 Sonnet (thinking)",
+      name: "Claude 3.7 Sonnet",
       maxInput: 200_000,
       maxOutput: 64_000,
       structuredOutput: true,
@@ -156,7 +156,7 @@ export const PAID_MODELS: ModelCollection = {
       }
     },
     {
-      name: "Claude 3.7 Sonnet",
+      name: "Claude 3.7 Sonnet (non-thinking)",
       maxInput: 200_000,
       maxOutput: 64_000,
       structuredOutput: true,
