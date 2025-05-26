@@ -13,5 +13,3 @@ export interface Model {
     | 'maxCompletionTokens'
   >>
 }
-
-export type ModelCollection = Record<string, Model[]>

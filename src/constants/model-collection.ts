@@ -1,6 +1,10 @@
-import { ModelCollection } from "@/types/model"
+import { Model } from "@/types/model"
 
-export const FREE_MODELS: ModelCollection = {
+type ModelCollection = Record<string, Model[]>
+type FreeModel = Omit<Model, "isPaid"> & { isPaid: false }
+type PaidModel = Omit<Model, "isPaid"> & { isPaid: true }
+
+export const FREE_MODELS: Record<string, FreeModel[]> = {
   "Free Trial": [
     {
       name: "DeepSeek R1 (Base)",
@@ -70,7 +74,7 @@ export const FREE_MODELS: ModelCollection = {
   ],
 }
 
-export const PAID_MODELS: ModelCollection = {
+export const PAID_MODELS: Record<string, PaidModel[]> = {
   Gemini: [
     {
       name: "Gemini 2.5 Pro Preview 05-06",
