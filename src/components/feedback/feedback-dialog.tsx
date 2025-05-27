@@ -13,14 +13,18 @@ import {
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
-import { Mail, MessageSquare, MessageCircle, Send } from "lucide-react"
+import { Mail, MessageSquare, Send } from "lucide-react"
 import { DISCORD_LINK, CONTACT_LINK } from "@/constants/external-links"
 import { submitFeedback } from "@/lib/api/feedback"
 
 type FeedbackType = "general" | "feature" | "bug" | "other"
 type SendMethod = "app" | "email" | "discord"
 
-export function FeedbackButton() {
+interface FeedbackDialogProps {
+  children: React.ReactNode
+}
+
+export function FeedbackDialog({ children }: FeedbackDialogProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -122,13 +126,7 @@ export function FeedbackButton() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="group relative overflow-hidden border-primary bg-primary hover:bg-primary/90 hover:text-primary-foreground text-primary-foreground transition-all duration-300 rounded-full"
-        >
-          <MessageCircle className="h-4 w-4" />
-          Feedback
-        </Button>
+        {children}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>

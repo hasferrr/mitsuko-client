@@ -4,7 +4,6 @@ import { PropsWithChildren } from "react"
 import { AppSidebarWrapper } from "@/components/sidebar/app-sidebar-wrapper"
 import { Metadata } from "next"
 import { META_TITLE } from "@/constants/metadata"
-import { FeedbackWrapper } from "@/components/feedback/feedback-wrapper"
 
 export const metadata: Metadata = {
   title: META_TITLE,
@@ -21,7 +20,6 @@ export default function Layout({ children }: PropsWithChildren) {
           <Footer />
         </div>
       </AppSidebarWrapper>
-      <FeedbackWrapper />
     </div>
   )
 }

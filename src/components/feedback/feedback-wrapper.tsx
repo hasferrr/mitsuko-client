@@ -1,20 +1,22 @@
 "use client"
 
-import { FeedbackButton } from "@/components/feedback/feedback-button"
-import { useHistoryStore } from "@/stores/use-history-store"
+import { FeedbackDialog } from "@/components/feedback/feedback-dialog"
 import { useSessionStore } from "@/stores/use-session-store"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 
-export function FeedbackWrapper() {
+interface FeedbackWrapperProps {
+  children: React.ReactNode
+}
+
+export function FeedbackWrapper({ children }: FeedbackWrapperProps) {
   const session = useSessionStore(state => state.session)
-  const history = useHistoryStore(state => state.history)
-  const isFeedbackEnabled = useLocalSettingsStore(state => state.isFeedbackEnabled)
-  const isLoggedIn = !!session
-  const isDashboard = history.length > 10
 
   return (
-    <div className="fixed bottom-6 right-6 z-10 flex gap-2">
-      {isLoggedIn && isDashboard && isFeedbackEnabled && <FeedbackButton />}
-    </div>
+    <>
+      {session && (
+        <FeedbackDialog>
+          {children}
+        </FeedbackDialog>
+      )}
+    </>
   )
 }

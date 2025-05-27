@@ -22,6 +22,7 @@ import { useQuery } from "@tanstack/react-query"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { UserCreditData } from "@/types/user"
 import { cn } from "@/lib/utils"
+import { FeedbackWrapper } from "@/components/feedback/feedback-wrapper"
 
 export function Navbar() {
   const _pathname = usePathname()
@@ -125,7 +126,18 @@ export function Navbar() {
             )}
           </BreadcrumbList>
         </Breadcrumb>
+
         <div className="flex items-center gap-2 ml-auto">
+          <FeedbackWrapper>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 mr-4"
+            >
+              Feedback
+            </Button>
+          </FeedbackWrapper>
+
           {isProcessing && (
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>

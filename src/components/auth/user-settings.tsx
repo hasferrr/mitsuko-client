@@ -18,13 +18,11 @@ import { useState } from "react"
 export function UserSettings() {
   const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
   const toggleThirdPartyModel = useLocalSettingsStore((state) => state.toggleThirdPartyModel)
-  const isFeedbackEnabled = useLocalSettingsStore((state) => state.isFeedbackEnabled)
-  const toggleFeedbackHidden = useLocalSettingsStore((state) => state.toggleFeedbackHidden)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isThirdPartyDialogOpen, setIsThirdPartyDialogOpen] = useState(false)
 
   const handleCheckedChange = (checked: boolean) => {
     if (checked) {
-      setIsDialogOpen(true)
+      setIsThirdPartyDialogOpen(true)
     } else {
       toggleThirdPartyModel()
     }
@@ -32,15 +30,11 @@ export function UserSettings() {
 
   const handleConfirm = () => {
     toggleThirdPartyModel()
-    setIsDialogOpen(false)
+    setIsThirdPartyDialogOpen(false)
   }
 
   const handleCancel = () => {
-    setIsDialogOpen(false)
-  }
-
-  const handleFeedbackCheckedChange = () => {
-    toggleFeedbackHidden()
+    setIsThirdPartyDialogOpen(false)
   }
 
   return (
@@ -60,19 +54,9 @@ export function UserSettings() {
               onCheckedChange={handleCheckedChange}
             />
           </div>
-          <div className="flex items-center justify-between">
-            <Label>
-              Enable Feedback Button
-            </Label>
-            <Switch
-              id="feedback-hidden-switch"
-              checked={isFeedbackEnabled}
-              onCheckedChange={handleFeedbackCheckedChange}
-            />
-          </div>
         </div>
       </div>
-      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <AlertDialog open={isThirdPartyDialogOpen} onOpenChange={setIsThirdPartyDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Enable Third-Party Model?</AlertDialogTitle>
