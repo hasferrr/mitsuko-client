@@ -5,6 +5,12 @@ interface WhichModelsProps {
 }
 
 export default function WhichModels({ className }: WhichModelsProps) {
+  const costEffectiveModels = [
+    'Gemini 2.0 Flash',
+    'Qwen3 235B',
+    'GPT-4.1 mini',
+  ]
+
   return (
     <div className={cn(
       "relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm",
@@ -25,19 +31,16 @@ export default function WhichModels({ className }: WhichModelsProps) {
           <span>Tips:</span>
           <ul className="list-disc pl-4">
             <li>
-              Start with cost-effective models (like {[
-                'Gemini 2.0 Flash',
-                'Gemini 1.5 Flash-8B',
-                'GPT-4.1 mini',
-              ].map((model, index) => (
+              Start with cost-effective models (like {costEffectiveModels.map((model, index) => (
                 <span key={model} className="font-semibold">
-                  {model}{index < 2 ? ' / ' : ''}
+                  {model}{(index < costEffectiveModels.length - 1) ? ' / ' : ''}
                 </span>
               ))}).
             </li>
             <li>If the results meet your needs, you can continue using them.</li>
             <li>If you need higher quality results, you can gradually switch to more expensive models.</li>
           </ul>
+          <p>Generally, <span className="font-semibold">Gemini 2.5 Flash</span>, <span className="font-semibold">GPT 4.1</span>, and <span className="font-semibold">Claude Sonnet</span> provide excellent results for most use cases and languages.</p>
         </div>
       </div>
     </div>

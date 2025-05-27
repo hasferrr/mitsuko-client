@@ -30,13 +30,13 @@ export default function PricingDescription() {
               You can receive credits by purchasing <a href="#credit-packs" className="text-blue-500 hover:text-blue-600">credit packs</a>{" "}
               as needed.
             </p>
-            <div className="flex flex-col gap-2">
+            {/* <div className="flex flex-col gap-2">
               <span>Notes:</span>
               <ul className="list-disc pl-4">
                 <li>The credits in your account never expire.</li>
                 <li>We currently do not offer refunds for purchased credits and plans.</li>
               </ul>
-            </div>
+            </div> */}
           </div>
         </div>
 

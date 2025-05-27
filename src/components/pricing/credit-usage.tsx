@@ -42,8 +42,15 @@ export default async function CreditUsage() {
     "DeepSeek R1",
   ])
 
-  const bestModels = new Set([
+  const highQualityModels = new Set([
     "Gemini 2.5 Pro Preview 05-06",
+    "Claude 3.5 Sonnet",
+    "GPT-4.1",
+  ])
+
+  const fastModels = new Set([
+    "GPT-4.1 mini",
+    "Gemini 2.0 Flash",
   ])
 
   const costEffectiveModels = new Set([
@@ -69,15 +76,6 @@ export default async function CreditUsage() {
       score: '-',
       discount: 0,
     },
-    {
-      name: 'Custom API',
-      creditPerInputToken: 0,
-      creditPerOutputToken: 0,
-      contextLength: 'Unknown',
-      maxCompletion: 'Unknown',
-      score: '-',
-      discount: 0,
-    }
   ]
 
   return (
@@ -119,14 +117,26 @@ export default async function CreditUsage() {
                       </Tooltip>
                     </TooltipProvider>
                   )}
-                  {bestModels.has(model.name) && (
+                  {highQualityModels.has(model.name) && (
                     <TooltipProvider>
                       <Tooltip delayDuration={0}>
                         <TooltipTrigger asChild>
                           <span className="cursor-default ml-1 text-[1rem]">⭐</span>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Best & Highest Quality Result</p>
+                          <p>High Quality</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                  {fastModels.has(model.name) && (
+                    <TooltipProvider>
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <span className="cursor-default ml-1 text-[1rem]">⚡</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Fast Model</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>

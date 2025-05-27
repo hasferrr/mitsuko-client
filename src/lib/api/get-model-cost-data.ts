@@ -21,7 +21,7 @@ export const getModelCostData = async (): Promise<Map<string, ModelCreditCost>> 
     })
 
   } catch {
-    console.error("Failed to fetch model prices, using fallback values")
+    console.warn("Failed to fetch model prices, using fallback values")
     modelCreditCosts.set('DeepSeek R1', {
       creditPerInputToken: 0.715,
       creditPerOutputToken: 2.847,
