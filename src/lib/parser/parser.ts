@@ -24,6 +24,7 @@ export function parseTranslationJson(response: string): SubOnlyTranslated[] {
 
 export function parseTranscription(response: string): Subtitle[] {
   let text = response.trim()
+  text = getContent(text)
   text = keepOnlyWrapped(text, "```", "```") || text
 
   const lines = text.split("\n").filter((line) => line.trim() !== "")

@@ -104,7 +104,7 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
       }
 
       if (reasoning.length > 0) {
-        buffer = `<think>\n${reasoning}\n</think>\n\n${result}`
+        buffer = `<think>\n${reasoning.trim()}\n</think>\n\n${result}`
       } else {
         buffer = result
       }
