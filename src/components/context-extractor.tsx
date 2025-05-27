@@ -28,7 +28,7 @@ import { removeTimestamp } from "@/lib/subtitles/timestamp"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useApiSettingsStore } from "@/stores/settings/use-api-settings-store"
+import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useExtractionInputStore } from "@/stores/services/use-extraction-input-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
@@ -74,9 +74,9 @@ export const ContextExtractor = () => {
   const [projectTranslations, setProjectTranslations] = useState<Translation[]>([])
 
   // API Settings Store
-  const apiKey = useApiSettingsStore((state) => state.apiKey)
-  const customBaseUrl = useApiSettingsStore((state) => state.customBaseUrl)
-  const customModel = useApiSettingsStore((state) => state.customModel)
+  const apiKey = useLocalSettingsStore((state) => state.apiKey)
+  const customBaseUrl = useLocalSettingsStore((state) => state.customBaseUrl)
+  const customModel = useLocalSettingsStore((state) => state.customModel)
 
   // Settings Store
   const modelDetail = useSettingsStore((state) => state.getModelDetail())

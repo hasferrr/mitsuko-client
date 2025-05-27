@@ -17,14 +17,14 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog"
-import { useApiSettingsStore } from "@/stores/settings/use-api-settings-store"
+import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 
 export function Login() {
   const session = useSessionStore((state) => state.session)
   const setSession = useSessionStore((state) => state.setSession)
 
-  const isThirdPartyModelEnabled = useApiSettingsStore((state) => state.isThirdPartyModelEnabled)
-  const toggleThirdPartyModel = useApiSettingsStore((state) => state.toggleThirdPartyModel)
+  const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
+  const toggleThirdPartyModel = useLocalSettingsStore((state) => state.toggleThirdPartyModel)
 
   const [mounted, setMounted] = useState(false)
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)

@@ -1,6 +1,6 @@
 "use client"
 
-import { useApiSettingsStore } from "@/stores/settings/use-api-settings-store"
+import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import {
@@ -16,8 +16,10 @@ import {
 import { useState } from "react"
 
 export function UserSettings() {
-  const isThirdPartyModelEnabled = useApiSettingsStore((state) => state.isThirdPartyModelEnabled)
-  const toggleThirdPartyModel = useApiSettingsStore((state) => state.toggleThirdPartyModel)
+  const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
+  const toggleThirdPartyModel = useLocalSettingsStore((state) => state.toggleThirdPartyModel)
+  const isFeedbackEnabled = useLocalSettingsStore((state) => state.isFeedbackEnabled)
+  const toggleFeedbackHidden = useLocalSettingsStore((state) => state.toggleFeedbackHidden)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const handleCheckedChange = (checked: boolean) => {
@@ -37,21 +39,37 @@ export function UserSettings() {
     setIsDialogOpen(false)
   }
 
+  const handleFeedbackCheckedChange = () => {
+    toggleFeedbackHidden()
+  }
+
   return (
     <>
       <div className="rounded-md overflow-hidden border">
         <div className="px-4 py-2 border-b">
           <h2 className="font-medium">User Settings</h2>
         </div>
-        <div className="p-4 flex items-center justify-between">
-          <Label>
-            Enable Third-Party Model
-          </Label>
-          <Switch
-            id="third-party-model-switch"
-            checked={isThirdPartyModelEnabled}
-            onCheckedChange={handleCheckedChange}
-          />
+        <div className="p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>
+              Enable Third-Party Model
+            </Label>
+            <Switch
+              id="third-party-model-switch"
+              checked={isThirdPartyModelEnabled}
+              onCheckedChange={handleCheckedChange}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>
+              Enable Feedback Button
+            </Label>
+            <Switch
+              id="feedback-hidden-switch"
+              checked={isFeedbackEnabled}
+              onCheckedChange={handleFeedbackCheckedChange}
+            />
+          </div>
         </div>
       </div>
       <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

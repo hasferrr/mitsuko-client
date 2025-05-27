@@ -99,7 +99,7 @@ import { UserCreditData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
 import { logSubtitle } from "@/lib/api/subtitle-log"
 import { z } from "zod"
-import { useApiSettingsStore } from "@/stores/settings/use-api-settings-store"
+import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
@@ -132,9 +132,9 @@ export default function SubtitleTranslator() {
   const parsed = translation?.parsed ?? { type: "srt", data: null }
 
   // API Settings Store
-  const apiKey = useApiSettingsStore((state) => state.apiKey)
-  const customBaseUrl = useApiSettingsStore((state) => state.customBaseUrl)
-  const customModel = useApiSettingsStore((state) => state.customModel)
+  const apiKey = useLocalSettingsStore((state) => state.apiKey)
+  const customBaseUrl = useLocalSettingsStore((state) => state.customBaseUrl)
+  const customModel = useLocalSettingsStore((state) => state.customModel)
 
   // Basic Settings Store
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
