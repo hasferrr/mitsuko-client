@@ -8,6 +8,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  costEffectiveModels,
+  favoriteModels,
+  fastModels,
+  highQualityModels,
+  priorityModels,
+  multiLingualModels,
+} from '@/constants/model-preferences'
 
 export default async function CreditUsage() {
   const fetchedCreditCostsMap = await getModelCostData()
@@ -30,32 +38,6 @@ export default async function CreditUsage() {
         discount: costs?.discount ?? 0,
       }
     })
-
-  let i = 0
-  const priorityModels = new Map<string, number>([
-    ["DeepSeek R1", i++],
-    ["DeepSeek V3", i++],
-    ["Gemini 2.5 Pro Preview 05-06", i++],
-  ])
-
-  const favoriteModels = new Set([
-    "DeepSeek R1",
-  ])
-
-  const highQualityModels = new Set([
-    "Gemini 2.5 Pro Preview 05-06",
-    "Claude 3.5 Sonnet",
-    "GPT-4.1",
-  ])
-
-  const fastModels = new Set([
-    "GPT-4.1 mini",
-    "Gemini 2.0 Flash",
-  ])
-
-  const costEffectiveModels = new Set([
-    "Gemini 1.5 Flash-8B",
-  ])
 
   const sortedPriorityModels = paidModelCostArray
     .filter(model => priorityModels.has(model.name))
@@ -137,6 +119,18 @@ export default async function CreditUsage() {
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Fast Model</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                  {multiLingualModels.has(model.name) && (
+                    <TooltipProvider>
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <span className="cursor-default ml-1 text-[1rem]">🌎</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Multilingual Model</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
