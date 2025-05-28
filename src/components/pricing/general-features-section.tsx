@@ -29,8 +29,8 @@ const generalFeaturesList = [
     description: "Conveniently export your project data for backup or transfer, and import projects to continue your work seamlessly.",
   },
   {
-    feature: "Custom Model Integration",
-    description: "Use your own LLM API within the Mitsuko platform.",
+    feature: "Access to All Models",
+    description: "Select from a wide range of AI models available on the platform.",
   },
   {
     feature: "Support Options",

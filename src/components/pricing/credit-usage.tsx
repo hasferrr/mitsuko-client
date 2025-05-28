@@ -118,7 +118,7 @@ export default async function CreditUsage() {
                           <span className="cursor-default ml-1 text-[1rem]">⚡</span>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Fast Model</p>
+                          <p>Fast & Underrated Model</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
