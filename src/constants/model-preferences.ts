@@ -11,13 +11,8 @@ export const favoriteModels = new Set([
 
 export const highQualityModels = new Set([
   "Gemini 2.5 Pro Preview 05-06",
-  "Claude 3.5 Sonnet",
+  "Claude 3.7 Sonnet",
   "GPT-4.1",
-])
-
-export const fastModels = new Set([
-  "GPT-4.1 mini",
-  "Gemini 2.0 Flash",
 ])
 
 export const multiLingualModels = new Set([
@@ -27,8 +22,4 @@ export const multiLingualModels = new Set([
   "Qwen3 30B A3B",
   "Meta: Llama 4 Maverick",
   "Meta: Llama 4 Scout",
-])
-
-export const costEffectiveModels = new Set([
-  "Gemini 1.5 Flash-8B",
 ])

@@ -9,9 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import {
-  costEffectiveModels,
   favoriteModels,
-  fastModels,
   highQualityModels,
   priorityModels,
   multiLingualModels,
@@ -111,18 +109,6 @@ export default async function CreditUsage() {
                       </Tooltip>
                     </TooltipProvider>
                   )}
-                  {fastModels.has(model.name) && (
-                    <TooltipProvider>
-                      <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                          <span className="cursor-default ml-1 text-[1rem]">⚡</span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Fast & Underrated Model</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
                   {multiLingualModels.has(model.name) && (
                     <TooltipProvider>
                       <Tooltip delayDuration={0}>
@@ -131,18 +117,6 @@ export default async function CreditUsage() {
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Multilingual Model</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                  {costEffectiveModels.has(model.name) && (
-                    <TooltipProvider>
-                      <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                          <span className="cursor-default ml-1 text-[1rem]">💰</span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Cost Effective Model</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
