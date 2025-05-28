@@ -62,8 +62,32 @@ export const FREE_MODELS: Record<string, FreeModel[]> = {
   ],
   "Free Limited": [
     {
+      name: "Gemini 2.5 Flash Preview 05-20",
+      maxInput: 1_048_576,
+      maxOutput: 65536,
+      structuredOutput: true,
+      isPaid: false,
+      default: {
+        temperature: 1,
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
+      name: "Gemini 2.0 Flash",
+      maxInput: 1_048_576,
+      maxOutput: 8192,
+      structuredOutput: true,
+      isPaid: false,
+      default: {
+        temperature: 1,
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: true
+      }
+    },
+    {
       name: "Gemini 2.0 Flash Experimental",
-      maxInput: 1000000,
+      maxInput: 1_048_576,
       maxOutput: 8192,
       structuredOutput: true,
       isPaid: false,
