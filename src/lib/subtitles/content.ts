@@ -40,9 +40,7 @@ export function removeStringContentBetween(
       if (text.slice(r, r + customEnd.length) === customEnd) {
         skipCount -= 1
         r += customEnd.length
-        if (r < text.length) {
-          l = r
-        }
+        l = r
         continue
       }
       r++

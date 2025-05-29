@@ -81,6 +81,30 @@ describe("removeContentBetween", () => {
     expect(result[0].content).toBe("llo")
   })
 
+  test("should handle delimiter at beginning of string", () => {
+    const subtitles = [createSubtitle("{remove this} keep this")]
+    const result = removeContentBetween(subtitles, "content", "{", "}")
+    expect(result[0].content).toBe("keep this")
+  })
+
+  test("should handle delimiter at end of string", () => {
+    const subtitles = [createSubtitle("keep this {remove this}")]
+    const result = removeContentBetween(subtitles, "content", "{", "}")
+    expect(result[0].content).toBe("keep this")
+  })
+
+  test("should handle delimiter in middle of string", () => {
+    const subtitles = [createSubtitle("keep this {remove this} keep this")]
+    const result = removeContentBetween(subtitles, "content", "{", "}")
+    expect(result[0].content).toBe("keep this keep this")
+  })
+
+  test("should handle delimiter at beginning and end of string", () => {
+    const subtitles = [createSubtitle("{remove this}")]
+    const result = removeContentBetween(subtitles, "content", "{", "}")
+    expect(result[0].content).toBe("")
+  })
+
   // Tests with multi-character delimiters
   test("should return empty for empty input string with multi-char delimiters", () => {
     const subtitles = [createSubtitle("")]
@@ -140,5 +164,29 @@ describe("removeContentBetween", () => {
     const subtitles = [createSubtitle("<!--<!--<!--he-->  llo")]
     const result = removeContentBetween(subtitles, "content", "<!--", "-->")
     expect(result[0].content).toBe("llo")
+  })
+
+  test("should handle multi-char delimiter at beginning of string", () => {
+    const subtitles = [createSubtitle("<!--remove this--> keep this")]
+    const result = removeContentBetween(subtitles, "content", "<!--", "-->")
+    expect(result[0].content).toBe("keep this")
+  })
+
+  test("should handle multi-char delimiter at end of string", () => {
+    const subtitles = [createSubtitle("keep this <!--remove this-->")]
+    const result = removeContentBetween(subtitles, "content", "<!--", "-->")
+    expect(result[0].content).toBe("keep this")
+  })
+
+  test("should handle multi-char delimiter in middle of string", () => {
+    const subtitles = [createSubtitle("keep this <!--remove this--> keep this")]
+    const result = removeContentBetween(subtitles, "content", "<!--", "-->")
+    expect(result[0].content).toBe("keep this keep this")
+  })
+
+  test("should handle multi-char delimiter at beginning and end of string", () => {
+    const subtitles = [createSubtitle("<!--remove this-->")]
+    const result = removeContentBetween(subtitles, "content", "<!--", "-->")
+    expect(result[0].content).toBe("")
   })
 })
