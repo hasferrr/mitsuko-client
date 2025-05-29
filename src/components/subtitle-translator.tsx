@@ -725,7 +725,7 @@ export default function SubtitleTranslator() {
           s.content,
           s.translated,
           combinedFormat,
-          parsed.type === "ass"
+          parsed.type,
         )
       }
 
