@@ -196,7 +196,7 @@ export const PAID_MODELS: Record<string, PaidModel[]> = {
   ],
   Anthropic: [
     {
-      name: "Claude Sonnet 4",
+      name: "Claude 4 Sonnet",
       maxInput: 200_000,
       maxOutput: 64_000,
       structuredOutput: true,
