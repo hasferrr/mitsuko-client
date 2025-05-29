@@ -46,6 +46,8 @@ import {
   SubOnlyTranslated,
   SubtitleTranslated,
   SubtitleNoTime,
+  DownloadOption,
+  CombinedFormat,
 } from "@/types/subtitles"
 import { ContextCompletion } from "@/types/completion"
 import { cn, minMax, sleep } from "@/lib/utils"
@@ -104,9 +106,7 @@ import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
 import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-gap"
-
-type DownloadOption = "original" | "translated" | "both"
-type BothFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
+import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
 
 export default function SubtitleTranslator() {
   const currentId = useTranslationDataStore((state) => state.currentId)
@@ -189,7 +189,7 @@ export default function SubtitleTranslator() {
   const [isContextUploadDialogOpen, setIsContextUploadDialogOpen] = useState(false)
   const [pendingContextFile, setPendingContextFile] = useState<File | null>(null)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
-  const [bothFormat, setBothFormat] = useState<BothFormat>("o-n-t")
+  const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
   const [toolsOpen, setToolsOpen] = useState(false)
   const [progressOpen, setProgressOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -720,32 +720,13 @@ export default function SubtitleTranslator() {
         content = s.content
       } else if (option === "translated") {
         content = s.translated
-      } else { // "both"
-        // Remove new line
-        const newContent = parsed.type === "ass"
-          ? s.content.replaceAll("\\N", " ").replaceAll("  ", " ").trim()
-          : s.content.replaceAll("\n", " ").replaceAll("  ", " ").trim()
-        const newTranslated = parsed.type === "ass"
-          ? s.translated.replaceAll("\\N", " ").replaceAll("  ", " ").trim()
-          : s.translated.replaceAll("\n", " ").replaceAll("  ", " ").trim()
-
-        // Added format options
-        if (bothFormat === "(o)-t") {
-          content = `(${newContent}) ${newTranslated}`
-        } else if (bothFormat === "(t)-o") {
-          content = `(${newTranslated}) ${newContent}`
-        } else if (bothFormat === "o-n-t") {
-          content = parsed.type === "ass"
-            ? `${newContent}\\N${newTranslated}`
-            : `${newContent}\n${newTranslated}`
-        } else if (bothFormat === "t-n-o") {
-          content = parsed.type === "ass"
-            ? `${newTranslated}\\N${newContent}`
-            : `${newTranslated}\n${newContent}`
-        } else {
-          content = ""
-          console.error("Invalid BothFormat")
-        }
+      } else { // "combined"
+        content = combineSubtitleContent(
+          s.content,
+          s.translated,
+          combinedFormat,
+          parsed.type === "ass"
+        )
       }
 
       return {
@@ -980,10 +961,10 @@ export default function SubtitleTranslator() {
           <div className="flex gap-4 mt-4 items-center">
             <Select
               value={downloadOption}
-              onValueChange={(value) => {
-                setDownloadOption(value as "original" | "translated" | "both")
-                if (value !== "both") {
-                  setBothFormat("o-n-t") // Reset format if not "both"
+              onValueChange={(value: DownloadOption) => {
+                setDownloadOption(value)
+                if (value !== "combined") {
+                  setCombinedFormat("o-n-t") // Reset format if not "combined"
                 }
               }}
             >
@@ -993,12 +974,12 @@ export default function SubtitleTranslator() {
               <SelectContent>
                 <SelectItem value="original">Original Text</SelectItem>
                 <SelectItem value="translated">Translated Text</SelectItem>
-                <SelectItem value="both">Original + Translated</SelectItem>
+                <SelectItem value="combined">Original + Translated</SelectItem>
               </SelectContent>
             </Select>
 
-            {/* Dialog for "both" format selection */}
-            {downloadOption === "both" && (
+            {/* Dialog for "combined" format selection */}
+            {downloadOption === "combined" && (
               <Dialog>
                 <DialogTrigger className="w-full" asChild>
                   <Button variant="outline">
@@ -1015,29 +996,29 @@ export default function SubtitleTranslator() {
                   </DialogHeader>
                   <div className="grid grid-cols-2 gap-4 py-4">
                     <Button
-                      variant={bothFormat === "(o)-t" ? "default" : "outline"}
-                      onClick={() => setBothFormat("(o)-t")}
+                      variant={combinedFormat === "(o)-t" ? "default" : "outline"}
+                      onClick={() => setCombinedFormat("(o)-t")}
                       className="py-8 flex justify-center w-56"
                     >
                       (Original Text) Translated Text
                     </Button>
                     <Button
-                      variant={bothFormat === "(t)-o" ? "default" : "outline"}
-                      onClick={() => setBothFormat("(t)-o")}
+                      variant={combinedFormat === "(t)-o" ? "default" : "outline"}
+                      onClick={() => setCombinedFormat("(t)-o")}
                       className="py-8 flex justify-center w-56"
                     >
                       (Translated Text) Original Text
                     </Button>
                     <Button
-                      variant={bothFormat === "o-n-t" ? "default" : "outline"}
-                      onClick={() => setBothFormat("o-n-t")}
+                      variant={combinedFormat === "o-n-t" ? "default" : "outline"}
+                      onClick={() => setCombinedFormat("o-n-t")}
                       className="py-8 flex justify-center w-56"
                     >
                       Original Text<br />Translated Text
                     </Button>
                     <Button
-                      variant={bothFormat === "t-n-o" ? "default" : "outline"}
-                      onClick={() => setBothFormat("t-n-o")}
+                      variant={combinedFormat === "t-n-o" ? "default" : "outline"}
+                      onClick={() => setCombinedFormat("t-n-o")}
                       className="py-8 flex justify-center w-56"
                     >
                       Translated Text<br />Original Text
