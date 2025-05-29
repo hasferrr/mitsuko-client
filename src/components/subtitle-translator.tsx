@@ -1024,6 +1024,20 @@ export default function SubtitleTranslator() {
                       Translated Text<br />Original Text
                     </Button>
                   </div>
+
+                  <div className="pt-4 border-t">
+                    <h3 className="text-sm font-medium mb-2">Comment Original</h3>
+                    <Button
+                      variant={combinedFormat === "{o}-t" ? "default" : "outline"}
+                      onClick={() => setCombinedFormat("{o}-t")}
+                      className="py-8 flex justify-center w-full"
+                    >
+                      {"{Commented Original}"}Translated Text
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Original text will be enclosed in curly braces, allowing it to be treated as a comment in many subtitle formats.
+                    </p>
+                  </div>
                 </DialogContent>
               </Dialog>
             )}

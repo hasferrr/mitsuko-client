@@ -59,4 +59,4 @@ export interface Parsed {
 export type SubtitleType = "srt" | "ass"
 
 export type DownloadOption = "original" | "translated" | "combined"
-export type CombinedFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o"
+export type CombinedFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o" | "{o}-t"

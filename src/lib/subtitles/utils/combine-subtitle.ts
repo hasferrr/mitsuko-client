@@ -1,4 +1,5 @@
 import { CombinedFormat, SubtitleType } from "@/types/subtitles"
+import { removeStringContentBetween } from "../content"
 
 /**
  * Combines original and translated subtitle content with different formatting options
@@ -9,14 +10,23 @@ export function combineSubtitleContent(
   format: CombinedFormat,
   type: SubtitleType
 ): string {
-  // Remove new lines and clean up content
-  const cleanOriginal = type === "ass"
-    ? original.replaceAll("\\N", " ").replaceAll("  ", " ").trim()
-    : original.replaceAll("\n", " ").replaceAll("  ", " ").trim()
+  let cleanOriginal = original
+  let cleanTranslated = translated
 
-  const cleanTranslated = type === "ass"
-    ? translated.replaceAll("\\N", " ").replaceAll("  ", " ").trim()
-    : translated.replaceAll("\n", " ").replaceAll("  ", " ").trim()
+  // Remove new lines and clean up content
+  if (format !== "{o}-t") {
+    cleanOriginal = type === "ass"
+      ? original.replaceAll("\\N", " ").replaceAll("  ", " ").trim()
+      : original.replaceAll("\n", " ").replaceAll("  ", " ").trim()
+
+    cleanTranslated = type === "ass"
+      ? translated.replaceAll("\\N", " ").replaceAll("  ", " ").trim()
+      : translated.replaceAll("\n", " ").replaceAll("  ", " ").trim()
+  }
+
+  if (format === "{o}-t") {
+    cleanOriginal = removeStringContentBetween(cleanOriginal, "{", "}")
+  }
 
   // Format based on option
   switch (format) {
@@ -32,6 +42,8 @@ export function combineSubtitleContent(
       return type === "ass"
         ? `${cleanTranslated}\\N${cleanOriginal}`
         : `${cleanTranslated}\n${cleanOriginal}`
+    case "{o}-t":
+      return `{${cleanOriginal}}${cleanTranslated}`
     default:
       console.error("Invalid CombinedFormat")
       return ""
