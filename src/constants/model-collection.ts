@@ -7,7 +7,7 @@ type PaidModel = Omit<Model, "isPaid"> & { isPaid: true }
 export const FREE_MODELS: Record<string, FreeModel[]> = {
   "Free Trial": [
     {
-      name: "DeepSeek R1 (Base)",
+      name: "DeepSeek R1 0528",
       maxInput: 128000,
       maxOutput: 128000,
       structuredOutput: true,
@@ -19,18 +19,7 @@ export const FREE_MODELS: Record<string, FreeModel[]> = {
       }
     },
     {
-      name: "DeepSeek R1 (Slow)",
-      maxInput: 163840,
-      maxOutput: 163840,
-      structuredOutput: true,
-      isPaid: false,
-      default: {
-        isMaxCompletionTokensAuto: true,
-        isUseStructuredOutput: false
-      }
-    },
-    {
-      name: "DeepSeek V3",
+      name: "DeepSeek V3 0324",
       maxInput: 128000,
       maxOutput: 128000,
       structuredOutput: true,
@@ -40,13 +29,6 @@ export const FREE_MODELS: Record<string, FreeModel[]> = {
         maxCompletionTokens: 128000,
         isUseStructuredOutput: true
       }
-    },
-    {
-      name: "Meta: Llama 4 Maverick",
-      maxInput: 256000,
-      maxOutput: 256000,
-      structuredOutput: true,
-      isPaid: false,
     },
     {
       name: "Qwen3 235B A22B",
@@ -107,6 +89,17 @@ export const FREE_MODELS: Record<string, FreeModel[]> = {
       }
     },
     {
+      name: "DeepSeek R1 0528 (free)",
+      maxInput: 163840,
+      maxOutput: 163840,
+      structuredOutput: true,
+      isPaid: false,
+      default: {
+        isMaxCompletionTokensAuto: true,
+        isUseStructuredOutput: false
+      }
+    },
+    {
       name: "Qwen3 235B A22B (free)",
       maxInput: 40000,
       maxOutput: 40000,
@@ -128,6 +121,13 @@ export const FREE_MODELS: Record<string, FreeModel[]> = {
         isUseStructuredOutput: true,
       }
     },
+    {
+      name: "Meta: Llama 4 Maverick",
+      maxInput: 256000,
+      maxOutput: 256000,
+      structuredOutput: true,
+      isPaid: false,
+    },
   ],
 }
 
@@ -147,18 +147,6 @@ export const PAID_MODELS: Record<string, PaidModel[]> = {
     },
     {
       name: "Gemini 2.5 Flash Preview 05-20",
-      maxInput: 1_048_576,
-      maxOutput: 65536,
-      structuredOutput: true,
-      isPaid: true,
-      default: {
-        temperature: 1,
-        isMaxCompletionTokensAuto: true,
-        isUseStructuredOutput: true
-      }
-    },
-    {
-      name: "Gemini 2.5 Flash Preview 04-17",
       maxInput: 1_048_576,
       maxOutput: 65536,
       structuredOutput: true,
@@ -426,7 +414,7 @@ export const PAID_MODELS: Record<string, PaidModel[]> = {
   ],
   DeepSeek: [
     {
-      name: "DeepSeek R1",
+      name: "DeepSeek R1 0528",
       maxInput: 128000,
       maxOutput: 128000,
       structuredOutput: true,
@@ -438,7 +426,7 @@ export const PAID_MODELS: Record<string, PaidModel[]> = {
       }
     },
     {
-      name: "DeepSeek V3",
+      name: "DeepSeek V3 0324",
       maxInput: 128000,
       maxOutput: 128000,
       structuredOutput: true,
