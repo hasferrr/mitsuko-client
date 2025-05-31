@@ -1,19 +1,11 @@
 "use client"
 
 import { Languages, AudioWaveform, Layers } from "lucide-react"
-import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
 
 export default function KeyFeatures() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
-
   return (
-    <div ref={ref} className="mt-24 mb-12">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
+    <div className="mt-24 mb-12">
+      <div
         className="relative text-center"
       >
         <div id="features" className="absolute -top-24" />
@@ -23,13 +15,10 @@ export default function KeyFeatures() {
         <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
           Everything you need for high-quality translation and transcription.
         </p>
-      </motion.div>
+      </div>
 
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+        <div
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"
         >
           <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
@@ -64,12 +53,9 @@ export default function KeyFeatures() {
               Maintain context across episodes and scenes for consistent, accurate, and high-quality translations.
             </p>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+        <div
           className="grid grid-cols-1 lg:grid-cols-3 gap-6 mx-auto"
         >
           {/* Context-aware translation component */}
@@ -212,7 +198,7 @@ export default function KeyFeatures() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   )

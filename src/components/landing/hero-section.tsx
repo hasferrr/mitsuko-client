@@ -13,19 +13,15 @@ import {
   AudioWaveform,
   BookOpen,
 } from "lucide-react"
-import { motion, useInView } from "framer-motion"
-import { useRef } from "react"
 import { useSessionStore } from "@/stores/use-session-store"
 import ImageLogo from "@/static/waifu.jpg"
 import { cn } from "@/lib/utils"
 
 export default function HeroSection() {
   const session = useSessionStore((state) => state.session)
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
 
   return (
-    <div ref={ref} className="w-full flex items-center justify-center px-4 py-12 lg:px-16 relative">
+    <div className="w-full flex items-center justify-center px-4 py-12 lg:px-16 relative">
       <div className="absolute top-0 left-0 w-full h-full bg-grid-white/[0.2] bg-grid-8 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
       <div className={cn(
         "w-full max-w-6xl flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-12",
@@ -37,10 +33,7 @@ export default function HeroSection() {
       )}>
         {/* Text content on the left */}
         <div className="flex flex-col items-center lg:items-start text-center lg:text-left max-w-xl gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+          <div
             className="flex flex-col-reverse"
           >
             <div className="text-gray-200 mb-8 text-sm md:text-lg sm:text-base drop-shadow-md">
@@ -50,11 +43,8 @@ export default function HeroSection() {
             <p className="text-4xl md:text-5xl lg:text-6xl font-medium text-white drop-shadow-md mb-6">
               Easily translate subtitles and transcribe audio with high quality results
             </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+          </div>
+          <div
             className="flex gap-4"
           >
             <Link
@@ -70,14 +60,11 @@ export default function HeroSection() {
             >
               {session ? "My Account" : "Sign In"}
             </Link>
-          </motion.div>
+          </div>
         </div>
 
         {/* Card element on the right */}
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+        <div
           className="w-full max-w-md min-w-[320px]"
         >
           <div className="w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg shadow-2xl overflow-hidden border border-white/20 dark:border-gray-800">
@@ -158,7 +145,7 @@ export default function HeroSection() {
               </ul>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   )

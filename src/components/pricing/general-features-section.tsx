@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { Check } from "lucide-react"
 
 const generalFeaturesList = [
@@ -38,16 +37,9 @@ const generalFeaturesList = [
   },
 ]
 
-interface GeneralFeaturesSectionProps {
-  isInView: boolean
-}
-
-export function GeneralFeaturesSection({ isInView }: GeneralFeaturesSectionProps) {
+export function GeneralFeaturesSection() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, delay: 0.6 }}
+    <div
       className="mt-8 rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto shadow-sm"
     >
       <div className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 p-4">
@@ -70,6 +62,6 @@ export function GeneralFeaturesSection({ isInView }: GeneralFeaturesSectionProps
           </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   )
 }

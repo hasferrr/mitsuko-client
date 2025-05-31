@@ -1,7 +1,5 @@
 "use client"
 
-import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 // FAQ data structure
@@ -47,17 +45,11 @@ const faqData = [
 ]
 
 export default function FAQSection() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
-
   return (
-    <section ref={ref} className="w-full py-16 bg-white dark:bg-black transition-colors">
+    <section className="w-full py-16 bg-white dark:bg-black transition-colors">
       <div className="relative max-w-6xl mx-auto px-4">
         <div id="faq" className="absolute -top-24" />
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+        <div
           className="flex flex-col items-center justify-center space-y-4 text-center"
         >
           <div className="space-y-2">
@@ -68,11 +60,8 @@ export default function FAQSection() {
               Find answers to common questions about Mitsuko and its features.
             </p>
           </div>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+        </div>
+        <div
           className="mx-auto max-w-3xl mt-12"
         >
           <Accordion type="single" collapsible className="w-full">
@@ -95,7 +84,7 @@ export default function FAQSection() {
               </AccordionItem>
             ))}
           </Accordion>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

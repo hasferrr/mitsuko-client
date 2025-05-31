@@ -1,13 +1,10 @@
 "use client"
 
 import { X } from "lucide-react"
-import { useState, useRef } from "react"
-import { motion, useInView } from "framer-motion"
+import { useState } from "react"
 
 export default function AnnouncementHeadline() {
   const [isVisible, setIsVisible] = useState(true)
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
 
   const handleDismiss = () => {
     setIsVisible(false)
@@ -18,11 +15,7 @@ export default function AnnouncementHeadline() {
   }
 
   return (
-    <motion.section
-      ref={ref}
-      initial={{ opacity: 0, y: -20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
+    <section
       className="py-1 text-center bg-gradient-to-r from-blue-500 to-purple-600 relative"
     >
       <div className="container mx-auto flex items-center justify-center gap-2 relative">
@@ -40,6 +33,6 @@ export default function AnnouncementHeadline() {
           <X size={16} />
         </button>
       </div>
-    </motion.section>
+    </section>
   )
 }

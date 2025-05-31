@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { Check, X } from "lucide-react"
-import { motion } from "framer-motion"
 import { Button } from "../ui/button"
 import { cn } from "@/lib/utils"
 import { ComingSoonTooltipWrapper } from "@/components/ui-custom/coming-soon-tooltip-wrapper"
@@ -23,22 +22,17 @@ interface PricingCardsProps {
   currency: Currency
   pricingData: PricingData
   redirectToPricingPage?: boolean
-  isInView: boolean
 }
 
 export function PricingCards({
   currency,
   pricingData,
   redirectToPricingPage = false,
-  isInView,
 }: PricingCardsProps) {
   const router = useRouter()
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
+    <div
       className="relative grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16"
     >
       <div id="pricing-cards" className="absolute -top-24" />
@@ -230,7 +224,7 @@ export function PricingCards({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 

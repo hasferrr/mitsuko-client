@@ -2,8 +2,7 @@
 
 import Link from "next/link"
 import { Check, X } from "lucide-react"
-import { useState, useTransition, useRef } from "react"
-import { motion, useInView } from "framer-motion"
+import { useState, useTransition } from "react"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { ProductId } from "@/types/product"
 import { useSnapStore } from "@/stores/use-snap-store"
@@ -60,9 +59,6 @@ export default function PricingSection({
   } | null>(null)
 
   const session = useSessionStore((state) => state.session)
-
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
 
   const handleCurrencyChange = (value: string) => {
     setCurrency(value === "$" ? USD : IDR)
@@ -245,14 +241,9 @@ export default function PricingSection({
   }
 
   return (
-    <div id="pricing" ref={ref} className="py-16">
+    <div id="pricing" className="py-16">
       <div className="max-w-6xl mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12">
           {useH1Title ? (
             <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
               Simple, Transparent <span className="text-blue-400">Pricing</span>
@@ -265,15 +256,10 @@ export default function PricingSection({
           <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Find the perfect plan for your needs. We offer monthly subscription and credit packs.
           </p>
-        </motion.div>
+        </div>
 
         {/* Currency Tabs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex justify-center items-center mb-8"
-        >
+        <div className="flex justify-center items-center mb-8">
           <span className="text-gray-600 dark:text-gray-400 mr-2">Show currency in</span>
           <Tabs
             defaultValue={USD.symbol}
@@ -286,14 +272,13 @@ export default function PricingSection({
               <TabsTrigger value={IDR.symbol}>IDR</TabsTrigger>
             </TabsList>
           </Tabs>
-        </motion.div>
+        </div>
 
         {/* Pricing Cards */}
         {false && <PricingCards
           currency={currency}
           pricingData={pricingData}
           redirectToPricingPage={redirectToPricingPage}
-          isInView={isInView}
         />}
 
         {/* Feature Comparison Table */}
@@ -302,7 +287,6 @@ export default function PricingSection({
           pricingData={pricingData}
           featuresData={featuresData}
           showDescription={showDescription}
-          isInView={isInView}
         />}
 
         {/* Credit Pack Prices */}
@@ -313,11 +297,10 @@ export default function PricingSection({
           isPending={isPending}
           loadingProductId={loadingProductId}
           redirectToPricingPage={redirectToPricingPage}
-          isInView={isInView}
         />
 
         {/* Use the new GeneralFeaturesSection component */}
-        <GeneralFeaturesSection isInView={isInView} />
+        <GeneralFeaturesSection />
 
         {/* More Information */}
         {showLink && (

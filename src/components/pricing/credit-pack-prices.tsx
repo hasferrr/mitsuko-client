@@ -1,7 +1,6 @@
 "use client"
 
 import { Loader2 } from "lucide-react"
-import { motion } from "framer-motion"
 import { Button } from "../ui/button"
 import { useRouter } from "next/navigation"
 import { ProductId } from "@/types/product"
@@ -26,7 +25,6 @@ interface CreditPackPricesProps {
   isPending: boolean
   loadingProductId: ProductId | null
   redirectToPricingPage?: boolean
-  isInView: boolean
 }
 
 export function CreditPackPrices({
@@ -36,15 +34,11 @@ export function CreditPackPrices({
   isPending,
   loadingProductId,
   redirectToPricingPage = false,
-  isInView,
 }: CreditPackPricesProps) {
   const router = useRouter()
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, delay: 0.5 }}
+    <div
       className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-sm"
     >
       <div id="credit-packs" className="absolute -top-24" />
@@ -125,6 +119,6 @@ export function CreditPackPrices({
           )
         })}
       </div>
-    </motion.div>
+    </div>
   )
 }
