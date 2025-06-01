@@ -2,149 +2,105 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import {
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  House,
-  Folder,
-  Languages,
-  AudioWaveform,
-  BookOpen,
-} from "lucide-react"
+import { useState, useEffect } from "react"
+import { ExternalLink } from "lucide-react"
 import { useSessionStore } from "@/stores/use-session-store"
-import ImageLogo from "@/static/waifu.jpg"
+import demoPlaceholderImage from "@/static/demo-placeholder.png"
 import { cn } from "@/lib/utils"
 
 export default function HeroSection() {
   const session = useSessionStore((state) => state.session)
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const vimeoScript = document.createElement('script')
+      vimeoScript.src = "https://player.vimeo.com/api/player.js"
+      vimeoScript.async = true
+
+      const handleScriptLoad = () => {
+        setIsScriptLoaded(true)
+      }
+
+      vimeoScript.addEventListener('load', handleScriptLoad)
+      document.body.appendChild(vimeoScript)
+
+      return () => {
+        vimeoScript.removeEventListener('load', handleScriptLoad)
+        if (document.body.contains(vimeoScript)) {
+          document.body.removeChild(vimeoScript)
+        }
+      }
+    }
+  }, [])
 
   return (
-    <div className="w-full flex items-center justify-center px-4 py-12 lg:px-16 relative">
-      <div className="absolute top-0 left-0 w-full h-full bg-grid-white/[0.2] bg-grid-8 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
-      <div className={cn(
-        "w-full max-w-6xl flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-12",
-        "bg-gradient-to-br dark:bg-gradient-to-br",
-        "from-indigo-600 via-purple-600 to-red-500",
-        "dark:from-indigo-600 dark:via-purple-700 dark:to-purple-800",
-        "rounded-2xl border border-white/20 dark:border-gray-800 transition-colors",
-        "p-8 md:p-12 overflow-hidden shadow-2xl relative z-10"
-      )}>
-        {/* Text content on the left */}
-        <div className="flex flex-col items-center lg:items-start text-center lg:text-left max-w-xl gap-6">
-          <div
-            className="flex flex-col-reverse"
-          >
-            <div className="text-gray-200 mb-8 text-sm md:text-lg sm:text-base drop-shadow-md">
-              <h1>AI-Powered Subtitle Translator & Audio Transcription.</h1>
-              <p>Get SRT/ASS translation with high-quality and context-aware results.</p>
-            </div>
-            <p className="text-4xl md:text-5xl lg:text-6xl font-medium text-white drop-shadow-md mb-6">
-              Easily translate subtitles and transcribe audio with high quality results
-            </p>
-          </div>
-          <div
-            className="flex gap-4"
-          >
-            <Link
-              href="/dashboard"
-              className="bg-blue-700 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-white px-6 py-3 rounded-md flex items-center gap-2 transition-colors drop-shadow-sm"
-            >
-              Try for Free!
-              <ArrowRight size={18} />
-            </Link>
-            <Link
-              href="/auth/login"
-              className="bg-white/10 hover:bg-gray-100/20 text-white px-6 py-3 rounded-md transition-colors drop-shadow-sm"
-            >
-              {session ? "My Account" : "Sign In"}
-            </Link>
-          </div>
-        </div>
+    <div className="w-full flex flex-col items-center justify-center px-4 my-12">
+      {/* Notification banner */}
+      <div className="mb-12 max-w-3xl mx-auto">
+        <Link href="/dashboard" className="group flex items-center justify-center gap-2 px-8 py-4 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a1a1a] dark:hover:bg-[#252525] hover:bg-gray-50 transition-colors drop-shadow-sm">
+          ✨
+          <span className="dark:text-gray-200 text-gray-800">Claude 4 Sonnet and Gemini 2.5 Pro are now available!</span>
+          <ExternalLink size={16} className="text-gray-400 group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </div>
 
-        {/* Card element on the right */}
-        <div
-          className="w-full max-w-md min-w-[320px]"
+      {/* Main heading */}
+      <h1 className="max-w-3xl text-5xl md:text-6xl font-medium text-center mb-8 bg-gradient-to-r  bg-clip-text">
+        {/* Easily translate subtitles and transcribe audio with high quality results. */}
+        {/* Your Professional AI-Powered Subtitle Translator */}
+        The Most Accurate AI <span className="text-purple-500">Subtitle Translator</span>
+      </h1>
+
+      {/* Subheading */}
+      <div className="max-w-2xl text-center mb-12 text-lg">
+        <p>
+          AI-Powered Subtitle Translator & Audio Transcription.
+          Get SRT/ASS translation with high-quality and context-aware results.
+        </p>
+      </div>
+
+      {/* CTA Buttons */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+        <Link
+          href="/dashboard"
+          className="px-8 py-4 rounded-md bg-gradient-to-r from-[#ff7b72] to-[#bc8cff] text-white font-medium flex items-center justify-center hover:brightness-110 transition-all"
         >
-          <div className="w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg shadow-2xl overflow-hidden border border-white/20 dark:border-gray-800">
-            {/* Browser chrome */}
-            <div className="bg-white/80 dark:bg-gray-800/80 border-b border-gray-200/50 dark:border-gray-700/50 px-4 py-2 flex items-center justify-between backdrop-blur-sm">
-              <div className="flex space-x-2">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              </div>
-              <div className="flex space-x-4">
-                <ChevronLeft className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                <ChevronRight className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                <Clock className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-              </div>
-            </div>
+          Try for Free!
+        </Link>
+        <Link
+          href="/auth/login"
+          className="px-8 py-4 rounded-md bg-[#1a1a1a] hover:bg-[#252525] border border-gray-800 transition-colors text-white font-medium flex items-center justify-center"
+        >
+          {session ? "My Account" : "Sign In"}
+        </Link>
+      </div>
 
-            {/* App header */}
-            <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-4 flex items-center">
-              <div className="flex items-center">
-                <div className="w-8 h-8 rounded-lg overflow-hidden mr-2 bg-white/20 backdrop-blur-sm">
-                  <Image
-                    width={32}
-                    height={32}
-                    src={ImageLogo}
-                    alt="Mitsuko Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-lg font-medium text-gray-800 dark:text-white">Mitsuko</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">AI-Powered Tools</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Sidebar navigation */}
-            <div className="p-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
-              <div className="text-gray-500 dark:text-gray-400 mb-3 font-medium">Platform</div>
-              <ul className="space-y-4 mb-6">
-                <li className="flex items-center group">
-                  <div className="w-5 h-5 mr-3 text-purple-600 dark:text-purple-400">
-                    <House className="w-full h-full" />
-                  </div>
-                  <span className="text-gray-800 dark:text-gray-300 font-medium group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Dashboard</span>
-                </li>
-                <li className="flex items-center group">
-                  <div className="w-5 h-5 mr-3 text-gray-600 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                    <Folder className="w-full h-full" />
-                  </div>
-                  <span className="text-gray-700 dark:text-gray-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Project</span>
-                </li>
-                <li className="flex items-center group">
-                  <div className="w-5 h-5 mr-3 text-gray-600 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                    <Languages className="w-full h-full" />
-                  </div>
-                  <span className="text-gray-700 dark:text-gray-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Translate</span>
-                </li>
-                <li className="flex items-center group">
-                  <div className="w-5 h-5 mr-3 text-gray-600 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                    <AudioWaveform className="w-full h-full" />
-                  </div>
-                  <span className="text-gray-700 dark:text-gray-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Transcribe</span>
-                </li>
-                <li className="flex items-center group">
-                  <div className="w-5 h-5 mr-3 text-gray-600 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                    <BookOpen className="w-full h-full" />
-                  </div>
-                  <span className="text-gray-700 dark:text-gray-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Extract Context</span>
-                </li>
-              </ul>
-
-              <div className="text-gray-500 dark:text-gray-400 mb-3 font-medium">Projects</div>
-              <ul className="space-y-2 pl-1">
-                <li className="flex items-center group">
-                  <span className="text-gray-700 dark:text-gray-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Movie</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+      {/* Video embed */}
+      <div className="mt-16 w-full max-w-5xl mx-auto rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800">
+        <div className="relative pt-[56.25%]">
+          {!isScriptLoaded && (
+            <Image
+              width={960}
+              height={540}
+              src={demoPlaceholderImage}
+              alt="Loading video..."
+              priority
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          )}
+          <iframe
+            suppressHydrationWarning
+            src="https://player.vimeo.com/video/1089413708?h=4944913f27&badge=0&autopause=0&player_id=0&app_id=58479&loop=1&autoplay=1&vimeo_logo=0"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            className={cn(
+              "absolute inset-0 w-full h-full transition-opacity duration-500",
+              isScriptLoaded ? "opacity-100" : "opacity-0"
+            )}
+            title="Mitsuko AI Subtitle Translator Demo"
+            style={{ visibility: isScriptLoaded ? "visible" : "hidden" }}
+          />
         </div>
       </div>
     </div>
