@@ -26,10 +26,8 @@ import {
   AlertDialogHeader as AlertDialogHeaderInner,
   AlertDialogTitle as AlertDialogTitleInner,
 } from "@/components/ui/alert-dialog"
-import {
-  removeAllLineBreaks,
-  removeContentBetween,
-} from "@/lib/subtitles/content"
+import { removeContentBetween } from "@/lib/subtitles/utils/remove-content-between"
+import { removeLineBreaks } from "@/lib/subtitles/utils/remove-line-breaks"
 import { shiftSubtitles } from "@/lib/subtitles/timestamp"
 import { SubtitleTranslated } from "@/types/subtitles"
 import { sleep } from "@/lib/utils"
@@ -69,7 +67,7 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
 
   const handleRemoveAllLineBreaks = (field: "content" | "translated") => {
     if (!subtitles.length) return
-    const updatedSubtitles = removeAllLineBreaks(subtitles, field, parsed.type === "ass")
+    const updatedSubtitles = removeLineBreaks(subtitles, field, parsed.type === "ass")
     handleSetSubtitles(updatedSubtitles)
     toast.success(`Removed all line breaks from ${field === "content" ? "original" : "translated"} text`)
   }

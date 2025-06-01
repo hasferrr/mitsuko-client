@@ -8,8 +8,7 @@ export function getThink(response: string): string {
 }
 
 export function getContent(response: string): string {
-  const removedThink = removeWrapped(response, '<think>', '</think>')
-  return removedThink
+  return removeWrapped(response, '<think>', '</think>').trim()
 }
 
 export function parseTranslationJson(response: string): SubOnlyTranslated[] {

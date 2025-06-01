@@ -1,5 +1,5 @@
 import { CombinedFormat, SubtitleType } from "@/types/subtitles"
-import { removeStringContentBetween } from "../content"
+import { removeStringContentBetween } from "./remove-content-between"
 
 /**
  * Combines original and translated subtitle content with different formatting options

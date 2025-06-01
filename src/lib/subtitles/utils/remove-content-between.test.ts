@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test"
-import { removeContentBetween } from "./content"
+import { removeContentBetween } from "./remove-content-between"
 import type { SubtitleTranslated } from "@/types/subtitles"
 
 describe("removeContentBetween", () => {
