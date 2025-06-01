@@ -57,16 +57,16 @@ export default function HeroSection() {
       </div>
 
       {/* CTA Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+      <div className="flex gap-4 mb-4">
         <Link
           href="/dashboard"
-          className="px-8 py-4 rounded-md bg-gradient-to-r from-[#ff7b72] to-[#bc8cff] text-white font-medium flex items-center justify-center hover:brightness-110 transition-all"
+          className="px-8 py-4 rounded-md bg-gradient-to-r from-[#ff7b72] to-[#bc8cff] text-white font-medium hover:brightness-110 transition-all whitespace-nowrap"
         >
           Try for Free!
         </Link>
         <Link
           href="/auth/login"
-          className="px-8 py-4 rounded-md bg-[#1a1a1a] hover:bg-[#252525] border border-gray-800 transition-colors text-white font-medium flex items-center justify-center"
+          className="px-8 py-4 rounded-md bg-[#1a1a1a] hover:bg-[#252525] border border-gray-800 transition-colors text-white font-medium whitespace-nowrap"
         >
           {session ? "My Account" : "Sign In"}
         </Link>
