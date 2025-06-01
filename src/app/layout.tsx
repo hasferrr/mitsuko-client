@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     siteName: 'Mitsuko',
     images: [
       {
-        url: `${DEPLOYMENT_URL}/opengraph-image.png`,
+        url: `${DEPLOYMENT_URL}/opengraph-image-0.png`,
         width: 1200,
         height: 630,
         alt: 'Mitsuko Application Preview',
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: META_TITLE_LONG,
     description: META_DESCRIPTION,
-    images: [`${DEPLOYMENT_URL}/opengraph-image.png`],
+    images: [`${DEPLOYMENT_URL}/opengraph-image-0.png`],
   },
 }
 
