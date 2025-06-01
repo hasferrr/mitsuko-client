@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { ExternalLink } from "lucide-react"
 import { useSessionStore } from "@/stores/use-session-store"
 import demoPlaceholderImage from "@/static/demo-placeholder.png"
@@ -10,27 +10,10 @@ import demoPlaceholderImage from "@/static/demo-placeholder.png"
 export default function HeroSection() {
   const session = useSessionStore((state) => state.session)
   const [isPlayClicked, setIsPlayClicked] = useState(false)
-  const vimeoScriptId = "vimeo-player-api-script"
 
   const handlePlayClick = () => {
     setIsPlayClicked(true)
-    if (typeof window !== 'undefined' && !document.getElementById(vimeoScriptId)) {
-      const vimeoScript = document.createElement('script')
-      vimeoScript.id = vimeoScriptId
-      vimeoScript.src = "https://player.vimeo.com/api/player.js"
-      vimeoScript.async = true
-      document.body.appendChild(vimeoScript)
-    }
   }
-
-  useEffect(() => {
-    return () => {
-      const scriptElement = document.getElementById(vimeoScriptId)
-      if (scriptElement && scriptElement.parentNode) {
-        scriptElement.parentNode.removeChild(scriptElement)
-      }
-    }
-  }, [])
 
   return (
     <div className="w-full flex flex-col items-center justify-center px-4 my-12">
@@ -100,9 +83,12 @@ export default function HeroSection() {
           {isPlayClicked && (
             <iframe
               suppressHydrationWarning
-              src="https://player.vimeo.com/video/1089413708?h=4944913f27&badge=0&autopause=0&player_id=0&app_id=58479&loop=1&autoplay=1&vimeo_logo=0"
+              src="https://player.vimeo.com/video/1089413708?h=4944913f27&badge=0&autopause=0&player_id=0&app_id=58479&loop=1&autoplay=1&vimeo_logo=0&byline=0&portrait=0&title=0"
               allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
+              sandbox="allow-same-origin allow-scripts"
+              referrerPolicy="strict-origin-when-cross-origin"
+              loading="lazy"
               className="absolute inset-0 w-full h-full"
               title="Mitsuko AI Subtitle Translator Demo"
             />
