@@ -6,30 +6,28 @@ import { useState, useEffect } from "react"
 import { ExternalLink } from "lucide-react"
 import { useSessionStore } from "@/stores/use-session-store"
 import demoPlaceholderImage from "@/static/demo-placeholder.png"
-import { cn } from "@/lib/utils"
 
 export default function HeroSection() {
   const session = useSessionStore((state) => state.session)
-  const [isScriptLoaded, setIsScriptLoaded] = useState(false)
+  const [isPlayClicked, setIsPlayClicked] = useState(false)
+  const vimeoScriptId = "vimeo-player-api-script"
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
+  const handlePlayClick = () => {
+    setIsPlayClicked(true)
+    if (typeof window !== 'undefined' && !document.getElementById(vimeoScriptId)) {
       const vimeoScript = document.createElement('script')
+      vimeoScript.id = vimeoScriptId
       vimeoScript.src = "https://player.vimeo.com/api/player.js"
       vimeoScript.async = true
-
-      const handleScriptLoad = () => {
-        setIsScriptLoaded(true)
-      }
-
-      vimeoScript.addEventListener('load', handleScriptLoad)
       document.body.appendChild(vimeoScript)
+    }
+  }
 
-      return () => {
-        vimeoScript.removeEventListener('load', handleScriptLoad)
-        if (document.body.contains(vimeoScript)) {
-          document.body.removeChild(vimeoScript)
-        }
+  useEffect(() => {
+    return () => {
+      const scriptElement = document.getElementById(vimeoScriptId)
+      if (scriptElement && scriptElement.parentNode) {
+        scriptElement.parentNode.removeChild(scriptElement)
       }
     }
   }, [])
@@ -47,8 +45,6 @@ export default function HeroSection() {
 
       {/* Main heading */}
       <h1 className="max-w-3xl text-5xl md:text-6xl font-medium text-center mb-8 bg-gradient-to-r  bg-clip-text">
-        {/* Easily translate subtitles and transcribe audio with high quality results. */}
-        {/* Your Professional AI-Powered Subtitle Translator */}
         The Most Accurate AI <span className="text-purple-500">Subtitle Translator</span>
       </h1>
 
@@ -78,29 +74,39 @@ export default function HeroSection() {
 
       {/* Video embed */}
       <div className="mt-16 w-full max-w-5xl mx-auto rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800">
-        <div className="relative pt-[56.25%]">
-          {!isScriptLoaded && (
+        <div className="relative pt-[56.25%] bg-black select-none">
+          {!isPlayClicked && (
             <Image
               width={960}
               height={540}
               src={demoPlaceholderImage}
-              alt="Loading video..."
-              priority
+              alt="Play video"
               className="absolute inset-0 w-full h-full object-cover"
             />
           )}
-          <iframe
-            suppressHydrationWarning
-            src="https://player.vimeo.com/video/1089413708?h=4944913f27&badge=0&autopause=0&player_id=0&app_id=58479&loop=1&autoplay=1&vimeo_logo=0"
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowFullScreen
-            className={cn(
-              "absolute inset-0 w-full h-full transition-opacity duration-500",
-              isScriptLoaded ? "opacity-100" : "opacity-0"
-            )}
-            title="Mitsuko AI Subtitle Translator Demo"
-            style={{ visibility: isScriptLoaded ? "visible" : "hidden" }}
-          />
+
+          {!isPlayClicked && (
+            <div
+              onClick={handlePlayClick}
+              className="absolute inset-0 flex items-center justify-center cursor-pointer group"
+              aria-label="Play video"
+              role="button"
+            >
+              <div className="absolute inset-0 bg-black bg-opacity-10 transition-colors duration-300"></div>
+              <svg className="w-20 h-20 text-white opacity-80 group-hover:opacity-100 transform group-hover:scale-110 transition-all duration-300 z-10" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"></path></svg>
+            </div>
+          )}
+
+          {isPlayClicked && (
+            <iframe
+              suppressHydrationWarning
+              src="https://player.vimeo.com/video/1089413708?h=4944913f27&badge=0&autopause=0&player_id=0&app_id=58479&loop=1&autoplay=1&vimeo_logo=0"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full"
+              title="Mitsuko AI Subtitle Translator Demo"
+            />
+          )}
         </div>
       </div>
     </div>
