@@ -133,7 +133,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
           <DialogHeader>
             <DialogTitle>✨ Share your feedback ✨</DialogTitle>
             <DialogDescription>
-              Help us improve our product by sharing your thoughts and experiences! 😊
+              Having any issues or suggestions? We'd love to hear from you! 😊
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -233,7 +233,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
               <div className="text-sm font-medium">Your feedback</div>
               <Textarea
                 ref={textareaRef}
-                placeholder="Tell us what you think..."
+                placeholder="It would be great if..."
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 className="min-h-[100px] max-h-[300px] overflow-y-auto transition-height duration-200"
