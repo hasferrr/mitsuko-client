@@ -1,6 +1,7 @@
 import Link from "next/link"
-import { Github, Twitter, DiscIcon as Discord } from "lucide-react"
-import { GITHUB_LINK } from "@/constants/external-links"
+import { Github, Twitter } from "lucide-react"
+import { IconBrandDiscord } from "@tabler/icons-react"
+import { DISCORD_LINK, GITHUB_LINK } from "@/constants/external-links"
 
 export function Footer() {
   return (
@@ -33,9 +34,14 @@ export function Footer() {
             <span className="sr-only">Twitter</span>
             <Twitter className="h-5 w-5" />
           </Link>
-          <Link href="#" className="text-muted-foreground hover:text-foreground">
+          <Link
+            href={DISCORD_LINK}
+            className="text-muted-foreground hover:text-foreground"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <span className="sr-only">Discord</span>
-            <Discord className="h-5 w-5" />
+            <IconBrandDiscord className="h-5 w-5" />
           </Link>
         </div>
       </div>

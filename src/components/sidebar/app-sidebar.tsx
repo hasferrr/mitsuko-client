@@ -4,7 +4,6 @@ import Link from "next/link"
 import {
   AudioWaveform,
   BookOpen,
-  Disc,
   Folder,
   House,
   Languages,
@@ -23,6 +22,7 @@ import {
 import { FEEDBACK_LINK, DISCORD_LINK } from "@/constants/external-links"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { SidebarHeaderIcon } from "./sidebar-header-icon"
+import { IconBrandDiscord } from "@tabler/icons-react"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const projects = useProjectStore((state) => state.projects)
@@ -60,7 +60,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         title: "Discord",
         url: DISCORD_LINK,
-        icon: Disc,
+        icon: IconBrandDiscord,
         newTab: true,
       },
       {

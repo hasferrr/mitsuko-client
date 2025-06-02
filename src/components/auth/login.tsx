@@ -18,6 +18,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+import { IconBrandGoogleFilled } from "@tabler/icons-react"
 
 export function Login() {
   const session = useSessionStore((state) => state.session)
@@ -62,7 +63,10 @@ export function Login() {
   if (!session) {
     return (
       <div className="mx-auto flex flex-col gap-4 items-center justify-center">
-        <Button onClick={signUp}>Sign in with Google</Button>
+        <Button onClick={signUp}>
+          <IconBrandGoogleFilled />
+          Sign in with Google
+        </Button>
       </div>
     )
   }

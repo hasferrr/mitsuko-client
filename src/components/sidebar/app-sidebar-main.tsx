@@ -1,6 +1,7 @@
 "use client"
 
 import { type LucideIcon } from "lucide-react"
+import { type Icon as TablerIcon } from "@tabler/icons-react"
 
 import {
   SidebarGroup,
@@ -15,7 +16,7 @@ import { cn } from "@/lib/utils"
 interface Item {
   title: string
   url: string
-  icon?: LucideIcon
+  icon?: LucideIcon | TablerIcon
   newTab?: boolean
   onClick?: () => void
 }
