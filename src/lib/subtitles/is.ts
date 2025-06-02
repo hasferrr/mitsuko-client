@@ -6,5 +6,5 @@ export function isSRT(content: string): boolean {
   const lines = content.trim().split('\n', 2)
   const firstLine = lines[0]
   const secondLine = lines[1]
-  return !isNaN(Number(firstLine)) && secondLine.includes(' --> ')
+  return !isNaN(Number(firstLine)) && secondLine?.includes(' --> ')
 }

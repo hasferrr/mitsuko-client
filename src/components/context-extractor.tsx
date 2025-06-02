@@ -49,6 +49,7 @@ import { db } from "@/lib/db/db"
 import { Extraction, Translation } from "@/types/project"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
+import { toast } from "sonner"
 
 interface FileItem {
   id: string
@@ -338,31 +339,31 @@ export const ContextExtractor = () => {
       throw new Error("Empty content")
     }
 
-    const data = parseSubtitle({ content: subtitleContent })
-    const subtitles: SubtitleNoTime[] = removeTimestamp(data.subtitles)
-
-    const result: string[] | undefined = isContinuation
-      ? [contextResult]
-      : undefined
-
-    const requestBody = {
-      input: {
-        episode: Number(episodeNumber),
-        subtitles: subtitles,
-        previous_context: previousContext,
-      },
-      isContinuation: isContinuation ? true : undefined,
-      continuationMessage: isContinuation ? result : undefined,
-      baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
-      model: isUseCustomModel ? customModel : modelDetail?.name || "",
-      maxCompletionTokens: isMaxCompletionTokensAuto ? undefined : minMax(
-        maxCompletionTokens,
-        MAX_COMPLETION_TOKENS_MIN,
-        MAX_COMPLETION_TOKENS_MAX
-      ),
-    }
-
     try {
+      const data = parseSubtitle({ content: subtitleContent })
+      const subtitles: SubtitleNoTime[] = removeTimestamp(data.subtitles)
+
+      const result: string[] | undefined = isContinuation
+        ? [contextResult]
+        : undefined
+
+      const requestBody = {
+        input: {
+          episode: Number(episodeNumber),
+          subtitles: subtitles,
+          previous_context: previousContext,
+        },
+        isContinuation: isContinuation ? true : undefined,
+        continuationMessage: isContinuation ? result : undefined,
+        baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
+        model: isUseCustomModel ? customModel : modelDetail?.name || "",
+        maxCompletionTokens: isMaxCompletionTokensAuto ? undefined : minMax(
+          maxCompletionTokens,
+          MAX_COMPLETION_TOKENS_MIN,
+          MAX_COMPLETION_TOKENS_MAX
+        ),
+      }
+
       await extractContext(
         requestBody,
         isUseCustomModel ? apiKey : "",
@@ -375,6 +376,7 @@ export const ContextExtractor = () => {
       )
     } catch (error) {
       console.error(error)
+      toast.error("Error extracting context, please make sure the subtitle content is valid")
     } finally {
       setIsExtracting(currentId, false)
 
