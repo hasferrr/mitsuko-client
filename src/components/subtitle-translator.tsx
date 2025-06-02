@@ -1092,12 +1092,15 @@ export default function SubtitleTranslator() {
                   <TemperatureSlider />
                   <StartIndexInput />
                   <EndIndexInput />
+                  <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
+                    <AdvancedReasoningSwitch />
+                  </div>
+                  <div className="text-sm font-semibold">Technical Options</div>
                   <SplitSizeInput />
                   <MaxCompletionTokenInput type="translation" />
                   <StructuredOutputSwitch />
                   <FullContextMemorySwitch />
                   <BetterContextCachingSwitch />
-                  <AdvancedReasoningSwitch />
                   <AdvancedSettingsResetButton />
                 </CardContent>
               </Card>

@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
-import { ChevronsRight, Eye, EyeOff, FolderDown, List, Link as LinkIcon, FileText as FileTextIcon, XCircle } from "lucide-react"
+import { ChevronsRight, Eye, EyeOff, FolderDown, List, Link as LinkIcon, FileText as FileTextIcon, XCircle, Sparkles } from "lucide-react"
 import { Button } from "./ui/button"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import {
@@ -1003,17 +1003,21 @@ export const AdvancedReasoningSwitch = memo(() => {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">Advanced Reasoning & Planning</label>
+        <label className="text-sm font-medium">
+          <span className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            Advanced Reasoning & Planning
+          </span>
+        </label>
         <Switch
           checked={isAdvancedReasoningEnabled}
           onCheckedChange={setIsAdvancedReasoningEnabled}
         />
       </div>
       <p className="text-xs text-muted-foreground">
-        Enable the AI follows a more structured, multi-step thinking process.
-        It first understands the original text and context, reviews its previous translations,
-        drafts, critiques, and refines the result, delivering a more accurate output.
-        Great for reasoning/thinking models
+        Enable the AI follows a more structured & multi-step thinking process.
+        It first understands the original text and context, then reviews its translations, drafts, critiques, and refines the translation.
+        Great for reasoning/thinking models.
       </p>
     </div>
   )
