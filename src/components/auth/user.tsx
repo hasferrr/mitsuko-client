@@ -1,7 +1,8 @@
 "use client"
 
+import Link from "next/link"
 import { capitalize, cn } from "@/lib/utils"
-import { RefreshCw } from "lucide-react"
+import { RefreshCw, Plus } from "lucide-react"
 import { Button } from "../ui/button"
 import { UserCreditData } from "@/types/user"
 import { useSessionStore } from "@/stores/use-session-store"
@@ -117,9 +118,21 @@ export function User() {
                 ) : isUserError ? (
                   <span className="italic text-red-500">Error</span>
                 ) : (
-                  <span className={cn((user?.credit ?? 0) < 0 && "text-red-500")}>
-                    {Math.round(user?.credit ?? 0).toLocaleString()}
-                  </span>
+                  <div className="flex items-center justify-end gap-2">
+                    <Link href="/pricing" target="_blank">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1 py-0 px-2 mr-1 h-6 text-white hover:text-white bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Buy
+                      </Button>
+                    </Link>
+                    <span className={cn((user?.credit ?? 0) < 0 && "text-red-500")}>
+                      {Math.round(user?.credit ?? 0).toLocaleString()}
+                    </span>
+                  </div>
                 )}
               </td>
             </tr>

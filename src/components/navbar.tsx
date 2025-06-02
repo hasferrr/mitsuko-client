@@ -31,7 +31,7 @@ export function Navbar() {
 
   // User data
   const session = useSessionStore(state => state.session)
-  const { data: user, isLoading, isFetching, isError, refetch } = useQuery<UserCreditData>({
+  const { data: user, isLoading, isFetching, isError } = useQuery<UserCreditData>({
     queryKey: ["user", session?.user?.id],
     queryFn: fetchUserCreditData,
     enabled: !!session?.user?.id,
@@ -204,16 +204,16 @@ export function Navbar() {
               <span className="text-red-500">Error</span>
             </div>
           ) : user && (
-            <div
+            <Link
+              href="/auth/login"
               className="flex items-center gap-2 text-sm mr-4 cursor-pointer hover:underline"
-              onClick={() => refetch()}
-              title="Click to refresh"
+              title="Click to add credits"
             >
               <CircleDollarSign className="h-4 w-4" />
               <span className={cn(user.credit < 0 && "text-red-500")}>
                 {Math.round(user.credit).toLocaleString()} credits
               </span>
-            </div>
+            </Link>
           )}
 
           <Button
