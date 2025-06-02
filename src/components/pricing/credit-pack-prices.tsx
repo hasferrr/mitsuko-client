@@ -5,54 +5,120 @@ import { Button } from "../ui/button"
 import { useRouter } from "next/navigation"
 import { ProductId } from "@/types/product"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-
-interface Currency {
-  symbol: string
-  rate: number
-}
-
-interface CreditPack {
-  productId: ProductId
-  baseCredits: number
-  basePriceUSD: number
-  discountUSD: number
-}
+import { useState, useTransition } from "react"
+import { useSnapStore } from "@/stores/use-snap-store"
+import { PaymentOptionsDialog } from "./payment-options-dialog"
+import { toast } from "sonner"
+import { useSessionStore } from "@/stores/use-session-store"
+import { CREDIT_PACKS } from "@/constants/pricing"
+import { CurrencyData } from "@/types/pricing"
 
 interface CreditPackPricesProps {
-  currency: Currency
-  creditPacks: CreditPack[]
-  handlePurchase: (productId: ProductId) => void
-  isPending: boolean
-  loadingProductId: ProductId | null
+  currency: CurrencyData
   redirectToPricingPage?: boolean
 }
 
 export function CreditPackPrices({
   currency,
-  creditPacks,
-  handlePurchase,
-  isPending,
-  loadingProductId,
   redirectToPricingPage = false,
 }: CreditPackPricesProps) {
   const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [loadingProductId, setLoadingProductId] = useState<ProductId | null>(null)
+  const [dialogData, setDialogData] = useState<{
+    token: string | null
+    redirectUrl: string | null
+    userId: string | null
+    productId: ProductId
+    price: number
+    credits: number
+    currencySymbol: string
+    currencyRate: number
+  } | null>(null)
+
+  const session = useSessionStore((state) => state.session)
+
+  const handlePurchase = async (productId: ProductId) => {
+    const getSnapData = useSnapStore.getState().getSnapData
+    const removeSnapData = useSnapStore.getState().removeSnapData
+    const clearSnapData = useSnapStore.getState().clearSnapData
+
+    setLoadingProductId(productId)
+    startTransition(async () => {
+      let token: string | null = null
+      let redirectUrl: string | null = null
+      let userId: string | null = null
+
+      try {
+        userId = session?.user.id ?? null
+
+        const packData = CREDIT_PACKS.find(p => p.productId === productId)
+        if (!packData) {
+          console.error(`Product data not found for productId: ${productId}`)
+          toast.error("Product information not available. Please try again later.")
+          return
+        }
+
+        if (userId) {
+          const existingData = getSnapData(userId, productId)
+          const isDataValid = !!existingData && existingData.expiresAt >= new Date()
+
+          if (isDataValid) {
+            console.log("Using existing valid Snap data for", productId)
+            token = existingData.token
+            redirectUrl = existingData.redirect_url
+          } else {
+            if (existingData) {
+              console.log("Existing Snap data expired for", productId)
+              removeSnapData(userId, productId)
+            }
+            console.log("No valid Snap data found for", productId, ". Dialog will fetch.")
+            token = null
+            redirectUrl = null
+          }
+        } else {
+          clearSnapData()
+          console.log("User not authenticated, skipping snap data check.")
+          token = null
+          redirectUrl = null
+        }
+
+        setDialogData({
+          token: token,
+          redirectUrl: redirectUrl,
+          userId: userId,
+          productId: productId,
+          price: packData.basePriceUSD,
+          credits: packData.baseCredits,
+          currencySymbol: currency.symbol,
+          currencyRate: currency.rate,
+        })
+        setIsDialogOpen(true)
+
+      } catch (error) {
+        console.error("Error during purchase preparation:", error)
+        toast.error("An error occurred while preparing your purchase. Please try again.")
+      } finally {
+        setLoadingProductId(null)
+      }
+    })
+  }
 
   return (
-    <div
-      className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-sm"
-    >
+    <div className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-sm">
       <div id="credit-packs" className="absolute -top-24" />
 
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
         Need more credits? Purchase additional credit packs starting at just{" "}
         {currency.symbol}
-        {(creditPacks[0]?.basePriceUSD * currency.rate || 0).toLocaleString()}
+        {(CREDIT_PACKS[0]?.basePriceUSD * currency.rate || 0).toLocaleString()}
         . Available to all tiers, these credit packs provide flexibility for your
         usage needs. <strong>Credits purchased do not expire.</strong>
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {creditPacks.map((pack) => {
+        {CREDIT_PACKS.map((pack) => {
           const price = pack.basePriceUSD * currency.rate
           const savings = pack.discountUSD * currency.rate
           const isCurrentCardLoading = isPending && loadingProductId === pack.productId
@@ -119,6 +185,20 @@ export function CreditPackPrices({
           )
         })}
       </div>
+
+      {/* Render the Dialog */}
+      {dialogData && (
+        <PaymentOptionsDialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          userId={dialogData.userId}
+          productId={dialogData.productId}
+          price={dialogData.price}
+          credits={dialogData.credits}
+          currencySymbol={dialogData.currencySymbol}
+          currencyRate={dialogData.currencyRate}
+        />
+      )}
     </div>
   )
 }

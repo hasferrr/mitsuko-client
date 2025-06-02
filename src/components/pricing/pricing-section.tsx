@@ -2,22 +2,14 @@
 
 import Link from "next/link"
 import { Check, X } from "lucide-react"
-import { useState, useTransition } from "react"
+import { useState } from "react"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
-import { ProductId } from "@/types/product"
-import { useSnapStore } from "@/stores/use-snap-store"
-import { PaymentOptionsDialog } from "./payment-options-dialog"
-import { toast } from "sonner"
-import { useSessionStore } from "@/stores/use-session-store"
 import { PricingCards } from "./pricing-cards"
 import { FeatureComparisonTable } from "./feature-comparison-table"
 import { CreditPackPrices } from "./credit-pack-prices"
 import { GeneralFeaturesSection } from "./general-features-section"
-
-interface Currency {
-  symbol: string
-  rate: number
-}
+import { CURRENCIES, SUBSCRIPTION_PLANS } from "@/constants/pricing"
+import { CurrencyData } from "@/types/pricing"
 
 interface Feature {
   feature: string
@@ -34,79 +26,34 @@ interface PricingSectionProps {
   showLink?: boolean
 }
 
-const USD = { symbol: "$", rate: 1 }
-const IDR = { symbol: "Rp", rate: 17000 }
-
 export default function PricingSection({
   useH1Title,
   redirectToPricingPage,
   showDescription,
   showLink,
 }: PricingSectionProps) {
-  const [currency, setCurrency] = useState<Currency>(USD)
-  const [isPending, startTransition] = useTransition()
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [loadingProductId, setLoadingProductId] = useState<ProductId | null>(null)
-  const [dialogData, setDialogData] = useState<{
-    token: string | null
-    redirectUrl: string | null
-    userId: string | null
-    productId: ProductId
-    price: number
-    credits: number
-    currencySymbol: string
-    currencyRate: number
-  } | null>(null)
-
-  const session = useSessionStore((state) => state.session)
+  const [currency, setCurrency] = useState<CurrencyData>(CURRENCIES.USD)
 
   const handleCurrencyChange = (value: string) => {
-    setCurrency(value === "$" ? USD : IDR)
+    setCurrency(value === "$" ? CURRENCIES.USD : CURRENCIES.IDR)
   }
 
   const pricingData = {
     free: {
-      price: (0 * currency.rate).toLocaleString(),
-      credits: "0",
+      price: (SUBSCRIPTION_PLANS.free.basePriceUSD * currency.rate).toLocaleString(),
+      credits: SUBSCRIPTION_PLANS.free.credits,
     },
     basic: {
-      productId: "basic_monthly" as const,
-      price: (5 * currency.rate).toLocaleString(),
-      credits: "5,000,000",
+      productId: SUBSCRIPTION_PLANS.basic.productId!,
+      price: (SUBSCRIPTION_PLANS.basic.basePriceUSD * currency.rate).toLocaleString(),
+      credits: SUBSCRIPTION_PLANS.basic.credits,
     },
     pro: {
-      productId: "pro_monthly" as const,
-      price: (20 * currency.rate).toLocaleString(),
-      credits: "22,000,000",
+      productId: SUBSCRIPTION_PLANS.pro.productId!,
+      price: (SUBSCRIPTION_PLANS.pro.basePriceUSD * currency.rate).toLocaleString(),
+      credits: SUBSCRIPTION_PLANS.pro.credits,
     },
   }
-
-  const creditPacks = [
-    {
-      productId: "credit_pack_2m" as const,
-      baseCredits: 2_000_000,
-      basePriceUSD: 2,
-      discountUSD: 0,
-    },
-    {
-      productId: "credit_pack_10m" as const,
-      baseCredits: 10_000_000,
-      basePriceUSD: 10,
-      discountUSD: 0,
-    },
-    {
-      productId: "credit_pack_20m" as const,
-      baseCredits: 20_000_000,
-      basePriceUSD: 19, // Discounted price
-      discountUSD: 1,
-    },
-    {
-      productId: "credit_pack_50m" as const,
-      baseCredits: 50_000_000,
-      basePriceUSD: 45, // Discounted price
-      discountUSD: 5,
-    },
-  ]
 
   const featuresData: Feature[] = [
     {
@@ -174,72 +121,6 @@ export default function PricingSection({
     }
   ]
 
-  const handlePurchase = async (productId: ProductId) => {
-    const getSnapData = useSnapStore.getState().getSnapData
-    const removeSnapData = useSnapStore.getState().removeSnapData
-    const clearSnapData = useSnapStore.getState().clearSnapData
-
-    setLoadingProductId(productId)
-    startTransition(async () => {
-      let token: string | null = null
-      let redirectUrl: string | null = null
-      let userId: string | null = null
-
-      try {
-        userId = session?.user.id ?? null
-
-        const packData = creditPacks.find(p => p.productId === productId)
-        if (!packData) {
-          console.error(`Product data not found for productId: ${productId}`)
-          toast.error("Product information not available. Please try again later.")
-          return
-        }
-
-        if (userId) {
-          const existingData = getSnapData(userId, productId)
-          const isDataValid = !!existingData && existingData.expiresAt >= new Date()
-
-          if (isDataValid) {
-            console.log("Using existing valid Snap data for", productId)
-            token = existingData.token
-            redirectUrl = existingData.redirect_url
-          } else {
-            if (existingData) {
-              console.log("Existing Snap data expired for", productId)
-              removeSnapData(userId, productId)
-            }
-            console.log("No valid Snap data found for", productId, ". Dialog will fetch.")
-            token = null
-            redirectUrl = null
-          }
-        } else {
-          clearSnapData()
-          console.log("User not authenticated, skipping snap data check.")
-          token = null
-          redirectUrl = null
-        }
-
-        setDialogData({
-          token: token,
-          redirectUrl: redirectUrl,
-          userId: userId,
-          productId: productId,
-          price: packData.basePriceUSD,
-          credits: packData.baseCredits,
-          currencySymbol: currency.symbol,
-          currencyRate: currency.rate,
-        })
-        setIsDialogOpen(true)
-
-      } catch (error) {
-        console.error("Error during purchase preparation:", error)
-        toast.error("An error occurred while preparing your purchase. Please try again.")
-      } finally {
-        setLoadingProductId(null)
-      }
-    })
-  }
-
   return (
     <div id="pricing" className="py-16">
       <div className="max-w-6xl mx-auto px-4">
@@ -262,14 +143,14 @@ export default function PricingSection({
         <div className="flex justify-center items-center mb-8">
           <span className="text-gray-600 dark:text-gray-400 mr-2">Show currency in</span>
           <Tabs
-            defaultValue={USD.symbol}
+            defaultValue={CURRENCIES.USD.symbol}
             value={currency.symbol}
             onValueChange={handleCurrencyChange}
             className="w-auto"
           >
             <TabsList className="bg-gray-200 dark:bg-muted text-primary">
-              <TabsTrigger value={USD.symbol}>USD</TabsTrigger>
-              <TabsTrigger value={IDR.symbol}>IDR</TabsTrigger>
+              <TabsTrigger value={CURRENCIES.USD.symbol}>USD</TabsTrigger>
+              <TabsTrigger value={CURRENCIES.IDR.symbol}>IDR</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -292,10 +173,6 @@ export default function PricingSection({
         {/* Credit Pack Prices */}
         <CreditPackPrices
           currency={currency}
-          creditPacks={creditPacks}
-          handlePurchase={handlePurchase}
-          isPending={isPending}
-          loadingProductId={loadingProductId}
           redirectToPricingPage={redirectToPricingPage}
         />
 
@@ -312,19 +189,6 @@ export default function PricingSection({
         )}
       </div>
 
-      {/* Render the Dialog */}
-      {dialogData && (
-        <PaymentOptionsDialog
-          isOpen={isDialogOpen}
-          onClose={() => setIsDialogOpen(false)}
-          userId={dialogData.userId}
-          productId={dialogData.productId}
-          price={dialogData.price}
-          credits={dialogData.credits}
-          currencySymbol={dialogData.currencySymbol}
-          currencyRate={dialogData.currencyRate}
-        />
-      )}
     </div>
   )
 }
