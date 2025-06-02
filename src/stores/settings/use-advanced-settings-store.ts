@@ -25,6 +25,7 @@ interface AdvancedSettingsStore {
   getIsUseStructuredOutput: () => boolean
   getIsUseFullContextMemory: () => boolean
   getIsBetterContextCaching: () => boolean
+  getIsAdvancedReasoningEnabled: () => boolean
   setTemperature: (value: number) => void
   setStartIndex: (value: number) => void
   setEndIndex: (value: number) => void
@@ -33,6 +34,7 @@ interface AdvancedSettingsStore {
   setIsUseStructuredOutput: (value: boolean) => void
   setIsUseFullContextMemory: (value: boolean) => void
   setIsBetterContextCaching: (value: boolean) => void
+  setIsAdvancedReasoningEnabled: (value: boolean) => void
   setIsMaxCompletionTokensAuto: (value: boolean, parent: SettingsParentType) => void
   resetIndex: (s?: number, e?: number) => void
   resetAdvancedSettings: () => void
@@ -144,6 +146,10 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         const id = get().currentId
         return id ? get().data[id]?.isBetterContextCaching : DEFAULT_ADVANCED_SETTINGS.isBetterContextCaching
       },
+      getIsAdvancedReasoningEnabled: () => {
+        const id = get().currentId
+        return id ? get().data[id]?.isAdvancedReasoningEnabled : DEFAULT_ADVANCED_SETTINGS.isAdvancedReasoningEnabled
+      },
       upsertData: (id, value) => set(state => ({
         ...state,
         data: {
@@ -231,6 +237,12 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         if (!id) return
         get().mutateData("isBetterContextCaching", value)
         updateSettings("isBetterContextCaching", value, "translation")
+      },
+      setIsAdvancedReasoningEnabled: (value) => {
+        const id = get().currentId
+        if (!id) return
+        get().mutateData("isAdvancedReasoningEnabled", value)
+        updateSettings("isAdvancedReasoningEnabled", value, "translation")
       },
       // Method for both translation and extraction
       setIsMaxCompletionTokensAuto: (value, parent) => {

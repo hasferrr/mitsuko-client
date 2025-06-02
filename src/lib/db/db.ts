@@ -120,6 +120,16 @@ class MyDatabase extends Dexie {
         await tx.table('advancedSettings').bulkAdd(newAdvancedSettingsList)
       }
     })
+    this.version(12).stores({
+      // No schema changes needed in stores() as we're adding a non-indexed field
+    }).upgrade(async tx => {
+      // Migrate advancedSettings: add isAdvancedReasoningEnabled field
+      await tx.table('advancedSettings').toCollection().modify(setting => {
+        if (typeof setting.isAdvancedReasoningEnabled === 'undefined') {
+          setting.isAdvancedReasoningEnabled = false
+        }
+      })
+    })
   }
 }
 

@@ -31,6 +31,7 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
   isUseFullContextMemory: false,
   isBetterContextCaching: true, // true means it is NOT using Minimal Context Mode
   isMaxCompletionTokensAuto: true,
+  isAdvancedReasoningEnabled: false,
 }
 
 export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models" | "isOverOneHour"> = {

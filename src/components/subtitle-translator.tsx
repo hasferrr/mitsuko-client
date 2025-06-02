@@ -40,6 +40,7 @@ import {
   BetterContextCachingSwitch,
   CustomInstructionsInput,
   FewShotInput,
+  AdvancedReasoningSwitch,
 } from "./settings-inputs"
 import {
   Subtitle,
@@ -397,6 +398,8 @@ export default function SubtitleTranslator() {
       console.log(chunk)
       console.log(JSON.parse(JSON.stringify(context)))
 
+      const isAdvancedReasoningEnabled = useAdvancedSettingsStore.getState().getIsAdvancedReasoningEnabled()
+
       const requestBody = {
         title: title.slice(0, 150),
         subtitles: {
@@ -421,6 +424,7 @@ export default function SubtitleTranslator() {
         structuredOutput: isUseStructuredOutput,
         contextMessage: context,
         fewShotExamples: usedFewShot,
+        promptWithPlanning: isAdvancedReasoningEnabled,
         uuid: currentId,
       }
 
@@ -1093,6 +1097,7 @@ export default function SubtitleTranslator() {
                   <StructuredOutputSwitch />
                   <FullContextMemorySwitch />
                   <BetterContextCachingSwitch />
+                  <AdvancedReasoningSwitch />
                   <AdvancedSettingsResetButton />
                 </CardContent>
               </Card>

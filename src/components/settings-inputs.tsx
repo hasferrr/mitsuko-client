@@ -996,6 +996,29 @@ export const BetterContextCachingSwitch = memo(() => {
   )
 })
 
+export const AdvancedReasoningSwitch = memo(() => {
+  const isAdvancedReasoningEnabled = useAdvancedSettingsStore((state) => state.getIsAdvancedReasoningEnabled())
+  const setIsAdvancedReasoningEnabled = useAdvancedSettingsStore((state) => state.setIsAdvancedReasoningEnabled)
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium">Advanced Reasoning & Planning</label>
+        <Switch
+          checked={isAdvancedReasoningEnabled}
+          onCheckedChange={setIsAdvancedReasoningEnabled}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Enable the AI follows a more structured, multi-step thinking process.
+        It first understands the original text and context, reviews its previous translations,
+        drafts, critiques, and refines the result, delivering a more accurate output.
+        Great for reasoning/thinking models
+      </p>
+    </div>
+  )
+})
+
 export const SystemPromptInput = memo(() => {
   const prompt = ""
   const setPrompt = (val: string) => console.log(val)
