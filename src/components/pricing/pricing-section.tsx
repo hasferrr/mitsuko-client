@@ -3,13 +3,13 @@
 import Link from "next/link"
 import { Check, X } from "lucide-react"
 import { useState } from "react"
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { PricingCards } from "./pricing-cards"
 import { FeatureComparisonTable } from "./feature-comparison-table"
 import { CreditPackPrices } from "./credit-pack-prices"
 import { GeneralFeaturesSection } from "./general-features-section"
 import { CURRENCIES, SUBSCRIPTION_PLANS } from "@/constants/pricing"
 import { CurrencyData } from "@/types/pricing"
+import { CurrencyTabs } from "./currency-tabs"
 
 interface Feature {
   feature: string
@@ -140,20 +140,10 @@ export default function PricingSection({
         </div>
 
         {/* Currency Tabs */}
-        <div className="flex justify-center items-center mb-8">
-          <span className="text-gray-600 dark:text-gray-400 mr-2">Show currency in</span>
-          <Tabs
-            defaultValue={CURRENCIES.USD.symbol}
-            value={currency.symbol}
-            onValueChange={handleCurrencyChange}
-            className="w-auto"
-          >
-            <TabsList className="bg-gray-200 dark:bg-muted text-primary">
-              <TabsTrigger value={CURRENCIES.USD.symbol}>USD</TabsTrigger>
-              <TabsTrigger value={CURRENCIES.IDR.symbol}>IDR</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+        <CurrencyTabs
+          currentCurrencySymbol={currency.symbol}
+          onCurrencyChange={handleCurrencyChange}
+        />
 
         {/* Pricing Cards */}
         {false && <PricingCards
