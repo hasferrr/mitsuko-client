@@ -19,7 +19,7 @@ export default async function CreditUsage() {
   const fetchedCreditCostsMap = await getModelCostData()
 
   const paidModelCostArray: ModelCost[] = Object.values(PAID_MODELS)
-    .flat()
+    .flatMap((group) => group.models)
     .map((paidModel) => {
       const costs = fetchedCreditCostsMap.get(paidModel.name)
 

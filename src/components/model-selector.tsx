@@ -20,7 +20,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
-import { Model } from "@/types/model"
+import { Model, ModelProvider } from "@/types/model"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { MODEL_COLLECTION } from "@/constants/model-collection"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
@@ -29,6 +29,34 @@ import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useModelCosts } from "@/contexts/model-cost-context"
 import { ModelCreditCost } from "@/types/model-cost"
 import Link from "next/link"
+import {
+  Anthropic,
+  DeepSeek,
+  Gemini,
+  Meta,
+  Mistral,
+  OpenAI,
+  OpenRouter,
+  Qwen,
+  XAI,
+} from "@lobehub/icons"
+
+const providerIconMap = {
+  google: Gemini,
+  anthropic: Anthropic,
+  openai: OpenAI,
+  meta: Meta,
+  mistral: Mistral,
+  deepseek: DeepSeek,
+  qwen: Qwen,
+  xai: XAI,
+  unknown: OpenRouter,
+}
+
+const ModelProviderIcon = ({ provider }: { provider: ModelProvider }) => {
+  const Icon = providerIconMap[provider] || OpenRouter
+  return <Icon size={16} />
+}
 
 interface ModelSelectorProps extends PopoverProps {
   type: SettingsParentType
@@ -119,23 +147,24 @@ export function ModelSelector({
           side="bottom"
           className="w-full p-0 overflow-y-auto"
         >
-          <Command loop defaultValue={`${modelDetail?.name}-${modelDetail?.isPaid ? "paid" : "free"}`}>
+          <Command className="min-w-[320px]" loop defaultValue={`${modelDetail?.name}-${modelDetail?.isPaid ? "paid" : "free"}`}>
             <CommandInput placeholder="Search Models..." />
             <CommandList>
               <CommandEmpty>No Models found.</CommandEmpty>
               {Object.entries(models).map(([key, value]) => (
                 <CommandGroup key={key} heading={(
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <ModelProviderIcon provider={value.provider} />
                     {key}
                     <Badge
-                      variant={value[0]?.isPaid ? "default" : "secondary"}
+                      variant={value.models[0]?.isPaid ? "default" : "secondary"}
                       className={cn("text-xs px-[6px] h-[1rem]", "text-[11px]")}
                     >
-                      {value[0]?.isPaid ? "Premium" : "Free"}
+                      {value.models[0]?.isPaid ? "Premium" : "Free"}
                     </Badge>
                   </div>
                 )}>
-                  {value.map((model) => (
+                  {value.models.map((model) => (
                     <ModelItem
                       key={`${model.name}-${model.isPaid ? "paid" : "free"}`}
                       model={model}
@@ -170,22 +199,20 @@ function ModelItem({ model, cost, isSelected, onSelect }: ModelItemProps) {
   return (
     <HoverCard openDelay={0} closeDelay={0}>
       <HoverCardTrigger asChild>
-        <div>
-          <CommandItem
-            onSelect={onSelect}
-            value={`${model.name}-${model.isPaid ? "paid" : "free"}`}
-          >
-            {model.name}
-            {cost && cost.discount > 0 && (
-              <span className="text-green-500">
-                ({cost.discount * 100}% off)
-              </span>
-            )}
-            <Check
-              className={cn("ml-auto", isSelected ? "opacity-100" : "opacity-0")}
-            />
-          </CommandItem>
-        </div>
+        <CommandItem
+          onSelect={onSelect}
+          value={`${model.name}-${model.isPaid ? "paid" : "free"}`}
+        >
+          {model.name}
+          {cost && cost.discount > 0 && (
+            <span className="text-green-500">
+              ({cost.discount * 100}% off)
+            </span>
+          )}
+          <Check
+            className={cn("ml-auto", isSelected ? "opacity-100" : "opacity-0")}
+          />
+        </CommandItem>
       </HoverCardTrigger>
       <HoverCardContent
         side="left"

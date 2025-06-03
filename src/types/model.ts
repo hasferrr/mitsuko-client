@@ -1,5 +1,16 @@
 import { AdvancedSettings } from "./project"
 
+export type ModelProvider =
+  | "google"
+  | "anthropic"
+  | "openai"
+  | "meta"
+  | "mistral"
+  | "deepseek"
+  | "qwen"
+  | "xai"
+  | "unknown"
+
 export interface Model {
   name: string
   maxInput: number
