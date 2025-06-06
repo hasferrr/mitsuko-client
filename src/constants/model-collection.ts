@@ -17,7 +17,8 @@ export const FREE_MODELS: FreeModelCollection = {
     provider: "unknown",
     models: [
       {
-        name: "DeepSeek R1 0528",
+        name: "DeepSeek R1",
+        subName: "DeepSeek-R1-0528",
         maxInput: 128000,
         maxOutput: 128000,
         structuredOutput: true,
@@ -29,7 +30,8 @@ export const FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "DeepSeek V3 0324",
+        name: "DeepSeek V3",
+        subName: "DeepSeek-V3-0324",
         maxInput: 128000,
         maxOutput: 128000,
         structuredOutput: true,
@@ -69,7 +71,8 @@ export const FREE_MODELS: FreeModelCollection = {
     provider: "unknown",
     models: [
       {
-        name: "Gemini 2.5 Flash Preview 05-20",
+        name: "Gemini 2.5 Flash Preview",
+        subName: "gemini-2.5-flash-preview-05-20",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -114,7 +117,8 @@ export const FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "DeepSeek R1 0528 (free)",
+        name: "DeepSeek R1 (free)",
+        subName: "DeepSeek-R1-0528",
         maxInput: 163840,
         maxOutput: 163840,
         structuredOutput: true,
@@ -156,6 +160,7 @@ export const PAID_MODELS: PaidModelCollection = {
     models: [
       {
         name: "Gemini 2.5 Pro Preview",
+        subName: "gemini-2.5-pro-preview-06-05",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -167,7 +172,8 @@ export const PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "Gemini 2.5 Flash Preview 05-20",
+        name: "Gemini 2.5 Flash Preview",
+        subName: "gemini-2.5-flash-preview-05-20",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -452,7 +458,8 @@ export const PAID_MODELS: PaidModelCollection = {
     provider: "deepseek",
     models: [
       {
-        name: "DeepSeek R1 0528",
+        name: "DeepSeek R1",
+        subName: "DeepSeek-R1-0528",
         maxInput: 128000,
         maxOutput: 128000,
         structuredOutput: true,
@@ -464,7 +471,8 @@ export const PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "DeepSeek V3 0324",
+        name: "DeepSeek V3",
+        subName: "DeepSeek-V3-0324",
         maxInput: 128000,
         maxOutput: 128000,
         structuredOutput: true,

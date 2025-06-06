@@ -240,7 +240,12 @@ function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
           Currently Selected Model
         </div>
       )}
-      <h4 className="font-semibold mb-1">{model.name}</h4>
+      <h4 className="font-bold mb-1">{model.name}</h4>
+      {model.subName && (
+        <p className="text-xs text-muted-foreground mb-1">
+          {model.subName}
+        </p>
+      )}
       <div>
         <p>Context Length: {model.maxInput.toLocaleString()}</p>
         <p>Max Completion: {model.maxOutput.toLocaleString()}</p>

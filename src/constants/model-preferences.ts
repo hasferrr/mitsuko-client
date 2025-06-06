@@ -1,13 +1,13 @@
 let i = 0
 export const priorityModels = new Map<string, number>([
-  ["DeepSeek R1 0528", i++],
-  ["DeepSeek V3 0324", i++],
+  ["DeepSeek R1", i++],
+  ["DeepSeek V3", i++],
   ["Gemini 2.5 Pro Preview", i++],
 ])
 
 export const favoriteModels = new Set([
-  "DeepSeek R1 0528",
-  "Gemini 2.5 Flash Preview 05-20",
+  "DeepSeek R1",
+  "Gemini 2.5 Flash Preview",
 ])
 
 export const highQualityModels = new Set([

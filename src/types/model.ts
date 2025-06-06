@@ -13,6 +13,7 @@ export type ModelProvider =
 
 export interface Model {
   name: string
+  subName?: string
   maxInput: number
   maxOutput: number
   structuredOutput: boolean
