@@ -33,12 +33,12 @@ import {
   Anthropic,
   DeepSeek,
   Gemini,
+  Grok,
   Meta,
   Mistral,
   OpenAI,
   OpenRouter,
   Qwen,
-  XAI,
 } from "@lobehub/icons"
 
 const providerIconMap = {
@@ -49,7 +49,7 @@ const providerIconMap = {
   mistral: Mistral,
   deepseek: DeepSeek,
   qwen: Qwen,
-  xai: XAI,
+  xai: Grok,
   unknown: OpenRouter,
 }
 

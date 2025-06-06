@@ -52,7 +52,7 @@ export const FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "Meta: Llama 4 Maverick",
+        name: "Llama 4 Maverick",
         maxInput: 1_048_576,
         maxOutput: 1_048_576,
         structuredOutput: true,
@@ -155,7 +155,7 @@ export const PAID_MODELS: PaidModelCollection = {
     provider: "google",
     models: [
       {
-        name: "Gemini 2.5 Pro Preview 05-06",
+        name: "Gemini 2.5 Pro Preview",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -396,7 +396,7 @@ export const PAID_MODELS: PaidModelCollection = {
     provider: "meta",
     models: [
       {
-        name: "Meta: Llama 4 Maverick",
+        name: "Llama 4 Maverick",
         maxInput: 1_048_576,
         maxOutput: 1_048_576,
         structuredOutput: true,
@@ -408,7 +408,7 @@ export const PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "Meta: Llama 4 Scout",
+        name: "Llama 4 Scout",
         maxInput: 1_048_576,
         maxOutput: 1_048_576,
         structuredOutput: true,
