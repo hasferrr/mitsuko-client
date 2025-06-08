@@ -9,6 +9,7 @@ import { useSessionStore } from "@/stores/use-session-store"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { fetchTransactions, PaginatedTransactions, AmountFilter } from "@/lib/api/transaction"
+import { fetchCreditBatches, CreditBatch } from "@/lib/api/credit-batch"
 import { useState } from "react"
 import {
   Pagination,
@@ -67,6 +68,23 @@ export function User() {
     refetchOnReconnect: false,
   })
 
+  const {
+    data: creditBatches,
+    isLoading: isCreditBatchesLoading,
+    isError: isCreditBatchesError,
+    isFetching: isCreditBatchesFetching,
+    refetch: refetchCreditBatches,
+  } = useQuery<CreditBatch[]>({
+    queryKey: ["creditBatches", session?.user?.id],
+    queryFn: fetchCreditBatches,
+    enabled: !!session?.user?.id,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 60 * 60 * 1000, // 1 hour
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+  })
+
   const transactions = paginatedTransactions?.data || []
   const totalCount = paginatedTransactions?.count || 0
   const totalPages = Math.ceil(totalCount / pageSize)
@@ -75,6 +93,7 @@ export function User() {
     setPage(1)
     refetchUser()
     refetchTransactions()
+    refetchCreditBatches()
   }
 
   const handlePageChange = (newPage: number) => {
@@ -95,10 +114,18 @@ export function User() {
             <Button
               variant="ghost"
               size="sm"
-              className={cn("p-2", (isUserFetching || isTransactionsFetching) && "opacity-50")}
+              className={cn(
+                "p-2",
+                (isUserFetching || isTransactionsFetching || isCreditBatchesFetching) && "opacity-50"
+              )}
               onClick={handleRefresh}
             >
-              <RefreshCw className={cn("h-4 w-4", (isUserFetching || isTransactionsFetching) && "animate-spin")} />
+              <RefreshCw
+                className={cn(
+                  "h-4 w-4",
+                  (isUserFetching || isTransactionsFetching || isCreditBatchesFetching) && "animate-spin"
+                )}
+              />
               <span className="text-sm">Refresh</span>
             </Button>
           </div>
@@ -293,6 +320,80 @@ export function User() {
             </Pagination>
           </div>
         )}
+      </div>
+
+      <div className="rounded-md overflow-hidden border mt-6">
+        <div className="px-4 py-2 border-b">
+          <h2 className="font-medium">Credit Grants</h2>
+        </div>
+        <table className="w-full">
+          <thead>
+            <tr className="border-b">
+              <th className="px-4 py-2 text-left font-medium">Received</th>
+              <th className="px-4 py-2 text-left font-medium">State</th>
+              <th className="px-4 py-2 text-left font-medium">Balance</th>
+              <th className="px-4 py-2 text-left font-medium">Expires</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isCreditBatchesLoading ? (
+              <tr>
+                <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                  Loading credit grants...
+                </td>
+              </tr>
+            ) : isCreditBatchesError ? (
+              <tr>
+                <td colSpan={4} className="p-4 text-center text-red-500">
+                  Error loading credit grants
+                </td>
+              </tr>
+            ) : creditBatches && creditBatches.length > 0 ? (
+              creditBatches.map((batch) => {
+                const isExpired = new Date(batch.expires_at) < new Date() || batch.remaining_amount <= 0
+                const state = isExpired ? "Expired" : "Available"
+
+                return (
+                  <tr key={batch.id} className="border-b last:border-0">
+                    <td className="px-4 py-2">
+                      {new Date(batch.created_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="px-4 py-2">
+                      <span
+                        className={cn(
+                          "px-2 py-1 rounded-full text-xs font-medium",
+                          isExpired
+                            ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                            : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                        )}
+                      >
+                        {state}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2">{batch.remaining_amount.toLocaleString()}</td>
+                    <td className="px-4 py-2">
+                      {new Date(batch.expires_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
+                    </td>
+                  </tr>
+                )
+              })
+            ) : (
+              <tr>
+                <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                  No credit grants history
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   )
