@@ -114,7 +114,7 @@ export function CreditPackPrices({
         {currency.symbol}
         {(CREDIT_PACKS[0]?.basePriceUSD * currency.rate || 0).toLocaleString()}
         . Available to all tiers, these credit packs provide flexibility for your
-        usage needs. <strong>Credits purchased do not expire.</strong>
+        usage needs. Credits valid for a whole year from purchase!
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -126,23 +126,13 @@ export function CreditPackPrices({
           return (
             <Card
               key={pack.productId}
-              className="relative flex flex-col h-full transition-all duration-200 hover:border-primary/50 hover:shadow-md dark:hover:border-primary/70 border dark:border-gray-800 bg-white dark:bg-gray-900/20"
+              className="relative border-t-4 border-t-blue-500 border-r border-b border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/30 rounded-md shadow-sm hover:border-blue-400 hover:dark:border-blue-600 transition-colors duration-200"
             >
-              <CardHeader className="pb-1">
-                <div className="text-lg font-medium text-gray-900 dark:text-white">
-                  {pack.baseCredits.toLocaleString()}
-                  {" "}
-                  <span className="text-muted-foreground text-sm">credits</span>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-grow pb-4">
-                <div className="flex items-end gap-1 mb-1">
-                  <span className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {currency.symbol}
-                    {price.toLocaleString()}
-                  </span>
+              <CardHeader className="pb-0 pt-4">
+                <div className="flex justify-between items-baseline mb-1">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Credit Pack</span>
                   {savings > 0 && (
-                    <span className="text-emerald-600 dark:text-emerald-400 text-xs font-medium mb-1">
+                    <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 rounded">
                       Save {currency.symbol}{(() => {
                         if (savings > 1000) {
                           return (savings / 1000) + 'k'
@@ -152,14 +142,39 @@ export function CreditPackPrices({
                     </span>
                   )}
                 </div>
-                <div className="text-muted-foreground text-xs">
-                  Credits never expire!
+                <div className="text-xl font-medium text-gray-900 dark:text-white">
+                  {pack.baseCredits.toLocaleString()}
+                  <span className="text-gray-500 dark:text-gray-400 text-sm"> credits</span>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-2 pb-4">
+                <div className="flex items-center gap-2">
+                  {savings > 0 ? (
+                    <>
+                      <span className="text-gray-500 dark:text-gray-400 line-through text-sm">
+                        {currency.symbol}{(() => {
+                          const originalPrice = price + savings
+                          if (originalPrice > 1000) {
+                            return (originalPrice / 1000) + 'k'
+                          }
+                          return originalPrice.toLocaleString()
+                        })()}
+                      </span>
+                      <span className="text-xl font-bold text-gray-900 dark:text-white">
+                        {currency.symbol}{price.toLocaleString()}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-xl font-bold text-gray-900 dark:text-white">
+                      {currency.symbol}{price.toLocaleString()}
+                    </span>
+                  )}
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="pt-0 pb-4">
                 {redirectToPricingPage ? (
                   <Button
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                    className="w-full bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-blue-500 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                     onClick={() => router.push("/pricing")}
                   >
                     See Details
