@@ -1,6 +1,6 @@
 # Terms of Service
 
-Last Updated: 17/04/2025
+Last Updated: 08/06/2025
 
 ## 1.  Acceptance of Terms
 
@@ -29,7 +29,7 @@ The Mitsuko software is open-source and licensed under the GNU GPLv3, which allo
 
 ## 5. Refund Policy
 
-Purchases of subscription plans and credits are final and non-refundable. Credits are consumed based on usage within the application as described in the service documentation. Subscription plans provide access for the agreed billing cycle. We currently do not offer refunds for any purchased credits or active/past subscription periods.
+Purchases of subscription plans and credits are final and non-refundable. Credits are consumed based on usage within the application as described in the service documentation. All purchased credits remain valid for one year or as otherwise specified from the date of purchase, after which any unused credits will expire. Subscription plans provide access for the agreed billing cycle. We currently do not offer refunds for any purchased credits or active/past subscription periods.
 
 ## 6.  Disclaimer of Warranties
 
