@@ -1,26 +1,19 @@
 export const META_TITLE = "Mitsuko"
-export const META_TITLE_LONG = "Mitsuko - AI Subtitle Translator and Audio Transcription"
-export const META_DESCRIPTION = "AI Subtitle Translator Mitsuko: Get accurate SRT/ASS translations & precise audio transcription. Experience natural, context-aware results in 100+ languages."
+export const META_TITLE_LONG = "Mitsuko - The Most Accurate Subtitle Translator"
+export const META_DESCRIPTION = "Translate subtitles with AI-powered subtitle translator. You can get high-quality, natural, and context-aware SRT/ASS translation in 100+ languages."
 
 export const META_KEYWORDS = [
-  "AI Subtitle Translator",
-  "Subtitle Translation",
-  "Mitsuko",
-  "Mitsuko App",
-  "Accurate Translations",
-  "Fast Translations",
-  "AI Translation",
-  "SRT Translation",
-  "ASS Translation",
-  "Audio Transcription",
-  "AI Transcription",
-  "Context-aware AI",
-  "Contextual Translation",
-  "100+ Languages Translation",
-  "Video Translation",
-  "Language Translator",
-  "Online Translator Tool",
-  "Natural Language Translation",
-  "Movie Subtitle Translator",
-  "Anime Subtitle Translator",
+  "translate subtitles",
+  "sub translate",
+  "subtitle translator",
+  "ai subtitle translator",
+  "srt translations",
+  "translate srt",
+  "srt translator",
+  "video subtitle translator",
+  "translation and subtitling services",
+  "closed captioning",
+  "subtitles cc",
+  "subscenes",
+  "movie subtitles"
 ]
