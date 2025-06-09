@@ -7,7 +7,7 @@ export const MAX_TRANSCRIPTION_SIZE = 1024 * 1024 * 100
 export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> = {
   sourceLanguage: "Japanese",
   targetLanguage: "Indonesian",
-  modelDetail: FREE_MODELS["Premium Trial"].models[0] || null,
+  modelDetail: FREE_MODELS["Free Limited"].models[0] || null,
   isUseCustomModel: false,
   contextDocument: "",
   customInstructions: "",
@@ -22,7 +22,7 @@ export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "u
 }
 
 export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {
-  temperature: 0.6,
+  temperature: 1,
   startIndex: 1,
   endIndex: 100000,
   splitSize: 100,
@@ -260,7 +260,7 @@ export const DEFAULT_SUBTITLES: SubtitleTranslated[] = [
       }
     },
     "actor": "",
-    "content": "千夏先輩との間にあった\\Nわだかまりみたいなものが",
+    "content": "千夏先輩との間にあった\nわだかまりみたいなものが",
     "translated": ""
   },
   {

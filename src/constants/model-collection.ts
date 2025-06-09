@@ -24,6 +24,7 @@ export const FREE_MODELS: FreeModelCollection = {
         structuredOutput: true,
         isPaid: false,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 128000,
           isUseStructuredOutput: false
@@ -37,6 +38,7 @@ export const FREE_MODELS: FreeModelCollection = {
         structuredOutput: true,
         isPaid: false,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 128000,
           isUseStructuredOutput: true
@@ -49,6 +51,7 @@ export const FREE_MODELS: FreeModelCollection = {
         structuredOutput: true,
         isPaid: false,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false,
         }
@@ -60,6 +63,7 @@ export const FREE_MODELS: FreeModelCollection = {
         structuredOutput: true,
         isPaid: false,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 1_000_000,
           isUseStructuredOutput: true,
@@ -124,6 +128,7 @@ export const FREE_MODELS: FreeModelCollection = {
         structuredOutput: true,
         isPaid: false,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false
         }
@@ -135,6 +140,7 @@ export const FREE_MODELS: FreeModelCollection = {
         structuredOutput: true,
         isPaid: false,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true,
         }
@@ -146,6 +152,7 @@ export const FREE_MODELS: FreeModelCollection = {
         structuredOutput: true,
         isPaid: false,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true,
         }
@@ -232,6 +239,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -243,6 +251,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -254,6 +263,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -265,6 +275,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -276,6 +287,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -292,6 +304,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -303,6 +316,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -408,6 +422,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 1_000_000,
           isUseStructuredOutput: true,
@@ -420,6 +435,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 1_000_000,
           isUseStructuredOutput: true,
@@ -437,6 +453,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false,
         }
@@ -448,6 +465,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false,
         }
@@ -465,6 +483,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 128000,
           isUseStructuredOutput: false
@@ -478,6 +497,7 @@ export const PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         default: {
+          temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 128000,
           isUseStructuredOutput: true
