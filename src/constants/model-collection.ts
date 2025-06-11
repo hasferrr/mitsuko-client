@@ -327,9 +327,21 @@ export const PAID_MODELS: PaidModelCollection = {
     provider: "openai",
     models: [
       {
+        name: "OpenAI o3",
+        maxInput: 200_000,
+        maxOutput: 100_000,
+        structuredOutput: true,
+        isPaid: true,
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "OpenAI o4-mini",
-        maxInput: 1_047_576,
-        maxOutput: 32_768,
+        maxInput: 200_000,
+        maxOutput: 100_000,
         structuredOutput: true,
         isPaid: true,
         default: {
@@ -340,8 +352,8 @@ export const PAID_MODELS: PaidModelCollection = {
       },
       {
         name: "OpenAI o3-mini",
-        maxInput: 1_047_576,
-        maxOutput: 32_768,
+        maxInput: 200_000,
+        maxOutput: 100_000,
         structuredOutput: true,
         isPaid: true,
         default: {
