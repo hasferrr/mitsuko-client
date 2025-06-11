@@ -252,50 +252,46 @@ function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
       </div>
       <div className="mt-2">
         {cost && (
-          <>
-            <div className="mb-2">
-              <p className="font-medium">Estimated Cost</p>
-              {cost.discount > 0 ? (
-                <>
-                  <p>
-                    Input: <span className="line-through opacity-70">{(cost.creditPerInputToken / (1 - cost.discount)).toLocaleString()}</span>
-                    <span className="ml-1 font-medium">
-                      {cost.creditPerInputToken} credits/token
-                    </span>
-                  </p>
-                  <p>
-                    Output: <span className="line-through opacity-70">{(cost.creditPerOutputToken / (1 - cost.discount)).toLocaleString()}</span>
-                    <span className="ml-1 font-medium">
-                      {cost.creditPerOutputToken} credits/token
-                    </span>
-                  </p>
-                  <p className="text-green-500">Discount: {cost.discount * 100}% off!!!</p>
-                </>
-              ) : (
-                <>
-                  <p>Input: {cost.creditPerInputToken} credits/token</p>
-                  <p>Output: {cost.creditPerOutputToken} credits/token</p>
-                </>
-              )}
-            </div>
-            <Link
-              href="/pricing#credit-usage"
-              target="_blank"
-              className="hover:underline text-blue-500/80"
-            >
-              See full comparison
-            </Link>
-          </>
+          <div className="mb-2">
+            <p className="font-medium">Estimated Cost</p>
+            {cost.discount > 0 ? (
+              <>
+                <p>
+                  Input: <span className="line-through opacity-70">{(cost.creditPerInputToken / (1 - cost.discount)).toLocaleString()}</span>
+                  <span className="ml-1 font-medium">
+                    {cost.creditPerInputToken} credits/token
+                  </span>
+                </p>
+                <p>
+                  Output: <span className="line-through opacity-70">{(cost.creditPerOutputToken / (1 - cost.discount)).toLocaleString()}</span>
+                  <span className="ml-1 font-medium">
+                    {cost.creditPerOutputToken} credits/token
+                  </span>
+                </p>
+                <p className="text-green-500">Discount: {cost.discount * 100}% off!!!</p>
+              </>
+            ) : (
+              <>
+                <p>Input: {cost.creditPerInputToken} credits/token</p>
+                <p>Output: {cost.creditPerOutputToken} credits/token</p>
+              </>
+            )}
+          </div>
         )}
-        <div>
-          <Link
-            href="/pricing#which-models"
-            target="_blank"
-            className="hover:underline text-blue-500/80"
-          >
-            Which Models Should I Use?
-          </Link>
-        </div>
+        <Link
+          href="/pricing#credit-usage"
+          target="_blank"
+          className="block hover:underline text-blue-500/80"
+        >
+          See full comparison
+        </Link>
+        <Link
+          href="/pricing#which-models"
+          target="_blank"
+          className="block hover:underline text-blue-500/80"
+        >
+          Which Models Should I Use?
+        </Link>
       </div>
     </div >
   ) : (
