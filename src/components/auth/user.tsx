@@ -374,7 +374,7 @@ export function User() {
                         {state}
                       </span>
                     </td>
-                    <td className="px-4 py-2">{batch.remaining_amount.toLocaleString()}</td>
+                    <td className="px-4 py-2">{batch.remaining_amount.toLocaleString()} / {batch.initial_amount.toLocaleString()}</td>
                     <td className="px-4 py-2">
                       {new Date(batch.expires_at).toLocaleDateString("en-US", {
                         month: "short",
