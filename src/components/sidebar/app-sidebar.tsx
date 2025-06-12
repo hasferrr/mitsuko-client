@@ -7,7 +7,7 @@ import {
   Folder,
   House,
   Languages,
-  MessageSquareIcon,
+  HistoryIcon,
 } from "lucide-react"
 import { AppSidebarMain } from "@/components/sidebar/app-sidebar-main"
 import { AppSidebarProjects } from "@/components/sidebar/app-sidebar-projects"
@@ -19,7 +19,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { FEEDBACK_LINK, DISCORD_LINK } from "@/constants/external-links"
+import { CHANGE_LOG_LINK, DISCORD_LINK } from "@/constants/external-links"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { SidebarHeaderIcon } from "./sidebar-header-icon"
 import { IconBrandDiscord } from "@tabler/icons-react"
@@ -64,9 +64,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         newTab: true,
       },
       {
-        title: "Feedback",
-        url: FEEDBACK_LINK,
-        icon: MessageSquareIcon,
+        title: "Changelog",
+        url: CHANGE_LOG_LINK,
+        icon: HistoryIcon,
         newTab: true,
       },
     ],
