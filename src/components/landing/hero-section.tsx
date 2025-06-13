@@ -27,8 +27,8 @@ export default function HeroSection() {
       </div>
 
       {/* Main heading */}
-      <h1 className="max-w-3xl text-5xl md:text-6xl font-medium text-center mb-8 bg-gradient-to-r  bg-clip-text">
-        The Most Accurate AI <span className="text-purple-500">Subtitle Translator</span>
+      <h1 className="max-w-3xl text-5xl md:text-6xl font-semibold text-center mb-8 bg-gradient-to-r bg-clip-text">
+        The Most Accurate AI <span className="text-purple-500 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">Subtitle Translator</span>
       </h1>
 
       {/* Subheading */}
