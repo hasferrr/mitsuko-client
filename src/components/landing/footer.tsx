@@ -148,7 +148,6 @@ export default function Footer() {
                 width="auto"
                 height="auto"
                 className={cn("h-[37px] md:h-[40px] object-contain", badge.className)}
-                loading="lazy"
               />
             </a>
           </li>
