@@ -5,10 +5,6 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-✓-blue)
 ![Bun](https://img.shields.io/badge/Bun-✓-000000)
 
-<!-- <div align="center">
-  <img src="https://i.imgur.com/b9gRjVi.jpeg" alt="Mitsuko Banner" width="300">
-</div> -->
-
 ## 📖 Description
 
 **Mitsuko** is an AI-powered subtitle translation and audio transcription system that provides high-quality, context-aware translations. This all-in-one solution offers:
@@ -42,6 +38,21 @@ Originally designed for anime translations, Mitsuko combines linguistic accuracy
 - Export to subtitle or text
 - Audio format support: MP3, WAV, FLAC, AAC, OPUS, etc
 
+### Context Extraction
+
+- **AI-powered context analysis** from subtitle content
+- Extracts character relationships, settings, and plot elements
+- Creates reusable context documents for series consistency
+- Episode-based context tracking for improved translation quality
+- Supports continuation and batch processing modes
+
+### Project Management
+
+- **Organized project workspace** with drag-and-drop functionality
+- Categorized tabs for translations, transcriptions, and extractions
+- Complete project history and version tracking
+- Export and import capabilities for project data
+
 ## 🚀 Quick Start
 
 Prerequisites
@@ -65,13 +76,13 @@ cd mitsuko-client
 bun install
 ```
 
-Create `.env.local`:
+Create and configure `.env.local`
 
 ```bash
 cp .env.example .env.local
 ```
 
-### 3. Running
+Run the project
 
 ```bash
 # In separate terminals
@@ -98,14 +109,42 @@ cd mitsuko-client && bun dev        # Frontend
 4. Edit results
 5. Export subtitle/text
 
+### Context Extraction
+
+1. Upload subtitle file or paste content
+2. Set episode number for tracking
+3. Add previous context (optional)
+4. Configure extraction settings
+5. Generate context document
+6. Use for future translations
+
 ## 🔧 Tech Stack
 
-- **Backend**: Bun + Express
-- **Frontend**: Next.js 15 (App Router)
-- **State Management**: Zustand
-- **UI**: Shadcn/ui + Tailwind CSS
+### Frontend
+
+- **Framework**: Next.js 15 (App Router) with React 19
+- **Language**: TypeScript 5.8+
+- **State Management**: Zustand for client-side state
+- **UI Components**: Radix UI with Tailwind CSS
+- **Data Persistence**: Dexie (IndexedDB wrapper)
+- **Server State**: TanStack React Query
+- **Authentication**: Supabase Auth
+- **Payment**: Midtrans/Snap integration
+- **Drag & Drop**: @dnd-kit for project management
+
+### Backend
+
+- **Runtime**: Bun + Express
 - **Subtitle Parsing**: Custom SRT/ASS processors
-- **AI Integration**: OpenAI-compatible API
+- **AI Integration**: Multi-provider support (OpenAI, Gemini, Claude)
+
+### Advanced Features
+
+- **Context Memory Modes**: Full, Balanced, and Minimal context strategies
+- **Advanced Reasoning**: Multi-step AI thinking process for complex translations
+- **Credit System**: Usage-based pricing with real-time credit tracking
+- **Concurrent Processing**: Handle multiple files simultaneously
+- **Custom Models**: Support for self-hosted AI models (OpenAI compatible)
 
 ## 🤝 Contributing
 
