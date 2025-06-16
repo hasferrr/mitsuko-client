@@ -58,6 +58,7 @@ export const FREE_MODELS: FreeModelCollection = {
       },
       {
         name: "Llama 4 Maverick",
+        subName: "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
         maxInput: 1_048_576,
         maxOutput: 1_048_576,
         structuredOutput: true,
@@ -66,6 +67,34 @@ export const FREE_MODELS: FreeModelCollection = {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 1_000_000,
+          isUseStructuredOutput: true,
+        }
+      },
+      {
+        name: "Llama 3.3 70B",
+        subName: "meta-llama/Llama-3.3-70B-Instruct",
+        maxInput: 131_072,
+        maxOutput: 131_072,
+        structuredOutput: true,
+        isPaid: false,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 16_384,
+          isUseStructuredOutput: true,
+        }
+      },
+      {
+        name: "Llama 3.1 405B",
+        subName: "meta-llama/Llama-3.1-405B-Instruct",
+        maxInput: 131_072,
+        maxOutput: 131_072,
+        structuredOutput: true,
+        isPaid: false,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 16_384,
           isUseStructuredOutput: true,
         }
       },
@@ -429,6 +458,7 @@ export const PAID_MODELS: PaidModelCollection = {
     models: [
       {
         name: "Llama 4 Maverick",
+        subName: "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
         maxInput: 1_048_576,
         maxOutput: 1_048_576,
         structuredOutput: true,
@@ -442,6 +472,7 @@ export const PAID_MODELS: PaidModelCollection = {
       },
       {
         name: "Llama 4 Scout",
+        subName: "meta-llama/Llama-4-Scout-17B-16E-Instruct",
         maxInput: 1_048_576,
         maxOutput: 1_048_576,
         structuredOutput: true,
@@ -450,6 +481,34 @@ export const PAID_MODELS: PaidModelCollection = {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 1_000_000,
+          isUseStructuredOutput: true,
+        }
+      },
+      {
+        name: "Llama 3.3 70B",
+        subName: "meta-llama/Llama-3.3-70B-Instruct",
+        maxInput: 131_072,
+        maxOutput: 131_072,
+        structuredOutput: true,
+        isPaid: true,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 16_384,
+          isUseStructuredOutput: true,
+        }
+      },
+      {
+        name: "Llama 3.1 405B",
+        subName: "meta-llama/Llama-3.1-405B-Instruct",
+        maxInput: 131_072,
+        maxOutput: 131_072,
+        structuredOutput: true,
+        isPaid: true,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 16_384,
           isUseStructuredOutput: true,
         }
       },

@@ -23,4 +23,6 @@ export const multiLingualModels = new Set([
   "Qwen3 30B A3B",
   "Llama 4 Maverick",
   "Llama 4 Scout",
+  "Llama 3.3 70B",
+  "Llama 3.1 405B",
 ])
