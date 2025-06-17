@@ -306,13 +306,11 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         newSettingsInput: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>,
         modelDetail: Model | null
       ): Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'> => {
-        // FIXME: this is a hack to get the default settings from the model
-        // we should use the newSettingsInput if it is provided (for temperature)
         const updatedSettings = { ...newSettingsInput }
         if (modelDetail?.default) {
-          if (modelDetail.default.temperature !== undefined) {
-            updatedSettings.temperature = modelDetail.default.temperature
-          }
+          // if (modelDetail.default.temperature !== undefined) {
+          //   updatedSettings.temperature = modelDetail.default.temperature
+          // }
           if (modelDetail.default.maxCompletionTokens !== undefined) {
             updatedSettings.maxCompletionTokens = modelDetail.default.maxCompletionTokens
           }
