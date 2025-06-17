@@ -629,7 +629,7 @@ export const FewShotInput = memo(() => {
   )
 })
 
-export const TemperatureSlider = memo(() => {
+export const TemperatureSlider = memo(({ type }: { type: SettingsParentType }) => {
   const temperature = useAdvancedSettingsStore((state) => state.getTemperature())
   const setTemperature = useAdvancedSettingsStore((state) => state.setTemperature)
   return (
@@ -642,7 +642,7 @@ export const TemperatureSlider = memo(() => {
       </div>
       <Slider
         value={[temperature]}
-        onValueChange={([value]) => setTemperature(value)}
+        onValueChange={([value]) => setTemperature(value, type)}
         max={TEMPERATURE_MAX}
         min={TEMPERATURE_MIN}
         step={0.1}
@@ -996,7 +996,7 @@ export const BetterContextCachingSwitch = memo(() => {
   )
 })
 
-export const AdvancedReasoningSwitch = memo(() => {
+export const AdvancedReasoningSwitch = memo(({ type }: { type: SettingsParentType }) => {
   const isAdvancedReasoningEnabled = useAdvancedSettingsStore((state) => state.getIsAdvancedReasoningEnabled())
   const setIsAdvancedReasoningEnabled = useAdvancedSettingsStore((state) => state.setIsAdvancedReasoningEnabled)
 
@@ -1011,7 +1011,7 @@ export const AdvancedReasoningSwitch = memo(() => {
         </label>
         <Switch
           checked={isAdvancedReasoningEnabled}
-          onCheckedChange={setIsAdvancedReasoningEnabled}
+          onCheckedChange={(value) => setIsAdvancedReasoningEnabled(value, type)}
         />
       </div>
       <p className="text-xs text-muted-foreground">

@@ -91,9 +91,9 @@ export function ModelSelector({
     setOpen(false)
 
     if (model.default?.temperature !== undefined) {
-      setTemperature(model.default.temperature)
+      setTemperature(model.default.temperature, type)
     } else {
-      setTemperature(DEFAULT_ADVANCED_SETTINGS.temperature)
+      setTemperature(DEFAULT_ADVANCED_SETTINGS.temperature, type)
     }
 
     if (model.default?.isUseStructuredOutput !== undefined) {

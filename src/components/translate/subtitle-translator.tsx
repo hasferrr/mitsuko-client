@@ -1089,11 +1089,11 @@ export default function SubtitleTranslator() {
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
                   <ModelDetail />
-                  <TemperatureSlider />
+                  <TemperatureSlider type="translation" />
                   <StartIndexInput />
                   <EndIndexInput />
                   <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
-                    <AdvancedReasoningSwitch />
+                    <AdvancedReasoningSwitch type="translation" />
                   </div>
                   <div className="text-sm font-semibold">Technical Options</div>
                   <SplitSizeInput />

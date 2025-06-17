@@ -26,7 +26,7 @@ interface AdvancedSettingsStore {
   getIsUseFullContextMemory: () => boolean
   getIsBetterContextCaching: () => boolean
   getIsAdvancedReasoningEnabled: () => boolean
-  setTemperature: (value: number) => void
+  setTemperature: (value: number, parent: SettingsParentType) => void
   setStartIndex: (value: number) => void
   setEndIndex: (value: number) => void
   setSplitSize: (value: number) => void
@@ -34,7 +34,7 @@ interface AdvancedSettingsStore {
   setIsUseStructuredOutput: (value: boolean) => void
   setIsUseFullContextMemory: (value: boolean) => void
   setIsBetterContextCaching: (value: boolean) => void
-  setIsAdvancedReasoningEnabled: (value: boolean) => void
+  setIsAdvancedReasoningEnabled: (value: boolean, parent: SettingsParentType) => void
   setIsMaxCompletionTokensAuto: (value: boolean, parent: SettingsParentType) => void
   resetIndex: (s?: number, e?: number) => void
   resetAdvancedSettings: () => void
@@ -189,11 +189,11 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
           console.error("Failed to save settings data:", error)
         }
       },
-      setTemperature: (value) => {
+      setTemperature: (value, parent) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("temperature", value)
-        updateSettings("temperature", value, "translation")
+        updateSettings("temperature", value, parent)
       },
       setStartIndex: (value) => {
         const id = get().currentId
@@ -238,11 +238,11 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         get().mutateData("isBetterContextCaching", value)
         updateSettings("isBetterContextCaching", value, "translation")
       },
-      setIsAdvancedReasoningEnabled: (value) => {
+      setIsAdvancedReasoningEnabled: (value, parent) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isAdvancedReasoningEnabled", value)
-        updateSettings("isAdvancedReasoningEnabled", value, "translation")
+        updateSettings("isAdvancedReasoningEnabled", value, parent)
       },
       // Method for both translation and extraction
       setIsMaxCompletionTokensAuto: (value, parent) => {
@@ -306,6 +306,8 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         newSettingsInput: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>,
         modelDetail: Model | null
       ): Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'> => {
+        // FIXME: this is a hack to get the default settings from the model
+        // we should use the newSettingsInput if it is provided (for temperature)
         const updatedSettings = { ...newSettingsInput }
         if (modelDetail?.default) {
           if (modelDetail.default.temperature !== undefined) {
