@@ -104,8 +104,21 @@ export const FREE_MODELS: FreeModelCollection = {
     provider: "unknown",
     models: [
       {
-        name: "Gemini 2.5 Flash Preview",
-        subName: "gemini-2.5-flash-preview-05-20",
+        name: "Gemini 2.5 Flash",
+        subName: "gemini-2.5-flash",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Gemini 2.5 Flash Lite",
+        subName: "gemini-2.5-flash-lite-preview-06-17",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -195,8 +208,8 @@ export const PAID_MODELS: PaidModelCollection = {
     provider: "google",
     models: [
       {
-        name: "Gemini 2.5 Pro Preview",
-        subName: "gemini-2.5-pro-preview-06-05",
+        name: "Gemini 2.5 Pro",
+        subName: "gemini-2.5-pro",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -208,8 +221,21 @@ export const PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "Gemini 2.5 Flash Preview",
-        subName: "gemini-2.5-flash-preview-05-20",
+        name: "Gemini 2.5 Flash",
+        subName: "gemini-2.5-flash",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: true,
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Gemini 2.5 Flash Lite",
+        subName: "gemini-2.5-flash-lite-preview-06-17",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
