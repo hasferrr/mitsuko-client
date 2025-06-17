@@ -1,4 +1,4 @@
-import { ContextExtractor } from "@/components/context-extractor"
+import { ContextExtractor } from "@/components/extract-context/context-extractor"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
 import { Metadata } from "next"
 

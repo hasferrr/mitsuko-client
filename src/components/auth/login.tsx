@@ -2,7 +2,7 @@
 
 import { supabase } from "@/lib/supabase"
 import { useEffect, useState, useTransition } from "react"
-import { Button } from "../ui/button"
+import { Button } from "@/components/ui/button"
 import { useSessionStore } from "@/stores/use-session-store"
 import { User } from "./user"
 import { UserSettings } from "./user-settings"

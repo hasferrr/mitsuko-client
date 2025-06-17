@@ -1,7 +1,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
-import { Button } from "./ui/button"
+import { Button } from "@/components/ui/button"
 import { List } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { transcriptionInstructionPresets } from "@/constants/custom-instructions"

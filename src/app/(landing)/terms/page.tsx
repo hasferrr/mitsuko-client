@@ -1,6 +1,6 @@
 import { Metadata } from "next"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
-import { Terms } from "@/components/terms"
+import { Terms } from "@/components/terms/terms"
 import fs from "fs/promises"
 import path from "path"
 import { META_TITLE } from "@/constants/metadata"

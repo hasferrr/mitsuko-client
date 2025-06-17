@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { timestampToString } from "@/lib/subtitles/timestamp"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
-import { DragAndDrop } from "./ui-custom/drag-and-drop"
+import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { toast } from "sonner"
 import {
   AlertDialog,
@@ -46,7 +46,7 @@ import { parseTranscription } from "@/lib/parser/parser"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { UserCreditData } from "@/types/user"
-import { Input } from "./ui/input"
+import { Input } from "@/components/ui/input"
 import { SettingsTranscription } from "./settings-transcription"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 

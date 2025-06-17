@@ -1,4 +1,4 @@
-import Transcription from "@/components/transcription"
+import Transcription from "@/components/transcribe/transcription"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
 import { Metadata } from "next"
 

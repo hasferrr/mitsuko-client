@@ -3,7 +3,7 @@
 import { memo, useEffect, useRef, useState } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
-import { Button } from "./ui/button"
+import { Button } from "@/components/ui/button"
 import { parseTranslationJson } from "@/lib/parser/parser"
 import { cn } from "@/lib/utils"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
