@@ -1017,7 +1017,7 @@ export const AdvancedReasoningSwitch = memo(() => {
       <p className="text-xs text-muted-foreground">
         Enable the AI follows a more structured & multi-step thinking process.
         It first understands the original text and context, then reviews its translations, drafts, critiques, and refines the translation.
-        Great for reasoning/thinking models.
+        Great for thinking models but increases token usage and cost.
       </p>
     </div>
   )
