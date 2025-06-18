@@ -29,9 +29,9 @@ export const SUBSCRIPTION_PLANS: {
 
 export const CREDIT_PACKS: CreditPack[] = [
   {
-    productId: "credit_pack_2m",
-    baseCredits: 2_000_000,
-    basePriceUSD: 2,
+    productId: "credit_pack_5m",
+    baseCredits: 5_000_000,
+    basePriceUSD: 5,
     discountUSD: 0,
   },
   {
@@ -47,9 +47,9 @@ export const CREDIT_PACKS: CreditPack[] = [
     discountUSD: 1,
   },
   {
-    productId: "credit_pack_50m",
-    baseCredits: 50_000_000,
-    basePriceUSD: 45, // Discounted price
-    discountUSD: 5,
+    productId: "credit_pack_70m",
+    baseCredits: 70_000_000,
+    basePriceUSD: 59, // Discounted price
+    discountUSD: 11,
   },
 ]
