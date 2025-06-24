@@ -6,10 +6,12 @@ interface LocalSettingsStore {
   customBaseUrl: string
   customModel: string
   isThirdPartyModelEnabled: boolean
+  isAutoTemperatureEnabled: boolean
   setApiKey: (key: string) => void
   setCustomBaseUrl: (url: string) => void
   setCustomModel: (model: string) => void
   toggleThirdPartyModel: () => void
+  setIsAutoTemperatureEnabled: (enabled: boolean) => void
 }
 
 export const useLocalSettingsStore = create<LocalSettingsStore>()(
@@ -19,11 +21,13 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       customBaseUrl: "",
       customModel: "",
       isThirdPartyModelEnabled: false,
+      isAutoTemperatureEnabled: true,
       setApiKey: (key) => set({ apiKey: key }),
       setCustomBaseUrl: (url) => set({ customBaseUrl: url }),
       setCustomModel: (model) => set({ customModel: model }),
       toggleThirdPartyModel: () =>
         set((state) => ({ isThirdPartyModelEnabled: !state.isThirdPartyModelEnabled })),
+      setIsAutoTemperatureEnabled: (enabled) => set({ isAutoTemperatureEnabled: enabled }),
     }),
     {
       name: "api-settings-storage",

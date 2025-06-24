@@ -28,6 +28,7 @@ import { SettingsParentType } from "@/types/project"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useModelCosts } from "@/contexts/model-cost-context"
 import { ModelCreditCost } from "@/types/model-cost"
+import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import Link from "next/link"
 import {
   Anthropic,
@@ -83,6 +84,9 @@ export function ModelSelector({
   const setIsMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.setIsMaxCompletionTokensAuto)
   const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
 
+  // Local Settings Store
+  const isAutoTemperatureEnabled = useLocalSettingsStore((state) => state.isAutoTemperatureEnabled)
+
   // Get model costs Map from context
   const modelCostsMap = useModelCosts()
 
@@ -90,10 +94,13 @@ export function ModelSelector({
     setModelDetail(model, type)
     setOpen(false)
 
-    if (model.default?.temperature !== undefined) {
-      setTemperature(model.default.temperature, type)
-    } else {
-      setTemperature(DEFAULT_ADVANCED_SETTINGS.temperature, type)
+    // Only adjust temperature if auto temperature is enabled
+    if (isAutoTemperatureEnabled) {
+      if (model.default?.temperature !== undefined) {
+        setTemperature(model.default.temperature, type)
+      } else {
+        setTemperature(DEFAULT_ADVANCED_SETTINGS.temperature, type)
+      }
     }
 
     if (model.default?.isUseStructuredOutput !== undefined) {

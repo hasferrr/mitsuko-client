@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils"
 import WhichModels from "@/components/pricing/which-models"
 import { HelpCircle } from "lucide-react"
 import { useLocalSettingsStore } from '@/stores/use-local-settings-store'
+import { Checkbox } from "./ui/checkbox"
 
 export const LanguageSelection = memo(({ type }: { type: SettingsParentType }) => {
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -632,6 +633,9 @@ export const FewShotInput = memo(() => {
 export const TemperatureSlider = memo(({ type }: { type: SettingsParentType }) => {
   const temperature = useAdvancedSettingsStore((state) => state.getTemperature())
   const setTemperature = useAdvancedSettingsStore((state) => state.setTemperature)
+  const isAutoTemperatureEnabled = useLocalSettingsStore((state) => state.isAutoTemperatureEnabled)
+  const setIsAutoTemperatureEnabled = useLocalSettingsStore((state) => state.setIsAutoTemperatureEnabled)
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between mb-2 items-center">
@@ -653,6 +657,18 @@ export const TemperatureSlider = memo(({ type }: { type: SettingsParentType }) =
         Higher values produce more diverse (creative) results,
         lower values produce more consistent (accurate) results.
       </p>
+      <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="auto-temperature"
+            checked={isAutoTemperatureEnabled}
+            onCheckedChange={setIsAutoTemperatureEnabled}
+          />
+          <label htmlFor="auto-temperature" className="text-xs text-muted-foreground">
+            Set the default temperature when switching models (global)
+          </label>
+        </div>
+      </div>
     </div>
   )
 })
