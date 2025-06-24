@@ -1093,7 +1093,7 @@ export default function SubtitleTranslator() {
                   <StartIndexInput />
                   <EndIndexInput />
                   <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
-                    <AdvancedReasoningSwitch type="translation" />
+                    <AdvancedReasoningSwitch />
                   </div>
                   <div className="text-sm font-semibold">Technical Options</div>
                   <SplitSizeInput />

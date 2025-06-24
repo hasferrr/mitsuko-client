@@ -12,7 +12,6 @@ import {
   LanguageSelection,
   ModelSelection,
   TemperatureSlider,
-  AdvancedReasoningSwitch
 } from "@/components/settings-inputs"
 import { Button } from "@/components/ui/button"
 import {
@@ -62,9 +61,6 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
                 <div className="space-y-4">
                   <div className="border border-muted-foreground/20 rounded-md p-4">
                     <TemperatureSlider type="project" />
-                  </div>
-                  <div className="border border-muted-foreground/20 rounded-md p-4">
-                    <AdvancedReasoningSwitch type="project" />
                   </div>
                 </div>
               </AccordionContent>

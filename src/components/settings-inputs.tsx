@@ -996,10 +996,8 @@ export const BetterContextCachingSwitch = memo(() => {
   )
 })
 
-export const AdvancedReasoningSwitch = memo(({ type }: { type: SettingsParentType }) => {
-  const isAdvancedReasoningEnabled = useAdvancedSettingsStore((state) => state.getIsAdvancedReasoningEnabled())
-  const setIsAdvancedReasoningEnabled = useAdvancedSettingsStore((state) => state.setIsAdvancedReasoningEnabled)
-
+export const AdvancedReasoningSwitch = memo(() => {
+  // TODO: Remove isAdvancedReasoningEnabled state from advanced settings store, indexed db, and remove this switch
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -1009,15 +1007,23 @@ export const AdvancedReasoningSwitch = memo(({ type }: { type: SettingsParentTyp
             Advanced Reasoning & Planning
           </span>
         </label>
-        <Switch
-          checked={isAdvancedReasoningEnabled}
-          onCheckedChange={(value) => setIsAdvancedReasoningEnabled(value, type)}
-        />
+        <TooltipProvider>
+          <Tooltip delayDuration={10}>
+            <TooltipTrigger asChild>
+              <div>
+                <Switch checked disabled />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>This feature is always enabled for optimal translation quality</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <p className="text-xs text-muted-foreground">
         Enable the AI follows a more structured & multi-step thinking process.
         It first understands the original text and context, then reviews its translations, drafts, critiques, and refines the translation.
-        Great for thinking models but increases token usage and cost.
+        Great for reasoning/thinking models.
       </p>
     </div>
   )
