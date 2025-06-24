@@ -45,7 +45,20 @@ export function removeStringContentBetween(
     r++
   }
 
-  return result.join("").replace(/\s+/g, " ").trim()
+  const collapseWhitespace = (parts: string[]) => {
+    const input = parts.join("").trim()
+    let out = ""
+    let prev = ""
+    for (let i = 0; i < input.length; i++) {
+      const ch = input[i]
+      if ((ch === " " && prev === " ") || (ch === "\n" && prev === "\n")) continue
+      out += ch
+      prev = ch
+    }
+    return out
+  }
+
+  return collapseWhitespace(result)
 }
 
 export function removeContentBetween(

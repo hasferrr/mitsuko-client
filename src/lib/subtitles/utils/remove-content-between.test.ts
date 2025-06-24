@@ -32,6 +32,18 @@ describe("removeContentBetween", () => {
     expect(result[0].content).toBe("")
   })
 
+  test("should handle multiple newlines correctly", () => {
+    const subtitles = [createSubtitle("\n\n\n")]
+    const result = removeContentBetween(subtitles, "content", "{", "}")
+    expect(result[0].content).toBe("")
+  })
+
+  test("should handle multiple newlines and spaces around content", () => {
+    const subtitles = [createSubtitle("\n\nHello\n   ")]
+    const result = removeContentBetween(subtitles, "content", "{", "}")
+    expect(result[0].content).toBe("Hello")
+  })
+
   // Tests with simple delimiters
   test("should return original string if no delimiters are found", () => {
     const subtitles = [createSubtitle("Hello world")]
@@ -188,5 +200,29 @@ describe("removeContentBetween", () => {
     const subtitles = [createSubtitle("<!--remove this-->")]
     const result = removeContentBetween(subtitles, "content", "<!--", "-->")
     expect(result[0].content).toBe("")
+  })
+
+  test("should handle single-char delimiter with newlines at start and end", () => {
+    const subtitles = [createSubtitle("\n<remove this>\n")]
+    const result = removeContentBetween(subtitles, "content", "<", ">")
+    expect(result[0].content).toBe("")
+  })
+
+  test("should handle single-char delimiter with newline before content", () => {
+    const subtitles = [createSubtitle("keep this\n<remove this>")]
+    const result = removeContentBetween(subtitles, "content", "<", ">")
+    expect(result[0].content).toBe("keep this")
+  })
+
+  test("should handle single-char delimiter with newlines between content", () => {
+    const subtitles = [createSubtitle("keep this\n<remove this>\nkeep this")]
+    const result = removeContentBetween(subtitles, "content", "<", ">")
+    expect(result[0].content).toBe("keep this\nkeep this")
+  })
+
+  test("should handle single-char delimiter with newline before content and space after", () => {
+    const subtitles = [createSubtitle("keep this\n<remove this> keep this")]
+    const result = removeContentBetween(subtitles, "content", "<", ">")
+    expect(result[0].content).toBe("keep this\n keep this")
   })
 })
