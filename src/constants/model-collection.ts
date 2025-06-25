@@ -100,7 +100,7 @@ export const FREE_MODELS: FreeModelCollection = {
       },
     ]
   },
-  "Free Limited": {
+  "Limited Models": {
     provider: "unknown",
     models: [
       {

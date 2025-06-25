@@ -584,7 +584,7 @@ export const FewShotInput = memo(() => {
               </Button>
             )}
             <p className="text-xs text-muted-foreground">
-              Use subtitles from other translation projects as examples. This helps the model understand the translation styles and nuances.
+              Use subtitles from other translation projects as examples. This helps the model understand the translation styles.
             </p>
           </div>
         )}

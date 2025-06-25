@@ -7,7 +7,7 @@ export const MAX_TRANSCRIPTION_SIZE = 1024 * 1024 * 100
 export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> = {
   sourceLanguage: "Japanese",
   targetLanguage: "Indonesian",
-  modelDetail: FREE_MODELS["Free Limited"].models[0] || null,
+  modelDetail: FREE_MODELS["Premium Trial"].models[0] || null,
   isUseCustomModel: false,
   contextDocument: "",
   customInstructions: "",
