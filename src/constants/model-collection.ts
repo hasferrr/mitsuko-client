@@ -20,13 +20,13 @@ export const FREE_MODELS: FreeModelCollection = {
         name: "DeepSeek R1",
         subName: "DeepSeek-R1-0528",
         maxInput: 128000,
-        maxOutput: 128000,
+        maxOutput: 64000,
         structuredOutput: true,
         isPaid: false,
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 128000,
+          maxCompletionTokens: 64000,
           isUseStructuredOutput: false
         }
       },
@@ -34,13 +34,13 @@ export const FREE_MODELS: FreeModelCollection = {
         name: "DeepSeek V3",
         subName: "DeepSeek-V3-0324",
         maxInput: 128000,
-        maxOutput: 128000,
+        maxOutput: 64000,
         structuredOutput: true,
         isPaid: false,
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 128000,
+          maxCompletionTokens: 64000,
           isUseStructuredOutput: true
         }
       },
@@ -52,7 +52,8 @@ export const FREE_MODELS: FreeModelCollection = {
         isPaid: false,
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 16000,
           isUseStructuredOutput: false,
         }
       },
@@ -80,7 +81,7 @@ export const FREE_MODELS: FreeModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 16_384,
+          maxCompletionTokens: 64000,
           isUseStructuredOutput: true,
         }
       },
@@ -94,7 +95,7 @@ export const FREE_MODELS: FreeModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 16_384,
+          maxCompletionTokens: 64000,
           isUseStructuredOutput: true,
         }
       },
@@ -152,21 +153,10 @@ export const FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "Gemma 3 27B",
-        maxInput: 94_000,
-        maxOutput: 8192,
-        structuredOutput: true,
-        isPaid: false,
-        default: {
-          temperature: 1,
-          isUseStructuredOutput: true,
-        }
-      },
-      {
         name: "DeepSeek R1 (free)",
         subName: "DeepSeek-R1-0528",
         maxInput: 163840,
-        maxOutput: 163840,
+        maxOutput: 64000,
         structuredOutput: true,
         isPaid: false,
         default: {
@@ -268,18 +258,6 @@ export const PAID_MODELS: PaidModelCollection = {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemma 3 27B",
-        maxInput: 110_000,
-        maxOutput: 16_384,
-        structuredOutput: true,
-        isPaid: true,
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true,
         }
       },
     ]
@@ -520,7 +498,7 @@ export const PAID_MODELS: PaidModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 16_384,
+          maxCompletionTokens: 64000,
           isUseStructuredOutput: true,
         }
       },
@@ -534,7 +512,7 @@ export const PAID_MODELS: PaidModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 16_384,
+          maxCompletionTokens: 64000,
           isUseStructuredOutput: true,
         }
       },
@@ -551,7 +529,8 @@ export const PAID_MODELS: PaidModelCollection = {
         isPaid: true,
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 16000,
           isUseStructuredOutput: false,
         }
       },
@@ -563,7 +542,8 @@ export const PAID_MODELS: PaidModelCollection = {
         isPaid: true,
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 16000,
           isUseStructuredOutput: false,
         }
       },
@@ -576,13 +556,13 @@ export const PAID_MODELS: PaidModelCollection = {
         name: "DeepSeek R1",
         subName: "DeepSeek-R1-0528",
         maxInput: 128000,
-        maxOutput: 128000,
+        maxOutput: 64000,
         structuredOutput: true,
         isPaid: true,
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 128000,
+          maxCompletionTokens: 64000,
           isUseStructuredOutput: false
         }
       },
@@ -590,13 +570,13 @@ export const PAID_MODELS: PaidModelCollection = {
         name: "DeepSeek V3",
         subName: "DeepSeek-V3-0324",
         maxInput: 128000,
-        maxOutput: 128000,
+        maxOutput: 64000,
         structuredOutput: true,
         isPaid: true,
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 128000,
+          maxCompletionTokens: 64000,
           isUseStructuredOutput: true
         }
       },

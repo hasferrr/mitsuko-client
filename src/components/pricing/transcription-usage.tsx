@@ -6,11 +6,11 @@ const MINUTE_THRESHOLD = Math.floor(TOKEN_THRESHOLD / TOKENS_PER_MINUTE)
 
 const costsTier115 = {
   "creditPerInputToken": 1.4375,
-  "creditPerOutputToken": 11.5
+  "creditPerOutputToken": 12
 }
 const costsTier215 = {
   "creditPerInputToken": 2.875,
-  "creditPerOutputToken": 17.25
+  "creditPerOutputToken": 18
 }
 
 const INPUT_CREDITS_PER_MINUTE_LOW = costsTier115.creditPerInputToken * TOKENS_PER_MINUTE
