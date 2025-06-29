@@ -271,6 +271,7 @@ export const CustomInstructionsInput = memo(() => {
   const customInstructions = useSettingsStore((state) => state.getCustomInstructions())
   const setCustomInstructions = useSettingsStore((state) => state.setCustomInstructions)
   const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
+  const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false)
   const { setHasChanges } = useUnsavedChanges()
 
   const handleCustomInstructionsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -290,15 +291,25 @@ export const CustomInstructionsInput = memo(() => {
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium">Additional Instructions</label>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsPresetsDialogOpen(true)}
-          className="h-8 px-2"
-        >
-          <List className="h-4 w-4" />
-          Presets
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsPresetsDialogOpen(true)}
+            className="h-8 px-2"
+          >
+            <List className="h-4 w-4" />
+            Presets
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setIsHelpDialogOpen(true)}
+            className="h-8 w-8 px-4"
+          >
+            <HelpCircle className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       <Textarea
         value={customInstructions}
@@ -334,6 +345,19 @@ export const CustomInstructionsInput = memo(() => {
                 </div>
               ))}
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isHelpDialogOpen} onOpenChange={setIsHelpDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>About Additional Instructions</DialogTitle>
+          </DialogHeader>
+          <div className="pt-2 text-base text-foreground space-y-2">
+            <div>Generally, it's not necessary to use additional instructions.</div>
+            <div>The model is <span className="italic">smart</span> enough to determine how the translation style should be, especially the latest model.</div>
+            <div>It is recommended to just leave it empty, unless you really need it and are okay if the result is a bit <span className="italic">forced</span>.</div>
           </div>
         </DialogContent>
       </Dialog>
