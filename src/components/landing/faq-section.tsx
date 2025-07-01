@@ -17,18 +17,22 @@ const faqData = [
   },
   {
     question: "How accurate is the AI translation?",
-    answer: "High accuracy with context-aware AI that retains and adapt original meaning, idioms, and cultural references. It uses frontier AI models like Gemini, Claude, Grok, and OpenAI.",
+    answer: [
+      "High accuracy with context-aware AI that retains and adapt original meaning, idioms, and cultural references. It uses frontier LLMs (Large Language Models) like Gemini, Claude, Grok, and OpenAI.",
+      "To achieve the highest accuracy, you can provide context to the AI to inform the translation.",
+    ],
   },
   {
     question: "How does the context extraction feature work?",
     answer: [
       "It analyzes subtitles to track characters, settings, and relationships, creating reusable context documents. You can use this context document to inform the translation.",
-      "To use this feature, you need to extract context from the first episode. Then, you can use this context document to inform the translation of the second episode."
+      "To use this feature, you need to extract context from the first episode. Then, you can use this context document to inform the translation of the second episode.",
+      "You can also use this feature by extracting context to inform the translation of the same episode.",
     ],
   },
   {
     question: "How many languages does Mitsuko support?",
-    answer: "100+ languages, including major global languages and regional dialects. Regularly updated. You can request new languages through Discord server.",
+    answer: "100+ languages, including major global languages and regional dialects. You can request new languages through Discord server.",
   },
   {
     question: "Is there a limit to how much content I can process?",

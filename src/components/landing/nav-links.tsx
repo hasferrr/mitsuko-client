@@ -14,7 +14,7 @@ const solutionItems = [
   "For Creators",
   "For Translators",
   "For Studios",
-  "For Fansubbers",
+  "For Subbers",
   "For Individuals",
 ]
 

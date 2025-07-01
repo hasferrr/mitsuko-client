@@ -31,7 +31,7 @@ export default function CreditValueShowcase({ showGetCreditsButton = false }: Cr
 
   const averageCreditsPerMinute = (example1CreditsPerMinute + example2CreditsPerMinute) / 2
 
-  const showcaseCredits = 2_000_000
+  const showcaseCredits = 5_000_000
   const totalMinutes = showcaseCredits / averageCreditsPerMinute
   const totalHours = Math.floor(totalMinutes / 60)
   const remainingMinutes = Math.round(totalMinutes % 60)
@@ -56,7 +56,7 @@ export default function CreditValueShowcase({ showGetCreditsButton = false }: Cr
               Unlock Massive Translation Power!
           </h3>
           <p className="text-base sm:text-lg text-blue-100 mb-4">
-            Ever wondered what <strong>2 Million Credits</strong> can get you? Hours of subtitle translation using powerful DeepSeek R1 with{' '}
+            Ever wondered what <strong>{showcaseCredits / 1_000_000} Million Credits</strong> can get you? Hours of subtitle translation using powerful DeepSeek R1 with{' '}
             <span
               onClick={handleContextToggle}
               className="relative inline-block group cursor-pointer font-medium text-white hover:text-blue-800 transition-colors duration-300"

@@ -113,7 +113,7 @@ export function CreditPackPrices({
         Need more credits? Purchase additional credit packs starting at just{" "}
         {currency.symbol}
         {(CREDIT_PACKS[0]?.basePriceUSD * currency.rate || 0).toLocaleString()}
-        . Available to all tiers, these credit packs provide flexibility for your
+        . These credit packs provide flexibility for your
         usage needs. Credits valid for a whole year from purchase!
       </p>
 
