@@ -22,7 +22,7 @@ export default function CreditValueShowcase({ showGetCreditsButton = false }: Cr
   const example2Minutes = 26
   const baseExample2CreditsPerMinute = example2Credits / example2Minutes
 
-  const contextMultiplier = (isMinimalContext ? 0.5 : 1) * 0.923
+  const contextMultiplier = (isMinimalContext ? 0.5 : 1)
   const example1CreditsPerMinute = baseExample1CreditsPerMinute * contextMultiplier
   const example2CreditsPerMinute = baseExample2CreditsPerMinute * contextMultiplier
 
