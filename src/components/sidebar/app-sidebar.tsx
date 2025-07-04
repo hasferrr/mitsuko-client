@@ -8,6 +8,7 @@ import {
   House,
   Languages,
   HistoryIcon,
+  Wrench,
 } from "lucide-react"
 import { AppSidebarMain } from "@/components/sidebar/app-sidebar-main"
 import { AppSidebarProjects } from "@/components/sidebar/app-sidebar-projects"
@@ -54,6 +55,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Extract Context",
         url: "/extract-context",
         icon: BookOpen,
+      },
+      {
+        title: "Subtitle Tools",
+        url: "/tools",
+        icon: Wrench,
       },
     ],
     links: [
