@@ -89,6 +89,11 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  ::selection {
+    background-color: hsl(var(--foreground));
+    color: hsl(var(--background));
+  }
 }
 
 /* Set the default width of the scrollbar to zero */
