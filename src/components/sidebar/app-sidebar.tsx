@@ -8,7 +8,7 @@ import {
   House,
   Languages,
   HistoryIcon,
-  Wrench,
+  PencilRuler,
 } from "lucide-react"
 import { AppSidebarMain } from "@/components/sidebar/app-sidebar-main"
 import { AppSidebarProjects } from "@/components/sidebar/app-sidebar-projects"
@@ -59,7 +59,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         title: "Subtitle Tools",
         url: "/tools",
-        icon: Wrench,
+        icon: PencilRuler,
       },
     ],
     links: [
