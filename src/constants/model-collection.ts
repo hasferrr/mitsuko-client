@@ -101,9 +101,22 @@ export const FREE_MODELS: FreeModelCollection = {
       },
     ]
   },
-  "Limited Models": {
+  "Free Limited": {
     provider: "unknown",
     models: [
+      {
+        name: "Gemini 2.5 Pro",
+        subName: "gemini-2.5-pro",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
       {
         name: "Gemini 2.5 Flash",
         subName: "gemini-2.5-flash",
@@ -161,8 +174,23 @@ export const FREE_MODELS: FreeModelCollection = {
         isPaid: false,
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 64000,
           isUseStructuredOutput: false
+        }
+      },
+      {
+        name: "DeepSeek V3 (free)",
+        subName: "DeepSeek-V3-0324",
+        maxInput: 128000,
+        maxOutput: 64000,
+        structuredOutput: true,
+        isPaid: false,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 64000,
+          isUseStructuredOutput: true
         }
       },
       {
