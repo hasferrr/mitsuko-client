@@ -86,6 +86,17 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
     toast.success(`Shifted subtitles by ${shiftTime} miliseconds`)
   }
 
+  const handleSwapSubtitles = () => {
+    if (!subtitles.length) return
+    const updatedSubtitles = subtitles.map((subtitle) => ({
+      ...subtitle,
+      content: subtitle.translated,
+      translated: subtitle.content,
+    }))
+    handleSetSubtitles(updatedSubtitles)
+    toast.success("Swapped original and translated text")
+  }
+
   const onInputShiftTimeBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     let num = parseInt(value, 10)
@@ -108,7 +119,7 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
         </DialogHeader>
 
         {/* Cleaner */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <DialogDescription className="font-medium text-base">Cleaner</DialogDescription>
           <div className="space-y-3">
             <div className="flex items-center space-x-3">
@@ -181,7 +192,7 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
         </div>
 
         {/* Time Shift */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <DialogDescription className="font-medium text-base">Time Shift</DialogDescription>
           <div className="grid gap-3">
             <Label htmlFor="shiftTime" className="text-sm">
@@ -204,6 +215,24 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
                 disabled={!subtitles.length || shiftTime === 0}
               >
                 Apply Shift
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Swap */}
+        <div className="space-y-3">
+          <DialogDescription className="font-medium text-base">Swap</DialogDescription>
+          <div className="grid gap-3">
+            <Label className="text-sm">Swap all original and translated text</Label>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => showConfirmationDialog(handleSwapSubtitles)}
+                disabled={!subtitles.length}
+              >
+                Swap Text
               </Button>
             </div>
           </div>
