@@ -196,6 +196,7 @@ export default function SubtitleTranslator() {
   const [isSaving, setIsSaving] = useState(false)
   const [isASSGuidanceDialogOpen, setIsASSGuidanceDialogOpen] = useState(false)
   const [subtitlesHidden, setSubtitlesHidden] = useState(true)
+  const [isInitialUploadDialogOpen, setIsInitialUploadDialogOpen] = useState(false)
 
   // Other
   const { setHasChanges } = useUnsavedChanges()
@@ -638,6 +639,8 @@ export default function SubtitleTranslator() {
     const fileList = event instanceof FileList ? event : event.target.files
     if (!fileList || fileList.length === 0) return
 
+    setIsInitialUploadDialogOpen(false)
+
     const file = fileList[0]
     setPendingFile(file) // Store the file
     setIsUploadDialogOpen(true) // Open the dialog
@@ -687,6 +690,7 @@ export default function SubtitleTranslator() {
 
     } catch (error) {
       console.error("Error parsing subtitle file:", error)
+      toast.error("Failed to parse subtitle file. Please ensure it is a valid SRT or ASS file.")
     } finally {
       setIsUploadDialogOpen(false) // Close dialog after processing
       setPendingFile(null) // Clear pending file
@@ -799,19 +803,17 @@ export default function SubtitleTranslator() {
           className="hidden"
           id="subtitle-upload"
         />
-        {/* Drag and Drop Area + Upload Button */}
-        <DragAndDrop onDropFiles={handleFileUpload} disabled={isTranslating}>
-          <Button
-            variant="outline"
-            size="lg"
-            className="gap-2"
-            onClick={() => document.getElementById("subtitle-upload")?.click()}
-            disabled={isTranslating}
-          >
-            <Upload className="h-5 w-5" />
-            Upload
-          </Button>
-        </DragAndDrop>
+        {/* Upload Button */}
+        <Button
+          variant="outline"
+          size="lg"
+          className="gap-2"
+          onClick={() => setIsInitialUploadDialogOpen(true)}
+          disabled={isTranslating}
+        >
+          <Upload className="h-5 w-5" />
+          Upload
+        </Button>
         {/* Save Button */}
         <Button
           variant="outline"
@@ -1118,6 +1120,29 @@ export default function SubtitleTranslator() {
         isHistoryOpen={isHistoryOpen}
         setIsHistoryOpen={setIsHistoryOpen}
       />
+
+      {/* Initial Upload Dialog */}
+      <Dialog open={isInitialUploadDialogOpen} onOpenChange={setIsInitialUploadDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Upload Subtitle File</DialogTitle>
+            <DialogDescription>
+              Upload a SRT or ASS file. You can also drag and drop the file.
+            </DialogDescription>
+          </DialogHeader>
+          <DragAndDrop onDropFiles={handleFileUpload} disabled={isTranslating}>
+            <div
+              className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
+              onClick={() => document.getElementById("subtitle-upload")?.click()}
+            >
+              <Upload className="h-10 w-10 text-muted-foreground" />
+              <p className="mt-2 text-sm text-muted-foreground">
+                Drag and drop file here, or click to select a file.
+              </p>
+            </div>
+          </DragAndDrop>
+        </DialogContent>
+      </Dialog>
 
       {/* Confirmation Dialog */}
       <AlertDialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
