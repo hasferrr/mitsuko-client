@@ -108,6 +108,8 @@ import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
 import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-gap"
 import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 
 export default function SubtitleTranslator() {
   const currentId = useTranslationDataStore((state) => state.currentId)
@@ -197,6 +199,9 @@ export default function SubtitleTranslator() {
   const [isASSGuidanceDialogOpen, setIsASSGuidanceDialogOpen] = useState(false)
   const [subtitlesHidden, setSubtitlesHidden] = useState(true)
   const [isInitialUploadDialogOpen, setIsInitialUploadDialogOpen] = useState(false)
+  const [uploadMode, setUploadMode] = useState<"normal" | "as-translated">("normal")
+  const [isMismatchDialogOpen, setIsMismatchDialogOpen] = useState(false)
+  const [pendingNewSubtitles, setPendingNewSubtitles] = useState<SubtitleNoTime[]>([])
 
   // Other
   const { setHasChanges } = useUnsavedChanges()
@@ -660,40 +665,66 @@ export default function SubtitleTranslator() {
   }
 
   const processFile = async () => {
-    if (!pendingFile) return;
+    if (!pendingFile) return
 
     try {
-      const text = await pendingFile.text()
+      if (uploadMode === "as-translated") {
+        if (!subtitles || subtitles.length === 0) {
+          toast.error("You must have subtitles loaded to upload a translation.")
+          return
+        }
 
-      const data = parseSubtitle({ content: text })
-      const parsedSubtitles: SubtitleTranslated[] = data.subtitles.map((subtitle) => ({
-        ...subtitle,
-        translated: "",
-      }))
+        const text = await pendingFile.text()
+        const data = parseSubtitle({ content: text })
+        const newSubtitles = data.subtitles
 
-      setParsed(currentId, data.parsed)
-      if (data.parsed.type === "ass") {
-        setIsASSGuidanceDialogOpen(true)
+        if (newSubtitles.length !== subtitles.length) {
+          setPendingNewSubtitles(newSubtitles)
+          setIsMismatchDialogOpen(true)
+          return // Stop processing, wait for user confirmation
+        }
+
+        const updatedSubtitles = subtitles.map((subtitle, index) => ({
+          ...subtitle,
+          translated: newSubtitles[index]?.content || "",
+        }))
+
+        setSubtitles(currentId, updatedSubtitles)
+        await saveData(currentId)
+        toast.success("Successfully updated translations from file.")
+      } else {
+        const text = await pendingFile.text()
+
+        const data = parseSubtitle({ content: text })
+        const parsedSubtitles: SubtitleTranslated[] = data.subtitles.map((subtitle) => ({
+          ...subtitle,
+          translated: "",
+        }))
+
+        setParsed(currentId, data.parsed)
+        if (data.parsed.type === "ass") {
+          setIsASSGuidanceDialogOpen(true)
+        }
+        if (parsedSubtitles.length >= maxSubtitles) {
+          setSubtitlesHidden(true)
+        }
+
+        setSubtitles(currentId, parsedSubtitles)
+        resetIndex(1, parsedSubtitles.length)
+
+        const fileName = pendingFile.name.split('.')
+        fileName.pop()
+        setTitle(currentId, fileName.join('.'))
+
+        await saveData(currentId)
       }
-      if (parsedSubtitles.length >= maxSubtitles) {
-        setSubtitlesHidden(true)
-      }
-
-      setSubtitles(currentId, parsedSubtitles)
-      resetIndex(1, parsedSubtitles.length)
-
-      const fileName = pendingFile.name.split('.')
-      fileName.pop()
-      setTitle(currentId, fileName.join('.'))
-
-      await saveData(currentId)
-
     } catch (error) {
       console.error("Error parsing subtitle file:", error)
       toast.error("Failed to parse subtitle file. Please ensure it is a valid SRT or ASS file.")
     } finally {
       setIsUploadDialogOpen(false) // Close dialog after processing
       setPendingFile(null) // Clear pending file
+      setUploadMode("normal")
     }
   }
 
@@ -713,11 +744,37 @@ export default function SubtitleTranslator() {
   const handleCancel = () => {
     setIsUploadDialogOpen(false)
     setPendingFile(null)
+    setUploadMode("normal")
   }
 
   const handleContextCancel = () => {
     setIsContextUploadDialogOpen(false)
     setPendingContextFile(null)
+  }
+
+  const handleMismatchConfirm = async () => {
+    if (pendingNewSubtitles.length === 0 || subtitles.length === 0) return
+
+    const updatedSubtitles = subtitles.map((subtitle, index) => {
+      const newTranslationContent = pendingNewSubtitles[index]?.content
+      return {
+        ...subtitle,
+        translated: newTranslationContent !== undefined ? newTranslationContent : subtitle.translated,
+      }
+    })
+
+    setSubtitles(currentId, updatedSubtitles)
+    await saveData(currentId)
+    toast.success("Successfully updated translations from file despite line mismatch.")
+
+    // Cleanup
+    setIsMismatchDialogOpen(false)
+    setPendingNewSubtitles([])
+  }
+
+  const handleMismatchCancel = () => {
+    setIsMismatchDialogOpen(false)
+    setPendingNewSubtitles([])
   }
 
   const generateSubtitleContent = (option: DownloadOption): string => {
@@ -783,6 +840,13 @@ export default function SubtitleTranslator() {
     setIsSaving(true)
     await saveData(currentId)
     setIsSaving(false)
+  }
+
+  const handleInitialUploadDialogChange = (isOpen: boolean) => {
+    setIsInitialUploadDialogOpen(isOpen)
+    if (!isOpen) {
+      setUploadMode("normal")
+    }
   }
 
   return (
@@ -1122,25 +1186,43 @@ export default function SubtitleTranslator() {
       />
 
       {/* Initial Upload Dialog */}
-      <Dialog open={isInitialUploadDialogOpen} onOpenChange={setIsInitialUploadDialogOpen}>
+      <Dialog open={isInitialUploadDialogOpen} onOpenChange={handleInitialUploadDialogChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Upload Subtitle File</DialogTitle>
             <DialogDescription>
-              Upload a SRT or ASS file. You can also drag and drop the file.
+              Upload a SRT or ASS file. Check the box below to upload as a translation only.
             </DialogDescription>
           </DialogHeader>
+
           <DragAndDrop onDropFiles={handleFileUpload} disabled={isTranslating}>
             <div
               className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
               onClick={() => document.getElementById("subtitle-upload")?.click()}
             >
               <Upload className="h-10 w-10 text-muted-foreground" />
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-2 text-sm text-muted-foreground text-center">
                 Drag and drop file here, or click to select a file.
+                <br />
+                SRT or ASS subtitles file.
               </p>
             </div>
           </DragAndDrop>
+          <div className="flex items-center justify-center space-x-2">
+            <Checkbox
+              id="upload-mode"
+              checked={uploadMode === "as-translated"}
+              onCheckedChange={(checked) => {
+                setUploadMode(checked ? "as-translated" : "normal")
+              }}
+            />
+            <Label
+              htmlFor="upload-mode"
+              className="text-muted-foreground"
+            >
+              Only update the current translation text
+            </Label>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -1150,9 +1232,11 @@ export default function SubtitleTranslator() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm File Upload</AlertDialogTitle>
             <AlertDialogDescription>
-              {subtitles.length > 0
-                ? "Uploading a new file will replace the current subtitles.  Are you sure you want to continue?"
-                : "Are you sure you want to upload this file?"}
+              {uploadMode === "as-translated"
+                ? "This will replace all existing translations with content from the uploaded file. The original text will remain unchanged. Are you sure?"
+                : subtitles.length > 0
+                  ? "Uploading a new file will replace the current subtitles. Are you sure you want to continue?"
+                  : "Are you sure you want to upload this file?"}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1212,6 +1296,34 @@ export default function SubtitleTranslator() {
           <AlertDialogFooter>
             <AlertDialogAction>
               I understand
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Mismatch Confirmation Dialog */}
+      <AlertDialog open={isMismatchDialogOpen} onOpenChange={setIsMismatchDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Subtitle Line Mismatch</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <span className="block">
+                The uploaded file has {pendingNewSubtitles.length} lines, but the current project has {subtitles.length} lines.
+              </span>
+              <span className="block">
+                Continuing will update translations line-by-line. Extra lines will be ignored. ASS Comments will be ignored (only consider Dialogue text).
+              </span>
+              <span className="block">
+                Do you want to proceed?
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleMismatchCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleMismatchConfirm}>
+              Continue Anyway
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
