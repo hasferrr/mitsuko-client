@@ -1,0 +1,9 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+## Code Guidelines
+
+- Do not write any comment
+- Do not write semicolon at the end of the line
