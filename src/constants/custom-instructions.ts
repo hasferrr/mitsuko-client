@@ -12,7 +12,7 @@ export const customInstructionPresets = [
   {
     title: "Emphasize Target Language Localization",
     instruction:
-      "Adapt cultural references, idioms, measurements, and formats (e.g., dates, currency) to be natural and easily understood by the target audience in [Target Language/Region]. Avoid overly literal translations that might sound awkward or lose meaning. Ensure names, places, and concepts are localized appropriately unless specifically instructed otherwise (e.g., keep original character names). The goal is seamless cultural integration.",
+      "Adapt cultural references, idioms, measurements, and formats (e.g., dates, currency) to be natural and easily understood by the target audience in <target_language>. Avoid overly literal translations that might sound awkward or lose meaning. Ensure names, places, and concepts are localized appropriately unless specifically instructed otherwise (e.g., keep original character names). The goal is seamless cultural integration.",
   },
   {
     title: "Strict Handling of Specific Terminology",
