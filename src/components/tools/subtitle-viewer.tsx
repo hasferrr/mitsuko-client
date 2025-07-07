@@ -142,6 +142,7 @@ export default function SubtitleViewer() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>#</TableHead>
               <TableHead>Start</TableHead>
               <TableHead>End</TableHead>
               <TableHead>CPS</TableHead>
@@ -155,6 +156,7 @@ export default function SubtitleViewer() {
               const cps = calculateCPS(event)
               return (
                 <TableRow key={index}>
+                  <TableCell>{index + 1}</TableCell>
                   <TableCell>{event.start}</TableCell>
                   <TableCell>{event.end}</TableCell>
                   <TableCell>{cps === -1 ? 'Invalid' : cps}</TableCell>
