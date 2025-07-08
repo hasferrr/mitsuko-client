@@ -22,6 +22,7 @@ import { exportDatabase, importDatabase } from "@/lib/db/db-io"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { useRouter } from "next/navigation"
 
 interface ExportImportDialogueProps {
   isOpen: boolean
@@ -32,6 +33,7 @@ export function ExportImportDialogue({
   isOpen,
   setIsOpen,
 }: ExportImportDialogueProps) {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [showImportConfirm, setShowImportConfirm] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -94,6 +96,9 @@ export function ExportImportDialogue({
       reader.onload = async (e) => {
         try {
           const content = e.target?.result as string
+          if (deleteExisting) {
+            router.push("/dashboard")
+          }
           await importDatabase(content, deleteExisting)
           await loadProjects()
           toast.success("Database imported successfully")
