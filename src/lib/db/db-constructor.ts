@@ -63,6 +63,19 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
     })
   }
 
+  for (const basicSetting of data.basicSettings) {
+    const newBasicSetting = basicSettingsMap.get(basicSetting.id)
+    if (newBasicSetting && newBasicSetting.fewShot.type === 'linked' && newBasicSetting.fewShot.linkedId) {
+      const newLinkedId = translationsMap.get(newBasicSetting.fewShot.linkedId)?.id
+      if (newLinkedId) {
+        newBasicSetting.fewShot = {
+          ...newBasicSetting.fewShot,
+          linkedId: newLinkedId,
+        }
+      }
+    }
+  }
+
   for (const extraction of data.extractions) {
     extractionsMap.set(extraction.id, {
       ...extraction,
