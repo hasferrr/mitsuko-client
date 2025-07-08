@@ -21,6 +21,86 @@ export async function exportDatabase(): Promise<string> {
   return JSON.stringify(exportData)
 }
 
+export async function exportProject(
+  projectId: string
+): Promise<{ name: string; content: string } | null> {
+  const project = await db.projects.get(projectId)
+  if (!project) {
+    return null
+  }
+
+  const translations = await db.translations
+    .where("projectId")
+    .equals(projectId)
+    .toArray()
+  const transcriptions = await db.transcriptions
+    .where("projectId")
+    .equals(projectId)
+    .toArray()
+  const extractions = await db.extractions
+    .where("projectId")
+    .equals(projectId)
+    .toArray()
+
+  const basicSettingsIds = new Set<string>()
+  const advancedSettingsIds = new Set<string>()
+
+  if (project.defaultBasicSettingsId) {
+    basicSettingsIds.add(project.defaultBasicSettingsId)
+  }
+  if (project.defaultAdvancedSettingsId) {
+    advancedSettingsIds.add(project.defaultAdvancedSettingsId)
+  }
+
+  translations.forEach((t) => {
+    basicSettingsIds.add(t.basicSettingsId)
+    advancedSettingsIds.add(t.advancedSettingsId)
+  })
+
+  extractions.forEach((e) => {
+    basicSettingsIds.add(e.basicSettingsId)
+    advancedSettingsIds.add(e.advancedSettingsId)
+  })
+
+  const basicSettings = (
+    await db.basicSettings.bulkGet(Array.from(basicSettingsIds))
+  ).filter((s): s is BasicSettings => s !== undefined)
+  const advancedSettings = (
+    await db.advancedSettings.bulkGet(Array.from(advancedSettingsIds))
+  ).filter((s): s is AdvancedSettings => s !== undefined)
+
+  const projectOrders = await db.projectOrders.limit(1).toArray()
+  const projectOrder =
+    projectOrders.length > 0
+      ? projectOrders[0]
+      : {
+          id: crypto.randomUUID(),
+          order: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+
+  const exportData: DatabaseExport = {
+    projects: [project],
+    translations,
+    transcriptions,
+    extractions,
+    projectOrders: [{ ...projectOrder, order: [project.id] }],
+    basicSettings,
+    advancedSettings,
+  }
+
+  const content =
+    process.env.NODE_ENV === "development"
+      ? JSON.stringify(exportData, null, 2)
+      : JSON.stringify(exportData)
+
+  return {
+    name: project.name,
+    content,
+  }
+}
+
 export async function importDatabase(jsonString: string, clearExisting: boolean): Promise<void> {
   try {
     const importData = JSON.parse(jsonString)

@@ -30,6 +30,9 @@ import { ExportImportDialogue } from "../ui-custom/export-import-dialogue"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { sleep } from "@/lib/utils"
+import { exportProject } from "@/lib/db/db-io"
+import { toast } from "sonner"
+
 interface AppSidebarProjectsProps {
   projects: Project[],
   label?: string,
@@ -53,6 +56,27 @@ export function AppSidebarProjects({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isExportImportModalOpen, setIsExportImportModalOpen] = useState(false)
   const [idToDelete, setIdToDelete] = useState("")
+
+  const handleExportProject = async (projectId: string) => {
+    try {
+      const result = await exportProject(projectId)
+      if (result) {
+        const blob = new Blob([result.content], { type: "application/json" })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `mitsuko-project-${result.name.replace(/\s+/g, "_")}-${new Date().toISOString().split("T")[0]}.json`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        toast.success("Project exported successfully")
+      }
+    } catch (error) {
+      console.error("Error exporting project:", error)
+      toast.error("Failed to export project")
+    }
+  }
 
   const handleDeleteProject = async () => {
     if (currentProject?.id === idToDelete) {
@@ -90,10 +114,16 @@ export function AppSidebarProjects({
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem onClick={() => {
-                  setIdToDelete(project.id)
-                  setIsDeleteModalOpen(true)
-                }}>
+                <DropdownMenuItem onClick={() => handleExportProject(project.id)}>
+                  <Upload className="text-muted-foreground" />
+                  <span>Export Project</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setIdToDelete(project.id)
+                    setIsDeleteModalOpen(true)
+                  }}
+                >
                   <Trash2 className="text-muted-foreground" />
                   <span>Delete Project</span>
                 </DropdownMenuItem>
