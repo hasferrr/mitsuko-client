@@ -25,6 +25,7 @@ export const SubtitleResultOutput = memo(() => {
   const isTranslating = isTranslatingSet.has(currentId ?? "")
 
   // State
+  const [isShowRaw, setIsShowRaw] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState("")
   const [isParseError, setIsParseError] = useState(false)
@@ -105,7 +106,7 @@ export const SubtitleResultOutput = memo(() => {
 
   return (
     <div className="space-y-4">
-      {isEditing ? (
+      {isEditing || isShowRaw ? (
         <Textarea
           ref={topTextareaRef}
           value={response || "Translation output will appear here..."}
@@ -143,11 +144,15 @@ export const SubtitleResultOutput = memo(() => {
       />
       <div className="flex gap-2">
         <Button
-          variant={isEditing ? "default" : "outline"}
-          onClick={isEditing ? handleParseAndSave : handleEditText}
+          variant={!isTranslating && isEditing ? "default" : "outline"}
+          onClick={!isTranslating
+            ? (isEditing ? handleParseAndSave : handleEditText)
+            : () => setIsShowRaw(prev => !prev)}
           className="w-full"
         >
-          {isEditing ? "Parse & Save" : "Edit Text"}
+          {!isTranslating
+            ? isEditing ? "Parse & Save" : "Edit Text"
+            : !isShowRaw ? "Show Raw" : "Show Subtitles"}
         </Button>
         <Button
           variant="outline"
