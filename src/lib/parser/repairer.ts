@@ -7,6 +7,18 @@ export function isEscaped(str: string, index: number): boolean {
 }
 
 export function repairJson(input: string): string {
+  let startIndex = input.lastIndexOf('{"subtitles"')
+  if (startIndex === -1) {
+    const subtitlesIndex = input.lastIndexOf('"subtitles"')
+    if (subtitlesIndex > -1) {
+      startIndex = input.lastIndexOf('{', subtitlesIndex)
+    }
+  }
+
+  if (startIndex > -1) {
+    input = input.substring(startIndex)
+  }
+
   input = input.trim()
 
   type OpenBracket = "{" | "["

@@ -236,6 +236,74 @@ const testData = [
       translated: ""
     }]),
   },
+  // Stupid model output tests
+  {
+    name: "stupid model output with reasoning",
+    input: `<internal_reasoning>
+Saya akan menerapkan proses 4 langkah untuk setiap baris subtitle yang belum diterjemahkan (index 7-100) sesuai panduan:
+{"subtitles": [
+...etc
+</internal_reasoning>
+{"subtitles":[ {"index":1,"content":"hello \\"{ [ world ] }\\" ","translated":"test"} ]}`,
+    expected: wrapSub([{
+      index: 1,
+      content: 'hello \"{ [ world ] }\" ',
+      translated: "test"
+    }]),
+  },
+  {
+    name: "stupid model output with reasoning and whitespace",
+    input: `<stupid>
+...
+</stupid>
+  {
+    "subtitles": [
+      {
+        "index": 1,
+        "content": "test",
+        "translated": "test"
+      }
+    ]
+  }
+<stupid>
+...
+</stupid>
+`,
+    expected: wrapSub([{
+      index: 1,
+      content: 'test',
+      translated: "test"
+    }]),
+  },
+  {
+    name: "stupid model output with trailing garbage",
+    input: `<stupid>
+...
+</stupid>
+**Explanation**:
+...
+some stupid explanation
+
+  {
+    "subtitles": [
+      {
+        "index": 1,
+        "content": "test",
+        "translated": "test"
+      }
+    ]
+  }
+
+**Explanation**:
+...
+some stupid explanation
+`,
+    expected: wrapSub([{
+      index: 1,
+      content: 'test',
+      translated: "test"
+    }]),
+  }
 ]
 
 describe("isEscaped", () => {
