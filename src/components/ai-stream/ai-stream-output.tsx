@@ -24,10 +24,27 @@ export const AiStreamOutput = ({
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false)
   const [translatedSubtitles, setTranslatedSubtitles] = useState<SubOnlyTranslated[]>([])
   const initialSubtitlesRef = useRef<SubtitleNoTimeTranslated[]>(subtitlesProp)
+  const lastParseTimeRef = useRef<number>(0)
 
   useEffect(() => {
-    const parsed = parseTranslationJson(content)
-    setTranslatedSubtitles(parsed)
+    if (!subtitlesProp.length) return
+    if (Date.now() - lastParseTimeRef.current < 1500) return
+    lastParseTimeRef.current = Date.now()
+    try {
+      const parsed = parseTranslationJson(content)
+      const split = content.split("\n")
+      if (split[split.length - 1].startsWith("[")) {
+        parsed.push({
+          index: NaN,
+          translated: split[split.length - 1],
+        })
+      }
+      if (translatedSubtitles.length !== parsed.length) {
+        setTranslatedSubtitles(parsed)
+      }
+    } catch {
+      setTranslatedSubtitles([])
+    }
   }, [content])
 
   const toggleCollapse = () => setIsCollapsed(prev => !prev)
