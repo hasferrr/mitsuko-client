@@ -50,7 +50,7 @@ import { Extraction, Translation } from "@/types/project"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { toast } from "sonner"
-import { AiStreamOutput } from "../common/ai-stream-output"
+import { AiStreamOutput } from "../ai-stream-output"
 
 interface FileItem {
   id: string
@@ -692,7 +692,7 @@ export const ContextExtractor = () => {
                     !contextResult && "text-muted-foreground",
                   )}
                 >
-                  <AiStreamOutput content={contextResult.trim() || "Extracted context will appear here..."} />
+                  <AiStreamOutput content={contextResult || "Extracted context will appear here..."} />
                 </div>
               )}
             </div>

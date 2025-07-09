@@ -8,7 +8,7 @@ import { parseTranslationJson } from "@/lib/parser/parser"
 import { cn } from "@/lib/utils"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
-import { AiStreamOutput } from "@/components/common/ai-stream-output"
+import { AiStreamOutput } from "@/components/ai-stream-output"
 
 export const SubtitleResultOutput = memo(() => {
   const currentId = useTranslationDataStore((state) => state.currentId)
@@ -110,7 +110,7 @@ export const SubtitleResultOutput = memo(() => {
           !response && "text-muted-foreground"
         )}
       >
-        <AiStreamOutput content={response.trim() || "Translation output will appear here..."} />
+        <AiStreamOutput content={response || "Translation output will appear here..."} />
       </div>
       <Textarea
         ref={bottomTextareaRef}
