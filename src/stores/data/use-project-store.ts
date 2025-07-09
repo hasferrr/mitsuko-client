@@ -127,6 +127,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
         projects: state.projects.map(p =>
           p.id === id ? updatedProject : p
         ),
+        currentProject: state.currentProject?.id === id ? updatedProject : state.currentProject,
         loading: false
       }))
       return updatedProject
