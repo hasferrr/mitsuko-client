@@ -72,7 +72,7 @@ export const AiStreamOutput = ({ content, className }: AiStreamOutputProps) => {
         </div>
       )}
       {parsedContent.output && (
-        <span className="whitespace-pre-wrap text-sm">
+        <span className="whitespace-pre-wrap break-words text-sm">
           {parsedContent.output}
         </span>
       )}
