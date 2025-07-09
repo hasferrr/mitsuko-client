@@ -8,80 +8,74 @@ interface AiStreamOutputProps {
 }
 
 interface ParsedSegment {
-  type: "think" | "output"
-  content: string
+  think: string
+  output: string
 }
 
 export const AiStreamOutput = ({ content, className }: AiStreamOutputProps) => {
-  const [collapsedStates, setCollapsedStates] = useState<Record<number, boolean>>({})
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false)
 
-  const toggleCollapse = (index: number) => {
-    setCollapsedStates(prev => ({ ...prev, [index]: !prev[index] }))
-  }
+  const toggleCollapse = () => setIsCollapsed(prev => !prev)
 
-  const parsedContent = useMemo((): ParsedSegment[] => {
+  const parsedContent = useMemo<ParsedSegment>(() => {
     const parts = content.split(/(<think>|<\/think>)/g)
-    const result: ParsedSegment[] = []
+    const result: ParsedSegment = { think: "", output: "" }
     let isThinking = false
+
     for (const part of parts) {
       if (part === "<think>") {
         isThinking = true
       } else if (part === "</think>") {
         isThinking = false
       } else if (part) {
-        const last = result[result.length - 1]
-        if (last && last.type === (isThinking ? "think" : "output")) {
-          last.content += part
+        if (isThinking) {
+          result.think += part
         } else {
-          result.push({ type: isThinking ? "think" : "output", content: part })
+          result.output += part
         }
       }
     }
-    return result
+
+    return {
+      think: result.think.trim(),
+      output: result.output.trim()
+    }
   }, [content])
 
   return (
     <div className={cn("text-sm", className)}>
-      {parsedContent.map((segment, index) => {
-        if (segment.type === "think") {
-          const isCollapsed = collapsedStates[index]
-          return (
-            <div
-              key={index}
-              className="bg-muted/30 p-3 mb-2 rounded-lg border"
-            >
-              <div
-                onClick={() => toggleCollapse(index)}
-                className="flex items-center font-semibold cursor-pointer"
-              >
-                {isCollapsed ? (
-                  <ChevronRight className="h-4 w-4 mr-1" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 mr-1" />
-                )}
-                Thinking...
-              </div>
-              <div
-                className={cn(
-                  "grid transition-[grid-template-rows] duration-300 ease-in-out",
-                  isCollapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]",
-                )}
-              >
-                <div className="overflow-hidden">
-                  <div className="whitespace-pre-wrap text-sm pt-3">
-                    {segment.content.trim() || "..."}
-                  </div>
-                </div>
+      {parsedContent.think && (
+        <div className="bg-muted/30 p-3 mb-2 rounded-lg border">
+          <div
+            onClick={toggleCollapse}
+            className="flex items-center font-semibold cursor-pointer"
+          >
+            {isCollapsed ? (
+              <ChevronRight className="h-4 w-4 mr-1" />
+            ) : (
+              <ChevronDown className="h-4 w-4 mr-1" />
+            )}
+            {parsedContent.output ? "Thought" : "Thinking..."}
+          </div>
+          <div
+            className={cn(
+              "grid transition-[grid-template-rows] duration-300 ease-in-out",
+              isCollapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]",
+            )}
+          >
+            <div className="overflow-hidden">
+              <div className="whitespace-pre-wrap text-sm pt-3">
+                {parsedContent.think}
               </div>
             </div>
-          )
-        }
-        return (
-          <span key={index} className="whitespace-pre-wrap text-sm">
-            {segment.content.trim()}
-          </span>
-        )
-      })}
+          </div>
+        </div>
+      )}
+      {parsedContent.output && (
+        <span className="whitespace-pre-wrap text-sm">
+          {parsedContent.output}
+        </span>
+      )}
     </div>
   )
 }
