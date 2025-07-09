@@ -8,6 +8,7 @@ import { parseTranslationJson } from "@/lib/parser/parser"
 import { cn } from "@/lib/utils"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
+import { AiStreamOutput } from "@/components/common/ai-stream-output"
 
 export const SubtitleResultOutput = memo(() => {
   const currentId = useTranslationDataStore((state) => state.currentId)
@@ -27,12 +28,12 @@ export const SubtitleResultOutput = memo(() => {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState("")
   const [isParseError, setIsParseError] = useState(false)
-  const topTextareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const topContainerRef = useRef<HTMLDivElement | null>(null)
   const bottomTextareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const jsonText = jsonResponse.length ? `[${jsonResponse.map(s => JSON.stringify(s, null, 2))}]` : ""
 
-  useAutoScroll(response, topTextareaRef)
+  useAutoScroll(response, topContainerRef)
 
   useEffect(() => {
     if (isParseError) {
@@ -52,12 +53,6 @@ export const SubtitleResultOutput = memo(() => {
       setIsEditing(false)
     }
   }, [isTranslating])
-
-  useEffect(() => {
-    if (topTextareaRef.current) {
-      topTextareaRef.current.scrollTop = topTextareaRef.current.scrollHeight
-    }
-  }, [topTextareaRef])
 
   const handleChangeJSONInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditValue(e.target.value)
@@ -108,13 +103,15 @@ export const SubtitleResultOutput = memo(() => {
 
   return (
     <div className="space-y-4">
-      <Textarea
-        ref={topTextareaRef}
-        value={response.trim()}
-        readOnly
-        className="h-[390px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
-        placeholder="Translation output will appear here..."
-      />
+      <div
+        ref={topContainerRef}
+        className={cn(
+          "h-[390px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2",
+          !response && "text-muted-foreground"
+        )}
+      >
+        <AiStreamOutput content={response.trim() || "Translation output will appear here..."} />
+      </div>
       <Textarea
         ref={bottomTextareaRef}
         value={isEditing ? editValue : jsonText}

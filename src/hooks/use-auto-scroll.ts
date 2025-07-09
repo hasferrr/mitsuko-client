@@ -1,6 +1,6 @@
 import { useEffect, RefObject } from 'react'
 
-export const useAutoScroll = (dependency: unknown, ref: RefObject<HTMLTextAreaElement | null>) => {
+export const useAutoScroll = <T extends HTMLElement>(dependency: unknown, ref: RefObject<T | null>) => {
   useEffect(() => {
     if (ref.current) {
       const { scrollTop, scrollHeight, clientHeight } = ref.current
