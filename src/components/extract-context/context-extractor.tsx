@@ -50,7 +50,7 @@ import { Extraction, Translation } from "@/types/project"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { toast } from "sonner"
-import { AiStreamOutput } from "../ai-stream-output"
+import { AiStreamOutput } from "../ai-stream/ai-stream-output"
 
 interface FileItem {
   id: string

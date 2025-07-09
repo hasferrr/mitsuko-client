@@ -1,10 +1,14 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { ChevronDown, ChevronRight } from "lucide-react"
+import { SubOnlyTranslated, SubtitleNoTimeTranslated } from "@/types/subtitles"
+import { AiStreamSubtitle } from "./ai-stream-subtitle"
+import { parseTranslationJson } from "@/lib/parser/parser"
 
 interface AiStreamOutputProps {
   content: string
   className?: string
+  subtitles?: SubtitleNoTimeTranslated[]
 }
 
 interface ParsedSegment {
@@ -12,8 +16,19 @@ interface ParsedSegment {
   output: string
 }
 
-export const AiStreamOutput = ({ content, className }: AiStreamOutputProps) => {
+export const AiStreamOutput = ({
+  content,
+  className,
+  subtitles: subtitlesProp = [],
+}: AiStreamOutputProps) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false)
+  const [translatedSubtitles, setTranslatedSubtitles] = useState<SubOnlyTranslated[]>([])
+  const initialSubtitlesRef = useRef<SubtitleNoTimeTranslated[]>(subtitlesProp)
+
+  useEffect(() => {
+    const parsed = parseTranslationJson(content)
+    setTranslatedSubtitles(parsed)
+  }, [content])
 
   const toggleCollapse = () => setIsCollapsed(prev => !prev)
 
@@ -71,7 +86,13 @@ export const AiStreamOutput = ({ content, className }: AiStreamOutputProps) => {
           </div>
         </div>
       )}
-      {parsedContent.output && (
+      {parsedContent.output && translatedSubtitles.length > 0 && (
+        <AiStreamSubtitle
+          initialSubtitles={initialSubtitlesRef.current}
+          translatedSubtitles={translatedSubtitles}
+        />
+      )}
+      {parsedContent.output && translatedSubtitles.length === 0 && (
         <span className="whitespace-pre-wrap break-words text-sm">
           {parsedContent.output}
         </span>
