@@ -113,6 +113,7 @@ export const SubtitleResultOutput = memo(() => {
         <AiStreamOutput
           content={response || "Translation output will appear here..."}
           subtitles={subtitles}
+          isTranslating={isTranslating}
         />
       </div>
       <Textarea

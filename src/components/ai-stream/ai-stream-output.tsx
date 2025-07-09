@@ -9,6 +9,7 @@ interface AiStreamOutputProps {
   content: string
   className?: string
   subtitles?: SubtitleNoTimeTranslated[]
+  isTranslating?: boolean
 }
 
 interface ParsedSegment {
@@ -20,11 +21,21 @@ export const AiStreamOutput = ({
   content,
   className,
   subtitles: subtitlesProp = [],
+  isTranslating,
 }: AiStreamOutputProps) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false)
   const [translatedSubtitles, setTranslatedSubtitles] = useState<SubOnlyTranslated[]>([])
   const initialSubtitlesRef = useRef<SubtitleNoTimeTranslated[]>(subtitlesProp)
   const lastParseTimeRef = useRef<number>(0)
+
+  useEffect(() => {
+    if (isTranslating === false && subtitlesProp.length) {
+      try {
+        const parsed = parseTranslationJson(content)
+        setTranslatedSubtitles(parsed)
+      } catch { }
+    }
+  }, [isTranslating])
 
   useEffect(() => {
     if (!subtitlesProp.length) return
@@ -42,9 +53,7 @@ export const AiStreamOutput = ({
       if (translatedSubtitles.length !== parsed.length) {
         setTranslatedSubtitles(parsed)
       }
-    } catch {
-      setTranslatedSubtitles([])
-    }
+    } catch { }
   }, [content])
 
   const toggleCollapse = () => setIsCollapsed(prev => !prev)
