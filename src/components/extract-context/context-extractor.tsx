@@ -50,6 +50,7 @@ import { Extraction, Translation } from "@/types/project"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { toast } from "sonner"
+import { AiStreamOutput } from "../common/ai-stream-output"
 
 interface FileItem {
   id: string
@@ -129,7 +130,8 @@ export const ContextExtractor = () => {
   const episodeNumberInputRef = useRef<HTMLInputElement | null>(null)
   const subtitleContentRef = useRef<HTMLTextAreaElement | null>(null)
   const previousContextRef = useRef<HTMLTextAreaElement | null>(null)
-  const contextResultRef = useRef<HTMLTextAreaElement | null>(null)
+  const contextResultRef = useRef<HTMLDivElement | null>(null)
+  const contextResultEditRef = useRef<HTMLTextAreaElement | null>(null)
 
   const { setHasChanges } = useUnsavedChanges()
   const currentProject = useProjectStore((state) => state.currentProject)
@@ -417,13 +419,14 @@ export const ContextExtractor = () => {
     const newEditingState = !isEditingResult
     setIsEditingResult(newEditingState)
 
-    // Focus on the textarea when entering edit mode
-    if (newEditingState && contextResultRef.current) {
-      contextResultRef.current?.focus()
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
+    if (newEditingState) {
+      setTimeout(() => {
+        contextResultEditRef.current?.focus()
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        })
+      }, 0)
     } else {
       await saveData(currentId)
     }
@@ -672,14 +675,26 @@ export const ContextExtractor = () => {
 
           <TabsContent value="result" className="flex-grow space-y-4 mt-4">
             <div className="space-y-2">
-              <Textarea
-                ref={contextResultRef}
-                value={contextResult}
-                onChange={isEditingResult ? handleResultChange : undefined}
-                readOnly={!isEditingResult}
-                className="min-h-[412px] h-[412px] max-h-[412px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
-                placeholder="Extracted context will appear here..."
-              />
+              {isEditingResult ? (
+                <Textarea
+                  ref={contextResultEditRef}
+                  value={contextResult}
+                  onChange={handleResultChange}
+                  readOnly={!isEditingResult}
+                  className="min-h-[412px] h-[412px] max-h-[412px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                  placeholder="Extracted context will appear here..."
+                />
+              ) : (
+                <div
+                  ref={contextResultRef}
+                  className={cn(
+                    "min-h-[412px] h-[412px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2",
+                    !contextResult && "text-muted-foreground",
+                  )}
+                >
+                  <AiStreamOutput content={contextResult.trim() || "Extracted context will appear here..."} />
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
