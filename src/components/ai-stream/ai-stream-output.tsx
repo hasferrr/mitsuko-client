@@ -119,9 +119,9 @@ export const AiStreamOutput = ({
         />
       )}
       {parsedContent.output && translatedSubtitles.length === 0 && (
-        <span className="whitespace-pre-wrap break-words text-sm">
+        <div className="whitespace-pre-wrap break-words text-sm p-1">
           {parsedContent.output}
-        </span>
+        </div>
       )}
     </div>
   )

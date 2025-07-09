@@ -106,7 +106,7 @@ export const SubtitleResultOutput = memo(() => {
       <div
         ref={topContainerRef}
         className={cn(
-          "h-[390px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2",
+          "h-[430px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2",
           !response && "text-muted-foreground"
         )}
       >
@@ -122,7 +122,7 @@ export const SubtitleResultOutput = memo(() => {
         readOnly={!isEditing}
         onChange={handleChangeJSONInput}
         className={cn(
-          "h-[247px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm",
+          "h-[209px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm",
           isParseError && "focus-visible:ring-red-600",
         )}
         placeholder="Accumulated result will appear here..."
