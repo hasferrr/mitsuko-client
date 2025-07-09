@@ -33,7 +33,9 @@ export const AiStreamOutput = ({
       try {
         const parsed = parseTranslationJson(content)
         setTranslatedSubtitles(parsed)
-      } catch { }
+      } catch {
+        setTranslatedSubtitles([])
+      }
     }
   }, [isTranslating])
 
@@ -53,7 +55,9 @@ export const AiStreamOutput = ({
       if (translatedSubtitles.length !== parsed.length) {
         setTranslatedSubtitles(parsed)
       }
-    } catch { }
+    } catch {
+      setTranslatedSubtitles([])
+    }
   }, [content])
 
   const toggleCollapse = () => setIsCollapsed(prev => !prev)

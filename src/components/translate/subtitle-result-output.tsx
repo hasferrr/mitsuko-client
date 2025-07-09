@@ -29,11 +29,13 @@ export const SubtitleResultOutput = memo(() => {
   const [editValue, setEditValue] = useState("")
   const [isParseError, setIsParseError] = useState(false)
   const topContainerRef = useRef<HTMLDivElement | null>(null)
+  const topTextareaRef = useRef<HTMLTextAreaElement | null>(null)
   const bottomTextareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const jsonText = jsonResponse.length ? `[${jsonResponse.map(s => JSON.stringify(s, null, 2))}]` : ""
 
   useAutoScroll(response, topContainerRef)
+  useAutoScroll(response, topTextareaRef)
 
   useEffect(() => {
     if (isParseError) {
@@ -103,23 +105,35 @@ export const SubtitleResultOutput = memo(() => {
 
   return (
     <div className="space-y-4">
-      <div
-        ref={topContainerRef}
-        className={cn(
-          "h-[430px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2",
-          !response && "text-muted-foreground"
-        )}
-      >
-        <AiStreamOutput
-          content={response || "Translation output will appear here..."}
-          subtitles={subtitles}
-          isTranslating={isTranslating}
+      {isEditing ? (
+        <Textarea
+          ref={topTextareaRef}
+          value={response || "Translation output will appear here..."}
+          readOnly
+          className={cn(
+            "h-[430px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2 resize-none",
+            !response && "text-muted-foreground"
+          )}
         />
-      </div>
+      ) : (
+        <div
+          ref={topContainerRef}
+          className={cn(
+            "h-[430px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2",
+            !response && "text-muted-foreground"
+          )}
+        >
+          <AiStreamOutput
+            content={response || "Translation output will appear here..."}
+            subtitles={subtitles}
+            isTranslating={isTranslating}
+          />
+        </div>
+      )}
       <Textarea
         ref={bottomTextareaRef}
         value={isEditing ? editValue : jsonText}
-        readOnly={!isEditing}
+        readOnly={!isEditing || isTranslating}
         onChange={handleChangeJSONInput}
         className={cn(
           "h-[209px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm",
@@ -131,7 +145,6 @@ export const SubtitleResultOutput = memo(() => {
         <Button
           variant={isEditing ? "default" : "outline"}
           onClick={isEditing ? handleParseAndSave : handleEditText}
-          disabled={isTranslating}
           className="w-full"
         >
           {isEditing ? "Parse & Save" : "Edit Text"}
