@@ -83,7 +83,10 @@ export default function LibraryView() {
           <ExportInstructionsControls
             isSelectionMode={isSelectionMode}
             selectedIds={selectedIds}
-            onEnterSelectionMode={() => setIsSelectionMode(true)}
+            onEnterSelectionMode={() => {
+              setIsSelectionMode(true)
+              setSelectedIds(new Set(filteredInstructions.map(item => item.id)))
+            }}
             onCancelSelectionMode={cancelSelectionMode}
             hasInstructions={customInstructions.length > 0}
             customInstructions={customInstructions}
