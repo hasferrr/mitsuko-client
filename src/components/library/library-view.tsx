@@ -20,7 +20,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Pencil, Trash, Plus, FileText, Search, Download, Upload } from 'lucide-react'
+import { Pencil, Trash, Plus, FileText, Search, Download, Upload, X } from 'lucide-react'
 import { CustomInstruction } from '@/types/custom-instruction'
 import {
   Card,
@@ -29,6 +29,8 @@ import {
   CardTitle,
   CardFooter,
 } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { cn } from '@/lib/utils'
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -42,6 +44,8 @@ export default function LibraryView() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isSelectionMode, setIsSelectionMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const importInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -89,7 +93,8 @@ export default function LibraryView() {
   }
 
   const handleExport = () => {
-    const dataStr = JSON.stringify(customInstructions, null, 2)
+    const itemsToExport = customInstructions.filter(item => selectedIds.has(item.id))
+    const dataStr = JSON.stringify(itemsToExport, null, 2)
     const dataBlob = new Blob([dataStr], { type: 'application/json' })
     const url = URL.createObjectURL(dataBlob)
     const link = document.createElement('a')
@@ -99,6 +104,8 @@ export default function LibraryView() {
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
+    setIsSelectionMode(false)
+    setSelectedIds(new Set())
   }
 
   const handleImportClick = () => {
@@ -136,87 +143,126 @@ export default function LibraryView() {
     item.content.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  const handleToggleSelection = (id: string) => {
+    const newSelectedIds = new Set(selectedIds)
+    if (newSelectedIds.has(id)) {
+      newSelectedIds.delete(id)
+    } else {
+      newSelectedIds.add(id)
+    }
+    setSelectedIds(newSelectedIds)
+  }
+
+  const handleToggleSelectAll = () => {
+    if (selectedIds.size === filteredInstructions.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(filteredInstructions.map(item => item.id)))
+    }
+  }
+
+  const cancelSelectionMode = () => {
+    setIsSelectionMode(false)
+    setSelectedIds(new Set())
+  }
+
+
   return (
     <div className="container max-w-6xl mx-auto p-4">
       <div className="flex justify-between items-center pb-4">
         <h1 className="text-2xl font-semibold">My Library</h1>
         <div className="flex items-center gap-2">
-          <input
-            type="file"
-            ref={importInputRef}
-            onChange={handleFileChange}
-            accept="application/json"
-            className="hidden"
-          />
-          <Button variant="outline" onClick={handleImportClick}>
-            <Upload size={18} />
-            Import
-          </Button>
-          {customInstructions.length > 0 && (
-            <Button variant="outline" onClick={handleExport}>
-              <Download size={18} />
-              Export
-            </Button>
-          )}
-          <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            {customInstructions.length > 0 && (
-              <AlertDialogTrigger asChild>
-                <Button onClick={() => { setEditingId(null); form.reset() }}>
-                  <Plus size={18} />
-                  New Instruction
+          {isSelectionMode ? (
+            <>
+              <Button variant="outline" onClick={handleExport} disabled={selectedIds.size === 0}>
+                <Download size={18} />
+                Export {selectedIds.size > 0 ? `(${selectedIds.size})` : ''}
+              </Button>
+              <Button variant="ghost" onClick={cancelSelectionMode}>
+                <X size={18} />
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <>
+              <input
+                type="file"
+                ref={importInputRef}
+                onChange={handleFileChange}
+                accept="application/json"
+                className="hidden"
+              />
+              <Button variant="outline" onClick={handleImportClick}>
+                <Upload size={18} />
+                Import
+              </Button>
+              {customInstructions.length > 0 && (
+                <Button variant="outline" onClick={() => setIsSelectionMode(true)}>
+                  <Download size={18} />
+                  Export
                 </Button>
-              </AlertDialogTrigger>
-            )}
-            <AlertDialogContent className="sm:max-w-md">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-xl">{editingId ? 'Edit' : 'Create'} Custom Instruction</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {editingId ? 'Update your custom instruction details below.' : 'Create a new custom instruction to use in your translations.'}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., Formal Translation Style" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="content"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Content</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            {...field}
-                            ref={textareaRef}
-                            onInput={handleResize}
-                            onFocus={handleResize}
-                            className="min-h-[100px] max-h-[300px] overflow-y-auto resize-none"
-                            placeholder="Enter your custom instruction here"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <AlertDialogFooter className="gap-2 sm:gap-0">
-                    <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Cancel</AlertDialogCancel>
-                    <AlertDialogAction type="submit" disabled={loading || !form.formState.isValid}>Save</AlertDialogAction>
-                  </AlertDialogFooter>
-                </form>
-              </Form>
-            </AlertDialogContent>
-          </AlertDialog>
+              )}
+              <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                {customInstructions.length > 0 && (
+                  <AlertDialogTrigger asChild>
+                    <Button onClick={() => { setEditingId(null); form.reset() }}>
+                      <Plus size={18} />
+                      New Instruction
+                    </Button>
+                  </AlertDialogTrigger>
+                )}
+                <AlertDialogContent className="sm:max-w-md">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-xl">{editingId ? 'Edit' : 'Create'} Custom Instruction</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {editingId ? 'Update your custom instruction details below.' : 'Create a new custom instruction to use in your translations.'}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., Formal Translation Style" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="content"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Content</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                {...field}
+                                ref={textareaRef}
+                                onInput={handleResize}
+                                onFocus={handleResize}
+                                className="min-h-[100px] max-h-[300px] overflow-y-auto resize-none"
+                                placeholder="Enter your custom instruction here"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <AlertDialogFooter className="gap-2 sm:gap-0">
+                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction type="submit" disabled={loading || !form.formState.isValid}>Save</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </form>
+                  </Form>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          )}
         </div>
       </div>
       <div className="relative mb-6">
@@ -228,6 +274,20 @@ export default function LibraryView() {
           className="pl-9 max-w-md"
         />
       </div>
+
+      {isSelectionMode && customInstructions.length > 0 && (
+        <div className="flex items-center gap-4 mb-4 p-2 border rounded-md bg-muted/50">
+          <Checkbox
+            id="select-all"
+            checked={selectedIds.size === filteredInstructions.length && filteredInstructions.length > 0}
+            onCheckedChange={handleToggleSelectAll}
+            aria-label="Select all"
+          />
+          <label htmlFor="select-all" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            {selectedIds.size === filteredInstructions.length ? 'Deselect All' : 'Select All'} ({filteredInstructions.length} items)
+          </label>
+        </div>
+      )}
 
       {loading ? (
         <div className="flex justify-center items-center py-8">
@@ -260,7 +320,23 @@ export default function LibraryView() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredInstructions.map(item => (
-                <Card key={item.id} className="overflow-hidden border border-muted h-full flex flex-col hover:border-primary/50 transition-colors duration-300">
+                <Card
+                  key={item.id}
+                  className={cn(
+                    "overflow-hidden border border-muted h-full flex flex-col transition-colors duration-300 relative",
+                    isSelectionMode && "cursor-pointer",
+                    selectedIds.has(item.id) && "border-primary"
+                  )}
+                  onClick={() => isSelectionMode && handleToggleSelection(item.id)}
+                >
+                  {isSelectionMode && (
+                    <Checkbox
+                      checked={selectedIds.has(item.id)}
+                      onCheckedChange={() => handleToggleSelection(item.id)}
+                      className="absolute top-3 right-3 z-10"
+                      aria-label={`Select ${item.name}`}
+                    />
+                  )}
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg">{item.name}</CardTitle>
                   </CardHeader>
@@ -268,11 +344,11 @@ export default function LibraryView() {
                     <p className="text-sm text-muted-foreground line-clamp-4">{item.content}</p>
                   </CardContent>
                   <CardFooter className="pt-2 flex justify-end gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEdit(item)}>
+                    <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(item) }}>
                       <Pencil className="h-4 w-4" />
                       Edit
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleDelete(item.id!)}>
+                    <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(item.id!) }}>
                       <Trash className="h-4 w-4" />
                       Delete
                     </Button>
