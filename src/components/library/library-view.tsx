@@ -20,7 +20,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Pencil, Trash, Plus, FileText, Search } from 'lucide-react'
+import { Pencil, Trash, Plus, FileText, Search, Download } from 'lucide-react'
 import { CustomInstruction } from '@/types/custom-instruction'
 import {
   Card,
@@ -37,10 +37,10 @@ const formSchema = z.object({
 
 export default function LibraryView() {
   const { customInstructions, load, create, update, remove, loading } = useCustomInstructionStore()
-  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -82,9 +82,22 @@ export default function LibraryView() {
     setIsDialogOpen(true)
   }
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     setDeleteId(id)
     setIsDeleteDialogOpen(true)
+  }
+
+  const handleExport = () => {
+    const dataStr = JSON.stringify(customInstructions, null, 2)
+    const dataBlob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(dataBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'custom-instructions.json'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   const filteredInstructions = customInstructions.filter(item =>
@@ -96,65 +109,73 @@ export default function LibraryView() {
     <div className="container max-w-6xl mx-auto p-4">
       <div className="flex justify-between items-center pb-4">
         <h1 className="text-2xl font-semibold">My Library</h1>
-        <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <div className="flex items-center gap-2">
           {customInstructions.length > 0 && (
-            <AlertDialogTrigger asChild>
-              <Button onClick={() => { setEditingId(null); form.reset() }}>
-                <Plus size={18} />
-                New Instruction
-              </Button>
-            </AlertDialogTrigger>
+            <Button variant="outline" onClick={handleExport}>
+              <Download size={18} />
+              Export
+            </Button>
           )}
-          <AlertDialogContent className="sm:max-w-md">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-xl">{editingId ? 'Edit' : 'Create'} Custom Instruction</AlertDialogTitle>
-              <AlertDialogDescription>
-                {editingId ? 'Update your custom instruction details below.' : 'Create a new custom instruction to use in your translations.'}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Formal Translation Style" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="content"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Content</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          ref={textareaRef}
-                          onInput={handleResize}
-                          onFocus={handleResize}
-                          className="min-h-[100px] max-h-[300px] overflow-y-auto resize-none"
-                          placeholder="Enter your custom instruction here"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <AlertDialogFooter className="gap-2 sm:gap-0">
-                  <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Cancel</AlertDialogCancel>
-                  <AlertDialogAction type="submit" disabled={loading || !form.formState.isValid}>Save</AlertDialogAction>
-                </AlertDialogFooter>
-              </form>
-            </Form>
-          </AlertDialogContent>
-        </AlertDialog>
+          <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            {customInstructions.length > 0 && (
+              <AlertDialogTrigger asChild>
+                <Button onClick={() => { setEditingId(null); form.reset() }}>
+                  <Plus size={18} />
+                  New Instruction
+                </Button>
+              </AlertDialogTrigger>
+            )}
+            <AlertDialogContent className="sm:max-w-md">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-xl">{editingId ? 'Edit' : 'Create'} Custom Instruction</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {editingId ? 'Update your custom instruction details below.' : 'Create a new custom instruction to use in your translations.'}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Formal Translation Style" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Content</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            ref={textareaRef}
+                            onInput={handleResize}
+                            onFocus={handleResize}
+                            className="min-h-[100px] max-h-[300px] overflow-y-auto resize-none"
+                            placeholder="Enter your custom instruction here"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <AlertDialogFooter className="gap-2 sm:gap-0">
+                    <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction type="submit" disabled={loading || !form.formState.isValid}>Save</AlertDialogAction>
+                  </AlertDialogFooter>
+                </form>
+              </Form>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
       <div className="relative mb-6">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
