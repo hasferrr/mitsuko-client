@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
-import { ChevronsRight, Eye, EyeOff, FolderDown, List, Link as LinkIcon, FileText as FileTextIcon, XCircle, Sparkles } from "lucide-react"
+import { ChevronsRight, Eye, EyeOff, FolderDown, List, Link as LinkIcon, FileText as FileTextIcon, XCircle, Sparkles, Save } from "lucide-react"
 import { Button } from "./ui/button"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import {
@@ -276,11 +276,14 @@ export const CustomInstructionsInput = memo(() => {
   const [isLibraryDialogOpen, setIsLibraryDialogOpen] = useState(false)
   const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false)
   const [librarySearch, setLibrarySearch] = useState("")
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
+  const [newInstructionName, setNewInstructionName] = useState("")
   const { setHasChanges } = useUnsavedChanges()
   const {
     customInstructions: libraryInstructions,
     load: loadInstructions,
-    loading: instructionsLoading
+    loading: instructionsLoading,
+    create: createInstruction,
   } = useCustomInstructionStore()
 
   const handleCustomInstructionsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -300,6 +303,13 @@ export const CustomInstructionsInput = memo(() => {
     setHasChanges(true)
     setCustomInstructions(instruction)
     setIsLibraryDialogOpen(false)
+  }
+
+  const handleSaveToLibrary = async () => {
+    if (!newInstructionName.trim() || !customInstructions.trim()) return
+    await createInstruction(newInstructionName, customInstructions)
+    setIsSaveDialogOpen(false)
+    setNewInstructionName("")
   }
 
   const openLibraryDialog = () => {
@@ -337,11 +347,14 @@ export const CustomInstructionsInput = memo(() => {
           </Button>
           <Button
             variant="outline"
-            size="icon"
-            onClick={() => setIsHelpDialogOpen(true)}
-            className="h-8 w-8 px-4"
+            size="sm"
+            onClick={() => {
+              setNewInstructionName("")
+              setIsSaveDialogOpen(true)
+            }}
+            className="h-8 px-2"
           >
-            <HelpCircle className="h-4 w-4" />
+            <Save className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -354,6 +367,13 @@ export const CustomInstructionsInput = memo(() => {
       />
       <p className="text-xs text-muted-foreground">
         Guide the model's translation style, tone, or specific terminology usage. This is passed directly to the system prompt.
+        {" "}
+        <span
+          className="hover:underline cursor-pointer"
+          onClick={() => setIsHelpDialogOpen(true)}
+        >
+          (Help)
+        </span>
       </p>
 
       <Dialog open={isPresetsDialogOpen} onOpenChange={setIsPresetsDialogOpen}>
@@ -436,10 +456,36 @@ export const CustomInstructionsInput = memo(() => {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Save to Library</DialogTitle>
+            <DialogDescription>
+              Give a name to this custom instruction to save it for later use.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-2">
+            <Label htmlFor="instruction-name" className="text-sm font-medium">Name</Label>
+            <Input
+              id="instruction-name"
+              value={newInstructionName}
+              onChange={(e) => setNewInstructionName(e.target.value)}
+              placeholder="e.g., Formal Translation Style"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsSaveDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveToLibrary} disabled={!newInstructionName.trim() || instructionsLoading}>
+              {instructionsLoading ? "Saving..." : "Save to Library"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={isHelpDialogOpen} onOpenChange={setIsHelpDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>About Additional Instructions</DialogTitle>
+            <DialogTitle>About Custom Instructions</DialogTitle>
           </DialogHeader>
           <div className="pt-2 text-base text-foreground space-y-2">
             <div>Generally, it's not necessary to use additional instructions.</div>
