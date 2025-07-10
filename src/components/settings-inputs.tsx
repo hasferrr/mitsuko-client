@@ -38,7 +38,6 @@ import { Book, HelpCircle } from "lucide-react"
 import { useLocalSettingsStore } from '@/stores/use-local-settings-store'
 import { Checkbox } from "./ui/checkbox"
 import { useCustomInstructionStore } from "@/stores/data/use-custom-instruction-store"
-import Link from "next/link"
 
 export const LanguageSelection = memo(({ type }: { type: SettingsParentType }) => {
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -411,24 +410,21 @@ export const CustomInstructionsInput = memo(() => {
               Choose a custom instruction from your library.
             </DialogDescription>
           </DialogHeader>
-          <div>
+          {libraryInstructions.length > 0 && (
             <Input
               placeholder="Search by name..."
               value={librarySearch}
               onChange={(e) => setLibrarySearch(e.target.value)}
             />
-          </div>
+          )}
           <div className="max-h-[350px] overflow-y-auto">
             {instructionsLoading ? (
               <div className="py-6 text-center text-muted-foreground">
                 Loading...
               </div>
             ) : libraryInstructions.length === 0 ? (
-              <div className="py-6 text-center text-muted-foreground space-y-2">
-                <div>Your library is empty.</div>
-                <Button asChild variant="link">
-                  <Link href="/library">Go to Library to add instructions</Link>
-                </Button>
+              <div className="py-6 text-center text-muted-foreground">
+                No custom instructions found in your library.
               </div>
             ) : (
               <div className="space-y-2 mr-1">
@@ -464,7 +460,7 @@ export const CustomInstructionsInput = memo(() => {
               Give a name to this custom instruction to save it for later use.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2 py-2">
+          <div className="space-y-2">
             <Label htmlFor="instruction-name" className="text-sm font-medium">Name</Label>
             <Input
               id="instruction-name"
