@@ -23,6 +23,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Pencil, Trash, Plus, FileText, Search, Download, Upload, X } from 'lucide-react'
 import { CustomInstruction } from '@/types/custom-instruction'
+import { toast } from 'sonner'
 import {
   Card,
   CardContent,
@@ -32,6 +33,22 @@ import {
 } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
+
+const customInstructionImportSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  content: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+}).transform(data => ({
+  ...data,
+  createdAt: data.createdAt ?? new Date(),
+  updatedAt: data.updatedAt ?? new Date(),
+}))
+
+const importFileSchema = z.object({
+  customInstruction: z.array(customInstructionImportSchema),
+})
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -98,7 +115,8 @@ export default function LibraryView() {
 
   const handleExport = () => {
     const itemsToExport = customInstructions.filter(item => selectedIds.has(item.id))
-    const dataStr = JSON.stringify(itemsToExport, null, 2)
+    const exportObject = { customInstruction: itemsToExport }
+    const dataStr = JSON.stringify(exportObject, null, 2)
     const dataBlob = new Blob([dataStr], { type: 'application/json' })
     const url = URL.createObjectURL(dataBlob)
     const link = document.createElement('a')
@@ -122,16 +140,22 @@ export default function LibraryView() {
 
     try {
       const text = await file.text()
-      const importedData: CustomInstruction[] = JSON.parse(text)
-      if (!Array.isArray(importedData) || !importedData.every(item => 'id' in item && 'name' in item && 'content' in item)) {
-        console.error('Invalid file format')
-        return
-      }
+      const parsedData = importFileSchema.parse(JSON.parse(text))
+      const importedData = parsedData.customInstruction
+
       setInstructionsToImport(importedData)
       setSelectedImportIds(new Set(importedData.map(i => i.id)))
       setIsImportDialogOpen(true)
     } catch (error) {
-      console.error('Failed to parse import file:', error)
+      if (error instanceof z.ZodError) {
+        toast.error("Invalid File Content", {
+          description: "The file content does not match the required structure or data types.",
+        })
+      } else {
+        toast.error("Import Failed", {
+          description: "There was an error parsing the file. Please ensure it is a valid JSON file.",
+        })
+      }
     }
 
     if (event.target) {
