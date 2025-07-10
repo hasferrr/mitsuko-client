@@ -4,7 +4,8 @@ import {
   createCustomInstruction as createDB,
   deleteCustomInstruction as deleteDB,
   getAllCustomInstructions as getAllDB,
-  updateCustomInstruction as updateDB
+  updateCustomInstruction as updateDB,
+  bulkCreateCustomInstructions as bulkCreateDB
 } from '@/lib/db/custom-instruction'
 
 interface CustomInstructionStore {
@@ -15,6 +16,7 @@ interface CustomInstructionStore {
   create: (name: string, content: string) => Promise<CustomInstruction>
   update: (id: string, changes: Partial<Pick<CustomInstruction, 'name' | 'content'>>) => Promise<void>
   remove: (id: string) => Promise<void>
+  bulkCreate: (instructions: CustomInstruction[]) => Promise<void>
 }
 
 export const useCustomInstructionStore = create<CustomInstructionStore>((set) => ({
@@ -72,6 +74,20 @@ export const useCustomInstructionStore = create<CustomInstructionStore>((set) =>
       }))
     } catch {
       set({ error: 'Failed to delete custom instruction', loading: false })
+    }
+  },
+
+  bulkCreate: async (instructions) => {
+    set({ loading: true })
+    try {
+      await bulkCreateDB(instructions)
+      set((state) => ({
+        customInstructions: [...state.customInstructions, ...instructions],
+        loading: false
+      }))
+    } catch (error) {
+      set({ error: 'Failed to import custom instructions', loading: false })
+      throw error
     }
   }
 }))

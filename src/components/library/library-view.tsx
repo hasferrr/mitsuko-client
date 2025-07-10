@@ -20,7 +20,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Pencil, Trash, Plus, FileText, Search, Download } from 'lucide-react'
+import { Pencil, Trash, Plus, FileText, Search, Download, Upload } from 'lucide-react'
 import { CustomInstruction } from '@/types/custom-instruction'
 import {
   Card,
@@ -36,12 +36,13 @@ const formSchema = z.object({
 })
 
 export default function LibraryView() {
-  const { customInstructions, load, create, update, remove, loading } = useCustomInstructionStore()
+  const { customInstructions, load, create, update, remove, bulkCreate, loading } = useCustomInstructionStore()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const importInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -100,6 +101,36 @@ export default function LibraryView() {
     URL.revokeObjectURL(url)
   }
 
+  const handleImportClick = () => {
+    importInputRef.current?.click()
+  }
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    try {
+      const text = await file.text()
+      const importedInstructions: CustomInstruction[] = JSON.parse(text)
+      const existingIds = new Set(customInstructions.map(i => i.id))
+      const newInstructions = importedInstructions.map(instr => {
+        if (existingIds.has(instr.id)) {
+          return { ...instr, id: crypto.randomUUID() }
+        }
+        return instr
+      })
+
+      await bulkCreate(newInstructions)
+
+    } catch (error) {
+      console.error('Failed to import instructions:', error)
+    }
+
+    if (event.target) {
+      event.target.value = ''
+    }
+  }
+
   const filteredInstructions = customInstructions.filter(item =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.content.toLowerCase().includes(searchQuery.toLowerCase())
@@ -110,6 +141,17 @@ export default function LibraryView() {
       <div className="flex justify-between items-center pb-4">
         <h1 className="text-2xl font-semibold">My Library</h1>
         <div className="flex items-center gap-2">
+          <input
+            type="file"
+            ref={importInputRef}
+            onChange={handleFileChange}
+            accept="application/json"
+            className="hidden"
+          />
+          <Button variant="outline" onClick={handleImportClick}>
+            <Upload size={18} />
+            Import
+          </Button>
           {customInstructions.length > 0 && (
             <Button variant="outline" onClick={handleExport}>
               <Download size={18} />

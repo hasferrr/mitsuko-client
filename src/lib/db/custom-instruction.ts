@@ -33,3 +33,8 @@ export const updateCustomInstruction = async (id: string, changes: Partial<Pick<
 export const deleteCustomInstruction = async (id: string): Promise<void> => {
   await db.customInstructions.delete(id)
 }
+
+export const bulkCreateCustomInstructions = async (instructions: CustomInstruction[]): Promise<CustomInstruction[]> => {
+  await db.customInstructions.bulkAdd(instructions)
+  return instructions
+}
