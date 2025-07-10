@@ -1,9 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
 import { useCustomInstructionStore } from '@/stores/data/use-custom-instruction-store'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,16 +11,10 @@ import {
   AlertDialogFooter,
   AlertDialogAction,
   AlertDialogCancel,
-  AlertDialogTrigger,
   AlertDialogDescription,
 } from '@/components/ui/alert-dialog'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Pencil, Trash, Plus, FileText, Search, Download, Upload, X } from 'lucide-react'
-import { CustomInstruction } from '@/types/custom-instruction'
-import { toast } from 'sonner'
+import { Pencil, Trash, Plus, FileText, Search } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -33,149 +24,25 @@ import {
 } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
-
-const customInstructionImportSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  content: z.string(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-}).transform(data => ({
-  ...data,
-  createdAt: data.createdAt ?? new Date(),
-  updatedAt: data.updatedAt ?? new Date(),
-}))
-
-const importFileSchema = z.object({
-  customInstruction: z.array(customInstructionImportSchema),
-})
-
-const formSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  content: z.string().min(1, 'Content is required'),
-})
+import { ImportInstructionsDialog } from './import-instructions-dialog'
+import { ExportInstructionsControls } from './export-instructions-controls'
+import { CreateEditInstructionDialog } from './create-edit-instruction-dialog'
 
 export default function LibraryView() {
-  const { customInstructions, load, create, update, remove, bulkCreate, loading } = useCustomInstructionStore()
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const { customInstructions, load, remove, loading } = useCustomInstructionStore()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [isSelectionMode, setIsSelectionMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
-  const [instructionsToImport, setInstructionsToImport] = useState<CustomInstruction[]>([])
-  const [selectedImportIds, setSelectedImportIds] = useState<Set<string>>(new Set())
-  const importInputRef = useRef<HTMLInputElement>(null)
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { name: '', content: '' },
-    mode: 'onChange',
-  })
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const handleResize = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
-    }
-  }
-  useEffect(() => {
-    handleResize()
-  }, [form.watch('content')])
 
   useEffect(() => {
     load()
   }, [load])
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (editingId) {
-      await update(editingId, values)
-    } else {
-      await create(values.name, values.content)
-    }
-    setIsDialogOpen(false)
-    setEditingId(null)
-    form.reset()
-  }
-
-  const handleEdit = (item: CustomInstruction) => {
-    setEditingId(item.id)
-    form.setValue('name', item.name)
-    form.setValue('content', item.content)
-    setIsDialogOpen(true)
-  }
-
   const handleDelete = (id: string) => {
     setDeleteId(id)
     setIsDeleteDialogOpen(true)
-  }
-
-  const handleExport = () => {
-    const itemsToExport = customInstructions.filter(item => selectedIds.has(item.id))
-    const exportObject = { customInstruction: itemsToExport }
-    const dataStr = JSON.stringify(exportObject, null, 2)
-    const dataBlob = new Blob([dataStr], { type: 'application/json' })
-    const url = URL.createObjectURL(dataBlob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = 'custom-instructions.json'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-    setIsSelectionMode(false)
-    setSelectedIds(new Set())
-  }
-
-  const handleImportClick = () => {
-    importInputRef.current?.click()
-  }
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    try {
-      const text = await file.text()
-      const parsedData = importFileSchema.parse(JSON.parse(text))
-      const importedData = parsedData.customInstruction
-
-      setInstructionsToImport(importedData)
-      setSelectedImportIds(new Set(importedData.map(i => i.id)))
-      setIsImportDialogOpen(true)
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast.error("Invalid File Content", {
-          description: "The file content does not match the required structure or data types.",
-        })
-      } else {
-        toast.error("Import Failed", {
-          description: "There was an error parsing the file. Please ensure it is a valid JSON file.",
-        })
-      }
-    }
-
-    if (event.target) {
-      event.target.value = ''
-    }
-  }
-
-  const handleConfirmImport = async () => {
-    const selectedInstructions = instructionsToImport.filter(instr => selectedImportIds.has(instr.id))
-    const existingIds = new Set(customInstructions.map(i => i.id))
-    const newInstructions = selectedInstructions.map(instr => {
-      if (existingIds.has(instr.id)) {
-        return { ...instr, id: crypto.randomUUID() }
-      }
-      return instr
-    })
-    await bulkCreate(newInstructions)
-    setIsImportDialogOpen(false)
-    setInstructionsToImport([])
-    setSelectedImportIds(new Set())
   }
 
   const filteredInstructions = customInstructions.filter(item =>
@@ -201,25 +68,6 @@ export default function LibraryView() {
     }
   }
 
-  const handleToggleImportSelection = (id: string) => {
-    const newSelectedIds = new Set(selectedImportIds)
-    if (newSelectedIds.has(id)) {
-      newSelectedIds.delete(id)
-    } else {
-      newSelectedIds.add(id)
-    }
-    setSelectedImportIds(newSelectedIds)
-  }
-
-  const handleToggleAllImportSelection = () => {
-    if (selectedImportIds.size === instructionsToImport.length) {
-      setSelectedImportIds(new Set())
-    } else {
-      setSelectedImportIds(new Set(instructionsToImport.map(item => item.id)))
-    }
-  }
-
-
   const cancelSelectionMode = () => {
     setIsSelectionMode(false)
     setSelectedIds(new Set())
@@ -231,96 +79,22 @@ export default function LibraryView() {
       <div className="flex justify-between items-center pb-4">
         <h1 className="text-2xl font-semibold">My Library</h1>
         <div className="flex items-center gap-2">
-          {isSelectionMode ? (
-            <>
-              <Button variant="outline" onClick={handleExport} disabled={selectedIds.size === 0}>
-                <Download size={18} />
-                Export {selectedIds.size > 0 ? `(${selectedIds.size})` : ''}
+          <ImportInstructionsDialog />
+          <ExportInstructionsControls
+            isSelectionMode={isSelectionMode}
+            selectedIds={selectedIds}
+            onEnterSelectionMode={() => setIsSelectionMode(true)}
+            onCancelSelectionMode={cancelSelectionMode}
+            hasInstructions={customInstructions.length > 0}
+            customInstructions={customInstructions}
+          />
+          {customInstructions.length > 0 && (
+            <CreateEditInstructionDialog>
+              <Button>
+                <Plus size={18} />
+                New Instruction
               </Button>
-              <Button variant="ghost" onClick={cancelSelectionMode}>
-                <X size={18} />
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <>
-              <input
-                type="file"
-                ref={importInputRef}
-                onChange={handleFileChange}
-                accept="application/json"
-                className="hidden"
-              />
-              <Button variant="outline" onClick={handleImportClick}>
-                <Upload size={18} />
-                Import
-              </Button>
-              {customInstructions.length > 0 && (
-                <Button variant="outline" onClick={() => setIsSelectionMode(true)}>
-                  <Download size={18} />
-                  Export
-                </Button>
-              )}
-              <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                {customInstructions.length > 0 && (
-                  <AlertDialogTrigger asChild>
-                    <Button onClick={() => { setEditingId(null); form.reset() }}>
-                      <Plus size={18} />
-                      New Instruction
-                    </Button>
-                  </AlertDialogTrigger>
-                )}
-                <AlertDialogContent className="sm:max-w-md">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="text-xl">{editingId ? 'Edit' : 'Create'} Custom Instruction</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {editingId ? 'Update your custom instruction details below.' : 'Create a new custom instruction to use in your translations.'}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g., Formal Translation Style" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="content"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Content</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                {...field}
-                                ref={textareaRef}
-                                onInput={handleResize}
-                                onFocus={handleResize}
-                                className="min-h-[100px] max-h-[300px] overflow-y-auto resize-none"
-                                placeholder="Enter your custom instruction here"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <AlertDialogFooter className="gap-2 sm:gap-0">
-                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction type="submit" disabled={loading || !form.formState.isValid}>Save</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </form>
-                  </Form>
-                </AlertDialogContent>
-              </AlertDialog>
-            </>
+            </CreateEditInstructionDialog>
           )}
         </div>
       </div>
@@ -359,9 +133,11 @@ export default function LibraryView() {
           <p className="text-muted-foreground mb-4 text-center text-sm">
             Add reusable custom instructions to improve your translations.
           </p>
-          <Button onClick={() => { setEditingId(null); form.reset(); setIsDialogOpen(true) }}>
-            <Plus className="h-4 w-4" /> Create Custom Instruction
-          </Button>
+          <CreateEditInstructionDialog>
+            <Button>
+              <Plus className="h-4 w-4" /> Create Custom Instruction
+            </Button>
+          </CreateEditInstructionDialog>
         </div>
       ) : (
         <>
@@ -403,10 +179,12 @@ export default function LibraryView() {
                     <p className="text-sm text-muted-foreground line-clamp-4">{item.content}</p>
                   </CardContent>
                   <CardFooter className="pt-2 flex justify-end gap-2">
-                    <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(item) }}>
-                      <Pencil className="h-4 w-4" />
-                      Edit
-                    </Button>
+                    <CreateEditInstructionDialog instruction={item}>
+                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation() }}>
+                        <Pencil className="h-4 w-4" />
+                        Edit
+                      </Button>
+                    </CreateEditInstructionDialog>
                     <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(item.id!) }}>
                       <Trash className="h-4 w-4" />
                       Delete
@@ -439,61 +217,6 @@ export default function LibraryView() {
               className="bg-destructive hover:bg-destructive/90 text-white"
             >
               Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-        <AlertDialogContent className="max-w-4xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Import Custom Instructions</AlertDialogTitle>
-            <AlertDialogDescription>
-              Select the instructions you want to import. Existing instructions with the same ID will be assigned a new ID.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="flex items-center gap-4 my-4 p-2 border rounded-md bg-muted/50">
-            <Checkbox
-              id="select-all-import"
-              checked={selectedImportIds.size === instructionsToImport.length && instructionsToImport.length > 0}
-              onCheckedChange={handleToggleAllImportSelection}
-              aria-label="Select all for import"
-            />
-            <label htmlFor="select-all-import" className="text-sm font-medium leading-none">
-              {selectedImportIds.size === instructionsToImport.length ? 'Deselect All' : 'Select All'} ({instructionsToImport.length} items)
-            </label>
-          </div>
-          <ScrollArea className="h-[50vh] pr-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {instructionsToImport.map(item => (
-                <Card
-                  key={item.id}
-                  className={cn(
-                    "overflow-hidden border h-full flex flex-col transition-colors duration-300 relative cursor-pointer",
-                    selectedImportIds.has(item.id) ? "border-primary" : "border-muted"
-                  )}
-                  onClick={() => handleToggleImportSelection(item.id)}
-                >
-                  <Checkbox
-                    checked={selectedImportIds.has(item.id)}
-                    onCheckedChange={() => handleToggleImportSelection(item.id)}
-                    className="absolute top-3 right-3 z-10"
-                    aria-label={`Select ${item.name}`}
-                  />
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">{item.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pb-2 flex-grow">
-                    <p className="text-sm text-muted-foreground line-clamp-4">{item.content}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </ScrollArea>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmImport} disabled={selectedImportIds.size === 0}>
-              Import {selectedImportIds.size > 0 ? `(${selectedImportIds.size})` : ''} Selected
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
