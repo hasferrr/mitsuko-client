@@ -17,6 +17,7 @@ import {
   AlertDialogTrigger,
   AlertDialogDescription,
 } from '@/components/ui/alert-dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -46,6 +47,9 @@ export default function LibraryView() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSelectionMode, setIsSelectionMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
+  const [instructionsToImport, setInstructionsToImport] = useState<CustomInstruction[]>([])
+  const [selectedImportIds, setSelectedImportIds] = useState<Set<string>>(new Set())
   const importInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -118,24 +122,36 @@ export default function LibraryView() {
 
     try {
       const text = await file.text()
-      const importedInstructions: CustomInstruction[] = JSON.parse(text)
-      const existingIds = new Set(customInstructions.map(i => i.id))
-      const newInstructions = importedInstructions.map(instr => {
-        if (existingIds.has(instr.id)) {
-          return { ...instr, id: crypto.randomUUID() }
-        }
-        return instr
-      })
-
-      await bulkCreate(newInstructions)
-
+      const importedData: CustomInstruction[] = JSON.parse(text)
+      if (!Array.isArray(importedData) || !importedData.every(item => 'id' in item && 'name' in item && 'content' in item)) {
+        console.error('Invalid file format')
+        return
+      }
+      setInstructionsToImport(importedData)
+      setSelectedImportIds(new Set(importedData.map(i => i.id)))
+      setIsImportDialogOpen(true)
     } catch (error) {
-      console.error('Failed to import instructions:', error)
+      console.error('Failed to parse import file:', error)
     }
 
     if (event.target) {
       event.target.value = ''
     }
+  }
+
+  const handleConfirmImport = async () => {
+    const selectedInstructions = instructionsToImport.filter(instr => selectedImportIds.has(instr.id))
+    const existingIds = new Set(customInstructions.map(i => i.id))
+    const newInstructions = selectedInstructions.map(instr => {
+      if (existingIds.has(instr.id)) {
+        return { ...instr, id: crypto.randomUUID() }
+      }
+      return instr
+    })
+    await bulkCreate(newInstructions)
+    setIsImportDialogOpen(false)
+    setInstructionsToImport([])
+    setSelectedImportIds(new Set())
   }
 
   const filteredInstructions = customInstructions.filter(item =>
@@ -160,6 +176,25 @@ export default function LibraryView() {
       setSelectedIds(new Set(filteredInstructions.map(item => item.id)))
     }
   }
+
+  const handleToggleImportSelection = (id: string) => {
+    const newSelectedIds = new Set(selectedImportIds)
+    if (newSelectedIds.has(id)) {
+      newSelectedIds.delete(id)
+    } else {
+      newSelectedIds.add(id)
+    }
+    setSelectedImportIds(newSelectedIds)
+  }
+
+  const handleToggleAllImportSelection = () => {
+    if (selectedImportIds.size === instructionsToImport.length) {
+      setSelectedImportIds(new Set())
+    } else {
+      setSelectedImportIds(new Set(instructionsToImport.map(item => item.id)))
+    }
+  }
+
 
   const cancelSelectionMode = () => {
     setIsSelectionMode(false)
@@ -380,6 +415,61 @@ export default function LibraryView() {
               className="bg-destructive hover:bg-destructive/90 text-white"
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+        <AlertDialogContent className="max-w-4xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Import Custom Instructions</AlertDialogTitle>
+            <AlertDialogDescription>
+              Select the instructions you want to import. Existing instructions with the same ID will be assigned a new ID.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex items-center gap-4 my-4 p-2 border rounded-md bg-muted/50">
+            <Checkbox
+              id="select-all-import"
+              checked={selectedImportIds.size === instructionsToImport.length && instructionsToImport.length > 0}
+              onCheckedChange={handleToggleAllImportSelection}
+              aria-label="Select all for import"
+            />
+            <label htmlFor="select-all-import" className="text-sm font-medium leading-none">
+              {selectedImportIds.size === instructionsToImport.length ? 'Deselect All' : 'Select All'} ({instructionsToImport.length} items)
+            </label>
+          </div>
+          <ScrollArea className="h-[50vh] pr-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {instructionsToImport.map(item => (
+                <Card
+                  key={item.id}
+                  className={cn(
+                    "overflow-hidden border h-full flex flex-col transition-colors duration-300 relative cursor-pointer",
+                    selectedImportIds.has(item.id) ? "border-primary" : "border-muted"
+                  )}
+                  onClick={() => handleToggleImportSelection(item.id)}
+                >
+                  <Checkbox
+                    checked={selectedImportIds.has(item.id)}
+                    onCheckedChange={() => handleToggleImportSelection(item.id)}
+                    className="absolute top-3 right-3 z-10"
+                    aria-label={`Select ${item.name}`}
+                  />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">{item.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pb-2 flex-grow">
+                    <p className="text-sm text-muted-foreground line-clamp-4">{item.content}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </ScrollArea>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmImport} disabled={selectedImportIds.size === 0}>
+              Import {selectedImportIds.size > 0 ? `(${selectedImportIds.size})` : ''} Selected
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
