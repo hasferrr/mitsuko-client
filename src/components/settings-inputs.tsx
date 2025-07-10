@@ -34,9 +34,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 import WhichModels from "@/components/pricing/which-models"
-import { HelpCircle } from "lucide-react"
+import { Book, HelpCircle } from "lucide-react"
 import { useLocalSettingsStore } from '@/stores/use-local-settings-store'
 import { Checkbox } from "./ui/checkbox"
+import { useCustomInstructionStore } from "@/stores/data/use-custom-instruction-store"
+import Link from "next/link"
 
 export const LanguageSelection = memo(({ type }: { type: SettingsParentType }) => {
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -271,8 +273,15 @@ export const CustomInstructionsInput = memo(() => {
   const customInstructions = useSettingsStore((state) => state.getCustomInstructions())
   const setCustomInstructions = useSettingsStore((state) => state.setCustomInstructions)
   const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
+  const [isLibraryDialogOpen, setIsLibraryDialogOpen] = useState(false)
   const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false)
+  const [librarySearch, setLibrarySearch] = useState("")
   const { setHasChanges } = useUnsavedChanges()
+  const {
+    customInstructions: libraryInstructions,
+    load: loadInstructions,
+    loading: instructionsLoading
+  } = useCustomInstructionStore()
 
   const handleCustomInstructionsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
@@ -287,10 +296,26 @@ export const CustomInstructionsInput = memo(() => {
     setIsPresetsDialogOpen(false)
   }
 
+  const handleLibrarySelect = (instruction: string) => {
+    setHasChanges(true)
+    setCustomInstructions(instruction)
+    setIsLibraryDialogOpen(false)
+  }
+
+  const openLibraryDialog = () => {
+    loadInstructions()
+    setLibrarySearch("")
+    setIsLibraryDialogOpen(true)
+  }
+
+  const filteredLibraryInstructions = libraryInstructions.filter((item) =>
+    item.name.toLowerCase().includes(librarySearch.toLowerCase())
+  )
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">Additional Instructions</label>
+        <label className="text-sm font-medium">Custom Instructions</label>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -300,6 +325,15 @@ export const CustomInstructionsInput = memo(() => {
           >
             <List className="h-4 w-4" />
             Presets
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={openLibraryDialog}
+            className="h-8 px-2"
+          >
+            <Book className="h-4 w-4" />
+            Library
           </Button>
           <Button
             variant="outline"
@@ -349,6 +383,59 @@ export const CustomInstructionsInput = memo(() => {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={isLibraryDialogOpen} onOpenChange={setIsLibraryDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Select from Library</DialogTitle>
+            <DialogDescription>
+              Choose a custom instruction from your library.
+            </DialogDescription>
+          </DialogHeader>
+          <div>
+            <Input
+              placeholder="Search by name..."
+              value={librarySearch}
+              onChange={(e) => setLibrarySearch(e.target.value)}
+            />
+          </div>
+          <div className="max-h-[350px] overflow-y-auto">
+            {instructionsLoading ? (
+              <div className="py-6 text-center text-muted-foreground">
+                Loading...
+              </div>
+            ) : libraryInstructions.length === 0 ? (
+              <div className="py-6 text-center text-muted-foreground space-y-2">
+                <div>Your library is empty.</div>
+                <Button asChild variant="link">
+                  <Link href="/library">Go to Library to add instructions</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2 mr-1">
+                {filteredLibraryInstructions.length > 0 ? (
+                  filteredLibraryInstructions.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-3 border rounded-md cursor-pointer hover:bg-muted"
+                      onClick={() => handleLibrarySelect(item.content)}
+                    >
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-sm text-muted-foreground line-clamp-2">
+                        {item.content}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-6 text-center text-muted-foreground">
+                    No instructions found.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={isHelpDialogOpen} onOpenChange={setIsHelpDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -357,7 +444,7 @@ export const CustomInstructionsInput = memo(() => {
           <div className="pt-2 text-base text-foreground space-y-2">
             <div>Generally, it's not necessary to use additional instructions.</div>
             <div>The model is <span className="italic">smart</span> enough to determine how the translation style should be, especially the latest model.</div>
-            <div>It is recommended to just leave it empty, unless you really need it and are okay if the result is a bit <span className="italic">forced</span>.</div>
+            <div>However, if you really need it, please be concise, direct, and specific to avoid confusing the model.</div>
           </div>
         </DialogContent>
       </Dialog>
