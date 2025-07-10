@@ -131,19 +131,6 @@ export const FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "Gemini 2.5 Flash Lite",
-        subName: "gemini-2.5-flash-lite-preview-06-17",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: false,
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
         name: "Gemini 2.0 Flash",
         maxInput: 1_048_576,
         maxOutput: 8192,
@@ -153,16 +140,6 @@ export const FREE_MODELS: FreeModelCollection = {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini 2.0 Flash Experimental",
-        maxInput: 1_048_576,
-        maxOutput: 8192,
-        structuredOutput: true,
-        isPaid: false,
-        default: {
-          temperature: 1,
         }
       },
       {
@@ -359,7 +336,19 @@ export const PAID_MODELS: PaidModelCollection = {
     provider: "xai",
     models: [
       {
-        name: "Grok 3 Beta",
+        name: "Grok 4",
+        maxInput: 256_000,
+        maxOutput: 256_000,
+        structuredOutput: true,
+        isPaid: true,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Grok 3",
         maxInput: 131_072,
         maxOutput: 131_072,
         structuredOutput: true,
@@ -371,7 +360,7 @@ export const PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "Grok 3 Mini Beta",
+        name: "Grok 3 Mini",
         maxInput: 131_072,
         maxOutput: 131_072,
         structuredOutput: true,
