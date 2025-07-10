@@ -78,8 +78,8 @@ export const AiStreamOutput = ({
 
     const NOW = Date.now()
     const MIN_DELAY_MS = 200
-    const THROTTLE_MS = 2000
-    const DEBOUNCE_MS = 4000
+    const THROTTLE_MS = 1000
+    const DEBOUNCE_MS = 3000
 
     if (NOW - lastParseTimeRef.current < MIN_DELAY_MS) {
       // do nothing
