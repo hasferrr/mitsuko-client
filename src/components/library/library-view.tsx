@@ -20,7 +20,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Pencil, Trash, Plus, FileText } from 'lucide-react'
+import { Pencil, Trash, Plus, FileText, Search } from 'lucide-react'
 import { CustomInstruction } from '@/types/custom-instruction'
 import {
   Card,
@@ -41,6 +41,7 @@ export default function LibraryView() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -86,6 +87,11 @@ export default function LibraryView() {
     setIsDeleteDialogOpen(true)
   }
 
+  const filteredInstructions = customInstructions.filter(item =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.content.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   return (
     <div className="container max-w-6xl mx-auto py-8 px-4">
       <div className="flex justify-between items-center pb-4">
@@ -115,7 +121,7 @@ export default function LibraryView() {
                     <FormItem>
                       <FormLabel>Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Instruction Name" {...field} />
+                        <Input placeholder="e.g., Formal Translation Style" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -150,6 +156,15 @@ export default function LibraryView() {
           </AlertDialogContent>
         </AlertDialog>
       </div>
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search instructions by name or content..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9 max-w-md"
+        />
+      </div>
 
       {loading ? (
         <div className="flex justify-center items-center py-8">
@@ -158,37 +173,52 @@ export default function LibraryView() {
       ) : customInstructions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
           <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-          <h2 className="text-xl font-medium mb-2">Your Library is Empty</h2>
+          <h2 className="text-xl font-medium mb-2 text-center">Your Library is Empty</h2>
           <p className="text-muted-foreground mb-4 text-center text-sm">
-            Add custom instructions to personalize AI translations and improve results
+            Add reusable custom instructions to improve your translations.
           </p>
           <Button onClick={() => { setEditingId(null); form.reset(); setIsDialogOpen(true) }}>
-            <Plus className="h-4 w-4" /> Create First Instruction
+            <Plus className="h-4 w-4" /> Create Custom Instruction
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {customInstructions.map(item => (
-            <Card key={item.id} className="overflow-hidden border border-muted h-full flex flex-col hover:border-primary/50 transition-colors duration-300">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">{item.name}</CardTitle>
-              </CardHeader>
-              <CardContent className="pb-2 flex-grow">
-                <p className="text-sm text-muted-foreground line-clamp-4">{item.content}</p>
-              </CardContent>
-              <CardFooter className="pt-2 flex justify-end gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleEdit(item)}>
-                  <Pencil className="h-4 w-4" />
-                  Edit
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => handleDelete(item.id!)}>
-                  <Trash className="h-4 w-4" />
-                  Delete
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+        <>
+          {filteredInstructions.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
+              <Search className="h-12 w-12 text-muted-foreground mb-4" />
+              <h2 className="text-xl font-medium mb-2 text-center">No Results Found</h2>
+              <p className="text-muted-foreground mb-4 text-center text-sm">
+                Try adjusting your search terms
+              </p>
+              <Button variant="outline" onClick={() => setSearchQuery('')}>
+                Clear Search
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredInstructions.map(item => (
+                <Card key={item.id} className="overflow-hidden border border-muted h-full flex flex-col hover:border-primary/50 transition-colors duration-300">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">{item.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pb-2 flex-grow">
+                    <p className="text-sm text-muted-foreground line-clamp-4">{item.content}</p>
+                  </CardContent>
+                  <CardFooter className="pt-2 flex justify-end gap-2">
+                    <Button variant="outline" size="sm" onClick={() => handleEdit(item)}>
+                      <Pencil className="h-4 w-4" />
+                      Edit
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => handleDelete(item.id!)}>
+                      <Trash className="h-4 w-4" />
+                      Delete
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
