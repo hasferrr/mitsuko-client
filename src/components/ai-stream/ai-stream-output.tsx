@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useMemo, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { ChevronDown, ChevronRight } from "lucide-react"
@@ -26,37 +28,76 @@ export const AiStreamOutput = ({
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false)
   const [translatedSubtitles, setTranslatedSubtitles] = useState<SubOnlyTranslated[]>([])
   const initialSubtitlesRef = useRef<SubtitleNoTimeTranslated[]>(subtitlesProp)
-  const lastParseTimeRef = useRef<number>(0)
+  const lastParseTimeRef = useRef<number>(Date.now())
+  const parseTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const prevIsTranslatingRef = useRef<boolean | undefined>(undefined)
 
-  useEffect(() => {
-    if (isTranslating === false && subtitlesProp.length) {
-      try {
-        const parsed = parseTranslationJson(content)
-        setTranslatedSubtitles(parsed)
-      } catch {
-        setTranslatedSubtitles([])
-      }
-    }
-  }, [isTranslating])
-
-  useEffect(() => {
-    if (!subtitlesProp.length) return
-    if (Date.now() - lastParseTimeRef.current < 1500) return
-    lastParseTimeRef.current = Date.now()
+  const parse = (content: string) => {
     try {
-      const parsed = parseTranslationJson(content)
       const split = content.split("\n")
+      const message = []
       if (split[split.length - 1].startsWith("[")) {
-        parsed.push({
+        message.push({
           index: NaN,
           translated: split[split.length - 1],
         })
+        split.pop()
       }
+      const parsed = parseTranslationJson(split.join("\n"))
+      parsed.push(...message)
       if (translatedSubtitles.length !== parsed.length) {
         setTranslatedSubtitles(parsed)
       }
     } catch {
       setTranslatedSubtitles([])
+    }
+  }
+
+  const cleanup = () => {
+    if (parseTimerRef.current) {
+      clearTimeout(parseTimerRef.current)
+      parseTimerRef.current = null
+    }
+  }
+
+  useEffect(() => {
+    if (subtitlesProp.length) {
+      parse(content)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (prevIsTranslatingRef.current && isTranslating === false && subtitlesProp.length) {
+      parse(content)
+    }
+    prevIsTranslatingRef.current = isTranslating
+  }, [isTranslating])
+
+  useEffect(() => {
+    if (!subtitlesProp.length) return
+
+    const NOW = Date.now()
+    const MIN_DELAY_MS = 200
+    const THROTTLE_MS = 2000
+    const DEBOUNCE_MS = 4000
+
+    if (NOW - lastParseTimeRef.current < MIN_DELAY_MS) {
+      // do nothing
+    } else if (NOW - lastParseTimeRef.current < THROTTLE_MS) {
+      cleanup()
+      parseTimerRef.current = setTimeout(() => {
+        lastParseTimeRef.current = Date.now()
+        parseTimerRef.current = null
+        parse(content)
+      }, DEBOUNCE_MS)
+    } else {
+      lastParseTimeRef.current = Date.now()
+      cleanup()
+      parse(content)
+    }
+
+    return () => {
+      cleanup()
     }
   }, [content])
 
