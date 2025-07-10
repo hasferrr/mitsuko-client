@@ -11,7 +11,7 @@ class MyDatabase extends Dexie {
   projectOrders!: Table<ProjectOrder, string>
   basicSettings!: Table<BasicSettings, string>
   advancedSettings!: Table<AdvancedSettings, string>
-  customInstructions!: Table<CustomInstruction, number>
+  customInstructions!: Table<CustomInstruction, string>
 
   constructor() {
     super('myDatabase')
@@ -133,7 +133,7 @@ class MyDatabase extends Dexie {
       })
     })
     this.version(13).stores({
-      customInstructions: '++id, name'
+      customInstructions: 'id, name'
     })
   }
 }

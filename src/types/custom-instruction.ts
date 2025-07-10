@@ -1,5 +1,5 @@
 export interface CustomInstruction {
-  id: number
+  id: string
   name: string
   content: string
   createdAt?: Date

@@ -2,23 +2,25 @@ import { CustomInstruction } from '@/types/custom-instruction'
 import { db } from './db'
 
 export const createCustomInstruction = async (data: Pick<CustomInstruction, 'name' | 'content'>): Promise<CustomInstruction> => {
-  const id = await db.customInstructions.add({
+  const newInstruction: CustomInstruction = {
+    id: crypto.randomUUID(),
     ...data,
     createdAt: new Date(),
     updatedAt: new Date()
-  })
-  return { id: Number(id), ...data, createdAt: new Date(), updatedAt: new Date() }
+  }
+  await db.customInstructions.add(newInstruction)
+  return newInstruction
 }
 
 export const getAllCustomInstructions = async (): Promise<CustomInstruction[]> => {
   return db.customInstructions.toArray()
 }
 
-export const getCustomInstruction = async (id: number): Promise<CustomInstruction | undefined> => {
+export const getCustomInstruction = async (id: string): Promise<CustomInstruction | undefined> => {
   return db.customInstructions.get(id)
 }
 
-export const updateCustomInstruction = async (id: number, changes: Partial<Pick<CustomInstruction, 'name' | 'content'>>): Promise<CustomInstruction> => {
+export const updateCustomInstruction = async (id: string, changes: Partial<Pick<CustomInstruction, 'name' | 'content'>>): Promise<CustomInstruction> => {
   await db.customInstructions.update(id, {
     ...changes,
     updatedAt: new Date()
@@ -28,6 +30,6 @@ export const updateCustomInstruction = async (id: number, changes: Partial<Pick<
   return updated
 }
 
-export const deleteCustomInstruction = async (id: number): Promise<void> => {
+export const deleteCustomInstruction = async (id: string): Promise<void> => {
   await db.customInstructions.delete(id)
 }

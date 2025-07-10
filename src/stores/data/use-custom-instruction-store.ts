@@ -13,8 +13,8 @@ interface CustomInstructionStore {
   error: string | null
   load: () => Promise<void>
   create: (name: string, content: string) => Promise<CustomInstruction>
-  update: (id: number, changes: Partial<Pick<CustomInstruction, 'name' | 'content'>>) => Promise<void>
-  remove: (id: number) => Promise<void>
+  update: (id: string, changes: Partial<Pick<CustomInstruction, 'name' | 'content'>>) => Promise<void>
+  remove: (id: string) => Promise<void>
 }
 
 export const useCustomInstructionStore = create<CustomInstructionStore>((set) => ({
