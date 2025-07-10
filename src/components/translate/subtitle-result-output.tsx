@@ -35,7 +35,7 @@ export const SubtitleResultOutput = memo(() => {
 
   const jsonText = jsonResponse.length ? `[${jsonResponse.map(s => JSON.stringify(s, null, 2))}]` : ""
 
-  useAutoScroll(response, topContainerRef)
+  useAutoScroll(response, topContainerRef, 500)
   useAutoScroll(response, topTextareaRef)
 
   useEffect(() => {
