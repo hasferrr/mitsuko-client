@@ -109,10 +109,10 @@ export const SubtitleResultOutput = memo(() => {
       {isEditing || isShowRaw ? (
         <Textarea
           ref={topTextareaRef}
-          value={response || "Translation output will appear here..."}
+          value={response.trim() || "Translation output will appear here..."}
           readOnly
           className={cn(
-            "h-[430px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2 resize-none",
+            "h-[439px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2 resize-none",
             !response && "text-muted-foreground"
           )}
         />
@@ -120,12 +120,12 @@ export const SubtitleResultOutput = memo(() => {
         <div
           ref={topContainerRef}
           className={cn(
-            "h-[430px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2",
+            "h-[439px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2",
             !response && "text-muted-foreground"
           )}
         >
           <AiStreamOutput
-            content={response || "Translation output will appear here..."}
+            content={response.trim() || "Translation output will appear here..."}
             subtitles={subtitles}
             isTranslating={isTranslating}
           />
@@ -137,7 +137,7 @@ export const SubtitleResultOutput = memo(() => {
         readOnly={!isEditing || isTranslating}
         onChange={handleChangeJSONInput}
         className={cn(
-          "h-[209px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm",
+          "h-[200px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm",
           isParseError && "focus-visible:ring-red-600",
         )}
         placeholder="Accumulated result will appear here..."
