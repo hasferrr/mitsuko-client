@@ -40,6 +40,7 @@ From each source, the system generates:
 - **Context-Aware Subtitle Translation** → Utilizes previous episode context for highly accurate translations in over 100 languages.
 - **Audio-to-Subtitle Transcription** → Generates perfectly timed subtitles from various audio formats.
 - **AI-Powered Context Extraction** → Analyzes subtitle content to build a reusable knowledge base for consistent translations across a series.
+- **My Library** → Manages a list of user's custom instructions for AI tasks.
 
 ### User Experience
 - **Responsive Design** → Optimized for desktop use.
@@ -141,6 +142,7 @@ This is the main source code folder for the Next.js application. All application
       - `dashboard/welcome-view.tsx`: The main component for the dashboard, showing options to start new tasks and recent projects.
       - `sidebar/app-sidebar.tsx`: The main sidebar component for the application.
       - `auth/login.tsx`: A component handling the user authentication form and user settings display.
+      - `library/library-view.tsx`: The main component for viewing and managing custom instructions.
 
 - **`constants/`**: Contains static, hard-coded values used throughout the application. This prevents magic strings and numbers in the codebase, making maintenance easier.
   - **Style:** Files export `const` variables.
@@ -232,6 +234,7 @@ This is the main source code folder for the Next.js application. All application
         -   `use-translation-data-store.ts`: Holds the in-memory data for individual translation tasks, including subtitles and results. It interfaces with Dexie.js for persistence.
         -   `use-transcription-data-store.ts`: Manages data for audio transcription tasks.
         -   `use-extraction-data-store.ts`: Manages data for context extraction tasks.
+        -   `use-custom-instruction-store.ts`: Manages the list of custom instructions.
 
     -   **`services/`**: Stores responsible for managing the state of ongoing processes, especially API interactions.
         -   `use-translation-store.ts`: Handles the state of the translation process itself, including loading states (`isTranslatingSet`) and abort controllers for network requests.
@@ -275,6 +278,7 @@ This is the main source code folder for the Next.js application. All application
     - `snap.ts`: Contains types for interacting with the Midtrans Snap payment gateway.
     - `transaction.ts`: Defines the `Transaction` type for recording credit usage.
     - `user.ts`: Defines the `UserCreditData` type.
+    - `custom-instruction.ts`: Defines the CustomInstruction interface.
 
 **LLM Context for Frontend:** When creating new features, follow this structure strictly. For example, a new "Analytics" page would involve:
 1. Adding a new route in `src/app/(main)/analytics/page.tsx`.

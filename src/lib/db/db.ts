@@ -1,5 +1,6 @@
 import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS } from '@/constants/default'
 import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
+import { CustomInstruction } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'
 
 class MyDatabase extends Dexie {
@@ -10,6 +11,7 @@ class MyDatabase extends Dexie {
   projectOrders!: Table<ProjectOrder, string>
   basicSettings!: Table<BasicSettings, string>
   advancedSettings!: Table<AdvancedSettings, string>
+  customInstructions!: Table<CustomInstruction, number>
 
   constructor() {
     super('myDatabase')
@@ -129,6 +131,9 @@ class MyDatabase extends Dexie {
           setting.isAdvancedReasoningEnabled = false
         }
       })
+    })
+    this.version(13).stores({
+      customInstructions: '++id, name'
     })
   }
 }

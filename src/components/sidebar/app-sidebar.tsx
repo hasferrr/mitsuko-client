@@ -9,6 +9,7 @@ import {
   Languages,
   HistoryIcon,
   PencilRuler,
+  Book,
 } from "lucide-react"
 import { AppSidebarMain } from "@/components/sidebar/app-sidebar-main"
 import { AppSidebarProjects } from "@/components/sidebar/app-sidebar-projects"
@@ -60,6 +61,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Subtitle Tools",
         url: "/tools",
         icon: PencilRuler,
+      },
+      {
+        title: "My Library",
+        url: "/library",
+        icon: Book,
       },
     ],
     links: [
