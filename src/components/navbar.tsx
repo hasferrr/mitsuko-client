@@ -16,7 +16,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
-import { useEffect, useState } from "react"
+import { useEffect, useState, Fragment } from "react"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
@@ -24,9 +24,14 @@ import { UserCreditData } from "@/types/user"
 import { cn } from "@/lib/utils"
 import { FeedbackWrapper } from "@/components/feedback/feedback-wrapper"
 
+interface Breadcrumb {
+  name: string
+  link: string
+}
+
 export function Navbar() {
   const _pathname = usePathname()
-  const [pathname, setPathname] = useState("")
+  const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[]>([])
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
 
   // User data
@@ -64,19 +69,29 @@ export function Navbar() {
   const exData = useExtractionDataStore(state => state.data)
 
   useEffect(() => {
-    setPathname("")
-    const len = 40
-    const getTruncatedTitle = (title: string) => title.length > len ? title.slice(0, len) + "..." : title
+    const newBreadcrumbs: Breadcrumb[] = [{
+      name: "Dashboard",
+      link: "/dashboard",
+    }]
+
+    const MAX_TITLE_LENGTH = 40
+    const getTruncatedTitle = (title: string) => (title.length > MAX_TITLE_LENGTH ? `${title.slice(0, MAX_TITLE_LENGTH)}...` : title)
+
+    if (currentProject) {
+      newBreadcrumbs.push({ name: currentProject.name, link: "/project" })
+    }
     if (_pathname === "/translate" && tlId && tlData[tlId]) {
-      setPathname(getTruncatedTitle(tlData[tlId].title))
+      newBreadcrumbs.push({ name: getTruncatedTitle(tlData[tlId].title), link: "" })
     }
     if (_pathname === "/transcribe" && tsId && tsData[tsId]) {
-      setPathname(getTruncatedTitle(tsData[tsId].title))
+      newBreadcrumbs.push({ name: getTruncatedTitle(tsData[tsId].title), link: "" })
     }
     if (_pathname === "/extract-context" && exId && exData[exId]) {
-      setPathname("Episode " + getTruncatedTitle(exData[exId].episodeNumber))
+      newBreadcrumbs.push({ name: `Episode ${getTruncatedTitle(exData[exId].episodeNumber)}`, link: "" })
     }
-  }, [_pathname, tlId, tsId, exId, tlData, tsData, exData])
+
+    setBreadcrumbs(newBreadcrumbs)
+  }, [_pathname, tlId, tsId, exId, tlData, tsData, exData, currentProject])
 
   useEffect(() => {
     if (!isProcessing) {
@@ -97,33 +112,22 @@ export function Navbar() {
         </div>
         <Breadcrumb>
           <BreadcrumbList>
-            <BreadcrumbItem className="text-foreground hover:underline">
-              <Link href="/dashboard" className="flex items-center gap-2">
-                Dashboard
-              </Link>
-            </BreadcrumbItem>
-            {currentProject && (
-              <>
-                <BreadcrumbSeparator />
+            {breadcrumbs.map((breadcrumb, index) => (
+              <Fragment key={index}>
+                {index > 0 && <BreadcrumbSeparator />}
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="line-clamp-1 hover:underline">
-                    <Link href="/project">
-                      {currentProject.name}
+                  {breadcrumb.link ? (
+                    <Link href={breadcrumb.link}>
+                      <BreadcrumbPage className="line-clamp-1 hover:underline">
+                        {breadcrumb.name}
+                      </BreadcrumbPage>
                     </Link>
-                  </BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbPage className="line-clamp-1 hover:underline">{breadcrumb.name}</BreadcrumbPage>
+                  )}
                 </BreadcrumbItem>
-              </>
-            )}
-            {currentProject && pathname && (
-              <>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="line-clamp-1 hover:underline hidden md:block">
-                    {pathname}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </>
-            )}
+              </Fragment>
+            ))}
           </BreadcrumbList>
         </Breadcrumb>
 
