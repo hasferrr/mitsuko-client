@@ -77,7 +77,7 @@ export default function LibraryView() {
   return (
     <div className="container max-w-6xl mx-auto p-4">
       <div className="flex justify-between items-center pb-4">
-        <h1 className="text-2xl font-semibold">My Library</h1>
+        <h1 className="text-2xl font-medium">My Library</h1>
         <div className="flex items-center gap-2">
           <ImportInstructionsDialog />
           <ExportInstructionsControls

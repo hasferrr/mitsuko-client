@@ -107,8 +107,8 @@ export default function SubtitleViewer() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-semibold mb-4">Tools</h1>
-      <div className="flex items-center space-x-4 mb-4">
+      <h1 className="text-2xl font-medium">Tools</h1>
+      <div className="flex items-center space-x-4 my-4">
         <Input type="file" onChange={handleFileChange} accept=".ass" className="max-w-xs" />
         <Button onClick={handleExportCSV} disabled={subtitleEvents.length === 0}>Export to CSV</Button>
         <AlertDialog>
