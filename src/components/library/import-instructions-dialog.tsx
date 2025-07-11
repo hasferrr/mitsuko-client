@@ -15,7 +15,7 @@ import {
   AlertDialogDescription,
 } from '@/components/ui/alert-dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Upload } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { CustomInstruction } from '@/types/custom-instruction'
 import {
   Card,
@@ -126,7 +126,7 @@ export function ImportInstructionsDialog() {
         className="hidden"
       />
       <Button variant="outline" onClick={handleImportClick}>
-        <Upload size={18} />
+        <Download size={18} />
         Import
       </Button>
 

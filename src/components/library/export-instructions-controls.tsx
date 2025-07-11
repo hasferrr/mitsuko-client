@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Download, X } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
 import { CustomInstruction } from '@/types/custom-instruction'
 
 interface ExportInstructionsControlsProps {
@@ -42,7 +42,7 @@ export function ExportInstructionsControls({
     return (
       <>
         <Button variant="outline" onClick={handleExport} disabled={selectedIds.size === 0}>
-          <Download size={18} />
+          <Upload size={18} />
           Export {selectedIds.size > 0 ? `(${selectedIds.size})` : ''}
         </Button>
         <Button variant="ghost" onClick={onCancelSelectionMode}>
@@ -56,7 +56,7 @@ export function ExportInstructionsControls({
   if (hasInstructions) {
     return (
       <Button variant="outline" onClick={onEnterSelectionMode}>
-        <Download size={18} />
+        <Upload size={18} />
         Export
       </Button>
     )
