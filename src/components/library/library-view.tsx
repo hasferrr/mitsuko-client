@@ -183,12 +183,22 @@ export default function LibraryView() {
                   </CardContent>
                   <CardFooter className="pt-2 flex justify-end gap-2">
                     <CreateEditInstructionDialog instruction={item}>
-                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation() }}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation() }}
+                        disabled={isSelectionMode}
+                      >
                         <Pencil className="h-4 w-4" />
                         Edit
                       </Button>
                     </CreateEditInstructionDialog>
-                    <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(item.id!) }}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => { e.stopPropagation(); handleDelete(item.id!) }}
+                      disabled={isSelectionMode}
+                    >
                       <Trash className="h-4 w-4" />
                       Delete
                     </Button>
