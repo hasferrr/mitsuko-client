@@ -8,8 +8,8 @@ import {
   House,
   Languages,
   HistoryIcon,
-  PencilRuler,
-  Book,
+  SwatchBook,
+  LibraryBig,
 } from "lucide-react"
 import { AppSidebarMain } from "@/components/sidebar/app-sidebar-main"
 import { AppSidebarProjects } from "@/components/sidebar/app-sidebar-projects"
@@ -58,14 +58,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: BookOpen,
       },
       {
-        title: "Tools",
-        url: "/tools",
-        icon: PencilRuler,
-      },
-      {
         title: "Library",
         url: "/library",
-        icon: Book,
+        icon: LibraryBig,
+      },
+      {
+        title: "Tools",
+        url: "/tools",
+        icon: SwatchBook,
       },
     ],
     links: [

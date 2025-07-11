@@ -34,7 +34,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 import WhichModels from "@/components/pricing/which-models"
-import { Book, HelpCircle } from "lucide-react"
+import { LibraryBig, HelpCircle } from "lucide-react"
 import { useLocalSettingsStore } from '@/stores/use-local-settings-store'
 import { Checkbox } from "./ui/checkbox"
 import { useCustomInstructionStore } from "@/stores/data/use-custom-instruction-store"
@@ -341,7 +341,7 @@ export const CustomInstructionsInput = memo(() => {
             onClick={openLibraryDialog}
             className="h-8 px-2"
           >
-            <Book className="h-4 w-4" />
+            <LibraryBig className="h-4 w-4" />
             Library
           </Button>
           <Button
