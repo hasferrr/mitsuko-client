@@ -58,12 +58,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: BookOpen,
       },
       {
-        title: "Subtitle Tools",
+        title: "Tools",
         url: "/tools",
         icon: PencilRuler,
       },
       {
-        title: "My Library",
+        title: "Library",
         url: "/library",
         icon: Book,
       },

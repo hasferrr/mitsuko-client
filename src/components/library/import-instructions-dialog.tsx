@@ -169,7 +169,7 @@ export function ImportInstructionsDialog() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg">{item.name}</CardTitle>
                   </CardHeader>
-                  <CardContent className="pb-2 flex-grow">
+                  <CardContent className="flex-grow">
                     <p className="text-sm text-muted-foreground line-clamp-4">{item.content}</p>
                   </CardContent>
                 </Card>
