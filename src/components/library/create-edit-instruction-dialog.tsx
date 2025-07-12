@@ -73,7 +73,7 @@ export function CreateEditInstructionDialog({ children, instruction }: CreateEdi
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
-      <AlertDialogContent className="sm:max-w-md">
+      <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-xl">{instruction ? 'Edit' : 'Create'} Custom Instruction</AlertDialogTitle>
           <AlertDialogDescription>
