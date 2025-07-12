@@ -27,6 +27,8 @@ import { cn } from '@/lib/utils'
 import { ImportInstructionsDialog } from './import-instructions-dialog'
 import { ExportInstructionsControls } from './export-instructions-controls'
 import { CreateEditInstructionDialog } from './create-edit-instruction-dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import PublicLibrary from './public-library'
 
 export default function LibraryView() {
   const { customInstructions, load, remove, loading } = useCustomInstructionStore()
@@ -35,6 +37,7 @@ export default function LibraryView() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSelectionMode, setIsSelectionMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [activeTab, setActiveTab] = useState('my-library')
 
   useEffect(() => {
     load()
@@ -76,8 +79,13 @@ export default function LibraryView() {
 
   return (
     <div className="container max-w-6xl mx-auto p-4">
+      <Tabs defaultValue="my-library" onValueChange={setActiveTab}>
       <div className="flex justify-between items-center pb-4">
-        <h1 className="text-2xl font-medium">My Library</h1>
+          <TabsList>
+            <TabsTrigger value="my-library">My Library</TabsTrigger>
+            <TabsTrigger value="public-library">Public Library</TabsTrigger>
+          </TabsList>
+          {activeTab === 'my-library' && (
         <div className="flex items-center gap-2">
           <ImportInstructionsDialog />
           <ExportInstructionsControls
@@ -100,7 +108,9 @@ export default function LibraryView() {
             </CreateEditInstructionDialog>
           )}
         </div>
+          )}
       </div>
+        <TabsContent value="my-library">
       <div className="relative mb-6">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
@@ -209,27 +219,30 @@ export default function LibraryView() {
           )}
         </>
       )}
-
+        </TabsContent>
+        <TabsContent value="public-library">
+          <PublicLibrary />
+        </TabsContent>
+      </Tabs>
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this custom instruction? This action cannot be undone.
+              This action cannot be undone. This will permanently delete your custom instruction.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={async () => {
-                if (deleteId !== null) {
-                  await remove(deleteId)
+              onClick={() => {
+                if (deleteId) {
+                  remove(deleteId)
+                  setIsDeleteDialogOpen(false)
                 }
-                setDeleteId(null)
               }}
-              className="bg-destructive hover:bg-destructive/90 text-white"
             >
-              Delete
+              Continue
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

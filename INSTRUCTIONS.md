@@ -41,6 +41,7 @@ From each source, the system generates:
 - **Audio-to-Subtitle Transcription** → Generates perfectly timed subtitles from various audio formats.
 - **AI-Powered Context Extraction** → Analyzes subtitle content to build a reusable knowledge base for consistent translations across a series.
 - **My Library** → Manages a list of user's custom instructions for AI tasks.
+- **Public Library** → A collection of public custom instructions.
 
 ### User Experience
 - **Responsive Design** → Optimized for desktop use.
