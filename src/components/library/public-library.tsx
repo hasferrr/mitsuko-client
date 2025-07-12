@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   getPublicCustomInstruction,
   getPublicCustomInstructionsPaged,
+  deletePublicCustomInstruction,
 } from '@/lib/api/custom-instruction'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,7 +19,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { Search, Download, User, Calendar } from 'lucide-react'
+import { Search, Download, User, Calendar, Trash, Loader2 } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -33,7 +34,19 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogDescription,
+} from '@/components/ui/alert-dialog'
 import { useCustomInstructionStore } from '@/stores/data/use-custom-instruction-store'
+import { supabase } from '@/lib/supabase'
+import { Session } from '@supabase/supabase-js'
 
 export default function PublicLibrary() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -44,6 +57,40 @@ export default function PublicLibrary() {
   const [showOnlyMyCreations, setShowOnlyMyCreations] = useState(false)
   const ITEMS_PER_PAGE = 30
   const { create: createCustomInstruction } = useCustomInstructionStore()
+  const [session, setSession] = useState<Session | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const { mutate: deleteInstruction, isPending: isDeleting } = useMutation({
+    mutationFn: (id: string) => deletePublicCustomInstruction(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['publicCustomInstructionsPaged'],
+      })
+      setIsDeleteDialogOpen(false)
+      setDeleteId(null)
+    },
+    onError: error => {
+      console.error('Failed to delete instruction:', error)
+      setIsDeleteDialogOpen(false)
+      setDeleteId(null)
+    },
+  })
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -99,10 +146,15 @@ export default function PublicLibrary() {
   const filteredInstructions = instructions.filter(
     item =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.preview.toLowerCase().includes(searchQuery.toLowerCase())
+      item.preview.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
   const isModalOpen = !!selectedId
+
+  const handleDeleteClick = (id: string) => {
+    setDeleteId(id)
+    setIsDeleteDialogOpen(true)
+  }
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -219,10 +271,10 @@ export default function PublicLibrary() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredInstructions.map(item => (
               <Card key={item.id} className="cursor-pointer flex flex-col" onClick={() => setSelectedId(item.id)}>
-                <CardHeader>
+                <CardHeader className="pb-4">
                   <CardTitle>{item.name}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-2">
                   <p className="text-sm text-muted-foreground line-clamp-4">{item.preview}</p>
                 </CardContent>
                 <CardFooter className="flex justify-between text-xs text-muted-foreground mt-auto">
@@ -230,9 +282,29 @@ export default function PublicLibrary() {
                     <User className="h-3 w-3 mr-1" />
                     <span>{item.user_id.split('-')[0]}</span>
                   </div>
-                  <div className="flex items-center">
-                    <Calendar className="h-3 w-3 mr-1" />
-                    <span>{formatDate(item.created_at)}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      <span>{formatDate(item.created_at)}</span>
+                    </div>
+                    {session?.user.id === item.user_id && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-foreground"
+                        onClick={e => {
+                          e.stopPropagation()
+                          if (item.id) handleDeleteClick(item.id)
+                        }}
+                        disabled={isDeleting && deleteId === item.id}
+                      >
+                        {isDeleting && deleteId === item.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Trash className="h-3 w-3" />
+                        )}
+                      </Button>
+                    )}
                   </div>
                 </CardFooter>
               </Card>
@@ -321,12 +393,40 @@ export default function PublicLibrary() {
               Cancel
             </Button>
             <Button onClick={handleImportInstruction}>
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-4 w-4" />
               Import to My Library
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this
+              public instruction.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteId) {
+                  deleteInstruction(deleteId)
+                }
+              }}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Continue'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

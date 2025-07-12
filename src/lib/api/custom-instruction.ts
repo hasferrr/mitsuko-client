@@ -81,6 +81,25 @@ export async function getPublicCustomInstruction(id: string): Promise<PublicCust
   return data
 }
 
+export async function deletePublicCustomInstruction(id: string): Promise<void> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  if (!session) {
+    throw new Error('User not authenticated')
+  }
+
+  const { error } = await supabase
+    .from('custom_instructions')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', session.user.id)
+
+  if (error) {
+    throw error
+  }
+}
+
 export async function createPublicCustomInstruction(
   name: string,
   content: string,
