@@ -12,7 +12,8 @@ export interface PaginatedInstructions {
 
 export async function getPublicCustomInstructionsPaged(
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  showOnlyMyCreations: boolean = false,
 ): Promise<PaginatedInstructions> {
   const {
     data: { session },
@@ -24,10 +25,22 @@ export async function getPublicCustomInstructionsPaged(
   const from = (page - 1) * limit
   const to = from + limit - 1
 
-  const { data, error, count } = await supabase
+  let query = supabase
     .from('custom_instructions')
-    .select<string, PublicCustomInstructionShort>('id, user_id, name, preview, created_at', { count: 'exact' })
-    .or(`and(is_public.eq.true,force_hide.eq.false),user_id.eq.${session.user.id}`)
+    .select<string, PublicCustomInstructionShort>(
+      'id, user_id, name, preview, created_at',
+      { count: 'exact' },
+    )
+
+  if (showOnlyMyCreations) {
+    query = query.eq('user_id', session.user.id)
+  } else {
+    query = query.or(
+      `and(is_public.eq.true,force_hide.eq.false),user_id.eq.${session.user.id}`,
+    )
+  }
+
+  const { data, error, count } = await query
     .order('created_at', { ascending: false })
     .range(from, to)
 

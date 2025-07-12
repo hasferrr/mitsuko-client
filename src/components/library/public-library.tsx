@@ -41,17 +41,25 @@ export default function PublicLibrary() {
   const [importName, setImportName] = useState('')
   const [importContent, setImportContent] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [showOnlyMyCreations, setShowOnlyMyCreations] = useState(false)
   const ITEMS_PER_PAGE = 30
   const { create: createCustomInstruction } = useCustomInstructionStore()
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const {
-    data: paginatedData,
-    isLoading: isLoadingInstructions
-  } = useQuery({
-    queryKey: ['publicCustomInstructionsPaged', currentPage, ITEMS_PER_PAGE],
-    queryFn: () => getPublicCustomInstructionsPaged(currentPage, ITEMS_PER_PAGE),
+  const { data: paginatedData, isLoading: isLoadingInstructions } = useQuery({
+    queryKey: [
+      'publicCustomInstructionsPaged',
+      currentPage,
+      ITEMS_PER_PAGE,
+      showOnlyMyCreations,
+    ],
+    queryFn: () =>
+      getPublicCustomInstructionsPaged(
+        currentPage,
+        ITEMS_PER_PAGE,
+        showOnlyMyCreations,
+      ),
   })
 
   const instructions = paginatedData?.data || []
@@ -174,14 +182,22 @@ export default function PublicLibrary() {
 
   return (
     <div>
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search public instructions..."
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          className="pl-9 max-w-md"
-        />
+      <div className="flex justify-between items-center mb-6">
+        <div className="relative w-full max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search public instructions..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => setShowOnlyMyCreations(prev => !prev)}
+        >
+          {showOnlyMyCreations ? 'Show All' : 'Show My Instructions'}
+        </Button>
       </div>
       {isLoadingInstructions ? (
         <div className="flex justify-center items-center py-8">
