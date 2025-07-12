@@ -26,7 +26,7 @@ export async function getPublicCustomInstructionsPaged(
 
   const { data, error, count } = await supabase
     .from('custom_instructions')
-    .select<string, PublicCustomInstructionShort>('id, name, preview, created_at', { count: 'exact' })
+    .select<string, PublicCustomInstructionShort>('id, user_id, name, preview, created_at', { count: 'exact' })
     .or(`and(is_public.eq.true,force_hide.eq.false),user_id.eq.${session.user.id}`)
     .order('created_at', { ascending: false })
     .range(from, to)
@@ -52,7 +52,7 @@ export async function getPublicCustomInstruction(id: string): Promise<PublicCust
 
   const { data, error } = await supabase
     .from('custom_instructions')
-    .select('id, name, preview, content, created_at')
+    .select('id, user_id, name, preview, content, created_at')
     .eq('id', id)
     .or(`and(is_public.eq.true,force_hide.eq.false),user_id.eq.${session.user.id}`)
     .maybeSingle<PublicCustomInstruction>()

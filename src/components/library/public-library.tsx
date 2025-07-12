@@ -18,12 +18,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { Search, Download } from 'lucide-react'
+import { Search, Download, User, Calendar } from 'lucide-react'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card'
 import {
   Dialog,
@@ -95,6 +96,15 @@ export default function PublicLibrary() {
 
   const isModalOpen = !!selectedId
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  }
+
   // Reset to first page when search query changes
   useEffect(() => {
     setCurrentPage(1)
@@ -163,7 +173,7 @@ export default function PublicLibrary() {
   }
 
   return (
-    <div className="mt-6">
+    <div>
       <div className="relative mb-6">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
@@ -192,13 +202,23 @@ export default function PublicLibrary() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredInstructions.map(item => (
-              <Card key={item.id} className="cursor-pointer" onClick={() => setSelectedId(item.id)}>
+              <Card key={item.id} className="cursor-pointer flex flex-col" onClick={() => setSelectedId(item.id)}>
                 <CardHeader>
                   <CardTitle>{item.name}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground line-clamp-4">{item.preview}</p>
                 </CardContent>
+                <CardFooter className="flex justify-between text-xs text-muted-foreground mt-auto">
+                  <div className="flex items-center">
+                    <User className="h-3 w-3 mr-1" />
+                    <span>{item.user_id.split('-')[0]}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar className="h-3 w-3 mr-1" />
+                    <span>{formatDate(item.created_at)}</span>
+                  </div>
+                </CardFooter>
               </Card>
             ))}
           </div>
@@ -231,50 +251,64 @@ export default function PublicLibrary() {
 
       <Dialog open={isModalOpen} onOpenChange={() => setSelectedId(null)}>
         <DialogContent>
+          <DialogHeader>
+            <DialogTitle className={isLoadingInstruction ? 'sr-only' : ''}>
+              {isLoadingInstruction ? 'Loading instruction' : 'Import Custom Instruction'}
+            </DialogTitle>
+            {!isLoadingInstruction && (
+              <DialogDescription>
+                Review the instruction before adding it to your library.
+              </DialogDescription>
+            )}
+          </DialogHeader>
           {isLoadingInstruction ? (
             <p>Loading instruction...</p>
           ) : (
-            <>
-              <DialogHeader>
-                <DialogTitle>Import Custom Instruction</DialogTitle>
-                <DialogDescription>
-                  Review the instruction before adding it to your library.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    value={importName}
-                    readOnly
-                    placeholder="e.g., Formal Translation Style"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="content">Content</Label>
-                  <Textarea
-                    id="content"
-                    ref={textareaRef}
-                    value={importContent}
-                    onFocus={handleResize}
-                    readOnly
-                    placeholder="Enter your custom instruction here"
-                    className="min-h-[100px] max-h-[300px] overflow-y-auto resize-none"
-                  />
-                </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  value={importName}
+                  readOnly
+                  placeholder="e.g., Formal Translation Style"
+                />
               </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setSelectedId(null)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleImportInstruction}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Import to My Library
-                </Button>
+              <div className="space-y-2">
+                <Label htmlFor="content">Content</Label>
+                <Textarea
+                  id="content"
+                  ref={textareaRef}
+                  value={importContent}
+                  onFocus={handleResize}
+                  readOnly
+                  placeholder="Enter your custom instruction here"
+                  className="min-h-[100px] max-h-[300px] overflow-y-auto resize-none"
+                />
               </div>
-            </>
+              {selectedInstruction && (
+                <div className="flex justify-between text-xs text-muted-foreground pt-2">
+                  <div className="flex items-center">
+                    <User className="h-3 w-3 mr-1" />
+                    <span>Created by: {selectedInstruction.user_id.split('-')[0]}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar className="h-3 w-3 mr-1" />
+                    <span>{formatDate(selectedInstruction.created_at)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setSelectedId(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleImportInstruction}>
+              <Download className="h-4 w-4 mr-2" />
+              Import to My Library
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
