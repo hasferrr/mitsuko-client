@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useCustomInstructionStore } from '@/stores/data/use-custom-instruction-store'
 import { Button } from '@/components/ui/button'
 import {
@@ -60,8 +61,11 @@ export default function MyLibrary() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['publicCustomInstructionsPaged'] })
     },
-    onError: error => {
+    onError: (error: Error) => {
       console.error('Failed to publish instruction:', error)
+      toast.error('Failed to publish instruction', {
+        description: error.message,
+      })
     },
   })
 
