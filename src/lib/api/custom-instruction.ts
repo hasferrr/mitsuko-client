@@ -67,3 +67,38 @@ export async function getPublicCustomInstruction(id: string): Promise<PublicCust
 
   return data
 }
+
+export async function createPublicCustomInstruction(
+  name: string,
+  content: string,
+): Promise<PublicCustomInstruction> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  if (!session) {
+    throw new Error('User not authenticated')
+  }
+
+  const { data, error } = await supabase
+    .from('custom_instructions')
+    .insert([
+      {
+        user_id: session.user.id,
+        name,
+        content,
+        is_public: true,
+      },
+    ])
+    .select('id, user_id, name, preview, content, created_at')
+    .single<PublicCustomInstruction>()
+
+  if (error) {
+    throw error
+  }
+
+  if (!data) {
+    throw new Error('Failed to create custom instruction')
+  }
+
+  return data
+}

@@ -14,7 +14,15 @@ import {
   AlertDialogDescription,
 } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
-import { Pencil, Trash, Plus, FileText, Search } from 'lucide-react'
+import {
+  Pencil,
+  Trash,
+  Plus,
+  FileText,
+  Search,
+  Loader2,
+  Globe,
+} from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -27,14 +35,35 @@ import { cn } from '@/lib/utils'
 import { ImportInstructionsDialog } from './import-instructions-dialog'
 import { ExportInstructionsControls } from './export-instructions-controls'
 import { CreateEditInstructionDialog } from './create-edit-instruction-dialog'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { createPublicCustomInstruction } from '@/lib/api/custom-instruction'
 
 export default function MyLibrary() {
-  const { customInstructions, load, remove, loading } = useCustomInstructionStore()
+  const { customInstructions, load, remove, loading } =
+    useCustomInstructionStore()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false)
+  const [
+    publishInstructionData,
+    setPublishInstructionData,
+  ] = useState<{ id: string; name: string; content: string } | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [isSelectionMode, setIsSelectionMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [publishingId, setPublishingId] = useState<string | null>(null)
+  const queryClient = useQueryClient()
+
+  const { mutate: publishInstruction } = useMutation({
+    mutationFn: ({ name, content }: { name: string; content: string }) =>
+      createPublicCustomInstruction(name, content),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['publicCustomInstructionsPaged'] })
+    },
+    onError: error => {
+      console.error('Failed to publish instruction:', error)
+    },
+  })
 
   useEffect(() => {
     load()
@@ -45,9 +74,31 @@ export default function MyLibrary() {
     setIsDeleteDialogOpen(true)
   }
 
-  const filteredInstructions = customInstructions.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.content.toLowerCase().includes(searchQuery.toLowerCase())
+  const handlePublish = (id: string, name: string, content: string) => {
+    setPublishingId(id)
+    publishInstruction(
+      { name, content },
+      {
+        onSettled: () => {
+          setPublishingId(null)
+        },
+      },
+    )
+  }
+
+  const handleOpenPublishDialog = (
+    id: string,
+    name: string,
+    content: string,
+  ) => {
+    setPublishInstructionData({ id, name, content })
+    setIsPublishDialogOpen(true)
+  }
+
+  const filteredInstructions = customInstructions.filter(
+    item =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.content.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
   const handleToggleSelection = (id: string) => {
@@ -184,14 +235,33 @@ export default function MyLibrary() {
                       <CardTitle className="text-lg">{item.name}</CardTitle>
                     </CardHeader>
                     <CardContent className="pb-2 flex-grow">
-                      <p className="text-sm text-muted-foreground line-clamp-4">{item.content}</p>
+                      <p className="text-sm text-muted-foreground line-clamp-4">
+                        {item.content}
+                      </p>
                     </CardContent>
                     <CardFooter className="pt-2 flex justify-end gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={isSelectionMode}
+                        onClick={e => {
+                          e.stopPropagation()
+                          if (item.id) {
+                            handleOpenPublishDialog(
+                              item.id,
+                              item.name,
+                              item.content,
+                            )
+                          }
+                        }}
+                        disabled={isSelectionMode || publishingId === item.id}
                       >
+                        {publishingId === item.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Globe className="h-4 w-4" />
+                        )}
+                      </Button>
+                      <Button variant="outline" size="sm" disabled={isSelectionMode}>
                         <Pencil className="h-4 w-4" />
                         Edit
                       </Button>
@@ -212,6 +282,43 @@ export default function MyLibrary() {
           )}
         </>
       )}
+      <AlertDialog
+        open={isPublishDialogOpen}
+        onOpenChange={setIsPublishDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to publish this instruction?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This will make your custom instruction publicly available for
+              other users to view and import. You can hide it later if you
+              wish.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPublishInstructionData(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (publishInstructionData) {
+                  handlePublish(
+                    publishInstructionData.id,
+                    publishInstructionData.name,
+                    publishInstructionData.content,
+                  )
+                  setIsPublishDialogOpen(false)
+                  setPublishInstructionData(null)
+                }
+              }}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
