@@ -1,10 +1,8 @@
 import { supabase } from '@/lib/supabase'
-import { CUSTOM_INSTRUCTIONS_URL } from '@/constants/api'
 import {
   PublicCustomInstruction,
   PublicCustomInstructionShort,
 } from '@/types/public-custom-instruction'
-import axios from 'axios'
 
 export interface PaginatedInstructions {
   data: PublicCustomInstructionShort[]
@@ -23,34 +21,25 @@ export async function getPublicCustomInstructionsPaged(
     throw new Error('User not authenticated')
   }
 
-  const response = await axios.get(`${CUSTOM_INSTRUCTIONS_URL}/paged`, {
-    headers: {
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    params: {
-      page,
-      limit,
-    },
-  })
+  const from = (page - 1) * limit
+  const to = from + limit - 1
 
-  return response.data
-}
+  const { data, error, count } = await supabase
+    .from('custom_instructions')
+    .select<string, PublicCustomInstructionShort>('id, name, preview, created_at', { count: 'exact' })
+    .or(`and(is_public.eq.true,force_hide.eq.false),user_id.eq.${session.user.id}`)
+    .order('created_at', { ascending: false })
+    .range(from, to)
 
-export async function getPublicCustomInstructions(): Promise<PublicCustomInstructionShort[]> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
-    throw new Error('User not authenticated')
+  if (error) {
+    throw error
   }
 
-  const response = await axios.get(CUSTOM_INSTRUCTIONS_URL, {
-    headers: {
-      Authorization: `Bearer ${session.access_token}`,
-    },
-  })
-
-  return response.data
+  return {
+    data: data || [],
+    totalPages: Math.ceil((count || 0) / limit),
+    currentPage: page
+  }
 }
 
 export async function getPublicCustomInstruction(id: string): Promise<PublicCustomInstruction> {
@@ -61,11 +50,20 @@ export async function getPublicCustomInstruction(id: string): Promise<PublicCust
     throw new Error('User not authenticated')
   }
 
-  const response = await axios.get(`${CUSTOM_INSTRUCTIONS_URL}/${id}`, {
-    headers: {
-      Authorization: `Bearer ${session.access_token}`,
-    },
-  })
+  const { data, error } = await supabase
+    .from('custom_instructions')
+    .select('id, name, preview, content, created_at')
+    .eq('id', id)
+    .or(`and(is_public.eq.true,force_hide.eq.false),user_id.eq.${session.user.id}`)
+    .maybeSingle<PublicCustomInstruction>()
 
-  return response.data
+  if (error) {
+    throw error
+  }
+
+  if (!data) {
+    throw new Error('Custom instruction not found')
+  }
+
+  return data
 }
