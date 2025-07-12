@@ -157,52 +157,56 @@ export default function MyLibrary() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredInstructions.map(item => (
-                <Card
-                  key={item.id}
-                  className={cn(
-                    "overflow-hidden border border-muted h-full flex flex-col transition-colors duration-300 relative",
-                    isSelectionMode && "cursor-pointer",
-                    selectedIds.has(item.id) && "border-primary"
-                  )}
-                  onClick={() => isSelectionMode && handleToggleSelection(item.id)}
-                >
-                  {isSelectionMode && (
-                    <Checkbox
-                      checked={selectedIds.has(item.id)}
-                      onCheckedChange={() => handleToggleSelection(item.id)}
-                      className="absolute top-3 right-3 z-10"
-                      aria-label={`Select ${item.name}`}
-                    />
-                  )}
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">{item.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pb-2 flex-grow">
-                    <p className="text-sm text-muted-foreground line-clamp-4">{item.content}</p>
-                  </CardContent>
-                  <CardFooter className="pt-2 flex justify-end gap-2">
-                    <CreateEditInstructionDialog instruction={item}>
+                <CreateEditInstructionDialog key={item.id} instruction={item}>
+                  <Card
+                    className={cn(
+                      "overflow-hidden border border-muted h-full flex flex-col transition-colors duration-300 relative",
+                      "cursor-pointer",
+                      selectedIds.has(item.id) && "border-primary"
+                    )}
+                    onClick={(e) => {
+                      if (isSelectionMode) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleToggleSelection(item.id)
+                      }
+                    }}
+                  >
+                    {isSelectionMode && (
+                      <Checkbox
+                        checked={selectedIds.has(item.id)}
+                        onCheckedChange={() => handleToggleSelection(item.id)}
+                        className="absolute top-3 right-3 z-10"
+                        aria-label={`Select ${item.name}`}
+                      />
+                    )}
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg">{item.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pb-2 flex-grow">
+                      <p className="text-sm text-muted-foreground line-clamp-4">{item.content}</p>
+                    </CardContent>
+                    <CardFooter className="pt-2 flex justify-end gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={(e) => { e.stopPropagation() }}
                         disabled={isSelectionMode}
                       >
                         <Pencil className="h-4 w-4" />
                         Edit
                       </Button>
-                    </CreateEditInstructionDialog>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => { e.stopPropagation(); handleDelete(item.id!) }}
-                      disabled={isSelectionMode}
-                    >
-                      <Trash className="h-4 w-4" />
-                      Delete
-                    </Button>
-                  </CardFooter>
-                </Card>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); handleDelete(item.id!) }}
+                        disabled={isSelectionMode}
+                      >
+                        <Trash className="h-4 w-4" />
+                        Delete
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </CreateEditInstructionDialog>
               ))}
             </div>
           )}
