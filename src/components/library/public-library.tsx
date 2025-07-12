@@ -19,7 +19,15 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { Search, Download, User, Calendar, Trash, Loader2 } from 'lucide-react'
+import {
+  Search,
+  Download,
+  User,
+  Calendar,
+  Trash,
+  Loader2,
+  RefreshCw,
+} from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -45,8 +53,7 @@ import {
   AlertDialogDescription,
 } from '@/components/ui/alert-dialog'
 import { useCustomInstructionStore } from '@/stores/data/use-custom-instruction-store'
-import { supabase } from '@/lib/supabase'
-import { Session } from '@supabase/supabase-js'
+import { useSessionStore } from '@/stores/use-session-store'
 
 export default function PublicLibrary() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -57,24 +64,11 @@ export default function PublicLibrary() {
   const [showOnlyMyCreations, setShowOnlyMyCreations] = useState(false)
   const ITEMS_PER_PAGE = 30
   const { create: createCustomInstruction } = useCustomInstructionStore()
-  const [session, setSession] = useState<Session | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const queryClient = useQueryClient()
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
+  const session = useSessionStore(state => state.session)
 
   const { mutate: deleteInstruction, isPending: isDeleting } = useMutation({
     mutationFn: (id: string) => deletePublicCustomInstruction(id),
@@ -94,7 +88,12 @@ export default function PublicLibrary() {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const { data: paginatedData, isLoading: isLoadingInstructions } = useQuery({
+  const {
+    data: paginatedData,
+    isLoading: isLoadingInstructions,
+    refetch,
+    isRefetching,
+  } = useQuery({
     queryKey: [
       'publicCustomInstructionsPaged',
       currentPage,
@@ -107,6 +106,8 @@ export default function PublicLibrary() {
         ITEMS_PER_PAGE,
         showOnlyMyCreations,
       ),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
   })
 
   const instructions = paginatedData?.data || []
@@ -244,14 +245,26 @@ export default function PublicLibrary() {
             className="pl-9"
           />
         </div>
-        <Button
-          variant="outline"
-          onClick={() => setShowOnlyMyCreations(prev => !prev)}
-        >
-          {showOnlyMyCreations ? 'Show All' : 'Show My Instructions'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => refetch()}
+            disabled={isRefetching || isLoadingInstructions}
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${isRefetching ? 'animate-spin' : ''}`}
+            />
+            Refresh
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setShowOnlyMyCreations(prev => !prev)}
+          >
+            {showOnlyMyCreations ? 'Show All' : 'Show My Instructions'}
+          </Button>
+        </div>
       </div>
-      {isLoadingInstructions ? (
+      {isLoadingInstructions && !isRefetching ? (
         <div className="flex justify-center items-center py-8">
           <p className="text-muted-foreground">Loading instructions...</p>
         </div>
