@@ -54,6 +54,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useCustomInstructionStore } from '@/stores/data/use-custom-instruction-store'
 import { useSessionStore } from '@/stores/use-session-store'
+import { cn } from '@/lib/utils'
 
 export default function PublicLibrary() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -62,7 +63,7 @@ export default function PublicLibrary() {
   const [importContent, setImportContent] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [showOnlyMyCreations, setShowOnlyMyCreations] = useState(false)
-  const ITEMS_PER_PAGE = 30
+  const ITEMS_PER_PAGE = 15
   const { create: createCustomInstruction } = useCustomInstructionStore()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -252,7 +253,7 @@ export default function PublicLibrary() {
             disabled={isRefetching || isLoadingInstructions}
           >
             <RefreshCw
-              className={`h-4 w-4 ${isRefetching ? 'animate-spin' : ''}`}
+              className={cn('h-4 w-4', isRefetching && 'animate-spin')}
             />
             Refresh
           </Button>
@@ -290,7 +291,7 @@ export default function PublicLibrary() {
                 <CardContent className="pb-2">
                   <p className="text-sm text-muted-foreground line-clamp-4">{item.preview}</p>
                 </CardContent>
-                <CardFooter className="flex justify-between text-xs text-muted-foreground mt-auto">
+                <CardFooter className="pt-2 flex justify-between text-xs text-muted-foreground mt-auto">
                   <div className="flex items-center">
                     <User className="h-3 w-3 mr-1" />
                     <span>{item.user_id.split('-')[0]}</span>
@@ -331,7 +332,9 @@ export default function PublicLibrary() {
                   <PaginationPrevious
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     aria-disabled={currentPage === 1}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                    className={cn(
+                      currentPage === 1 && 'pointer-events-none opacity-50',
+                    )}
                   />
                 </PaginationItem>
 
@@ -339,9 +342,14 @@ export default function PublicLibrary() {
 
                 <PaginationItem>
                   <PaginationNext
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    onClick={() =>
+                      setCurrentPage(prev => Math.min(totalPages, prev + 1))
+                    }
                     aria-disabled={currentPage === totalPages}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                    className={cn(
+                      currentPage === totalPages &&
+                        'pointer-events-none opacity-50',
+                    )}
                   />
                 </PaginationItem>
               </PaginationContent>
@@ -353,8 +361,10 @@ export default function PublicLibrary() {
       <Dialog open={isModalOpen} onOpenChange={() => setSelectedId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className={isLoadingInstruction ? 'sr-only' : ''}>
-              {isLoadingInstruction ? 'Loading instruction' : 'Import Custom Instruction'}
+            <DialogTitle className={cn(isLoadingInstruction && 'sr-only')}>
+              {isLoadingInstruction
+                ? 'Loading instruction'
+                : 'Import Custom Instruction'}
             </DialogTitle>
             {!isLoadingInstruction && (
               <DialogDescription>
