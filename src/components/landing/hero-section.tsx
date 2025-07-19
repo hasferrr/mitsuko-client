@@ -35,7 +35,7 @@ export default function HeroSection() {
       <div className="max-w-2xl text-center mb-12 text-lg">
         <p>
           It prioritizes meaning over literal translation, adapting for cultural nuance and idiomatic expressions.
-          Get SRT/ASS translation with high-quality results.
+          Get subtitle translation with high-quality results.
         </p>
       </div>
 

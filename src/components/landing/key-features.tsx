@@ -27,7 +27,7 @@ export default function KeyFeatures() {
             </div>
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Subtitle Translator</h3>
             <p className="text-gray-600 dark:text-gray-400">
-              {/* Translate SRT and ASS subtitles with context-aware AI that captures both literal meaning and idiomatic expressions. */}
+              {/* Translate subtitles with context-aware AI that captures both literal meaning and idiomatic expressions. */}
               Translate subtitles with frontier AI models like Gemini, Claude, Grok, and OpenAI.
             </p>
           </div>

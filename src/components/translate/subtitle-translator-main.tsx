@@ -110,6 +110,14 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Translation } from "@/types/project"
 
+const subNameMap = new Map([
+  ["srt", "SRT"],
+  ["ass", "SSA"],
+  ["vtt", "VTT"],
+])
+
+const acceptedFormats = [".srt", ".ass", ".vtt"]
+
 interface SubtitleTranslatorMainProps {
   currentId: string
   translation: Translation
@@ -132,7 +140,7 @@ export default function SubtitleTranslatorMain({
   const title = translation.title
   const subtitles = translation.subtitles
   const parsed = translation.parsed
-  const subName = parsed.type === "ass" ? "SSA" : "SRT"
+  const subName = subNameMap.get(parsed.type) ?? "SRT"
   const maxSubtitles = 1000
 
   // API Settings Store
@@ -823,7 +831,7 @@ export default function SubtitleTranslatorMain({
         </div>
         <input
           type="file"
-          accept=".srt,.ass"
+          accept={acceptedFormats.join(",")}
           onChange={handleFileUpload}
           className="hidden"
           id="subtitle-upload"
@@ -1165,7 +1173,7 @@ export default function SubtitleTranslatorMain({
               <p className="mt-2 text-sm text-muted-foreground text-center">
                 Drag and drop file here, or click to select a file.
                 <br />
-                SRT or ASS subtitles file.
+                {Array.from(subNameMap.keys()).join(", ").toUpperCase()} subtitles file.
               </p>
             </div>
           </DragAndDrop>

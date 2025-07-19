@@ -8,3 +8,7 @@ export function isSRT(content: string): boolean {
   const secondLine = lines[1]
   return !isNaN(Number(firstLine)) && secondLine?.includes(' --> ')
 }
+
+export function isVTT(content: string): boolean {
+  return content.trim().toLowerCase().startsWith('webvtt')
+}

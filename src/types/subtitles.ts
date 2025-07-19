@@ -56,7 +56,7 @@ export interface Parsed {
   data: ASSParseOutput | null
 }
 
-export type SubtitleType = "srt" | "ass"
+export type SubtitleType = "srt" | "ass" | "vtt"
 
 export type DownloadOption = "original" | "translated" | "combined"
 export type CombinedFormat = "(o)-t" | "(t)-o" | "o-n-t" | "t-n-o" | "{o}-t"

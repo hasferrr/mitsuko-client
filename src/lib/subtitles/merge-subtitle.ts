@@ -1,6 +1,7 @@
 import { Parsed, Subtitle } from "@/types/subtitles";
 import { _mergeASSback } from "./ass/merge"
 import { _generateSRT } from "./srt/generate"
+import { _generateVTT } from "./vtt/generate"
 
 interface MergeSubtitleOptions {
   subtitles: Subtitle[]
@@ -20,6 +21,10 @@ export const mergeSubtitle = ({
 
   if (parsed.type === "srt") {
     return _generateSRT(subtitles)
+  }
+
+  if (parsed.type === "vtt") {
+    return _generateVTT(subtitles)
   }
 
   throw new Error("Invalid subtitle type")

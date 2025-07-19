@@ -11,7 +11,7 @@ const faqData = [
   {
     question: "What file formats does Mitsuko support?",
     answer: [
-      "Subtitles: SRT and ASS.",
+      "Subtitles: SRT, ASS, and VTT.",
       "Audio: WAV, MP3, AIFF, AAC, OGG, and FLAC."
     ],
   },

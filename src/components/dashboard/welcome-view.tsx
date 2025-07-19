@@ -181,7 +181,7 @@ export function WelcomeView() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-sm">SRT and ASS format support</span>
+                  <span className="text-sm">SRT, ASS, VTT format support</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <div className="h-5 w-5 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
