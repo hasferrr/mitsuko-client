@@ -21,7 +21,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { CHANGE_LOG_LINK, DISCORD_LINK } from "@/constants/external-links"
+import { DISCORD_LINK } from "@/constants/external-links"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { SidebarHeaderIcon } from "./sidebar-header-icon"
 import { IconBrandDiscord } from "@tabler/icons-react"
@@ -77,9 +77,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         title: "Changelog",
-        url: CHANGE_LOG_LINK,
+        url: "/changelog",
         icon: HistoryIcon,
-        newTab: true,
+        newTab: false,
       },
     ],
   }

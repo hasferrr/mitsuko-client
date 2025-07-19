@@ -9,14 +9,17 @@ export function Footer() {
       <div className="flex flex-col gap-4 p-8 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
           <nav className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-            <Link href="#" className="hover:text-foreground">
+            {/* <Link href="#" className="hover:text-foreground">
               Documentation
-            </Link>
+            </Link> */}
             <Link href="/privacy" className="hover:text-foreground">
               Privacy Policy
             </Link>
             <Link href="/terms" className="hover:text-foreground">
               Terms of Service
+            </Link>
+            <Link href="/changelog" className="hover:text-foreground">
+              Changelog
             </Link>
           </nav>
         </div>

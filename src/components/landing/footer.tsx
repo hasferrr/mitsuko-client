@@ -73,8 +73,8 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-                Status
+              <Link href="/changelog" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                Changelog
               </Link>
             </li>
           </ul>
