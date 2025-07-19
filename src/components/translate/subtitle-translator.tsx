@@ -145,7 +145,7 @@ function SubtitleTranslatorMain({
   currentId,
   translation,
 }: SubtitleTranslatorMainProps) {
-  // Get translation data and functions from store
+  // Translation Data Store
   const setTitle = useTranslationDataStore((state) => state.setTitle)
   const setSubtitles = useTranslationDataStore((state) => state.setSubtitles)
   const setParsed = useTranslationDataStore((state) => state.setParsed)
@@ -158,6 +158,8 @@ function SubtitleTranslatorMain({
   const title = translation.title
   const subtitles = translation.subtitles
   const parsed = translation.parsed
+  const subName = parsed.type === "ass" ? "SSA" : "SRT"
+  const maxSubtitles = 1000
 
   // API Settings Store
   const apiKey = useLocalSettingsStore((state) => state.apiKey)
@@ -191,20 +193,9 @@ function SubtitleTranslatorMain({
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
   const isTranslating = isTranslatingSet.has(currentId)
 
-  // History Store & State
-  const addHistory = useHistoryStore((state) => state.addHistory)
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
-
   // Other Store
+  const addHistory = useHistoryStore((state) => state.addHistory)
   const session = useSessionStore((state) => state.session)
-
-  // Add lazy user data query that only executes manually
-  const { refetch: refetchUserData } = useQuery<UserCreditData>({
-    queryKey: ["user", session?.user?.id],
-    queryFn: fetchUserCreditData,
-    enabled: false, // Lazy query - won't run automatically
-    staleTime: 0, // Always refetch when requested
-  })
 
   // Other State
   const [activeTab, setActiveTab] = useState(isTranslating ? "result" : "basic")
@@ -223,18 +214,25 @@ function SubtitleTranslatorMain({
   const [uploadMode, setUploadMode] = useState<"normal" | "as-translated">("normal")
   const [isMismatchDialogOpen, setIsMismatchDialogOpen] = useState(false)
   const [pendingNewSubtitles, setPendingNewSubtitles] = useState<SubtitleNoTime[]>([])
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
 
-  // Other
+  // Custom Hooks
   const { setHasChanges } = useUnsavedChanges()
-  const subName = parsed.type === "ass" ? "SSA" : "SRT"
 
   // Auto-show subtitles if count is less than 1000
-  const maxSubtitles = 1000
   useEffect(() => {
     if (subtitles.length < maxSubtitles) {
       setSubtitlesHidden(false)
     }
   }, [subtitles.length])
+
+  // Lazy user data query
+  const { refetch: refetchUserData } = useQuery<UserCreditData>({
+    queryKey: ["user", session?.user?.id],
+    queryFn: fetchUserCreditData,
+    enabled: false,
+    staleTime: 0,
+  })
 
 
   const firstChunk = (size: number, s: number, e: number) => {
