@@ -1,6 +1,7 @@
 "use client"
 
-import { Plus, FileText } from "lucide-react"
+import { Plus, FileText, Move, Check } from "lucide-react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -30,6 +31,8 @@ export const Project = () => {
   const createProject = useProjectStore(state => state.createProject)
   const setCurrentProject = useProjectStore(state => state.setCurrentProject)
   const reorderProjects = useProjectStore(state => state.reorderProjects)
+
+  const [isReordering, setIsReordering] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -106,10 +109,34 @@ export const Project = () => {
       <div className="flex flex-col gap-4 mx-auto container p-4 mb-6">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-medium">Select a Project</h2>
-          <Button onClick={handleCreateProject}>
-            <Plus size={18} className="mr-2" />
-            Create New Project
-          </Button>
+          <div className="flex gap-2">
+            {isReordering && (
+              <Button
+                variant="default"
+                onClick={() => {
+                  setIsReordering(false)
+                }}
+              >
+                <Check className="h-4 w-4" />
+                Done
+              </Button>
+            )}
+
+            <Button
+              variant={isReordering ? "outline" : "outline"}
+              disabled={isReordering}
+              onClick={() => {
+                setIsReordering(true)
+              }}
+            >
+              <Move className="h-4 w-4" />
+              Reorder
+            </Button>
+            <Button onClick={handleCreateProject}>
+              <Plus size={18} />
+              Create New Project
+            </Button>
+          </div>
         </div>
 
         {projects.length === 0 ? (
@@ -121,22 +148,52 @@ export const Project = () => {
             </p>
           </div>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={projects.map(p => p.id)}
-              strategy={rectSortingStrategy}
+          isReordering ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projects.map(p => (
-                  <SortableProjectCard key={p.id} project={p} />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+              <SortableContext
+                items={projects.map(p => p.id)}
+                strategy={rectSortingStrategy}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {projects.map(p => (
+                    <SortableProjectCard key={p.id} project={p} />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.map(p => {
+                const totalItems = p.translations.length + p.transcriptions.length + p.extractions.length
+                return (
+                  <Card
+                    key={p.id}
+                    className="cursor-pointer hover:border-primary transition-colors overflow-hidden border border-muted h-full flex flex-col"
+                    onClick={() => setCurrentProject(p.id)}
+                  >
+                    <CardHeader className="pb-2">
+                      <CardTitle>{p.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pb-4 flex flex-col flex-1">
+                      <div className="flex-1" />
+                      <div className="flex flex-col gap-1 mt-auto">
+                        <p className="text-sm text-muted-foreground">
+                          {totalItems} {totalItems === 1 ? 'item' : 'items'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Updated: {new Date(p.updatedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          )
         )}
       </div>
     )
