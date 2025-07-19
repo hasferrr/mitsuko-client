@@ -11,7 +11,7 @@ export const countUntranslatedLines = (subtitles: SubtitleTranslated[]): CountUn
 
   // Single pass to collect indices for untranslated and missing original lines
   subtitles.forEach((sub, index) => {
-    if (sub.translated.trim() === "") {
+    if (sub.translated.trim() === "" && sub.content.trim() !== "") {
       untranslatedIndices.push(index + 1) // +1 to convert to 1-based index
     }
 
