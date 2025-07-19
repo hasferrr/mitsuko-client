@@ -1,5 +1,5 @@
 export function isASS(content: string): boolean {
-  return content.trim().startsWith('[Script Info]')
+  return content.trim().includes('[Script Info]')
 }
 
 export function isSRT(content: string): boolean {
