@@ -6,8 +6,8 @@ import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-setting
 import { getAdvancedSettings, getBasicSettings } from "@/lib/db/settings"
 
 interface UseSettingsProps {
-  basicSettingsId: string
-  advancedSettingsId: string
+  basicSettingsId: string | null
+  advancedSettingsId: string | null
 }
 
 export const useSettings = ({ basicSettingsId, advancedSettingsId }: UseSettingsProps) => {
@@ -17,6 +17,8 @@ export const useSettings = ({ basicSettingsId, advancedSettingsId }: UseSettings
   const upsertAdvancedSettingsData = useAdvancedSettingsStore((state) => state.upsertData)
 
   useEffect(() => {
+    if (!basicSettingsId || !advancedSettingsId) return
+
     setSettingsCurrentId(basicSettingsId)
     setAdvancedSettingsCurrentId(advancedSettingsId)
 
