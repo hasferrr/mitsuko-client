@@ -26,6 +26,7 @@ import {
   Loader2,
   Settings,
   ArrowLeft,
+  Upload,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -49,6 +50,8 @@ import { useSettings } from "@/hooks/use-settings"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { exportProject } from "@/lib/db/db-io"
+import { toast } from "sonner"
 
 export const ProjectMain = () => {
   const router = useRouter()
@@ -174,6 +177,27 @@ export const ProjectMain = () => {
     await sleep(1000)
     setIsDeleteModalOpen(false)
     await deleteProject(currentProject.id)
+  }
+
+  const handleExportProject = async () => {
+    try {
+      const result = await exportProject(currentProject.id)
+      if (result) {
+        const blob = new Blob([result.content], { type: "application/json" })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `mitsuko-project-${result.name.replace(/\s+/g, "_")}-${new Date().toISOString().split("T")[0]}.json`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        toast.success("Project exported successfully")
+      }
+    } catch (error) {
+      console.error("Error exporting project:", error)
+      toast.error("Failed to export project")
+    }
   }
 
   const translationComponentList = translations.map((translation) => (
@@ -346,6 +370,13 @@ export const ProjectMain = () => {
             >
               <Settings size={4 * 5} />
               Settings
+            </button>
+            <button
+              onClick={handleExportProject}
+              className="flex items-center gap-2 hover:underline"
+            >
+              <Upload size={4 * 5} />
+              Export
             </button>
             <button
               onClick={() => setIsDeleteModalOpen(true)}
