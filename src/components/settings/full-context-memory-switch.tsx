@@ -5,8 +5,13 @@ import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { SettingsParentType } from "@/types/project"
 
-export const FullContextMemorySwitch = memo(() => {
+interface Props {
+  parent: SettingsParentType
+}
+
+export const FullContextMemorySwitch = memo(({ parent }: Props) => {
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
   const setIsUseFullContextMemory = useAdvancedSettingsStore((state) => state.setIsUseFullContextMemory)
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
@@ -15,12 +20,12 @@ export const FullContextMemorySwitch = memo(() => {
     if (checked) {
       setIsConfirmDialogOpen(true)
     } else {
-      setIsUseFullContextMemory(false)
+      setIsUseFullContextMemory(false, parent)
     }
   }
 
   const handleConfirm = () => {
-    setIsUseFullContextMemory(true)
+    setIsUseFullContextMemory(true, parent)
     setIsConfirmDialogOpen(false)
   }
 

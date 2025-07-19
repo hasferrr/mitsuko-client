@@ -34,14 +34,14 @@ interface SettingsStore {
   setTargetLanguage: (language: string, parent: SettingsParentType) => void
   setModelDetail: (model: Model | null, parent: SettingsParentType) => void
   setIsUseCustomModel: (value: boolean, parent: SettingsParentType) => void
-  setContextDocument: (doc: string) => void
-  setCustomInstructions: (instructions: string) => void
-  setIsFewShotEnabled: (isEnabled: boolean) => void
-  setFewShotValue: (value: string) => void
-  setFewShotLinkedId: (id: string) => void
-  setFewShotType: (type: 'manual' | 'linked') => void
-  setFewShotStartIndex: (index?: number) => void
-  setFewShotEndIndex: (index?: number) => void
+  setContextDocument: (doc: string, parent: SettingsParentType) => void
+  setCustomInstructions: (instructions: string, parent: SettingsParentType) => void
+  setIsFewShotEnabled: (isEnabled: boolean, parent: SettingsParentType) => void
+  setFewShotValue: (value: string, parent: SettingsParentType) => void
+  setFewShotLinkedId: (id: string, parent: SettingsParentType) => void
+  setFewShotType: (type: 'manual' | 'linked', parent: SettingsParentType) => void
+  setFewShotStartIndex: (index: number, parent: SettingsParentType) => void
+  setFewShotEndIndex: (index: number, parent: SettingsParentType) => void
 }
 
 const getOrCreateBasicSettings = async <T>(
@@ -107,7 +107,6 @@ const updateSettings = async <K extends keyof Omit<BasicSettings, 'id' | 'create
         store.getState().updateProject(data.id, { defaultBasicSettingsId: basicSettings.id })
       }
     }
-
     if (basicSettings) {
       await updateBasicSettings(basicSettings.id, { [field]: value })
     }
@@ -244,65 +243,65 @@ export const useSettingsStore = create<SettingsStore>()(
         get().mutateData("isUseCustomModel", value)
         updateSettings("isUseCustomModel", value, type)
       },
-      setContextDocument: (doc) => {
+      setContextDocument: (doc, parent) => {
         const id = get().currentId
-        if (!id) return
+        if (!id && parent === 'translation') return
         get().mutateData("contextDocument", doc)
-        updateSettings("contextDocument", doc, "translation")
+        updateSettings("contextDocument", doc, parent)
       },
-      setCustomInstructions: (instructions) => {
+      setCustomInstructions: (instructions, parent) => {
         const id = get().currentId
-        if (!id) return
+        if (!id && parent === 'translation') return
         get().mutateData("customInstructions", instructions)
-        updateSettings("customInstructions", instructions, "translation")
+        updateSettings("customInstructions", instructions, parent)
       },
-      setIsFewShotEnabled: (isEnabled) => {
+      setIsFewShotEnabled: (isEnabled, parent) => {
         const id = get().currentId
-        if (!id) return
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        if (!id && parent === 'translation') return
+        const currentFewShot = (id ? get().data[id]?.fewShot : undefined) ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, isEnabled }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, "translation")
+        updateSettings("fewShot", newFewShot, parent)
       },
-      setFewShotValue: (value) => {
+      setFewShotValue: (value, parent) => {
         const id = get().currentId
-        if (!id) return
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        if (!id && parent === 'translation') return
+        const currentFewShot = (id ? get().data[id]?.fewShot : undefined) ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, value }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, "translation")
+        updateSettings("fewShot", newFewShot, parent)
       },
-      setFewShotLinkedId: (linkedId) => {
+      setFewShotLinkedId: (linkedId, parent) => {
         const id = get().currentId
-        if (!id) return
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        if (!id && parent === 'translation') return
+        const currentFewShot = (id ? get().data[id]?.fewShot : undefined) ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, linkedId }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, "translation")
+        updateSettings("fewShot", newFewShot, parent)
       },
-      setFewShotType: (type) => {
+      setFewShotType: (type, parent) => {
         const id = get().currentId
-        if (!id) return
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        if (!id && parent === 'translation') return
+        const currentFewShot = (id ? get().data[id]?.fewShot : undefined) ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, type }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, "translation")
+        updateSettings("fewShot", newFewShot, parent)
       },
-      setFewShotStartIndex: (index) => {
+      setFewShotStartIndex: (index, parent) => {
         const id = get().currentId
-        if (!id) return
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        if (!id && parent === 'translation') return
+        const currentFewShot = (id ? get().data[id]?.fewShot : undefined) ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, fewShotStartIndex: index }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, "translation")
+        updateSettings("fewShot", newFewShot, parent)
       },
-      setFewShotEndIndex: (index) => {
+      setFewShotEndIndex: (index, parent) => {
         const id = get().currentId
-        if (!id) return
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
+        if (!id && parent === 'translation') return
+        const currentFewShot = (id ? get().data[id]?.fewShot : undefined) ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, fewShotEndIndex: index }
         get().mutateData("fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, "translation")
+        updateSettings("fewShot", newFewShot, parent)
       },
     }),
     {

@@ -47,9 +47,9 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <LanguageSelection type="project" />
+          <LanguageSelection parent="project" />
           <ModelSelection
-            type="project"
+            parent="project"
             showUseCustomModelSwitch={false}
           />
           <Accordion type="single" collapsible className="border-none">
@@ -60,7 +60,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
               <AccordionContent className="pt-4 pb-0">
                 <div className="space-y-4">
                   <div className="border border-muted-foreground/20 rounded-md p-4">
-                    <TemperatureSlider type="project" />
+                    <TemperatureSlider parent="project" />
                   </div>
                 </div>
               </AccordionContent>

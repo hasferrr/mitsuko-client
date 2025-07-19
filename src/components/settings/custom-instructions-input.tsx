@@ -11,8 +11,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Label } from "@/components/ui/label"
 import { customInstructionPresets } from "@/constants/custom-instructions"
 import { useCustomInstructionStore } from "@/stores/data/use-custom-instruction-store"
+import { SettingsParentType } from "@/types/project"
 
-export const CustomInstructionsInput = memo(() => {
+interface Props {
+  parent: SettingsParentType
+}
+
+export const CustomInstructionsInput = memo(({ parent }: Props) => {
   const customInstructions = useSettingsStore((state) => state.getCustomInstructions())
   const setCustomInstructions = useSettingsStore((state) => state.setCustomInstructions)
   const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
@@ -31,20 +36,20 @@ export const CustomInstructionsInput = memo(() => {
 
   const handleCustomInstructionsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
-    setCustomInstructions(e.target.value)
+    setCustomInstructions(e.target.value, parent)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`
   }
 
   const handlePresetSelect = (instruction: string) => {
     setHasChanges(true)
-    setCustomInstructions(instruction)
+    setCustomInstructions(instruction, parent)
     setIsPresetsDialogOpen(false)
   }
 
   const handleLibrarySelect = (instruction: string) => {
     setHasChanges(true)
-    setCustomInstructions(instruction)
+    setCustomInstructions(instruction, parent)
     setIsLibraryDialogOpen(false)
   }
 

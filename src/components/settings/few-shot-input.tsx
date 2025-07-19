@@ -16,8 +16,13 @@ import { db } from "@/lib/db/db"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import { SettingsParentType } from "@/types/project"
 
-export const FewShotInput = memo(() => {
+interface Props {
+  parent: SettingsParentType
+}
+
+export const FewShotInput = memo(({ parent }: Props) => {
   const isFewShotEnabled = useSettingsStore((state) => state.getFewShotIsEnabled())
   const setIsFewShotEnabled = useSettingsStore((state) => state.setIsFewShotEnabled)
   const fewShotValue = useSettingsStore((state) => state.getFewShotValue())
@@ -58,16 +63,16 @@ export const FewShotInput = memo(() => {
           const lineCount = translation.subtitles?.length || 0
           setLinkedTranslationLineCount(lineCount)
           if (fewShotStartIndex === undefined || fewShotStartIndex < 1) {
-            setFewShotStartIndex(1)
+            setFewShotStartIndex(1, parent)
           }
           if (fewShotEndIndex === undefined || fewShotEndIndex > lineCount || fewShotEndIndex < (fewShotStartIndex || 1)) {
-            setFewShotEndIndex(lineCount > 0 ? lineCount : 1)
+            setFewShotEndIndex(lineCount > 0 ? lineCount : 1, parent)
           }
         } else {
           setLinkedTranslationTitle(null)
           setLinkedTranslationLineCount(null)
-          setFewShotStartIndex(undefined)
-          setFewShotEndIndex(undefined)
+          setFewShotStartIndex(0, parent)
+          setFewShotEndIndex(0, parent)
         }
       })
     }
@@ -75,14 +80,14 @@ export const FewShotInput = memo(() => {
 
   const handleFewShotValueChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
-    setFewShotValue(e.target.value)
+    setFewShotValue(e.target.value, parent)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`
   }
 
   const handleEnableChange = (enabled: boolean) => {
     setHasChanges(true)
-    setIsFewShotEnabled(enabled)
+    setIsFewShotEnabled(enabled, parent)
     if (enabled && fewShotType === 'linked' && !fewShotLinkedId) {
       loadAvailableTranslations()
     }
@@ -90,8 +95,8 @@ export const FewShotInput = memo(() => {
 
   const handleTypeChange = (type: 'manual' | 'linked') => {
     setHasChanges(true)
-    setIsFewShotEnabled(true)
-    setFewShotType(type)
+    setIsFewShotEnabled(true, parent)
+    setFewShotType(type, parent)
     if (type === 'linked' && !fewShotLinkedId) {
       loadAvailableTranslations()
     }
@@ -99,24 +104,24 @@ export const FewShotInput = memo(() => {
 
   const handleLinkTranslationSelect = async (translation: Translation) => {
     setHasChanges(true)
-    setIsFewShotEnabled(true)
-    setFewShotLinkedId(translation.id)
-    setFewShotType('linked')
+    setIsFewShotEnabled(true, parent)
+    setFewShotLinkedId(translation.id, parent)
+    setFewShotType('linked', parent)
     setLinkedTranslationTitle(translation.title)
     const lineCount = translation.subtitles?.length || 0
     setLinkedTranslationLineCount(lineCount)
-    setFewShotStartIndex(1)
-    setFewShotEndIndex(Math.min(lineCount > 0 ? lineCount : 1, 20))
+    setFewShotStartIndex(1, parent)
+    setFewShotEndIndex(Math.min(lineCount > 0 ? lineCount : 1, 20), parent)
     setIsLinkTranslationDialogOpen(false)
   }
 
   const handleUnlinkTranslation = () => {
     setHasChanges(true)
-    setFewShotLinkedId("")
+    setFewShotLinkedId("", parent)
     setLinkedTranslationTitle(null)
     setLinkedTranslationLineCount(null)
-    setFewShotStartIndex(undefined)
-    setFewShotEndIndex(undefined)
+    setFewShotStartIndex(0, parent)
+    setFewShotEndIndex(0, parent)
   }
 
   const openLinkDialog = () => {
@@ -128,14 +133,14 @@ export const FewShotInput = memo(() => {
     const value = e.target.value === '' ? undefined : parseInt(e.target.value, 10)
     setHasChanges(true)
     if (value === undefined) {
-      setFewShotStartIndex(undefined)
+      setFewShotStartIndex(0, parent)
       return
     }
     if (!isNaN(value) && linkedTranslationLineCount !== null) {
       const newStartIndex = Math.max(1, Math.min(value, linkedTranslationLineCount))
-      setFewShotStartIndex(newStartIndex)
+      setFewShotStartIndex(newStartIndex, parent)
       if (fewShotEndIndex !== undefined && newStartIndex > fewShotEndIndex) {
-        setFewShotEndIndex(newStartIndex)
+        setFewShotEndIndex(newStartIndex, parent)
       }
     }
   }
@@ -144,12 +149,12 @@ export const FewShotInput = memo(() => {
     const value = e.target.value === '' ? undefined : parseInt(e.target.value, 10)
     setHasChanges(true)
     if (value === undefined) {
-      setFewShotEndIndex(undefined)
+      setFewShotEndIndex(0, parent)
       return
     }
     if (!isNaN(value) && linkedTranslationLineCount !== null) {
       const newEndIndex = Math.max(fewShotStartIndex || 1, Math.min(value, linkedTranslationLineCount))
-      setFewShotEndIndex(newEndIndex)
+      setFewShotEndIndex(newEndIndex, parent)
     }
   }
 

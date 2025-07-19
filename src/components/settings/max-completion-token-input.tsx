@@ -8,7 +8,11 @@ import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-setting
 import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constants/limits"
 import { SettingsParentType } from "@/types/project"
 
-export const MaxCompletionTokenInput = memo(({ type }: { type: SettingsParentType }) => {
+interface MaxCompletionTokenInputProps {
+  parent: SettingsParentType
+}
+
+export const MaxCompletionTokenInput = memo(({ parent }: MaxCompletionTokenInputProps) => {
   const modelDetail = useSettingsStore((state) => state.getModelDetail())
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
@@ -26,13 +30,13 @@ export const MaxCompletionTokenInput = memo(({ type }: { type: SettingsParentTyp
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10) // Prevent NaN
       num = Math.min(num, maxToken)
-      setMaxCompletionTokens(value === "" ? 0 : num, type)
+      setMaxCompletionTokens(value === "" ? 0 : num, parent)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setMaxCompletionTokens(Math.min(Math.max(parseInt(value, 10), MAX_COMPLETION_TOKENS_MIN), maxToken), type)
+    setMaxCompletionTokens(Math.min(Math.max(parseInt(value, 10), MAX_COMPLETION_TOKENS_MIN), maxToken), parent)
   }
 
   return (
@@ -41,7 +45,7 @@ export const MaxCompletionTokenInput = memo(({ type }: { type: SettingsParentTyp
         <label className="text-sm font-medium">Max Completion Token</label>
         <Switch
           checked={!isMaxCompletionTokensAuto}
-          onCheckedChange={(checked) => setIsMaxCompletionTokensAuto(!checked, type)}
+          onCheckedChange={(checked) => setIsMaxCompletionTokensAuto(!checked, parent)}
         />
       </div>
       <Input

@@ -6,7 +6,11 @@ import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { LANGUAGES } from "@/constants/lang"
 import { SettingsParentType } from "@/types/project"
 
-export const LanguageSelection = memo(({ type }: { type: SettingsParentType }) => {
+interface LanguageSelectionProps {
+  parent: SettingsParentType
+}
+
+export const LanguageSelection = memo(({ parent }: LanguageSelectionProps) => {
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
   const setSourceLanguage = useSettingsStore((state) => state.setSourceLanguage)
   const targetLanguage = useSettingsStore((state) => state.getTargetLanguage())
@@ -19,7 +23,7 @@ export const LanguageSelection = memo(({ type }: { type: SettingsParentType }) =
         <ComboBox
           data={LANGUAGES}
           value={sourceLanguage}
-          setValue={(t) => setSourceLanguage(t, type)}
+          setValue={(t) => setSourceLanguage(t, parent)}
           name="language"
         />
       </div>
@@ -28,7 +32,7 @@ export const LanguageSelection = memo(({ type }: { type: SettingsParentType }) =
         <ComboBox
           data={LANGUAGES}
           value={targetLanguage}
-          setValue={(t) => setTargetLanguage(t, type)}
+          setValue={(t) => setTargetLanguage(t, parent)}
           name="language"
         />
       </div>

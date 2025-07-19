@@ -7,8 +7,13 @@ import { ChevronsRight } from "lucide-react"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { SettingsParentType } from "@/types/project"
 
-export const StartIndexInput = memo(() => {
+interface Props {
+  parent: SettingsParentType
+}
+
+export const StartIndexInput = memo(({ parent }: Props) => {
   const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex())
   const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex())
   const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
@@ -23,15 +28,15 @@ export const StartIndexInput = memo(() => {
       let num = parseInt(value, 10)
       num = Math.min(num, subtitles.length)
       num = value === "" ? 0 : num
-      setStartIndex(num)
+      setStartIndex(num, parent)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setStartIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
+    setStartIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length), parent)
     if (startIndex > endIndex) {
-      setEndIndex(Math.max(1, startIndex))
+      setEndIndex(Math.max(1, startIndex), parent)
     }
   }
 
@@ -41,8 +46,8 @@ export const StartIndexInput = memo(() => {
         subtitles[i].translated.trim() === "" &&
         subtitles[i].content.trim() !== ""
       ) {
-        setStartIndex(i + 1)
-        setEndIndex(subtitles.length)
+        setStartIndex(i + 1, parent)
+        setEndIndex(subtitles.length, parent)
         break
       }
     }

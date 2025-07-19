@@ -104,9 +104,9 @@ export function ModelSelector({
     }
 
     if (model.default?.isUseStructuredOutput !== undefined) {
-      setIsUseStructuredOutput(model.default.isUseStructuredOutput)
+      setIsUseStructuredOutput(model.default.isUseStructuredOutput, type)
     } else {
-      setIsUseStructuredOutput(model.structuredOutput)
+      setIsUseStructuredOutput(model.structuredOutput, type)
     }
 
     if (model.default?.isMaxCompletionTokensAuto !== undefined) {

@@ -4,8 +4,13 @@ import { memo } from "react"
 import { Input } from "@/components/ui/input"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SPLIT_SIZE_MIN, SPLIT_SIZE_MAX } from "@/constants/limits"
+import { SettingsParentType } from "@/types/project"
 
-export const SplitSizeInput = memo(() => {
+interface Props {
+  parent: SettingsParentType
+}
+
+export const SplitSizeInput = memo(({ parent }: Props) => {
   const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize())
   const setSplitSize = useAdvancedSettingsStore((state) => state.setSplitSize)
 
@@ -15,13 +20,13 @@ export const SplitSizeInput = memo(() => {
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10) // Prevent NaN
       num = Math.min(num, SPLIT_SIZE_MAX)
-      setSplitSize(value === "" ? 0 : num)
+      setSplitSize(value === "" ? 0 : num, parent)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setSplitSize(Math.min(Math.max(parseInt(value, 10), SPLIT_SIZE_MIN), SPLIT_SIZE_MAX))
+    setSplitSize(Math.min(Math.max(parseInt(value, 10), SPLIT_SIZE_MIN), SPLIT_SIZE_MAX), parent)
   }
 
   return (

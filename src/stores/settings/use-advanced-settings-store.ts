@@ -27,17 +27,21 @@ interface AdvancedSettingsStore {
   getIsBetterContextCaching: () => boolean
   getIsAdvancedReasoningEnabled: () => boolean
   setTemperature: (value: number, parent: SettingsParentType) => void
-  setStartIndex: (value: number) => void
-  setEndIndex: (value: number) => void
-  setSplitSize: (value: number) => void
+  setStartIndex: (value: number, parent: SettingsParentType) => void
+  setEndIndex: (value: number, parent: SettingsParentType) => void
+  setSplitSize: (value: number, parent: SettingsParentType) => void
   setMaxCompletionTokens: (value: number, parent: SettingsParentType) => void
-  setIsUseStructuredOutput: (value: boolean) => void
-  setIsUseFullContextMemory: (value: boolean) => void
-  setIsBetterContextCaching: (value: boolean) => void
+  setIsUseStructuredOutput: (value: boolean, parent: SettingsParentType) => void
+  setIsUseFullContextMemory: (value: boolean, parent: SettingsParentType) => void
+  setIsBetterContextCaching: (value: boolean, parent: SettingsParentType) => void
   setIsAdvancedReasoningEnabled: (value: boolean, parent: SettingsParentType) => void
   setIsMaxCompletionTokensAuto: (value: boolean, parent: SettingsParentType) => void
-  resetIndex: (s?: number, e?: number) => void
-  resetAdvancedSettings: () => void
+  resetIndex: (
+    s: number | null,
+    e: number | null,
+    parent: SettingsParentType,
+  ) => void
+  resetAdvancedSettings: (parent: SettingsParentType) => void
   applyModelDefaults: (
     newSettingsInput: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>,
     modelDetail: Model | null
@@ -211,23 +215,23 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         get().mutateData("temperature", value)
         updateSettings("temperature", value, parent)
       },
-      setStartIndex: (value) => {
+      setStartIndex: (value, parent) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("startIndex", value)
-        updateSettings("startIndex", value, "translation")
+        updateSettings("startIndex", value, parent)
       },
-      setEndIndex: (value) => {
+      setEndIndex: (value, parent) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("endIndex", value)
-        updateSettings("endIndex", value, "translation")
+        updateSettings("endIndex", value, parent)
       },
-      setSplitSize: (value) => {
+      setSplitSize: (value, parent) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("splitSize", value)
-        updateSettings("splitSize", value, "translation")
+        updateSettings("splitSize", value, parent)
       },
       // Method for both translation and extraction
       setMaxCompletionTokens: (value, parent) => {
@@ -236,23 +240,23 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         get().mutateData("maxCompletionTokens", value)
         updateSettings("maxCompletionTokens", value, parent)
       },
-      setIsUseStructuredOutput: (value) => {
+      setIsUseStructuredOutput: (value, parent) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isUseStructuredOutput", value)
-        updateSettings("isUseStructuredOutput", value, "translation")
+        updateSettings("isUseStructuredOutput", value, parent)
       },
-      setIsUseFullContextMemory: (value) => {
+      setIsUseFullContextMemory: (value, parent) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isUseFullContextMemory", value)
-        updateSettings("isUseFullContextMemory", value, "translation")
+        updateSettings("isUseFullContextMemory", value, parent)
       },
-      setIsBetterContextCaching: (value) => {
+      setIsBetterContextCaching: (value, parent) => {
         const id = get().currentId
         if (!id) return
         get().mutateData("isBetterContextCaching", value)
-        updateSettings("isBetterContextCaching", value, "translation")
+        updateSettings("isBetterContextCaching", value, parent)
       },
       setIsAdvancedReasoningEnabled: (value, parent) => {
         const id = get().currentId
@@ -267,7 +271,7 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         get().mutateData("isMaxCompletionTokensAuto", value)
         updateSettings("isMaxCompletionTokensAuto", value, parent)
       },
-      resetIndex: (s?: number, e?: number) => {
+      resetIndex: (s, e, parent) => {
         const id = get().currentId
         if (!id) return
         const translationData = useTranslationDataStore.getState().data[id]
@@ -283,10 +287,10 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         store.mutateData("endIndex", endIndex)
 
         // Update both indices in the database
-        updateSettings("startIndex", startIndex, "translation")
-        updateSettings("endIndex", endIndex, "translation")
+        updateSettings("startIndex", startIndex, parent)
+        updateSettings("endIndex", endIndex, parent)
       },
-      resetAdvancedSettings: () => {
+      resetAdvancedSettings: (parent) => {
         const id = get().currentId
         if (!id) return
 
@@ -315,7 +319,7 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
 
         // Update all settings in the database
         Object.entries(newSettings).forEach(([key, value]) => {
-          updateSettings(key as keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>, value, "translation")
+          updateSettings(key as keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>, value, parent)
         })
       },
       applyModelDefaults: (

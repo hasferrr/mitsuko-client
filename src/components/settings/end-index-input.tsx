@@ -4,8 +4,13 @@ import { memo } from "react"
 import { Input } from "@/components/ui/input"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+import { SettingsParentType } from "@/types/project"
 
-export const EndIndexInput = memo(() => {
+interface Props {
+  parent: SettingsParentType
+}
+
+export const EndIndexInput = memo(({ parent }: Props) => {
   const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex())
   const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex())
   const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
@@ -20,15 +25,15 @@ export const EndIndexInput = memo(() => {
       let num = parseInt(value, 10)
       num = Math.min(num, subtitles.length)
       num = value === "" ? 0 : num
-      setEndIndex(num)
+      setEndIndex(num, parent)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setEndIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
+    setEndIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length), parent)
     if (endIndex < startIndex) {
-      setStartIndex(Math.max(1, endIndex))
+      setStartIndex(Math.max(1, endIndex), parent)
     }
   }
 

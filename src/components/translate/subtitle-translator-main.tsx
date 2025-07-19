@@ -671,7 +671,7 @@ export default function SubtitleTranslatorMain({
         }
 
         setSubtitles(currentId, parsedSubtitles)
-        resetIndex(1, parsedSubtitles.length)
+        resetIndex(1, parsedSubtitles.length, "translation")
 
         const fileName = pendingFile.name.split('.')
         fileName.pop()
@@ -693,7 +693,7 @@ export default function SubtitleTranslatorMain({
     if (!pendingContextFile) return
     try {
       const text = await pendingContextFile.text()
-      setContextDocument(text)
+      setContextDocument(text, "translation")
     } catch (error) {
       console.error("Error reading context file:", error)
     } finally {
@@ -1097,16 +1097,16 @@ export default function SubtitleTranslatorMain({
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
-                  <LanguageSelection type="translation" />
-                  <ModelSelection type="translation" />
+                  <LanguageSelection parent="translation" />
+                  <ModelSelection parent="translation" />
                   <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
-                    <ContextDocumentInput />
+                    <ContextDocumentInput parent="translation" />
                   </DragAndDrop>
                   <div className="m-[2px]">
-                    <CustomInstructionsInput />
+                    <CustomInstructionsInput parent="translation" />
                   </div>
                   <div className="m-[2px]">
-                    <FewShotInput />
+                    <FewShotInput parent="translation" />
                   </div>
                 </CardContent>
               </Card>
@@ -1116,19 +1116,19 @@ export default function SubtitleTranslatorMain({
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
                   <ModelDetail />
-                  <TemperatureSlider type="translation" />
-                  <StartIndexInput />
-                  <EndIndexInput />
+                  <TemperatureSlider parent="translation" />
+                  <StartIndexInput parent="translation" />
+                  <EndIndexInput parent="translation" />
                   <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
                     <AdvancedReasoningSwitch />
                   </div>
                   <div className="text-sm font-semibold">Technical Options</div>
-                  <SplitSizeInput />
-                  <MaxCompletionTokenInput type="translation" />
-                  <StructuredOutputSwitch />
-                  <FullContextMemorySwitch />
-                  <BetterContextCachingSwitch />
-                  <AdvancedSettingsResetButton />
+                  <SplitSizeInput parent="translation" />
+                  <MaxCompletionTokenInput parent="translation" />
+                  <StructuredOutputSwitch parent="translation" />
+                  <FullContextMemorySwitch parent="translation" />
+                  <BetterContextCachingSwitch parent="translation" />
+                  <AdvancedSettingsResetButton parent="translation" />
                 </CardContent>
               </Card>
             </TabsContent>

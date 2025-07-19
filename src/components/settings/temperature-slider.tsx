@@ -8,7 +8,11 @@ import { useLocalSettingsStore } from '@/stores/use-local-settings-store'
 import { TEMPERATURE_MIN, TEMPERATURE_MAX } from "@/constants/limits"
 import { SettingsParentType } from "@/types/project"
 
-export const TemperatureSlider = memo(({ type }: { type: SettingsParentType }) => {
+interface TemperatureSliderProps {
+  parent: SettingsParentType
+}
+
+export const TemperatureSlider = memo(({ parent }: TemperatureSliderProps) => {
   const temperature = useAdvancedSettingsStore((state) => state.getTemperature())
   const setTemperature = useAdvancedSettingsStore((state) => state.setTemperature)
   const isAutoTemperatureEnabled = useLocalSettingsStore((state) => state.isAutoTemperatureEnabled)
@@ -24,7 +28,7 @@ export const TemperatureSlider = memo(({ type }: { type: SettingsParentType }) =
       </div>
       <Slider
         value={[temperature]}
-        onValueChange={([value]) => setTemperature(value, type)}
+        onValueChange={([value]) => setTemperature(value, parent)}
         max={TEMPERATURE_MAX}
         min={TEMPERATURE_MIN}
         step={0.1}

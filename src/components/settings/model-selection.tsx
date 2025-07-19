@@ -12,10 +12,15 @@ import { ModelSelector } from "@/components/model-selector"
 import WhichModels from "@/components/pricing/which-models"
 import { SettingsParentType } from "@/types/project"
 
+interface ModelSelectionProps {
+  parent: SettingsParentType
+  showUseCustomModelSwitch?: boolean
+}
+
 export const ModelSelection = memo(({
-  type,
+  parent,
   showUseCustomModelSwitch = true
-}: { type: SettingsParentType, showUseCustomModelSwitch?: boolean }) => {
+}: ModelSelectionProps) => {
   // Settings Store
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
   const setIsUseCustomModel = useSettingsStore((state) => state.setIsUseCustomModel)
@@ -34,9 +39,9 @@ export const ModelSelection = memo(({
 
   useEffect(() => {
     if (!isThirdPartyModelEnabled && isUseCustomModel) {
-      setIsUseCustomModel(false, type)
+      setIsUseCustomModel(false, parent)
     }
-  }, [isThirdPartyModelEnabled, isUseCustomModel, setIsUseCustomModel, type])
+  }, [isThirdPartyModelEnabled, isUseCustomModel, setIsUseCustomModel, parent])
 
   return (
     <>
@@ -46,7 +51,7 @@ export const ModelSelection = memo(({
           <div className="flex-grow">
             <ModelSelector
               disabled={isUseCustomModel}
-              type={type}
+              type={parent}
               className="w-full"
             />
           </div>
@@ -63,7 +68,7 @@ export const ModelSelection = memo(({
       </div>
       {showUseCustomModelSwitch && isThirdPartyModelEnabled && (
         <div className="flex items-center space-x-2">
-          <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={(checked) => setIsUseCustomModel(checked, type)} />
+          <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={(checked) => setIsUseCustomModel(checked, parent)} />
           <label htmlFor="custom-model" className="text-sm font-medium">
             Use Custom Model
           </label>

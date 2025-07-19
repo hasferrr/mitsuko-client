@@ -4,8 +4,13 @@ import { memo } from "react"
 import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { SettingsParentType } from "@/types/project"
 
-export const StructuredOutputSwitch = memo(() => {
+interface Props {
+  parent: SettingsParentType
+}
+
+export const StructuredOutputSwitch = memo(({ parent }: Props) => {
   const modelDetail = useSettingsStore((state) => state.getModelDetail())
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
   const useStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput())
@@ -20,7 +25,7 @@ export const StructuredOutputSwitch = memo(() => {
         <Switch
           disabled={disabled}
           checked={useStructuredOutput}
-          onCheckedChange={setUseStructuredOutput}
+          onCheckedChange={(value) => setUseStructuredOutput(value, parent)}
         />
       </div>
       <p className="text-xs text-muted-foreground">
