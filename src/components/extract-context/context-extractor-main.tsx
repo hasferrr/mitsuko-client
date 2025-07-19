@@ -316,7 +316,7 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
 
       const requestBody = {
         input: {
-          episode: Number(episodeNumber),
+          episode: episodeNumber.trim(),
           subtitles: subtitles,
           previous_context: previousContext,
         },
