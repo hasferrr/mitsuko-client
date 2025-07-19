@@ -35,7 +35,7 @@ import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-setting
 import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constants/limits"
 import { getContent } from "@/lib/parser/parser"
 import { minMax, cn } from "@/lib/utils"
-import { MaxCompletionTokenInput, ModelSelection } from "../settings-inputs"
+import { MaxCompletionTokenInput, ModelSelection } from "../settings"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"

@@ -41,7 +41,7 @@ import {
   CustomInstructionsInput,
   FewShotInput,
   AdvancedReasoningSwitch,
-} from "../settings-inputs"
+} from "../settings"
 import {
   Subtitle,
   SubOnlyTranslated,

@@ -12,7 +12,7 @@ import {
   LanguageSelection,
   ModelSelection,
   TemperatureSlider,
-} from "@/components/settings-inputs"
+} from "@/components/settings"
 import { Button } from "@/components/ui/button"
 import {
   Accordion,
