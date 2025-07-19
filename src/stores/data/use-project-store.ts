@@ -179,14 +179,17 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   },
 
   reorderProjects: async (newOrder) => {
-    set({ loading: true })
+    const previousProjects = get().projects
+    const reordered = newOrder
+      .map(id => previousProjects.find(p => p.id === id))
+      .filter((p): p is NonNullable<typeof p> => Boolean(p))
+    set({ projects: reordered })
+
     try {
       await updateProjectOrderDB(newOrder)
-      const projects = await getAllProjectsDB()
-      set({ projects, loading: false })
     } catch (error) {
       console.error('Failed to reorder projects', error)
-      set({ error: 'Failed to reorder projects', loading: false })
+      set({ projects: previousProjects, error: 'Failed to reorder projects' })
     }
   }
 }))
