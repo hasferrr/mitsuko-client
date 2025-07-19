@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, FileText, GripVertical } from "lucide-react"
+import { Plus, FileText, GripVertical, MoreHorizontal, Trash, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -23,6 +23,16 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { toast } from "sonner"
+import { exportProject } from "@/lib/db/db-io"
+import { DeleteDialogue } from "../ui-custom/delete-dialogue"
+import { useState } from "react"
 
 export const Project = () => {
   const projects = useProjectStore(state => state.projects)
@@ -30,6 +40,10 @@ export const Project = () => {
   const createProject = useProjectStore(state => state.createProject)
   const setCurrentProject = useProjectStore(state => state.setCurrentProject)
   const reorderProjects = useProjectStore(state => state.reorderProjects)
+  const deleteProject = useProjectStore(state => state.deleteProject)
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -50,6 +64,35 @@ export const Project = () => {
       const newIndex = projects.findIndex(p => p.id === over.id)
       const newOrder = arrayMove(projects.map(p => p.id), oldIndex, newIndex)
       await reorderProjects(newOrder)
+    }
+  }
+
+  const handleExportProject = async (projectId: string) => {
+    try {
+      const result = await exportProject(projectId)
+      if (result) {
+        const blob = new Blob([result.content], { type: "application/json" })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `mitsuko-project-${result.name.replace(/\s+/g, "_")}-${new Date().toISOString().split("T")[0]}.json`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        toast.success("Project exported successfully")
+      }
+    } catch (error) {
+      console.error("Error exporting project:", error)
+      toast.error("Failed to export project")
+    }
+  }
+
+  const handleDelete = async () => {
+    if (projectToDelete) {
+      await deleteProject(projectToDelete)
+      setIsDeleteModalOpen(false)
+      setProjectToDelete(null)
     }
   }
 
@@ -83,12 +126,43 @@ export const Project = () => {
       >
         <CardHeader className="flex-row items-center justify-between gap-2 pb-2">
           <CardTitle>{project.name}</CardTitle>
-          <GripVertical
-            className="h-4 w-4 cursor-grab text-muted-foreground focus:outline-none"
-            {...attributes}
-            {...listeners}
-            onClick={e => e.stopPropagation()}
-          />
+          <div className="flex items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <div className="rounded-md hover:bg-muted cursor-pointer">
+                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleExportProject(project.id)
+                  }}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Export
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setProjectToDelete(project.id)
+                    setIsDeleteModalOpen(true)
+                  }}
+                  className="text-destructive"
+                >
+                  <Trash className="h-4 w-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <GripVertical
+              className="h-4 w-4 cursor-grab text-muted-foreground focus:outline-none"
+              {...attributes}
+              {...listeners}
+              onClick={e => e.stopPropagation()}
+            />
+          </div>
         </CardHeader>
         <CardContent className="pb-4 flex flex-col flex-1">
           <div className="flex-1" />
@@ -144,6 +218,12 @@ export const Project = () => {
             </SortableContext>
           </DndContext>
         )}
+
+        <DeleteDialogue
+          handleDelete={handleDelete}
+          isDeleteModalOpen={isDeleteModalOpen}
+          setIsDeleteModalOpen={setIsDeleteModalOpen}
+        />
       </div>
     )
   }
