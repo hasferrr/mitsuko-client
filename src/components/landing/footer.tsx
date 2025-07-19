@@ -44,17 +44,27 @@ const badges = [
 export default function Footer() {
   return (
     <footer className="border-t border-gray-200 dark:border-gray-800 py-12 px-4">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
-        <div className="flex flex-col gap-4">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-11 gap-8">
+        <div className="flex flex-col gap-4 lg:col-span-3 lg:mr-16">
           <div className="flex items-center">
-            <span className="text-base font-medium text-gray-900 dark:text-white">Mitsuko</span>
+            <span className="text-base font-medium text-gray-900 dark:text-white">About</span>
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            High quality AI subtitle translator for SRT/ASS files, audio transcriber, and more.
+          <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+            <p>Mitsuko bridges language barriers to make all content accessible.</p>
+            <p>Made with ❤️ by{" "}
+              <Link
+                href={GITHUB_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                Hasfer
+              </Link>
+            </p>
           </div>
         </div>
 
-        <div>
+        <div className="lg:col-span-2">
           <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Resources</h3>
           <ul className="space-y-2">
             <li>
@@ -80,7 +90,7 @@ export default function Footer() {
           </ul>
         </div>
 
-        <div>
+        <div className="lg:col-span-2">
           <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Legal</h3>
           <ul className="space-y-2">
             <li>
@@ -96,7 +106,7 @@ export default function Footer() {
           </ul>
         </div>
 
-        <div>
+        <div className="lg:col-span-2">
           <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Community</h3>
           <ul className="space-y-2">
             <li>
@@ -122,8 +132,8 @@ export default function Footer() {
           </ul>
         </div>
 
-        <div>
-          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Partner links</h3>
+        <div className="lg:col-span-2">
+          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Partner</h3>
           <ul className="flex flex-col gap-2">
             <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               <a target="_blank" rel="noopener" title="All The Best AI Tools" href="https://allinai.tools">All in AI Tools</a>
