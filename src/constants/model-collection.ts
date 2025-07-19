@@ -71,34 +71,6 @@ export const FREE_MODELS: FreeModelCollection = {
           isUseStructuredOutput: true,
         }
       },
-      {
-        name: "Llama 3.3 70B",
-        subName: "meta-llama/Llama-3.3-70B-Instruct",
-        maxInput: 131_072,
-        maxOutput: 131_072,
-        structuredOutput: true,
-        isPaid: false,
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
-          isUseStructuredOutput: true,
-        }
-      },
-      {
-        name: "Llama 3.1 405B",
-        subName: "meta-llama/Llama-3.1-405B-Instruct",
-        maxInput: 131_072,
-        maxOutput: 131_072,
-        structuredOutput: true,
-        isPaid: false,
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
-          isUseStructuredOutput: true,
-        }
-      },
     ]
   },
   "Free Limited": {
@@ -502,34 +474,6 @@ export const PAID_MODELS: PaidModelCollection = {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 1_000_000,
-          isUseStructuredOutput: true,
-        }
-      },
-      {
-        name: "Llama 3.3 70B",
-        subName: "meta-llama/Llama-3.3-70B-Instruct",
-        maxInput: 131_072,
-        maxOutput: 131_072,
-        structuredOutput: true,
-        isPaid: true,
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
-          isUseStructuredOutput: true,
-        }
-      },
-      {
-        name: "Llama 3.1 405B",
-        subName: "meta-llama/Llama-3.1-405B-Instruct",
-        maxInput: 131_072,
-        maxOutput: 131_072,
-        structuredOutput: true,
-        isPaid: true,
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
           isUseStructuredOutput: true,
         }
       },

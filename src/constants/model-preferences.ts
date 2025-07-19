@@ -14,14 +14,3 @@ export const highQualityModels = new Set([
   "Claude 3.7 Sonnet",
   "GPT-4.1",
 ])
-
-export const multiLingualModels = new Set([
-  "Gemma 3 27B",
-  "Gemini 1.5 Flash-8B",
-  "Qwen3 235B A22B",
-  "Qwen3 30B A3B",
-  "Llama 4 Maverick",
-  "Llama 4 Scout",
-  "Llama 3.3 70B",
-  "Llama 3.1 405B",
-])

@@ -12,7 +12,6 @@ import {
   favoriteModels,
   highQualityModels,
   priorityModels,
-  multiLingualModels,
 } from '@/constants/model-preferences'
 
 export default async function CreditUsage() {
@@ -105,18 +104,6 @@ export default async function CreditUsage() {
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>High Quality</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                  {multiLingualModels.has(model.name) && (
-                    <TooltipProvider>
-                      <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                          <span className="cursor-default ml-1 text-[1rem]">🌎</span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Multilingual Model</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
