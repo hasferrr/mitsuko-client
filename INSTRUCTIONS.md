@@ -131,6 +131,8 @@ This is the main source code folder for the Next.js application. All application
     - **`(main)/`**: A route group for all authenticated app pages (e.g., dashboard, translate). It has its own `layout.tsx` which includes the main app sidebar and navigation.
       - `dashboard/page.tsx`: The main dashboard page after a user logs in.
       - `project/page.tsx`: Displays the contents and tasks within a single project.
+      - `library/page.tsx`: Hosts the custom instruction Library, rendering `LibraryView` and its tabs.
+      - `tools/page.tsx`: Central hub for supplementary utilities (e.g., subtitle tools, viewers).
       - `translate/page.tsx`, `transcribe/page.tsx`, `extract-context/page.tsx`: These are the main pages for the core application features.
 
 - **`components/`**: Contains all reusable React components. This is the heart of the UI.
@@ -143,7 +145,12 @@ This is the main source code folder for the Next.js application. All application
       - `dashboard/welcome-view.tsx`: The main component for the dashboard, showing options to start new tasks and recent projects.
       - `sidebar/app-sidebar.tsx`: The main sidebar component for the application.
       - `auth/login.tsx`: A component handling the user authentication form and user settings display.
-      - `library/library-view.tsx`: The main component for viewing and managing custom instructions.
+      - `library/library-view.tsx`: Composes the Library tabs (`My Library`, `Public Library`) as the entry point for managing instructions.
+      - `library/create-edit-instruction-dialog.tsx`: Modal dialog for creating or editing a custom instruction with validation and auto-resizing textarea.
+      - `library/export-instructions-controls.tsx`: Toolbar controls for batch selection and export of instructions to a downloadable JSON file.
+      - `library/import-instructions-dialog.tsx`: Dialog for importing instructions from JSON with schema validation, selectable items, and ID conflict handling.
+      - `library/my-library.tsx`: Implements the “My Library” view with search, CRUD, export, and publish capabilities for the user’s own instructions.
+      - `library/public-library.tsx`: Implements the “Public Library” view for browsing, searching, paginating, importing, and deleting public instructions (owner-only delete).
 
 - **`constants/`**: Contains static, hard-coded values used throughout the application. This prevents magic strings and numbers in the codebase, making maintenance easier.
   - **Style:** Files export `const` variables.
@@ -195,9 +202,11 @@ This is the main source code folder for the Next.js application. All application
       - `feedback.ts`: Submits user feedback to the backend.
       - `create-snap-payment.ts`: Initiates a payment process with the Midtrans payment gateway.
       - `credit-batch.ts`: Fetches information about credit batches granted to a user.
+      - `custom-instruction.ts`: Handles CRUD operations for public and private custom instructions (publish, fetch, delete).
     - **`db/`**: The entire client-side database layer, built with **Dexie.js**.
       - `db.ts`: Defines the Dexie database schema, including all tables, their versions, and migration logic.
       - `project.ts`, `translation.ts`, `transcription.ts`, `extraction.ts`, `settings.ts`: These files contain all the CRUD (Create, Read, Update, Delete) operations for their respective data models. They use Dexie transactions to ensure data integrity.
+      - `custom-instruction.ts`: Contains all CRUD operations for custom instructions stored in Dexie, mirroring logic in `use-custom-instruction-store`.
       - `db-io.ts`: Implements the logic for exporting and importing the entire database as a JSON file.
       - `db-constructor.ts`: Validates and cleans data during the import process, setting default values for missing fields to ensure compatibility with the current schema.
     - **`parser/`**: Contains logic for parsing and cleaning data, especially AI model responses.
@@ -269,6 +278,7 @@ This is the main source code folder for the Next.js application. All application
   - **Style:** Uses `interface` for object shapes and `type` for unions or other complex types. Files are named after the data model they describe.
   - **Structure:**
     - `project.ts`: Defines the core data models for the application, such as `Project`, `Translation`, `Transcription`, `Extraction`, `BasicSettings`, and `AdvancedSettings`.
+    - `public-custom-instruction.ts`: Defines the `PublicCustomInstruction` type used by the public instruction sharing feature.
     - `subtitles.ts`: Defines the various shapes of subtitle data, including `Subtitle`, `SubtitleTranslated`, `Timestamp`, and `Parsed` (which holds format-specific data like ASS headers).
     - `model.ts`: Defines the `Model` interface, which describes the properties of an AI model, and the `ModelProvider` type.
     - `completion.ts`: Defines the type for context completion messages sent to the AI.
