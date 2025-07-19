@@ -95,8 +95,6 @@ import { getContent, parseTranslationJson } from "@/lib/parser/parser"
 import { createContextMemory } from "@/lib/context-memory"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
-import { getAdvancedSettings, getBasicSettings } from "@/lib/db/settings"
-import { useProjectStore } from "@/stores/data/use-project-store"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { UserCreditData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
@@ -110,15 +108,43 @@ import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-g
 import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { Translation } from "@/types/project"
+import { useSettings } from "@/hooks/use-settings"
 
 export default function SubtitleTranslator() {
   const currentId = useTranslationDataStore((state) => state.currentId)
   const translationData = useTranslationDataStore((state) => state.data)
 
+  useSettings({
+    basicSettingsId: translationData[currentId ?? ""]?.basicSettingsId ?? null,
+    advancedSettingsId: translationData[currentId ?? ""]?.advancedSettingsId ?? null,
+  })
+
   if (!currentId || !translationData[currentId]) {
     return <div className="p-4">No translation project selected</div>
   }
 
+  if (!translationData[currentId].basicSettingsId || !translationData[currentId].advancedSettingsId) {
+    return <div className="p-4">Invalid settings data</div>
+  }
+
+  return (
+    <SubtitleTranslatorMain
+      currentId={currentId}
+      translation={translationData[currentId]}
+    />
+  )
+}
+
+interface SubtitleTranslatorMainProps {
+  currentId: string
+  translation: Translation
+}
+
+function SubtitleTranslatorMain({
+  currentId,
+  translation,
+}: SubtitleTranslatorMainProps) {
   // Get translation data and functions from store
   const setTitle = useTranslationDataStore((state) => state.setTitle)
   const setSubtitles = useTranslationDataStore((state) => state.setSubtitles)
@@ -129,10 +155,9 @@ export default function SubtitleTranslator() {
   const saveData = useTranslationDataStore((state) => state.saveData)
 
   // Get current translation data
-  const translation = translationData[currentId]
-  const title = translation?.title ?? ""
-  const subtitles = translation?.subtitles ?? []
-  const parsed = translation?.parsed ?? { type: "srt", data: null }
+  const title = translation.title
+  const subtitles = translation.subtitles
+  const parsed = translation.parsed
 
   // API Settings Store
   const apiKey = useLocalSettingsStore((state) => state.apiKey)
@@ -147,8 +172,6 @@ export default function SubtitleTranslator() {
   const contextDocument = useSettingsStore((state) => state.getContextDocument())
   const customInstructions = useSettingsStore((state) => state.getCustomInstructions())
   const fewShot = useSettingsStore((state) => state.getFewShot())
-  const setSettingsCurrentId = useSettingsStore((state) => state.setCurrentId)
-  const upsertSettingsData = useSettingsStore((state) => state.upsertData)
   const setContextDocument = useSettingsStore((state) => state.setContextDocument)
 
   // Advanced Settings Store
@@ -159,8 +182,6 @@ export default function SubtitleTranslator() {
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput())
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
   const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching())
-  const setAdvancedSettingsCurrentId = useAdvancedSettingsStore((state) => state.setCurrentId)
-  const upsertAdvancedSettingsData = useAdvancedSettingsStore((state) => state.upsertData)
   const resetIndex = useAdvancedSettingsStore((state) => state.resetIndex)
 
   // Translation Store
@@ -215,38 +236,6 @@ export default function SubtitleTranslator() {
     }
   }, [subtitles.length])
 
-  // TODO: Refactor to use useSettings hook
-  useEffect(() => {
-    if (translationData[currentId].projectId !== useProjectStore.getState().currentProject?.id) {
-      useProjectStore.getState().setCurrentProject(translationData[currentId].projectId)
-    }
-
-    if (!translationData[currentId]) return
-    setSettingsCurrentId(translationData[currentId].basicSettingsId)
-    setAdvancedSettingsCurrentId(translationData[currentId].advancedSettingsId)
-
-    // Fetch settings data if available
-    if (translationData[currentId].basicSettingsId) {
-      getBasicSettings(translationData[currentId].basicSettingsId)
-        .then(settings => {
-          if (settings) {
-            upsertSettingsData(settings.id, settings)
-          }
-        })
-    }
-
-    // Fetch advanced settings data if available
-    if (translationData[currentId].advancedSettingsId) {
-      getAdvancedSettings(translationData[currentId].advancedSettingsId)
-        .then(advancedSettings => {
-          if (advancedSettings) {
-            upsertAdvancedSettingsData(advancedSettings.id, advancedSettings)
-          }
-        })
-    }
-
-    return () => { saveData(currentId) }
-  }, [])
 
   const firstChunk = (size: number, s: number, e: number) => {
     const subtitleChunks: SubtitleNoTime[][] = []
