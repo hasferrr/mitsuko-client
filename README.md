@@ -11,7 +11,7 @@
 
 - 🎭 Context-aware subtitle translation between 100+ languages
 - 🔊 Audio-to-text transcription with perfect timing alignment
-- 📜 Native support for SRT/ASS subtitle formats
+- 📜 Native support for SRT/ASS/VTT subtitle formats
 - 🧠 AI-powered context analysis from previous episodes
 - 🔧 Advanced customization options for professional results
 
@@ -22,7 +22,7 @@ Originally designed for anime translations, Mitsuko combines linguistic accuracy
 ### Subtitle Translation
 
 - **Context-aware AI translations** using previous episode context
-- Supports **SRT & ASS formats** with style preservation
+- Supports **SRT, ASS, & VTT formats** with style preservation
 - **100+ language support** including Japanese, Chinese, English, Indonesian
 - **Custom model integration** (OpenAI-compatible APIs)
 - Advanced controls:
@@ -94,7 +94,7 @@ cd mitsuko-client && bun dev        # Frontend
 
 ### Subtitle Translation
 
-1. Upload SRT/ASS file
+1. Upload SRT/ASS/VTT file
 2. Set source/target languages
 3. Add context document (optional)
 4. Configure advanced settings
@@ -135,7 +135,7 @@ cd mitsuko-client && bun dev        # Frontend
 ### Backend
 
 - **Runtime**: Bun + Express
-- **Subtitle Parsing**: Custom SRT/ASS processors
+- **Subtitle Parsing**: Custom SRT/ASS/VTT processors
 - **AI Integration**: Multi-provider support (OpenAI, Gemini, Claude)
 
 ### Advanced Features

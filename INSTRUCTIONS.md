@@ -15,14 +15,14 @@ Your task is to develop **Mitsuko**, an AI-powered subtitle translation and audi
 The platform accepts and processes the following source materials:
 
 **Supported Input Formats:**
-- **Subtitle Files** → `SRT` and `ASS` format support with style preservation
+- **Subtitle Files** → `SRT`, `ASS`, and `VTT` format support with style preservation
 - **Audio Files** → Transcription to timed text (MP3, WAV, FLAC, AAC, OPUS, etc.)
 - **Text Content** → Pasted text for context extraction
 
 ### Generated Outputs
 
 From each source, the system generates:
-- **Translated Subtitle Files** → Context-aware translations in `SRT` or `ASS` format.
+- **Translated Subtitle Files** → Context-aware translations in `SRT`, `ASS`, or `VTT` format.
 - **Transcribed Subtitle Files** → Perfectly timed subtitles from audio sources.
 - **Context Documents** → Reusable JSON documents containing character relationships, settings, and plot elements for series-wide consistency.
 
@@ -73,7 +73,7 @@ From each source, the system generates:
 - **API Server:** Express.js with TypeScript
 - **Runtime:** Bun native
 - **AI Integration:** Multi-provider support (OpenAI, Gemini, Claude)
-- **Subtitle Processing:** Custom parsers for SRT/ASS formats.
+- **Subtitle Processing:** Custom parsers for SRT/ASS/VTT formats.
 
 ### Supporting Services
 **Payment Processing:** Midtrans/Snap integration
@@ -219,9 +219,9 @@ This is the main source code folder for the Next.js application. All application
       - `cleaner.ts`: Provides helper functions to clean up raw string responses from the AI, such as removing markdown wrappers.
       - `repairer.ts`: A robust utility to fix malformed or incomplete JSON strings returned by the AI, ensuring they can be parsed correctly.
     - **`subtitles/`**: Houses advanced logic for creating, parsing, and manipulating subtitle data structures.
-      - `parse-subtitle.ts`: The main entry point for parsing subtitle files, which detects the format (SRT or ASS) and uses the appropriate parser.
-      - `merge-subtitle.ts`: The main entry point for generating a subtitle file string from subtitle data structures.
-      - `is.ts`: Contains simple functions to check if a file content is SRT or ASS.
+      - `parse-subtitle.ts`: The main entry point for parsing subtitle files, which detects the format (SRT, ASS, or VTT) and uses the appropriate parser.
+      - `merge-subtitle.ts`: The main entry point for generating a subtitle file string from subtitle data structures (SRT, ASS, or VTT).
+      - `is.ts`: Contains simple functions to check if a file content is SRT, ASS, or VTT.
       - `timestamp.ts`: Provides utilities for handling subtitle timestamps, such as converting them to strings or shifting them.
       - **`srt/`**: Contains the specific logic for handling SRT files.
         - `parse.ts`: Parses a raw SRT file string into a structured `Subtitle[]` array.
@@ -230,6 +230,9 @@ This is the main source code folder for the Next.js application. All application
         - `parse.ts`: Parses a raw ASS file string, separating it into header, events, and footer.
         - `merge.ts`: Reconstructs an ASS file string from its component parts.
         - `helper.ts`: Contains helper functions for ASS parsing and reconstruction.
+      - **`vtt/`**: Contains the specific logic for handling VTT (WebVTT) files.
+        - `parse.ts`: Parses a raw VTT file string into a structured `Subtitle[]` array.
+        - `generate.ts`: Generates a valid VTT file string from a `Subtitle[]` array.
       - **`utils/`**: Contains utility functions for working with subtitle data.
         - `combine-subtitle.ts`: Merges original and translated text into a single subtitle entry with various formatting options.
         - `count-untranslated.ts`: Counts the number of untranslated lines in a subtitle project.
