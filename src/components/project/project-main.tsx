@@ -25,6 +25,7 @@ import {
   Trash,
   Loader2,
   Settings,
+  ArrowLeft,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -61,6 +62,7 @@ export const ProjectMain = () => {
   const renameProject = useProjectStore((state) => state.renameProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
+  const setCurrentProject = useProjectStore(state => state.setCurrentProject)
 
   const [translations, setTranslations] = useState<Translation[]>([])
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
@@ -324,7 +326,12 @@ export const ProjectMain = () => {
     <div className="flex-1 p-6">
       <div className="mb-6">
         <div className="text-2xl font-medium mb-2 flex gap-4 items-center">
-          <h1>{currentProject.name}</h1>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={() => setCurrentProject(null)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1>{currentProject.name}</h1>
+          </div>
           <div className="flex flex-wrap gap-4 text-sm">
             <button
               onClick={() => setIsEditModalOpen(true)}
