@@ -44,59 +44,75 @@ interface AdvancedSettingsStore {
   ) => Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>
 }
 
+const getOrCreateAdvancedSettings = async <T>(
+  store: { getState: () => { currentId: string | null; data: Record<string, T> } },
+  currentId: string | null,
+  getSettingsId: (data: T) => string | null | undefined,
+  createAndUpdate: (newSettings: AdvancedSettings) => void
+): Promise<AdvancedSettings | null> => {
+  if (!currentId) return null
+  const data = store.getState().data[currentId]
+  if (!data) return null
+
+  let advancedSettings = getSettingsId(data)
+    ? await getAdvancedSettings(getSettingsId(data)!) ?? null
+    : null
+
+  if (!advancedSettings) {
+    advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
+    createAndUpdate(advancedSettings)
+  }
+
+  return advancedSettings
+}
+
 const updateSettings = async <K extends keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>>(
   field: K,
   value: AdvancedSettings[K],
   parent: SettingsParentType,
 ) => {
-  let advancedSettings: AdvancedSettings | null = null
+  try {
+    let advancedSettings: AdvancedSettings | null = null
 
-  if (parent === 'translation') {
-    const store = useTranslationDataStore
-    const currentId = store.getState().currentId
-    if (!currentId) return
-    const data = store.getState().data[currentId]
-    if (!data) return
-    advancedSettings = data.advancedSettingsId
-      ? await getAdvancedSettings(data.advancedSettingsId) ?? null
-      : null
-    if (!advancedSettings) {
-      advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
-      store.getState().mutateData(currentId, "advancedSettingsId", advancedSettings.id)
+    if (parent === 'translation') {
+      const store = useTranslationDataStore
+      const currentId = store.getState().currentId
+      advancedSettings = await getOrCreateAdvancedSettings(
+        store,
+        currentId,
+        (data) => data.advancedSettingsId,
+        (newSettings) => store.getState().mutateData(currentId!, "advancedSettingsId", newSettings.id)
+      )
+    } else if (parent === 'extraction') {
+      const store = useExtractionDataStore
+      const currentId = store.getState().currentId
+      advancedSettings = await getOrCreateAdvancedSettings(
+        store,
+        currentId,
+        (data) => data.advancedSettingsId,
+        (newSettings) => store.getState().mutateData(currentId!, "advancedSettingsId", newSettings.id)
+      )
+    } else if (parent === 'project') {
+      const store = useProjectStore
+      const data = store.getState().currentProject
+      if (!data) return
+
+      const advancedSettingsId = data.defaultAdvancedSettingsId
+      advancedSettings = advancedSettingsId
+        ? await getAdvancedSettings(advancedSettingsId) ?? null
+        : null
+
+      if (!advancedSettings) {
+        advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
+        store.getState().updateProject(data.id, { defaultAdvancedSettingsId: advancedSettings.id })
+      }
     }
-  }
 
-  if (parent === 'extraction') {
-    const store = useExtractionDataStore
-    const currentId = store.getState().currentId
-    if (!currentId) return
-    const data = store.getState().data[currentId]
-    if (!data) return
-    advancedSettings = data.advancedSettingsId
-      ? await getAdvancedSettings(data.advancedSettingsId) ?? null
-      : null
-    if (!advancedSettings) {
-      advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
-      store.getState().mutateData(currentId, "advancedSettingsId", advancedSettings.id)
+    if (advancedSettings) {
+      await updateAdvancedSettings(advancedSettings.id, { [field]: value })
     }
-  }
-
-  if (parent === 'project') {
-    const store = useProjectStore
-    const data = store.getState().currentProject
-    if (!data) return
-    advancedSettings = data.defaultAdvancedSettingsId
-      ? await getAdvancedSettings(data.defaultAdvancedSettingsId) ?? null
-      : null
-    if (!advancedSettings) {
-      advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
-      store.getState().updateProject(data.id, { defaultAdvancedSettingsId: advancedSettings.id })
-    }
-  }
-
-  // Update the settings
-  if (advancedSettings) {
-    await updateAdvancedSettings(advancedSettings.id, { [field]: value })
+  } catch (error) {
+    console.error(`Failed to update advanced settings for ${parent}:`, error)
   }
 }
 

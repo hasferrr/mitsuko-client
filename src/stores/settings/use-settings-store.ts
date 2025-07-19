@@ -44,59 +44,75 @@ interface SettingsStore {
   setFewShotEndIndex: (index?: number) => void
 }
 
+const getOrCreateBasicSettings = async <T>(
+  store: { getState: () => { currentId: string | null; data: Record<string, T> } },
+  currentId: string | null,
+  getSettingsId: (data: T) => string | null | undefined,
+  createAndUpdate: (newSettings: BasicSettings) => void
+): Promise<BasicSettings | null> => {
+  if (!currentId) return null
+  const data = store.getState().data[currentId]
+  if (!data) return null
+
+  let basicSettings = getSettingsId(data)
+    ? await getBasicSettings(getSettingsId(data)!) ?? null
+    : null
+
+  if (!basicSettings) {
+    basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
+    createAndUpdate(basicSettings)
+  }
+
+  return basicSettings
+}
+
 const updateSettings = async <K extends keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>>(
   field: K,
   value: BasicSettings[K],
   parent: SettingsParentType,
 ) => {
-  let basicSettings: BasicSettings | null = null
+  try {
+    let basicSettings: BasicSettings | null = null
 
-  if (parent === 'translation') {
-    const store = useTranslationDataStore
-    const currentId = store.getState().currentId
-    if (!currentId) return
-    const data = store.getState().data[currentId]
-    if (!data) return
-    basicSettings = data.basicSettingsId
-      ? await getBasicSettings(data.basicSettingsId) ?? null
-      : null
-    if (!basicSettings) {
-      basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
-      store.getState().mutateData(currentId, "basicSettingsId", basicSettings.id)
+    if (parent === 'translation') {
+      const store = useTranslationDataStore
+      const currentId = store.getState().currentId
+      basicSettings = await getOrCreateBasicSettings(
+        store,
+        currentId,
+        (data) => data.basicSettingsId,
+        (newSettings) => store.getState().mutateData(currentId!, "basicSettingsId", newSettings.id)
+      )
+    } else if (parent === 'extraction') {
+      const store = useExtractionDataStore
+      const currentId = store.getState().currentId
+      basicSettings = await getOrCreateBasicSettings(
+        store,
+        currentId,
+        (data) => data.basicSettingsId,
+        (newSettings) => store.getState().mutateData(currentId!, "basicSettingsId", newSettings.id)
+      )
+    } else if (parent === 'project') {
+      const store = useProjectStore
+      const data = store.getState().currentProject
+      if (!data) return
+
+      const basicSettingsId = data.defaultBasicSettingsId
+      basicSettings = basicSettingsId
+        ? await getBasicSettings(basicSettingsId) ?? null
+        : null
+
+      if (!basicSettings) {
+        basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
+        store.getState().updateProject(data.id, { defaultBasicSettingsId: basicSettings.id })
+      }
     }
-  }
 
-  if (parent === 'extraction') {
-    const store = useExtractionDataStore
-    const currentId = store.getState().currentId
-    if (!currentId) return
-    const data = store.getState().data[currentId]
-    if (!data) return
-    basicSettings = data.basicSettingsId
-      ? await getBasicSettings(data.basicSettingsId) ?? null
-      : null
-    if (!basicSettings) {
-      basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
-      store.getState().mutateData(currentId, "basicSettingsId", basicSettings.id)
+    if (basicSettings) {
+      await updateBasicSettings(basicSettings.id, { [field]: value })
     }
-  }
-
-  if (parent === 'project') {
-    const store = useProjectStore
-    const data = store.getState().currentProject
-    if (!data) return
-    basicSettings = data.defaultBasicSettingsId
-      ? await getBasicSettings(data.defaultBasicSettingsId) ?? null
-      : null
-    if (!basicSettings) {
-      basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
-      store.getState().updateProject(data.id, { defaultBasicSettingsId: basicSettings.id })
-    }
-  }
-
-  // Update the settings
-  if (basicSettings) {
-    await updateBasicSettings(basicSettings.id, { [field]: value })
+  } catch (error) {
+    console.error(`Failed to update settings for ${parent}:`, error)
   }
 }
 
