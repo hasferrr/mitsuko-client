@@ -307,7 +307,7 @@ export default function SubtitleTranslator() {
           return
         }
       } else if (fewShot.type === "linked") {
-        const linkedTranslation = await useTranslationDataStore.getState().getTranslationDb(translationData[currentId].projectId, fewShot.linkedId)
+        const linkedTranslation = await useTranslationDataStore.getState().getTranslationDb(fewShot.linkedId)
         if (linkedTranslation) {
           usedFewShot = linkedTranslation.subtitles
             .slice(fewShot.fewShotStartIndex, (fewShot.fewShotEndIndex ?? 0) + 1)

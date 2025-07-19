@@ -50,11 +50,8 @@ export const createTranslation = async (
   })
 }
 
-export const getTranslation = async (projectId: string, translationId: string): Promise<Translation | undefined> => {
-  return db.translations
-    .where('id').equals(translationId)
-    .and(t => t.projectId === projectId)
-    .first()
+export const getTranslation = async (translationId: string): Promise<Translation | undefined> => {
+  return db.translations.get(translationId)
 }
 
 export const updateTranslation = async (

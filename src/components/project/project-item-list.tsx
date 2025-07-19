@@ -82,7 +82,7 @@ export const ProjectItemList = ({
     switch (type) {
       case "translation":
         if (!(id in translationData)) {
-          const translation = await getTranslationDb(projectId, id)
+          const translation = await getTranslationDb(id)
           if (translation) {
             upsertTranslationData(id, translation)
           }
@@ -92,7 +92,7 @@ export const ProjectItemList = ({
         break
       case "transcription":
         if (!(id in transcriptionData)) {
-          const transcription = await getTranscriptionDb(projectId, id)
+          const transcription = await getTranscriptionDb(id)
           if (transcription) {
             upsertTranscriptionData(id, transcription)
           }
@@ -102,7 +102,7 @@ export const ProjectItemList = ({
         break
       case "extraction":
         if (!(id in extractionData)) {
-          const extraction = await getExtractionDb(projectId, id)
+          const extraction = await getExtractionDb(id)
           if (extraction) {
             upsertExtractionData(id, extraction)
           }

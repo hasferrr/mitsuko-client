@@ -1,11 +1,11 @@
 import { create } from "zustand"
 import { Project, ProjectType } from "@/types/project"
 import {
-  getAllProjects,
+  getAllProjects as getAllProjectsDB,
   createProject as createProjectDB,
   deleteProject as deleteProjectDB,
   renameProject as renameProjectDB,
-  updateProjectOrder,
+  updateProjectOrder as updateProjectOrderDB,
   updateProjectItems as updateProjectItemsDB,
   updateProject as updateProjectDB,
 } from "@/lib/db/project"
@@ -48,7 +48,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   loadProjects: async () => {
     set({ loading: true, error: null })
     try {
-      const projects = await getAllProjects()
+      const projects = await getAllProjectsDB()
       set((state) => ({
         projects,
         currentProject: (() => {
@@ -181,8 +181,8 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   reorderProjects: async (newOrder) => {
     set({ loading: true })
     try {
-      await updateProjectOrder(newOrder)
-      const projects = await getAllProjects()
+      await updateProjectOrderDB(newOrder)
+      const projects = await getAllProjectsDB()
       set({ projects, loading: false })
     } catch (error) {
       console.error('Failed to reorder projects', error)

@@ -30,11 +30,8 @@ export const createTranscription = async (
   })
 }
 
-export const getTranscription = async (projectId: string, transcriptionId: string): Promise<Transcription | undefined> => {
-  return db.transcriptions
-    .where('id').equals(transcriptionId)
-    .and(t => t.projectId === projectId)
-    .first()
+export const getTranscription = async (transcriptionId: string): Promise<Transcription | undefined> => {
+  return db.transcriptions.get(transcriptionId)
 }
 
 export const updateTranscription = async (

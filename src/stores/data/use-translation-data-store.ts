@@ -1,7 +1,12 @@
 import { create } from "zustand"
 import { AdvancedSettings, BasicSettings, Translation } from "@/types/project"
 import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/subtitles"
-import { updateTranslation, createTranslation, getTranslation, deleteTranslation } from "@/lib/db/translation"
+import {
+  updateTranslation as updateDB,
+  createTranslation as createDB,
+  getTranslation as getDB,
+  deleteTranslation as deleteDB,
+} from "@/lib/db/translation"
 
 export interface TranslationDataStore {
   currentId: string | null
@@ -13,7 +18,7 @@ export interface TranslationDataStore {
     basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
     advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Translation>
-  getTranslationDb: (projectId: string, translationId: string) => Promise<Translation | undefined>
+  getTranslationDb: (translationId: string) => Promise<Translation | undefined>
   updateTranslationDb: (translationId: string, changes: Partial<Pick<Translation, "title" | "subtitles" | "parsed">>) => Promise<Translation>
   deleteTranslationDb: (projectId: string, translationId: string) => Promise<void>
   // Existing methods
@@ -39,24 +44,24 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
   data: {},
   // CRUD methods
   createTranslationDb: async (projectId, data, basicSettingsData, advancedSettingsData) => {
-    const translation = await createTranslation(projectId, data, basicSettingsData, advancedSettingsData)
+    const translation = await createDB(projectId, data, basicSettingsData, advancedSettingsData)
     set(state => ({ data: { ...state.data, [translation.id]: translation } }))
     return translation
   },
-  getTranslationDb: async (projectId, translationId) => {
-    const translation = await getTranslation(projectId, translationId)
+  getTranslationDb: async (translationId) => {
+    const translation = await getDB(translationId)
     if (translation) {
       set(state => ({ data: { ...state.data, [translationId]: translation } }))
     }
     return translation
   },
   updateTranslationDb: async (translationId, changes) => {
-    const translation = await updateTranslation(translationId, changes)
+    const translation = await updateDB(translationId, changes)
     set(state => ({ data: { ...state.data, [translationId]: translation } }))
     return translation
   },
   deleteTranslationDb: async (projectId, translationId) => {
-    await deleteTranslation(projectId, translationId)
+    await deleteDB(projectId, translationId)
     set(state => {
       const newData = { ...state.data }
       delete newData[translationId]
@@ -91,7 +96,7 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       return
     }
     try {
-      const result = await updateTranslation(id, translation)
+      const result = await updateDB(id, translation)
       set({ data: { ...get().data, [id]: result } })
     } catch (error) {
       console.error("Failed to save translation data:", error)

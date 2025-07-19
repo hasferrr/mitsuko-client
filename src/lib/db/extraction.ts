@@ -45,11 +45,8 @@ export const createExtraction = async (
   })
 }
 
-export const getExtraction = async (projectId: string, extractionId: string): Promise<Extraction | undefined> => {
-  return db.extractions
-    .where('id').equals(extractionId)
-    .and(e => e.projectId === projectId)
-    .first()
+export const getExtraction = async (extractionId: string): Promise<Extraction | undefined> => {
+  return db.extractions.get(extractionId)
 }
 
 export const updateExtraction = async (

@@ -1,6 +1,11 @@
 import { create } from "zustand"
 import { Transcription } from "@/types/project"
-import { updateTranscription, createTranscription, getTranscription, deleteTranscription } from "@/lib/db/transcription"
+import {
+  updateTranscription as updateDB,
+  createTranscription as createDB,
+  getTranscription as getDB,
+  deleteTranscription as deleteDB,
+} from "@/lib/db/transcription"
 import { Subtitle } from "@/types/subtitles"
 import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
 
@@ -9,7 +14,7 @@ interface TranscriptionDataStore {
   data: Record<string, Transcription>
   // CRUD methods
   createTranscriptionDb: (projectId: string, data: Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles">) => Promise<Transcription>
-  getTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<Transcription | undefined>
+  getTranscriptionDb: (transcriptionId: string) => Promise<Transcription | undefined>
   updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "isOverOneHour">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
   // getters
@@ -41,24 +46,24 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   data: {},
   // CRUD methods
   createTranscriptionDb: async (projectId, data) => {
-    const transcription = await createTranscription(projectId, data)
+    const transcription = await createDB(projectId, data)
     set(state => ({ data: { ...state.data, [transcription.id]: transcription } }))
     return transcription
   },
-  getTranscriptionDb: async (projectId, transcriptionId) => {
-    const transcription = await getTranscription(projectId, transcriptionId)
+  getTranscriptionDb: async (transcriptionId) => {
+    const transcription = await getDB(transcriptionId)
     if (transcription) {
       set(state => ({ data: { ...state.data, [transcriptionId]: transcription } }))
     }
     return transcription
   },
   updateTranscriptionDb: async (transcriptionId, changes) => {
-    const transcription = await updateTranscription(transcriptionId, changes)
+    const transcription = await updateDB(transcriptionId, changes)
     set(state => ({ data: { ...state.data, [transcriptionId]: transcription } }))
     return transcription
   },
   deleteTranscriptionDb: async (projectId, transcriptionId) => {
-    await deleteTranscription(projectId, transcriptionId)
+    await deleteDB(projectId, transcriptionId)
     set(state => {
       const newData = { ...state.data }
       delete newData[transcriptionId]
@@ -139,7 +144,7 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
       return
     }
     try {
-      const result = await updateTranscription(id, {
+      const result = await updateDB(id, {
         title: transcription.title,
         transcriptionText: transcription.transcriptionText,
         transcriptSubtitles: transcription.transcriptSubtitles,

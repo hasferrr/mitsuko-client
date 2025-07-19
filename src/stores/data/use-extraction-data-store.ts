@@ -1,6 +1,11 @@
 import { create } from "zustand"
 import { Extraction, BasicSettings, AdvancedSettings } from "@/types/project"
-import { updateExtraction, createExtraction, getExtraction, deleteExtraction } from "@/lib/db/extraction"
+import {
+  updateExtraction as updateDB,
+  createExtraction as createDB,
+  getExtraction as getDB,
+  deleteExtraction as deleteDB,
+} from "@/lib/db/extraction"
 
 export interface ExtractionDataStore {
   currentId: string | null
@@ -12,7 +17,7 @@ export interface ExtractionDataStore {
     basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
     advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Extraction>
-  getExtractionDb: (projectId: string, extractionId: string) => Promise<Extraction | undefined>
+  getExtractionDb: (extractionId: string) => Promise<Extraction | undefined>
   updateExtractionDb: (extractionId: string, changes: Partial<Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext">>) => Promise<Extraction>
   deleteExtractionDb: (projectId: string, extractionId: string) => Promise<void>
   // getters
@@ -38,24 +43,24 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
   data: {},
   // CRUD methods
   createExtractionDb: async (projectId, data, basicSettingsData, advancedSettingsData) => {
-    const extraction = await createExtraction(projectId, data, basicSettingsData, advancedSettingsData)
+    const extraction = await createDB(projectId, data, basicSettingsData, advancedSettingsData)
     set(state => ({ data: { ...state.data, [extraction.id]: extraction } }))
     return extraction
   },
-  getExtractionDb: async (projectId, extractionId) => {
-    const extraction = await getExtraction(projectId, extractionId)
+  getExtractionDb: async (extractionId) => {
+    const extraction = await getDB(extractionId)
     if (extraction) {
       set(state => ({ data: { ...state.data, [extractionId]: extraction } }))
     }
     return extraction
   },
   updateExtractionDb: async (extractionId, changes) => {
-    const extraction = await updateExtraction(extractionId, changes)
+    const extraction = await updateDB(extractionId, changes)
     set(state => ({ data: { ...state.data, [extractionId]: extraction } }))
     return extraction
   },
   deleteExtractionDb: async (projectId, extractionId) => {
-    await deleteExtraction(projectId, extractionId)
+    await deleteDB(projectId, extractionId)
     set(state => {
       const newData = { ...state.data }
       delete newData[extractionId]
@@ -122,7 +127,7 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
       return
     }
     try {
-      const result = await updateExtraction(id, extraction)
+      const result = await updateDB(id, extraction)
       set({ data: { ...get().data, [id]: result } })
     } catch (error) {
       console.error("Failed to save extraction data:", error)
