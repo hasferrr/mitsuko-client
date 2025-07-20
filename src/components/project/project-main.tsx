@@ -53,6 +53,20 @@ import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-setting
 import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
 
+const countTranslatedLines = (subtitles: Translation['subtitles']) => {
+  if (!subtitles || subtitles.length === 0) {
+    return 0
+  }
+  let count = 0
+  for (const sub of subtitles) {
+    if ((sub.translated && sub.translated.trim() !== "") ||
+      (sub.content.trim() === "" && sub.translated.trim() === "")) {
+      count++
+    }
+  }
+  return count
+}
+
 export const ProjectMain = () => {
   const router = useRouter()
 
@@ -200,30 +214,42 @@ export const ProjectMain = () => {
     }
   }
 
-  const translationComponentList = translations.map((translation) => (
-    <ProjectItemList
-      key={translation.id}
-      id={translation.id}
-      projectId={currentProject.id}
-      type="translation"
-      icon={isTranslatingSet.has(translation.id)
-        ? <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
-        : <Globe className="h-5 w-5 text-blue-500" />}
-      title={translation.title}
-      description={`${translation.parsed.type.toUpperCase()} • ${translation.subtitles.length} Lines`}
-      date={translation.updatedAt.toLocaleDateString()}
-      handleEdit={async (newName) => {
-        await updateTranslationDb(translation.id, { title: newName })
-        mutateTranslationData(translation.id, "title", newName)
-        loadProjects()
-      }}
-      handleDelete={async () => {
-        await deleteTranslationDb(currentProject.id, translation.id)
-        removeTranslationData(translation.id)
-        loadProjects()
-      }}
-    />
-  ))
+  const translationComponentList = translations.map((translation) => {
+    const totalLines = translation.subtitles.length
+
+    const translatedLines = countTranslatedLines(translation.subtitles)
+    const allTranslated = totalLines > 0 && totalLines === translatedLines
+    const type = translation.parsed.type.toUpperCase()
+
+    const description = allTranslated
+      ? `${type} • ${totalLines} Lines`
+      : `${type} • ${translatedLines}/${totalLines} Lines`
+
+    return (
+      <ProjectItemList
+        key={translation.id}
+        id={translation.id}
+        projectId={currentProject.id}
+        type="translation"
+        icon={isTranslatingSet.has(translation.id)
+          ? <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
+          : <Globe className="h-5 w-5 text-blue-500" />}
+        title={translation.title}
+        description={description}
+        date={translation.updatedAt.toLocaleDateString()}
+        handleEdit={async (newName) => {
+          await updateTranslationDb(translation.id, { title: newName })
+          mutateTranslationData(translation.id, "title", newName)
+          loadProjects()
+        }}
+        handleDelete={async () => {
+          await deleteTranslationDb(currentProject.id, translation.id)
+          removeTranslationData(translation.id)
+          loadProjects()
+        }}
+      />
+    )
+  })
 
   const transcriptionComponentList = transcriptions.map((transcription) => (
     <ProjectItemList
