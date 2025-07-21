@@ -101,6 +101,31 @@ export const FREE_MODELS: FreeModelCollection = {
         }
       },
       {
+        name: "Mistral Small 3",
+        subName: "Mistral Small 3.2 24B",
+        maxInput: 128000,
+        maxOutput: 128000,
+        structuredOutput: true,
+        isPaid: false,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Mistral Nemo",
+        maxInput: 128000,
+        maxOutput: 128000,
+        structuredOutput: true,
+        isPaid: false,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "DeepSeek R1 (free)",
         subName: "DeepSeek-R1-0528",
         maxInput: 163840,
@@ -430,6 +455,48 @@ export const PAID_MODELS: PaidModelCollection = {
           isUseStructuredOutput: true
         }
       },
+    ]
+  },
+  Mistral: {
+    provider: "mistral",
+    models: [
+      {
+        name: "Mistral Medium 3",
+        maxInput: 128000,
+        maxOutput: 128000,
+        structuredOutput: true,
+        isPaid: true,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Mistral Small 3",
+        subName: "Mistral Small 3.2 24B",
+        maxInput: 128000,
+        maxOutput: 128000,
+        structuredOutput: true,
+        isPaid: true,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Mistral Nemo",
+        maxInput: 128000,
+        maxOutput: 128000,
+        structuredOutput: true,
+        isPaid: true,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      }
     ]
   },
   Qwen: {
