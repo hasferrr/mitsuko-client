@@ -35,18 +35,16 @@ import {
   DeepSeek,
   Gemini,
   Grok,
-  Meta,
   Mistral,
   OpenAI,
   OpenRouter,
   Qwen,
 } from "@lobehub/icons"
 
-const providerIconMap = {
+const providerIconMap: Record<ModelProvider, React.ElementType> = {
   google: Gemini,
   anthropic: Anthropic,
   openai: OpenAI,
-  meta: Meta,
   mistral: Mistral,
   deepseek: DeepSeek,
   qwen: Qwen,

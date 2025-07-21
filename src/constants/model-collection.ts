@@ -57,20 +57,6 @@ export const FREE_MODELS: FreeModelCollection = {
           isUseStructuredOutput: false,
         }
       },
-      {
-        name: "Llama 4 Maverick",
-        subName: "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
-        maxInput: 1_048_576,
-        maxOutput: 1_048_576,
-        structuredOutput: true,
-        isPaid: false,
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 1_000_000,
-          isUseStructuredOutput: true,
-        }
-      },
     ]
   },
   "Free Limited": {
@@ -442,39 +428,6 @@ export const PAID_MODELS: PaidModelCollection = {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
-        }
-      },
-    ]
-  },
-  Meta: {
-    provider: "meta",
-    models: [
-      {
-        name: "Llama 4 Maverick",
-        subName: "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
-        maxInput: 1_048_576,
-        maxOutput: 1_048_576,
-        structuredOutput: true,
-        isPaid: true,
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 1_000_000,
-          isUseStructuredOutput: true,
-        }
-      },
-      {
-        name: "Llama 4 Scout",
-        subName: "meta-llama/Llama-4-Scout-17B-16E-Instruct",
-        maxInput: 1_048_576,
-        maxOutput: 1_048_576,
-        structuredOutput: true,
-        isPaid: true,
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 1_000_000,
-          isUseStructuredOutput: true,
         }
       },
     ]
