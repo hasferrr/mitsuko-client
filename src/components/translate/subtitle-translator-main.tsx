@@ -822,6 +822,7 @@ export default function SubtitleTranslatorMain({
           <Input
             value={title}
             onChange={(e) => setTitle(currentId, e.target.value)}
+            onBlur={() => saveData(currentId)}
             className="text-xl font-semibold h-12"
           />
         </div>

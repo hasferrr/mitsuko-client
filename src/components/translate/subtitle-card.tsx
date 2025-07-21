@@ -18,6 +18,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
   const translatedRef = useRef<HTMLTextAreaElement | null>(null)
   const currentId = useTranslationDataStore((state) => state.currentId)
   const updateSubtitle = useTranslationDataStore((state) => state.updateSubtitle)
+  const saveData = useTranslationDataStore((state) => state.saveData)
 
   const { setHasChanges } = useUnsavedChanges()
 
@@ -98,6 +99,9 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
                 subtitleUpdate(e, "content")
                 handleResize(e.target)
               }}
+              onBlur={() => {
+                if (currentId) saveData(currentId)
+              }}
               className="md:min-h-[36px] md:h-[36px] min-h-[40px] h-[40px] max-h-[120px] bg-muted/50 dark:bg-muted/30 resize-none overflow-y-hidden"
               rows={1}
             />
@@ -108,6 +112,9 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
               onChange={(e) => {
                 subtitleUpdate(e, "translated")
                 handleResize(e.target)
+              }}
+              onBlur={() => {
+                if (currentId) saveData(currentId)
               }}
               className="md:min-h-[36px] md:h-[36px] min-h-[40px] h-[40px] max-h-[120px] resize-none overflow-y-hidden"
               rows={1}
