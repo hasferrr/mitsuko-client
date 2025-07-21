@@ -34,7 +34,7 @@ export default function HeroSection() {
       {/* Subheading */}
       <div className="max-w-2xl text-center mb-12 text-lg">
         <p>
-          It prioritizes meaning over literal translation, adapting for cultural nuance and idiomatic expressions.
+          Mitsuko prioritizes meaning over literal translation, adapting for cultural nuance and idiomatic expressions.
           Get subtitle translation with high-quality results.
         </p>
       </div>
