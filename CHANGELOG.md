@@ -14,23 +14,24 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### July 22
+
+- 🤖 **Model Updates:** We've added new Mistral models (Mistral Small 3, Mistral Medium 3, and Mistral Nemo) and cleaned up the model list by removing older Llama models to keep your choices relevant and up-to-date.
+
 ### July 20
 
 - ✨ **VTT Subtitle Support:** You can now work with VTT subtitle files, expanding the range of supported formats.
-- 🤖 **Model Updates:** We've cleaned up the model list by removing some older Llama models to keep your choices relevant and up-to-date.
 - 🐛 **Improved Subtitle Parsing:** We've made our ASS file parser more flexible to better handle different file variations.
 
 ### July 19
 
 - ✨ **Enhanced Project Management:** We've made it easier to manage your projects! You can now drag-and-drop to reorder them, and a new dropdown menu lets you export or delete projects with a single click.
-- ⚙️ **Better Navigation:** Added a "Back" button inside projects to make navigating back to your dashboard more intuitive.
-- 🛠️ **Internal Upgrades:** We've been busy refactoring our settings system to pave the way for upcoming features like batch translation, and we've updated some of our core dependencies to keep things running smoothly.
+- ⚙️ **Better Navigation:** Added a "Back" button inside projects to make navigating back to your project list more intuitive.
 
 ### July 12
 
 - ✨ **Share & Discover in the Public Library:** Introducing the Public Library! You can now publish your own custom instructions to share with the community. You can also browse and import instructions created by other users to enhance your workflow.
 - 🛠️ **Library Enhancements:** We've polished the library experience with a more compact design, a new refresh button, and the ability to filter the public library to see only your own published work. You can also now delete instructions you've shared.
-- 🐛 **Bug Fix:** Fixed an issue where an error message wouldn't appear if publishing an instruction failed.
 
 ### July 11
 
