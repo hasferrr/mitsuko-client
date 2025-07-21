@@ -462,6 +462,7 @@ export default function SubtitleTranslatorMain({
           }
         }
         setSubtitles(currentId, merged)
+        refetchUserData()
         await saveData(currentId)
       }
 
@@ -550,11 +551,6 @@ export default function SubtitleTranslatorMain({
         useTranslationDataStore.getState().data[currentId].subtitles,
         useTranslationDataStore.getState().data[currentId].parsed,
       )
-    }
-
-    // Refetch user data after translation completes to update credits
-    if (!partOfBatch) {
-      refetchUserData()
     }
 
     await saveData(currentId)
