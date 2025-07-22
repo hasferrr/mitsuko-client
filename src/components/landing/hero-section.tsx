@@ -21,7 +21,7 @@ export default function HeroSection() {
       <div className="mb-12 max-w-3xl mx-auto">
         <Link href="/dashboard" className="group flex items-center justify-center gap-2 px-8 py-4 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a1a1a] dark:hover:bg-[#252525] hover:bg-gray-50 transition-colors drop-shadow-sm">
           ✨
-          <span className="dark:text-gray-200 text-gray-800">Claude 4 Sonnet and Gemini 2.5 Pro are now available!</span>
+          <span className="dark:text-gray-200 text-gray-800">Grok 4 and Gemini 2.5 Pro are now available!</span>
           <ExternalLink size={16} className="text-gray-400 group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
