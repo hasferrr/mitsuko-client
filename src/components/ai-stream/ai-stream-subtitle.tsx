@@ -10,12 +10,13 @@ interface AiStreamSubtitleProps {
 export const AiStreamSubtitle = memo(({ initialSubtitles, translatedSubtitles }: AiStreamSubtitleProps) => {
   return (
     <AnimatePresence>
-      {translatedSubtitles.map((subtitle, index) => (
+      {translatedSubtitles.map((subtitle) => (
         <Subtitle
           key={subtitle.index}
           subtitle={{
-            ...initialSubtitles[index],
             index: subtitle.index,
+            actor: initialSubtitles[subtitle.index - 1]?.actor || "",
+            content: initialSubtitles[subtitle.index - 1]?.content || "",
             translated: subtitle.translated,
           }}
         />
