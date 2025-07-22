@@ -16,40 +16,45 @@ export default function HeroSection() {
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-center px-4 my-12">
+    <div className="min-h-[calc(100vh-4.5rem)] supports-[height:100dvh]:min-h-[calc(100dvh-4.5rem)] flex flex-col justify-between items-center text-center px-4 my-12">
       {/* Notification banner */}
-      <div className="mb-12 max-w-3xl mx-auto">
-        <Link href="/dashboard" className="group flex items-center justify-center gap-2 px-8 py-4 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a1a1a] dark:hover:bg-[#252525] hover:bg-gray-50 transition-colors drop-shadow-sm">
+      <div className="flex justify-center">
+        <Link href="/dashboard" className="group flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a1a1a] dark:hover:bg-[#252525] hover:bg-gray-50 transition-colors drop-shadow-sm">
           ✨
-          <span className="dark:text-gray-200 text-gray-800">Grok 4 and Gemini 2.5 Pro are now available!</span>
+          <span className="dark:text-gray-200 text-gray-800">
+            Grok 4 and Gemini 2.5 Pro are now available!
+          </span>
           <ExternalLink size={16} className="text-gray-400 group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
 
       {/* Main heading */}
-      <h1 className="max-w-3xl text-5xl md:text-6xl font-medium text-center mb-8 bg-gradient-to-r bg-clip-text">
-        The Most Accurate AI <span className="text-purple-500 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">Subtitle Translator</span>
+      <h1 className="mt-8 max-w-3xl inline-block font-semibold tracking-tighter text-5xl md:text-[4rem] leading-none">
+        The Most Accurate AI{" "}
+        <span className="text-purple-500 drop-shadow-[0_0_2px_rgba(168,85,247,0.6)]">
+          Subtitle Translator
+        </span>
       </h1>
 
       {/* Subheading */}
-      <div className="max-w-2xl text-center mb-12 text-lg">
+      <div className="mt-8 text-base md:text-xl text-muted-foreground font-light tracking-wide max-w-xl mx-auto">
         <p>
           Mitsuko prioritizes meaning over literal translation, adapting for cultural nuance and idiomatic expressions.
-          Get subtitle translation with high-quality results.
+          {/* Get subtitle translation with high-quality results. */}
         </p>
       </div>
 
       {/* CTA Buttons */}
-      <div className="flex gap-4 mb-4">
+      <div className="mt-8 flex gap-4 justify-center">
         <Link
           href="/dashboard"
-          className="px-8 py-4 rounded-md bg-gradient-to-r from-[#ff7b72] to-[#bc8cff] text-white font-medium hover:brightness-110 transition-all whitespace-nowrap"
+          className="px-8 py-4 rounded-xl bg-gradient-to-r from-[#ff7b72] to-[#bc8cff] text-white font-medium hover:brightness-110 transition-all whitespace-nowrap"
         >
           Try for Free!
         </Link>
         <Link
           href="/auth/login"
-          className="px-8 py-4 rounded-md bg-[#1a1a1a] hover:bg-[#252525] border border-gray-800 transition-colors text-white font-medium whitespace-nowrap"
+          className="px-8 py-4 rounded-xl bg-[#1a1a1a] hover:bg-[#252525] border border-gray-800 transition-colors text-white font-medium whitespace-nowrap"
         >
           {session ? "My Account" : "Sign In"}
         </Link>
