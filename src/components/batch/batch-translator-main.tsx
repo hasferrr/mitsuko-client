@@ -68,14 +68,13 @@ import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
-// createTranslationForBatch comes from project store
-
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { SubtitleList } from "../translate/subtitle-list"
 import { SubtitleResultOutput } from "../translate/subtitle-result-output"
+import { SortableBatchFile } from "./sortable-batch-file"
 
 interface BatchFile {
   id: string
@@ -272,39 +271,6 @@ export default function BatchTranslatorMain() {
     }
   }
 
-  function SortableBatchFile({ batchFile, onDelete, onDownload, onClick }: { batchFile: BatchFile; onDelete: (id: string) => void; onDownload: (id: string, option: DownloadOption, format: CombinedFormat) => void; onClick: (id: string) => void }) {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id })
-    const style = { transform: CSS.Transform.toString(transform), transition }
-    return (
-      <Card ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>} style={style} className="flex cursor-pointer" onClick={() => onClick(batchFile.id)}>
-        <div className="flex items-center ml-4 cursor-grab" {...attributes} {...listeners}>
-          <GripVertical className="h-5 w-5 text-muted-foreground" />
-        </div>
-        <CardContent className="p-4 flex-1 flex items-center justify-between">
-          <div>
-            <p className="font-semibold">{batchFile.title}</p>
-            <p className="text-sm text-muted-foreground">{batchFile.subtitlesCount} lines</p>
-          </div>
-          <div className="flex items-center gap-2">
-            {batchFile.status === 'pending' && <Badge variant="secondary">Pending</Badge>}
-            {batchFile.status === 'translating' && <Badge variant="outline">Translating ({batchFile.progress.toFixed(0)}%)</Badge>}
-            {batchFile.status === 'done' && (
-              <>
-                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id, 'translated', 'o-n-t') }}>
-                  <Download className="h-4 w-4" />
-                </Button>
-                <Badge variant="default">Done</Badge>
-              </>
-            )}
-            {batchFile.status === 'error' && <Badge variant="destructive">Error</Badge>}
-            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDelete(batchFile.id) }}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
 
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
