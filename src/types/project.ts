@@ -23,6 +23,16 @@ export interface Project {
   updatedAt: Date
 }
 
+export interface Batch {
+  id: string
+  name: string
+  translations: string[] // Array of Translation IDs
+  defaultBasicSettingsId: string
+  defaultAdvancedSettingsId: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface Translation {
   id: string
   title: string
@@ -31,6 +41,7 @@ export interface Translation {
   createdAt: Date
   updatedAt: Date
   projectId: string
+  batchId: string
   basicSettingsId: string
   advancedSettingsId: string
   response: ResponseTranslation

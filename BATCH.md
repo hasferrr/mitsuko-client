@@ -9,7 +9,7 @@ PLEASE READ THESE INSTRUCTIONS BEFORE YOU START WORKING ON THE BATCH TRANSLATOR 
 
 ## Store
 
-- [ ] create batch type
+- [x] create batch type
   ```ts
   export interface Batch {
     id: string
@@ -21,12 +21,12 @@ PLEASE READ THESE INSTRUCTIONS BEFORE YOU START WORKING ON THE BATCH TRANSLATOR 
     updatedAt: Date
   }
   ```
-- [ ] create batch store
-- [ ] create batch dexie db migration
+- [x] create batch store
+- [x] create batch dexie db migration
 - [ ] integrate useSettings hook
-- [ ] bump Dexie version and add `batches` table schema
-- [ ] write Dexie `.upgrade()` migration for existing data
-- [ ] update `Translation` data model to link back to its parent `Batch` via `batchId: string`.
+- [x] bump Dexie version and add `batches` table schema
+- [x] write Dexie `.upgrade()` migration for existing data
+- [x] update `Translation` data model to link back to its parent `Batch` via `batchId: string`.
 
 ## Batch Translator Component
 
