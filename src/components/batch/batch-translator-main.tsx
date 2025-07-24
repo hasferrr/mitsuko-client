@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -69,6 +69,10 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 // createTranslationForBatch comes from project store
 
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
+import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+
 interface BatchFile {
   id: string
   status: "pending" | "translating" | "done" | "error"
@@ -90,6 +94,13 @@ export default function BatchTranslatorMain() {
   const createTranslationForBatch = useProjectStore((state) => state.createTranslationForBatch)
   const renameProject = useProjectStore((state) => state.renameProject)
   const removeTranslationFromBatch = useProjectStore((state) => state.removeTranslationFromBatch)
+  const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
+
+  const [order, setOrder] = useState<string[]>(currentProject?.translations ?? [])
+
+  useEffect(() => {
+    if (currentProject?.translations) setOrder(currentProject.translations)
+  }, [currentProject?.translations?.join("-")])
 
   const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
 
@@ -118,6 +129,20 @@ export default function BatchTranslatorMain() {
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const session = useSessionStore((state) => state.session)
   const { setHasChanges } = useUnsavedChanges()
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
+
+  const handleDragEnd = (event: import("@dnd-kit/core").DragEndEvent) => {
+    const { active, over } = event
+    if (!over || !currentProject) return
+    if (active.id === over.id) return
+    const oldIndex = currentProject.translations.indexOf(active.id as string)
+    const newIndex = currentProject.translations.indexOf(over.id as string)
+    if (oldIndex === -1 || newIndex === -1) return
+    const newOrder = arrayMove(order, oldIndex, newIndex)
+    setOrder(newOrder)
+    updateProjectItems(currentProject.id, newOrder, 'translations')
+  }
 
   const handleFileDrop = async (droppedFiles: FileList | File[]) => {
     if (!droppedFiles || !currentProject || !currentProject.isBatch) return
@@ -155,7 +180,7 @@ export default function BatchTranslatorMain() {
   }
 
   // Get batch files from translationData
-  const batchFiles: BatchFile[] = currentProject && currentProject.isBatch ? currentProject.translations.map(id => {
+  const batchFiles: BatchFile[] = currentProject && currentProject.isBatch ? order.map(id => {
     const translation = translationData[id]
     return {
       id,
@@ -209,6 +234,37 @@ export default function BatchTranslatorMain() {
     if (currentProject?.id && value.trim()) {
       renameProject(currentProject.id, value)
     }
+  }
+
+  function SortableBatchFile({ batchFile, onDelete, onDownload }: { batchFile: BatchFile; onDelete: (id: string) => void; onDownload: (id: string, option: DownloadOption, format: CombinedFormat) => void }) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id })
+    const style = { transform: CSS.Transform.toString(transform), transition }
+    return (
+      <Card ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>} style={style} {...attributes} {...listeners}>
+        <CardContent className="p-4 flex items-center justify-between">
+          <div>
+            <p className="font-semibold">{batchFile.title}</p>
+            <p className="text-sm text-muted-foreground">{batchFile.subtitlesCount} lines</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {batchFile.status === 'pending' && <Badge variant="secondary">Pending</Badge>}
+            {batchFile.status === 'translating' && <Badge variant="outline">Translating ({batchFile.progress.toFixed(0)}%)</Badge>}
+            {batchFile.status === 'done' && (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => onDownload(batchFile.id, 'translated', 'o-n-t')}>
+                  <Download className="h-4 w-4" />
+                </Button>
+                <Badge variant="default">Done</Badge>
+              </>
+            )}
+            {batchFile.status === 'error' && <Badge variant="destructive">Error</Badge>}
+            <Button variant="ghost" size="sm" onClick={() => onDelete(batchFile.id)}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -283,34 +339,13 @@ export default function BatchTranslatorMain() {
           </DragAndDrop>
 
           <div className="space-y-2">
-            {batchFiles.map((batchFile) => (
-              <Card key={batchFile.id}>
-                <CardContent className="p-4 flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold">{batchFile.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {batchFile.subtitlesCount} lines
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {batchFile.status === 'pending' && <Badge variant="secondary">Pending</Badge>}
-                    {batchFile.status === 'translating' && <Badge variant="outline">Translating ({batchFile.progress.toFixed(0)}%)</Badge>}
-                    {batchFile.status === 'done' && (
-                      <>
-                        <Button variant="ghost" size="sm" onClick={() => handleFileDownload(batchFile.id, 'translated', 'o-n-t')}>
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Badge variant="default">Done</Badge>
-                      </>
-                    )}
-                    {batchFile.status === 'error' && <Badge variant="destructive">Error</Badge>}
-                    <Button variant="ghost" size="sm" onClick={() => setDeleteFileId(batchFile.id)}>
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={order} strategy={verticalListSortingStrategy}>
+                {batchFiles.map(batchFile => (
+                  <SortableBatchFile key={batchFile.id} batchFile={batchFile} onDelete={id => setDeleteFileId(id)} onDownload={handleFileDownload} />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
         </div>
 
@@ -375,14 +410,14 @@ export default function BatchTranslatorMain() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={!!deleteFileId} onOpenChange={(open)=>!open && setDeleteFileId(null)}>
+      <AlertDialog open={!!deleteFileId} onOpenChange={(open) => !open && setDeleteFileId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Remove File</AlertDialogTitle>
             <AlertDialogDescription>Are you sure you want to remove this file from the batch? This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={()=>setDeleteFileId(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setDeleteFileId(null)}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDeleteFile}>Remove</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

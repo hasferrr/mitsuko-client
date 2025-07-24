@@ -57,10 +57,10 @@ Batch logic is now handled by the existing **Project** store.
   - [ ] A function within the component will calculate the average progress (`total progress / number of files`) and update the UI.
 
 ### UI Enhancements
-- [ ] **Drag-and-Drop Reordering:**
-  - [ ] Use `@dnd-kit` to allow reordering of files in the batch list.
-  - [ ] On `onDragEnd`, update the order of translation IDs in the `useProjectStore`.
-  - [ ] This new order will be persisted to Dexie to be saved across sessions.
+- [x] **Drag-and-Drop Reordering:**
+  - [x] Use `@dnd-kit` to allow reordering of files in the batch list.
+  - [x] On `onDragEnd`, update the order of translation IDs in the `useProjectStore`.
+  - [x] This new order will be persisted to Dexie to be saved across sessions.
 
 ### Batch Export Options
 - [ ] **Export as ZIP Archive:**
