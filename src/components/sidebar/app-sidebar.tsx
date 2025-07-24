@@ -4,6 +4,7 @@ import Link from "next/link"
 import {
   AudioWaveform,
   BookOpen,
+  Box,
   Folder,
   House,
   Languages,
@@ -41,6 +42,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Project",
         url: "/project",
         icon: Folder,
+      },
+      {
+        title: "Batch",
+        url: "/batch",
+        icon: Box,
       },
       {
         title: "Translate",
