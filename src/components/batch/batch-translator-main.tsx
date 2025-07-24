@@ -364,7 +364,15 @@ export default function BatchTranslatorMain() {
     setIsBatchTranslating(true)
     setHasChanges(true)
 
-    const ids = batchFiles.map(f => f.id)
+    const ids = batchFiles
+      .map(f => f.id)
+      .filter(id => !isTranslatingSet.has(id))
+
+    if (ids.length === 0) {
+      setIsBatchTranslating(false)
+      return
+    }
+
     setQueueSet(new Set(ids.slice(maxConcurrentTranslations)))
 
     let index = 0
@@ -386,11 +394,18 @@ export default function BatchTranslatorMain() {
         return
       }
       const id = ids[index++]
+
+      if (isTranslatingSet.has(id)) {
+        launch()
+        return
+      }
+
       setQueueSet(prev => {
         const next = new Set(prev)
         next.delete(id)
         return next
       })
+
       active++
       handleStartTranslation(id, undefined, undefined, true).finally(() => {
         setIsTranslating(id, false)
@@ -419,7 +434,15 @@ export default function BatchTranslatorMain() {
     setIsBatchTranslating(true)
     setHasChanges(true)
 
-    const ids = batchFiles.map(f => f.id)
+    const ids = batchFiles
+      .map(f => f.id)
+      .filter(id => !isTranslatingSet.has(id))
+
+    if (ids.length === 0) {
+      setIsBatchTranslating(false)
+      return
+    }
+
     setQueueSet(new Set(ids.slice(maxConcurrentTranslations)))
 
     let index = 0
@@ -441,11 +464,18 @@ export default function BatchTranslatorMain() {
         return
       }
       const id = ids[index++]
+
+      if (isTranslatingSet.has(id)) {
+        launch()
+        return
+      }
+
       setQueueSet(prev => {
         const next = new Set(prev)
         next.delete(id)
         return next
       })
+
       active++
       handleContinueTranslation(id).finally(() => {
         setIsTranslating(id, false)
