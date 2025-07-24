@@ -11,6 +11,7 @@ import {
 import { DownloadOption, CombinedFormat } from "@/types/subtitles"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { cn } from "@/lib/utils"
 
 interface BatchFile {
   id: string
@@ -27,6 +28,9 @@ interface SortableBatchFileProps {
   onDelete: (id: string) => void
   onDownload: (id: string, option: DownloadOption, format: CombinedFormat) => void
   onClick: (id: string) => void
+  selectMode?: boolean
+  selected?: boolean
+  onSelectToggle?: (id: string) => void
 }
 
 export function SortableBatchFile({
@@ -34,14 +38,50 @@ export function SortableBatchFile({
   onDelete,
   onDownload,
   onClick,
+  selectMode = false,
+  selected = false,
+  onSelectToggle,
 }: SortableBatchFileProps) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id })
   const style = { transform: CSS.Transform.toString(transform), transition }
+
+  const handleCardClick = () => {
+    if (selectMode) {
+      onSelectToggle?.(batchFile.id)
+    } else {
+      onClick(batchFile.id)
+    }
+  }
+
   return (
-    <Card ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>} style={style} className="flex cursor-pointer" onClick={() => onClick(batchFile.id)}>
-      <div className="flex items-center ml-4 cursor-grab" {...attributes} {...listeners}>
-        <GripVertical className="h-5 w-5 text-muted-foreground" />
-      </div>
+    <Card
+      ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>}
+      style={style}
+      className={cn(
+        "flex",
+        selectMode ? "cursor-default select-none" : "cursor-pointer",
+        selected && "bg-primary/10"
+      )}
+      onClick={handleCardClick}
+    >
+      {selectMode ? (
+        <div className="flex items-center ml-4">
+          <input
+            type="checkbox"
+            className="w-4 h-4"
+            checked={selected}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => {
+              e.stopPropagation()
+              onSelectToggle?.(batchFile.id)
+            }}
+          />
+        </div>
+      ) : (
+        <div className="flex items-center ml-4 cursor-grab" {...attributes} {...listeners}>
+          <GripVertical className="h-5 w-5 text-muted-foreground" />
+        </div>
+      )}
       <CardContent className="p-4 flex-1 flex items-center justify-between">
         <div>
           <p className="text-sm">{batchFile.title}</p>
@@ -65,9 +105,11 @@ export function SortableBatchFile({
             </>
           )}
           {batchFile.status === 'error' && <Badge variant="destructive">Error</Badge>}
-          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDelete(batchFile.id) }}>
-            <X className="h-4 w-4" />
-          </Button>
+          {!selectMode && (
+            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDelete(batchFile.id) }}>
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>

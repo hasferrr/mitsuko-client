@@ -28,6 +28,8 @@ import {
   X,
   GripVertical,
   Square,
+  CheckSquare,
+  ListChecks,
 } from "lucide-react"
 import {
   LanguageSelection,
@@ -106,6 +108,11 @@ export default function BatchTranslatorMain() {
 
   const [activeTab, setActiveTab] = useState("basic")
   const [isBatchTranslating, setIsBatchTranslating] = useState(false)
+
+  // Selection state
+  const [isSelecting, setIsSelecting] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [isDeleteSelectedDialogOpen, setIsDeleteSelectedDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
   const [previewTranslationId, setPreviewTranslationId] = useState<string | null>(null)
@@ -211,6 +218,45 @@ export default function BatchTranslatorMain() {
     })
   }, [currentProject?.isBatch, order, translationData, isTranslatingSet, queueSet])
 
+  // --------------------- Selection helpers ---------------------
+  const toggleSelectMode = () => {
+    setIsSelecting(prev => {
+      if (prev) {
+        setSelectedIds(new Set())
+      }
+      return !prev
+    })
+  }
+
+  const handleSelectToggle = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const handleDeleteSelected = async () => {
+    if (!currentProject) return
+    for (const id of Array.from(selectedIds)) {
+      try {
+        await removeTranslationFromBatch(currentProject.id, id)
+      } catch {
+        toast.error('Failed to delete file')
+      }
+    }
+    setSelectedIds(new Set())
+    setIsSelecting(false)
+  }
+
+  const handleSelectAllToggle = () => {
+    if (selectedIds.size === batchFiles.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(batchFiles.map(f => f.id)))
+    }
+  }
 
   const handleDragEnd = (event: import("@dnd-kit/core").DragEndEvent) => {
     const { active, over } = event
@@ -831,21 +877,68 @@ export default function BatchTranslatorMain() {
           <input
             type="file"
             ref={fileInputRef}
-            className="hidden"
+            hidden
             onChange={handleFileInputChange}
             accept={acceptedFormats.join(",")}
             multiple
           />
 
-          <DragAndDrop onDropFiles={handleFileDrop} disabled={isBatchTranslating}>
-            <div className={cn(
-              "space-y-2 max-h-[510px] pr-2 overflow-x-hidden",
-              batchFiles.length > 6 && "overflow-y-auto"
-            )}>
+          {/* Selection Controls */}
+          <div className={cn(
+            "flex items-center gap-2 justify-end pr-2",
+            !batchFiles.length && "hidden"
+          )}>
+            {isSelecting && (
+              <>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="gap-2 rounded-lg"
+                  onClick={() => setIsDeleteSelectedDialogOpen(true)}
+                  disabled={selectedIds.size === 0}
+                >
+                  <Trash className="h-4 w-4" />
+                  Delete Subtitle
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 rounded-lg"
+                  onClick={handleSelectAllToggle}
+                  disabled={batchFiles.length === 0}
+                >
+                  <ListChecks className="h-4 w-4" />
+                  {selectedIds.size === batchFiles.length ? 'Deselect All' : 'Select All'}
+                </Button>
+              </>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 rounded-lg"
+              onClick={toggleSelectMode}
+              disabled={isBatchTranslating || batchFiles.length === 0}
+            >
+              <CheckSquare className="h-4 w-4" />
+              {isSelecting ? 'Cancel' : 'Select'}
+            </Button>
+          </div>
+
+          <DragAndDrop onDropFiles={handleFileDrop} disabled={isBatchTranslating} className={cn(!batchFiles.length && "hidden")}>
+            <div className="space-y-2 max-h-[510px] pr-2 overflow-x-hidden overflow-y-auto">
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <SortableContext items={order} strategy={verticalListSortingStrategy}>
                   {batchFiles.map(batchFile => (
-                    <SortableBatchFile key={batchFile.id} batchFile={batchFile} onDelete={id => setDeleteFileId(id)} onDownload={handleFileDownload} onClick={handlePreview} />
+                    <SortableBatchFile
+                      key={batchFile.id}
+                      batchFile={batchFile}
+                      onDelete={id => setDeleteFileId(id)}
+                      onDownload={handleFileDownload}
+                      onClick={handlePreview}
+                      selectMode={isSelecting}
+                      selected={selectedIds.has(batchFile.id)}
+                      onSelectToggle={handleSelectToggle}
+                    />
                   ))}
                 </SortableContext>
               </DndContext>
@@ -975,6 +1068,22 @@ export default function BatchTranslatorMain() {
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setDeleteFileId(null)}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDeleteFile}>Remove</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Selected Subtitles Dialog */}
+      <AlertDialog open={isDeleteSelectedDialogOpen} onOpenChange={(open) => !open && setIsDeleteSelectedDialogOpen(false)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Selected Subtitles</AlertDialogTitle>
+            <AlertDialogDescription>
+              {`Are you sure you want to delete ${selectedIds.size} selected subtitle${selectedIds.size === 1 ? "" : "s"}? This action cannot be undone.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteSelectedDialogOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { handleDeleteSelected(); setIsDeleteSelectedDialogOpen(false) }}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

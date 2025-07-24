@@ -6,12 +6,14 @@ import { cn } from "@/lib/utils"
 interface DragAndDropProps extends PropsWithChildren {
   onDropFiles: (files: FileList) => void
   disabled?: boolean
+  className?: string
 }
 
 export const DragAndDrop: React.FC<DragAndDropProps> = ({
   children,
   onDropFiles,
   disabled = false,
+  className,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false)
 
@@ -48,6 +50,7 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({
       className={cn(
         "relative p-0 border-2 border-dashed rounded-md ",
         isDragOver ? "border-primary" : "border-transparent",
+        className,
       )}
     >
       {children}
