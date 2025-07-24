@@ -7,10 +7,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import {
   Play,
   Upload,
   Loader2,
   Download,
+  Trash,
+  ArrowLeft,
 } from "lucide-react"
 import {
   LanguageSelection,
@@ -53,6 +65,7 @@ import { getContent, parseTranslationJson } from "@/lib/parser/parser"
 import { createContextMemory } from "@/lib/context-memory"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
+import { useBatchStore } from "@/stores/data/use-batch-store"
 
 interface BatchFile {
   file: File
@@ -72,6 +85,11 @@ export default function BatchTranslatorMain() {
   const [isTranslating, setIsTranslating] = useState(false)
   const [activeTab, setActiveTab] = useState("basic")
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
+  const deleteBatch = useBatchStore((state) => state.deleteBatch)
+  const currentBatch = useBatchStore((state) => state.currentBatch)
+  const setCurrentBatch = useBatchStore((state) => state.setCurrentBatch)
 
   // Settings Stores
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -395,11 +413,26 @@ export default function BatchTranslatorMain() {
     URL.revokeObjectURL(url)
   }
 
+  const handleDeleteBatch = async () => {
+    if (currentBatch?.id) {
+      await deleteBatch(currentBatch.id)
+      setIsDeleteDialogOpen(false)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
       {/* Header */}
       <div className="flex flex-wrap items-center gap-4 mb-2">
-        <div className="flex-1 min-w-40">
+        <div className="flex-1 min-w-40 flex items-center gap-2">
+          <Button
+            variant="ghost"
+            className="h-10 w-10 flex-shrink-0"
+            onClick={() => setCurrentBatch(null)}
+            title="Go back to batch selection"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
           <Input
             value="Batch Translation"
             className="text-xl font-semibold h-12"
@@ -407,7 +440,7 @@ export default function BatchTranslatorMain() {
           />
         </div>
         <Button
-          className="gap-2"
+          className="gap-2 h-10"
           onClick={handleStartBatchTranslation}
           disabled={isTranslating || !session || files.length === 0}
         >
@@ -422,6 +455,13 @@ export default function BatchTranslatorMain() {
               {session ? `Translate ${files.length} files` : "Sign In to Start"}
             </>
           )}
+        </Button>
+        <Button
+          variant="outline"
+          className="h-10 w-10"
+          onClick={() => setIsDeleteDialogOpen(true)}
+        >
+          <Trash className="h-5 w-5" />
         </Button>
       </div>
 
@@ -525,6 +565,21 @@ export default function BatchTranslatorMain() {
           </Tabs>
         </div>
       </div>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Batch</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this batch? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteBatch}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
