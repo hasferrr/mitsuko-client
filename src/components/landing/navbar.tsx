@@ -23,7 +23,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-4 z-50 w-full px-4 flex justify-center">
       <div className="w-full max-w-5xl bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 rounded-xl border border-gray-200/70 dark:border-gray-800/70">
-        <div className="px-6 flex h-16 items-center justify-between">
+        <div className="px-6 flex h-16 items-center justify-between relative">
           <div className="flex items-center gap-4 md:gap-8">
             <button
               className="md:hidden text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
@@ -48,11 +48,11 @@ export default function Navbar() {
                 Mitsuko
               </Link>
             )}
-
-            <nav className="hidden md:flex items-center space-x-8">
-              <NavLinks />
-            </nav>
           </div>
+
+          <nav className="hidden md:flex items-center space-x-8 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <NavLinks />
+          </nav>
 
           <div className="flex items-center gap-4 md:gap-6">
             <ThemeToggle />

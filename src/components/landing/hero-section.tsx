@@ -16,7 +16,7 @@ export default function HeroSection() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4.5rem)] supports-[height:100dvh]:min-h-[calc(100dvh-4.5rem)] flex flex-col justify-between items-center text-center px-4 my-12">
+    <div className="flex flex-col justify-between items-center text-center px-4 my-12">
       {/* Notification banner */}
       <div className="flex justify-center">
         <Link href="/dashboard" className="group flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a1a1a] dark:hover:bg-[#252525] hover:bg-gray-50 transition-colors drop-shadow-sm">
