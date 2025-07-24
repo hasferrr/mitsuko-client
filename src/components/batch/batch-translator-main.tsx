@@ -600,6 +600,7 @@ export default function BatchTranslatorMain() {
         fewShotExamples: usedFewShot,
         promptWithPlanning: isAdvancedReasoningEnabled,
         uuid: currentId,
+        isBatch: true,
       }
 
       let tlChunk: SubOnlyTranslated[] = []
