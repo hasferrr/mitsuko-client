@@ -44,14 +44,14 @@ export function SortableBatchFile({
       </div>
       <CardContent className="p-4 flex-1 flex items-center justify-between">
         <div>
-          <p className="font-semibold">{batchFile.title}</p>
+          <p className="text-sm">{batchFile.title}</p>
           <p className="text-sm text-muted-foreground">
             {batchFile.translatedCount === batchFile.subtitlesCount
               ? `${batchFile.subtitlesCount} lines`
               : `${batchFile.translatedCount}/${batchFile.subtitlesCount} lines`}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {batchFile.status === 'pending' && <Badge variant="secondary">Pending</Badge>}
           {batchFile.status === 'partial' && <Badge variant="outline">Partial</Badge>}
           {batchFile.status === 'translating' && <Badge variant="outline">Translating ({batchFile.progress.toFixed(0)}%)</Badge>}
