@@ -104,10 +104,9 @@ const subNameMap = new Map([
 const acceptedFormats = [".srt", ".ass", ".vtt"]
 
 export default function BatchTranslatorMain() {
-  const MAX_CONCURRENT_TRANSLATIONS = 5
-
   const [activeTab, setActiveTab] = useState("basic")
   const [isBatchTranslating, setIsBatchTranslating] = useState(false)
+  const [maxConcurrentTranslations, setMaxConcurrentTranslations] = useState(5)
 
   // Selection state
   const [isSelecting, setIsSelecting] = useState(false)
@@ -312,7 +311,7 @@ export default function BatchTranslatorMain() {
     setHasChanges(true)
 
     const ids = batchFiles.map(f => f.id)
-    setQueueSet(new Set(ids.slice(MAX_CONCURRENT_TRANSLATIONS)))
+    setQueueSet(new Set(ids.slice(maxConcurrentTranslations)))
 
     let index = 0
     let active = 0
@@ -346,7 +345,7 @@ export default function BatchTranslatorMain() {
       })
     }
 
-    for (let i = 0; i < MAX_CONCURRENT_TRANSLATIONS && i < ids.length; i++) {
+    for (let i = 0; i < maxConcurrentTranslations && i < ids.length; i++) {
       launch()
     }
   }
@@ -358,7 +357,7 @@ export default function BatchTranslatorMain() {
     setHasChanges(true)
 
     const ids = batchFiles.map(f => f.id)
-    setQueueSet(new Set(ids.slice(MAX_CONCURRENT_TRANSLATIONS)))
+    setQueueSet(new Set(ids.slice(maxConcurrentTranslations)))
 
     let index = 0
     let active = 0
@@ -392,7 +391,7 @@ export default function BatchTranslatorMain() {
       })
     }
 
-    for (let i = 0; i < MAX_CONCURRENT_TRANSLATIONS && i < ids.length; i++) {
+    for (let i = 0; i < maxConcurrentTranslations && i < ids.length; i++) {
       launch()
     }
   }
@@ -911,6 +910,39 @@ export default function BatchTranslatorMain() {
                   {selectedIds.size === batchFiles.length ? 'Deselect All' : 'Select All'}
                 </Button>
               </>
+            )}
+            {!isSelecting && (
+              <div className="flex items-center gap-2 mr-auto">
+                <span className="text-sm">Max Concurrent:</span>
+                <div className="flex items-center">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 rounded-r-none select-none"
+                    onClick={() => setMaxConcurrentTranslations(prev => Math.max(1, prev - 1))}
+                    disabled={maxConcurrentTranslations <= 1}
+                  >
+                    -
+                  </Button>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={5}
+                    value={maxConcurrentTranslations}
+                    onChange={(e) => setMaxConcurrentTranslations(Math.max(1, Math.min(5, parseInt(e.target.value) || 1)))}
+                    className="w-12 h-8 text-center rounded-none border-x-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 rounded-l-none select-none"
+                    onClick={() => setMaxConcurrentTranslations(prev => Math.min(5, prev + 1))}
+                    disabled={maxConcurrentTranslations >= 5}
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
             )}
             <Button
               variant="outline"
