@@ -23,7 +23,7 @@ export default function BatchTranslator() {
   }, [loadBatches])
 
   const handleCreateBatch = async () => {
-    const newBatch = await createBatch(`New Batch ${new Date().toLocaleString()}`)
+    const newBatch = await createBatch(`Batch ${new Date().toLocaleDateString()}`)
     setCurrentBatch(newBatch)
   }
 
@@ -34,9 +34,9 @@ export default function BatchTranslator() {
 
   if (!batch) {
     return (
-      <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Select a Batch</h2>
+      <div className="flex flex-col gap-4 mx-auto container p-4 mb-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-medium">Select a Batch</h2>
           <Button onClick={handleCreateBatch}>
             <Plus size={18} className="mr-2" />
             Create New Batch
