@@ -63,9 +63,9 @@ Batch logic is now handled by the existing **Project** store.
   - [x] This new order will be persisted to Dexie to be saved across sessions.
 
 ### Batch Export Options
-- [ ] **Export as ZIP Archive:**
-  - [ ] Add an "Export All as ZIP" button. This will export all *completed* translations.
-  - [ ] Use the `jszip` library to create a zip archive in the browser.
-  - [ ] For each completed file, generate the translated subtitle content.
-  - [ ] Add each generated file to the zip with a descriptive name (e.g., `original-name-translated.srt`).
-  - [ ] Trigger a download of the generated zip file.
+- [x] **Export as ZIP Archive:**
+  - [x] Add an "Export All as ZIP" button. This will export all *completed* translations.
+  - [x] Use the `jszip` library to create a zip archive in the browser.
+  - [x] For each completed file, generate the translated subtitle content.
+  - [x] Add each generated file to the zip with a descriptive name (e.g., `original-name-translated.srt`).
+  - [x] Trigger a download of the generated zip file.

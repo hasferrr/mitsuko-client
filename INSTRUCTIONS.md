@@ -38,6 +38,7 @@ From each source, the system generates:
 
 ### Core Functionalities
 - **Context-Aware Subtitle Translation** → Utilizes previous episode context for highly accurate translations in over 100 languages.
+- **Batch Subtitle Translation** → Translate multiple subtitle files concurrently with queue management, selection, and drag-and-drop reordering.
 - **Audio-to-Subtitle Transcription** → Generates perfectly timed subtitles from various audio formats.
 - **AI-Powered Context Extraction** → Analyzes subtitle content to build a reusable knowledge base for consistent translations across a series.
 - **My Library** → Manages a list of user's custom instructions for AI tasks.
@@ -133,7 +134,7 @@ This is the main source code folder for the Next.js application. All application
       - `project/page.tsx`: Displays the contents and tasks within a single project.
       - `library/page.tsx`: Hosts the custom instruction Library, rendering `LibraryView` and its tabs.
       - `tools/page.tsx`: Central hub for supplementary utilities (e.g., subtitle tools, viewers).
-      - `translate/page.tsx`, `transcribe/page.tsx`, `extract-context/page.tsx`: These are the main pages for the core application features.
+      - `batch/page.tsx`, `translate/page.tsx`, `transcribe/page.tsx`, `extract-context/page.tsx`: These are the main pages for the core application features.
 
 - **`components/`**: Contains all reusable React components. This is the heart of the UI.
   - **Style:** Components are built with **Shadcn UI** (`@/components/ui`) and **Tailwind CSS**. Logic is encapsulated within the component or sourced from hooks. Props interfaces are defined directly in the component file.
@@ -156,6 +157,9 @@ This is the main source code folder for the Next.js application. All application
       - `library/import-instructions-dialog.tsx`: Dialog for importing instructions from JSON with schema validation, selectable items, and ID conflict handling.
       - `library/my-library.tsx`: Implements the “My Library” view with search, CRUD, export, and publish capabilities for the user’s own instructions.
       - `library/public-library.tsx`: Implements the “Public Library” view for browsing, searching, paginating, importing, and deleting public instructions (owner-only delete).
+      - `batch/batch-translator.tsx`: A wrapper component that manages batch projects and renders `BatchTranslatorMain`.
+      - `batch/batch-translator-main.tsx`: The primary container for batch subtitle translation, handling file upload, selection, concurrent translation, and downloads.
+      - `batch/sortable-batch-file.tsx`: A sortable list item component representing an individual subtitle file within a batch with status indicators and actions.
 
 - **`constants/`**: Contains static, hard-coded values used throughout the application. This prevents magic strings and numbers in the codebase, making maintenance easier.
   - **Style:** Files export `const` variables.
@@ -248,7 +252,7 @@ This is the main source code folder for the Next.js application. All application
     Stores are organized into subdirectories by their domain: `data` for core application data, `services` for managing API calls and processes, and `settings` for user-configurable options.
 
     -   **`data/`**: Stores that hold the primary data structures of the application, often mirroring the database schema.
-        -   `use-project-store.ts`: Manages the list of all projects, the currently selected project, and performs CRUD operations on projects.
+        -   `use-project-store.ts`: Manages the list of all projects (including **Batch** projects where `isBatch` is `true`), the currently selected project, and performs CRUD operations on projects.
         -   `use-translation-data-store.ts`: Holds the in-memory data for individual translation tasks, including subtitles and results. It interfaces with Dexie.js for persistence.
         -   `use-transcription-data-store.ts`: Manages data for audio transcription tasks.
         -   `use-extraction-data-store.ts`: Manages data for context extraction tasks.
@@ -285,7 +289,7 @@ This is the main source code folder for the Next.js application. All application
 - **`types/`**: Contains shared TypeScript type definitions and interfaces used across the application.
   - **Style:** Uses `interface` for object shapes and `type` for unions or other complex types. Files are named after the data model they describe.
   - **Structure:**
-    - `project.ts`: Defines the core data models for the application, such as `Project`, `Translation`, `Transcription`, `Extraction`, `BasicSettings`, and `AdvancedSettings`.
+    - `project.ts`: Defines the core data models for the application, such as `Project` (with an `isBatch` boolean that marks a Batch Translation project), `Translation`, `Transcription`, `Extraction`, `BasicSettings`, and `AdvancedSettings`.
     - `public-custom-instruction.ts`: Defines the `PublicCustomInstruction` type used by the public instruction sharing feature.
     - `subtitles.ts`: Defines the various shapes of subtitle data, including `Subtitle`, `SubtitleTranslated`, `Timestamp`, and `Parsed` (which holds format-specific data like ASS headers).
     - `model.ts`: Defines the `Model` interface, which describes the properties of an AI model, and the `ModelProvider` type.

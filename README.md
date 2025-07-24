@@ -31,6 +31,15 @@ Originally designed for anime translations, Mitsuko combines linguistic accuracy
   - Structured JSON output
   - Full context memory mode
 
+### Batch Subtitle Translation
+
+- Translate **multiple subtitle files** in one go
+- Drag-and-drop uploader with **reordering** via @dnd-kit
+- **Queue management** with configurable max concurrent translations
+- Checkbox selection for targeted processing
+- Real-time progress and status indicators
+- Export all completed files as a **ZIP archive**
+
 ### Audio Transcription
 
 - Generate **perfectly timed subtitles** from audio
@@ -101,6 +110,15 @@ cd mitsuko-client && bun dev        # Frontend
 5. Start translation
 6. Export translated file
 
+### Batch Subtitle Translation
+
+1. Create a new Batch project
+2. Drag-and-drop multiple SRT/ASS/VTT files
+3. Reorder or select files as needed
+4. Configure settings (languages, model, etc.)
+5. Start batch translation (or Continue/Stop)
+6. Download all translated files as ZIP
+
 ### Audio Transcription
 
 1. Upload audio file
@@ -143,7 +161,7 @@ cd mitsuko-client && bun dev        # Frontend
 - **Context Memory Modes**: Full, Balanced, and Minimal context strategies
 - **Advanced Reasoning**: Multi-step AI thinking process for complex translations
 - **Credit System**: Usage-based pricing with real-time credit tracking
-- **Concurrent Processing**: Handle multiple files simultaneously
+- **Batch Subtitle Translation**: Concurrently translate multiple subtitle files with queue management and ZIP export
 - **Custom Models**: Support for self-hosted AI models (OpenAI compatible)
 
 ## 🤝 Contributing
