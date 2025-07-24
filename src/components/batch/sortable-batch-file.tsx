@@ -14,7 +14,7 @@ import { CSS } from "@dnd-kit/utilities"
 
 interface BatchFile {
   id: string
-  status: "pending" | "partial" | "translating" | "done" | "error"
+  status: "pending" | "partial" | "translating" | "queued" | "done" | "error"
   progress: number
   title: string
   subtitlesCount: number
@@ -55,6 +55,7 @@ export function SortableBatchFile({
           {batchFile.status === 'pending' && <Badge variant="secondary">Pending</Badge>}
           {batchFile.status === 'partial' && <Badge variant="outline">Partial</Badge>}
           {batchFile.status === 'translating' && <Badge variant="outline">Translating ({batchFile.progress.toFixed(0)}%)</Badge>}
+          {batchFile.status === 'queued' && <Badge variant="secondary">Queued</Badge>}
           {batchFile.status === 'done' && (
             <>
               <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id, 'translated', 'o-n-t') }}>

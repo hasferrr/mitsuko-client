@@ -85,7 +85,7 @@ import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated
 
 interface BatchFile {
   id: string
-  status: "pending" | "partial" | "translating" | "done" | "error"
+  status: "pending" | "partial" | "translating" | "queued" | "done" | "error"
   progress: number
   title: string
   subtitlesCount: number
@@ -102,12 +102,16 @@ const subNameMap = new Map([
 const acceptedFormats = [".srt", ".ass", ".vtt"]
 
 export default function BatchTranslatorMain() {
+  const MAX_CONCURRENT_TRANSLATIONS = 5
+
   const [activeTab, setActiveTab] = useState("basic")
   const [isBatchTranslating, setIsBatchTranslating] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
   const [previewTranslationId, setPreviewTranslationId] = useState<string | null>(null)
+  const [queueSet, setQueueSet] = useState<Set<string>>(new Set())
 
+  const queueAbortRef = useRef(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Project Store
@@ -185,6 +189,8 @@ export default function BatchTranslatorMain() {
 
       if (isTranslatingSet.has(id)) {
         status = "translating"
+      } else if (queueSet.has(id)) {
+        status = "queued"
       } else if (translatedCount === 0) {
         status = "pending"
       } else if (translatedCount < totalSubtitles) {
@@ -203,7 +209,7 @@ export default function BatchTranslatorMain() {
         type: translation?.parsed?.type || "srt",
       }
     })
-  }, [currentProject?.isBatch, order, translationData, isTranslatingSet])
+  }, [currentProject?.isBatch, order, translationData, isTranslatingSet, queueSet])
 
 
   const handleDragEnd = (event: import("@dnd-kit/core").DragEndEvent) => {
@@ -253,29 +259,107 @@ export default function BatchTranslatorMain() {
     fileInputRef.current?.click()
   }
 
-  const handleStartBatchTranslation = async () => {
-    if (batchFiles.length === 0) return
+  const handleStartBatchTranslation = () => {
+    if (batchFiles.length === 0 || isBatchTranslating) return
+    queueAbortRef.current = false
     setIsBatchTranslating(true)
     setHasChanges(true)
-    await Promise.all(batchFiles.map(f => handleStartTranslation(f.id)))
-    setIsBatchTranslating(false)
+
+    const ids = batchFiles.map(f => f.id)
+    setQueueSet(new Set(ids.slice(MAX_CONCURRENT_TRANSLATIONS)))
+
+    let index = 0
+    let active = 0
+
+    const launch = () => {
+      if (queueAbortRef.current) {
+        if (active === 0) {
+          setIsBatchTranslating(false)
+          setQueueSet(new Set())
+        }
+        return
+      }
+      if (index >= ids.length) {
+        if (active === 0) {
+          setIsBatchTranslating(false)
+          setQueueSet(new Set())
+        }
+        return
+      }
+      const id = ids[index++]
+      setQueueSet(prev => {
+        const next = new Set(prev)
+        next.delete(id)
+        return next
+      })
+      active++
+      handleStartTranslation(id, undefined, undefined, true).finally(() => {
+        setIsTranslating(id, false)
+        active--
+        launch()
+      })
+    }
+
+    for (let i = 0; i < MAX_CONCURRENT_TRANSLATIONS && i < ids.length; i++) {
+      launch()
+    }
   }
 
-  const handleContinueBatchTranslation = async () => {
-    if (batchFiles.length === 0) return
+  const handleContinueBatchTranslation = () => {
+    if (batchFiles.length === 0 || isBatchTranslating) return
+    queueAbortRef.current = false
     setIsBatchTranslating(true)
     setHasChanges(true)
-    await Promise.all(batchFiles.map(f => handleContinueTranslation(f.id)))
-    setIsBatchTranslating(false)
+
+    const ids = batchFiles.map(f => f.id)
+    setQueueSet(new Set(ids.slice(MAX_CONCURRENT_TRANSLATIONS)))
+
+    let index = 0
+    let active = 0
+
+    const launch = () => {
+      if (queueAbortRef.current) {
+        if (active === 0) {
+          setIsBatchTranslating(false)
+          setQueueSet(new Set())
+        }
+        return
+      }
+      if (index >= ids.length) {
+        if (active === 0) {
+          setIsBatchTranslating(false)
+          setQueueSet(new Set())
+        }
+        return
+      }
+      const id = ids[index++]
+      setQueueSet(prev => {
+        const next = new Set(prev)
+        next.delete(id)
+        return next
+      })
+      active++
+      handleContinueTranslation(id).finally(() => {
+        setIsTranslating(id, false)
+        active--
+        launch()
+      })
+    }
+
+    for (let i = 0; i < MAX_CONCURRENT_TRANSLATIONS && i < ids.length; i++) {
+      launch()
+    }
   }
 
   const handleStopBatchTranslation = () => {
+    queueAbortRef.current = true
     const handleStopTranslation = (currentId: string) => {
       stopTranslation(currentId)
       setIsTranslating(currentId, false)
       saveData(currentId)
     }
     batchFiles.forEach(f => handleStopTranslation(f.id))
+    setQueueSet(new Set())
     setIsBatchTranslating(false)
   }
 
