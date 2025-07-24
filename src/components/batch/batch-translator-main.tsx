@@ -138,6 +138,7 @@ export default function BatchTranslatorMain() {
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const session = useSessionStore((state) => state.session)
   const { setHasChanges } = useUnsavedChanges()
+  const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
@@ -193,16 +194,28 @@ export default function BatchTranslatorMain() {
     if (!currentProject?.isBatch) return []
     return order.map(id => {
       const translation = translationData[id]
+
+      const totalSubtitles = translation?.subtitles?.length || 0
+      const translatedCount = translation?.subtitles?.filter(s => s.translated && s.translated.trim() !== "").length || 0
+      const progress = totalSubtitles ? (translatedCount / totalSubtitles) * 100 : 0
+
+      let status: BatchFile["status"] = "pending"
+      if (isTranslatingSet.has(id)) {
+        status = "translating"
+      } else if (translatedCount === totalSubtitles && totalSubtitles > 0) {
+        status = "done"
+      }
+
       return {
         id,
         title: translation?.title || "Loading...",
-        subtitlesCount: translation?.subtitles?.length || 0,
-        status: "pending", // We need to implement proper status tracking
-        progress: 0,
-        type: translation?.parsed?.type || "srt"
+        subtitlesCount: totalSubtitles,
+        status,
+        progress,
+        type: translation?.parsed?.type || "srt",
       }
     })
-  }, [currentProject?.isBatch, order, translationData])
+  }, [currentProject?.isBatch, order, translationData, isTranslatingSet])
 
   const handleStartBatchTranslation = async () => {
     if (batchFiles.length === 0) return
