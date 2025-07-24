@@ -38,9 +38,9 @@ PLEASE READ THESE INSTRUCTIONS BEFORE YOU START WORKING ON THE BATCH TRANSLATOR 
     - [x] The `basicSettingsId` and `advancedSettingsId` for the new `Translation` will be copied from the batch's default settings IDs.
     - [x] Add the new `Translation` ID to the `translations` array in the current `Batch` object.
     - [x] Update both `use-batch-store` and `use-translation-data-store` to reflect the new additions.
-- [ ] **Batch Naming:**
-  - [ ] Implement a debounced `onChange` handler for the batch name `<Input>`.
-  - [ ] On change, call `renameBatch` from the `useBatchStore` to update the name in Dexie and Zustand.
+- [x] **Batch Naming:**
+  - [x] Implement a debounced `onChange` handler for the batch name `<Input>`.
+  - [x] On change, call `renameBatch` from the `useBatchStore` to update the name in Dexie and Zustand.
 - [ ] **File Selection for Translation:**
   - [ ] Add a `<Checkbox>` next to each file in the batch list.
   - [ ] Maintain a local state `Set<string>` to track the IDs of selected files.

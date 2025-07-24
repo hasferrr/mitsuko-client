@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useCallback } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -88,6 +88,7 @@ export default function BatchTranslatorMain() {
   const currentBatch = useBatchStore((state) => state.currentBatch)
   const setCurrentBatch = useBatchStore((state) => state.setCurrentBatch)
   const createTranslationForBatch = useBatchStore((state) => state.createTranslationForBatch)
+  const renameBatch = useBatchStore((state) => state.renameBatch)
 
   const translationData = useTranslationDataStore((state) => state.data)
   const loadTranslation = useTranslationDataStore((state) => state.getTranslationDb)
@@ -194,6 +195,12 @@ export default function BatchTranslatorMain() {
     }
   }
 
+  const handleBatchNameChange = (value: string) => {
+    if (currentBatch?.id && value.trim()) {
+      renameBatch(currentBatch.id, value)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
       {/* Header */}
@@ -208,9 +215,9 @@ export default function BatchTranslatorMain() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <Input
-            value={currentBatch?.name || "Batch Translation"}
+            defaultValue={currentBatch?.name || "Batch Translation"}
             className="text-xl font-semibold h-12"
-            readOnly
+            onChange={(e) => handleBatchNameChange(e.target.value)}
           />
         </div>
         <Button
