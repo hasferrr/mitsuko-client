@@ -82,6 +82,14 @@ interface BatchFile {
   type: string
 }
 
+const subNameMap = new Map([
+  ["srt", "SRT"],
+  ["ass", "SSA"],
+  ["vtt", "VTT"],
+])
+
+const acceptedFormats = [".srt", ".ass", ".vtt"]
+
 export default function BatchTranslatorMain() {
   const [isTranslating, setIsTranslating] = useState(false)
   const [activeTab, setActiveTab] = useState("basic")
@@ -151,7 +159,7 @@ export default function BatchTranslatorMain() {
     const filesArray = 'item' in droppedFiles ? Array.from(droppedFiles) : droppedFiles
 
     for await (const file of filesArray) {
-      if (!file.name.endsWith(".srt") && !file.name.endsWith(".ass")) {
+      if (!acceptedFormats.some(format => file.name.endsWith(format))) {
         toast.error(`Unsupported file type: ${file.name}`)
         continue
       }
@@ -321,7 +329,7 @@ export default function BatchTranslatorMain() {
             ref={fileInputRef}
             className="hidden"
             onChange={handleFileInputChange}
-            accept=".srt,.ass"
+            accept={acceptedFormats.join(",")}
             multiple
           />
           <DragAndDrop onDropFiles={handleFileDrop} disabled={isTranslating}>
@@ -331,9 +339,9 @@ export default function BatchTranslatorMain() {
             >
               <Upload className="h-10 w-10 text-muted-foreground" />
               <p className="mt-2 text-sm text-muted-foreground text-center">
-                Drag and drop subtitle files here or click to browse.
+                Drag and drop file here, or click to select a file.
                 <br />
-                SRT or ASS formats supported.
+                {Array.from(subNameMap.keys()).join(", ").toUpperCase()} subtitles file.
               </p>
             </div>
           </DragAndDrop>
