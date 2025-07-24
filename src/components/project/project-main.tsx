@@ -51,6 +51,7 @@ import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
+import { Badge } from "../ui/badge"
 
 const countTranslatedLines = (subtitles: Translation['subtitles']) => {
   if (!subtitles || subtitles.length === 0) {
@@ -323,8 +324,9 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         )
         loadProjects()
       }}
+      disabled={currentProject.isBatch}
     >
-      New Translation
+      {currentProject.isBatch ? "Disabled in Batch Projects" : "New Translation"}
     </Button>
   )
 
@@ -379,6 +381,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <h1>{currentProject.name}</h1>
+            {currentProject.isBatch && <Badge className="ml-2">Batch Project</Badge>}
           </div>
           <div className="flex flex-wrap gap-4 text-sm">
             <button
@@ -460,7 +463,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
           <div className="space-y-6">
             <div className="bg-card border border-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium">Translations</h3>
+                <h3 className="text-sm font-medium">Translations {currentProject.isBatch && "(Shared Settings)"}</h3>
                 {NewTranslationButton}
               </div>
               <DndContext

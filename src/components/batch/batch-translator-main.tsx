@@ -31,6 +31,7 @@ import {
   CheckSquare,
   ListChecks,
   AlertTriangle,
+  FileText,
 } from "lucide-react"
 import {
   LanguageSelection,
@@ -91,6 +92,7 @@ import { logSubtitle } from "@/lib/api/subtitle-log"
 import { UserCreditData } from "@/types/user"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { useQuery } from "@tanstack/react-query"
+import Link from "next/link"
 
 interface BatchFile {
   id: string
@@ -984,12 +986,19 @@ export default function BatchTranslatorMain() {
             onChange={(e) => handleBatchNameChange(e.target.value)}
           />
         </div>
+        <Link href="/project">
+          <Button variant="outline" className="h-10">
+            <FileText className="h-5 w-5" />
+            See as Project
+          </Button>
+        </Link>
         <Button
           variant="outline"
-          className="h-10 w-10"
+          className="h-10"
           onClick={() => setIsDeleteDialogOpen(true)}
         >
           <Trash className="h-5 w-5" />
+          Delete
         </Button>
       </div>
 

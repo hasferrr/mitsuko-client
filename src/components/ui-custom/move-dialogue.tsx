@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Project } from "@/types/project"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Badge } from "../ui/badge"
 
 interface MoveDialogueProps {
   isOpen: boolean
@@ -39,7 +40,7 @@ export function MoveDialogue({
         <ScrollArea className="h-[300px] w-full pr-4">
           <div className="space-y-2">
             {projects
-              .filter((project) => project.id !== currentProjectId)
+              .filter((project) => project.id !== currentProjectId && !project.isBatch)
               .map((project) => (
                 <Button
                   key={project.id}
@@ -49,6 +50,20 @@ export function MoveDialogue({
                   onClick={() => onMove(project.id)}
                 >
                   {project.name}
+                </Button>
+              ))}
+            {projects
+              .filter((project) => project.id !== currentProjectId && project.isBatch)
+              .map((project) => (
+                <Button
+                  key={project.id}
+                  variant="outline"
+                  className="w-full justify-start"
+                  disabled={isProcessing}
+                  onClick={() => onMove(project.id)}
+                >
+                  {project.name}
+                  <Badge className="ml-2 h-5 px-2">Batch</Badge>
                 </Button>
               ))}
           </div>
