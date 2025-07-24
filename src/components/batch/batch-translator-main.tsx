@@ -25,6 +25,7 @@ import {
   Trash,
   ArrowLeft,
   X,
+  GripVertical,
 } from "lucide-react"
 import {
   LanguageSelection,
@@ -248,8 +249,11 @@ export default function BatchTranslatorMain() {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id })
     const style = { transform: CSS.Transform.toString(transform), transition }
     return (
-      <Card ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>} style={style} {...attributes} {...listeners}>
-        <CardContent className="p-4 flex items-center justify-between">
+      <Card ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>} style={style} className="flex">
+        <div className="flex items-center ml-4 cursor-grab" {...attributes} {...listeners}>
+          <GripVertical className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <CardContent className="p-4 flex-1 flex items-center justify-between">
           <div>
             <p className="font-semibold">{batchFile.title}</p>
             <p className="text-sm text-muted-foreground">{batchFile.subtitlesCount} lines</p>
