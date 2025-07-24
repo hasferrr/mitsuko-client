@@ -30,6 +30,7 @@ import {
   Square,
   CheckSquare,
   ListChecks,
+  AlertTriangle,
 } from "lucide-react"
 import {
   LanguageSelection,
@@ -116,6 +117,10 @@ export default function BatchTranslatorMain() {
   const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
   const [previewTranslationId, setPreviewTranslationId] = useState<string | null>(null)
   const [queueSet, setQueueSet] = useState<Set<string>>(new Set())
+
+  // Confirmation dialog for restarting translation
+  const [isRestartTranslationDialogOpen, setIsRestartTranslationDialogOpen] = useState(false)
+  const [translatedStats, setTranslatedStats] = useState({ translated: 0, total: 0 })
 
   const queueAbortRef = useRef(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -304,8 +309,32 @@ export default function BatchTranslatorMain() {
     fileInputRef.current?.click()
   }
 
+  const handleInitiateBatchTranslation = () => {
+    if (batchFiles.length === 0 || isBatchTranslating) return
+
+    let totalSubtitles = 0
+    let translatedSubtitles = 0
+
+    batchFiles.forEach(file => {
+      totalSubtitles += file.subtitlesCount
+      translatedSubtitles += file.translatedCount
+    })
+
+    if (translatedSubtitles > 0) {
+      setTranslatedStats({
+        translated: translatedSubtitles,
+        total: totalSubtitles
+      })
+      setIsRestartTranslationDialogOpen(true)
+    } else {
+      handleStartBatchTranslation()
+    }
+  }
+
   const handleStartBatchTranslation = () => {
     if (batchFiles.length === 0 || isBatchTranslating) return
+
+    setIsRestartTranslationDialogOpen(false)
     queueAbortRef.current = false
     setIsBatchTranslating(true)
     setHasChanges(true)
@@ -995,7 +1024,7 @@ export default function BatchTranslatorMain() {
           <div className="flex flex-wrap items-center gap-4 w-full">
             <Button
               className="gap-2 h-10 flex-1"
-              onClick={handleStartBatchTranslation}
+              onClick={handleInitiateBatchTranslation}
               disabled={isBatchTranslating || !session || batchFiles.length === 0}
             >
               {isBatchTranslating ? (
@@ -1012,7 +1041,7 @@ export default function BatchTranslatorMain() {
             </Button>
             <Button
               variant="outline"
-              className="gap-2 h-10 flex-1"
+              className="gap-2 h-10 flex-1 border-primary/25 hover:border-primary/50"
               onClick={handleContinueBatchTranslation}
               disabled={isBatchTranslating || batchFiles.length === 0}
             >
@@ -1117,6 +1146,33 @@ export default function BatchTranslatorMain() {
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setIsDeleteSelectedDialogOpen(false)}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={() => { handleDeleteSelected(); setIsDeleteSelectedDialogOpen(false) }}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Restart Translation Confirmation Dialog */}
+      <AlertDialog open={isRestartTranslationDialogOpen} onOpenChange={setIsRestartTranslationDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Already Translated Content
+            </AlertDialogTitle>
+            <AlertDialogDescription className="pt-2 space-y-2">
+              <span className="block">
+                You have already translated <strong>{translatedStats.translated}</strong> of <strong>{translatedStats.total}</strong> subtitles in this batch.
+              </span>
+              <span className="block">
+                Starting a new translation will start from the beginning.
+              </span>
+              <span className="block">
+                If you want to translate only the remaining content, use the <strong>Continue</strong> button instead.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleStartBatchTranslation}>Restart Translation</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
