@@ -26,6 +26,7 @@ import {
   ArrowLeft,
   X,
   GripVertical,
+  Square,
 } from "lucide-react"
 import {
   LanguageSelection,
@@ -241,6 +242,16 @@ export default function BatchTranslatorMain() {
     setIsBatchTranslating(true)
     setHasChanges(true)
     await Promise.all(batchFiles.map(f => handleStartTranslation(f.id)))
+    setIsBatchTranslating(false)
+  }
+
+  const handleStopBatchTranslation = () => {
+    const handleStopTranslation = (currentId: string) => {
+      stopTranslation(currentId)
+      setIsTranslating(currentId, false)
+      saveData(currentId)
+    }
+    batchFiles.forEach(f => handleStopTranslation(f.id))
     setIsBatchTranslating(false)
   }
 
@@ -663,6 +674,15 @@ export default function BatchTranslatorMain() {
               {session ? `Translate ${batchFiles.length} files` : "Sign In to Start"}
             </>
           )}
+        </Button>
+        <Button
+          variant="outline"
+          className="gap-2 h-10"
+          onClick={handleStopBatchTranslation}
+          disabled={!isBatchTranslating}
+        >
+          <Square className="h-4 w-4" />
+          Stop All
         </Button>
         <Button
           variant="outline"
