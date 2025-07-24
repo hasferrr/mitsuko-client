@@ -99,10 +99,12 @@ interface BatchFile {
   type: string
 }
 
+const MAX_CONCURRENT_TRANSLATION = 5
+
 export default function BatchTranslatorMain() {
   const [activeTab, setActiveTab] = useState("basic")
   const [isBatchTranslating, setIsBatchTranslating] = useState(false)
-  const [maxConcurrentTranslations, setMaxConcurrentTranslations] = useState(5)
+  const [concurrentTranslations, setConcurrentTranslations] = useState(3)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
 
@@ -370,7 +372,7 @@ export default function BatchTranslatorMain() {
       return
     }
 
-    setQueueSet(new Set(ids.slice(maxConcurrentTranslations)))
+    setQueueSet(new Set(ids.slice(concurrentTranslations)))
 
     let index = 0
     let active = 0
@@ -411,7 +413,7 @@ export default function BatchTranslatorMain() {
       })
     }
 
-    for (let i = 0; i < maxConcurrentTranslations && i < ids.length; i++) {
+    for (let i = 0; i < concurrentTranslations && i < ids.length; i++) {
       launch()
     }
   }
@@ -451,7 +453,7 @@ export default function BatchTranslatorMain() {
       return
     }
 
-    setQueueSet(new Set(ids.slice(maxConcurrentTranslations)))
+    setQueueSet(new Set(ids.slice(concurrentTranslations)))
 
     let index = 0
     let active = 0
@@ -492,7 +494,7 @@ export default function BatchTranslatorMain() {
       })
     }
 
-    for (let i = 0; i < maxConcurrentTranslations && i < ids.length; i++) {
+    for (let i = 0; i < concurrentTranslations && i < ids.length; i++) {
       launch()
     }
   }
@@ -1223,25 +1225,25 @@ export default function BatchTranslatorMain() {
                 variant="ghost"
                 size="sm"
                 className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
-                onClick={() => setMaxConcurrentTranslations(prev => Math.max(1, prev - 1))}
-                disabled={maxConcurrentTranslations <= 1}
+                onClick={() => setConcurrentTranslations(prev => Math.max(1, prev - 1))}
+                disabled={concurrentTranslations <= 1}
               >
                 -
               </Button>
               <Input
                 type="number"
                 min={1}
-                max={5}
-                value={maxConcurrentTranslations}
-                onChange={(e) => setMaxConcurrentTranslations(Math.max(1, Math.min(5, parseInt(e.target.value) || 1)))}
+                max={MAX_CONCURRENT_TRANSLATION}
+                value={concurrentTranslations}
+                onChange={(e) => setConcurrentTranslations(Math.max(1, Math.min(MAX_CONCURRENT_TRANSLATION, parseInt(e.target.value) || 1)))}
                 className="w-10 h-7 text-center border-0 bg-transparent shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
-                onClick={() => setMaxConcurrentTranslations(prev => Math.min(5, prev + 1))}
-                disabled={maxConcurrentTranslations >= 5}
+                onClick={() => setConcurrentTranslations(prev => Math.min(MAX_CONCURRENT_TRANSLATION, prev + 1))}
+                disabled={concurrentTranslations >= MAX_CONCURRENT_TRANSLATION}
               >
                 +
               </Button>
@@ -1390,7 +1392,7 @@ export default function BatchTranslatorMain() {
                 Are you sure you want to start translating <strong>{batchFiles.length}</strong> files with <strong>{translatedStats.total}</strong> subtitles?
               </span>
               <span className="block">
-                This will process up to <strong>{maxConcurrentTranslations}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{modelDetail?.name}</strong>.
+                This will process up to <strong>{concurrentTranslations}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{modelDetail?.name}</strong>.
               </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
