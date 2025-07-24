@@ -195,7 +195,6 @@ function translationConstructor(translation: Partial<Translation>): Translation 
     createdAt: translation.createdAt ?? new Date(),
     updatedAt: translation.updatedAt ?? new Date(),
     projectId: translation.projectId ?? "",
-    batchId: translation.batchId ?? "",
     basicSettingsId: translation.basicSettingsId ?? "",
     advancedSettingsId: translation.advancedSettingsId ?? "",
     response: translation.response ?? { response: "", jsonResponse: [] },

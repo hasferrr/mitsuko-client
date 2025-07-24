@@ -37,7 +37,7 @@ Batch logic is now handled by the existing **Project** store.
   - [ ] The "Start Translation" button will only process the files selected in this set.
 - [x] **State Synchronization:**
   - [x] Refactor the component to remove local `files` state.
-  - [x] The list of files will be derived from `useBatchStore` (getting the array of translation IDs).
+  - [x] The list of files will be derived from `useProjectStore` (getting the array of translation IDs).
   - [x] The data for each file (title, status, progress) will be fetched from `useTranslationDataStore` and a new `use-batch-translation-store` for real-time status.
 - [x] **Deletion Logic:**
   - [x] The 'x' button on a file will trigger a confirmation dialog.
@@ -59,7 +59,7 @@ Batch logic is now handled by the existing **Project** store.
 ### UI Enhancements
 - [ ] **Drag-and-Drop Reordering:**
   - [ ] Use `@dnd-kit` to allow reordering of files in the batch list.
-  - [ ] On `onDragEnd`, update the order of translation IDs in the `useBatchStore`.
+  - [ ] On `onDragEnd`, update the order of translation IDs in the `useProjectStore`.
   - [ ] This new order will be persisted to Dexie to be saved across sessions.
 
 ### Batch Export Options

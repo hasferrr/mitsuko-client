@@ -228,7 +228,6 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       const originalAdvancedSettingsId = translation.advancedSettingsId
 
       await db.translations.update(translation.id, {
-        batchId: projectId,
         basicSettingsId: currentProject.defaultBasicSettingsId,
         advancedSettingsId: currentProject.defaultAdvancedSettingsId,
         updatedAt: new Date(),

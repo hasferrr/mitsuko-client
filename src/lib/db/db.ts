@@ -136,15 +136,6 @@ class MyDatabase extends Dexie {
       customInstructions: 'id, name'
     })
     this.version(14).stores({
-      // No new stores, keeping version bump for translation batchId field
-    }).upgrade(async tx => {
-      await tx.table('translations').toCollection().modify(translation => {
-        if (typeof translation.batchId === 'undefined') {
-          translation.batchId = ''
-        }
-      })
-    })
-    this.version(15).stores({
       // adding isBatch flag to projects (non-indexed)
     }).upgrade(async tx => {
       await tx.table('projects').toCollection().modify(project => {

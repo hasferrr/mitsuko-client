@@ -32,7 +32,6 @@ export interface Translation {
   createdAt: Date
   updatedAt: Date
   projectId: string
-  batchId: string
   basicSettingsId: string
   advancedSettingsId: string
   response: ResponseTranslation

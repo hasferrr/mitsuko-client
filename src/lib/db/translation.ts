@@ -28,7 +28,6 @@ export const createTranslation = async (
     const translation: Translation = {
       id,
       projectId,
-      batchId: "",
       ...data,
       basicSettingsId: basicSettings.id,
       advancedSettingsId: advancedSettings.id,
