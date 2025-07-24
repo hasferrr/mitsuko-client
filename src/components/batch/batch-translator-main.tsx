@@ -75,6 +75,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { SubtitleList } from "../translate/subtitle-list"
 import { SubtitleResultOutput } from "../translate/subtitle-result-output"
 import { SortableBatchFile } from "./sortable-batch-file"
+import { minMax, sleep } from "@/lib/utils"
+import { SubOnlyTranslated, SubtitleTranslated, SubtitleNoTime } from "@/types/subtitles"
+import { Translation } from "@/types/project"
 
 interface BatchFile {
   id: string
@@ -94,7 +97,7 @@ const subNameMap = new Map([
 const acceptedFormats = [".srt", ".ass", ".vtt"]
 
 export default function BatchTranslatorMain() {
-  const [isTranslating, setIsTranslating] = useState(false)
+  const [isBatchTranslating, setIsBatchTranslating] = useState(false)
   const [activeTab, setActiveTab] = useState("basic")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -115,10 +118,24 @@ export default function BatchTranslatorMain() {
 
   const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
 
+  // Translation Data Store
   const translationData = useTranslationDataStore((state) => state.data)
   const loadTranslation = useTranslationDataStore((state) => state.getTranslationDb)
   const setCurrentTranslationId = useTranslationDataStore((state) => state.setCurrentId)
+  const setTitle = useTranslationDataStore((state) => state.setTitle)
+  const setSubtitles = useTranslationDataStore((state) => state.setSubtitles)
+  const setParsed = useTranslationDataStore((state) => state.setParsed)
+  const setResponse = useTranslationDataStore((state) => state.setResponse)
+  const setJsonResponse = useTranslationDataStore((state) => state.setJsonResponse)
+  const appendJsonResponse = useTranslationDataStore((state) => state.appendJsonResponse)
+  const saveData = useTranslationDataStore((state) => state.saveData)
   const [previewTranslationId, setPreviewTranslationId] = useState<string | null>(null)
+
+  // Translation Store
+  const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
+  const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
+  const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
+  const stopTranslation = useTranslationStore((state) => state.stopTranslation)
 
   // Settings Stores
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -139,11 +156,9 @@ export default function BatchTranslatorMain() {
   const customBaseUrl = useLocalSettingsStore((state) => state.customBaseUrl)
   const customModel = useLocalSettingsStore((state) => state.customModel)
 
-  const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const session = useSessionStore((state) => state.session)
-  const { setHasChanges } = useUnsavedChanges()
-  const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
 
+  const { setHasChanges } = useUnsavedChanges()
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
   const handleDragEnd = (event: import("@dnd-kit/core").DragEndEvent) => {
@@ -223,18 +238,359 @@ export default function BatchTranslatorMain() {
 
   const handleStartBatchTranslation = async () => {
     if (batchFiles.length === 0) return
-    setIsTranslating(true)
+    setIsBatchTranslating(true)
     setHasChanges(true)
-
-    // Implementation for batch translation will be needed here
-    // This can be a future task
-
-    setIsTranslating(false)
+    await Promise.all(batchFiles.map(f => handleStartTranslation(f.id)))
+    setIsBatchTranslating(false)
   }
 
-  const handleStartTranslation = async (batchFileId: string) => {
-    // Implementation for single file translation will be needed here
-    // This can be a future task
+  const handleStartTranslation = async (
+    currentId: string,
+    overrideStartIndexParam?: number,
+    overrideEndIndexParam?: number,
+    partOfBatch?: boolean
+  ) => {
+    const subtitles = translationData[currentId]?.subtitles ?? []
+    const title = translationData[currentId]?.title ?? ""
+
+    const firstChunk = (size: number, s: number, e: number) => {
+      const subtitleChunks: SubtitleNoTime[][] = []
+      subtitleChunks.push(subtitles.slice(s, Math.min(s + size, e + 1)).map((s) => ({
+        index: s.index,
+        actor: s.actor,
+        content: s.content,
+      })))
+      return subtitleChunks
+    }
+
+    // TODO: Refactor to separate function
+    // --- COPY PASTE FROM SUBTITLE TRANSLATOR MAIN ---
+
+    if (!subtitles.length) return
+    setIsTranslating(currentId, true)
+    setHasChanges(true)
+
+    if (!partOfBatch) {
+      // setActiveTab("result")
+      setJsonResponse(currentId, [])
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        })
+      }, 300)
+    }
+
+    await saveData(currentId)
+
+    // Validate few shot
+    const fewShotSchema = z.object({
+      content: z.string(),
+      translated: z.string()
+    })
+
+    // Few shot examples
+    let usedFewShot: z.infer<typeof fewShotSchema>[] = []
+
+    if (fewShot.isEnabled) {
+      if (fewShot.type === "manual") {
+        try {
+          usedFewShot = fewShotSchema.array().parse(JSON.parse(fewShot.value.trim() || "[]"))
+        } catch {
+          toast.error(
+            <div className="select-none">
+              <div>Few shot format is invalid! Please follow this format:</div>
+              <div className="font-mono">
+                <pre>{"[" + JSON.stringify({ content: "string", translated: "string" }, null, 2) + "]"}</pre>
+              </div>
+            </div>
+          )
+          setActiveTab("basic")
+          setIsTranslating(currentId, false)
+          return
+        }
+      } else if (fewShot.type === "linked") {
+        const linkedTranslation = await useTranslationDataStore.getState().getTranslationDb(fewShot.linkedId)
+        if (linkedTranslation) {
+          usedFewShot = linkedTranslation.subtitles
+            .slice(fewShot.fewShotStartIndex, (fewShot.fewShotEndIndex ?? 0) + 1)
+            .map((s) => ({ content: s.content, translated: s.translated }))
+        }
+      }
+      usedFewShot = usedFewShot?.filter((s) => s.content && s.translated)
+    }
+    console.log("usedFewShot: ", usedFewShot)
+
+    // Accumulate raw responses
+    const allRawResponses: string[] = []
+
+    // Split subtitles into chunks, starting from startIndex - 1
+    const storeStartIndex = useAdvancedSettingsStore.getState().getStartIndex()
+    const storeEndIndex = useAdvancedSettingsStore.getState().getEndIndex()
+
+    const sIndexToUse = overrideStartIndexParam !== undefined
+      ? overrideStartIndexParam
+      : storeStartIndex
+
+    const eIndexToUse = overrideEndIndexParam !== undefined
+      ? overrideEndIndexParam
+      : storeEndIndex
+
+    const size = minMax(splitSize, SPLIT_SIZE_MIN, SPLIT_SIZE_MAX)
+    // adjustedStartIndex and adjustedEndIndex are 0-based for slicing
+    // Ensure subtitles.length - 1 is not negative if subtitles.length is 0 (already handled by early return)
+    const adjustedStartIndex = minMax(sIndexToUse - 1, 0, subtitles.length - 1)
+    const adjustedEndIndex = minMax(eIndexToUse - 1, adjustedStartIndex, subtitles.length - 1)
+
+    const subtitleChunks = firstChunk(size, adjustedStartIndex, adjustedEndIndex)
+
+    // Set Limited Context Memory size
+    const limitedContextMemorySize = 5
+
+    // Prepare context for the first chunk
+    let context: ContextCompletion[] = []
+
+    // Split by number of split size
+    if (sIndexToUse > 1) {
+      // Calculate the proper context range based on context strategy
+      let contextStartIndex: number
+
+      if (isUseFullContextMemory) {
+        // Use all subtitles from beginning
+        contextStartIndex = 0
+      } else if (isBetterContextCaching) {
+        // Use split size for context
+        contextStartIndex = Math.max(0, adjustedStartIndex - size)
+      } else {
+        // Use limited context memory size (5)
+        contextStartIndex = Math.max(0, adjustedStartIndex - limitedContextMemorySize)
+      }
+
+      context.push({
+        role: "user",
+        content: createContextMemory(subtitles
+          .slice(
+            contextStartIndex,
+            adjustedStartIndex,
+          )
+          .map((chunk) => ({
+            index: chunk.index,
+            actor: chunk.actor,
+            content: chunk.content,
+          }))
+        ),
+      })
+      context.push({
+        role: "assistant",
+        content: createContextMemory(subtitles
+          .slice(
+            contextStartIndex,
+            adjustedStartIndex,
+          )
+          .map((chunk) => ({
+            index: chunk.index,
+            content: chunk.content,
+            translated: chunk.translated,
+          }))
+        ),
+      })
+    }
+
+    // Log subtitles
+    // TODO: Add logSubtitle
+    // logSubtitle(title, generateSubtitleContent("original"), currentId)
+
+    // Translate each chunk of subtitles
+    let batch = 0
+    while (subtitleChunks.length > 0) {
+      const chunk = subtitleChunks.shift()!
+      console.log(`Batch ${batch + 1}`)
+      console.log(chunk)
+      console.log(JSON.parse(JSON.stringify(context)))
+
+      const isAdvancedReasoningEnabled = useAdvancedSettingsStore.getState().getIsAdvancedReasoningEnabled()
+
+      const requestBody = {
+        title: title.slice(0, 150),
+        subtitles: {
+          subtitles: chunk.map((s) => ({
+            index: s.index,
+            actor: s.actor,
+            content: s.content,
+          }))
+        },
+        sourceLanguage,
+        targetLanguage,
+        contextDocument,
+        customInstructions,
+        baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
+        model: isUseCustomModel ? customModel : modelDetail?.name || "",
+        temperature: minMax(temperature, TEMPERATURE_MIN, TEMPERATURE_MAX),
+        maxCompletionTokens: isMaxCompletionTokensAuto ? undefined : minMax(
+          maxCompletionTokens,
+          MAX_COMPLETION_TOKENS_MIN,
+          MAX_COMPLETION_TOKENS_MAX
+        ),
+        structuredOutput: isUseStructuredOutput,
+        contextMessage: context,
+        fewShotExamples: usedFewShot,
+        promptWithPlanning: isAdvancedReasoningEnabled,
+        uuid: currentId,
+      }
+
+      let tlChunk: SubOnlyTranslated[] = []
+      let rawResponse = ""
+
+      try {
+        const result = await translateSubtitles(
+          requestBody,
+          isUseCustomModel ? apiKey : "",
+          (isUseCustomModel || modelDetail === null)
+            ? "custom"
+            : (modelDetail.isPaid ? "paid" : "free"),
+          currentId,
+          (response) => setResponse(currentId, response)
+        )
+        tlChunk = result.parsed
+        rawResponse = result.raw
+
+      } catch {
+        setIsTranslating(currentId, false)
+
+        rawResponse = useTranslationDataStore.getState().data[currentId].response.response.trim()
+        const rawResponseArr = rawResponse.split("\n")
+        if (rawResponseArr[rawResponseArr.length - 1].startsWith("[")) {
+          rawResponseArr.pop()
+        }
+        rawResponse = rawResponseArr.join("\n")
+
+        // TODO: Refactor to separate function
+        try {
+          tlChunk = parseTranslationJson(rawResponse)
+        } catch (error) {
+          console.error("Error: ", error)
+          console.log("Failed to parse: ", rawResponse)
+          setResponse(currentId, rawResponse + "\n\n[Failed to parse]")
+          // If part of a batch, don't set isTranslating to false here, let the batch handler do it.
+          // The error is logged, and the loop in handleContinueTranslation should ideally break.
+          if (!partOfBatch) {
+            setIsTranslating(currentId, false)
+          }
+          break
+        }
+
+      } finally {
+        console.log("result: ", tlChunk)
+        allRawResponses.push(useTranslationDataStore.getState().data[currentId].response.response)
+
+        // Update the parsed json
+        appendJsonResponse(currentId, tlChunk)
+
+        // Merge translated chunk with original subtitles
+        const currentSubtitles = useTranslationDataStore.getState().data[currentId].subtitles
+        const merged: SubtitleTranslated[] = [...currentSubtitles]
+        for (let j = 0; j < tlChunk.length; j++) {
+          const index = tlChunk[j].index - 1
+          merged[index] = {
+            ...merged[index],
+            translated: tlChunk[j].translated || merged[index].translated,
+          }
+        }
+        setSubtitles(currentId, merged)
+        // TODO: Refetch user data
+        // refetchUserData()
+        await saveData(currentId)
+      }
+
+      // Break if translation is stopped
+      const translatingStatus = useTranslationStore.getState().isTranslatingSet.has(currentId)
+      if (!translatingStatus) {
+        console.log('translation is stopped', 'isTranslating is FALSE')
+        break
+      }
+
+      // Update context for next chunk
+      context.push({
+        role: "user",
+        content: createContextMemory(requestBody.subtitles)
+      })
+      context.push({
+        role: "assistant",
+        content: getContent(rawResponse),
+      })
+
+      // For Limited Context Memory
+      if (!isUseFullContextMemory) {
+        // When isBetterContextCaching is TRUE
+        // Only wake the last (pair of) context.
+        context = [
+          context[context.length - 2],
+          context[context.length - 1],
+        ]
+
+        // When isBetterContextCaching is FALSE
+        // Assume: size (split size) >= contextMemorySize
+        // Slice maximum of contextMemorySize of dialogues
+        if (!isBetterContextCaching && context.length >= 2) {
+          if (size < limitedContextMemorySize) {
+            console.error(
+              "Split size should be greater than or equal to context memory size " +
+              "The code below only takes the last (pair of) context"
+            )
+          }
+
+          const lastUser = requestBody.subtitles.subtitles
+          const lastAssistant = requestBody.subtitles.subtitles.map((s, subIndex) => ({
+            index: s.index,
+            content: s.content,
+            translated: tlChunk[subIndex]?.translated || "",
+          }))
+
+          context[0].content = createContextMemory(lastUser.slice(-limitedContextMemorySize))
+          context[1].content = createContextMemory(lastAssistant.slice(-limitedContextMemorySize))
+        }
+      }
+
+      // Process the next chunk
+      const nextIndex = tlChunk[tlChunk.length - 1].index + 1
+
+      const s = nextIndex - 1
+      const e = minMax(adjustedEndIndex, s, subtitles.length - 1)
+      if (s > adjustedEndIndex) break
+
+      const nextChunk = firstChunk(size, s, e)[0]
+      if (nextChunk.length) {
+        subtitleChunks.push(nextChunk)
+      }
+
+      // Delay between each chunk
+      await sleep(3000)
+      batch++
+    }
+
+    // Only set isTranslating to false if not part of a batch operation,
+    // or if it was stopped (in which case it would already be false or will be set by stopTranslation)
+    if (!partOfBatch) {
+      // Check if it was stopped during the process by looking at the store state
+      const stillTranslating = useTranslationStore.getState().isTranslatingSet.has(currentId)
+      if (stillTranslating) {
+        setIsTranslating(currentId, false)
+      }
+    }
+
+    // Add to history *after* translation is complete, including subtitles and parsed
+    if (allRawResponses.length > 0) {
+      // TODO: Save to history
+      // addHistory(
+      //   title,
+      //   allRawResponses,
+      //   useTranslationDataStore.getState().data[currentId].response.jsonResponse,
+      //   useTranslationDataStore.getState().data[currentId].subtitles,
+      //   useTranslationDataStore.getState().data[currentId].parsed,
+      // )
+    }
+
+    await saveData(currentId)
   }
 
   const handleFileDownload = (batchFileId: string, option: DownloadOption, format: CombinedFormat) => {
@@ -294,9 +650,9 @@ export default function BatchTranslatorMain() {
         <Button
           className="gap-2 h-10"
           onClick={handleStartBatchTranslation}
-          disabled={isTranslating || !session || batchFiles.length === 0}
+          disabled={isBatchTranslating || !session || batchFiles.length === 0}
         >
-          {isTranslating ? (
+          {isBatchTranslating ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
               Translating...
@@ -329,7 +685,7 @@ export default function BatchTranslatorMain() {
             accept={acceptedFormats.join(",")}
             multiple
           />
-          <DragAndDrop onDropFiles={handleFileDrop} disabled={isTranslating}>
+          <DragAndDrop onDropFiles={handleFileDrop} disabled={isBatchTranslating}>
             <div
               className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
               onClick={handleClickFileUpload}
