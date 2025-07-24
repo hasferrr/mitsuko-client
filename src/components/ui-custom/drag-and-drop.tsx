@@ -46,11 +46,16 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={cn(
-        "p-0 border-2 border-dashed rounded-md ",
+        "relative p-0 border-2 border-dashed rounded-md ",
         isDragOver ? "border-primary" : "border-transparent",
       )}
     >
       {children}
+      {isDragOver && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80 pointer-events-none">
+          <p className="text-lg font-semibold text-primary text-center px-4">Drop files here</p>
+        </div>
+      )}
     </div>
   )
 }

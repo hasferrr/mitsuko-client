@@ -77,7 +77,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { SubtitleList } from "../translate/subtitle-list"
 import { SubtitleResultOutput } from "../translate/subtitle-result-output"
 import { SortableBatchFile } from "./sortable-batch-file"
-import { minMax, sleep } from "@/lib/utils"
+import { cn, minMax, sleep } from "@/lib/utils"
 import { SubOnlyTranslated, SubtitleTranslated, SubtitleNoTime } from "@/types/subtitles"
 import { Translation } from "@/types/project"
 import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-gap"
@@ -816,41 +816,6 @@ export default function BatchTranslatorMain() {
           />
         </div>
         <Button
-          className="gap-2 h-10"
-          onClick={handleStartBatchTranslation}
-          disabled={isBatchTranslating || !session || batchFiles.length === 0}
-        >
-          {isBatchTranslating ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Translating...
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4" />
-              {session ? `Translate ${batchFiles.length} files` : "Sign In to Start"}
-            </>
-          )}
-        </Button>
-        <Button
-          variant="outline"
-          className="gap-2 h-10"
-          onClick={handleContinueBatchTranslation}
-          disabled={isBatchTranslating || batchFiles.length === 0}
-        >
-          <FastForward className="h-4 w-4" />
-          Continue
-        </Button>
-        <Button
-          variant="outline"
-          className="gap-2 h-10"
-          onClick={handleStopBatchTranslation}
-          disabled={!isBatchTranslating}
-        >
-          <Square className="h-4 w-4" />
-          Stop All
-        </Button>
-        <Button
           variant="outline"
           className="h-10 w-10"
           onClick={() => setIsDeleteDialogOpen(true)}
@@ -871,6 +836,22 @@ export default function BatchTranslatorMain() {
             accept={acceptedFormats.join(",")}
             multiple
           />
+
+          <DragAndDrop onDropFiles={handleFileDrop} disabled={isBatchTranslating}>
+            <div className={cn(
+              "space-y-2 max-h-[510px] pr-2 overflow-x-hidden",
+              batchFiles.length > 6 && "overflow-y-auto"
+            )}>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={order} strategy={verticalListSortingStrategy}>
+                  {batchFiles.map(batchFile => (
+                    <SortableBatchFile key={batchFile.id} batchFile={batchFile} onDelete={id => setDeleteFileId(id)} onDownload={handleFileDownload} onClick={handlePreview} />
+                  ))}
+                </SortableContext>
+              </DndContext>
+            </div>
+          </DragAndDrop>
+
           <DragAndDrop onDropFiles={handleFileDrop} disabled={isBatchTranslating}>
             <div
               className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
@@ -885,14 +866,42 @@ export default function BatchTranslatorMain() {
             </div>
           </DragAndDrop>
 
-          <div className="space-y-2">
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={order} strategy={verticalListSortingStrategy}>
-                {batchFiles.map(batchFile => (
-                  <SortableBatchFile key={batchFile.id} batchFile={batchFile} onDelete={id => setDeleteFileId(id)} onDownload={handleFileDownload} onClick={handlePreview} />
-                ))}
-              </SortableContext>
-            </DndContext>
+          <div className="flex flex-wrap items-center gap-4 w-full">
+            <Button
+              className="gap-2 h-10 flex-1"
+              onClick={handleStartBatchTranslation}
+              disabled={isBatchTranslating || !session || batchFiles.length === 0}
+            >
+              {isBatchTranslating ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Translating...
+                </>
+              ) : (
+                <>
+                  <Play className="h-4 w-4" />
+                  {session ? `Translate ${batchFiles.length} files` : "Sign In to Start"}
+                </>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              className="gap-2 h-10 flex-1"
+              onClick={handleContinueBatchTranslation}
+              disabled={isBatchTranslating || batchFiles.length === 0}
+            >
+              <FastForward className="h-4 w-4" />
+              Continue {batchFiles.filter(file => file.status === "done").length} / {batchFiles.length}
+            </Button>
+            <Button
+              variant="outline"
+              className="gap-2 h-10 flex-1"
+              onClick={handleStopBatchTranslation}
+              disabled={!isBatchTranslating}
+            >
+              <Square className="h-4 w-4" />
+              Stop All
+            </Button>
           </div>
         </div>
 
