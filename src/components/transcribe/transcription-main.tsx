@@ -413,18 +413,12 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
 
         {/* Right Column - Results */}
         <div className="md:col-span-2 space-y-6">
-          <Tabs defaultValue="transcript" className="w-full">
-            <TabsList className="bg-card border-b border-border w-full justify-start rounded-none p-0">
-              <TabsTrigger
-                value="transcript"
-                className="py-2 px-4 data-[state=active]:bg-secondary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
-              >
+          <Tabs defaultValue="transcript">
+            <TabsList className="w-full">
+              <TabsTrigger value="transcript" className="w-full">
                 Transcript
               </TabsTrigger>
-              <TabsTrigger
-                value="subtitles"
-                className="py-2 px-4 data-[state=active]:bg-secondary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
-              >
+              <TabsTrigger value="subtitles" className="w-full" >
                 Subtitles
               </TabsTrigger>
             </TabsList>
@@ -503,7 +497,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                     value={transcriptionText}
                     readOnly={!isEditing || isTranscribing}
                     onChange={handleTranscriptionTextChange}
-                    className="w-full h-96 p-4 bg-background text-foreground resize-none"
+                    className="w-full h-96 p-4 bg-background text-foreground resize-none overflow-y-auto"
                   />
                 )}
               </div>
@@ -612,29 +606,45 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
             <h2 className="text-lg font-medium mb-4">What's Next?</h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="p-4 border border-border rounded-md">
+              <div className="flex flex-col justify-between p-4 border border-border rounded-md">
                 <div className="flex items-start gap-3 mb-2">
-                  <Globe className="h-5 w-5 text-blue-500 mt-0.5" />
+                  <div className="h-5 w-5 mt-0.5 text-blue-500">
+                    <Globe className="h-5 w-5" />
+                  </div>
                   <div>
                     <h3 className="text-sm font-medium">Translate</h3>
                     <p className="text-xs text-muted-foreground">Translate your transcript into 100+ languages</p>
                   </div>
                 </div>
-                <Button size="sm" variant="outline" className="w-full mt-2 border-border" onClick={handleCreateTranslation} disabled={!transcriptSubtitles.length || isTranscribing}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full mt-2 border-border"
+                  onClick={handleCreateTranslation}
+                  disabled={!transcriptSubtitles.length || isTranscribing}
+                >
                   Translate Subtitles
                 </Button>
               </div>
 
-              <div className="p-4 border border-border rounded-md">
+              <div className="flex flex-col justify-between p-4 border border-border rounded-md">
                 <div className="flex items-start gap-3 mb-2">
-                  <FileText className="h-5 w-5 text-blue-500 mt-0.5" />
+                  <div className="h-5 w-5 mt-0.5 text-blue-500">
+                    <FileText className="h-5 w-5" />
+                  </div>
                   <div>
                     <h3 className="text-sm font-medium">Export</h3>
-                    <p className="text-xs text-muted-foreground">Export as SRT, ASS, or plain text</p>
+                    <p className="text-xs text-muted-foreground">Export transcription as SRT subtitle</p>
                   </div>
                 </div>
-                <Button size="sm" variant="outline" className="w-full mt-2 border-border">
-                  Export Options
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full mt-2 border-border"
+                  onClick={handleExport}
+                  disabled={!transcriptSubtitles.length || isTranscribing}
+                >
+                  Export Subtitles
                 </Button>
               </div>
             </div>
