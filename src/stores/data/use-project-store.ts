@@ -14,7 +14,7 @@ import { useTranslationDataStore } from "./use-translation-data-store"
 import { useExtractionDataStore } from "./use-extraction-data-store"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { SubtitleTranslated } from "@/types/subtitles"
-import { createTranslation } from "@/lib/db/translation"
+import { createTranslation, deleteTranslation } from "@/lib/db/translation"
 import { db } from "@/lib/db/db"
 
 interface ProjectStore {
@@ -32,6 +32,7 @@ interface ProjectStore {
   reorderProjects: (newOrder: string[]) => Promise<void>
 
   createTranslationForBatch: (projectId: string, file: File, content: string) => Promise<string>
+  removeTranslationFromBatch: (projectId: string, translationId: string) => Promise<void>
 }
 
 export const useProjectStore = create<ProjectStore>((set, get) => ({
@@ -257,6 +258,41 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     } catch (err) {
       console.error('Failed to create translation for batch', err)
       set({ loading: false, error: 'Failed to create translation for batch' })
+      throw err
+    }
+  },
+
+  removeTranslationFromBatch: async (projectId, translationId) => {
+    set({ loading: true })
+    try {
+      const currentProject = get().projects.find(p => p.id === projectId)
+      if (!currentProject) throw new Error('Project not found')
+
+      const isBatchProject = currentProject.isBatch
+
+      if (isBatchProject) {
+        // Only delete the translation record; keep shared settings intact
+        await db.translations.delete(translationId)
+      } else {
+        await deleteTranslation(projectId, translationId)
+      }
+
+      const updatedTranslations = currentProject.translations.filter(id => id !== translationId)
+      await updateProjectItemsDB(projectId, updatedTranslations, 'translations')
+
+      // update translation store
+      const translationStore = useTranslationDataStore.getState()
+      translationStore.removeData(translationId)
+
+      // update local project state
+      set(state => ({
+        projects: state.projects.map(p => p.id === projectId ? { ...p, translations: updatedTranslations, updatedAt: new Date() } : p),
+        currentProject: state.currentProject?.id === projectId ? { ...state.currentProject, translations: updatedTranslations, updatedAt: new Date() } : state.currentProject,
+        loading: false
+      }))
+    } catch (err) {
+      console.error('Failed to remove translation from batch', err)
+      set({ loading: false, error: 'Failed to remove translation from batch' })
       throw err
     }
   }

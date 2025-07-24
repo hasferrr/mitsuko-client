@@ -39,10 +39,10 @@ Batch logic is now handled by the existing **Project** store.
   - [x] Refactor the component to remove local `files` state.
   - [x] The list of files will be derived from `useBatchStore` (getting the array of translation IDs).
   - [x] The data for each file (title, status, progress) will be fetched from `useTranslationDataStore` and a new `use-batch-translation-store` for real-time status.
-- [ ] **Deletion Logic:**
-  - [ ] The 'x' button on a file will trigger a confirmation dialog.
-  - [ ] On confirmation, it will call a `removeTranslationFromBatch` function.
-  - [ ] This function will remove the `Translation` from Dexie (via `deleteTranslation`), and update the `translations` array in the `Batch` store.
+- [x] **Deletion Logic:**
+  - [x] The 'x' button on a file will trigger a confirmation dialog.
+  - [x] On confirmation, it will call a `removeTranslationFromBatch` function.
+  - [x] This function will remove the `Translation` from Dexie (via `deleteTranslation`), and update the `translations` array in the `Batch` store.
 
 ### Batch Operations
 - [ ] **Pause/Resume Functionality:**
@@ -61,10 +61,6 @@ Batch logic is now handled by the existing **Project** store.
   - [ ] Use `@dnd-kit` to allow reordering of files in the batch list.
   - [ ] On `onDragEnd`, update the order of translation IDs in the `useBatchStore`.
   - [ ] This new order will be persisted to Dexie to be saved across sessions.
-- [ ] **Delete Button (`x`):**
-  - [ ] Add an 'x' icon button to each file card.
-  - [ ] On click, show a confirmation `<AlertDialog>`.
-  - [ ] If confirmed, execute the deletion logic defined in the "Batch Management" section.
 
 ### Batch Export Options
 - [ ] **Export as ZIP Archive:**

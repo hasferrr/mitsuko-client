@@ -24,6 +24,7 @@ import {
   Download,
   Trash,
   ArrowLeft,
+  X,
 } from "lucide-react"
 import {
   LanguageSelection,
@@ -88,6 +89,9 @@ export default function BatchTranslatorMain() {
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const createTranslationForBatch = useProjectStore((state) => state.createTranslationForBatch)
   const renameProject = useProjectStore((state) => state.renameProject)
+  const removeTranslationFromBatch = useProjectStore((state) => state.removeTranslationFromBatch)
+
+  const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
 
   const translationData = useTranslationDataStore((state) => state.data)
   const loadTranslation = useTranslationDataStore((state) => state.getTranslationDb)
@@ -192,6 +196,16 @@ export default function BatchTranslatorMain() {
   const handleFileDownload = (batchFileId: string, option: DownloadOption, format: CombinedFormat) => {
     // Implementation for file download will be needed here
     // This can be a future task
+  }
+
+  const confirmDeleteFile = async () => {
+    if (!currentProject || !deleteFileId) return
+    try {
+      await removeTranslationFromBatch(currentProject.id, deleteFileId)
+      setDeleteFileId(null)
+    } catch (err) {
+      toast.error('Failed to delete file')
+    }
   }
 
   const handleDeleteBatch = async () => {
@@ -300,6 +314,9 @@ export default function BatchTranslatorMain() {
                       </>
                     )}
                     {batchFile.status === 'error' && <Badge variant="destructive">Error</Badge>}
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteFileId(batchFile.id)}>
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -364,6 +381,19 @@ export default function BatchTranslatorMain() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteBatch}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!deleteFileId} onOpenChange={(open)=>!open && setDeleteFileId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove File</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to remove this file from the batch? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={()=>setDeleteFileId(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteFile}>Remove</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
