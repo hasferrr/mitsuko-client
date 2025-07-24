@@ -126,8 +126,10 @@ export default function BatchTranslatorMain() {
   const [previewTranslationId, setPreviewTranslationId] = useState<string | null>(null)
   const [queueSet, setQueueSet] = useState<Set<string>>(new Set())
 
-  // Confirmation dialog for restarting translation
+  // Confirmation dialog for starting translation
   const [isRestartTranslationDialogOpen, setIsRestartTranslationDialogOpen] = useState(false)
+  const [isStartTranslationDialogOpen, setIsStartTranslationDialogOpen] = useState(false)
+  const [isContinueTranslationDialogOpen, setIsContinueTranslationDialogOpen] = useState(false)
   const [translatedStats, setTranslatedStats] = useState({ translated: 0, total: 0 })
 
   const queueAbortRef = useRef(false)
@@ -348,7 +350,11 @@ export default function BatchTranslatorMain() {
       })
       setIsRestartTranslationDialogOpen(true)
     } else {
-      handleStartBatchTranslation()
+      setTranslatedStats({
+        translated: 0,
+        total: totalSubtitles
+      })
+      setIsStartTranslationDialogOpen(true)
     }
   }
 
@@ -425,6 +431,19 @@ export default function BatchTranslatorMain() {
 
   const handleContinueBatchTranslation = () => {
     if (batchFiles.length === 0 || isBatchTranslating) return
+
+    const remainingFiles = batchFiles.filter(file => file.status !== "done").length
+
+    setTranslatedStats({
+      translated: batchFiles.reduce((acc, file) => acc + file.translatedCount, 0),
+      total: batchFiles.reduce((acc, file) => acc + file.subtitlesCount, 0)
+    })
+
+    setIsContinueTranslationDialogOpen(true)
+  }
+
+  const handleStartContinueBatchTranslation = () => {
+    setIsContinueTranslationDialogOpen(false)
 
     setTimeout(() => {
       window.scrollTo({
@@ -1327,13 +1346,61 @@ export default function BatchTranslatorMain() {
                 Are you sure you want to translate from the beginning?
               </span>
               <span className="block">
-                If you want to translate only the remaining content, use the <strong>Continue</strong> button instead.
+                Use the <strong>Continue</strong> button instead to translate only the remaining content.
               </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleStartBatchTranslation}>Restart Translation</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Start Translation Confirmation Dialog */}
+      <AlertDialog open={isStartTranslationDialogOpen} onOpenChange={setIsStartTranslationDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Play className="h-5 w-5 text-primary" />
+              Start Batch Translation
+            </AlertDialogTitle>
+            <AlertDialogDescription className="pt-2 space-y-2">
+              <span className="block">
+                Are you sure you want to start translating <strong>{batchFiles.length}</strong> files with <strong>{translatedStats.total}</strong> subtitles?
+              </span>
+              <span className="block">
+                This will process up to <strong>{maxConcurrentTranslations}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{modelDetail?.name}</strong>.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleStartBatchTranslation}>Start Translation</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Continue Translation Confirmation Dialog */}
+      <AlertDialog open={isContinueTranslationDialogOpen} onOpenChange={setIsContinueTranslationDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <FastForward className="h-5 w-5 text-primary" />
+              Continue Batch Translation
+            </AlertDialogTitle>
+            <AlertDialogDescription className="pt-2 space-y-2">
+              <span className="block">
+                Are you sure you want to continue translating <strong>{batchFiles.length - finishedCount}</strong> remaining files?
+              </span>
+              <span className="block">
+                Only untranslated portions of each file will be processed.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleStartContinueBatchTranslation}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
