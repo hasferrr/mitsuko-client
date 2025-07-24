@@ -50,8 +50,7 @@ import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { toast } from "sonner"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
-
-const acceptedFormats = [".srt", ".ass", ".vtt"]
+import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 
 interface FileItem {
   id: string
@@ -438,7 +437,7 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
                 <label className="text-sm font-medium">Subtitle Content</label>
                 <input
                   type="file"
-                  accept={acceptedFormats.join(",")}
+                  accept={ACCEPTED_FORMATS.join(",")}
                   onChange={(e) => {
                     if (e.target.files) {
                       handleFileUploadSingle(
@@ -549,7 +548,7 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
               <input
                 type="file"
                 multiple
-                accept={acceptedFormats.join(",")}
+                accept={ACCEPTED_FORMATS.join(",")}
                 onChange={(e) => {
                   if (e.target.files) {
                     handleFileUploadBatch(e.target.files)

@@ -87,6 +87,7 @@ import { UserCreditData } from "@/types/user"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
+import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 
 interface BatchFile {
   id: string
@@ -97,14 +98,6 @@ interface BatchFile {
   translatedCount: number
   type: string
 }
-
-const subNameMap = new Map([
-  ["srt", "SRT"],
-  ["ass", "SSA"],
-  ["vtt", "VTT"],
-])
-
-const acceptedFormats = [".srt", ".ass", ".vtt"]
 
 export default function BatchTranslatorMain() {
   const [activeTab, setActiveTab] = useState("basic")
@@ -298,7 +291,7 @@ export default function BatchTranslatorMain() {
     const filesArray = 'item' in droppedFiles ? Array.from(droppedFiles) : droppedFiles
 
     for await (const file of filesArray) {
-      if (!acceptedFormats.some(format => file.name.endsWith(format))) {
+      if (!ACCEPTED_FORMATS.some(format => file.name.endsWith(format))) {
         toast.error(`Unsupported file type: ${file.name}`)
         continue
       }
@@ -1086,7 +1079,7 @@ export default function BatchTranslatorMain() {
             ref={fileInputRef}
             hidden
             onChange={handleFileInputChange}
-            accept={acceptedFormats.join(",")}
+            accept={ACCEPTED_FORMATS.join(",")}
             multiple
           />
 
@@ -1177,7 +1170,7 @@ export default function BatchTranslatorMain() {
                   <p className="mt-2 text-sm text-muted-foreground text-center">
                     Drag and drop file here, or click to select a file.
                     <br />
-                    {Array.from(subNameMap.keys()).join(", ").toUpperCase()} subtitles file.
+                    {Array.from(SUBTITLE_NAME_MAP.keys()).join(", ").toUpperCase()} subtitles file.
                   </p>
                 </div>
               )}
