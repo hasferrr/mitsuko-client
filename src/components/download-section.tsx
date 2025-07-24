@@ -18,8 +18,10 @@ import { AlignCenter, Download } from "lucide-react"
 import { DownloadOption, CombinedFormat } from "@/types/subtitles"
 import { useState } from "react"
 
+type GenerateContentResult = string | Blob | Promise<string | Blob | undefined> | undefined
+
 interface DownloadSectionProps {
-  generateContent: (option: DownloadOption, format: CombinedFormat) => string
+  generateContent: (option: DownloadOption, format: CombinedFormat) => GenerateContentResult
   fileName: string
   subName: string
 }
@@ -28,11 +30,11 @@ export function DownloadSection({ generateContent, fileName, subName }: Download
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
 
-  const handleDownload = () => {
-    const fileContent = generateContent(downloadOption, combinedFormat)
-    if (!fileContent) return
+  const handleDownload = async () => {
+    const content = await generateContent(downloadOption, combinedFormat)
+    if (!content) return
 
-    const blob = new Blob([fileContent], { type: "text/plain" })
+    const blob = content instanceof Blob ? content : new Blob([content], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url

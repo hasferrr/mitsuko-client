@@ -85,6 +85,8 @@ import { SubOnlyTranslated, SubtitleTranslated, SubtitleNoTime } from "@/types/s
 import { Translation } from "@/types/project"
 import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-gap"
 import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
+import { DownloadSection } from "@/components/download-section"
+import JSZip from "jszip"
 
 interface BatchFile {
   id: string
@@ -841,6 +843,61 @@ export default function BatchTranslatorMain() {
     // This can be a future task
   }
 
+  const generateSubtitleContentForTranslation = (
+    translation: Translation,
+    option: DownloadOption,
+    format: CombinedFormat,
+  ): string => {
+    const { subtitles, parsed } = translation
+
+    const subtitleData = subtitles.map((s) => {
+      let content = ""
+      if (option === "original") {
+        content = s.content
+      } else if (option === "translated") {
+        content = s.translated
+      } else {
+        content = combineSubtitleContent(
+          s.content,
+          s.translated,
+          format,
+          parsed.type,
+        )
+      }
+      return {
+        index: s.index,
+        timestamp: s.timestamp,
+        actor: s.actor,
+        content,
+      }
+    })
+
+    if (subtitleData.length === 0) return ""
+
+    return mergeSubtitle({ subtitles: subtitleData, parsed })
+  }
+
+  const handleGenerateZip = async (
+    option: DownloadOption,
+    format: CombinedFormat,
+  ): Promise<Blob> => {
+    const zip = new JSZip()
+
+    for (const batchFile of batchFiles) {
+      const translation = translationData[batchFile.id]
+      if (!translation) continue
+      const fileContent = generateSubtitleContentForTranslation(translation, option, format)
+
+      const ext = translation.parsed?.type || "srt"
+      const hasExt = translation.title.toLowerCase().endsWith(`.${ext}`)
+      const fileName = hasExt ? translation.title : `${translation.title}.${ext}`
+
+      zip.file(fileName, fileContent)
+    }
+
+    return await zip.generateAsync({ type: "blob" })
+  }
+
   const handlePreview = async (id: string) => {
     await loadTranslation(id)
     setCurrentTranslationId(id)
@@ -1058,6 +1115,13 @@ export default function BatchTranslatorMain() {
               Stop All
             </Button>
           </div>
+
+          {/* Download All Subtitles */}
+          <DownloadSection
+            generateContent={handleGenerateZip}
+            fileName={`${currentProject?.name || "subtitles"}.zip`}
+            subName="ZIP"
+          />
         </div>
 
         {/* Right Column - Settings */}
