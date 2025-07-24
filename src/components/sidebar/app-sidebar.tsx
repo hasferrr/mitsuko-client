@@ -2,12 +2,9 @@
 
 import Link from "next/link"
 import {
-  AudioWaveform,
-  BookOpen,
   Box,
   Folder,
   House,
-  Languages,
   HistoryIcon,
   SwatchBook,
   LibraryBig,
@@ -40,30 +37,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: House,
       },
       {
-        title: "Project",
+        title: "Projects",
         url: "/project",
         icon: Folder,
       },
       {
-        title: "Batch",
+        title: "Batches",
         url: "/batch",
         icon: Box,
       },
-      {
-        title: "Translate",
-        url: "/translate",
-        icon: Languages,
-      },
-      {
-        title: "Transcribe",
-        url: "/transcribe",
-        icon: AudioWaveform,
-      },
-      {
-        title: "Extract Context",
-        url: "/extract-context",
-        icon: BookOpen,
-      },
+      // {
+      //   title: "Translate",
+      //   url: "/translate",
+      //   icon: Languages,
+      // },
+      // {
+      //   title: "Transcribe",
+      //   url: "/transcribe",
+      //   icon: AudioWaveform,
+      // },
+      // {
+      //   title: "Extract Context",
+      //   url: "/extract-context",
+      //   icon: BookOpen,
+      // },
       {
         title: "Library",
         url: "/library",
