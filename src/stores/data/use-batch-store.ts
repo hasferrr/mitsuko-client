@@ -9,6 +9,9 @@ import {
   updateBatchItems as updateBatchItemsDB,
 } from "@/lib/db/batch"
 import { useTranslationDataStore } from "./use-translation-data-store"
+import { createTranslation } from "@/lib/db/translation"
+import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
+import { SubtitleTranslated } from "@/types/subtitles"
 
 interface BatchStore {
   currentBatch: Batch | null
@@ -18,6 +21,7 @@ interface BatchStore {
   setCurrentBatch: (batch: Batch | string | null) => void
   loadBatches: () => Promise<void>
   createBatch: (name: string) => Promise<Batch>
+  createTranslationForBatch: (batchId: string, file: File, content: string) => Promise<string>
   renameBatch: (id: string, name: string) => Promise<void>
   updateBatch: (id: string, update: Partial<Omit<Batch, "id" | "createdAt" | "updatedAt">>) => Promise<Batch | null>
   updateBatchItems: (id: string, items: string[]) => Promise<Batch | null>
@@ -70,6 +74,66 @@ export const useBatchStore = create<BatchStore>((set, get) => ({
       return newBatch
     } catch (error) {
       set({ error: 'Failed to create batch', loading: false })
+      throw error
+    }
+  },
+
+  createTranslationForBatch: async (batchId, file, content) => {
+    set({ loading: true })
+    try {
+      const currentBatch = get().batches.find(batch => batch.id === batchId)
+      if (!currentBatch) {
+        throw new Error("Batch not found")
+      }
+
+      const parsedData = parseSubtitle({ content })
+
+      // Convert subtitles to SubtitleTranslated by adding the translated field
+      const translatedSubtitles: SubtitleTranslated[] = parsedData.subtitles.map(subtitle => ({
+        ...subtitle,
+        translated: ""
+      }))
+
+      // Create the translation with the batch's default settings
+      const translation = await createTranslation(
+        "", // Empty projectId since this is for a batch
+        {
+          title: file.name,
+          subtitles: translatedSubtitles,
+          parsed: parsedData.parsed,
+        },
+        {}, // Use batch's default settings, no need to override
+        {}  // Use batch's default settings, no need to override
+      )
+
+      // Update the translation to link it to this batch
+      const translationStore = useTranslationDataStore.getState()
+      translationStore.mutateData(translation.id, "batchId", batchId)
+      translationStore.mutateData(translation.id, "basicSettingsId", currentBatch.defaultBasicSettingsId)
+      translationStore.mutateData(translation.id, "advancedSettingsId", currentBatch.defaultAdvancedSettingsId)
+      await translationStore.saveData(translation.id)
+
+      // Update the batch's translations array
+      const updatedTranslations = [...currentBatch.translations, translation.id]
+      await updateBatchItemsDB(batchId, updatedTranslations)
+
+      // Update the local state
+      set((state) => ({
+        batches: state.batches.map(b =>
+          b.id === batchId
+            ? { ...b, translations: updatedTranslations, updatedAt: new Date() }
+            : b
+        ),
+        currentBatch: state.currentBatch?.id === batchId
+          ? { ...state.currentBatch, translations: updatedTranslations, updatedAt: new Date() }
+          : state.currentBatch,
+        loading: false
+      }))
+
+      return translation.id
+    } catch (error) {
+      console.error('Failed to create translation for batch', error)
+      set({ error: 'Failed to create translation for batch', loading: false })
       throw error
     }
   },

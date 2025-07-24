@@ -17,24 +17,27 @@ export const useSettings = ({ basicSettingsId, advancedSettingsId }: UseSettings
   const upsertAdvancedSettingsData = useAdvancedSettingsStore((state) => state.upsertData)
 
   useEffect(() => {
-    if (!basicSettingsId || !advancedSettingsId) return
+    if (basicSettingsId) {
+      setSettingsCurrentId(basicSettingsId)
 
-    setSettingsCurrentId(basicSettingsId)
-    setAdvancedSettingsCurrentId(advancedSettingsId)
+      getBasicSettings(basicSettingsId)
+        .then(settings => {
+          if (settings) {
+            upsertSettingsData(settings.id, settings)
+          }
+        })
+    }
 
-    getBasicSettings(basicSettingsId)
-      .then(settings => {
-        if (settings) {
-          upsertSettingsData(settings.id, settings)
-        }
-      })
+    if (advancedSettingsId) {
+      setAdvancedSettingsCurrentId(advancedSettingsId)
 
-    getAdvancedSettings(advancedSettingsId)
-      .then(advancedSettings => {
-        if (advancedSettings) {
-          upsertAdvancedSettingsData(advancedSettings.id, advancedSettings)
-        }
-      })
+      getAdvancedSettings(advancedSettingsId)
+        .then(advancedSettings => {
+          if (advancedSettings) {
+            upsertAdvancedSettingsData(advancedSettings.id, advancedSettings)
+          }
+        })
+    }
 
   }, [
     basicSettingsId,
