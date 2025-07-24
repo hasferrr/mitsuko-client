@@ -7,6 +7,7 @@ import {
   getTranslation as getDB,
   deleteTranslation as deleteDB,
 } from "@/lib/db/translation"
+import { db } from "@/lib/db/db"
 
 export interface TranslationDataStore {
   currentId: string | null
@@ -19,6 +20,7 @@ export interface TranslationDataStore {
     advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Translation>
   getTranslationDb: (translationId: string) => Promise<Translation | undefined>
+  getTranslationsDb: (translationIds: string[]) => Promise<Translation[]>
   updateTranslationDb: (translationId: string, changes: Partial<Pick<Translation, "title" | "subtitles" | "parsed">>) => Promise<Translation>
   deleteTranslationDb: (projectId: string, translationId: string) => Promise<void>
   // Existing methods
@@ -54,6 +56,20 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       set(state => ({ data: { ...state.data, [translationId]: translation } }))
     }
     return translation
+  },
+  getTranslationsDb: async (translationIds) => {
+    if (translationIds.length === 0) return []
+    const translations = await db.translations.bulkGet(translationIds)
+    const found: Translation[] = translations.filter((t): t is Translation => t !== undefined)
+    if (found.length) {
+      set(state => ({
+        data: {
+          ...state.data,
+          ...Object.fromEntries(found.map(t => [t.id, t]))
+        }
+      }))
+    }
+    return found
   },
   updateTranslationDb: async (translationId, changes) => {
     const translation = await updateDB(translationId, changes)

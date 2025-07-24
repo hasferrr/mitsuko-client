@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useSettings } from "@/hooks/use-settings"
+import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import BatchTranslatorMain from "./batch-translator-main"
 
 export default function BatchTranslator() {
@@ -18,9 +19,21 @@ export default function BatchTranslator() {
   const createProject = useProjectStore((state) => state.createProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
 
+  // Load translation data for selected batch
+  const translationData = useTranslationDataStore((state) => state.data)
+  const loadTranslations = useTranslationDataStore((state) => state.getTranslationsDb)
+
   useEffect(() => {
     loadProjects()
   }, [loadProjects])
+
+  // Ensure translations are loaded for current batch project
+  useEffect(() => {
+    if (!batch || !batch.isBatch) return
+    const missing = batch.translations.filter(id => !translationData[id])
+    if (missing.length === 0) return
+    loadTranslations(missing).catch(err => console.error('Failed to load translations', err))
+  }, [batch, translationData, loadTranslations])
 
   const handleCreateBatch = async () => {
     const newBatch = await createProject(`Batch ${new Date().toLocaleDateString()}`, true)
