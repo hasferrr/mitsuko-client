@@ -48,6 +48,10 @@ import { UserCreditData } from "@/types/user"
 import { Input } from "@/components/ui/input"
 import { SettingsTranscription } from "./settings-transcription"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
+import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+import { useProjectStore } from "@/stores/data/use-project-store"
+import { SubtitleTranslated } from "@/types/subtitles"
+import { useRouter } from "next/navigation"
 
 interface TranscriptionMainProps {
   currentId: string
@@ -90,6 +94,12 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     enabled: false, // Lazy query - won't run automatically
     staleTime: 0, // Always refetch when requested
   })
+
+  const router = useRouter()
+  const createTranslationDb = useTranslationDataStore(state => state.createTranslationDb)
+  const setTranslationCurrentId = useTranslationDataStore(state => state.setCurrentId)
+  const currentProject = useProjectStore(state => state.currentProject)
+  const loadProjects = useProjectStore(state => state.loadProjects)
 
   const [isEditing, setIsEditing] = useState(false)
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false)
@@ -252,6 +262,43 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     setTranscriptionText(currentId, "")
     setTranscriptSubtitles(currentId, [])
     setIsClearDialogOpen(false)
+  }
+
+  const handleCreateTranslation = async () => {
+    if (isTranscribing) return
+    if (!transcriptSubtitles.length) {
+      toast.error("No subtitles to translate")
+      return
+    }
+    if (!currentProject) {
+      toast.error("Project not found")
+      return
+    }
+
+    try {
+      const subtitles: SubtitleTranslated[] = transcriptSubtitles.map((sub) => ({
+        ...sub,
+        translated: "",
+      }))
+
+      const translation = await createTranslationDb(
+        currentProject.id,
+        {
+          title,
+          subtitles,
+          parsed: { type: "srt", data: null },
+        },
+        {},
+        {},
+      )
+
+      setTranslationCurrentId(translation.id)
+      loadProjects()
+      router.push("/translate")
+    } catch (error) {
+      console.error(error)
+      toast.error("Failed to create translation")
+    }
   }
 
   return (
@@ -573,7 +620,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                     <p className="text-xs text-muted-foreground">Translate your transcript into 100+ languages</p>
                   </div>
                 </div>
-                <Button size="sm" variant="outline" className="w-full mt-2 border-border">
+                <Button size="sm" variant="outline" className="w-full mt-2 border-border" onClick={handleCreateTranslation} disabled={!transcriptSubtitles.length || isTranscribing}>
                   Translate Subtitles
                 </Button>
               </div>
