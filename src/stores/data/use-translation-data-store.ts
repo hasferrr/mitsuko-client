@@ -10,13 +10,24 @@ import {
 import { db } from "@/lib/db/db"
 
 // Throttle store writes
+const THROTTLE_LIMIT = 100
 const lastUpdateMap: Record<string, number> = {}
-const shouldUpdate = (key: string): boolean => {
+const pendingTimeouts: Record<string, ReturnType<typeof setTimeout>> = {}
+const throttleUpdate = (key: string, fn: () => void): void => {
   const now = Date.now()
   const last = lastUpdateMap[key] ?? 0
-  if (now - last < 100) return false
-  lastUpdateMap[key] = now
-  return true
+  const timeSinceLast = now - last
+  if (timeSinceLast >= THROTTLE_LIMIT) {
+    lastUpdateMap[key] = now
+    fn()
+  } else {
+    if (pendingTimeouts[key]) clearTimeout(pendingTimeouts[key])
+    pendingTimeouts[key] = setTimeout(() => {
+      lastUpdateMap[key] = Date.now()
+      delete pendingTimeouts[key]
+      fn()
+    }, THROTTLE_LIMIT - timeSinceLast)
+  }
 }
 
 export interface TranslationDataStore {
@@ -167,16 +178,16 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
   setResponse: (id, res) => {
     const translation = get().data[id]
     if (!translation) return
-    if (shouldUpdate(`resp-${id}`)) {
+    throttleUpdate(`resp-${id}`, () => {
       get().mutateData(id, "response", { ...translation.response, response: res })
-    }
+    })
   },
   setJsonResponse: (id, jsonRes) => {
     const translation = get().data[id]
     if (!translation) return
-    if (shouldUpdate(`json-${id}`)) {
+    throttleUpdate(`json-${id}`, () => {
       get().mutateData(id, "response", { ...translation.response, jsonResponse: jsonRes })
-    }
+    })
   },
   appendJsonResponse: (id, arr) => {
     const translation = get().data[id]
