@@ -23,7 +23,7 @@ PLEASE READ THESE INSTRUCTIONS BEFORE YOU START WORKING ON THE BATCH TRANSLATOR 
   ```
 - [x] create batch store
 - [x] create batch dexie db migration
-- [ ] integrate useSettings hook
+- [x] integrate useSettings hook
 - [x] bump Dexie version and add `batches` table schema
 - [x] write Dexie `.upgrade()` migration for existing data
 - [x] update `Translation` data model to link back to its parent `Batch` via `batchId: string`.

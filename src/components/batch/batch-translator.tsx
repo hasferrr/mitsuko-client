@@ -53,6 +53,9 @@ import { getContent, parseTranslationJson } from "@/lib/parser/parser"
 import { createContextMemory } from "@/lib/context-memory"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
+import { useBatchStore } from "@/stores/data/use-batch-store"
+import { useSettings } from "@/hooks/use-settings"
+import { Batch } from "@/types/project"
 
 interface BatchFile {
   file: File
@@ -68,6 +71,35 @@ interface BatchFile {
 }
 
 export default function BatchTranslator() {
+  const batchId = useBatchStore((state) => state.currentBatch?.id)
+  const batchData = useBatchStore((state) => state.batches)
+  const batch = batchData.find(b => b.id === batchId)
+
+  useSettings({
+    basicSettingsId: batch?.defaultBasicSettingsId ?? null,
+    advancedSettingsId: batch?.defaultAdvancedSettingsId ?? null,
+  })
+
+  if (!batchId || !batch) {
+    return <div className="p-4">No batch project selected</div>
+  }
+
+  if (!batch.defaultBasicSettingsId || !batch.defaultAdvancedSettingsId) {
+    return <div className="p-4">Invalid settings data</div>
+  }
+
+  return (
+    <BatchTranslatorMain
+      batch={batch}
+    />
+  )
+}
+
+interface BatchTranslatorMainProps {
+  batch: Batch
+}
+
+function BatchTranslatorMain({ batch }: BatchTranslatorMainProps) {
   const [files, setFiles] = useState<BatchFile[]>([])
   const [isTranslating, setIsTranslating] = useState(false)
   const [activeTab, setActiveTab] = useState("basic")
