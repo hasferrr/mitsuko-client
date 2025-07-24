@@ -38,7 +38,7 @@ Batch logic is now handled by the existing **Project** store.
 - [x] **State Synchronization:**
   - [x] Refactor the component to remove local `files` state.
   - [x] The list of files will be derived from `useProjectStore` (getting the array of translation IDs).
-  - [x] The data for each file (title, status, progress) will be fetched from `useTranslationDataStore` and a new `use-batch-translation-store` for real-time status.
+  - [x] The data for each file (title, status, progress) will be fetched from `useTranslationDataStore` and `useProjectStore` for real-time status.
 - [x] **Deletion Logic:**
   - [x] The 'x' button on a file will trigger a confirmation dialog.
   - [x] On confirmation, it will call a `removeTranslationFromBatch` function.
@@ -46,14 +46,14 @@ Batch logic is now handled by the existing **Project** store.
 
 ### Batch Operations
 - [ ] **Pause/Resume Functionality:**
-  - [ ] Implement a global pause/resume state for the batch process (e.g., in `use-batch-translation-store`).
+  - [ ] Implement a global pause/resume state for the batch process (e.g., in `useProjectStore`).
   - [ ] The main translation loop will check this state *between* processing files, not during a file's translation.
   - [ ] A "Pause" button will set the state to `paused`, and a "Resume" button will set it back to `running`.
 - [ ] **Overall Progress Indicator:**
   - [ ] Add a `<Progress>` bar to the main header of the batch translator.
   - [ ] The value of this progress bar will be the average of the progress of all individual files in the batch.
 - [ ] **Progress Calculation:**
-  - [ ] The progress for each file will be tracked in the new `use-batch-translation-store`.
+  - [ ] The progress for each file will be tracked in `useProjectStore`.
   - [ ] A function within the component will calculate the average progress (`total progress / number of files`) and update the UI.
 
 ### UI Enhancements
