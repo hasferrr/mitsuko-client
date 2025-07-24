@@ -30,7 +30,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Translation, Transcription, Extraction } from "@/types/project"
+import { Translation, Transcription, Extraction, Project } from "@/types/project"
 import { ProjectItemList } from "./project-item-list"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { EditDialogue } from "../ui-custom/edit-dialogue"
@@ -39,7 +39,6 @@ import { db } from "@/lib/db/db"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
-import { NoProjectSelected } from "./no-project-selected"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
@@ -67,7 +66,11 @@ const countTranslatedLines = (subtitles: Translation['subtitles']) => {
   return count
 }
 
-export const ProjectMain = () => {
+interface ProjectMainProps {
+  currentProject: Project
+}
+
+export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const router = useRouter()
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -75,7 +78,6 @@ export const ProjectMain = () => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
 
   const loadProjects = useProjectStore((state) => state.loadProjects)
-  const currentProject = useProjectStore((state) => state.currentProject)
   const renameProject = useProjectStore((state) => state.renameProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
@@ -175,10 +177,6 @@ export const ProjectMain = () => {
           break
       }
     }
-  }
-
-  if (!currentProject) {
-    return <NoProjectSelected />
   }
 
   const handleSave = async (newName: string) => {

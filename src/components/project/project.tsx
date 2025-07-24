@@ -228,5 +228,5 @@ export const Project = () => {
     )
   }
 
-  return <ProjectMain />
+  return <ProjectMain currentProject={currentProject} />
 }
