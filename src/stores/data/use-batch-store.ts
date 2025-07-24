@@ -111,12 +111,23 @@ export const useBatchStore = create<BatchStore>((set, get) => ({
       const originalBasicSettingsId = translation.basicSettingsId
       const originalAdvancedSettingsId = translation.advancedSettingsId
 
-      // Update the translation to link it to this batch
+      // Update the translation directly in the database first
+      await db.translations.update(translation.id, {
+        batchId,
+        basicSettingsId: currentBatch.defaultBasicSettingsId,
+        advancedSettingsId: currentBatch.defaultAdvancedSettingsId,
+        updatedAt: new Date()
+      })
+
+      // Fetch the updated translation
+      const updatedTranslation = await db.translations.get(translation.id)
+      if (!updatedTranslation) {
+        throw new Error("Failed to update translation")
+      }
+
+      // Update translation in the store
       const translationStore = useTranslationDataStore.getState()
-      translationStore.mutateData(translation.id, "batchId", batchId)
-      translationStore.mutateData(translation.id, "basicSettingsId", currentBatch.defaultBasicSettingsId)
-      translationStore.mutateData(translation.id, "advancedSettingsId", currentBatch.defaultAdvancedSettingsId)
-      await translationStore.saveData(translation.id)
+      translationStore.upsertData(updatedTranslation.id, updatedTranslation)
 
       // Delete the unused settings that were created with the translation
       await db.transaction('rw', db.basicSettings, db.advancedSettings, async () => {
