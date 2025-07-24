@@ -36,6 +36,7 @@ import { useState } from "react"
 
 export const Project = () => {
   const projects = useProjectStore(state => state.projects)
+  const visibleProjects = projects.filter(p => !p.isBatch)
   const currentProject = useProjectStore(state => state.currentProject)
   const createProject = useProjectStore(state => state.createProject)
   const setCurrentProject = useProjectStore(state => state.setCurrentProject)
@@ -192,7 +193,7 @@ export const Project = () => {
           </div>
         </div>
 
-        {projects.length === 0 ? (
+        {visibleProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
             <FileText className="h-12 w-12 text-muted-foreground mb-4" />
             <h2 className="text-xl font-medium mb-2 text-center">No Projects Found</h2>
@@ -207,11 +208,11 @@ export const Project = () => {
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={projects.map(p => p.id)}
+              items={visibleProjects.map(p => p.id)}
               strategy={rectSortingStrategy}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projects.map(p => (
+                {visibleProjects.map(p => (
                   <SortableProjectCard key={p.id} project={p} />
                 ))}
               </div>

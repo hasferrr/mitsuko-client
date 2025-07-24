@@ -29,6 +29,7 @@ import { IconBrandDiscord } from "@tabler/icons-react"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const projects = useProjectStore((state) => state.projects)
+  const visibleProjects = projects.filter(p => !p.isBatch)
   const createProject = useProjectStore((state) => state.createProject)
 
   const data = {
@@ -100,7 +101,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <AppSidebarMain items={data.navMain} />
         <AppSidebarProjects
-          projects={projects}
+          projects={visibleProjects}
           addButtonFn={() => {
             createProject("Project " + crypto.randomUUID().slice(0, 3))
           }}

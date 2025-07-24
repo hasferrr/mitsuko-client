@@ -125,7 +125,7 @@ export function ExportImportDialogue({
           <DialogHeader>
             <DialogTitle>Export/Import Database</DialogTitle>
             <DialogDescription className="pt-1">
-              Backup all your projects to a JSON file or restore from a previously exported backup.
+              Backup all your projects and batches to a JSON file or restore from a previously exported backup.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4">
