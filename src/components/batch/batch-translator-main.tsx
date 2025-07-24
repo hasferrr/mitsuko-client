@@ -392,12 +392,12 @@ export default function BatchTranslatorMain() {
     if (!partOfBatch) {
       // setActiveTab("result")
       setJsonResponse(currentId, [])
-      setTimeout(() => {
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        })
-      }, 300)
+      // setTimeout(() => {
+      //   window.scrollTo({
+      //     top: 0,
+      //     behavior: "smooth",
+      //   })
+      // }, 300)
     }
 
     await saveData(currentId)
@@ -726,14 +726,14 @@ export default function BatchTranslatorMain() {
 
     setIsTranslating(currentId, true)
     setHasChanges(true)
-    setActiveTab("result")
+    // setActiveTab("result")
     setJsonResponse(currentId, [])
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }, 300)
+    // setTimeout(() => {
+    //   window.scrollTo({
+    //     top: 0,
+    //     behavior: "smooth",
+    //   })
+    // }, 300)
 
     for (const block of untranslated) {
       if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) {
