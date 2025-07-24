@@ -14,10 +14,11 @@ import { CSS } from "@dnd-kit/utilities"
 
 interface BatchFile {
   id: string
-  status: "pending" | "translating" | "done" | "error"
+  status: "pending" | "partial" | "translating" | "done" | "error"
   progress: number
   title: string
   subtitlesCount: number
+  translatedCount: number
   type: string
 }
 
@@ -44,10 +45,15 @@ export function SortableBatchFile({
       <CardContent className="p-4 flex-1 flex items-center justify-between">
         <div>
           <p className="font-semibold">{batchFile.title}</p>
-          <p className="text-sm text-muted-foreground">{batchFile.subtitlesCount} lines</p>
+          <p className="text-sm text-muted-foreground">
+            {batchFile.translatedCount === batchFile.subtitlesCount
+              ? `${batchFile.subtitlesCount} lines`
+              : `${batchFile.translatedCount}/${batchFile.subtitlesCount} lines`}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {batchFile.status === 'pending' && <Badge variant="secondary">Pending</Badge>}
+          {batchFile.status === 'partial' && <Badge variant="outline">Partial</Badge>}
           {batchFile.status === 'translating' && <Badge variant="outline">Translating ({batchFile.progress.toFixed(0)}%)</Badge>}
           {batchFile.status === 'done' && (
             <>

@@ -85,10 +85,11 @@ import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated
 
 interface BatchFile {
   id: string
-  status: "pending" | "translating" | "done" | "error"
+  status: "pending" | "partial" | "translating" | "done" | "error"
   progress: number
   title: string
   subtitlesCount: number
+  translatedCount: number
   type: string
 }
 
@@ -222,10 +223,15 @@ export default function BatchTranslatorMain() {
       const translatedCount = translation?.subtitles?.filter(s => s.translated && s.translated.trim() !== "").length || 0
       const progress = totalSubtitles ? (translatedCount / totalSubtitles) * 100 : 0
 
-      let status: BatchFile["status"] = "pending"
+      let status: BatchFile["status"]
+
       if (isTranslatingSet.has(id)) {
         status = "translating"
-      } else if (translatedCount === totalSubtitles && totalSubtitles > 0) {
+      } else if (translatedCount === 0) {
+        status = "pending"
+      } else if (translatedCount < totalSubtitles) {
+        status = "partial"
+      } else {
         status = "done"
       }
 
@@ -233,6 +239,7 @@ export default function BatchTranslatorMain() {
         id,
         title: translation?.title || "Loading...",
         subtitlesCount: totalSubtitles,
+        translatedCount,
         status,
         progress,
         type: translation?.parsed?.type || "srt",
