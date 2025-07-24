@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { useState, useRef, useEffect, useMemo } from "react"
@@ -6,7 +5,6 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,12 +19,9 @@ import {
   Play,
   Upload,
   Loader2,
-  Download,
   Trash,
   ArrowLeft,
   FastForward,
-  X,
-  GripVertical,
   Square,
   CheckSquare,
   ListChecks,
@@ -75,13 +70,12 @@ import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
-import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { SubtitleList } from "../translate/subtitle-list"
 import { SubtitleResultOutput } from "../translate/subtitle-result-output"
 import { SortableBatchFile } from "./sortable-batch-file"
-import { cn, minMax, sleep } from "@/lib/utils"
+import { minMax, sleep } from "@/lib/utils"
 import { SubOnlyTranslated, SubtitleTranslated, SubtitleNoTime } from "@/types/subtitles"
 import { Translation } from "@/types/project"
 import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-gap"
@@ -159,9 +153,7 @@ export default function BatchTranslatorMain() {
   const translationData = useTranslationDataStore((state) => state.data)
   const loadTranslation = useTranslationDataStore((state) => state.getTranslationDb)
   const setCurrentTranslationId = useTranslationDataStore((state) => state.setCurrentId)
-  const setTitle = useTranslationDataStore((state) => state.setTitle)
   const setSubtitles = useTranslationDataStore((state) => state.setSubtitles)
-  const setParsed = useTranslationDataStore((state) => state.setParsed)
   const setResponse = useTranslationDataStore((state) => state.setResponse)
   const setJsonResponse = useTranslationDataStore((state) => state.setJsonResponse)
   const appendJsonResponse = useTranslationDataStore((state) => state.appendJsonResponse)
@@ -433,8 +425,6 @@ export default function BatchTranslatorMain() {
 
   const handleContinueBatchTranslation = () => {
     if (batchFiles.length === 0 || isBatchTranslating) return
-
-    const remainingFiles = batchFiles.filter(file => file.status !== "done").length
 
     setTranslatedStats({
       translated: batchFiles.reduce((acc, file) => acc + file.translatedCount, 0),
@@ -1033,7 +1023,7 @@ export default function BatchTranslatorMain() {
     try {
       await removeTranslationFromBatch(currentProject.id, deleteFileId)
       setDeleteFileId(null)
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete file')
     }
   }
