@@ -78,7 +78,7 @@ export function Navbar() {
     const getTruncatedTitle = (title: string) => (title.length > MAX_TITLE_LENGTH ? `${title.slice(0, MAX_TITLE_LENGTH)}...` : title)
 
     if (currentProject) {
-      newBreadcrumbs.push({ name: currentProject.name, link: "/project" })
+      newBreadcrumbs.push({ name: currentProject.name, link: currentProject.isBatch ? "/batch" : "/project" })
     }
     if (_pathname === "/translate" && tlId && tlData[tlId]) {
       newBreadcrumbs.push({ name: getTruncatedTitle(tlData[tlId].title), link: "" })
