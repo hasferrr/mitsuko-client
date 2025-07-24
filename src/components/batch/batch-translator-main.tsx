@@ -87,6 +87,10 @@ import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-g
 import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
 import { DownloadSection } from "@/components/download-section"
 import JSZip from "jszip"
+import { logSubtitle } from "@/lib/api/subtitle-log"
+import { UserCreditData } from "@/types/user"
+import { fetchUserCreditData } from "@/lib/api/user-credit"
+import { useQuery } from "@tanstack/react-query"
 
 interface BatchFile {
   id: string
@@ -187,6 +191,14 @@ export default function BatchTranslatorMain() {
   // Other Hooks
   const { setHasChanges } = useUnsavedChanges()
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
+
+  // Lazy user data query
+  const { refetch: refetchUserData } = useQuery<UserCreditData>({
+    queryKey: ["user", session?.user?.id],
+    queryFn: fetchUserCreditData,
+    enabled: false,
+    staleTime: 0,
+  })
 
   // Get batch files from translationData
   const batchFiles: BatchFile[] = useMemo(() => {
@@ -336,6 +348,13 @@ export default function BatchTranslatorMain() {
   const handleStartBatchTranslation = () => {
     if (batchFiles.length === 0 || isBatchTranslating) return
 
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, 300)
+
     setIsRestartTranslationDialogOpen(false)
     queueAbortRef.current = false
     setIsBatchTranslating(true)
@@ -383,6 +402,14 @@ export default function BatchTranslatorMain() {
 
   const handleContinueBatchTranslation = () => {
     if (batchFiles.length === 0 || isBatchTranslating) return
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, 300)
+
     queueAbortRef.current = false
     setIsBatchTranslating(true)
     setHasChanges(true)
@@ -592,8 +619,7 @@ export default function BatchTranslatorMain() {
     }
 
     // Log subtitles
-    // TODO: Add logSubtitle
-    // logSubtitle(title, generateSubtitleContent("original"), currentId)
+    logSubtitle(title, generateSubtitleContentForTranslation(translationData[currentId], "original", "o-n-t"), currentId, true)
 
     // Translate each chunk of subtitles
     let batch = 0
@@ -693,8 +719,7 @@ export default function BatchTranslatorMain() {
           }
         }
         setSubtitles(currentId, merged)
-        // TODO: Refetch user data
-        // refetchUserData()
+
         await saveData(currentId)
       }
 
@@ -786,6 +811,7 @@ export default function BatchTranslatorMain() {
       // )
     }
 
+    refetchUserData()
     await saveData(currentId)
   }
 
@@ -834,8 +860,7 @@ export default function BatchTranslatorMain() {
     }
 
     setIsTranslating(currentId, false)
-    // TODO: Refetch user data
-    // refetchUserData()
+    refetchUserData()
   }
 
   const handleFileDownload = (batchFileId: string, option: DownloadOption, format: CombinedFormat) => {
