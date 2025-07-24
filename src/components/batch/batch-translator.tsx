@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -71,6 +71,7 @@ export default function BatchTranslator() {
   const [files, setFiles] = useState<BatchFile[]>([])
   const [isTranslating, setIsTranslating] = useState(false)
   const [activeTab, setActiveTab] = useState("basic")
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Settings Stores
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -95,23 +96,26 @@ export default function BatchTranslator() {
   const session = useSessionStore((state) => state.session)
   const { setHasChanges } = useUnsavedChanges()
 
-  const handleFileDrop = async (droppedFiles: FileList) => {
-    if (!droppedFiles) return;
-    const newFiles: BatchFile[] = [];
-    for (let i = 0; i < droppedFiles.length; i++) {
-      const file = droppedFiles[i];
+  const handleFileDrop = async (droppedFiles: FileList | File[]) => {
+    if (!droppedFiles) return
+
+    // Convert to array if it's a FileList
+    const filesArray = 'item' in droppedFiles ? Array.from(droppedFiles) : droppedFiles
+
+    const newFiles: BatchFile[] = []
+    for (const file of filesArray) {
       if (!file.name.endsWith(".srt") && !file.name.endsWith(".ass")) {
-        toast.error(`Unsupported file type: ${file.name}`);
-        continue;
+        toast.error(`Unsupported file type: ${file.name}`)
+        continue
       }
-      const text = await file.text();
-      const data = parseSubtitle({ content: text });
+      const text = await file.text()
+      const data = parseSubtitle({ content: text })
       const parsedSubtitles: SubtitleTranslated[] = data.subtitles.map(
         (subtitle) => ({
           ...subtitle,
           translated: "",
         })
-      );
+      )
 
       newFiles.push({
         file,
@@ -124,10 +128,22 @@ export default function BatchTranslator() {
           response: "",
           jsonResponse: [],
         },
-      });
+      })
     }
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-  };
+    setFiles((prevFiles) => [...prevFiles, ...newFiles])
+  }
+
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const filesArray = Array.from(event.target.files)
+      event.target.value = ""
+      handleFileDrop(filesArray)
+    }
+  }
+
+  const handleClickFileUpload = () => {
+    fileInputRef.current?.click()
+  }
 
   const handleStartBatchTranslation = async () => {
     if (!files.length) return
@@ -413,11 +429,22 @@ export default function BatchTranslator() {
       <div className="grid md:grid-cols-[1fr_402px] gap-6">
         {/* Left Column - Files */}
         <div className="space-y-4">
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            onChange={handleFileInputChange}
+            accept=".srt,.ass"
+            multiple
+          />
           <DragAndDrop onDropFiles={handleFileDrop} disabled={isTranslating}>
-            <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary">
+            <div
+              className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
+              onClick={handleClickFileUpload}
+            >
               <Upload className="h-10 w-10 text-muted-foreground" />
               <p className="mt-2 text-sm text-muted-foreground text-center">
-                Drag and drop subtitle files here.
+                Drag and drop subtitle files here or click to browse.
                 <br />
                 SRT or ASS formats supported.
               </p>
