@@ -239,6 +239,10 @@ export default function BatchTranslatorMain() {
     })
   }, [currentProject?.isBatch, order, translationData, isTranslatingSet, queueSet])
 
+  const finishedCount = useMemo(() => {
+    return batchFiles.filter(file => file.status === "done").length
+  }, [batchFiles])
+
   // --------------------- Selection helpers ---------------------
   const toggleSelectMode = () => {
     setIsSelecting(prev => {
@@ -1046,10 +1050,15 @@ export default function BatchTranslatorMain() {
           />
 
           {/* Selection Controls */}
-          <div className={cn(
-            "flex items-center gap-2 justify-end pr-2",
-            !batchFiles.length && "hidden"
-          )}>
+          <div className="flex items-center gap-2 px-2">
+            {!isSelecting && (
+              <div className="text-sm mr-auto">Finished: {finishedCount} / {batchFiles.length}</div>
+            )}
+            {isSelecting && (
+              <div className="flex items-center gap-2 mr-auto">
+                <span className="text-sm">Selected: {selectedIds.size} / {batchFiles.length}</span>
+              </div>
+            )}
             {isSelecting && (
               <>
                 <Button
@@ -1075,37 +1084,16 @@ export default function BatchTranslatorMain() {
               </>
             )}
             {!isSelecting && (
-              <div className="flex items-center gap-2 mr-auto">
-                <span className="text-sm">Max Concurrent:</span>
-                <div className="flex items-center">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8 rounded-r-none select-none"
-                    onClick={() => setMaxConcurrentTranslations(prev => Math.max(1, prev - 1))}
-                    disabled={maxConcurrentTranslations <= 1}
-                  >
-                    -
-                  </Button>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={5}
-                    value={maxConcurrentTranslations}
-                    onChange={(e) => setMaxConcurrentTranslations(Math.max(1, Math.min(5, parseInt(e.target.value) || 1)))}
-                    className="w-12 h-8 text-center rounded-none border-x-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8 rounded-l-none select-none"
-                    onClick={() => setMaxConcurrentTranslations(prev => Math.min(5, prev + 1))}
-                    disabled={maxConcurrentTranslations >= 5}
-                  >
-                    +
-                  </Button>
-                </div>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 rounded-lg"
+                onClick={handleClickFileUpload}
+                disabled={isBatchTranslating || batchFiles.length === 0}
+              >
+                <Upload className="h-4 w-4" />
+                Upload
+              </Button>
             )}
             <Button
               variant="outline"
@@ -1119,44 +1107,44 @@ export default function BatchTranslatorMain() {
             </Button>
           </div>
 
-          <DragAndDrop onDropFiles={handleFileDrop} disabled={isBatchTranslating} className={cn(!batchFiles.length && "hidden")}>
-            <div className="space-y-2 max-h-[510px] pr-2 overflow-x-hidden overflow-y-auto">
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={order} strategy={verticalListSortingStrategy}>
-                  {batchFiles.map(batchFile => (
-                    <SortableBatchFile
-                      key={batchFile.id}
-                      batchFile={batchFile}
-                      onDelete={id => setDeleteFileId(id)}
-                      onDownload={handleFileDownload}
-                      onClick={handlePreview}
-                      selectMode={isSelecting}
-                      selected={selectedIds.has(batchFile.id)}
-                      onSelectToggle={handleSelectToggle}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
-            </div>
-          </DragAndDrop>
-
           <DragAndDrop onDropFiles={handleFileDrop} disabled={isBatchTranslating}>
-            <div
-              className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
-              onClick={handleClickFileUpload}
-            >
-              <Upload className="h-10 w-10 text-muted-foreground" />
-              <p className="mt-2 text-sm text-muted-foreground text-center">
-                Drag and drop file here, or click to select a file.
-                <br />
-                {Array.from(subNameMap.keys()).join(", ").toUpperCase()} subtitles file.
-              </p>
+            <div className="space-y-2 h-[510px] pr-2 overflow-x-hidden overflow-y-auto">
+              {batchFiles.length ? (
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={order} strategy={verticalListSortingStrategy}>
+                    {batchFiles.map(batchFile => (
+                      <SortableBatchFile
+                        key={batchFile.id}
+                        batchFile={batchFile}
+                        onDelete={id => setDeleteFileId(id)}
+                        onDownload={handleFileDownload}
+                        onClick={handlePreview}
+                        selectMode={isSelecting}
+                        selected={selectedIds.has(batchFile.id)}
+                        onSelectToggle={handleSelectToggle}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+              ) : (
+                <div
+                  className="h-full flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
+                  onClick={handleClickFileUpload}
+                >
+                  <Upload className="h-10 w-10 text-muted-foreground" />
+                  <p className="mt-2 text-sm text-muted-foreground text-center">
+                    Drag and drop file here, or click to select a file.
+                    <br />
+                    {Array.from(subNameMap.keys()).join(", ").toUpperCase()} subtitles file.
+                  </p>
+                </div>
+              )}
             </div>
           </DragAndDrop>
 
           <div className="flex flex-wrap items-center gap-4 w-full">
             <Button
-              className="gap-2 h-10 flex-1"
+              className="h-10 flex-1"
               onClick={handleInitiateBatchTranslation}
               disabled={isBatchTranslating || !session || batchFiles.length === 0}
             >
@@ -1174,22 +1162,55 @@ export default function BatchTranslatorMain() {
             </Button>
             <Button
               variant="outline"
-              className="gap-2 h-10 flex-1 border-primary/25 hover:border-primary/50"
-              onClick={handleContinueBatchTranslation}
-              disabled={isBatchTranslating || batchFiles.length === 0}
-            >
-              <FastForward className="h-4 w-4" />
-              Continue {batchFiles.filter(file => file.status === "done").length} / {batchFiles.length}
-            </Button>
-            <Button
-              variant="outline"
-              className="gap-2 h-10 flex-1"
+              className="h-10 flex-1"
               onClick={handleStopBatchTranslation}
               disabled={!isBatchTranslating}
             >
               <Square className="h-4 w-4" />
               Stop All
             </Button>
+          </div>
+
+          <Button
+            variant="outline"
+            className="h-10 w-full border-primary/25 hover:border-primary/50"
+            onClick={handleContinueBatchTranslation}
+            disabled={isBatchTranslating || batchFiles.length === 0}
+          >
+            <FastForward className="h-4 w-4" />
+            Continue Batch Translation ({batchFiles.length - finishedCount} remaining)
+          </Button>
+
+          <div className="flex items-center justify-between w-full h-9 px-3 py-2 rounded-md border border-input">
+            <span className="text-sm font-medium">Max Concurrent Translations</span>
+            <div className="flex items-center gap-[0.5]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
+                onClick={() => setMaxConcurrentTranslations(prev => Math.max(1, prev - 1))}
+                disabled={maxConcurrentTranslations <= 1}
+              >
+                -
+              </Button>
+              <Input
+                type="number"
+                min={1}
+                max={5}
+                value={maxConcurrentTranslations}
+                onChange={(e) => setMaxConcurrentTranslations(Math.max(1, Math.min(5, parseInt(e.target.value) || 1)))}
+                className="w-10 h-7 text-center border-0 bg-transparent shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
+                onClick={() => setMaxConcurrentTranslations(prev => Math.min(5, prev + 1))}
+                disabled={maxConcurrentTranslations >= 5}
+              >
+                +
+              </Button>
+            </div>
           </div>
 
           {/* Download All Subtitles */}
@@ -1303,7 +1324,7 @@ export default function BatchTranslatorMain() {
                 You have already translated <strong>{translatedStats.translated}</strong> of <strong>{translatedStats.total}</strong> subtitles in this batch.
               </span>
               <span className="block">
-                Starting a new translation will start from the beginning.
+                Are you sure you want to translate from the beginning?
               </span>
               <span className="block">
                 If you want to translate only the remaining content, use the <strong>Continue</strong> button instead.
