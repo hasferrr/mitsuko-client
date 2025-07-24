@@ -20,12 +20,12 @@ const generalFeaturesList = [
     description: "Convert audio into subtitle text. Supports large files and background processing.",
   },
   {
-    feature: "Project Management",
-    description: "Efficiently manage and organize your translation projects, subtitles, and related assets locally.",
+    feature: "Batch Translation",
+    description: "Translate multiple files simultaneously to improve workflow efficiency and save time.",
   },
   {
-    feature: "Project Backup & Transfer",
-    description: "Conveniently export your project data for backup or transfer, and import projects to continue your work seamlessly.",
+    feature: "Project Management & Backup",
+    description: "Efficiently manage, organize, backup and transfer your translation projects, subtitles, and related assets.",
   },
   {
     feature: "Access to All Models",
