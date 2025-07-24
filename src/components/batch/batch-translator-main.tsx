@@ -24,6 +24,7 @@ import {
   Download,
   Trash,
   ArrowLeft,
+  FastForward,
   X,
   GripVertical,
   Square,
@@ -79,6 +80,8 @@ import { SortableBatchFile } from "./sortable-batch-file"
 import { minMax, sleep } from "@/lib/utils"
 import { SubOnlyTranslated, SubtitleTranslated, SubtitleNoTime } from "@/types/subtitles"
 import { Translation } from "@/types/project"
+import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-gap"
+import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
 
 interface BatchFile {
   id: string
@@ -242,6 +245,14 @@ export default function BatchTranslatorMain() {
     setIsBatchTranslating(true)
     setHasChanges(true)
     await Promise.all(batchFiles.map(f => handleStartTranslation(f.id)))
+    setIsBatchTranslating(false)
+  }
+
+  const handleContinueBatchTranslation = async () => {
+    if (batchFiles.length === 0) return
+    setIsBatchTranslating(true)
+    setHasChanges(true)
+    await Promise.all(batchFiles.map(f => handleContinueTranslation(f.id)))
     setIsBatchTranslating(false)
   }
 
@@ -604,6 +615,55 @@ export default function BatchTranslatorMain() {
     await saveData(currentId)
   }
 
+  const handleContinueTranslation = async (currentId: string) => {
+    const subtitles = translationData[currentId]?.subtitles ?? []
+
+    // TODO: Refactor to separate function
+    // --- COPY PASTE FROM SUBTITLE TRANSLATOR MAIN ---
+
+    const { untranslated: initialUntranslated } = countUntranslatedLines(subtitles)
+    const untranslated = mergeIntervalsWithGap(initialUntranslated, 5)
+    console.log(JSON.stringify(untranslated))
+
+    if (untranslated.length === 0) return
+
+    setIsTranslating(currentId, true)
+    setHasChanges(true)
+    setActiveTab("result")
+    setJsonResponse(currentId, [])
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }, 300)
+
+    for (const block of untranslated) {
+      if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) {
+        console.log("Continue Translation: Operation stopped by user before processing a block.")
+        break
+      }
+
+      const [startIdx, endIdx] = block
+      console.log(`Continue Translation: Processing block from index ${startIdx} to ${endIdx}.`)
+
+      try {
+        await handleStartTranslation(currentId, startIdx, endIdx, true)
+        if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) {
+          console.log("Continue Translation: Operation stopped by user during processing of a block.")
+          break
+        }
+      } catch (error) {
+        console.error(`Continue Translation: Error processing block ${startIdx}-${endIdx}:`, error)
+        break
+      }
+    }
+
+    setIsTranslating(currentId, false)
+    // TODO: Refetch user data
+    // refetchUserData()
+  }
+
   const handleFileDownload = (batchFileId: string, option: DownloadOption, format: CombinedFormat) => {
     // Implementation for file download will be needed here
     // This can be a future task
@@ -674,6 +734,15 @@ export default function BatchTranslatorMain() {
               {session ? `Translate ${batchFiles.length} files` : "Sign In to Start"}
             </>
           )}
+        </Button>
+        <Button
+          variant="outline"
+          className="gap-2 h-10"
+          onClick={handleContinueBatchTranslation}
+          disabled={isBatchTranslating || batchFiles.length === 0}
+        >
+          <FastForward className="h-4 w-4" />
+          Continue
         </Button>
         <Button
           variant="outline"
