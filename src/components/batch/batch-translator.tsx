@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
-  FileText,
+  Files,
   Plus,
 } from "lucide-react"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -51,22 +51,24 @@ export default function BatchTranslator() {
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-medium">Select a Batch</h2>
           <Button onClick={handleCreateBatch}>
-            <Plus size={18} className="mr-2" />
+            <Plus size={18} />
             Create New Batch
           </Button>
         </div>
 
-        {projects.filter(p=>p.isBatch).length === 0 ? (
+        {projects.filter(p => p.isBatch).length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
-            <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-            <h2 className="text-xl font-medium mb-2 text-center">No Batches Found</h2>
+            <Files className="h-12 w-12 text-muted-foreground mb-4" />
+            <h1 className="text-xl font-medium mb-2 text-center">Subtitle Batch Translation</h1>
             <p className="text-muted-foreground mb-4 text-center text-sm">
-              Create a new batch to start translating files.
+              Create a new batch to translate multiple subtitles at once.
+              <br />
+              Translate SRT, VTT, and ASS files with a single click.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.filter(p=>p.isBatch).map((b) => (
+            {projects.filter(p => p.isBatch).map((b) => (
               <Card
                 key={b.id}
                 className="cursor-pointer hover:border-primary transition-colors overflow-hidden border border-muted h-full flex flex-col"

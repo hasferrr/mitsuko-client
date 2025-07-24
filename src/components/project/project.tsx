@@ -196,9 +196,11 @@ export const Project = () => {
         {visibleProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
             <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-            <h2 className="text-xl font-medium mb-2 text-center">No Projects Found</h2>
+            <h1 className="text-xl font-medium mb-2 text-center">Translation & Transcription</h1>
             <p className="text-muted-foreground mb-4 text-center text-sm">
-              Create a new project to start working.
+              Create a new project to manage your subtitle translations.
+              <br />
+              Organize, edit, and track all your work in one place.
             </p>
           </div>
         ) : (

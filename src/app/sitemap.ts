@@ -16,6 +16,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${DEPLOYMENT_URL}/project`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${DEPLOYMENT_URL}/batch`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
       url: `${DEPLOYMENT_URL}/privacy`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
