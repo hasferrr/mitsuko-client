@@ -220,29 +220,27 @@ export const useBatchStore = create<BatchStore>((set, get) => ({
   deleteBatch: async (id) => {
     set({ loading: true })
     try {
+      // Get the batch we're going to delete
+      const deletedBatch = get().batches.find(p => p.id === id)
+      if (!deletedBatch) {
+        throw new Error("Batch not found")
+      }
+
+      // Delete the batch and its translations from the database
       await deleteBatchDB(id)
 
+      // Remove translations from the store
       const translationStore = useTranslationDataStore.getState()
+      deletedBatch.translations.forEach(translationId => {
+        translationStore.removeData(translationId)
+      })
 
-      // Remove data for deleted batch from all stores
-      const deletedBatch = get().batches.find((p: { id: string }) => p.id === id)
-      if (deletedBatch) {
-        deletedBatch.translations.forEach((translationId: string) => {
-          translationStore.removeData(translationId)
-        })
-      }
-
+      // Update the local state
       set((state) => ({
         batches: state.batches.filter(p => p.id !== id),
-        currentBatch: state.currentBatch?.id === id
-          ? null
-          : state.currentBatch,
+        currentBatch: state.currentBatch?.id === id ? null : state.currentBatch,
         loading: false
       }))
-
-      if (get().currentBatch?.id === id) {
-        set({ currentBatch: null })
-      }
     } catch (error) {
       console.error('Failed to delete batch', error)
       set({ error: 'Failed to delete batch', loading: false })

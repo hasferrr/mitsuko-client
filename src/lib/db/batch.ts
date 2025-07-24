@@ -49,10 +49,27 @@ export const deleteBatch = async (id: string) => {
   const batch = await db.batches.get(id)
   if (!batch) return
 
-  return db.transaction('rw', [db.batches, db.basicSettings, db.advancedSettings], async () => {
+  return db.transaction('rw', [db.batches, db.basicSettings, db.advancedSettings, db.translations], async () => {
     // Delete associated settings
     await db.basicSettings.delete(batch.defaultBasicSettingsId)
     await db.advancedSettings.delete(batch.defaultAdvancedSettingsId)
+
+    // Delete all associated translations
+    for (const translationId of batch.translations) {
+      const translation = await db.translations.get(translationId)
+      if (translation) {
+        // Delete the translation's settings if they're not the batch's default settings
+        if (translation.basicSettingsId !== batch.defaultBasicSettingsId) {
+          await db.basicSettings.delete(translation.basicSettingsId)
+        }
+        if (translation.advancedSettingsId !== batch.defaultAdvancedSettingsId) {
+          await db.advancedSettings.delete(translation.advancedSettingsId)
+        }
+
+        // Delete the translation itself
+        await db.translations.delete(translationId)
+      }
+    }
 
     // Delete the batch
     await db.batches.delete(id)
