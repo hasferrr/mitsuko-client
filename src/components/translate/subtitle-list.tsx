@@ -5,12 +5,17 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 
 interface SubtitleListProps {
   hidden?: boolean
+  translationId?: string
 }
 
-export const SubtitleList = memo(({ hidden = false }: SubtitleListProps) => {
+export const SubtitleList = memo(({
+  hidden = false,
+  translationId,
+}: SubtitleListProps) => {
   const currentId = useTranslationDataStore((state) => state.currentId)
   const translationData = useTranslationDataStore((state) => state.data)
-  const subtitles = currentId ? translationData[currentId]?.subtitles ?? [] : []
+  const idToUse = translationId ?? currentId
+  const subtitles = idToUse ? translationData[idToUse]?.subtitles ?? [] : []
 
   if (hidden) {
     return (

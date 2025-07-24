@@ -73,6 +73,9 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { SubtitleList } from "../translate/subtitle-list"
+import { SubtitleResultOutput } from "../translate/subtitle-result-output"
 
 interface BatchFile {
   id: string
@@ -115,6 +118,8 @@ export default function BatchTranslatorMain() {
 
   const translationData = useTranslationDataStore((state) => state.data)
   const loadTranslation = useTranslationDataStore((state) => state.getTranslationDb)
+  const setCurrentTranslationId = useTranslationDataStore((state) => state.setCurrentId)
+  const [previewTranslationId, setPreviewTranslationId] = useState<string | null>(null)
 
   // Settings Stores
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
@@ -238,6 +243,12 @@ export default function BatchTranslatorMain() {
     // This can be a future task
   }
 
+  const handlePreview = async (id: string) => {
+    await loadTranslation(id)
+    setCurrentTranslationId(id)
+    setPreviewTranslationId(id)
+  }
+
   const confirmDeleteFile = async () => {
     if (!currentProject || !deleteFileId) return
     try {
@@ -261,11 +272,11 @@ export default function BatchTranslatorMain() {
     }
   }
 
-  function SortableBatchFile({ batchFile, onDelete, onDownload }: { batchFile: BatchFile; onDelete: (id: string) => void; onDownload: (id: string, option: DownloadOption, format: CombinedFormat) => void }) {
+  function SortableBatchFile({ batchFile, onDelete, onDownload, onClick }: { batchFile: BatchFile; onDelete: (id: string) => void; onDownload: (id: string, option: DownloadOption, format: CombinedFormat) => void; onClick: (id: string) => void }) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id })
     const style = { transform: CSS.Transform.toString(transform), transition }
     return (
-      <Card ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>} style={style} className="flex">
+      <Card ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>} style={style} className="flex cursor-pointer" onClick={() => onClick(batchFile.id)}>
         <div className="flex items-center ml-4 cursor-grab" {...attributes} {...listeners}>
           <GripVertical className="h-5 w-5 text-muted-foreground" />
         </div>
@@ -279,14 +290,14 @@ export default function BatchTranslatorMain() {
             {batchFile.status === 'translating' && <Badge variant="outline">Translating ({batchFile.progress.toFixed(0)}%)</Badge>}
             {batchFile.status === 'done' && (
               <>
-                <Button variant="ghost" size="sm" onClick={() => onDownload(batchFile.id, 'translated', 'o-n-t')}>
+                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id, 'translated', 'o-n-t') }}>
                   <Download className="h-4 w-4" />
                 </Button>
                 <Badge variant="default">Done</Badge>
               </>
             )}
             {batchFile.status === 'error' && <Badge variant="destructive">Error</Badge>}
-            <Button variant="ghost" size="sm" onClick={() => onDelete(batchFile.id)}>
+            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDelete(batchFile.id) }}>
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -370,7 +381,7 @@ export default function BatchTranslatorMain() {
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={order} strategy={verticalListSortingStrategy}>
                 {batchFiles.map(batchFile => (
-                  <SortableBatchFile key={batchFile.id} batchFile={batchFile} onDelete={id => setDeleteFileId(id)} onDownload={handleFileDownload} />
+                  <SortableBatchFile key={batchFile.id} batchFile={batchFile} onDelete={id => setDeleteFileId(id)} onDownload={handleFileDownload} onClick={handlePreview} />
                 ))}
               </SortableContext>
             </DndContext>
@@ -450,6 +461,22 @@ export default function BatchTranslatorMain() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!previewTranslationId} onOpenChange={(open) => { if (!open) setPreviewTranslationId(null) }}>
+        <DialogContent className="max-w-6xl w-full">
+          <DialogHeader>
+            <DialogTitle>{previewTranslationId ? translationData[previewTranslationId]?.title || 'Subtitle Preview' : ''}</DialogTitle>
+          </DialogHeader>
+          <div className="grid md:grid-cols-[1fr_450px] gap-6 max-h-[80vh] overflow-y-auto p-2">
+            {previewTranslationId && <SubtitleList translationId={previewTranslationId} />}
+            {previewTranslationId && (
+              <div className="pr-2">
+                <SubtitleResultOutput />
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
