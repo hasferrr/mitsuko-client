@@ -45,11 +45,15 @@ export function SortableBatchFile({
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id })
   const style = { transform: CSS.Transform.toString(transform), transition }
 
+  const handleTitleClick = () => {
+    if (!selectMode) {
+      onClick(batchFile.id)
+    }
+  }
+
   const handleCardClick = () => {
     if (selectMode) {
       onSelectToggle?.(batchFile.id)
-    } else {
-      onClick(batchFile.id)
     }
   }
 
@@ -59,7 +63,7 @@ export function SortableBatchFile({
       style={style}
       className={cn(
         "flex",
-        selectMode ? "cursor-default select-none" : "cursor-pointer",
+        selectMode && "select-none",
         selected && "bg-primary/10"
       )}
       onClick={handleCardClick}
@@ -84,7 +88,12 @@ export function SortableBatchFile({
       )}
       <CardContent className="p-4 flex-1 flex items-center justify-between">
         <div>
-          <p className="text-sm">{batchFile.title}</p>
+          <p
+            className={cn("text-sm", !selectMode && "hover:underline cursor-pointer")}
+            onClick={handleTitleClick}
+          >
+            {batchFile.title}
+          </p>
           <p className="text-sm text-muted-foreground">
             {batchFile.translatedCount === batchFile.subtitlesCount
               ? `${batchFile.subtitlesCount} lines`
