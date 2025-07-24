@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
-import { useState, useRef, useCallback, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -189,17 +189,20 @@ export default function BatchTranslatorMain() {
   }
 
   // Get batch files from translationData
-  const batchFiles: BatchFile[] = currentProject && currentProject.isBatch ? order.map(id => {
-    const translation = translationData[id]
-    return {
-      id,
-      title: translation?.title || "Loading...",
-      subtitlesCount: translation?.subtitles?.length || 0,
-      status: "pending", // We need to implement proper status tracking
-      progress: 0,
-      type: translation?.parsed?.type || "srt"
-    }
-  }) : []
+  const batchFiles: BatchFile[] = useMemo(() => {
+    if (!currentProject?.isBatch) return []
+    return order.map(id => {
+      const translation = translationData[id]
+      return {
+        id,
+        title: translation?.title || "Loading...",
+        subtitlesCount: translation?.subtitles?.length || 0,
+        status: "pending", // We need to implement proper status tracking
+        progress: 0,
+        type: translation?.parsed?.type || "srt"
+      }
+    })
+  }, [currentProject?.isBatch, order, translationData])
 
   const handleStartBatchTranslation = async () => {
     if (batchFiles.length === 0) return
