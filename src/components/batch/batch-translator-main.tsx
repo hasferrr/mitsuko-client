@@ -994,6 +994,8 @@ export default function BatchTranslatorMain() {
   ): Promise<Blob> => {
     const zip = new JSZip()
 
+    const nameCountMap = new Map<string, number>()
+
     for (const batchFile of batchFiles) {
       const translation = translationData[batchFile.id]
       if (!translation) continue
@@ -1001,9 +1003,20 @@ export default function BatchTranslatorMain() {
 
       const ext = translation.parsed?.type || "srt"
       const hasExt = translation.title.toLowerCase().endsWith(`.${ext}`)
-      const fileName = hasExt ? translation.title : `${translation.title}.${ext}`
+      const baseName = hasExt
+        ? translation.title.slice(0, -(`.${ext}`.length))
+        : translation.title
 
-      zip.file(fileName, fileContent)
+      const fileKey = `${baseName}.${ext}`
+      const currentCount = nameCountMap.get(fileKey) ?? 0
+      const newCount = currentCount + 1
+      nameCountMap.set(fileKey, newCount)
+
+      const uniqueFileName = newCount === 1
+        ? fileKey
+        : `${baseName} (${newCount}).${ext}`
+
+      zip.file(uniqueFileName, fileContent)
     }
 
     return await zip.generateAsync({ type: "blob" })
