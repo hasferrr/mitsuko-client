@@ -12,6 +12,7 @@ import { useTranslationDataStore } from "./use-translation-data-store"
 import { createTranslation } from "@/lib/db/translation"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { SubtitleTranslated } from "@/types/subtitles"
+import { db } from "@/lib/db/db"
 
 interface BatchStore {
   currentBatch: Batch | null
@@ -106,12 +107,22 @@ export const useBatchStore = create<BatchStore>((set, get) => ({
         {}  // Use batch's default settings, no need to override
       )
 
+      // Store the original settings IDs before updating them
+      const originalBasicSettingsId = translation.basicSettingsId
+      const originalAdvancedSettingsId = translation.advancedSettingsId
+
       // Update the translation to link it to this batch
       const translationStore = useTranslationDataStore.getState()
       translationStore.mutateData(translation.id, "batchId", batchId)
       translationStore.mutateData(translation.id, "basicSettingsId", currentBatch.defaultBasicSettingsId)
       translationStore.mutateData(translation.id, "advancedSettingsId", currentBatch.defaultAdvancedSettingsId)
       await translationStore.saveData(translation.id)
+
+      // Delete the unused settings that were created with the translation
+      await db.transaction('rw', db.basicSettings, db.advancedSettings, async () => {
+        await db.basicSettings.delete(originalBasicSettingsId)
+        await db.advancedSettings.delete(originalAdvancedSettingsId)
+      })
 
       // Update the batch's translations array
       const updatedTranslations = [...currentBatch.translations, translation.id]
