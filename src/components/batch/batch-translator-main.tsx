@@ -129,6 +129,7 @@ export default function BatchTranslatorMain() {
   const [translatedStats, setTranslatedStats] = useState({ translated: 0, total: 0 })
 
   const queueAbortRef = useRef(false)
+  const errorCountRef = useRef(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Project Store
@@ -357,6 +358,7 @@ export default function BatchTranslatorMain() {
 
     setIsRestartTranslationDialogOpen(false)
     queueAbortRef.current = false
+    errorCountRef.current = 0
     setIsBatchTranslating(true)
     setHasChanges(true)
 
@@ -411,6 +413,7 @@ export default function BatchTranslatorMain() {
     }, 300)
 
     queueAbortRef.current = false
+    errorCountRef.current = 0
     setIsBatchTranslating(true)
     setHasChanges(true)
 
@@ -677,6 +680,15 @@ export default function BatchTranslatorMain() {
         rawResponse = result.raw
 
       } catch {
+        if (partOfBatch) {
+          errorCountRef.current += 1
+          if (errorCountRef.current >= 5) {
+            queueAbortRef.current = true
+            handleStopBatchTranslation()
+            toast.error('Encountered 5 errors. Stopping batch translation')
+          }
+        }
+
         setIsTranslating(currentId, false)
 
         rawResponse = useTranslationDataStore.getState().data[currentId].response.response.trim()
