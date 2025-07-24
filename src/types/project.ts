@@ -21,16 +21,7 @@ export interface Project {
   defaultAdvancedSettingsId: string
   createdAt: Date
   updatedAt: Date
-}
-
-export interface Batch {
-  id: string
-  name: string
-  translations: string[] // Array of Translation IDs
-  defaultBasicSettingsId: string
-  defaultAdvancedSettingsId: string
-  createdAt: Date
-  updatedAt: Date
+  isBatch: boolean // Indicates whether this project is a batch-type project
 }
 
 export interface Translation {

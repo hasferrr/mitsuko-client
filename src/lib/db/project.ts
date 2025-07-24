@@ -4,7 +4,7 @@ import { createBasicSettings, createAdvancedSettings } from "./settings"
 import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 
 // Project CRUD functions
-export const createProject = async (name: string): Promise<Project> => {
+export const createProject = async (name: string, isBatch = false): Promise<Project> => {
   return db.transaction('rw', [db.projects, db.projectOrders, db.basicSettings, db.advancedSettings], async () => {
     const id = crypto.randomUUID()
 
@@ -21,6 +21,7 @@ export const createProject = async (name: string): Promise<Project> => {
       defaultAdvancedSettingsId: advancedSettings.id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      isBatch,
     }
 
     await db.projects.add(project)

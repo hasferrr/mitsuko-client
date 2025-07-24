@@ -1,5 +1,5 @@
 import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS } from '@/constants/default'
-import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings, Batch } from '@/types/project'
+import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
 import { CustomInstruction } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'
 
@@ -12,7 +12,6 @@ class MyDatabase extends Dexie {
   basicSettings!: Table<BasicSettings, string>
   advancedSettings!: Table<AdvancedSettings, string>
   customInstructions!: Table<CustomInstruction, string>
-  batches!: Table<Batch, string>
 
   constructor() {
     super('myDatabase')
@@ -137,11 +136,20 @@ class MyDatabase extends Dexie {
       customInstructions: 'id, name'
     })
     this.version(14).stores({
-      batches: 'id, name, createdAt, updatedAt'
+      // No new stores, keeping version bump for translation batchId field
     }).upgrade(async tx => {
       await tx.table('translations').toCollection().modify(translation => {
         if (typeof translation.batchId === 'undefined') {
           translation.batchId = ''
+        }
+      })
+    })
+    this.version(15).stores({
+      // adding isBatch flag to projects (non-indexed)
+    }).upgrade(async tx => {
+      await tx.table('projects').toCollection().modify(project => {
+        if (typeof project.isBatch === 'undefined') {
+          project.isBatch = false
         }
       })
     })

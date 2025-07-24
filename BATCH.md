@@ -3,30 +3,20 @@
 ## Notes
 
 PLEASE READ THESE INSTRUCTIONS BEFORE YOU START WORKING ON THE BATCH TRANSLATOR COMPONENT:
-- When a file is selected, dropped, or deleted, save it as a Translation data store for each subtitle, add its ID to `string[] // Array of Translation IDs` on the Batch store.
-- When a file is reordered, update the `string[] // Array of Translation IDs` on the Batch store.
-- Translation `basicSettings` and `advancedSettings` are the same as the batch's `defaultBasicSettingsId` and `defaultAdvancedSettingsId` for all translations in a batch.
+- Each batch is now just a **Project** with `isBatch: true`.
+- When a file is selected, dropped, or deleted, create a new Translation and push its ID to the parent Project’s `translations` array via **`useProjectStore`**.
+- When a file is reordered, update the `translations` array order on the same Project via **`useProjectStore.updateProjectItems`**.
+- Translation `basicSettings` and `advancedSettings` are copied from the Project’s `defaultBasicSettingsId` and `defaultAdvancedSettingsId`.
 
 ## Store
 
-- [x] create batch type
-  ```ts
-  export interface Batch {
-    id: string
-    name: string
-    translations: string[] // Array of Translation IDs
-    defaultBasicSettingsId: string
-    defaultAdvancedSettingsId: string
-    createdAt: Date
-    updatedAt: Date
-  }
-  ```
-- [x] create batch store
-- [x] create batch dexie db migration
-- [x] integrate useSettings hook
-- [x] bump Dexie version and add `batches` table schema
-- [x] write Dexie `.upgrade()` migration for existing data
-- [x] update `Translation` data model to link back to its parent `Batch` via `batchId: string`.
+Batch logic is now handled by the existing **Project** store.
+
+- [x] Add `isBatch: boolean` flag to `Project` interface
+- [x] Dexie migration (`db` v15) sets `isBatch = false` for existing projects
+- [x] Implement `createTranslationForBatch` helper inside **`useProjectStore`**
+  - Parses dropped file, creates `Translation`, assigns default settings from the batch-project, and updates the project’s `translations` array
+- [x] All component interactions (`handleFileDrop`, rename, reorder, delete) now go through **`useProjectStore`** APIs
 
 ## Batch Translator Component
 
@@ -36,11 +26,11 @@ PLEASE READ THESE INSTRUCTIONS BEFORE YOU START WORKING ON THE BATCH TRANSLATOR 
     - [x] Create a new `Translation` entry in Dexie using a new `createTranslationForBatch` function.
     - [x] This function will associate the new `Translation` with the current `Batch` ID.
     - [x] The `basicSettingsId` and `advancedSettingsId` for the new `Translation` will be copied from the batch's default settings IDs.
-    - [x] Add the new `Translation` ID to the `translations` array in the current `Batch` object.
-    - [x] Update both `use-batch-store` and `use-translation-data-store` to reflect the new additions.
+    - [x] Add the new `Translation` ID to the `translations` array on the current batch Project.
+    - [x] Update both `useProjectStore` and `use-translation-data-store` to reflect the new additions.
 - [x] **Batch Naming:**
   - [x] Implement a debounced `onChange` handler for the batch name `<Input>`.
-  - [x] On change, call `renameBatch` from the `useBatchStore` to update the name in Dexie and Zustand.
+  - [x] On change, call `renameProject` from the `useProjectStore` to update the name in Dexie and Zustand.
 - [ ] **File Selection for Translation:**
   - [ ] Add a `<Checkbox>` next to each file in the batch list.
   - [ ] Maintain a local state `Set<string>` to track the IDs of selected files.

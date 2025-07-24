@@ -137,6 +137,7 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       extractions: newExtractionsId,
       defaultBasicSettingsId: newDefaultBasicSettingsId,
       defaultAdvancedSettingsId: newDefaultAdvancedSettingsId,
+      isBatch: project.isBatch ?? false,
     }
   })
 
@@ -181,6 +182,7 @@ function projectConstructor(project: Partial<Project>): Project {
     extractions: project.extractions ?? [],
     defaultBasicSettingsId: project.defaultBasicSettingsId ?? "",
     defaultAdvancedSettingsId: project.defaultAdvancedSettingsId ?? "",
+    isBatch: project.isBatch ?? false,
   }
 }
 

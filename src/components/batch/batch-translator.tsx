@@ -7,24 +7,24 @@ import {
   FileText,
   Plus,
 } from "lucide-react"
-import { useBatchStore } from "@/stores/data/use-batch-store"
+import { useProjectStore } from "@/stores/data/use-project-store"
 import { useSettings } from "@/hooks/use-settings"
 import BatchTranslatorMain from "./batch-translator-main"
 
 export default function BatchTranslator() {
-  const batch = useBatchStore((state) => state.currentBatch)
-  const batches = useBatchStore((state) => state.batches)
-  const loadBatches = useBatchStore((state) => state.loadBatches)
-  const createBatch = useBatchStore((state) => state.createBatch)
-  const setCurrentBatch = useBatchStore((state) => state.setCurrentBatch)
+  const batch = useProjectStore((state) => state.currentProject)
+  const projects = useProjectStore((state) => state.projects)
+  const loadProjects = useProjectStore((state) => state.loadProjects)
+  const createProject = useProjectStore((state) => state.createProject)
+  const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
 
   useEffect(() => {
-    loadBatches()
-  }, [loadBatches])
+    loadProjects()
+  }, [loadProjects])
 
   const handleCreateBatch = async () => {
-    const newBatch = await createBatch(`Batch ${new Date().toLocaleDateString()}`)
-    setCurrentBatch(newBatch)
+    const newBatch = await createProject(`Batch ${new Date().toLocaleDateString()}`, true)
+    setCurrentProject(newBatch)
   }
 
   useSettings({
@@ -32,7 +32,7 @@ export default function BatchTranslator() {
     advancedSettingsId: batch?.defaultAdvancedSettingsId ?? "",
   })
 
-  if (!batch) {
+  if (!batch || !batch.isBatch) {
     return (
       <div className="flex flex-col gap-4 mx-auto container p-4 mb-6">
         <div className="flex justify-between items-center">
@@ -43,7 +43,7 @@ export default function BatchTranslator() {
           </Button>
         </div>
 
-        {batches.length === 0 ? (
+        {projects.filter(p=>p.isBatch).length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
             <FileText className="h-12 w-12 text-muted-foreground mb-4" />
             <h2 className="text-xl font-medium mb-2 text-center">No Batches Found</h2>
@@ -53,11 +53,11 @@ export default function BatchTranslator() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {batches.map((b) => (
+            {projects.filter(p=>p.isBatch).map((b) => (
               <Card
                 key={b.id}
                 className="cursor-pointer hover:border-primary transition-colors overflow-hidden border border-muted h-full flex flex-col"
-                onClick={() => setCurrentBatch(b.id)}
+                onClick={() => setCurrentProject(b.id)}
               >
                 <CardHeader className="pb-2">
                   <CardTitle>{b.name}</CardTitle>

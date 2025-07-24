@@ -40,8 +40,7 @@ import {
   FewShotInput,
   AdvancedReasoningSwitch,
 } from "../settings"
-import { SubtitleTranslated, SubtitleNoTime, SubOnlyTranslated, DownloadOption, CombinedFormat, Subtitle, Parsed } from "@/types/subtitles"
-import { minMax, sleep } from "@/lib/utils"
+import { DownloadOption, CombinedFormat } from "@/types/subtitles"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
@@ -59,15 +58,15 @@ import { ModelDetail } from "../translate/model-detail"
 import { toast } from "sonner"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
-import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { z } from "zod"
 import { ContextCompletion } from "@/types/completion"
 import { getContent, parseTranslationJson } from "@/lib/parser/parser"
 import { createContextMemory } from "@/lib/context-memory"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
-import { useBatchStore } from "@/stores/data/use-batch-store"
+import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+// createTranslationForBatch comes from project store
 
 interface BatchFile {
   id: string
@@ -84,11 +83,11 @@ export default function BatchTranslatorMain() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
-  const deleteBatch = useBatchStore((state) => state.deleteBatch)
-  const currentBatch = useBatchStore((state) => state.currentBatch)
-  const setCurrentBatch = useBatchStore((state) => state.setCurrentBatch)
-  const createTranslationForBatch = useBatchStore((state) => state.createTranslationForBatch)
-  const renameBatch = useBatchStore((state) => state.renameBatch)
+  const deleteProject = useProjectStore((state) => state.deleteProject)
+  const currentProject = useProjectStore((state) => state.currentProject)
+  const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
+  const createTranslationForBatch = useProjectStore((state) => state.createTranslationForBatch)
+  const renameProject = useProjectStore((state) => state.renameProject)
 
   const translationData = useTranslationDataStore((state) => state.data)
   const loadTranslation = useTranslationDataStore((state) => state.getTranslationDb)
@@ -117,12 +116,12 @@ export default function BatchTranslatorMain() {
   const { setHasChanges } = useUnsavedChanges()
 
   const handleFileDrop = async (droppedFiles: FileList | File[]) => {
-    if (!droppedFiles || !currentBatch) return
+    if (!droppedFiles || !currentProject || !currentProject.isBatch) return
 
     // Convert to array if it's a FileList
     const filesArray = 'item' in droppedFiles ? Array.from(droppedFiles) : droppedFiles
 
-    for (const file of filesArray) {
+    for await (const file of filesArray) {
       if (!file.name.endsWith(".srt") && !file.name.endsWith(".ass")) {
         toast.error(`Unsupported file type: ${file.name}`)
         continue
@@ -130,10 +129,7 @@ export default function BatchTranslatorMain() {
 
       try {
         const content = await file.text()
-        // Create a new Translation entry in Dexie using createTranslationForBatch
-        const translationId = await createTranslationForBatch(currentBatch.id, file, content)
-
-        // Load the translation to ensure it's in the store
+        const translationId = await createTranslationForBatch(currentProject.id, file, content)
         await loadTranslation(translationId)
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error)
@@ -155,7 +151,7 @@ export default function BatchTranslatorMain() {
   }
 
   // Get batch files from translationData
-  const batchFiles: BatchFile[] = currentBatch ? currentBatch.translations.map(id => {
+  const batchFiles: BatchFile[] = currentProject && currentProject.isBatch ? currentProject.translations.map(id => {
     const translation = translationData[id]
     return {
       id,
@@ -189,15 +185,15 @@ export default function BatchTranslatorMain() {
   }
 
   const handleDeleteBatch = async () => {
-    if (currentBatch?.id) {
-      await deleteBatch(currentBatch.id)
+    if (currentProject?.id) {
+      await deleteProject(currentProject.id)
       setIsDeleteDialogOpen(false)
     }
   }
 
   const handleBatchNameChange = (value: string) => {
-    if (currentBatch?.id && value.trim()) {
-      renameBatch(currentBatch.id, value)
+    if (currentProject?.id && value.trim()) {
+      renameProject(currentProject.id, value)
     }
   }
 
@@ -209,13 +205,13 @@ export default function BatchTranslatorMain() {
           <Button
             variant="ghost"
             className="h-10 w-10 flex-shrink-0"
-            onClick={() => setCurrentBatch(null)}
+            onClick={() => setCurrentProject(null)}
             title="Go back to batch selection"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <Input
-            defaultValue={currentBatch?.name || "Batch Translation"}
+            defaultValue={currentProject?.name || "Batch Translation"}
             className="text-xl font-semibold h-12"
             onChange={(e) => handleBatchNameChange(e.target.value)}
           />
@@ -312,14 +308,14 @@ export default function BatchTranslatorMain() {
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
-                  <LanguageSelection type="translation" />
-                  <ModelSelection type="translation" />
-                  <ContextDocumentInput />
+                  <LanguageSelection parent="project" />
+                  <ModelSelection parent="project" />
+                  <ContextDocumentInput parent="project" />
                   <div className="m-[2px]">
-                    <CustomInstructionsInput />
+                    <CustomInstructionsInput parent="project" />
                   </div>
                   <div className="m-[2px]">
-                    <FewShotInput />
+                    <FewShotInput parent="project" />
                   </div>
                 </CardContent>
               </Card>
@@ -329,17 +325,17 @@ export default function BatchTranslatorMain() {
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
                   <ModelDetail />
-                  <TemperatureSlider type="translation" />
+                  <TemperatureSlider parent="project" />
                   <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
                     <AdvancedReasoningSwitch />
                   </div>
                   <div className="text-sm font-semibold">Technical Options</div>
-                  <SplitSizeInput />
-                  <MaxCompletionTokenInput type="translation" />
-                  <StructuredOutputSwitch />
-                  <FullContextMemorySwitch />
-                  <BetterContextCachingSwitch />
-                  <AdvancedSettingsResetButton />
+                  <SplitSizeInput parent="project" />
+                  <MaxCompletionTokenInput parent="project" />
+                  <StructuredOutputSwitch parent="project" />
+                  <FullContextMemorySwitch parent="project" />
+                  <BetterContextCachingSwitch parent="project" />
+                  <AdvancedSettingsResetButton parent="project" />
                 </CardContent>
               </Card>
             </TabsContent>
