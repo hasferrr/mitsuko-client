@@ -102,13 +102,17 @@ const subNameMap = new Map([
 const acceptedFormats = [".srt", ".ass", ".vtt"]
 
 export default function BatchTranslatorMain() {
-  const [isBatchTranslating, setIsBatchTranslating] = useState(false)
   const [activeTab, setActiveTab] = useState("basic")
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isBatchTranslating, setIsBatchTranslating] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
+  const [previewTranslationId, setPreviewTranslationId] = useState<string | null>(null)
 
-  const deleteProject = useProjectStore((state) => state.deleteProject)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Project Store
   const currentProject = useProjectStore((state) => state.currentProject)
+  const deleteProject = useProjectStore((state) => state.deleteProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const createTranslationForBatch = useProjectStore((state) => state.createTranslationForBatch)
   const renameProject = useProjectStore((state) => state.renameProject)
@@ -118,10 +122,10 @@ export default function BatchTranslatorMain() {
   const [order, setOrder] = useState<string[]>(currentProject?.translations ?? [])
 
   useEffect(() => {
-    if (currentProject?.translations) setOrder(currentProject.translations)
+    if (currentProject?.translations) {
+      setOrder(currentProject.translations)
+    }
   }, [currentProject?.translations?.join("-")])
-
-  const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
 
   // Translation Data Store
   const translationData = useTranslationDataStore((state) => state.data)
@@ -134,7 +138,6 @@ export default function BatchTranslatorMain() {
   const setJsonResponse = useTranslationDataStore((state) => state.setJsonResponse)
   const appendJsonResponse = useTranslationDataStore((state) => state.appendJsonResponse)
   const saveData = useTranslationDataStore((state) => state.saveData)
-  const [previewTranslationId, setPreviewTranslationId] = useState<string | null>(null)
 
   // Translation Store
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
@@ -161,10 +164,47 @@ export default function BatchTranslatorMain() {
   const customBaseUrl = useLocalSettingsStore((state) => state.customBaseUrl)
   const customModel = useLocalSettingsStore((state) => state.customModel)
 
+  // Session Store
   const session = useSessionStore((state) => state.session)
 
+  // Other Hooks
   const { setHasChanges } = useUnsavedChanges()
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
+
+  // Get batch files from translationData
+  const batchFiles: BatchFile[] = useMemo(() => {
+    if (!currentProject?.isBatch) return []
+    return order.map(id => {
+      const translation = translationData[id]
+
+      const totalSubtitles = translation?.subtitles?.length || 0
+      const translatedCount = translation?.subtitles?.filter(s => s.translated && s.translated.trim() !== "").length || 0
+      const progress = totalSubtitles ? (translatedCount / totalSubtitles) * 100 : 0
+
+      let status: BatchFile["status"]
+
+      if (isTranslatingSet.has(id)) {
+        status = "translating"
+      } else if (translatedCount === 0) {
+        status = "pending"
+      } else if (translatedCount < totalSubtitles) {
+        status = "partial"
+      } else {
+        status = "done"
+      }
+
+      return {
+        id,
+        title: translation?.title || "Loading...",
+        subtitlesCount: totalSubtitles,
+        translatedCount,
+        status,
+        progress,
+        type: translation?.parsed?.type || "srt",
+      }
+    })
+  }, [currentProject?.isBatch, order, translationData, isTranslatingSet])
+
 
   const handleDragEnd = (event: import("@dnd-kit/core").DragEndEvent) => {
     const { active, over } = event
@@ -212,40 +252,6 @@ export default function BatchTranslatorMain() {
   const handleClickFileUpload = () => {
     fileInputRef.current?.click()
   }
-
-  // Get batch files from translationData
-  const batchFiles: BatchFile[] = useMemo(() => {
-    if (!currentProject?.isBatch) return []
-    return order.map(id => {
-      const translation = translationData[id]
-
-      const totalSubtitles = translation?.subtitles?.length || 0
-      const translatedCount = translation?.subtitles?.filter(s => s.translated && s.translated.trim() !== "").length || 0
-      const progress = totalSubtitles ? (translatedCount / totalSubtitles) * 100 : 0
-
-      let status: BatchFile["status"]
-
-      if (isTranslatingSet.has(id)) {
-        status = "translating"
-      } else if (translatedCount === 0) {
-        status = "pending"
-      } else if (translatedCount < totalSubtitles) {
-        status = "partial"
-      } else {
-        status = "done"
-      }
-
-      return {
-        id,
-        title: translation?.title || "Loading...",
-        subtitlesCount: totalSubtitles,
-        translatedCount,
-        status,
-        progress,
-        type: translation?.parsed?.type || "srt",
-      }
-    })
-  }, [currentProject?.isBatch, order, translationData, isTranslatingSet])
 
   const handleStartBatchTranslation = async () => {
     if (batchFiles.length === 0) return
