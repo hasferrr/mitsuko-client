@@ -9,6 +9,16 @@ import {
 } from "@/lib/db/translation"
 import { db } from "@/lib/db/db"
 
+// Throttle store writes
+const lastUpdateMap: Record<string, number> = {}
+const shouldUpdate = (key: string): boolean => {
+  const now = Date.now()
+  const last = lastUpdateMap[key] ?? 0
+  if (now - last < 100) return false
+  lastUpdateMap[key] = now
+  return true
+}
+
 export interface TranslationDataStore {
   currentId: string | null
   data: Record<string, Translation>
@@ -157,12 +167,16 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
   setResponse: (id, res) => {
     const translation = get().data[id]
     if (!translation) return
-    get().mutateData(id, "response", { ...translation.response, response: res })
+    if (shouldUpdate(`resp-${id}`)) {
+      get().mutateData(id, "response", { ...translation.response, response: res })
+    }
   },
   setJsonResponse: (id, jsonRes) => {
     const translation = get().data[id]
     if (!translation) return
-    get().mutateData(id, "response", { ...translation.response, jsonResponse: jsonRes })
+    if (shouldUpdate(`json-${id}`)) {
+      get().mutateData(id, "response", { ...translation.response, jsonResponse: jsonRes })
+    }
   },
   appendJsonResponse: (id, arr) => {
     const translation = get().data[id]
