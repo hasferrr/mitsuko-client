@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/dialog"
 import { AlignCenter, Download } from "lucide-react"
 import { DownloadOption, CombinedFormat } from "@/types/subtitles"
-import { useState } from "react"
 
 type GenerateContentResult = string | Blob | Promise<string | Blob | undefined> | undefined
 
@@ -24,11 +23,21 @@ interface DownloadSectionProps {
   generateContent: (option: DownloadOption, format: CombinedFormat) => GenerateContentResult
   fileName: string
   subName: string
+  downloadOption: DownloadOption
+  setDownloadOption: (option: DownloadOption) => void
+  combinedFormat: CombinedFormat
+  setCombinedFormat: (format: CombinedFormat) => void
 }
 
-export function DownloadSection({ generateContent, fileName, subName }: DownloadSectionProps) {
-  const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
-  const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
+export function DownloadSection({
+  generateContent,
+  fileName,
+  subName,
+  downloadOption,
+  setDownloadOption,
+  combinedFormat,
+  setCombinedFormat
+}: DownloadSectionProps) {
 
   const handleDownload = async () => {
     const content = await generateContent(downloadOption, combinedFormat)

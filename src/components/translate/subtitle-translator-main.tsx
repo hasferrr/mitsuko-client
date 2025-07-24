@@ -193,6 +193,8 @@ export default function SubtitleTranslatorMain({
   const [isMismatchDialogOpen, setIsMismatchDialogOpen] = useState(false)
   const [pendingNewSubtitles, setPendingNewSubtitles] = useState<SubtitleNoTime[]>([])
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
+  const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
 
   // Custom Hooks
   const { setHasChanges } = useUnsavedChanges()
@@ -981,8 +983,16 @@ export default function SubtitleTranslatorMain({
 
           <DownloadSection
             generateContent={generateSubtitleContent}
-            fileName={`${title}.${parsed.type}`}
+            fileName={
+              title.toLowerCase().endsWith(`.${parsed.type}`)
+                ? title
+                : `${title}.${parsed.type}`
+            }
             subName={subName}
+            downloadOption={downloadOption}
+            setDownloadOption={setDownloadOption}
+            combinedFormat={combinedFormat}
+            setCombinedFormat={setCombinedFormat}
           />
         </div>
 

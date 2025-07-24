@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -8,10 +9,10 @@ import {
   X,
   GripVertical,
 } from "lucide-react"
-import { DownloadOption, CombinedFormat } from "@/types/subtitles"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
+import { DownloadOption } from "@/types/subtitles"
 
 interface BatchFile {
   id: string
@@ -26,11 +27,12 @@ interface BatchFile {
 interface SortableBatchFileProps {
   batchFile: BatchFile
   onDelete: (id: string) => void
-  onDownload: (id: string, option: DownloadOption, format: CombinedFormat) => void
+  onDownload: (id: string) => void
   onClick: (id: string) => void
   selectMode?: boolean
   selected?: boolean
   onSelectToggle?: (id: string) => void
+  downloadOption: DownloadOption
 }
 
 export function SortableBatchFile({
@@ -41,6 +43,7 @@ export function SortableBatchFile({
   selectMode = false,
   selected = false,
   onSelectToggle,
+  downloadOption,
 }: SortableBatchFileProps) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id })
   const style = { transform: CSS.Transform.toString(transform), transition }
@@ -56,6 +59,12 @@ export function SortableBatchFile({
       onSelectToggle?.(batchFile.id)
     }
   }
+
+  const optionText = downloadOption === "original"
+    ? "Original Text"
+    : downloadOption === "translated"
+      ? "Translated Text"
+      : "Original + Translated"
 
   return (
     <Card
@@ -107,9 +116,16 @@ export function SortableBatchFile({
           {batchFile.status === 'queued' && <Badge variant="secondary" className="bg-transparent">Queued</Badge>}
           {batchFile.status === 'done' && (
             <>
-              <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id, 'translated', 'o-n-t') }}>
-                <Download className="h-4 w-4" />
-              </Button>
+              <TooltipProvider delayDuration={50}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id) }}>
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{optionText}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <Badge variant="default">Done</Badge>
             </>
           )}

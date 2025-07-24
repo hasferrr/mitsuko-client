@@ -116,6 +116,8 @@ export default function BatchTranslatorMain() {
   const [activeTab, setActiveTab] = useState("basic")
   const [isBatchTranslating, setIsBatchTranslating] = useState(false)
   const [maxConcurrentTranslations, setMaxConcurrentTranslations] = useState(5)
+  const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
+  const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
 
   // Selection state
   const [isSelecting, setIsSelecting] = useState(false)
@@ -930,9 +932,26 @@ export default function BatchTranslatorMain() {
     refetchUserData()
   }
 
-  const handleFileDownload = (batchFileId: string, option: DownloadOption, format: CombinedFormat) => {
-    // Implementation for file download will be needed here
-    // This can be a future task
+  const handleSingleFileDownload = (batchFileId: string) => {
+    const translation = translationData[batchFileId]
+    if (!translation) return
+
+    const fileContent = generateSubtitleContentForTranslation(translation, downloadOption, combinedFormat)
+    if (!fileContent) return
+
+    const ext = translation.parsed?.type || "srt"
+    const hasExt = translation.title.toLowerCase().endsWith(`.${ext}`)
+    const fileName = hasExt ? translation.title : `${translation.title}.${ext}`
+
+    const blob = new Blob([fileContent], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = fileName
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   const generateSubtitleContentForTranslation = (
@@ -1136,11 +1155,12 @@ export default function BatchTranslatorMain() {
                         key={batchFile.id}
                         batchFile={batchFile}
                         onDelete={id => setDeleteFileId(id)}
-                        onDownload={handleFileDownload}
+                        onDownload={handleSingleFileDownload}
                         onClick={handlePreview}
                         selectMode={isSelecting}
                         selected={selectedIds.has(batchFile.id)}
                         onSelectToggle={handleSelectToggle}
+                        downloadOption={downloadOption}
                       />
                     ))}
                   </SortableContext>
@@ -1237,6 +1257,10 @@ export default function BatchTranslatorMain() {
             generateContent={handleGenerateZip}
             fileName={`${currentProject?.name || "subtitles"}.zip`}
             subName="ZIP"
+            downloadOption={downloadOption}
+            setDownloadOption={setDownloadOption}
+            combinedFormat={combinedFormat}
+            setCombinedFormat={setCombinedFormat}
           />
         </div>
 
