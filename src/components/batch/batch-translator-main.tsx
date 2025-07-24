@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -114,6 +114,16 @@ export default function BatchTranslatorMain() {
   const translateSubtitles = useTranslationStore((state) => state.translateSubtitles)
   const session = useSessionStore((state) => state.session)
   const { setHasChanges } = useUnsavedChanges()
+
+  // Load translations from Dexie on initial render or when project changes
+  useEffect(() => {
+    if (!currentProject || !currentProject.isBatch) return
+    const missingIds = currentProject.translations.filter(id => !translationData[id])
+    if (missingIds.length === 0) return
+    missingIds.forEach(id => {
+      loadTranslation(id).catch(err => console.error('Failed to load translation', err))
+    })
+  }, [currentProject, translationData, loadTranslation])
 
   const handleFileDrop = async (droppedFiles: FileList | File[]) => {
     if (!droppedFiles || !currentProject || !currentProject.isBatch) return
