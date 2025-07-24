@@ -1442,7 +1442,14 @@ export default function BatchTranslatorMain() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={!!previewTranslationId} onOpenChange={(open) => { if (!open) setPreviewTranslationId(null) }}>
+      <Dialog open={!!previewTranslationId} onOpenChange={(open) => {
+        if (!open) {
+          setPreviewTranslationId(null)
+          if (previewTranslationId) {
+            saveData(previewTranslationId)
+          }
+        }
+      }}>
         <DialogContent className="max-w-6xl w-full">
           <DialogHeader>
             <DialogTitle>{previewTranslationId ? translationData[previewTranslationId]?.title || 'Subtitle Preview' : ''}</DialogTitle>
