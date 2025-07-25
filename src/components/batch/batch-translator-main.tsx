@@ -719,6 +719,7 @@ export default function BatchTranslatorMain() {
         )
         tlChunk = result.parsed
         rawResponse = result.raw
+        errorCountRef.current = Math.max(0, errorCountRef.current - 1)
 
       } catch {
         if (partOfBatch) {
@@ -1211,7 +1212,7 @@ export default function BatchTranslatorMain() {
             variant="outline"
             className="h-10 w-full border-primary/25 hover:border-primary/50"
             onClick={handleContinueBatchTranslation}
-            disabled={isBatchTranslating || batchFiles.length === 0}
+            disabled={isBatchTranslating || !session || batchFiles.length === 0}
           >
             <FastForward className="h-4 w-4" />
             Continue Batch Translation ({batchFiles.length - finishedCount} remaining)
