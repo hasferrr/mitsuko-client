@@ -102,7 +102,6 @@ const MAX_CONCURRENT_TRANSLATION = 5
 
 export default function BatchTranslatorMain() {
   const [activeTab, setActiveTab] = useState("basic")
-  const [isBatchTranslating, setIsBatchTranslating] = useState(false)
   const [concurrentTranslations, setConcurrentTranslations] = useState(3)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
@@ -233,6 +232,10 @@ export default function BatchTranslatorMain() {
     return batchFiles.filter(file => file.status === "done").length
   }, [batchFiles])
 
+  const isBatchTranslating = useMemo(() => {
+    return batchFiles.some(file => file.status === "translating" || file.status === "queued")
+  }, [batchFiles])
+
   // --------------------- Selection helpers ---------------------
   const toggleSelectMode = () => {
     setIsSelecting(prev => {
@@ -359,7 +362,6 @@ export default function BatchTranslatorMain() {
     setIsRestartTranslationDialogOpen(false)
     queueAbortRef.current = false
     errorCountRef.current = 0
-    setIsBatchTranslating(true)
     setHasChanges(true)
 
     const ids = batchFiles
@@ -367,7 +369,6 @@ export default function BatchTranslatorMain() {
       .filter(id => !isTranslatingSet.has(id))
 
     if (ids.length === 0) {
-      setIsBatchTranslating(false)
       return
     }
 
@@ -379,14 +380,12 @@ export default function BatchTranslatorMain() {
     const launch = () => {
       if (queueAbortRef.current) {
         if (active === 0) {
-          setIsBatchTranslating(false)
           setQueueSet(new Set())
         }
         return
       }
       if (index >= ids.length) {
         if (active === 0) {
-          setIsBatchTranslating(false)
           setQueueSet(new Set())
         }
         return
@@ -440,7 +439,6 @@ export default function BatchTranslatorMain() {
 
     queueAbortRef.current = false
     errorCountRef.current = 0
-    setIsBatchTranslating(true)
     setHasChanges(true)
 
     const ids = batchFiles
@@ -448,7 +446,6 @@ export default function BatchTranslatorMain() {
       .filter(id => !isTranslatingSet.has(id))
 
     if (ids.length === 0) {
-      setIsBatchTranslating(false)
       return
     }
 
@@ -460,14 +457,12 @@ export default function BatchTranslatorMain() {
     const launch = () => {
       if (queueAbortRef.current) {
         if (active === 0) {
-          setIsBatchTranslating(false)
           setQueueSet(new Set())
         }
         return
       }
       if (index >= ids.length) {
         if (active === 0) {
-          setIsBatchTranslating(false)
           setQueueSet(new Set())
         }
         return
@@ -507,7 +502,6 @@ export default function BatchTranslatorMain() {
     }
     batchFiles.forEach(f => handleStopTranslation(f.id))
     setQueueSet(new Set())
-    setIsBatchTranslating(false)
   }
 
   const handleStartTranslation = async (
