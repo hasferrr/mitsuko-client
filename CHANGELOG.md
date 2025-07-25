@@ -14,6 +14,16 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### July 25
+
+- 🚀 **Introducing Batch Translation:** Translate multiple subtitle files at once! Drag-and-drop your files, reorder them, and manage the entire process with a powerful new queue system.
+- ✨ **Enhanced Batch Workflow:** Take full control of your batch translations:
+    - **Flexible Controls:** Adjust concurrent jobs, stop all translations at once, or continue partially completed batches.
+    - **Easy File Management:** Download individual files or entire projects as a ZIP archive.
+    - **Instant Previews:** Review translated subtitles in a new preview dialog before finalizing.
+- 🐛 **Performance & Reliability:** Made the batch translator more robust with several bug fixes, improved performance by optimizing database writes, and corrected an issue with subtitle mapping to ensure translation accuracy.
+- 🌐 **Website & Landing Page:** We've refreshed our landing page with a new layout and text, added custom error pages for a better browsing experience, and polished various UI elements across the application.
+
 ### July 22
 
 - 🤖 **Model Updates:** We've added new Mistral models (Mistral Small 3, Mistral Medium 3, and Mistral Nemo) and cleaned up the model list by removing older Llama models to keep your choices relevant and up-to-date.
