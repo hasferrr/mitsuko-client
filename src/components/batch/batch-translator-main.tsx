@@ -495,13 +495,13 @@ export default function BatchTranslatorMain() {
 
   const handleStopBatchTranslation = () => {
     queueAbortRef.current = true
+    setQueueSet(new Set())
     const handleStopTranslation = (currentId: string) => {
       stopTranslation(currentId)
       setIsTranslating(currentId, false)
       saveData(currentId)
     }
     batchFiles.forEach(f => handleStopTranslation(f.id))
-    setQueueSet(new Set())
   }
 
   const handleStartTranslation = async (
@@ -719,7 +719,6 @@ export default function BatchTranslatorMain() {
         if (partOfBatch) {
           errorCountRef.current += 1
           if (errorCountRef.current >= 5) {
-            queueAbortRef.current = true
             handleStopBatchTranslation()
             toast.error('Encountered 5 errors. Stopping batch translation')
           }
