@@ -2,13 +2,19 @@ import { Project } from "@/types/project"
 import { db } from "./db"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
 import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import { FREE_MODELS } from "@/constants/model-collection"
 
 // Project CRUD functions
 export const createProject = async (name: string, isBatch = false): Promise<Project> => {
   return db.transaction('rw', [db.projects, db.projectOrders, db.basicSettings, db.advancedSettings], async () => {
     const id = crypto.randomUUID()
 
-    const basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
+    const basicSettings = await createBasicSettings(!isBatch
+      ? DEFAULT_BASIC_SETTINGS
+      : {
+        ...DEFAULT_BASIC_SETTINGS,
+        modelDetail: FREE_MODELS["Free Limited"].models.find(m => m.name === "Gemini 2.0 Flash") || null,
+      })
     const advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
 
     const project: Project = {
