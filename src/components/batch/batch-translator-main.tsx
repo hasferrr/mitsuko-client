@@ -72,8 +72,6 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { SubtitleList } from "../translate/subtitle-list"
-import { SubtitleResultOutput } from "../translate/subtitle-result-output"
 import { SortableBatchFile } from "./sortable-batch-file"
 import { minMax, sleep } from "@/lib/utils"
 import { SubOnlyTranslated, SubtitleTranslated, SubtitleNoTime } from "@/types/subtitles"
@@ -88,6 +86,7 @@ import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
+import SubtitleTranslatorMain from "../translate/subtitle-translator-main"
 
 interface BatchFile {
   id: string
@@ -1437,16 +1436,16 @@ export default function BatchTranslatorMain() {
       }}>
         <DialogContent className="max-w-6xl w-full">
           <DialogHeader>
-            <DialogTitle>{previewTranslationId ? translationData[previewTranslationId]?.title || 'Subtitle Preview' : ''}</DialogTitle>
+            <DialogTitle>Translation Preview</DialogTitle>
           </DialogHeader>
-          <div className="grid md:grid-cols-[1fr_450px] gap-6 max-h-[80vh] overflow-y-auto p-2">
-            {previewTranslationId && <SubtitleList translationId={previewTranslationId} />}
-            {previewTranslationId && (
-              <div className="pr-2">
-                <SubtitleResultOutput />
-              </div>
-            )}
-          </div>
+          {previewTranslationId && (
+            <div className="max-h-[80vh] overflow-y-auto">
+              <SubtitleTranslatorMain
+                currentId={previewTranslationId}
+                translation={translationData[previewTranslationId]}
+              />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
