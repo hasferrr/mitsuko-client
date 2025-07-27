@@ -146,42 +146,37 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   },
 
   deleteProject: async (id) => {
-    set({ loading: true })
+    const previousProjects = get().projects
+    const previousCurrentProject = get().currentProject
+    const projectToDelete = previousProjects.find(p => p.id === id)
+    if (!projectToDelete) return
+
+    const transcriptionStore = useTranscriptionDataStore.getState()
+    const extractionStore = useExtractionDataStore.getState()
+    const translationStore = useTranslationDataStore.getState()
+
+    projectToDelete.transcriptions.forEach((tid: string) => transcriptionStore.removeData(tid))
+    projectToDelete.extractions.forEach((eid: string) => extractionStore.removeData(eid))
+    projectToDelete.translations.forEach((tid: string) => translationStore.removeData(tid))
+
+    set({
+      projects: previousProjects.filter(p => p.id !== id),
+      currentProject: previousCurrentProject?.id === id ? null : previousCurrentProject,
+      loading: true,
+      error: null,
+    })
+
     try {
       await deleteProjectDB(id)
-
-      const transcriptionStore = useTranscriptionDataStore.getState()
-      const extractionStore = useExtractionDataStore.getState()
-      const translationStore = useTranslationDataStore.getState()
-
-      // Remove data for deleted project from all stores
-      const deletedProject = get().projects.find((p: { id: string }) => p.id === id)
-      if (deletedProject) {
-        deletedProject.transcriptions.forEach((transcriptionId: string) => {
-          transcriptionStore.removeData(transcriptionId)
-        })
-        deletedProject.extractions.forEach((extractionId: string) => {
-          extractionStore.removeData(extractionId)
-        })
-        deletedProject.translations.forEach((translationId: string) => {
-          translationStore.removeData(translationId)
-        })
-      }
-
-      set((state) => ({
-        projects: state.projects.filter(p => p.id !== id),
-        currentProject: state.currentProject?.id === id
-          ? null
-          : state.currentProject,
-        loading: false
-      }))
-
-      if (get().currentProject?.id === id) {
-        set({ currentProject: null })
-      }
+      set({ loading: false })
     } catch (error) {
       console.error('Failed to delete project', error)
-      set({ error: 'Failed to delete project', loading: false })
+      set({
+        projects: previousProjects,
+        currentProject: previousCurrentProject,
+        error: 'Failed to delete project',
+        loading: false,
+      })
     }
   },
 

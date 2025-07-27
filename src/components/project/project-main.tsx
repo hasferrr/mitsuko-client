@@ -42,8 +42,6 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
-import { useRouter } from "next/navigation"
-import { sleep } from "@/lib/utils"
 import { SettingsDialogue } from "./settings-dialogue"
 import { useSettings } from "@/hooks/use-settings"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
@@ -72,8 +70,6 @@ interface ProjectMainProps {
 }
 
 export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
-  const router = useRouter()
-
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
@@ -186,8 +182,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   }
 
   const handleDelete = async () => {
-    router.push("/dashboard")
-    await sleep(1000)
     setIsDeleteModalOpen(false)
     await deleteProject(currentProject.id)
   }

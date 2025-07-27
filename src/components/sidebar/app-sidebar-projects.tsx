@@ -28,8 +28,6 @@ import { redirect } from "next/navigation"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { ExportImportDialogue } from "../ui-custom/export-import-dialogue"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { sleep } from "@/lib/utils"
 import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
 
@@ -46,10 +44,7 @@ export function AppSidebarProjects({
   addButton,
   addButtonFn,
 }: AppSidebarProjectsProps) {
-  const router = useRouter()
-
   const { isMobile } = useSidebar()
-  const currentProject = useProjectStore((state) => state.currentProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
 
@@ -79,15 +74,8 @@ export function AppSidebarProjects({
   }
 
   const handleDeleteProject = async () => {
-    if (currentProject?.id === idToDelete) {
-      router.push("/dashboard")
-      setIsDeleteModalOpen(false)
-      await sleep(1000)
-      await deleteProject(idToDelete)
-    } else {
-      setIsDeleteModalOpen(false)
-      await deleteProject(idToDelete)
-    }
+    setIsDeleteModalOpen(false)
+    await deleteProject(idToDelete)
   }
 
   return (
