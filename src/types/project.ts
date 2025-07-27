@@ -95,7 +95,6 @@ export interface AdvancedSettings {
   isUseFullContextMemory: boolean
   isBetterContextCaching: boolean
   isMaxCompletionTokensAuto: boolean
-  isAdvancedReasoningEnabled: boolean
   createdAt: Date
   updatedAt: Date
 }

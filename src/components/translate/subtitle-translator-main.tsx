@@ -364,8 +364,6 @@ export default function SubtitleTranslatorMain({
       console.log(chunk)
       console.log(JSON.parse(JSON.stringify(context)))
 
-      const isAdvancedReasoningEnabled = useAdvancedSettingsStore.getState().getIsAdvancedReasoningEnabled()
-
       const requestBody = {
         title: title.slice(0, 150),
         subtitles: {
@@ -390,7 +388,6 @@ export default function SubtitleTranslatorMain({
         structuredOutput: isUseStructuredOutput,
         contextMessage: context,
         fewShotExamples: usedFewShot,
-        promptWithPlanning: isAdvancedReasoningEnabled,
         uuid: currentId,
       }
 

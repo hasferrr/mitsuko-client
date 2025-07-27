@@ -122,16 +122,7 @@ class MyDatabase extends Dexie {
         await tx.table('advancedSettings').bulkAdd(newAdvancedSettingsList)
       }
     })
-    this.version(12).stores({
-      // No schema changes needed in stores() as we're adding a non-indexed field
-    }).upgrade(async tx => {
-      // Migrate advancedSettings: add isAdvancedReasoningEnabled field
-      await tx.table('advancedSettings').toCollection().modify(setting => {
-        if (typeof setting.isAdvancedReasoningEnabled === 'undefined') {
-          setting.isAdvancedReasoningEnabled = false
-        }
-      })
-    })
+    this.version(12).stores({})
     this.version(13).stores({
       customInstructions: 'id, name'
     })
@@ -142,6 +133,12 @@ class MyDatabase extends Dexie {
         if (typeof project.isBatch === 'undefined') {
           project.isBatch = false
         }
+      })
+    })
+    this.version(15).stores({}).upgrade(async tx => {
+      // Cleanup: remove deprecated isAdvancedReasoningEnabled field
+      await tx.table('advancedSettings').toCollection().modify(setting => {
+        delete (setting as Record<string, unknown>).isAdvancedReasoningEnabled
       })
     })
   }

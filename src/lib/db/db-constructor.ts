@@ -259,7 +259,6 @@ function advancedSettingsConstructor(advancedSettings: Partial<AdvancedSettings>
     isUseFullContextMemory: advancedSettings.isUseFullContextMemory ?? false,
     isBetterContextCaching: advancedSettings.isBetterContextCaching ?? false,
     isMaxCompletionTokensAuto: advancedSettings.isMaxCompletionTokensAuto ?? false,
-    isAdvancedReasoningEnabled: advancedSettings.isAdvancedReasoningEnabled ?? false,
     createdAt: advancedSettings.createdAt ?? new Date(),
     updatedAt: advancedSettings.updatedAt ?? new Date(),
   }

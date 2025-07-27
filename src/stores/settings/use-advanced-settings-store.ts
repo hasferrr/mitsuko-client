@@ -25,7 +25,6 @@ interface AdvancedSettingsStore {
   getIsUseStructuredOutput: () => boolean
   getIsUseFullContextMemory: () => boolean
   getIsBetterContextCaching: () => boolean
-  getIsAdvancedReasoningEnabled: () => boolean
   setTemperature: (value: number, parent: SettingsParentType) => void
   setStartIndex: (value: number, parent: SettingsParentType) => void
   setEndIndex: (value: number, parent: SettingsParentType) => void
@@ -34,7 +33,6 @@ interface AdvancedSettingsStore {
   setIsUseStructuredOutput: (value: boolean, parent: SettingsParentType) => void
   setIsUseFullContextMemory: (value: boolean, parent: SettingsParentType) => void
   setIsBetterContextCaching: (value: boolean, parent: SettingsParentType) => void
-  setIsAdvancedReasoningEnabled: (value: boolean, parent: SettingsParentType) => void
   setIsMaxCompletionTokensAuto: (value: boolean, parent: SettingsParentType) => void
   resetIndex: (
     s: number | null,
@@ -166,10 +164,6 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         const id = get().currentId
         return id ? get().data[id]?.isBetterContextCaching : DEFAULT_ADVANCED_SETTINGS.isBetterContextCaching
       },
-      getIsAdvancedReasoningEnabled: () => {
-        const id = get().currentId
-        return id ? get().data[id]?.isAdvancedReasoningEnabled : DEFAULT_ADVANCED_SETTINGS.isAdvancedReasoningEnabled
-      },
       upsertData: (id, value) => set(state => ({
         ...state,
         data: {
@@ -257,12 +251,6 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         if (!id) return
         get().mutateData("isBetterContextCaching", value)
         updateSettings("isBetterContextCaching", value, parent)
-      },
-      setIsAdvancedReasoningEnabled: (value, parent) => {
-        const id = get().currentId
-        if (!id) return
-        get().mutateData("isAdvancedReasoningEnabled", value)
-        updateSettings("isAdvancedReasoningEnabled", value, parent)
       },
       // Method for both translation and extraction
       setIsMaxCompletionTokensAuto: (value, parent) => {
