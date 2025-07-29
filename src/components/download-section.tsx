@@ -15,39 +15,54 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { AlignCenter, Download } from "lucide-react"
-import { DownloadOption, CombinedFormat } from "@/types/subtitles"
+import { DownloadOption, CombinedFormat, SubtitleType } from "@/types/subtitles"
+import { SUBTITLE_NAME_MAP } from "@/constants/subtitle-formats"
+import { cn } from "@/lib/utils"
 
 type GenerateContentResult = string | Blob | Promise<string | Blob | undefined> | undefined
 
 interface DownloadSectionProps {
   generateContent: (option: DownloadOption, format: CombinedFormat) => GenerateContentResult
   fileName: string
-  subName: string
+  type: SubtitleType | "zip"
   downloadOption: DownloadOption
   setDownloadOption: (option: DownloadOption) => void
   combinedFormat: CombinedFormat
   setCombinedFormat: (format: CombinedFormat) => void
+  toType: SubtitleType | "no-change"
+  setToType: ((type: SubtitleType) => void) | ((type: SubtitleType | "no-change") => void)
+  noChangeOption?: boolean
 }
 
 export function DownloadSection({
   generateContent,
   fileName,
-  subName,
+  type,
   downloadOption,
   setDownloadOption,
   combinedFormat,
-  setCombinedFormat
+  setCombinedFormat,
+  toType,
+  setToType,
+  noChangeOption,
 }: DownloadSectionProps) {
 
   const handleDownload = async () => {
     const content = await generateContent(downloadOption, combinedFormat)
     if (!content) return
 
+    let name = fileName
+    const nameArr = name.split(".")
+    if (nameArr.at(-1) !== type) {
+      nameArr.push(type)
+      name = nameArr.join(".")
+    }
+
     const blob = content instanceof Blob ? content : new Blob([content], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = fileName
+    a.download = name
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -55,7 +70,7 @@ export function DownloadSection({
   }
 
   return (
-    <div className="flex gap-4 mt-4 items-center">
+    <div className="grid grid-cols-2 gap-4 mt-4 items-center">
       <Select
         value={downloadOption}
         onValueChange={(value: DownloadOption) => {
@@ -72,6 +87,24 @@ export function DownloadSection({
           <SelectItem value="original">Original Text</SelectItem>
           <SelectItem value="translated">Translated Text</SelectItem>
           <SelectItem value="combined">Original + Translated</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select value={toType} onValueChange={(value: SubtitleType) => setToType(value)}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Convert Subtitles" />
+        </SelectTrigger>
+        <SelectContent>
+          {[
+            ...(noChangeOption ? [["no-change", "No Change"]] : []),
+            ...SUBTITLE_NAME_MAP.entries(),
+          ].map(([key, value]) => (
+            <SelectItem key={key} value={key}>
+              <div className="flex items-center gap-2">
+                {value}
+              </div>
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
@@ -140,11 +173,11 @@ export function DownloadSection({
 
       <Button
         variant="outline"
-        className="gap-2 w-full"
+        className={cn("gap-2 w-full", downloadOption !== "combined" && "col-span-2")}
         onClick={handleDownload}
       >
         <Download className="h-4 w-4" />
-        Download {subName}
+        Download {type === "zip" ? "ZIP" : SUBTITLE_NAME_MAP.get(type)}
       </Button>
     </div>
   )

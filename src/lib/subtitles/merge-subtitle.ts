@@ -13,9 +13,6 @@ export const mergeSubtitle = ({
   parsed,
 }: MergeSubtitleOptions): string => {
   if (parsed.type === "ass") {
-    if (!parsed.data) {
-      throw new Error("Parsed is required for ASS subtitles")
-    }
     return _mergeASSback(subtitles, parsed.data)
   }
 

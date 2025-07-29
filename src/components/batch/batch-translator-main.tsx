@@ -43,7 +43,7 @@ import {
   FewShotInput,
   AdvancedReasoningSwitch,
 } from "../settings"
-import { DownloadOption, CombinedFormat } from "@/types/subtitles"
+import { DownloadOption, CombinedFormat, SubtitleType } from "@/types/subtitles"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
@@ -87,6 +87,7 @@ import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import SubtitleTranslatorMain from "../translate/subtitle-translator-main"
+import { convertSubtitle } from "@/lib/subtitles/utils/convert-subtitle"
 
 interface BatchFile {
   id: string
@@ -105,6 +106,7 @@ export default function BatchTranslatorMain() {
   const [concurrentTranslations, setConcurrentTranslations] = useState(3)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
+  const [toType, setToType] = useState<SubtitleType | "no-change">("no-change")
 
   // Selection state
   const [isSelecting, setIsSelecting] = useState(false)
@@ -512,6 +514,7 @@ export default function BatchTranslatorMain() {
   ) => {
     const subtitles = translationData[currentId]?.subtitles ?? []
     const title = translationData[currentId]?.title ?? ""
+    const parsed = translationData[currentId]?.parsed
 
     const firstChunk = (size: number, s: number, e: number) => {
       const subtitleChunks: SubtitleNoTime[][] = []
@@ -657,7 +660,7 @@ export default function BatchTranslatorMain() {
     }
 
     // Log subtitles
-    logSubtitle(title, generateSubtitleContentForTranslation(translationData[currentId], "original", "o-n-t"), currentId, true)
+    logSubtitle(title, generateSubtitleContentForTranslation(translationData[currentId], "original", "o-n-t", parsed.type), currentId, true)
 
     // Translate each chunk of subtitles
     let batch = 0
@@ -933,6 +936,7 @@ export default function BatchTranslatorMain() {
     translation: Translation,
     option: DownloadOption,
     format: CombinedFormat,
+    forceToType?: SubtitleType,
   ): string => {
     const { subtitles, parsed } = translation
 
@@ -960,7 +964,11 @@ export default function BatchTranslatorMain() {
 
     if (subtitleData.length === 0) return ""
 
-    return mergeSubtitle({ subtitles: subtitleData, parsed })
+    const fileContent = mergeSubtitle({ subtitles: subtitleData, parsed })
+
+    return toType !== "no-change"
+      ? convertSubtitle(fileContent, parsed.type, forceToType ?? toType)
+      : fileContent
   }
 
   const handleGenerateZip = async (
@@ -976,11 +984,15 @@ export default function BatchTranslatorMain() {
       if (!translation) continue
       const fileContent = generateSubtitleContentForTranslation(translation, option, format)
 
-      const ext = translation.parsed?.type || "srt"
+      let ext = translation.parsed.type
       const hasExt = translation.title.toLowerCase().endsWith(`.${ext}`)
       const baseName = hasExt
         ? translation.title.slice(0, -(`.${ext}`.length))
         : translation.title
+
+      if (ext !== toType && toType !== "no-change") {
+        ext = toType
+      }
 
       const fileKey = `${baseName}.${ext}`
       const currentCount = nameCountMap.get(fileKey) ?? 0
@@ -1244,11 +1256,14 @@ export default function BatchTranslatorMain() {
           <DownloadSection
             generateContent={handleGenerateZip}
             fileName={`${currentProject?.name || "subtitles"}.zip`}
-            subName="ZIP"
+            type="zip"
             downloadOption={downloadOption}
             setDownloadOption={setDownloadOption}
             combinedFormat={combinedFormat}
             setCombinedFormat={setCombinedFormat}
+            toType={toType}
+            setToType={setToType}
+            noChangeOption
           />
         </div>
 

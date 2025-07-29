@@ -47,6 +47,7 @@ import {
   SubtitleNoTime,
   DownloadOption,
   CombinedFormat,
+  SubtitleType,
 } from "@/types/subtitles"
 import { ContextCompletion } from "@/types/completion"
 import { cn, minMax, sleep } from "@/lib/utils"
@@ -108,6 +109,7 @@ import { Label } from "@/components/ui/label"
 import { Translation } from "@/types/project"
 import { DownloadSection } from "../download-section"
 import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
+import { convertSubtitle } from "@/lib/subtitles/utils/convert-subtitle"
 
 interface SubtitleTranslatorMainProps {
   currentId: string
@@ -188,6 +190,7 @@ export default function SubtitleTranslatorMain({
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
+  const [toType, setToType] = useState<SubtitleType>(parsed.type)
 
   // Custom Hooks
   const { setHasChanges } = useUnsavedChanges()
@@ -354,7 +357,7 @@ export default function SubtitleTranslatorMain({
     }
 
     // Log subtitles
-    logSubtitle(title, generateSubtitleContent("original", "o-n-t"), currentId)
+    logSubtitle(title, generateSubtitleContent("original", "o-n-t", parsed.type), currentId)
 
     // Translate each chunk of subtitles
     let batch = 0
@@ -732,7 +735,8 @@ export default function SubtitleTranslatorMain({
 
   const generateSubtitleContent = (
     option: DownloadOption,
-    format: CombinedFormat
+    format: CombinedFormat,
+    forceToType?: SubtitleType,
   ): string => {
     const subtitleData: Subtitle[] = subtitles.map((s) => {
       // Determine content based on downloadOption
@@ -765,7 +769,7 @@ export default function SubtitleTranslatorMain({
       parsed: parsed,
     })
 
-    return fileContent
+    return convertSubtitle(fileContent, parsed.type, forceToType ?? toType)
   }
 
   // handleFileDownload logic is now inside DownloadSection
@@ -973,16 +977,14 @@ export default function SubtitleTranslatorMain({
 
           <DownloadSection
             generateContent={generateSubtitleContent}
-            fileName={
-              title.toLowerCase().endsWith(`.${parsed.type}`)
-                ? title
-                : `${title}.${parsed.type}`
-            }
-            subName={subName}
+            fileName={title}
+            type={toType}
             downloadOption={downloadOption}
             setDownloadOption={setDownloadOption}
             combinedFormat={combinedFormat}
             setCombinedFormat={setCombinedFormat}
+            toType={toType}
+            setToType={setToType}
           />
         </div>
 

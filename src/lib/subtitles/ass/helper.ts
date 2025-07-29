@@ -206,3 +206,26 @@ export function parseASSEvents(assSubtitle: string): SubtitleEvent[] {
 
   return events
 }
+
+export function convertSubtitlesToSubtitleEvents(subtitles: Subtitle[]): SubtitleEvent[] {
+  const events: SubtitleEvent[] = []
+
+  for (const subtitle of subtitles) {
+    const event: SubtitleEvent = {
+      format: 'Dialogue',
+      layer: 0,
+      start: formatAssTimestamp(subtitle.timestamp.start),
+      end: formatAssTimestamp(subtitle.timestamp.end),
+      style: 'Default',
+      name: subtitle.actor || '',
+      marginL: '0',
+      marginR: '0',
+      marginV: '0',
+      effect: '',
+      text: subtitle.content,
+    }
+    events.push(event)
+  }
+
+  return events
+}
