@@ -14,6 +14,14 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### July 31
+
+- 💳 **Improved Payments:** We've integrated Lemon Squeezy to make payments smoother and more reliable.
+
+### July 29
+
+- ✨ **Improved Subtitle Downloads:** You can now convert subtitles to different formats right from the download section, with better support for various file types.
+
 ### July 25
 
 - 🚀 **Introducing Batch Translation:** Translate multiple subtitle files at once! Drag-and-drop your files, reorder them, and manage the entire process with a powerful new queue system.
