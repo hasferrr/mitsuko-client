@@ -14,6 +14,12 @@ export function convertSubtitle(
 
   const parseResult = parseSubtitle({ content, type: fromType })
 
+  if (fromType === "ass") {
+    for (const subtitle of parseResult.subtitles) {
+      subtitle.content = subtitle.content.replace(/\\N/g, "\n")
+    }
+  }
+
   const convertedParsed = {
     ...parseResult.parsed,
     type: toType
