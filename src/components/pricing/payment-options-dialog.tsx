@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useSnapStore } from "@/stores/use-snap-store"
 import { ProductId } from "@/types/product"
-import { CreditCard, ExternalLink, Loader2, Minus, Plus } from "lucide-react"
+import { CreditCard, Loader2, Minus, Plus } from "lucide-react"
 import { useSnapPayment } from "@/hooks/use-snap-payment"
 import { toast } from "sonner"
 import { useTransition, useState, useEffect, useRef } from "react"
@@ -20,6 +20,7 @@ import { sleep } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createSnapPayment } from "@/lib/api/create-snap-payment"
+import { useSessionStore } from "@/stores/use-session-store"
 
 const MIN_QUANTITY = 1
 const MAX_QUANTITY = 10
@@ -49,6 +50,7 @@ export function PaymentOptionsDialog({
   const [isFetchingPayment, startFetchingPayment] = useTransition()
   const [paymentError, setPaymentError] = useState<string | null>(null)
   const [inputQuantity, setInputQuantity] = useState(1)
+  const [lemonSqueezyCache, setLemonSqueezyCache] = useState<Map<string, string>>(new Map())
 
   const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const incrementIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -59,6 +61,7 @@ export function PaymentOptionsDialog({
   const getSnapData = useSnapStore((state) => state.getSnapData)
   const removeSnapData = useSnapStore((state) => state.removeSnapData)
   const setSnapData = useSnapStore((state) => state.setSnapData)
+  const session = useSessionStore((state) => state.session)
 
   const snapData = !!userId ? getSnapData(userId, productId) : undefined
   const currentQuantity = snapData?.quantity ?? inputQuantity
@@ -70,7 +73,13 @@ export function PaymentOptionsDialog({
     setPaymentError(null)
   }, [isOpen, productId])
 
-  const fetchAndProceed = (action: 'popup' | 'newTab') => {
+  useEffect(() => {
+    if (!session) {
+      setLemonSqueezyCache(new Map())
+    }
+  }, [session])
+
+  const fetchAndProceed = (paymentType: 'snap' | 'lemonsqueezy') => {
     if (!userId) {
       toast.error("Please sign in to proceed.")
       return
@@ -78,11 +87,15 @@ export function PaymentOptionsDialog({
     setPaymentError(null)
     startFetchingPayment(async () => {
       try {
-        console.log(`Fetching new payment data for ${productId} (Qty: ${inputQuantity}) before ${action}...`)
-        const { data: apiResult } = await createSnapPayment(productId, inputQuantity)
-        setSnapData(userId, productId, apiResult, inputQuantity)
-        console.log(`Successfully fetched data for ${productId} (Qty: ${inputQuantity}). Proceeding with ${action}.`)
-        if (action === 'popup') {
+        console.log(`Fetching new payment data for ${productId} (Qty: ${inputQuantity}) before ${paymentType}...`)
+        const { data: apiResult } = await createSnapPayment(productId, inputQuantity, paymentType)
+        if (paymentType === 'snap') {
+          setSnapData(userId, productId, apiResult, inputQuantity)
+        } else {
+          setLemonSqueezyCache(prev => new Map(prev).set(`${productId}-${inputQuantity}`, apiResult.redirect_url))
+        }
+        console.log(`Successfully fetched data for ${productId} (Qty: ${inputQuantity}). Proceeding with ${paymentType}.`)
+        if (paymentType === 'snap') {
           onClose()
           await sleep(100)
           initiatePaymentPopup(apiResult.token, userId, productId)
@@ -93,7 +106,9 @@ export function PaymentOptionsDialog({
       } catch (error) {
         console.error("Failed to create/fetch payment link:", error instanceof Error ? error.message : "")
         setPaymentError("Failed to prepare payment. Please try again or contact support.")
-        removeSnapData(userId, productId)
+        if (paymentType === 'snap') {
+          removeSnapData(userId, productId)
+        }
         toast.error("Failed to initiate payment.")
       }
     })
@@ -109,29 +124,26 @@ export function PaymentOptionsDialog({
       onClose()
       initiatePaymentPopup(snapData.token, userId, productId)
     } else {
-      fetchAndProceed('popup')
+      fetchAndProceed('snap')
     }
   }
 
   const handleNewTab = () => {
-    if (!userId) {
-      toast.error("Please sign in to proceed.")
-      return
-    }
-    if (snapData) {
-      console.log("Using existing redirect URL for new tab.")
-      window.open(snapData.redirect_url, '_blank')
+    const cachedUrl = lemonSqueezyCache.get(`${productId}-${inputQuantity}`)
+    if (cachedUrl) {
+      window.open(cachedUrl, '_blank')
       onClose()
     } else {
-      fetchAndProceed('newTab')
+      fetchAndProceed('lemonsqueezy')
     }
   }
 
   const handleReset = () => {
     if (!userId) return
     startResetTransition(async () => {
-      await sleep(250)
+      await sleep(100)
       removeSnapData(userId, productId)
+      setLemonSqueezyCache(new Map())
       console.log(`Cleared payment data for user ${userId}, product ${productId}`)
       setInputQuantity(1)
       toast.info("Payment session reset.")
@@ -243,7 +255,7 @@ export function PaymentOptionsDialog({
                   <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700">RECOMMENDED</Badge>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {isFetchingPayment ? "Preparing secure payment..." : "Continue payment securely in a pop-up window."}
+                  {isFetchingPayment ? "Preparing secure payment..." : "Continue payment securely in IDR with no additional fee."}
                 </p>
               </div>
             </button>
@@ -256,12 +268,12 @@ export function PaymentOptionsDialog({
               {isFetchingPayment ? (
                 <Loader2 className="w-6 h-6 mr-4 text-gray-500 flex-shrink-0 mt-1 animate-spin" />
               ) : (
-                <ExternalLink className="w-6 h-6 mr-4 text-gray-500 flex-shrink-0 mt-1" />
+                <img src="/lemonsqueezy.svg" alt="Lemon Squeezy" className="w-6 h-6 mr-4 flex-shrink-0 mt-1" />
               )}
               <div className="flex-grow">
-                <div className="font-medium text-sm mb-1">Open Payment Link</div>
+                <div className="font-medium text-sm mb-1">Pay with Lemon Squeezy</div>
                 <p className="text-xs text-muted-foreground">
-                  {isFetchingPayment ? "Preparing secure payment link..." : "Open the Midtrans payment page in new tab."}
+                  {isFetchingPayment ? "Preparing secure payment..." : "Proceed to Lemon Squeezy. A fee of 10% + $1 applies."}
                 </p>
               </div>
             </button>
@@ -335,10 +347,10 @@ export function PaymentOptionsDialog({
         </div>
 
         <DialogFooter className="flex flex-row justify-between w-full sm:justify-between pt-4 border-t border-border mt-auto">
-          <Button onClick={handleReset} variant="destructive" size="sm" disabled={isResetting || isFetchingPayment || !snapData}>
+          <Button onClick={handleReset} variant="destructive" size="sm" disabled={isResetting || isFetchingPayment || (!snapData && lemonSqueezyCache.size === 0)}>
             {isResetting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Resetting...
               </>
             ) : (

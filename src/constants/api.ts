@@ -19,3 +19,4 @@ export const MODEL_PRICES_URL = `${BASE_URL}/api/model-prices`
 export const FEEDBACK_URL = `${BASE_URL}/api/feedback`
 
 export const PAYMENT_CREATE_SNAP_URL = `${BASE_URL}/api/payment/create-snap`
+export const PAYMENT_CREATE_LEMONSQUEEZY_URL = `${BASE_URL}/api/payment/create-checkout`
