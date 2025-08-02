@@ -41,18 +41,12 @@ export function CustomApiConfigManager() {
     }
   }, [selectedApiConfigIndex, customApiConfigs])
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (selectedApiConfigIndex !== null) {
-        const config: Omit<CustomApiConfig, "name"> = { apiKey, customBaseUrl, customModel }
-        updateApiConfig(selectedApiConfigIndex, config)
-      }
-    }, 500)
-
-    return () => {
-      clearTimeout(handler)
+  const handleBlur = async () => {
+    if (selectedApiConfigIndex !== null) {
+      const config: Omit<CustomApiConfig, "name"> = { apiKey, customBaseUrl, customModel }
+      await updateApiConfig(selectedApiConfigIndex, config)
     }
-  }, [apiKey, customBaseUrl, customModel, selectedApiConfigIndex, updateApiConfig])
+  }
 
   const handleAddNew = () => {
     const newConfig: Omit<CustomApiConfig, "name"> = {
@@ -102,6 +96,7 @@ export function CustomApiConfigManager() {
       <Input
         value={customBaseUrl}
         onChange={(e) => setCustomBaseUrl(e.target.value)}
+        onBlur={handleBlur}
         placeholder="Base URL (OpenAI compatibility)"
         className="bg-background dark:bg-muted/30"
         disabled={selectedApiConfigIndex === null}
@@ -109,6 +104,7 @@ export function CustomApiConfigManager() {
       <Input
         value={customModel}
         onChange={(e) => setCustomModel(e.target.value)}
+        onBlur={handleBlur}
         placeholder="Model Name"
         className="bg-background dark:bg-muted/30"
         disabled={selectedApiConfigIndex === null}
@@ -118,6 +114,7 @@ export function CustomApiConfigManager() {
           type={showApiKey ? "text" : "password"}
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
+          onBlur={handleBlur}
           placeholder="API Key"
           className="pr-12"
           disabled={selectedApiConfigIndex === null}

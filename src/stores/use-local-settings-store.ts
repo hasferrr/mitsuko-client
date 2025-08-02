@@ -14,7 +14,7 @@ interface LocalSettingsStore {
   isAutoTemperatureEnabled: boolean
 
   addApiConfig: (config: CustomApiConfig) => void
-  updateApiConfig: (index: number, updates: Partial<CustomApiConfig>) => void
+  updateApiConfig: (index: number, updates: Partial<CustomApiConfig>) => Promise<void>
   removeApiConfig: (index: number) => void
   selectApiConfig: (index: number | null) => void
 
@@ -35,7 +35,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
           customApiConfigs: [...state.customApiConfigs, config],
         })),
 
-      updateApiConfig: (index, updates) =>
+      updateApiConfig: async (index, updates) =>
         set((state) => {
           const newConfigs = [...state.customApiConfigs]
           if (newConfigs[index]) {
