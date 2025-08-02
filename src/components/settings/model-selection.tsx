@@ -1,15 +1,15 @@
 "use client"
 
 import { memo, useEffect, useState } from "react"
-import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { Eye, EyeOff, HelpCircle } from "lucide-react"
+import { HelpCircle } from "lucide-react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useLocalSettingsStore } from '@/stores/use-local-settings-store'
 import { ModelSelector } from "@/components/model-selector"
 import WhichModels from "@/components/pricing/which-models"
+import { CustomApiConfigManager } from "./custom-api-config-manager"
 import { SettingsParentType } from "@/types/project"
 
 interface ModelSelectionProps {
@@ -26,15 +26,7 @@ export const ModelSelection = memo(({
   const setIsUseCustomModel = useSettingsStore((state) => state.setIsUseCustomModel)
 
   // API Settings Store
-  const apiKey = useLocalSettingsStore((state) => state.apiKey)
-  const customBaseUrl = useLocalSettingsStore((state) => state.customBaseUrl)
-  const customModel = useLocalSettingsStore((state) => state.customModel)
-  const setApiKey = useLocalSettingsStore((state) => state.setApiKey)
-  const setCustomBaseUrl = useLocalSettingsStore((state) => state.setCustomBaseUrl)
-  const setCustomModel = useLocalSettingsStore((state) => state.setCustomModel)
   const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
-
-  const [showApiKey, setShowApiKey] = useState(false)
   const [isWhichModelsDialogOpen, setIsWhichModelsDialogOpen] = useState(false)
 
   useEffect(() => {
@@ -74,46 +66,7 @@ export const ModelSelection = memo(({
           </label>
         </div>
       )}
-      {isUseCustomModel && (
-        <div className="space-y-4 pt-2">
-          <Input
-            value={customBaseUrl}
-            onChange={(e) => setCustomBaseUrl(e.target.value)}
-            placeholder="Base URL (OpenAI compatibility)"
-            className="bg-background dark:bg-muted/30"
-          />
-          <Input
-            value={customModel}
-            onChange={(e) => setCustomModel(e.target.value)}
-            placeholder="Model Name"
-            className="bg-background dark:bg-muted/30"
-          />
-          <div className="grid grid-cols-2 items-center gap-4">
-            <div className="col-span-2 relative">
-              <Input
-                type={showApiKey ? "text" : "password"}
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="API Key"
-                className="pr-12"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
-                onClick={() => setShowApiKey(!showApiKey)}
-              >
-                {showApiKey ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {isUseCustomModel && <CustomApiConfigManager />}
       <Dialog open={isWhichModelsDialogOpen} onOpenChange={setIsWhichModelsDialogOpen}>
         <DialogContent className="sm:max-w-2xl pt-2">
           <DialogTitle></DialogTitle>

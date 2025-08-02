@@ -73,9 +73,13 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
   const [projectTranslations, setProjectTranslations] = useState<Translation[]>([])
 
   // API Settings Store
-  const apiKey = useLocalSettingsStore((state) => state.apiKey)
-  const customBaseUrl = useLocalSettingsStore((state) => state.customBaseUrl)
-  const customModel = useLocalSettingsStore((state) => state.customModel)
+  const customApiConfigs = useLocalSettingsStore((state) => state.customApiConfigs)
+  const selectedApiConfigIndex = useLocalSettingsStore((state) => state.selectedApiConfigIndex)
+  const selectedConfig =
+    selectedApiConfigIndex !== null ? customApiConfigs[selectedApiConfigIndex] : null
+  const apiKey = selectedConfig?.apiKey ?? ""
+  const customBaseUrl = selectedConfig?.customBaseUrl ?? ""
+  const customModel = selectedConfig?.customModel ?? ""
 
   // Settings Store
   const modelDetail = useSettingsStore((state) => state.getModelDetail())

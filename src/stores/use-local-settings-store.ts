@@ -1,15 +1,23 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-interface LocalSettingsStore {
+export interface CustomApiConfig {
   apiKey: string
   customBaseUrl: string
   customModel: string
+}
+
+interface LocalSettingsStore {
+  customApiConfigs: CustomApiConfig[]
+  selectedApiConfigIndex: number | null
   isThirdPartyModelEnabled: boolean
   isAutoTemperatureEnabled: boolean
-  setApiKey: (key: string) => void
-  setCustomBaseUrl: (url: string) => void
-  setCustomModel: (model: string) => void
+
+  addApiConfig: (config: CustomApiConfig) => void
+  updateApiConfig: (index: number, updates: Partial<CustomApiConfig>) => void
+  removeApiConfig: (index: number) => void
+  selectApiConfig: (index: number | null) => void
+
   toggleThirdPartyModel: () => void
   setIsAutoTemperatureEnabled: (enabled: boolean) => void
 }
@@ -17,16 +25,47 @@ interface LocalSettingsStore {
 export const useLocalSettingsStore = create<LocalSettingsStore>()(
   persist(
     (set) => ({
-      apiKey: "",
-      customBaseUrl: "",
-      customModel: "",
+      customApiConfigs: [],
+      selectedApiConfigIndex: null,
       isThirdPartyModelEnabled: false,
       isAutoTemperatureEnabled: true,
-      setApiKey: (key) => set({ apiKey: key }),
-      setCustomBaseUrl: (url) => set({ customBaseUrl: url }),
-      setCustomModel: (model) => set({ customModel: model }),
+
+      addApiConfig: (config) =>
+        set((state) => ({
+          customApiConfigs: [...state.customApiConfigs, config],
+        })),
+
+      updateApiConfig: (index, updates) =>
+        set((state) => {
+          const newConfigs = [...state.customApiConfigs]
+          if (newConfigs[index]) {
+            newConfigs[index] = { ...newConfigs[index], ...updates }
+          }
+          return { customApiConfigs: newConfigs }
+        }),
+
+      removeApiConfig: (index) =>
+        set((state) => {
+          const newConfigs = state.customApiConfigs.filter((_, i) => i !== index)
+          let newSelectedIndex = state.selectedApiConfigIndex
+
+          if (state.selectedApiConfigIndex === index) {
+            newSelectedIndex = newConfigs.length > 0 ? newConfigs.length - 1 : null
+          } else if (state.selectedApiConfigIndex !== null && state.selectedApiConfigIndex > index) {
+            newSelectedIndex = state.selectedApiConfigIndex - 1
+          }
+
+          return {
+            customApiConfigs: newConfigs,
+            selectedApiConfigIndex: newSelectedIndex,
+          }
+        }),
+
+      selectApiConfig: (index) => set({ selectedApiConfigIndex: index }),
+
       toggleThirdPartyModel: () =>
         set((state) => ({ isThirdPartyModelEnabled: !state.isThirdPartyModelEnabled })),
+
       setIsAutoTemperatureEnabled: (enabled) => set({ isAutoTemperatureEnabled: enabled }),
     }),
     {

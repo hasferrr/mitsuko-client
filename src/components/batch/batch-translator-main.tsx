@@ -175,9 +175,13 @@ export default function BatchTranslatorMain() {
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput())
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
   const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching())
-  const apiKey = useLocalSettingsStore((state) => state.apiKey)
-  const customBaseUrl = useLocalSettingsStore((state) => state.customBaseUrl)
-  const customModel = useLocalSettingsStore((state) => state.customModel)
+  const customApiConfigs = useLocalSettingsStore((state) => state.customApiConfigs)
+  const selectedApiConfigIndex = useLocalSettingsStore((state) => state.selectedApiConfigIndex)
+  const selectedConfig =
+    selectedApiConfigIndex !== null ? customApiConfigs[selectedApiConfigIndex] : null
+  const apiKey = selectedConfig?.apiKey ?? ""
+  const customBaseUrl = selectedConfig?.customBaseUrl ?? ""
+  const customModel = selectedConfig?.customModel ?? ""
 
   // Session Store
   const session = useSessionStore((state) => state.session)
