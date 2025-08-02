@@ -70,6 +70,33 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
     }),
     {
       name: "api-settings-storage",
+      version: 1,
+      migrate: (persistedState, version) => {
+        if (version === 0) {
+          const oldState = persistedState as {
+            apiKey?: string
+            customBaseUrl?: string
+            customModel?: string
+            customApiConfigs?: CustomApiConfig[]
+            selectedApiConfigIndex?: number | null
+          }
+          if (oldState.apiKey || oldState.customBaseUrl || oldState.customModel) {
+            const migratedConfig: CustomApiConfig = {
+              apiKey: oldState.apiKey ?? "",
+              customBaseUrl: oldState.customBaseUrl ?? "",
+              customModel: oldState.customModel ?? "",
+            }
+
+            oldState.customApiConfigs = [migratedConfig]
+            oldState.selectedApiConfigIndex = 0
+
+            delete oldState.apiKey
+            delete oldState.customBaseUrl
+            delete oldState.customModel
+          }
+        }
+        return persistedState
+      },
     }
   )
 )
