@@ -22,7 +22,7 @@ export default function HeroSection() {
         <Link href="/dashboard" className="group flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a1a1a] dark:hover:bg-[#252525] hover:bg-gray-50 transition-colors drop-shadow-sm">
           ✨
           <span className="dark:text-gray-200 text-gray-800">
-            Grok 4 and Gemini 2.5 Pro are now available!
+            GPT-5, the latest advanced model, is now available!
           </span>
           <ExternalLink size={16} className="text-gray-400 group-hover:translate-x-1 transition-transform" />
         </Link>
