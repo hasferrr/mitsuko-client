@@ -280,8 +280,7 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
 
   // Extraction Handlers
 
-  // TODO: Remove isContinuation and continueGeneration completely
-  const handleStartExtraction = async (isContinuation: boolean = false) => {
+  const handleStartExtraction = async () => {
     setTimeout(() => {
       window.scrollTo({
         top: 0,
@@ -313,18 +312,12 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
       const data = parseSubtitle({ content: subtitleContent })
       const subtitles: SubtitleNoTime[] = removeTimestamp(data.subtitles)
 
-      const result: string[] | undefined = isContinuation
-        ? [contextResult]
-        : undefined
-
       const requestBody = {
         input: {
           episode: episodeNumber.trim(),
           subtitles: subtitles,
           previous_context: previousContext,
         },
-        isContinuation: isContinuation ? true : undefined,
-        continuationMessage: isContinuation ? result : undefined,
         baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
         model: isUseCustomModel ? customModel : modelDetail?.name || "",
         maxCompletionTokens: isMaxCompletionTokensAuto ? undefined : minMax(
@@ -342,7 +335,6 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
           : (modelDetail.isPaid ? "paid" : "free"),
         currentId,
         (response) => setContextResult(currentId, response),
-        isContinuation ? contextResult : "",
       )
     } catch (error) {
       console.error(error)
@@ -356,10 +348,6 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
       await saveData(currentId)
     }
   }
-
-  // const handleContinueGeneration = async () => {
-  //   await handleStartExtraction(true)
-  // }
 
   const handleStopExtraction = async () => {
     stopExtraction(currentId)
@@ -672,7 +660,7 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
       <div className="lg:col-span-2 flex items-center justify-center gap-4 flex-wrap">
         <Button
           className="gap-2 w-[152px]"
-          onClick={() => handleStartExtraction(false)}
+          onClick={() => handleStartExtraction()}
           disabled={isExtracting || isBatchMode || !session}
         >
           {isExtracting ? (
@@ -727,25 +715,6 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
           )}
         </Button>
 
-        {/* Continue Extraction is disabled for now */}
-        {/* <Button
-          variant="outline"
-          className="gap-2"
-          onClick={handleContinueGeneration}
-          disabled={isExtracting || !session || contextResult.trim() === ""}
-        >
-          {isExtracting ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Continuing...
-            </>
-          ) : (
-            <>
-              <StepForward className="h-4 w-4" />
-              Continue Extraction
-            </>
-          )}
-        </Button> */}
       </div>
 
       {/* Subtitle Import Dialog */}
