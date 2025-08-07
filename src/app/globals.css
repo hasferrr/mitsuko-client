@@ -126,3 +126,13 @@
 .overflow-auto::-webkit-scrollbar-thumb:hover {
   background: rgba(175, 175, 175, 0.3);
 }
+
+/* Custom thinking animation with delay */
+@keyframes thinking {
+  0%, 70%, 100% {
+    opacity: 1;
+  }
+  35% {
+    opacity: 0.5;
+  }
+}

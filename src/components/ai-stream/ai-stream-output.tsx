@@ -11,7 +11,7 @@ interface AiStreamOutputProps {
   content: string
   className?: string
   subtitles?: SubtitleNoTimeTranslated[]
-  isTranslating?: boolean
+  isProcessing: boolean
 }
 
 interface ParsedSegment {
@@ -23,7 +23,7 @@ export const AiStreamOutput = ({
   content,
   className,
   subtitles: subtitlesProp = [],
-  isTranslating,
+  isProcessing,
 }: AiStreamOutputProps) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false)
   const [translatedSubtitles, setTranslatedSubtitles] = useState<SubOnlyTranslated[]>([])
@@ -67,11 +67,11 @@ export const AiStreamOutput = ({
   }, [])
 
   useEffect(() => {
-    if (prevIsTranslatingRef.current && isTranslating === false && subtitlesProp.length) {
+    if (prevIsTranslatingRef.current && isProcessing === false && subtitlesProp.length) {
       parse(content)
     }
-    prevIsTranslatingRef.current = isTranslating
-  }, [isTranslating])
+    prevIsTranslatingRef.current = isProcessing
+  }, [isProcessing])
 
   useEffect(() => {
     if (!subtitlesProp.length) return
@@ -141,7 +141,22 @@ export const AiStreamOutput = ({
             ) : (
               <ChevronDown className="h-4 w-4 mr-1" />
             )}
-            {parsedContent.output ? "Thought" : "Thinking..."}
+            {parsedContent.output || !isProcessing ? "Thought" : (
+              <span className="inline-flex">
+                {"Thinking...".split("").map((char, index) => (
+                  <span
+                    key={index}
+                    className="animate-[thinking_2s_ease-in-out_infinite]"
+                    style={{
+                      animationDelay: `${index * 100}ms`,
+                      color: "hsl(var(--primary))",
+                    }}
+                  >
+                    {char}
+                  </span>
+                ))}
+              </span>
+            )}
           </div>
           <div
             className={cn(

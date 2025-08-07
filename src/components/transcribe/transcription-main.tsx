@@ -511,7 +511,10 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                       !transcriptionText && "text-muted-foreground",
                     )}
                   >
-                    <AiStreamOutput content={transcriptionText} />
+                    <AiStreamOutput
+                      content={transcriptionText || "Transcription will appear here..."}
+                      isProcessing={isTranscribing}
+                    />
                   </div>
                 )}
               </div>

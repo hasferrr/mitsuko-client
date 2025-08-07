@@ -648,7 +648,10 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
                     !contextResult && "text-muted-foreground",
                   )}
                 >
-                  <AiStreamOutput content={contextResult || "Extracted context will appear here..."} />
+                  <AiStreamOutput
+                    content={contextResult || "Extracted context will appear here..."}
+                    isProcessing={isExtracting}
+                  />
                 </div>
               )}
             </div>
