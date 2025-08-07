@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getTranscriptionLogs } from '@/lib/api/transcription-log'
 import {
   Pagination,
@@ -22,6 +22,7 @@ import {
   RefreshCw,
   Search,
   SquareArrowOutUpRight,
+  Trash2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TranscriptionLogItem } from '@/types/transcription-log'
@@ -35,6 +36,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import LogResultDialog from './log-result-dialog'
+import { deleteTranscriptionLog } from '@/lib/api/transcription-log'
+import { toast } from 'sonner'
+import { DeleteDialogue } from '@/components/ui-custom/delete-dialogue'
 import { useSessionStore } from '@/stores/use-session-store'
 
 const ITEMS_PER_PAGE = 10
@@ -45,6 +49,30 @@ export default function HistoryView() {
   const [selectedLog, setSelectedLog] = useState<TranscriptionLogItem | null>(null)
 
   const session = useSessionStore(state => state.session)
+
+  const queryClient = useQueryClient()
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+
+  const { mutate: deleteLog } = useMutation({
+    mutationFn: (id: string) => deleteTranscriptionLog(id),
+    onMutate: (id: string) => {
+      setDeletingId(id)
+    },
+    onSuccess: () => {
+      toast.success('Transcription deleted')
+      queryClient.invalidateQueries({ queryKey: ['transcriptionLogs'] })
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to delete transcription', {
+        description: error.message,
+      })
+    },
+    onSettled: () => {
+      setDeletingId(null)
+    },
+  })
 
   const {
     data: paged,
@@ -259,14 +287,31 @@ export default function HistoryView() {
                         {item.reqModels}
                       </Badge>
                     </TableCell>
-                    <TableCell className="py-4 text-center">
+                    <TableCell className="py-4 flex justify-center gap-1">
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
                         onClick={() => setSelectedLog(item)}
                       >
                         <SquareArrowOutUpRight className="h-4 w-4" />
-                        View Result
+                        Preview
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-500"
+                        disabled={deletingId === item._id}
+                        onClick={() => {
+                          setPendingDeleteId(item._id)
+                          setIsDeleteDialogOpen(true)
+                        }}
+                      >
+                        {deletingId === item._id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                        Delete
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -316,6 +361,15 @@ export default function HistoryView() {
           )}
         </div>
       )}
+
+      <DeleteDialogue
+        handleDelete={() => {
+          if (pendingDeleteId) deleteLog(pendingDeleteId)
+        }}
+        isDeleteModalOpen={isDeleteDialogOpen}
+        setIsDeleteModalOpen={setIsDeleteDialogOpen}
+        isProcessing={deletingId !== null}
+      />
 
       <LogResultDialog
         log={selectedLog}

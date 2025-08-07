@@ -2,7 +2,7 @@ import {
   TranscriptionLogListResponse,
   TranscriptionLogResultResponse,
 } from '@/types/transcription-log'
-import { TRANSCRIPTION_LOG_LIST_URL, TRANSCRIPTION_LOG_RESULT_URL } from '@/constants/api'
+import { TRANSCRIPTION_LOG_LIST_URL, TRANSCRIPTION_LOG_RESULT_URL, TRANSCRIPTION_LOG_DELETE_URL } from '@/constants/api'
 import { supabase } from '@/lib/supabase'
 
 export async function getTranscriptionLogs(page: number, pageSize: number = 10): Promise<TranscriptionLogListResponse> {
@@ -46,6 +46,29 @@ export async function getTranscriptionLogResult(id: string): Promise<Transcripti
 
   if (!res.ok) {
     throw new Error(`Failed to fetch transcription result: ${res.status}`)
+  }
+
+  return await res.json()
+}
+
+export async function deleteTranscriptionLog(id: string): Promise<{ message: string }> {
+  const { data: { session } } = await supabase.auth.getSession()
+  const accessToken = session?.access_token
+  if (!accessToken) {
+    throw new Error('No access token found')
+  }
+
+  const res = await fetch(TRANSCRIPTION_LOG_DELETE_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ id })
+  })
+
+  if (!res.ok) {
+    throw new Error(`Failed to delete transcription: ${res.status}`)
   }
 
   return await res.json()

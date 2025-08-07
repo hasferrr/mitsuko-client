@@ -23,3 +23,4 @@ export const PAYMENT_CREATE_LEMONSQUEEZY_URL = `${BASE_URL}/api/payment/create-c
 
 export const TRANSCRIPTION_LOG_LIST_URL = `${BASE_URL}/api/transcription-log`
 export const TRANSCRIPTION_LOG_RESULT_URL = `${BASE_URL}/api/transcription-log/result`
+export const TRANSCRIPTION_LOG_DELETE_URL = `${BASE_URL}/api/transcription-log/delete`
