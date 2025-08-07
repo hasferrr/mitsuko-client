@@ -52,6 +52,8 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { SubtitleTranslated } from "@/types/subtitles"
 import { useRouter } from "next/navigation"
+import { AiStreamOutput } from "../ai-stream/ai-stream-output"
+import { cn } from "@/lib/utils"
 
 interface TranscriptionMainProps {
   currentId: string
@@ -59,6 +61,7 @@ interface TranscriptionMainProps {
 
 export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const transcriptionAreaRef = useRef<HTMLTextAreaElement>(null)
+  const transcriptionResultRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
 
@@ -105,6 +108,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false)
 
   useAutoScroll(transcriptionText, transcriptionAreaRef)
+  useAutoScroll(transcriptionText, transcriptionResultRef)
   const { setHasChanges } = useUnsavedChanges()
 
   const isExceeded = file ? file.size > MAX_TRANSCRIPTION_SIZE : false
@@ -460,7 +464,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="text-xs border-border"
+                        className={cn("text-xs border-border", isEditing && "border-primary/50")}
                         onClick={handleIsEditing}
                         disabled={isTranscribing}
                       >
@@ -491,7 +495,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                       Your transcription will appear here in real-time
                     </p>
                   </div>
-                ) : (
+                ) : isEditing ? (
                   <Textarea
                     ref={transcriptionAreaRef}
                     value={transcriptionText}
@@ -499,6 +503,16 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                     onChange={handleTranscriptionTextChange}
                     className="w-full h-96 p-4 bg-background text-foreground resize-none overflow-y-auto"
                   />
+                ) : (
+                  <div
+                    ref={transcriptionResultRef}
+                    className={cn(
+                      "min-h-96 h-96 overflow-y-auto rounded-md border p-3 pr-2",
+                      !transcriptionText && "text-muted-foreground",
+                    )}
+                  >
+                    <AiStreamOutput content={transcriptionText} />
+                  </div>
                 )}
               </div>
             </TabsContent>
@@ -543,7 +557,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                         className="text-xs border-border"
                         onClick={handleParse}
                       >
-                        <ClipboardPaste className="h-3 w-3" /> Parse Subtitle
+                        <ClipboardPaste className="h-3 w-3" /> Get Subtitle
                       </Button>
                       <Button
                         size="sm"
