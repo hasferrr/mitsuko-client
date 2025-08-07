@@ -20,3 +20,6 @@ export const FEEDBACK_URL = `${BASE_URL}/api/feedback`
 
 export const PAYMENT_CREATE_SNAP_URL = `${BASE_URL}/api/payment/create-snap`
 export const PAYMENT_CREATE_LEMONSQUEEZY_URL = `${BASE_URL}/api/payment/create-checkout`
+
+export const TRANSCRIPTION_LOG_LIST_URL = `${BASE_URL}/api/transcription-log`
+export const TRANSCRIPTION_LOG_RESULT_URL = `${BASE_URL}/api/transcription-log/result`

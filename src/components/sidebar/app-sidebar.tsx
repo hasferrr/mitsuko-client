@@ -3,6 +3,7 @@
 import Link from "next/link"
 import {
   Box,
+  Cloud,
   Folder,
   House,
   HistoryIcon,
@@ -46,21 +47,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/batch",
         icon: Box,
       },
-      // {
-      //   title: "Translate",
-      //   url: "/translate",
-      //   icon: Languages,
-      // },
-      // {
-      //   title: "Transcribe",
-      //   url: "/transcribe",
-      //   icon: AudioWaveform,
-      // },
-      // {
-      //   title: "Extract Context",
-      //   url: "/extract-context",
-      //   icon: BookOpen,
-      // },
+      {
+        title: "History",
+        url: "/history",
+        icon: Cloud,
+      },
       {
         title: "Library",
         url: "/library",
