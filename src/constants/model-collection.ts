@@ -278,18 +278,6 @@ export const PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "Claude 3.7 Sonnet (non-thinking)",
-        maxInput: 200_000,
-        maxOutput: 64_000,
-        structuredOutput: true,
-        isPaid: true,
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
         name: "Claude 3.5 Sonnet",
         maxInput: 200_000,
         maxOutput: 8_129,
@@ -387,18 +375,6 @@ export const PAID_MODELS: PaidModelCollection = {
         name: "GPT-5 nano",
         maxInput: 400_000,
         maxOutput: 128_000,
-        structuredOutput: true,
-        isPaid: true,
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "OpenAI o3",
-        maxInput: 200_000,
-        maxOutput: 100_000,
         structuredOutput: true,
         isPaid: true,
         default: {

@@ -63,13 +63,12 @@ export default function PricingDescription() {
         {/* Background Processing */}
         <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
           <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-            Background Processing (Soon)
+            Background Processing
           </h3>
           <p>
-            Background processing allows certain tasks, like audio transcriptions, to run on our servers even if you close the browser tab.
+            Background processing allows audio transcriptions to run on our server even if you close the browser tab.
             <br />
-            This means you don't have to wait for the process to finish. This feature will be available soon.
-            {/* This feature is available for Basic and Pro user. */}
+            This means you don't have to wait for the process to finish.
           </p>
         </div>
 

@@ -15,7 +15,7 @@ const languages = [
 ]
 
 const models = [
-  { value: "free", label: "Mitsuko (Free Limited)" },
+  { value: "free", label: "Mitsuko (Free Trial)" },
   { value: "premium", label: "Mitsuko (Premium)" },
 ]
 
