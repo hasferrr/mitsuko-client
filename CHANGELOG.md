@@ -14,6 +14,12 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### August 8
+
+- 🤖 **Model Updates:** Added the GPT‑5 family and refreshed model references and descriptions for greater clarity and quality.
+- 🎙️ **Smoother Transcription:** See detailed transcription streaming output and enjoy a streamlined, consistent processing flow — now with background processing, so you can close the page without losing results.
+- 🗂️ **Cloud Transcription History:** Browse your transcriptions stored in the cloud and delete logs with one click.
+
 ### July 31
 
 - 💳 **Improved Payments:** We've integrated Lemon Squeezy to make payments smoother and more reliable.
