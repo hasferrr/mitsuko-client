@@ -243,7 +243,7 @@ export default function HistoryView() {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="font-semibold lg:min-w-[300px]">File Name</TableHead>
+                  <TableHead className="font-semibold">File Name</TableHead>
                   <TableHead className="font-semibold">Created</TableHead>
                   <TableHead className="font-semibold">Costs</TableHead>
                   <TableHead className="font-semibold">Model</TableHead>
@@ -253,13 +253,13 @@ export default function HistoryView() {
               <TableBody>
                 {filtered.map((item) => (
                   <TableRow key={item._id} className="group">
-                    <TableCell className="py-4">
+                    <TableCell className="py-4 min-w-[250px] max-w-[250px] lg:min-w-[300px] lg:max-w-[400px]">
                       <div className="flex items-center gap-3">
                         <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                           <FileAudio2 className="h-5 w-5 text-primary" />
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium truncate max-w-[200px] sm:max-w-[300px] lg:max-w-[400px]">
+                        <div className="w-full line-clamp-3">
+                          <p className="font-medium line-clamp-2">
                             {item.metadata.originalname || 'Unknown file'}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
@@ -268,15 +268,19 @@ export default function HistoryView() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="py-4">
+                    <TableCell className="py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <div className="h-4 w-4">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                        </div>
                         {formatDate(item.createdAt)}
                       </div>
                     </TableCell>
                     <TableCell className="py-4">
                       <div className="flex items-center gap-2 text-sm">
-                        <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+                        <div className="h-4 w-4">
+                          <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+                        </div>
                         {item.creditsConsumed !== undefined
                           ? item.creditsConsumed.toLocaleString()
                           : 'N/A'}
@@ -287,32 +291,34 @@ export default function HistoryView() {
                         {item.reqModels}
                       </Badge>
                     </TableCell>
-                    <TableCell className="py-4 flex justify-center gap-1">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedLog(item)}
-                      >
-                        <SquareArrowOutUpRight className="h-4 w-4" />
-                        Preview
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-red-500"
-                        disabled={deletingId === item._id}
-                        onClick={() => {
-                          setPendingDeleteId(item._id)
-                          setIsDeleteDialogOpen(true)
-                        }}
-                      >
-                        {deletingId === item._id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
-                        Delete
-                      </Button>
+                    <TableCell className="py-4 text-center">
+                      <div className="inline-flex items-center justify-center gap-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedLog(item)}
+                        >
+                          <SquareArrowOutUpRight className="h-4 w-4" />
+                          Preview
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-red-500"
+                          disabled={deletingId === item._id}
+                          onClick={() => {
+                            setPendingDeleteId(item._id)
+                            setIsDeleteDialogOpen(true)
+                          }}
+                        >
+                          {deletingId === item._id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                          Delete
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
