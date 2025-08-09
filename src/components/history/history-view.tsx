@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getTranscriptionLogs } from '@/lib/api/transcription-log'
+import { Card, CardHeader } from '@/components/ui/card'
 import {
   Pagination,
   PaginationContent,
@@ -16,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Calendar,
+  CheckCircle,
   CircleDollarSign,
   FileAudio2,
   Loader2,
@@ -40,6 +42,7 @@ import { deleteTranscriptionLog } from '@/lib/api/transcription-log'
 import { toast } from 'sonner'
 import { DeleteDialogue } from '@/components/ui-custom/delete-dialogue'
 import { useSessionStore } from '@/stores/use-session-store'
+import { fetchBackgroundTranscriptionCount } from '@/lib/api/credit-reservations'
 
 const ITEMS_PER_PAGE = 10
 
@@ -85,6 +88,21 @@ export default function HistoryView() {
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     enabled: !!session,
+  })
+
+  const {
+    data: bgCount = 0,
+    isLoading: isBgLoading,
+    refetch: refetchBg,
+    isFetching: isBgFetching,
+  } = useQuery({
+    queryKey: ['bg-transcription-count', session?.user?.id],
+    queryFn: () => fetchBackgroundTranscriptionCount(),
+    staleTime: Infinity,
+    refetchInterval: (query) => (query.state.data && query.state.data > 0 ? 2 * 60 * 1000 : false),
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
+    enabled: !!session?.user?.id,
   })
 
   const logs = paged?.data ?? []
@@ -169,6 +187,15 @@ export default function HistoryView() {
     return items
   }
 
+  const handleRefresh = async () => {
+    try {
+      await Promise.all([refetch(), refetchBg()])
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Unknown error'
+      toast.error('Failed to refresh data', { description: message })
+    }
+  }
+
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       {/* Header Section */}
@@ -182,12 +209,12 @@ export default function HistoryView() {
           </p>
         </div>
         <Button
-          onClick={() => refetch()}
-          disabled={isRefetching}
+          onClick={handleRefresh}
+          disabled={isRefetching || isBgFetching}
           variant="outline"
           className="w-fit"
         >
-          {isRefetching ? (
+          {isRefetching || isBgFetching ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <RefreshCw className="h-4 w-4" />
@@ -238,6 +265,32 @@ export default function HistoryView() {
         </div>
       ) : (
         <div className="space-y-6">
+          <Card className="border-dashed">
+            <CardHeader className="py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {(isBgLoading || bgCount > 0) ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  ) : (
+                    <CheckCircle className="h-4 w-4 " />
+                  )}
+                  <div>
+                    <div className="text-sm font-medium">
+                      Background processing
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {isBgLoading
+                        ? 'Checking status...'
+                        : bgCount > 0
+                          ? `${bgCount} transcription${bgCount > 1 ? 's' : ''} still processing`
+                          : 'No transcriptions running'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+
           {/* Table */}
           <div className="rounded-lg border bg-card px-4">
             <Table>
