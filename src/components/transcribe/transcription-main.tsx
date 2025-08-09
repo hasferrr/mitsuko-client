@@ -514,6 +514,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                     <AiStreamOutput
                       content={transcriptionText || "Transcription will appear here..."}
                       isProcessing={isTranscribing}
+                      defaultCollapsed
                     />
                   </div>
                 )}

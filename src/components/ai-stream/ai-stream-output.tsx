@@ -12,6 +12,7 @@ interface AiStreamOutputProps {
   className?: string
   subtitles?: SubtitleNoTimeTranslated[]
   isProcessing: boolean
+  defaultCollapsed?: boolean
 }
 
 interface ParsedSegment {
@@ -24,8 +25,9 @@ export const AiStreamOutput = ({
   className,
   subtitles: subtitlesProp = [],
   isProcessing,
+  defaultCollapsed = false,
 }: AiStreamOutputProps) => {
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false)
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(defaultCollapsed)
   const [translatedSubtitles, setTranslatedSubtitles] = useState<SubOnlyTranslated[]>([])
   const initialSubtitlesRef = useRef<SubtitleNoTimeTranslated[]>(subtitlesProp)
   const lastParseTimeRef = useRef<number>(Date.now())
