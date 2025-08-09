@@ -72,7 +72,6 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const selectedMode = useTranscriptionDataStore(state => state.getSelectedMode())
   const customInstructions = useTranscriptionDataStore(state => state.getCustomInstructions())
   const models = useTranscriptionDataStore(state => state.getModels())
-  const isOverOneHour = useTranscriptionDataStore(state => state.getIsOverOneHour())
   const setTitle = useTranscriptionDataStore(state => state.setTitle)
   const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)
   const setTranscriptSubtitles = useTranscriptionDataStore(state => state.setTranscriptSubtitles)
@@ -174,8 +173,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     formData.append("selectedMode", selectedMode)
     formData.append("customInstructions", customInstructions)
     formData.append("models", models)
-    formData.append("isOverOneHour", isOverOneHour.toString())
-    console.log({ file, selectedMode, customInstructions, models, isOverOneHour })
+    console.log({ file, selectedMode, customInstructions, models })
 
     try {
       const text = await startTranscription(

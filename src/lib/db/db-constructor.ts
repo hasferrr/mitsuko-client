@@ -210,7 +210,6 @@ function transcriptionConstructor(transcription: Partial<Transcription>): Transc
     selectedMode: transcription.selectedMode ?? "sentence",
     customInstructions: transcription.customInstructions ?? "",
     models: transcription.models ?? "premium",
-    isOverOneHour: transcription.isOverOneHour ?? false,
     createdAt: transcription.createdAt ?? new Date(),
     updatedAt: transcription.updatedAt ?? new Date(),
     projectId: transcription.projectId ?? "",
