@@ -67,6 +67,8 @@ export default function HistoryView() {
     onSuccess: () => {
       toast.success('Transcription deleted')
       queryClient.invalidateQueries({ queryKey: ['transcriptionLogs'] })
+      setIsDeleteDialogOpen(false)
+      setPendingDeleteId(null)
     },
     onError: (error: Error) => {
       toast.error('Failed to delete transcription', {
