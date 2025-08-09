@@ -67,7 +67,6 @@ export default function PricingDescription() {
           </h3>
           <p>
             Background processing allows audio transcriptions to run on our server even if you close the browser tab.
-            <br />
             This means you don't have to wait for the process to finish.
           </p>
         </div>

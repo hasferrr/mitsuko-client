@@ -9,7 +9,7 @@ const generalFeaturesList = [
   },
   {
     feature: "Subtitle Translation",
-    description: "Translate subtitles (SRT & ASS) using all available AI models for over 100+ languages.",
+    description: "Translate subtitles (SRT, VTT, ASS) using all available AI models for over 100+ languages.",
   },
   {
     feature: "Extract Context Feature",

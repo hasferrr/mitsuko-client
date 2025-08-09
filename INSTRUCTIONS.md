@@ -123,7 +123,6 @@ This is the main source code folder for the Next.js application. All application
     - `layout.tsx`: The root layout for the entire application. It sets up the HTML shell, including fonts, metadata, and global providers.
     - `globals.css`: Global styles and Tailwind CSS base layers. Defines the application's color palette and default styles.
     - `manifest.ts`, `robots.ts`, `sitemap.ts`: These files configure the application's metadata for SEO and PWA functionality.
-    - `og/page.tsx`: A special route for generating Open Graph images for social media sharing.
     - **`(landing)/`**: A route group for all public-facing pages (e.g., home, pricing, terms). It has its own `layout.tsx` that defines the navigation and footer for the landing site.
       - `page.tsx`: The main landing page.
       - `pricing/page.tsx`: The pricing page.
@@ -133,6 +132,7 @@ This is the main source code folder for the Next.js application. All application
       - `dashboard/page.tsx`: The main dashboard page after a user logs in.
       - `project/page.tsx`: Displays the contents and tasks within a single project.
       - `library/page.tsx`: Hosts the custom instruction Library, rendering `LibraryView` and its tabs.
+      - `history/page.tsx`: Transcription History with redesigned UI and log viewer.
       - `tools/page.tsx`: Central hub for supplementary utilities (e.g., subtitle tools, viewers).
       - `batch/page.tsx`, `translate/page.tsx`, `transcribe/page.tsx`, `extract-context/page.tsx`: These are the main pages for the core application features.
 
@@ -148,6 +148,8 @@ This is the main source code folder for the Next.js application. All application
       - `extract-context/context-extractor-main.tsx`: The main container component housing all logic and UI for context extraction.
       - `transcribe/transcription.tsx`: A thin wrapper component that loads project data and renders `TranscriptionMain`.
       - `transcribe/transcription-main.tsx`: The main container component responsible for the entire audio transcription workflow.
+      - `history/history-panel.tsx`: Main history list UI with table and actions.
+      - `history/history-item-details.tsx`: Dialog for viewing a single history item’s details.
       - `dashboard/welcome-view.tsx`: The main component for the dashboard, showing options to start new tasks and recent projects.
       - `sidebar/app-sidebar.tsx`: The main sidebar component for the application.
       - `auth/login.tsx`: A component handling the user authentication form and user settings display.
@@ -207,10 +209,12 @@ This is the main source code folder for the Next.js application. All application
       - `user-credit.ts`: Fetches the current user's credit balance.
       - `transaction.ts`: Fetches the user's transaction history.
       - `subtitle-log.ts`: Sends subtitle data to the server for logging and analysis.
+      - `transcription-log.ts`: Sends transcription data to the server for logging and analysis.
       - `get-model-cost-data.ts`: Retrieves the current pricing for various AI models.
       - `feedback.ts`: Submits user feedback to the backend.
       - `create-snap-payment.ts`: Initiates a payment process with the Midtrans payment gateway.
       - `credit-batch.ts`: Fetches information about credit batches granted to a user.
+      - `credit-reservations.ts`: Manages temporary holds of credits during processing.
       - `custom-instruction.ts`: Handles CRUD operations for public and private custom instructions (publish, fetch, delete).
     - **`db/`**: The entire client-side database layer, built with **Dexie.js**.
       - `db.ts`: Defines the Dexie database schema, including all tables, their versions, and migration logic.
@@ -300,6 +304,7 @@ This is the main source code folder for the Next.js application. All application
     - `request.ts`: Defines the `RequestType` for API calls (e.g., `free`, `paid`).
     - `snap.ts`: Contains types for interacting with the Midtrans Snap payment gateway.
     - `transaction.ts`: Defines the `Transaction` type for recording credit usage.
+    - `transcription-log.ts`: Defines types for transcription logging entries.
     - `user.ts`: Defines the `UserCreditData` type.
     - `custom-instruction.ts`: Defines the CustomInstruction interface.
 
@@ -400,15 +405,16 @@ The application supports full data portability through JSON export and import. T
 
 ### 7. Dependencies
 
-The project relies on a number of key dependencies to function. This is not an exhaustive list, but it highlights the most important libraries and their roles.
+ The project relies on a number of key dependencies to function. This is not an exhaustive list, but it highlights the most important libraries and their roles.
 
--   **`next`**: The core React framework for building the application.
--   **`react`**: The UI library for building components.
--   **`tailwindcss`**: A utility-first CSS framework for styling.
--   **`@radix-ui/react-*`**: A collection of unstyled, accessible UI primitives that form the basis of Shadcn UI.
--   **`shadcn-ui`**: The component library used for building the user interface.
--   **`zustand`**: A small, fast, and scalable state management library.
--   **`dexie`**: A wrapper for IndexedDB that makes it easier to work with client-side databases.
--   **`@dnd-kit/core`**: A lightweight, modular library for building drag-and-drop interfaces.
--   **`@supabase/supabase-js`**: The official JavaScript library for interacting with Supabase for authentication.
--   **`bun`**: The JavaScript runtime used for development and building the project.
+ -   **`next`**: The core React framework for building the application.
+ -   **`react`** / **`react-dom`**: The UI library and DOM renderer.
+ -   **`tailwindcss`**, **`tailwind-merge`**, **`tailwindcss-animate`**: Styling utilities and animations.
+ -   **`@radix-ui/react-*`**: Accessible UI primitives. Shadcn-generated components live in `src/components/ui`.
+ -   **`zustand`** and **`@tanstack/react-query`**: Client and server state management.
+ -   **`dexie`**: IndexedDB wrapper for robust client-side persistence.
+ -   **`@dnd-kit/*`**: Drag-and-drop utilities for interactive lists.
+ -   **`@supabase/supabase-js`**: Authentication and Supabase client.
+ -   **`lucide-react`**, **`sonner`**, **`next-themes`**, **`vaul`**, **`react-day-picker`**: Icons, toasts, theming, drawers, and date picker.
+ -   **`react-markdown`** + **`rehype-raw`**, **`recharts`**, **`framer-motion`**, **`jszip`**, **`sharp`**: Rendering, charts, animations, archiving, and image processing.
+ -   **Runtime: Bun**
