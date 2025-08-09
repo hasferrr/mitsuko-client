@@ -36,7 +36,7 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
 export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models" | "isOverOneHour"> = {
   selectedMode: "sentence",
   customInstructions: "",
-  models: "premium",
+  models: null,
   isOverOneHour: false,
 }
 

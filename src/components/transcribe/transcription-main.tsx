@@ -144,19 +144,27 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   }
 
   const handleStartTranscription = async () => {
+    await saveData(currentId)
+
+    if (!file) {
+      toast.error("No file selected")
+      return
+    }
+    if (file.size > MAX_TRANSCRIPTION_SIZE) {
+      toast.error(`File size must be less than ${MAX_TRANSCRIPTION_SIZE / (1024 * 1024)}MB`)
+      return
+    }
+    if (!models) {
+      toast.error("Please select a model")
+      return
+    }
+
     setTimeout(() => {
       window.scrollTo({
         top: 0,
         behavior: "smooth",
       })
     }, 300)
-
-    await saveData(currentId)
-
-    if (!file) throw new Error("No file selected")
-    if (file.size > MAX_TRANSCRIPTION_SIZE) {
-      throw new Error(`File size must be less than ${MAX_TRANSCRIPTION_SIZE / (1024 * 1024)}MB`)
-    }
 
     setIsTranscribing(currentId, true)
     setHasChanges(true)
@@ -514,7 +522,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                     <AiStreamOutput
                       content={transcriptionText || "Transcription will appear here..."}
                       isProcessing={isTranscribing}
-                      defaultCollapsed
+                      defaultCollapsed={!!transcriptionText}
                     />
                   </div>
                 )}

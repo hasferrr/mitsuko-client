@@ -44,7 +44,7 @@ export interface Transcription {
   transcriptSubtitles: Subtitle[]
   selectedMode: "clause" | "sentence"
   customInstructions: string
-  models: "premium" | "free"
+  models: "premium" | "premium-fast" | "free" | null
   isOverOneHour: boolean
   createdAt: Date
   updatedAt: Date

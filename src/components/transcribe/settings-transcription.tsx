@@ -9,14 +9,16 @@ import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-
 import { Transcription } from "@/types/project"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
 
 const languages = [
   { value: "auto", label: "Auto-detect" },
 ]
 
 const models = [
-  { value: "free", label: "Mitsuko (Free Trial)" },
-  { value: "premium", label: "Mitsuko (Premium)" },
+  { value: "free", label: "Mitsuko" },
+  { value: "premium", label: "Mitsuko" },
+  { value: "premium-fast", label: "Mitsuko-Fast" },
 ]
 
 const modes = [
@@ -42,7 +44,7 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
   const _setCustomInstructions = useTranscriptionDataStore((state) => state.setCustomInstructions)
   const _setIsOverOneHour = useTranscriptionDataStore((state) => state.setIsOverOneHour)
 
-  const setSelectedModel = (model: Transcription["models"]) => {
+  const setSelectedModel = (model: Exclude<Transcription["models"], null>) => {
     _setModels(transcriptionId, model)
     saveData(transcriptionId)
   }
@@ -91,14 +93,22 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
       {/* Model Selection */}
       <div>
         <label className="text-sm text-muted-foreground block mb-1">Model</label>
-        <Select value={selectedModel} onValueChange={setSelectedModel}>
+        <Select value={selectedModel ?? undefined} onValueChange={setSelectedModel}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a model" />
           </SelectTrigger>
           <SelectContent>
             {models.map((model) => (
               <SelectItem key={model.value} value={model.value}>
-                {model.label}
+                <div className="flex items-center gap-2">
+                  {model.label}
+                  <Badge
+                    variant={model.value.includes("free") ? "secondary" : "default"}
+                    className="text-xs px-2 h-[1.125rem]"
+                  >
+                    {model.value.includes("free") ? "Free" : "Premium"}
+                  </Badge>
+                </div>
               </SelectItem>
             ))}
           </SelectContent>
