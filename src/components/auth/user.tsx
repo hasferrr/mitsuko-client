@@ -4,6 +4,7 @@ import Link from "next/link"
 import { capitalize, cn } from "@/lib/utils"
 import { RefreshCw, Plus } from "lucide-react"
 import { Button } from "../ui/button"
+import { Skeleton } from "../ui/skeleton"
 import { UserCreditData } from "@/types/user"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useQuery } from "@tanstack/react-query"
@@ -213,11 +214,19 @@ export function User() {
           </thead>
           <tbody>
             {isTransactionsLoading ? (
-              <tr>
-                <td colSpan={3} className="p-4 text-center text-muted-foreground">
-                  Loading transactions...
-                </td>
-              </tr>
+              Array.from({ length: 10 }).map((_, index) => (
+                <tr key={index} className="border-b last:border-0">
+                  <td className="px-4 py-2 h-10">
+                    <Skeleton className="h-4 w-32" />
+                  </td>
+                  <td className="px-4 py-2 h-10">
+                    <Skeleton className="h-4 w-16" />
+                  </td>
+                  <td className="px-4 py-2 h-10">
+                    <Skeleton className="h-4 w-24" />
+                  </td>
+                </tr>
+              ))
             ) : isTransactionsError ? (
               <tr>
                 <td colSpan={3} className="p-4 text-center text-red-500">
@@ -337,11 +346,22 @@ export function User() {
           </thead>
           <tbody>
             {isCreditBatchesLoading ? (
-              <tr>
-                <td colSpan={4} className="p-4 text-center text-muted-foreground">
-                  Loading credit grants...
-                </td>
-              </tr>
+              Array.from({ length: 3 }).map((_, index) => (
+                <tr key={index} className="border-b last:border-0">
+                  <td className="px-4 py-2 h-10">
+                    <Skeleton className="h-4 w-20" />
+                  </td>
+                  <td className="px-4 py-2 h-10">
+                    <Skeleton className="h-4 w-16 rounded-full" />
+                  </td>
+                  <td className="px-4 py-2 h-10">
+                    <Skeleton className="h-4 w-24" />
+                  </td>
+                  <td className="px-4 py-2 h-10">
+                    <Skeleton className="h-4 w-20" />
+                  </td>
+                </tr>
+              ))
             ) : isCreditBatchesError ? (
               <tr>
                 <td colSpan={4} className="p-4 text-center text-red-500">
