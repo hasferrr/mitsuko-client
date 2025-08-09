@@ -37,6 +37,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
 import LogResultDialog from './log-result-dialog'
 import { deleteTranscriptionLog } from '@/lib/api/transcription-log'
 import { toast } from 'sonner'
@@ -44,7 +45,7 @@ import { DeleteDialogue } from '@/components/ui-custom/delete-dialogue'
 import { useSessionStore } from '@/stores/use-session-store'
 import { fetchBackgroundTranscriptionCount } from '@/lib/api/credit-reservations'
 
-const ITEMS_PER_PAGE = 10
+const ITEMS_PER_PAGE = 5
 
 export default function HistoryView() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -237,18 +238,82 @@ export default function HistoryView() {
       </div>
 
       {/* Content Section */}
-      {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-          <h3 className="text-lg font-medium mb-2">
-            Loading your files
-          </h3>
-          <p className="text-muted-foreground text-sm">
-            Please wait while we fetch your transcription history...
-          </p>
+      {isLoading || !session ? (
+        <div className="space-y-6">
+          <Card className="border-dashed">
+            <CardHeader className="py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-4 w-4 rounded-full" />
+                  <div className="h-9">
+                    <Skeleton className="h-4 w-32 mb-1" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+
+          {/* Skeleton Table */}
+          <div className="rounded-lg border bg-card px-4">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="font-semibold">File Name</TableHead>
+                  <TableHead className="font-semibold">Created</TableHead>
+                  <TableHead className="font-semibold">Costs</TableHead>
+                  <TableHead className="font-semibold">Model</TableHead>
+                  <TableHead className="font-semibold text-center">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="py-4 min-w-[250px] max-w-[250px] lg:min-w-[300px] lg:max-w-[400px]">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="flex-shrink-0 w-10 h-10 rounded-lg" />
+                        <div className="w-full">
+                          <Skeleton className="h-4 w-full mb-2" />
+                          <Skeleton className="h-3 w-20" />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-4 w-4 rounded-full" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-4 w-4 rounded-full" />
+                        <Skeleton className="h-4 w-12" />
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <Skeleton className="h-4 w-16 rounded-full" />
+                    </TableCell>
+                    <TableCell className="py-4 text-center">
+                      <div className="inline-flex items-center justify-center gap-1">
+                        <Skeleton className="h-6 w-20" />
+                        <Skeleton className="h-6 w-20" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+              <TableFooter className="bg-card">
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={5} className="py-4">
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </div>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16">
+        <div className="flex flex-col items-center justify-center py-16 border border-dashed rounded-lg">
           <FileAudio2 className="h-8 w-8 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium mb-2">
             {searchQuery

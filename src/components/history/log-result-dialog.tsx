@@ -11,17 +11,18 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Calendar,
   CircleDollarSign,
   Download,
   FileAudio2,
-  Loader2,
 } from "lucide-react"
 import { TranscriptionLogItem } from "@/types/transcription-log"
 import { parseTranscription } from "@/lib/parser/parser"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 interface LogResultDialogProps {
   log: TranscriptionLogItem | null
@@ -144,11 +145,24 @@ export default function LogResultDialog({ log, onOpenChange }: LogResultDialogPr
 
         <div className="min-h-0 flex flex-col">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-              <h3 className="font-medium mb-2">Processing transcription</h3>
-              <p className="text-sm text-muted-foreground">Please wait while we fetch the result...</p>
-            </div>
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-5 w-24" />
+              </div>
+              <div className="h-full min-h-96 w-full rounded-lg border bg-muted/10 p-3 space-y-2">
+                {Array.from({ length: 12 }).map((_, index) => (
+                  <Skeleton
+                    key={index}
+                    className={cn("h-4", {
+                      "w-3/4": index % 4 === 3,
+                      "w-5/6": index % 3 === 2,
+                      "w-full": index % 4 !== 3 && index % 3 !== 2
+                    })}
+                  />
+                ))}
+              </div>
+            </>
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-12">
               <div className="w-12 h-12 mb-4 bg-destructive/10 rounded-full flex items-center justify-center">
