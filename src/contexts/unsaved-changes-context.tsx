@@ -23,7 +23,8 @@ export default function UnsavedChangesProvider({ children }: PropsWithChildren) 
 
     window.addEventListener("beforeunload", handler)
     return () => window.removeEventListener("beforeunload", handler)
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasChangesRef.current])
 
   return (
     <UnsavedChangesContext.Provider value={{ hasChangesRef, setHasChanges }}>
