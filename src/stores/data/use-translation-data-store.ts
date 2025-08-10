@@ -9,27 +9,6 @@ import {
 } from "@/lib/db/translation"
 import { db } from "@/lib/db/db"
 
-// Throttle store writes
-const THROTTLE_LIMIT = 100
-const lastUpdateMap: Record<string, number> = {}
-const pendingTimeouts: Record<string, ReturnType<typeof setTimeout>> = {}
-const throttleUpdate = (key: string, fn: () => void): void => {
-  const now = Date.now()
-  const last = lastUpdateMap[key] ?? 0
-  const timeSinceLast = now - last
-  if (timeSinceLast >= THROTTLE_LIMIT) {
-    lastUpdateMap[key] = now
-    fn()
-  } else {
-    if (pendingTimeouts[key]) clearTimeout(pendingTimeouts[key])
-    pendingTimeouts[key] = setTimeout(() => {
-      lastUpdateMap[key] = Date.now()
-      delete pendingTimeouts[key]
-      fn()
-    }, THROTTLE_LIMIT - timeSinceLast)
-  }
-}
-
 export interface TranslationDataStore {
   currentId: string | null
   data: Record<string, Translation>
@@ -47,6 +26,7 @@ export interface TranslationDataStore {
   // Existing methods
   setCurrentId: (id: string | null) => void
   mutateData: <T extends keyof Translation>(id: string, key: T, value: Translation[T]) => void
+  mutateDataNoRender: <T extends keyof Translation>(id: string, key: T, value: Translation[T]) => void
   saveData: (id: string) => Promise<void>
   upsertData: (id: string, value: Translation) => void
   removeData: (id: string) => void
@@ -126,6 +106,11 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       }
     })
   },
+  mutateDataNoRender: (id, key, value) => {
+    const data = get().data[id]
+    if (!data) return
+    data[key] = value
+  },
   saveData: async (id) => {
     const translation = get().data[id]
     if (!translation) {
@@ -178,16 +163,16 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
   setResponse: (id, res) => {
     const translation = get().data[id]
     if (!translation) return
-    throttleUpdate(`resp-${id}`, () => {
+    if (get().currentId === id) {
       get().mutateData(id, "response", { ...translation.response, response: res })
-    })
+    } else {
+      get().mutateDataNoRender(id, "response", { ...translation.response, response: res })
+    }
   },
   setJsonResponse: (id, jsonRes) => {
     const translation = get().data[id]
     if (!translation) return
-    throttleUpdate(`json-${id}`, () => {
-      get().mutateData(id, "response", { ...translation.response, jsonResponse: jsonRes })
-    })
+    get().mutateData(id, "response", { ...translation.response, jsonResponse: jsonRes })
   },
   appendJsonResponse: (id, arr) => {
     const translation = get().data[id]

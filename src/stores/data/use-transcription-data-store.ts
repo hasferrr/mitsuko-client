@@ -34,6 +34,7 @@ interface TranscriptionDataStore {
   setModels: (id: string, models: Transcription["models"]) => void
   // data manipulation methods
   mutateData: <T extends keyof Transcription>(id: string, key: T, value: Transcription[T]) => void
+  mutateDataNoRender: <T extends keyof Transcription>(id: string, key: T, value: Transcription[T]) => void
   saveData: (id: string) => Promise<void>
   upsertData: (id: string, value: Transcription) => void
   removeData: (id: string) => void
@@ -102,7 +103,11 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     get().mutateData(id, "title", title)
   },
   setTranscriptionText: (id, transcriptionText) => {
-    get().mutateData(id, "transcriptionText", transcriptionText)
+    if (get().currentId === id) {
+      get().mutateData(id, "transcriptionText", transcriptionText)
+    } else {
+      get().mutateDataNoRender(id, "transcriptionText", transcriptionText)
+    }
   },
   setTranscriptSubtitles: (id, subtitles) => {
     get().mutateData(id, "transcriptSubtitles", subtitles)
@@ -127,6 +132,11 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
         }
       }
     }))
+  },
+  mutateDataNoRender: (id, key, value) => {
+    const data = get().data[id]
+    if (!data) return
+    data[key] = value
   },
   saveData: async (id) => {
     const transcription = get().data[id]

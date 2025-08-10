@@ -33,6 +33,7 @@ export interface ExtractionDataStore {
   setContextResult: (id: string, contextResult: string) => void
   // data manipulation methods
   mutateData: <T extends keyof Extraction>(id: string, key: T, value: Extraction[T]) => void
+  mutateDataNoRender: <T extends keyof Extraction>(id: string, key: T, value: Extraction[T]) => void
   saveData: (id: string) => Promise<void>
   upsertData: (id: string, value: Extraction) => void
   removeData: (id: string) => void
@@ -100,7 +101,11 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
     get().mutateData(id, "previousContext", previousContext)
   },
   setContextResult: (id, contextResult) => {
-    get().mutateData(id, "contextResult", contextResult)
+    if (get().currentId === id) {
+      get().mutateData(id, "contextResult", contextResult)
+    } else {
+      get().mutateDataNoRender(id, "contextResult", contextResult)
+    }
   },
 
   // data manipulation methods
@@ -119,6 +124,11 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
         }
       }
     })
+  },
+  mutateDataNoRender: (id, key, value) => {
+    const data = get().data[id]
+    if (!data) return
+    data[key] = value
   },
   saveData: async (id) => {
     const extraction = get().data[id]
