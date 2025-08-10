@@ -44,7 +44,7 @@ export function Login() {
     if (!session && isThirdPartyModelEnabled) {
       toggleThirdPartyModel()
     }
-  }, [session, isThirdPartyModelEnabled])
+  }, [session, isThirdPartyModelEnabled, toggleThirdPartyModel])
 
   const signUp = async () => {
     await supabase.auth.signInWithOAuth({

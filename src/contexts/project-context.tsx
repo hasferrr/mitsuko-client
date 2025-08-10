@@ -10,7 +10,7 @@ export default function ProjectStoreProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     loadProjects()
-  }, [])
+  }, [loadProjects])
 
   return (
     <ProjectStoreContext.Provider value={undefined}>

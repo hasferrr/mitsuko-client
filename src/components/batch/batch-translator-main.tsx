@@ -142,7 +142,7 @@ export default function BatchTranslatorMain() {
     if (currentProject?.translations) {
       setOrder(currentProject.translations)
     }
-  }, [currentProject?.translations?.join("-")])
+  }, [currentProject?.translations])
 
   // Translation Data Store
   const translationData = useTranslationDataStore((state) => state.data)

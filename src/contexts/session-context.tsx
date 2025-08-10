@@ -27,7 +27,7 @@ export default function SessionStoreProvider({ children }: PropsWithChildren) {
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [setSession])
 
   return (
     <SessionStoreContext.Provider value={undefined}>

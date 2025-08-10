@@ -23,7 +23,7 @@ export default function UnsavedChangesProvider({ children }: PropsWithChildren) 
 
     window.addEventListener("beforeunload", handler)
     return () => window.removeEventListener("beforeunload", handler)
-  }, [hasChangesRef.current])
+  }, [])
 
   return (
     <UnsavedChangesContext.Provider value={{ hasChangesRef, setHasChanges }}>

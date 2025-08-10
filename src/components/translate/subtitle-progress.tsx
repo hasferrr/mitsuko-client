@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
 
@@ -24,7 +24,9 @@ interface SubtitleCountProps {
 export const SubtitleProgress = ({ isOpen, setIsOpen, children }: SubtitleCountProps) => {
   const currentId = useTranslationDataStore((state) => state.currentId)
   const translationData = useTranslationDataStore((state) => state.data)
-  const subtitles = currentId ? translationData[currentId]?.subtitles ?? [] : []
+  const subtitles = useMemo(() => (currentId ? translationData[currentId]?.subtitles ?? [] : []),
+    [currentId, translationData]
+  )
 
   const [translatedCount, setTranslatedCount] = useState<number | null>(null)
   const [originalCount, setOriginalCount] = useState<number | null>(null)

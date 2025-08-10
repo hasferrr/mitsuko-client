@@ -1,6 +1,6 @@
 "use client"
 
-import { memo, useEffect, useRef, useState } from "react"
+import { memo, useRef, useState, useMemo } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { Button } from "@/components/ui/button"
@@ -21,7 +21,6 @@ export const SubtitleResultOutput = memo(() => {
   const translation = currentId ? translationData[currentId] : null
   const subtitles = translation?.subtitles ?? []
   const response = translation?.response.response ?? ""
-  const jsonResponse = translation?.response.jsonResponse ?? []
   const isTranslating = isTranslatingSet.has(currentId ?? "")
 
   // State
@@ -33,41 +32,31 @@ export const SubtitleResultOutput = memo(() => {
   const topTextareaRef = useRef<HTMLTextAreaElement | null>(null)
   const bottomTextareaRef = useRef<HTMLTextAreaElement | null>(null)
 
-  const jsonText = jsonResponse.length ? `[${jsonResponse.map(s => JSON.stringify(s, null, 2))}]` : ""
+  const jsonResponse = useMemo(() => translation?.response.jsonResponse ?? [], [translation])
+
+  const jsonText = useMemo(() => {
+    if (!jsonResponse?.length) return ""
+    return JSON.stringify(jsonResponse, null, 2)
+  }, [jsonResponse])
 
   useAutoScroll(response, topContainerRef, 500)
   useAutoScroll(response, topTextareaRef)
-
-  useEffect(() => {
-    if (isParseError) {
-      setIsParseError(false)
-    }
-  }, [editValue])
-
-  useEffect(() => {
-    setEditValue(jsonText)
-    if (isParseError) {
-      setIsParseError(false)
-    }
-  }, [isEditing])
-
-  useEffect(() => {
-    if (isTranslating) {
-      setIsEditing(false)
-    }
-  }, [isTranslating])
 
   const handleChangeJSONInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditValue(e.target.value)
   }
 
   const handleEditText = () => {
+    setEditValue(jsonText)
     bottomTextareaRef.current?.focus()
     setIsEditing(true)
   }
 
   const handleCancelEdit = () => {
     setIsEditing(false)
+    if (isParseError) {
+      setIsParseError(false)
+    }
   }
 
   const handleParseAndSave = () => {
@@ -83,6 +72,9 @@ export const SubtitleResultOutput = memo(() => {
       return
     }
     setIsEditing(false)
+    if (isParseError) {
+      setIsParseError(false)
+    }
   }
 
   const handleApply = async () => {

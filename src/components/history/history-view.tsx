@@ -108,17 +108,17 @@ export default function HistoryView() {
     enabled: !!session?.user?.id,
   })
 
-  const logs = paged?.data ?? []
   const totalPages = paged?.totalPages ?? 1
 
   const filtered = useMemo(() => {
+    const logs = paged?.data ?? []
     if (!searchQuery) return logs
     const q = searchQuery.toLowerCase()
     return logs.filter(item =>
       item.metadata.originalname?.toLowerCase().includes(q) ||
       item.reqModels?.toLowerCase().includes(q)
     )
-  }, [logs, searchQuery])
+  }, [paged?.data, searchQuery])
 
   const formatDate = (iso: string) => {
     const d = new Date(iso)

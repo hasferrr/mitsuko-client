@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, RefObject } from 'react'
 
 export const useAutoScroll = <T extends HTMLElement>(
@@ -14,5 +16,5 @@ export const useAutoScroll = <T extends HTMLElement>(
         ref.current.scrollTop = scrollHeight
       }
     }
-  }, [dependency, ref])
+  }, [dependency, offset, ref])
 }
