@@ -560,6 +560,20 @@ export const PAID_MODELS: PaidModelCollection = {
         }
       },
       {
+        name: "DeepSeek R1 (Fast)",
+        subName: "DeepSeek-R1-0528⚡\nIf fast version not available, routed to normal version",
+        maxInput: 128000,
+        maxOutput: 64000,
+        structuredOutput: true,
+        isPaid: true,
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 64000,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "DeepSeek V3",
         subName: "DeepSeek-V3-0324",
         maxInput: 128000,
