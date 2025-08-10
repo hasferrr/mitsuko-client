@@ -171,8 +171,9 @@ export function ModelSelector({
                 )}>
                   {value.models.map((model) => (
                     <ModelItem
-                      key={`${model.name}-${model.isPaid ? "paid" : "free"}`}
+                      key={`${model.name}-${value.provider}-${model.isPaid ? "paid" : "free"}`}
                       model={model}
+                      modelKey={key}
                       cost={model.isPaid ? modelCostsMap.get(model.name) : undefined}
                       isSelected={
                         modelDetail?.name === model.name &&
@@ -195,18 +196,19 @@ export function ModelSelector({
 
 interface ModelItemProps {
   model: Model
+  modelKey: string
   cost?: ModelCreditCost
   isSelected: boolean
   onSelect: () => void
 }
 
-function ModelItem({ model, cost, isSelected, onSelect }: ModelItemProps) {
+function ModelItem({ model, modelKey, cost, isSelected, onSelect }: ModelItemProps) {
   return (
     <HoverCard openDelay={0} closeDelay={0}>
       <HoverCardTrigger asChild>
         <CommandItem
           onSelect={onSelect}
-          value={`${model.name}-${model.isPaid ? "paid" : "free"}`}
+          value={`${model.name}-${modelKey}-${model.isPaid ? "premium" : "free"}`}
         >
           {model.name}
           {cost && cost.discount > 0 && (
@@ -248,7 +250,9 @@ function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
       <h4 className="font-bold mb-1">{model.name}</h4>
       {model.subName && (
         <p className="text-xs text-muted-foreground mb-1">
-          {model.subName}
+          {model.subName.split("\n").map((line, index) => (
+            <span key={index} className="block">{line}</span>
+          ))}
         </p>
       )}
       <div>
