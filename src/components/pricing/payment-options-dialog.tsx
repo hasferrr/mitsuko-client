@@ -273,7 +273,7 @@ export function PaymentOptionsDialog({
               <div className="flex-grow">
                 <div className="font-medium text-sm mb-1">Pay with Lemon Squeezy</div>
                 <p className="text-xs text-muted-foreground">
-                  {isFetchingPayment ? "Preparing secure payment..." : "Proceed to Lemon Squeezy. A fee of 10% + $1 applies."}
+                  {isFetchingPayment ? "Preparing secure payment..." : "Proceed to Lemon Squeezy. A small fee applies."}
                 </p>
               </div>
             </button>
