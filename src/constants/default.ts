@@ -2,7 +2,7 @@ import { SubtitleTranslated } from "@/types/subtitles"
 import { FREE_MODELS } from "./model-collection"
 import { AdvancedSettings, BasicSettings, Transcription } from "@/types/project"
 
-export const MAX_TRANSCRIPTION_SIZE = 1024 * 1024 * 100
+export const MAX_FILE_SIZE = 1024 * 1024 * 200
 
 export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> = {
   sourceLanguage: "Japanese",

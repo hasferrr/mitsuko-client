@@ -34,7 +34,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 import { DeleteDialogue } from '@/components/ui-custom/delete-dialogue'
 import { useSessionStore } from '@/stores/use-session-store'
-import { MAX_TRANSCRIPTION_SIZE } from '@/constants/default'
+import { MAX_FILE_SIZE } from '@/constants/default'
 
 const getFileIcon = (contentType?: string) => {
   if (contentType?.startsWith('audio/')) return FileText
@@ -188,9 +188,9 @@ export default function CloudFilesList() {
     }
 
     // Validate file size
-    if (file.size > MAX_TRANSCRIPTION_SIZE) {
+    if (file.size > MAX_FILE_SIZE) {
       toast.error('File too large', {
-        description: `Please select a file smaller than ${formatFileSize(MAX_TRANSCRIPTION_SIZE)}`
+        description: `Please select a file smaller than ${formatFileSize(MAX_FILE_SIZE)}`
       })
       return
     }

@@ -54,7 +54,7 @@ import { useClientIdStore } from "@/stores/use-client-id-store"
 import { Input } from "@/components/ui/input"
 import { SettingsTranscription } from "./settings-transcription"
 import { uploadFile } from "@/lib/api/file-upload"
-import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
+import { MAX_FILE_SIZE } from "@/constants/default"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -333,7 +333,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       toast.error("Invalid file type", { description: "Please select an audio file" })
       return
     }
-    if (selectedFile.size > MAX_TRANSCRIPTION_SIZE) {
+    if (selectedFile.size > MAX_FILE_SIZE) {
       toast.error("File too large", { description: "Please choose smaller file" })
       return
     }
@@ -453,7 +453,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                     >
                       <Upload className="h-10 w-10 text-muted-foreground mb-3" />
                       <p className="text-muted-foreground text-sm mb-1">Click to upload or drag and drop</p>
-                      <p className="text-muted-foreground text-xs">AAC, FLAC, MP3, and more (max {Math.round(MAX_TRANSCRIPTION_SIZE / 1024 / 1024)}MB)</p>
+                      <p className="text-muted-foreground text-xs">AAC, FLAC, MP3, and more (max {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB)</p>
                     </div>
                   </DragAndDrop>
                 )}
@@ -493,8 +493,8 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                         <p>
                           {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
                         </p>
-                        {file.size > MAX_TRANSCRIPTION_SIZE &&
-                          <p className="text-red-500">File size exceeds {Math.round(MAX_TRANSCRIPTION_SIZE / 1024 / 1024)}MB</p>}
+                        {file.size > MAX_FILE_SIZE &&
+                          <p className="text-red-500">File size exceeds {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB</p>}
                       </div>
                     </div>
                     <Button
