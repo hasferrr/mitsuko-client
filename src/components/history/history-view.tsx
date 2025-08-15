@@ -343,7 +343,7 @@ export default function HistoryView() {
                   )}
                   <div>
                     <div className="text-sm font-medium">
-                      Background processing
+                      Audio Transcription
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {isBgLoading
