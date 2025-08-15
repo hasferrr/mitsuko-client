@@ -2,7 +2,6 @@ import { TRANSCRIPT_URL } from "@/constants/api"
 import { handleStream } from "@/lib/api/stream"
 import { create } from "zustand"
 import { RefObject } from "react"
-import { useClientIdStore } from "../use-client-id-store"
 
 interface TranscriptionStore {
   files: Record<string, File | null>
@@ -15,7 +14,7 @@ interface TranscriptionStore {
   stopTranscription: (id: string) => void
   startTranscription: (
     id: string,
-    formData: FormData,
+    requestBody: Record<string, unknown>,
     setResponse: (response: string) => void,
   ) => Promise<string>
 }
@@ -73,11 +72,11 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         })
       },
 
-      startTranscription: async (id, formData, setResponse) => {
+      startTranscription: async (id, requestBody, setResponse) => {
         const abortControllerRef = { current: new AbortController() }
         get().abortControllerMap.set(id, abortControllerRef)
 
-        formData.append("clientId", useClientIdStore.getState().clientId || "")
+        const bodyString = JSON.stringify(requestBody)
 
         const transcriptionText = await handleStream({
           setResponse,
@@ -85,8 +84,8 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
           isUseApiKey: false,
           apiKey: "",
           requestUrl: TRANSCRIPT_URL,
-          requestHeader: {},
-          requestBody: formData,
+          requestHeader: { "Content-Type": "application/json" },
+          requestBody: bodyString,
         })
         get().abortControllerMap.delete(id)
 

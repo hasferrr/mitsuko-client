@@ -6,25 +6,29 @@ import {
   Download,
   FileText,
   Globe,
-  Upload,
-  X,
   Wand2,
   Clock,
   File,
-  AudioWaveform,
-  Square,
   Loader2,
-  Edit,
-  Save,
-  ClipboardPaste,
+  Square,
+  Trash2,
   Trash,
+  Save,
+  Edit,
+  AudioWaveform,
+  ClipboardPaste,
+  RefreshCw,
+  Upload,
+  X,
 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DeleteDialogue } from "@/components/ui-custom/delete-dialogue"
+import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
+import { useUploadStore } from "@/stores/use-upload-store"
 import { timestampToString } from "@/lib/subtitles/timestamp"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
-import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { toast } from "sonner"
 import {
   AlertDialog,
@@ -40,18 +44,23 @@ import {
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
-import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
 import { parseTranscription } from "@/lib/parser/parser"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
+import { listUploads, deleteUpload } from "@/lib/api/uploads"
 import { UserCreditData } from "@/types/user"
+import { UploadFileMeta } from "@/types/uploads"
+import { useClientIdStore } from "@/stores/use-client-id-store"
 import { Input } from "@/components/ui/input"
 import { SettingsTranscription } from "./settings-transcription"
+import { uploadFile } from "@/lib/api/file-upload"
+import { MAX_TRANSCRIPTION_SIZE } from "@/constants/default"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { SubtitleTranslated } from "@/types/subtitles"
 import { useRouter } from "next/navigation"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
 import { cn } from "@/lib/utils"
 
@@ -60,12 +69,7 @@ interface TranscriptionMainProps {
 }
 
 export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
-  const transcriptionAreaRef = useRef<HTMLTextAreaElement>(null)
-  const transcriptionResultRef = useRef<HTMLDivElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const audioRef = useRef<HTMLAudioElement>(null)
-
-  // Get data store getters and setters
+  // Transcription data store
   const title = useTranscriptionDataStore(state => state.getTitle())
   const transcriptionText = useTranscriptionDataStore(state => state.getTranscriptionText())
   const transcriptSubtitles = useTranscriptionDataStore(state => state.getTranscriptSubtitles())
@@ -87,70 +91,110 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const stopTranscription = useTranscriptionStore((state) => state.stopTranscription)
   const isTranscribing = isTranscribingSet.has(currentId)
 
-  const session = useSessionStore((state) => state.session)
+  // Upload & Delete mutations
+  const uploadProgress = useUploadStore((state) => state.uploadProgress)
+  const isUploading = useUploadStore((state) => state.isUploading)
+  const setUploadProgress = useUploadStore((state) => state.setUploadProgress)
+  const setIsUploading = useUploadStore((state) => state.setIsUploading)
 
-  // Add lazy user data query that only executes manually
-  const { refetch: refetchUserData } = useQuery<UserCreditData>({
-    queryKey: ["user", session?.user?.id],
-    queryFn: fetchUserCreditData,
-    enabled: false, // Lazy query - won't run automatically
-    staleTime: 0, // Always refetch when requested
-  })
-
-  const router = useRouter()
+  // Other stores
   const createTranslationDb = useTranslationDataStore(state => state.createTranslationDb)
   const setTranslationCurrentId = useTranslationDataStore(state => state.setCurrentId)
   const currentProject = useProjectStore(state => state.currentProject)
   const loadProjects = useProjectStore(state => state.loadProjects)
+  const session = useSessionStore((state) => state.session)
 
+  // React Query
+  const queryClient = useQueryClient()
+
+  const {
+    data: uploads = [],
+    isLoading: isUploadsLoading,
+    isRefetching: isUploadsRefetching,
+    refetch: refetchUploads,
+  } = useQuery({
+    queryKey: ["uploads", session?.user?.id],
+    queryFn: () => listUploads(),
+    staleTime: Infinity,
+    enabled: !!session,
+  })
+
+  const { mutate: handleUpload } = useMutation({
+    mutationFn: (file: File) => uploadFile(file, setUploadProgress),
+    onMutate: () => {
+      setIsUploading(true)
+      setUploadProgress(null)
+    },
+    onSuccess: (uploadId) => {
+      toast.success("File uploaded successfully")
+      queryClient.invalidateQueries({ queryKey: ["uploads"] })
+      setUploadProgress(null)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+      setFileAndUrl(currentId, null)
+      setActiveTab("select")
+      if (uploadId) {
+        setSelectedUploadId(uploadId)
+        if (file) {
+          setTitle(currentId, file.name)
+        }
+      }
+    },
+    onError: (err: Error) => {
+      toast.error("Failed to upload file", { description: err.message })
+      setUploadProgress(null)
+    },
+    onSettled: () => setIsUploading(false),
+  })
+
+  const { mutate: deleteFile, isPending: isDeleting } = useMutation({
+    mutationFn: (uploadId: string) => deleteUpload(uploadId),
+    onSuccess: () => {
+      toast.success("File deleted")
+      queryClient.invalidateQueries({ queryKey: ["uploads"] })
+      setSelectedUploadId(null)
+      setIsDeleteDialogOpen(false)
+    },
+    onError: (err: Error) => toast.error("Failed to delete", { description: err.message }),
+  })
+
+  const { refetch: refetchUserData } = useQuery<UserCreditData>({
+    queryKey: ["user", session?.user?.id],
+    queryFn: fetchUserCreditData,
+    enabled: false,
+    staleTime: 0,
+  })
+
+  // State
   const [isEditing, setIsEditing] = useState(false)
+  const [selectedUploadId, setSelectedUploadId] = useState<string | null>(null)
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState("upload")
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
+  // Refs
+  const transcriptionAreaRef = useRef<HTMLTextAreaElement>(null)
+  const transcriptionResultRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Hooks
+  const router = useRouter()
   useAutoScroll(transcriptionText, transcriptionAreaRef)
   useAutoScroll(transcriptionText, transcriptionResultRef)
   const { setHasChanges } = useUnsavedChanges()
 
-  const isExceeded = file ? file.size > MAX_TRANSCRIPTION_SIZE : false
-  const maxMB = MAX_TRANSCRIPTION_SIZE / (1024 * 1024)
-
+  // Effects
   useEffect(() => {
     return () => {
       saveData(currentId)
     }
   }, [currentId, saveData])
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      setFileAndUrl(currentId, file)
-      setTitle(currentId, file.name)
-    }
-    e.target.value = ""
-  }
-
-  const handleDropFiles = (files: FileList) => {
-    if (files.length > 0) {
-      const file = files[0]
-      setFileAndUrl(currentId, file)
-      setTitle(currentId, file.name)
-    }
-  }
-
-  const handleUploadClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click()
-    }
-  }
-
   const handleStartTranscription = async () => {
     await saveData(currentId)
 
-    if (!file) {
-      toast.error("No file selected")
-      return
-    }
-    if (file.size > MAX_TRANSCRIPTION_SIZE) {
-      toast.error(`File size must be less than ${MAX_TRANSCRIPTION_SIZE / (1024 * 1024)}MB`)
+    if (!selectedUploadId) {
+      toast.error("No uploaded file selected")
       return
     }
     if (!models) {
@@ -168,17 +212,19 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     setIsTranscribing(currentId, true)
     setHasChanges(true)
 
-    const formData = new FormData()
-    formData.append("audio", file)
-    formData.append("selectedMode", selectedMode)
-    formData.append("customInstructions", customInstructions)
-    formData.append("models", models)
-    console.log({ file, selectedMode, customInstructions, models })
+    const requestBody = {
+      uploadId: selectedUploadId,
+      selectedMode,
+      customInstructions,
+      models,
+      clientId: useClientIdStore.getState().clientId || ""
+    }
+    console.log(requestBody)
 
     try {
       const text = await startTranscription(
         currentId,
-        formData,
+        requestBody,
         (text) => setTranscriptionText(currentId, text),
       )
       setTranscriptSubtitles(currentId, parseTranscription(text))
@@ -187,8 +233,12 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     } finally {
       setIsTranscribing(currentId, false)
 
-      // Refetch user data after transcription completes to update credits
+      // Refetch user data to update credits
       refetchUserData()
+
+      // Revalidate uploads list
+      queryClient.invalidateQueries({ queryKey: ["uploads"] })
+      await refetchUploads()
 
       await saveData(currentId)
     }
@@ -276,6 +326,56 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     setIsClearDialogOpen(false)
   }
 
+  const handleDropFiles = (files: FileList) => {
+    const selectedFile = files[0]
+    if (!selectedFile) return
+    if (!selectedFile.type.startsWith("audio/")) {
+      toast.error("Invalid file type", { description: "Please select an audio file" })
+      return
+    }
+    if (selectedFile.size > MAX_TRANSCRIPTION_SIZE) {
+      toast.error("File too large", { description: "Please choose smaller file" })
+      return
+    }
+
+    setTitle(currentId, selectedFile.name)
+    setFileAndUrl(currentId, selectedFile)
+  }
+
+  const handleSelectUpload = (upload: UploadFileMeta) => {
+    if (selectedUploadId === upload.uploadId) {
+      setSelectedUploadId(null)
+    } else {
+      setSelectedUploadId(upload.uploadId)
+      setTitle(currentId, upload.fileName)
+    }
+  }
+
+  const handleUploadSelectedFile = () => {
+    if (!file) return
+    handleUpload(file)
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  const formatDuration = (seconds: number) => {
+    if (seconds === 0) return 'N/A'
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const secs = Math.floor(seconds % 60)
+
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`
+  }
+
   const handleCreateTranslation = async () => {
     if (isTranscribing) return
     if (!transcriptSubtitles.length) {
@@ -328,56 +428,166 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] lg:grid-cols-[400px_1fr_1fr] gap-8">
         {/* Left Column - Upload & Controls */}
         <div className="md:col-span-1 space-y-6">
-          {/* File Upload */}
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h2 className="text-lg font-medium mb-4">Upload Audio</h2>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept=".aac,audio/wav,audio/mp3,audio/aiff,audio/ogg,audio/flac"
-              className="hidden"
-            />
-            {!file ? (
-              <DragAndDrop onDropFiles={handleDropFiles} disabled={isTranscribing}>
-                <div
-                  onClick={handleUploadClick}
-                  className="border-2 border-dashed border-border rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
-                >
-                  <Upload className="h-10 w-10 text-muted-foreground mb-3" />
-                  <p className="text-muted-foreground text-sm mb-1">Click to upload or drag and drop</p>
-                  <p className="text-muted-foreground text-xs">AAC, FLAC, MP3, and more (max {maxMB}MB)</p>
-                </div>
-              </DragAndDrop>
-            ) : (
-              <div className="border border-border rounded-lg p-4">
-                <div className="flex items-center mb-3">
-                  <File className="h-6 w-6 text-blue-500 mr-2" />
-                  <div className="flex-1 line-clamp-3 text-sm">{file.name}</div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                    onClick={() => {
-                      setFileAndUrl(currentId, null)
-                    }}
+          {/* File Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full grid grid-cols-2 mb-4">
+              <TabsTrigger value="upload" className="w-full">Upload</TabsTrigger>
+              <TabsTrigger value="select" className="w-full">Select</TabsTrigger>
+            </TabsList>
+
+            {/* Upload Tab */}
+            <TabsContent value="upload">
+              <div className="bg-card border border-border rounded-lg p-6 space-y-4">
+                <h2 className="text-lg font-medium">Upload Audio</h2>
+
+                {/* Drag and drop area */}
+                {!file && (
+                  <DragAndDrop
+                    onDropFiles={handleDropFiles}
+                    disabled={isUploading}
+                    className="rounded-lg"
                   >
-                    <X className="h-4 w-4" />
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="border-2 border-dashed border-border rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
+                    >
+                      <Upload className="h-10 w-10 text-muted-foreground mb-3" />
+                      <p className="text-muted-foreground text-sm mb-1">Click to upload or drag and drop</p>
+                      <p className="text-muted-foreground text-xs">AAC, FLAC, MP3, and more (max {Math.round(MAX_TRANSCRIPTION_SIZE / 1024 / 1024)}MB)</p>
+                    </div>
+                  </DragAndDrop>
+                )}
+                {/* Hidden input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".aac,audio/wav,audio/mp3,audio/aiff,audio/ogg,audio/flac"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      handleDropFiles(e.target.files)
+                    }
+                  }}
+                  className="hidden"
+                />
+
+                {file && (
+                  <div className="space-y-3">
+                    <div className="border border-border rounded-lg p-4">
+                      <div className="flex items-center mb-3">
+                        <File className="h-6 w-6 text-blue-500 mr-2" />
+                        <div className="flex-1 line-clamp-3 text-sm">{file.name}</div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => setFileAndUrl(currentId, null)}
+                          disabled={isUploading}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      {audioUrl && <audio controls className="w-full h-10 mb-2" src={audioUrl} />}
+
+                      <div className="text-xs text-muted-foreground flex flex-col">
+                        <p>
+                          {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
+                        </p>
+                        {file.size > MAX_TRANSCRIPTION_SIZE &&
+                          <p className="text-red-500">File size exceeds {Math.round(MAX_TRANSCRIPTION_SIZE / 1024 / 1024)}MB</p>}
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={handleUploadSelectedFile}
+                      disabled={isUploading || !session}
+                      className="w-full"
+                    >
+                      {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      Upload Selected File {uploadProgress && `(${uploadProgress.percentage}%)`}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
+            {/* Select Tab */}
+            <TabsContent value="select">
+              <div className="bg-card border border-border rounded-lg p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-medium">Select Uploaded Audio</h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => refetchUploads()}
+                    disabled={isUploadsRefetching}
+                  >
+                    {isUploadsRefetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                    Refresh
                   </Button>
                 </div>
 
-                {audioUrl && <audio ref={audioRef} controls className="w-full h-10 mb-2" src={audioUrl} />}
+                {isUploadsLoading ? (
+                  <p>Loading uploads...</p>
+                ) : uploads.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No uploaded files found. Please upload a file first.</p>
+                ) : (
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {uploads.map(upload => (
+                      <div
+                        key={upload.uploadId}
+                        onClick={() => handleSelectUpload(upload)}
+                        className={cn(
+                          "border rounded-md p-3 cursor-pointer",
+                          selectedUploadId === upload.uploadId ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
+                        )}
+                      >
+                        <div className="flex items-center gap-3">
+                          <File className="h-5 w-5 text-primary" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm truncate font-medium">{upload.fileName}</p>
+                            <p className="text-xs text-muted-foreground flex gap-1">
+                              <span className="block">{upload.contentType || "audio"}</span>
+                              <span className="block">{upload.size ? formatFileSize(upload.size) : 'N/A'}</span>
+                              <span className="block">{upload.duration ? formatDuration(upload.duration) : 'N/A'}</span>
+                            </p>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-red-500"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setPendingDeleteId(upload.uploadId)
+                              setIsDeleteDialogOpen(true)
+                            }}
+                            disabled={isTranscribing}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-                <div className="text-xs text-muted-foreground flex flex-col">
-                  <p>
-                    {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
+                {selectedUploadId && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Selected: <span className="text-foreground">{uploads.find(u => u.uploadId === selectedUploadId)?.fileName || 'Unknown file'}</span>
                   </p>
-                  {isExceeded &&
-                    <p className="text-red-500">File size exceeds {maxMB}MB</p>}
-                </div>
+                )}
+
+                <DeleteDialogue
+                  handleDelete={() => {
+                    if (pendingDeleteId) deleteFile(pendingDeleteId)
+                  }}
+                  isDeleteModalOpen={isDeleteDialogOpen}
+                  setIsDeleteModalOpen={setIsDeleteDialogOpen}
+                  isProcessing={isDeleting}
+                />
               </div>
-            )}
-          </div>
+            </TabsContent>
+          </Tabs>
 
           {/* Transcription Controls */}
           <div className="bg-card border border-border rounded-lg p-6">
@@ -392,7 +602,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                 {/* Start Button */}
                 <Button
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                  disabled={!file || isTranscribing || isExceeded || !session}
+                  disabled={!selectedUploadId || isTranscribing || !session}
                   onClick={handleStartTranscription}
                 >
                   {isTranscribing ? (
