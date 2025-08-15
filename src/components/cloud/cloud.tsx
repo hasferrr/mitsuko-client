@@ -1,12 +1,14 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { listUploads, deleteUpload } from '@/lib/api/uploads'
+import { uploadFile, UploadProgress } from '@/lib/api/file-upload'
 import { Card, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
 import {
   Calendar,
   FileText,
@@ -17,6 +19,7 @@ import {
   Upload,
   Clock,
   HardDrive,
+  Plus,
 } from 'lucide-react'
 import {
   Table,
@@ -30,6 +33,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 import { DeleteDialogue } from '@/components/ui-custom/delete-dialogue'
 import { useSessionStore } from '@/stores/use-session-store'
+import { MAX_TRANSCRIPTION_SIZE } from '@/constants/default'
 
 const getFileIcon = (contentType?: string) => {
   if (contentType?.startsWith('audio/')) return FileText
@@ -74,7 +78,10 @@ export default function CloudFilesList() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const session = useSessionStore(state => state.session)
   const queryClient = useQueryClient()
 
@@ -96,6 +103,31 @@ export default function CloudFilesList() {
     },
     onSettled: () => {
       setDeletingId(null)
+    },
+  })
+
+  const { mutate: handleUpload } = useMutation({
+    mutationFn: (file: File) => uploadFile(file, setUploadProgress),
+    onMutate: () => {
+      setIsUploading(true)
+      setUploadProgress(null)
+    },
+    onSuccess: () => {
+      toast.success('File uploaded successfully')
+      queryClient.invalidateQueries({ queryKey: ['uploads'] })
+      setUploadProgress(null)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to upload file', {
+        description: error.message,
+      })
+      setUploadProgress(null)
+    },
+    onSettled: () => {
+      setIsUploading(false)
     },
   })
 
@@ -139,6 +171,33 @@ export default function CloudFilesList() {
   const totalUploads = uploads.length
   const totalSize = uploads.reduce((acc, upload) => acc + (upload.size || 0), 0)
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('audio/')) {
+      toast.error('Invalid file type', {
+        description: 'Please select an audio file'
+      })
+      return
+    }
+
+    // Validate file size
+    if (file.size > MAX_TRANSCRIPTION_SIZE) {
+      toast.error('File too large', {
+        description: `Please select a file smaller than ${formatFileSize(MAX_TRANSCRIPTION_SIZE)}`
+      })
+      return
+    }
+
+    handleUpload(file)
+  }
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
   return (
     <div className="space-y-6">
       {/* Header Section */}
@@ -151,20 +210,60 @@ export default function CloudFilesList() {
             Manage your uploaded audio files
           </p>
         </div>
-        <Button
-          onClick={handleRefresh}
-          disabled={isRefetching}
-          variant="outline"
-          className="w-fit"
-        >
-          {isRefetching ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <RefreshCw className="h-4 w-4" />
-          )}
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleUploadClick}
+            disabled={isUploading || !session}
+            className="w-fit"
+          >
+            {isUploading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
+            Upload File
+          </Button>
+          <Button
+            onClick={handleRefresh}
+            disabled={isRefetching}
+            variant="outline"
+            className="w-fit"
+          >
+            {isRefetching ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
+            Refresh
+          </Button>
+        </div>
       </div>
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="audio/*"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+
+      {/* Upload Progress */}
+      {uploadProgress && (
+        <Card>
+          <CardHeader className="py-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Uploading file...</span>
+                <span className="text-sm text-muted-foreground">
+                  {uploadProgress.percentage}%
+                </span>
+              </div>
+              <Progress value={uploadProgress.percentage} className="w-full" />
+            </div>
+          </CardHeader>
+        </Card>
+      )}
 
       {/* Search Section */}
       <div className="relative max-w-md">
