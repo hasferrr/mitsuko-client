@@ -48,8 +48,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Box,
       },
       {
-        title: "History",
-        url: "/history",
+        title: "Cloud",
+        url: "/cloud",
         icon: Cloud,
       },
       {

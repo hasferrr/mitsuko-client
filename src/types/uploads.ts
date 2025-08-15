@@ -23,9 +23,9 @@ export type UploadState = "pending" | "completed" | "revoked"
 export interface UploadFileMeta {
   uploadId: string
   fileName: string
-  size: number
-  duration: number
-  contentType: string
+  size?: number
+  duration?: number
+  contentType?: string
   state: UploadState
   createdAt: string
 }

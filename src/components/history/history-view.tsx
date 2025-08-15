@@ -200,11 +200,11 @@ export default function HistoryView() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
+    <div className="container mx-auto max-w-7xl">
       {/* Header Section */}
       <div className="flex flex-wrap justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-medium">
+          <h1 className="text-xl font-medium">
             Transcription History
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
