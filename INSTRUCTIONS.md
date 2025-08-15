@@ -132,7 +132,8 @@ This is the main source code folder for the Next.js application. All application
       - `dashboard/page.tsx`: The main dashboard page after a user logs in.
       - `project/page.tsx`: Displays the contents and tasks within a single project.
       - `library/page.tsx`: Hosts the custom instruction Library, rendering `LibraryView` and its tabs.
-      - `history/page.tsx`: Transcription History with redesigned UI and log viewer.
+      - `cloud/page.tsx`: Cloud hub for Uploaded Files and Transcription History in tabs, rendered via `CloudWrapper`.
+      - `history/page.tsx`: Redirects to `/cloud` for backward compatibility.
       - `tools/page.tsx`: Central hub for supplementary utilities (e.g., subtitle tools, viewers).
       - `batch/page.tsx`, `translate/page.tsx`, `transcribe/page.tsx`, `extract-context/page.tsx`: These are the main pages for the core application features.
 
@@ -148,8 +149,9 @@ This is the main source code folder for the Next.js application. All application
       - `extract-context/context-extractor-main.tsx`: The main container component housing all logic and UI for context extraction.
       - `transcribe/transcription.tsx`: A thin wrapper component that loads project data and renders `TranscriptionMain`.
       - `transcribe/transcription-main.tsx`: The main container component responsible for the entire audio transcription workflow.
-      - `history/history-panel.tsx`: Main history list UI with table and actions.
-      - `history/history-item-details.tsx`: Dialog for viewing a single history item’s details.
+      - `cloud/cloud-wrapper.tsx`: Top-level container that renders two tabs: `Uploaded Files` and `Transcription History`.
+      - `cloud/cloud.tsx`: Cloud files list component. Supports authenticated uploads, list, search, progress, and deletion using React Query and `useUploadStore`.
+      - `history/history-view.tsx`: Transcription History UI with modern table, search, pagination, and a detailed viewer dialog.
       - `dashboard/welcome-view.tsx`: The main component for the dashboard, showing options to start new tasks and recent projects.
       - `sidebar/app-sidebar.tsx`: The main sidebar component for the application.
       - `auth/login.tsx`: A component handling the user authentication form and user settings display.
@@ -210,6 +212,8 @@ This is the main source code folder for the Next.js application. All application
       - `transaction.ts`: Fetches the user's transaction history.
       - `subtitle-log.ts`: Sends subtitle data to the server for logging and analysis.
       - `transcription-log.ts`: Sends transcription data to the server for logging and analysis.
+      - `uploads.ts`: Lists and deletes uploaded files for the current user session.
+      - `file-upload.ts`: Uploads files with progress callbacks that update UI via `useUploadStore`.
       - `get-model-cost-data.ts`: Retrieves the current pricing for various AI models.
       - `feedback.ts`: Submits user feedback to the backend.
       - `create-snap-payment.ts`: Initiates a payment process with the Midtrans payment gateway.
@@ -279,6 +283,7 @@ This is the main source code folder for the Next.js application. All application
         -   `use-history-store.ts`: Persists a history of completed translations to IndexedDB.
         -   `use-snap-store.ts`: Manages payment transaction data from Midtrans/Snap.
         -   `use-client-id-store.ts`: Stores a unique client ID for the session.
+        -   `use-upload-store.ts`: Tracks upload progress and status for file uploads used in Cloud and Transcription.
 
   - **How to Add or Modify State:**
     When you need to add a new piece of client-side state, follow these steps:
@@ -305,6 +310,7 @@ This is the main source code folder for the Next.js application. All application
     - `snap.ts`: Contains types for interacting with the Midtrans Snap payment gateway.
     - `transaction.ts`: Defines the `Transaction` type for recording credit usage.
     - `transcription-log.ts`: Defines types for transcription logging entries.
+    - `uploads.ts`: Defines `UploadFileMeta` and related types used by Cloud and Transcription features.
     - `user.ts`: Defines the `UserCreditData` type.
     - `custom-instruction.ts`: Defines the CustomInstruction interface.
 
@@ -349,6 +355,37 @@ The platform's functionality relies on a clear interaction model between the fro
 7.  **Export (Frontend):** The user can then export the final, translated subtitle file directly from the browser.
 
 This workflow is optimized for handling large files and long-running AI tasks by using streaming and local data persistence, providing a responsive and powerful user experience.
+
+#### Transcription Workflow (New)
+
+The transcription flow has been upgraded to work with cloud uploads and a streaming UI.
+
+1. **Upload & Manage Files**
+   - Route: `/cloud` via `src/app/(main)/cloud/page.tsx` (canonical metadata set)
+   - Component: `src/components/cloud/cloud-wrapper.tsx` renders tabs for `Uploaded Files` and `Transcription History`
+   - Component: `src/components/cloud/cloud.tsx` lists uploads, provides search, progress, and deletion
+   - APIs: `src/lib/api/file-upload.ts` and `src/lib/api/uploads.ts` with React Query integration
+   - Store: `src/stores/use-upload-store.ts` tracks `uploadProgress` and `isUploading`
+
+2. **Select Upload In Transcription**
+   - Component: `src/components/transcribe/transcription-main.tsx`
+   - The left panel has Upload and Select tabs
+   - Users upload from Transcription or choose an existing upload from Cloud using `listUploads()`
+   - Selection stores an `uploadId` rather than raw file data
+
+3. **Start Transcription**
+   - `startTranscription()` is called with `{ uploadId, selectedMode, customInstructions, models, clientId }`
+   - Streaming content updates the transcript via `AiStreamOutput`, persisted through `useTranscriptionDataStore`
+   - On completion, text is parsed to timestamped subtitles with `parseTranscription()` and saved
+   - User credits are refreshed and the uploads list is revalidated
+
+4. **Post-processing**
+   - Export to SRT via `mergeSubtitle()`
+   - One-click create a Translation project from the generated subtitles
+
+5. **History**
+   - The `Transcription History` tab in `/cloud` renders `src/components/history/history-view.tsx`
+   - The legacy `/history` route redirects to `/cloud`
 
 ### 6. Data Management & Migrations
 
