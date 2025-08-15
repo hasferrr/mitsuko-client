@@ -1,5 +1,6 @@
 import axios from "axios"
 import { requestSignedUrl, notifyUploadComplete } from "./uploads"
+import { calculateAudioDuration } from "@/lib/utils"
 
 export interface UploadProgress {
   loaded: number
@@ -50,7 +51,7 @@ export const uploadFile = async (
     await notifyUploadComplete({
       uploadId,
       size: file.size,
-      duration: 0, // TODO: Calculate duration
+      duration: await calculateAudioDuration(file),
       contentType: file.type,
     })
 
