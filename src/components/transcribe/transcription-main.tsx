@@ -63,6 +63,9 @@ import { useRouter } from "next/navigation"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
 import { cn } from "@/lib/utils"
+import { Checkbox } from "@/components/ui/checkbox"
+import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+import { Label } from "../ui/label"
 
 interface TranscriptionMainProps {
   currentId: string
@@ -103,6 +106,8 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const currentProject = useProjectStore(state => state.currentProject)
   const loadProjects = useProjectStore(state => state.loadProjects)
   const session = useSessionStore((state) => state.session)
+  const deleteAfterTranscription = useLocalSettingsStore(state => state.deleteAfterTranscription)
+  const setDeleteAfterTranscription = useLocalSettingsStore(state => state.setDeleteAfterTranscription)
 
   // React Query
   const queryClient = useQueryClient()
@@ -217,7 +222,8 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       selectedMode,
       customInstructions,
       models,
-      clientId: useClientIdStore.getState().clientId || ""
+      clientId: useClientIdStore.getState().clientId || "",
+      deleteFile: deleteAfterTranscription,
     }
     console.log(requestBody)
 
@@ -240,6 +246,9 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       queryClient.invalidateQueries({ queryKey: ["uploads"] })
       await refetchUploads()
 
+      if (deleteAfterTranscription) {
+        setSelectedUploadId(null)
+      }
       await saveData(currentId)
     }
   }
@@ -575,6 +584,19 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                   <p className="text-xs text-muted-foreground mt-2">
                     Selected: <span className="text-foreground">{uploads.find(u => u.uploadId === selectedUploadId)?.fileName || 'Unknown file'}</span>
                   </p>
+                )}
+
+                {uploads.length > 0 && (
+                  <div className="flex items-center gap-2 mt-4">
+                    <Checkbox
+                      id="delete-after-transcription"
+                      checked={deleteAfterTranscription}
+                      onCheckedChange={v => setDeleteAfterTranscription(v === true)}
+                    />
+                    <Label htmlFor="delete-after-transcription" className="text-sm text-muted-foreground">
+                      Delete file after transcription
+                    </Label>
+                  </div>
                 )}
 
                 <DeleteDialogue

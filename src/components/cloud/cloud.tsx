@@ -215,7 +215,7 @@ export default function CloudFilesList() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             onClick={handleUploadClick}
             disabled={isUploading || !session}
             className="w-fit"
@@ -226,7 +226,7 @@ export default function CloudFilesList() {
               <Plus className="h-4 w-4" />
             )}
             Upload File
-          </Button>
+          </Button> */}
           <Button
             onClick={handleRefresh}
             disabled={isRefetching}

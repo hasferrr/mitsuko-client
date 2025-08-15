@@ -12,6 +12,7 @@ interface LocalSettingsStore {
   selectedApiConfigIndex: number | null
   isThirdPartyModelEnabled: boolean
   isAutoTemperatureEnabled: boolean
+  deleteAfterTranscription: boolean
 
   addApiConfig: (config: CustomApiConfig) => void
   updateApiConfig: (index: number, updates: Partial<CustomApiConfig>) => Promise<void>
@@ -20,6 +21,7 @@ interface LocalSettingsStore {
 
   toggleThirdPartyModel: () => void
   setIsAutoTemperatureEnabled: (enabled: boolean) => void
+  setDeleteAfterTranscription: (enabled: boolean) => void
 }
 
 export const useLocalSettingsStore = create<LocalSettingsStore>()(
@@ -29,6 +31,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       selectedApiConfigIndex: null,
       isThirdPartyModelEnabled: false,
       isAutoTemperatureEnabled: true,
+      deleteAfterTranscription: false,
 
       addApiConfig: (config) =>
         set((state) => ({
@@ -67,6 +70,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
         set((state) => ({ isThirdPartyModelEnabled: !state.isThirdPartyModelEnabled })),
 
       setIsAutoTemperatureEnabled: (enabled) => set({ isAutoTemperatureEnabled: enabled }),
+      setDeleteAfterTranscription: (enabled) => set({ deleteAfterTranscription: enabled }),
     }),
     {
       name: "api-settings-storage",
