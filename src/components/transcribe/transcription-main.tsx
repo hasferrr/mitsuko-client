@@ -240,7 +240,9 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
 
     let fileName = title.trim()
     if (fileName) {
-      fileName = fileName.endsWith(".srt") ? fileName : fileName + ".srt"
+      fileName = fileName.endsWith(".srt")
+        ? fileName
+        : fileName.slice(0, fileName.lastIndexOf(".")) + ".srt"
     } else {
       fileName = "transcription.srt"
     }
