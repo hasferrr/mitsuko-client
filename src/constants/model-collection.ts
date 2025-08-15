@@ -1,18 +1,53 @@
 import { Model, ModelProvider } from "@/types/model"
-
-type FreeModel = Omit<Model, "isPaid"> & { isPaid: false }
-type PaidModel = Omit<Model, "isPaid"> & { isPaid: true }
+import { z } from "zod"
 
 interface ModelGroup<T extends Model> {
   models: T[]
   provider: ModelProvider
 }
 
+type FreeModel = Omit<Model, "isPaid"> & { isPaid: false }
+type PaidModel = Omit<Model, "isPaid"> & { isPaid: true }
+
 type FreeModelCollection = Record<string, ModelGroup<FreeModel>>
 type PaidModelCollection = Record<string, ModelGroup<PaidModel>>
 type ModelCollection = Record<string, ModelGroup<Model>>
 
-export const FREE_MODELS: FreeModelCollection = {
+const csvToArray = z
+  .string()
+  .optional()
+  .default("")
+  .transform((str) => str.split(",").filter(Boolean).map((s) => s.trim()))
+
+const EXCLUDE_FREE_MODELS = new Set(csvToArray.parse(process.env.NEXT_PUBLIC_EXCLUDE_FREE_MODELS))
+const EXCLUDE_PAID_MODELS = new Set(csvToArray.parse(process.env.NEXT_PUBLIC_EXCLUDE_PAID_MODELS))
+
+const excludeModelsByName = <T extends ModelCollection>(
+  collection: T,
+  excludeSet: Set<string>
+): T => {
+  const result: T = {} as T
+
+  for (const key in collection) {
+    if (Object.prototype.hasOwnProperty.call(collection, key)) {
+      const group = collection[key]
+      const filteredModels = group.models.filter(
+        (model) => !excludeSet.has(model.name)
+      )
+
+      if (filteredModels.length > 0) {
+        result[key as keyof T] = {
+          ...group,
+          models: filteredModels,
+        }
+      }
+    }
+  }
+
+  return result
+}
+
+const RAW_FREE_MODELS: FreeModelCollection = {
   "Premium Trial": {
     provider: "unknown",
     models: [
@@ -181,7 +216,7 @@ export const FREE_MODELS: FreeModelCollection = {
   },
 }
 
-export const PAID_MODELS: PaidModelCollection = {
+const RAW_PAID_MODELS: PaidModelCollection = {
   Google: {
     provider: "google",
     models: [
@@ -590,6 +625,9 @@ export const PAID_MODELS: PaidModelCollection = {
     ]
   },
 }
+
+export const FREE_MODELS = excludeModelsByName(RAW_FREE_MODELS, EXCLUDE_FREE_MODELS)
+export const PAID_MODELS = excludeModelsByName(RAW_PAID_MODELS, EXCLUDE_PAID_MODELS)
 
 export const MODEL_COLLECTION: ModelCollection = {
   ...PAID_MODELS,
