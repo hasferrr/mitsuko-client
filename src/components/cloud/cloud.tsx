@@ -208,7 +208,7 @@ export default function CloudFilesList() {
       <div className="flex flex-wrap justify-between gap-4">
         <div>
           <h2 className="text-xl font-medium">
-            Cloud Storage
+            Uploaded Files
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
             Manage your uploaded audio files

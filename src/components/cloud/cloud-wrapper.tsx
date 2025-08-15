@@ -10,7 +10,7 @@ export default function CloudWrapper() {
         <TabsList className="mb-4">
           <TabsTrigger value="storage" className="flex items-center gap-2 w-48">
             <Upload className="h-4 w-4" />
-            Cloud Storage
+            Uploaded Files
           </TabsTrigger>
           <TabsTrigger value="history" className="flex items-center gap-2 w-48">
             <History className="h-4 w-4" />
