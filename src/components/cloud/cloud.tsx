@@ -1,9 +1,10 @@
 'use client'
 
 import { useMemo, useState, useRef } from 'react'
+import { useUploadStore } from '@/stores/use-upload-store'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { listUploads, deleteUpload } from '@/lib/api/uploads'
-import { uploadFile, UploadProgress } from '@/lib/api/file-upload'
+import { uploadFile } from '@/lib/api/file-upload'
 import { Card, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -78,8 +79,11 @@ export default function CloudFilesList() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
+
+  const uploadProgress = useUploadStore(state => state.uploadProgress)
+  const isUploading = useUploadStore(state => state.isUploading)
+  const setUploadProgress = useUploadStore(state => state.setUploadProgress)
+  const setIsUploading = useUploadStore(state => state.setIsUploading)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const session = useSessionStore(state => state.session)
