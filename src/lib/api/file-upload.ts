@@ -56,8 +56,21 @@ export const uploadFile = async (
     })
 
     return uploadId
-  } catch (error) {
+  } catch (error: unknown) {
+    // Attempt to surface a user-friendly message from the server
+    let message = 'Failed to upload file'
+
+    if (axios.isAxiosError(error)) {
+      // AxiosError with possible response from backend
+      const respData = error.response?.data as { message?: string; error?: string }
+      if (respData?.message) message = respData.message
+      else if (respData?.error) message = respData.error
+      else if (error.message) message = error.message
+    } else if (error instanceof Error) {
+      message = error.message
+    }
+
     console.error('Upload failed:', error)
-    throw new Error('Failed to upload file')
+    throw new Error(message)
   }
 }
