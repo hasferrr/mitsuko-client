@@ -14,6 +14,17 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### August 16
+
+- 🎙️ **Reliable Transcription & Uploads:** Fixed an issue with transcription and file uploads.
+- 📤 **Unified File Uploads:** Upload up to 200MB with progress tracking. Choose from previously uploaded files, or delete them right in the flow.
+- ☁️ **Cloud Hub & Uploads:** A single place for Uploaded Files and History with tabs, search, status, and one‑click delete — plus clearer upload progress and messages. Guides updated for the new workflow.
+
+### August 10
+
+- 🤖 **Model Updates:** Added DeepSeek R1 Fast.
+- 🎙️ **Transcription Simplified:** Removed the "over one hour" toggle and refined model selection, including the new Mitsuko‑Fast option.
+
 ### August 8
 
 - 🤖 **Model Updates:** Added the GPT‑5 family and refreshed model references and descriptions for greater clarity and quality.
