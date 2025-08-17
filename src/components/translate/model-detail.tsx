@@ -1,8 +1,12 @@
 import { useSettingsStore } from '@/stores/settings/use-settings-store'
 
-export function ModelDetail() {
-  const modelDetail = useSettingsStore((state) => state.getModelDetail())
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
+interface ModelDetailProps {
+  basicSettingsId: string
+}
+
+export function ModelDetail({ basicSettingsId }: ModelDetailProps) {
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
 
   if (isUseCustomModel) return (
     <div className="text-xs text-muted-foreground">

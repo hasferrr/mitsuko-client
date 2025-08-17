@@ -60,9 +60,10 @@ interface FileItem {
 
 interface ContextExtractorMainProps {
   currentId: string
+  basicSettingsId: string
 }
 
-export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) => {
+export const ContextExtractorMain = ({ currentId, basicSettingsId }: ContextExtractorMainProps) => {
   const [activeTab, setActiveTab] = useState("result")
   const [isEpisodeNumberValid, setIsEpisodeNumberValid] = useState(true)
   const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
@@ -82,8 +83,8 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
   const customModel = selectedConfig?.customModel ?? ""
 
   // Settings Store
-  const modelDetail = useSettingsStore((state) => state.getModelDetail())
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
 
   // Advanced Settings Store
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
@@ -623,8 +624,14 @@ export const ContextExtractorMain = ({ currentId }: ContextExtractorMainProps) =
           <TabsContent value="settings" className="flex-grow space-y-4 mt-4">
             <Card className="border border-border bg-card text-card-foreground">
               <CardContent className="p-4 space-y-4">
-                <ModelSelection parent="extraction" />
-                <MaxCompletionTokenInput parent="extraction" />
+                <ModelSelection
+                  basicSettingsId={basicSettingsId}
+                  parent="extraction"
+                />
+                <MaxCompletionTokenInput
+                  basicSettingsId={basicSettingsId}
+                  parent="extraction"
+                />
               </CardContent>
             </Card>
           </TabsContent>

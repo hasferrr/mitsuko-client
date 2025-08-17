@@ -58,12 +58,14 @@ const ModelProviderIcon = ({ provider }: { provider: ModelProvider }) => {
 }
 
 interface ModelSelectorProps extends PopoverProps {
+  basicSettingsId: string
   type: SettingsParentType
   disabled?: boolean
   className?: string
 }
 
 export function ModelSelector({
+  basicSettingsId,
   type,
   disabled,
   className,
@@ -73,8 +75,9 @@ export function ModelSelector({
   const [open, setOpen] = useState(false)
 
   // Settings Store
-  const modelDetail = useSettingsStore((state) => state.getModelDetail())
-  const setModelDetail = useSettingsStore((state) => state.setModelDetail)
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
+  const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
+  const setModelDetail = (model: Model | null, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "modelDetail", model, parent)
 
   // Advanced Settings Store
   const setTemperature = useAdvancedSettingsStore((state) => state.setTemperature)

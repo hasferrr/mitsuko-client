@@ -37,6 +37,7 @@ export default function SubtitleTranslator() {
     <SubtitleTranslatorMain
       currentId={currentId}
       translation={translation}
+      basicSettingsId={translation.basicSettingsId}
     />
   )
 }

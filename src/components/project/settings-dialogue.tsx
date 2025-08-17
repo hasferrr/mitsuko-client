@@ -25,12 +25,14 @@ interface SettingsDialogueProps {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
   projectName: string
+  basicSettingsId: string
 }
 
 export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
   isOpen,
   onOpenChange,
   projectName,
+  basicSettingsId,
 }) => {
   return (
     <DialogCustom
@@ -47,8 +49,12 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <LanguageSelection parent="project" />
+          <LanguageSelection
+            basicSettingsId={basicSettingsId}
+            parent="project"
+          />
           <ModelSelection
+            basicSettingsId={basicSettingsId}
             parent="project"
             showUseCustomModelSwitch={false}
           />

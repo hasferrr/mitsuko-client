@@ -14,19 +14,24 @@ import { useCustomInstructionStore } from "@/stores/data/use-custom-instruction-
 import { SettingsParentType } from "@/types/project"
 
 interface Props {
+  basicSettingsId: string
   parent: SettingsParentType
 }
 
-export const CustomInstructionsInput = memo(({ parent }: Props) => {
-  const customInstructions = useSettingsStore((state) => state.getCustomInstructions())
-  const setCustomInstructions = useSettingsStore((state) => state.setCustomInstructions)
+export const CustomInstructionsInput = memo(({ basicSettingsId, parent }: Props) => {
+  const customInstructions = useSettingsStore((state) => state.getCustomInstructions(basicSettingsId))
+  const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
+  const setCustomInstructions = (instructions: string, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "customInstructions", instructions, parent)
+
   const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
   const [isLibraryDialogOpen, setIsLibraryDialogOpen] = useState(false)
   const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false)
   const [librarySearch, setLibrarySearch] = useState("")
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
   const [newInstructionName, setNewInstructionName] = useState("")
+
   const { setHasChanges } = useUnsavedChanges()
+
   const {
     customInstructions: libraryInstructions,
     load: loadInstructions,

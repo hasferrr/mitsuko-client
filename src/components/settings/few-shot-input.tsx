@@ -19,22 +19,30 @@ import { cn } from "@/lib/utils"
 import { SettingsParentType } from "@/types/project"
 
 interface Props {
+  basicSettingsId: string
   parent: SettingsParentType
 }
 
-export const FewShotInput = memo(({ parent }: Props) => {
-  const isFewShotEnabled = useSettingsStore((state) => state.getFewShotIsEnabled())
-  const setIsFewShotEnabled = useSettingsStore((state) => state.setIsFewShotEnabled)
-  const fewShotValue = useSettingsStore((state) => state.getFewShotValue())
-  const setFewShotValue = useSettingsStore((state) => state.setFewShotValue)
-  const fewShotLinkedId = useSettingsStore((state) => state.getFewShotLinkedId())
-  const setFewShotLinkedId = useSettingsStore((state) => state.setFewShotLinkedId)
-  const fewShotType = useSettingsStore((state) => state.getFewShotType())
-  const setFewShotType = useSettingsStore((state) => state.setFewShotType)
-  const fewShotStartIndex = useSettingsStore((state) => state.getFewShotStartIndex())
-  const setFewShotStartIndex = useSettingsStore((state) => state.setFewShotStartIndex)
-  const fewShotEndIndex = useSettingsStore((state) => state.getFewShotEndIndex())
-  const setFewShotEndIndex = useSettingsStore((state) => state.setFewShotEndIndex)
+export const FewShotInput = memo(({ basicSettingsId, parent }: Props) => {
+  const isFewShotEnabled = useSettingsStore((state) => state.getFewShotIsEnabled(basicSettingsId))
+  const fewShotValue = useSettingsStore((state) => state.getFewShotValue(basicSettingsId))
+  const fewShotLinkedId = useSettingsStore((state) => state.getFewShotLinkedId(basicSettingsId))
+  const fewShotType = useSettingsStore((state) => state.getFewShotType(basicSettingsId))
+  const fewShotStartIndex = useSettingsStore((state) => state.getFewShotStartIndex(basicSettingsId))
+  const fewShotEndIndex = useSettingsStore((state) => state.getFewShotEndIndex(basicSettingsId))
+  const _setIsFewShotEnabled = useSettingsStore((state) => state.setIsFewShotEnabled)
+  const _setFewShotValue = useSettingsStore((state) => state.setFewShotValue)
+  const _setFewShotLinkedId = useSettingsStore((state) => state.setFewShotLinkedId)
+  const _setFewShotType = useSettingsStore((state) => state.setFewShotType)
+  const _setFewShotStartIndex = useSettingsStore((state) => state.setFewShotStartIndex)
+  const _setFewShotEndIndex = useSettingsStore((state) => state.setFewShotEndIndex)
+
+  const setIsFewShotEnabled = (isEnabled: boolean, parent: SettingsParentType) => _setIsFewShotEnabled(basicSettingsId, isEnabled, parent)
+  const setFewShotValue = (value: string, parent: SettingsParentType) => _setFewShotValue(basicSettingsId, value, parent)
+  const setFewShotLinkedId = (linkedId: string, parent: SettingsParentType) => _setFewShotLinkedId(basicSettingsId, linkedId, parent)
+  const setFewShotType = (type: 'manual' | 'linked', parent: SettingsParentType) => _setFewShotType(basicSettingsId, type, parent)
+  const setFewShotStartIndex = (index: number, parent: SettingsParentType) => _setFewShotStartIndex(basicSettingsId, index, parent)
+  const setFewShotEndIndex = (index: number, parent: SettingsParentType) => _setFewShotEndIndex(basicSettingsId, index, parent)
 
   const currentTranslationId = useTranslationDataStore((state) => state.currentId)
   const currentProject = useProjectStore((state) => state.currentProject)

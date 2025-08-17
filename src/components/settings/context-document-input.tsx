@@ -14,16 +14,20 @@ import { getContent } from "@/lib/parser/parser"
 import { SettingsParentType } from "@/types/project"
 
 interface Props {
+  basicSettingsId: string
   parent: SettingsParentType
 }
 
-export const ContextDocumentInput = memo(({ parent }: Props) => {
-  const contextDocument = useSettingsStore((state) => state.getContextDocument())
-  const setContextDocument = useSettingsStore((state) => state.setContextDocument)
-  const { setHasChanges } = useUnsavedChanges()
-  const [isContextDialogOpen, setIsContextDialogOpen] = useState(false)
+export const ContextDocumentInput = memo(({ basicSettingsId, parent }: Props) => {
   const currentProject = useProjectStore((state) => state.currentProject)
+  const contextDocument = useSettingsStore((state) => state.getContextDocument(basicSettingsId))
+  const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
+  const setContextDocument = (doc: string, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc, parent)
+
+  const [isContextDialogOpen, setIsContextDialogOpen] = useState(false)
   const [projectExtractions, setProjectExtractions] = useState<Extraction[]>([])
+
+  const { setHasChanges } = useUnsavedChanges()
 
   const loadProjectExtractions = useCallback(async () => {
     if (!currentProject) return

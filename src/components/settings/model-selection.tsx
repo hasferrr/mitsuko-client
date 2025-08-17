@@ -1,6 +1,6 @@
 "use client"
 
-import { memo, useEffect, useState } from "react"
+import { memo, useCallback, useEffect, useState } from "react"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { HelpCircle } from "lucide-react"
@@ -13,17 +13,22 @@ import { CustomApiConfigManager } from "./custom-api-config-manager"
 import { SettingsParentType } from "@/types/project"
 
 interface ModelSelectionProps {
+  basicSettingsId: string
   parent: SettingsParentType
   showUseCustomModelSwitch?: boolean
 }
 
 export const ModelSelection = memo(({
+  basicSettingsId,
   parent,
   showUseCustomModelSwitch = true
 }: ModelSelectionProps) => {
   // Settings Store
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
-  const setIsUseCustomModel = useSettingsStore((state) => state.setIsUseCustomModel)
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
+  const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
+  const setIsUseCustomModel = useCallback((value: boolean, parent: SettingsParentType) => {
+    setBasicSettingsValue(basicSettingsId, "isUseCustomModel", value, parent)
+  }, [basicSettingsId, setBasicSettingsValue])
 
   // API Settings Store
   const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
@@ -42,6 +47,7 @@ export const ModelSelection = memo(({
         <div className="flex items-center gap-2">
           <div className="flex-grow">
             <ModelSelector
+              basicSettingsId={basicSettingsId}
               disabled={isUseCustomModel}
               type={parent}
               className="w-full"

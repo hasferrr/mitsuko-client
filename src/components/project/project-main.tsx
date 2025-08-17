@@ -310,10 +310,10 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
               data: null
             }
           },
-          getBasicSettings() ?? {},
+          getBasicSettings(currentProject.defaultBasicSettingsId) ?? {},
           applyModelDefaults(
             getAdvancedSettings() ?? DEFAULT_ADVANCED_SETTINGS,
-            getModelDetail() ?? null
+            getModelDetail(currentProject.defaultBasicSettingsId) ?? null
           ),
         )
         loadProjects()
@@ -356,7 +356,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
             previousContext: "",
             contextResult: ""
           },
-          getBasicSettings() ?? {},
+          getBasicSettings(currentProject.defaultBasicSettingsId) ?? {},
           getAdvancedSettings() ?? {},
         )
         loadProjects()
@@ -430,6 +430,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         isOpen={isSettingsModalOpen}
         onOpenChange={setIsSettingsModalOpen}
         projectName={currentProject.name}
+        basicSettingsId={currentProject.defaultBasicSettingsId}
       />
 
       <Tabs defaultValue="overview" className="mb-6">

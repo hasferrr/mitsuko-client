@@ -9,12 +9,13 @@ import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constant
 import { SettingsParentType } from "@/types/project"
 
 interface MaxCompletionTokenInputProps {
+  basicSettingsId: string
   parent: SettingsParentType
 }
 
-export const MaxCompletionTokenInput = memo(({ parent }: MaxCompletionTokenInputProps) => {
-  const modelDetail = useSettingsStore((state) => state.getModelDetail())
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
+export const MaxCompletionTokenInput = memo(({ basicSettingsId, parent }: MaxCompletionTokenInputProps) => {
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
   const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
   const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())

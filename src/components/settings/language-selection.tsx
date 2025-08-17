@@ -7,14 +7,16 @@ import { LANGUAGES } from "@/constants/lang"
 import { SettingsParentType } from "@/types/project"
 
 interface LanguageSelectionProps {
+  basicSettingsId: string
   parent: SettingsParentType
 }
 
-export const LanguageSelection = memo(({ parent }: LanguageSelectionProps) => {
-  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
-  const setSourceLanguage = useSettingsStore((state) => state.setSourceLanguage)
-  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage())
-  const setTargetLanguage = useSettingsStore((state) => state.setTargetLanguage)
+export const LanguageSelection = memo(({ basicSettingsId, parent }: LanguageSelectionProps) => {
+  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))
+  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(basicSettingsId))
+  const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
+  const setSourceLanguage = (language: string, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "sourceLanguage", language, parent)
+  const setTargetLanguage = (language: string, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "targetLanguage", language, parent)
 
   return (
     <div className="grid gap-4 md:grid-cols-2">

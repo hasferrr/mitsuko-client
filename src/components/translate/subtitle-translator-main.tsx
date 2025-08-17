@@ -106,7 +106,7 @@ import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-g
 import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Translation } from "@/types/project"
+import { SettingsParentType, Translation } from "@/types/project"
 import { DownloadSection } from "../download-section"
 import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { convertSubtitle } from "@/lib/subtitles/utils/convert-subtitle"
@@ -114,11 +114,13 @@ import { convertSubtitle } from "@/lib/subtitles/utils/convert-subtitle"
 interface SubtitleTranslatorMainProps {
   currentId: string
   translation: Translation
+  basicSettingsId: string
 }
 
 export default function SubtitleTranslatorMain({
   currentId,
   translation,
+  basicSettingsId,
 }: SubtitleTranslatorMainProps) {
   // Translation Data Store
   const setTitle = useTranslationDataStore((state) => state.setTitle)
@@ -146,14 +148,15 @@ export default function SubtitleTranslatorMain({
   const customModel = selectedConfig?.customModel ?? ""
 
   // Basic Settings Store
-  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
-  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage())
-  const modelDetail = useSettingsStore((state) => state.getModelDetail())
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
-  const contextDocument = useSettingsStore((state) => state.getContextDocument())
-  const customInstructions = useSettingsStore((state) => state.getCustomInstructions())
-  const fewShot = useSettingsStore((state) => state.getFewShot())
-  const setContextDocument = useSettingsStore((state) => state.setContextDocument)
+  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))
+  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(basicSettingsId))
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
+  const contextDocument = useSettingsStore((state) => state.getContextDocument(basicSettingsId))
+  const customInstructions = useSettingsStore((state) => state.getCustomInstructions(basicSettingsId))
+  const fewShot = useSettingsStore((state) => state.getFewShot(basicSettingsId))
+  const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
+  const setContextDocument = (doc: string, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc, parent)
 
   // Advanced Settings Store
   const temperature = useAdvancedSettingsStore((state) => state.getTemperature())
@@ -1004,16 +1007,31 @@ export default function SubtitleTranslatorMain({
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
-                  <LanguageSelection parent="translation" />
-                  <ModelSelection parent="translation" />
+                  <LanguageSelection
+                    basicSettingsId={basicSettingsId}
+                    parent="translation"
+                  />
+                  <ModelSelection
+                    basicSettingsId={basicSettingsId}
+                    parent="translation"
+                  />
                   <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
-                    <ContextDocumentInput parent="translation" />
+                    <ContextDocumentInput
+                      basicSettingsId={basicSettingsId}
+                      parent="translation"
+                    />
                   </DragAndDrop>
                   <div className="m-[2px]">
-                    <CustomInstructionsInput parent="translation" />
+                    <CustomInstructionsInput
+                      basicSettingsId={basicSettingsId}
+                      parent="translation"
+                    />
                   </div>
                   <div className="m-[2px]">
-                    <FewShotInput parent="translation" />
+                    <FewShotInput
+                      basicSettingsId={basicSettingsId}
+                      parent="translation"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -1022,7 +1040,9 @@ export default function SubtitleTranslatorMain({
             <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
-                  <ModelDetail />
+                  <ModelDetail
+                    basicSettingsId={basicSettingsId}
+                  />
                   <TemperatureSlider parent="translation" />
                   <StartIndexInput parent="translation" />
                   <EndIndexInput parent="translation" />
@@ -1031,8 +1051,14 @@ export default function SubtitleTranslatorMain({
                   </div>
                   <div className="text-sm font-semibold">Technical Options</div>
                   <SplitSizeInput parent="translation" />
-                  <MaxCompletionTokenInput parent="translation" />
-                  <StructuredOutputSwitch parent="translation" />
+                  <MaxCompletionTokenInput
+                    basicSettingsId={basicSettingsId}
+                    parent="translation"
+                  />
+                  <StructuredOutputSwitch
+                    basicSettingsId={basicSettingsId}
+                    parent="translation"
+                  />
                   <FullContextMemorySwitch parent="translation" />
                   <BetterContextCachingSwitch parent="translation" />
                   <AdvancedSettingsResetButton parent="translation" />

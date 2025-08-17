@@ -101,7 +101,11 @@ interface BatchFile {
 
 const MAX_CONCURRENT_TRANSLATION = 5
 
-export default function BatchTranslatorMain() {
+interface BatchTranslatorMainProps {
+  basicSettingsId: string
+}
+
+export default function BatchTranslatorMain({ basicSettingsId }: BatchTranslatorMainProps) {
   const [activeTab, setActiveTab] = useState("basic")
   const [concurrentTranslations, setConcurrentTranslations] = useState(3)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
@@ -161,13 +165,14 @@ export default function BatchTranslatorMain() {
   const stopTranslation = useTranslationStore((state) => state.stopTranslation)
 
   // Settings Stores
-  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage())
-  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage())
-  const modelDetail = useSettingsStore((state) => state.getModelDetail())
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel())
-  const contextDocument = useSettingsStore((state) => state.getContextDocument())
-  const customInstructions = useSettingsStore((state) => state.getCustomInstructions())
-  const fewShot = useSettingsStore((state) => state.getFewShot())
+  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))
+  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(basicSettingsId))
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
+  const contextDocument = useSettingsStore((state) => state.getContextDocument(basicSettingsId))
+  const customInstructions = useSettingsStore((state) => state.getCustomInstructions(basicSettingsId))
+  const fewShot = useSettingsStore((state) => state.getFewShot(basicSettingsId))
+
   const temperature = useAdvancedSettingsStore((state) => state.getTemperature())
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
   const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())
@@ -175,8 +180,10 @@ export default function BatchTranslatorMain() {
   const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput())
   const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
   const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching())
+
   const customApiConfigs = useLocalSettingsStore((state) => state.customApiConfigs)
   const selectedApiConfigIndex = useLocalSettingsStore((state) => state.selectedApiConfigIndex)
+
   const selectedConfig =
     selectedApiConfigIndex !== null ? customApiConfigs[selectedApiConfigIndex] : null
   const apiKey = selectedConfig?.apiKey ?? ""
@@ -1282,14 +1289,29 @@ export default function BatchTranslatorMain() {
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
-                  <LanguageSelection parent="project" />
-                  <ModelSelection parent="project" />
-                  <ContextDocumentInput parent="project" />
+                  <LanguageSelection
+                    basicSettingsId={basicSettingsId}
+                    parent="project"
+                  />
+                  <ModelSelection
+                    basicSettingsId={basicSettingsId}
+                    parent="project"
+                  />
+                  <ContextDocumentInput
+                    basicSettingsId={basicSettingsId}
+                    parent="project"
+                  />
                   <div className="m-[2px]">
-                    <CustomInstructionsInput parent="project" />
+                    <CustomInstructionsInput
+                      basicSettingsId={basicSettingsId}
+                      parent="project"
+                    />
                   </div>
                   <div className="m-[2px]">
-                    <FewShotInput parent="project" />
+                    <FewShotInput
+                      basicSettingsId={basicSettingsId}
+                      parent="project"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -1298,15 +1320,23 @@ export default function BatchTranslatorMain() {
             <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
-                  <ModelDetail />
+                  <ModelDetail
+                    basicSettingsId={basicSettingsId}
+                  />
                   <TemperatureSlider parent="project" />
                   <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
                     <AdvancedReasoningSwitch />
                   </div>
                   <div className="text-sm font-semibold">Technical Options</div>
                   <SplitSizeInput parent="project" />
-                  <MaxCompletionTokenInput parent="project" />
-                  <StructuredOutputSwitch parent="project" />
+                  <MaxCompletionTokenInput
+                    basicSettingsId={basicSettingsId}
+                    parent="project"
+                  />
+                  <StructuredOutputSwitch
+                    basicSettingsId={basicSettingsId}
+                    parent="project"
+                  />
                   <FullContextMemorySwitch parent="project" />
                   <BetterContextCachingSwitch parent="project" />
                   <AdvancedSettingsResetButton parent="project" />
@@ -1453,6 +1483,7 @@ export default function BatchTranslatorMain() {
               <SubtitleTranslatorMain
                 currentId={previewTranslationId}
                 translation={translationData[previewTranslationId]}
+                basicSettingsId={basicSettingsId}
               />
             </div>
           )}
