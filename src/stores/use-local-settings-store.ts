@@ -31,7 +31,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       selectedApiConfigIndex: null,
       isThirdPartyModelEnabled: false,
       isAutoTemperatureEnabled: true,
-      deleteAfterTranscription: false,
+      deleteAfterTranscription: true,
 
       addApiConfig: (config) =>
         set((state) => ({
