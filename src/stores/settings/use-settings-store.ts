@@ -1,17 +1,12 @@
 import { create } from "zustand"
 import { Model } from "@/types/model"
-import { BasicSettings, SettingsParentType } from "@/types/project"
+import { BasicSettings } from "@/types/project"
 import { persist } from "zustand/middleware"
 import {
-  createBasicSettings,
   updateBasicSettings,
-  getBasicSettings,
   getAllBasicSettings,
 } from "@/lib/db/settings"
 import { DEFAULT_BASIC_SETTINGS } from "@/constants/default"
-import { useTranslationDataStore } from "../data/use-translation-data-store"
-import { useExtractionDataStore } from "../data/use-extraction-data-store"
-import { useProjectStore } from "../data/use-project-store"
 
 interface SettingsStore {
   data: Record<string, BasicSettings>
@@ -37,85 +32,13 @@ interface SettingsStore {
     id: string,
     key: keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>,
     value: BasicSettings[keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>],
-    parent: SettingsParentType
   ) => void
-  setIsFewShotEnabled: (id: string, isEnabled: boolean, parent: SettingsParentType) => void
-  setFewShotValue: (id: string, value: string, parent: SettingsParentType) => void
-  setFewShotLinkedId: (id: string, linkedId: string, parent: SettingsParentType) => void
-  setFewShotType: (id: string, type: 'manual' | 'linked', parent: SettingsParentType) => void
-  setFewShotStartIndex: (id: string, index: number, parent: SettingsParentType) => void
-  setFewShotEndIndex: (id: string, index: number, parent: SettingsParentType) => void
-}
-
-const getOrCreateBasicSettings = async <T>(
-  store: { getState: () => { currentId: string | null; data: Record<string, T> } },
-  currentId: string | null,
-  getSettingsId: (data: T) => string | null | undefined,
-  createAndUpdate: (newSettings: BasicSettings) => void
-): Promise<BasicSettings | null> => {
-  if (!currentId) return null
-  const data = store.getState().data[currentId]
-  if (!data) return null
-
-  let basicSettings = getSettingsId(data)
-    ? await getBasicSettings(getSettingsId(data)!) ?? null
-    : null
-
-  if (!basicSettings) {
-    basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
-    createAndUpdate(basicSettings)
-  }
-
-  return basicSettings
-}
-
-const updateSettings = async <K extends keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>>(
-  field: K,
-  value: BasicSettings[K],
-  parent: SettingsParentType,
-) => {
-  try {
-    let basicSettings: BasicSettings | null = null
-
-    if (parent === 'translation') {
-      const store = useTranslationDataStore
-      const currentId = store.getState().currentId
-      basicSettings = await getOrCreateBasicSettings(
-        store,
-        currentId,
-        (data) => data.basicSettingsId,
-        (newSettings) => store.getState().mutateData(currentId!, "basicSettingsId", newSettings.id)
-      )
-    } else if (parent === 'extraction') {
-      const store = useExtractionDataStore
-      const currentId = store.getState().currentId
-      basicSettings = await getOrCreateBasicSettings(
-        store,
-        currentId,
-        (data) => data.basicSettingsId,
-        (newSettings) => store.getState().mutateData(currentId!, "basicSettingsId", newSettings.id)
-      )
-    } else if (parent === 'project') {
-      const store = useProjectStore
-      const data = store.getState().currentProject
-      if (!data) return
-
-      const basicSettingsId = data.defaultBasicSettingsId
-      basicSettings = basicSettingsId
-        ? await getBasicSettings(basicSettingsId) ?? null
-        : null
-
-      if (!basicSettings) {
-        basicSettings = await createBasicSettings(DEFAULT_BASIC_SETTINGS)
-        store.getState().updateProject(data.id, { defaultBasicSettingsId: basicSettings.id })
-      }
-    }
-    if (basicSettings) {
-      await updateBasicSettings(basicSettings.id, { [field]: value })
-    }
-  } catch (error) {
-    console.error(`Failed to update settings for ${parent}:`, error)
-  }
+  setIsFewShotEnabled: (id: string, isEnabled: boolean) => void
+  setFewShotValue: (id: string, value: string) => void
+  setFewShotLinkedId: (id: string, linkedId: string) => void
+  setFewShotType: (id: string, type: 'manual' | 'linked') => void
+  setFewShotStartIndex: (id: string, index: number) => void
+  setFewShotEndIndex: (id: string, index: number) => void
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -210,45 +133,45 @@ export const useSettingsStore = create<SettingsStore>()(
           console.error("Failed to save settings data:", error)
         }
       },
-      setBasicSettingsValue: (id, key, value, parent) => {
+      setBasicSettingsValue: (id, key, value) => {
         get().mutateData(id, key, value)
-        updateSettings(key, value, parent)
+        get().saveData(id)
       },
-      setIsFewShotEnabled: (id, isEnabled, parent) => {
+      setIsFewShotEnabled: (id, isEnabled) => {
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, isEnabled }
         get().mutateData(id, "fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, parent)
+        get().saveData(id)
       },
-      setFewShotValue: (id, value, parent) => {
+      setFewShotValue: (id, value) => {
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, value }
         get().mutateData(id, "fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, parent)
+        get().saveData(id)
       },
-      setFewShotLinkedId: (id, linkedId, parent) => {
+      setFewShotLinkedId: (id, linkedId) => {
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, linkedId }
         get().mutateData(id, "fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, parent)
+        get().saveData(id)
       },
-      setFewShotType: (id, type, parent) => {
+      setFewShotType: (id, type) => {
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, type }
         get().mutateData(id, "fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, parent)
+        get().saveData(id)
       },
-      setFewShotStartIndex: (id, index, parent) => {
+      setFewShotStartIndex: (id, index) => {
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, fewShotStartIndex: index }
         get().mutateData(id, "fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, parent)
+        get().saveData(id)
       },
-      setFewShotEndIndex: (id, index, parent) => {
+      setFewShotEndIndex: (id, index) => {
         const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
         const newFewShot = { ...currentFewShot, fewShotEndIndex: index }
         get().mutateData(id, "fewShot", newFewShot)
-        updateSettings("fewShot", newFewShot, parent)
+        get().saveData(id)
       },
     }),
     {

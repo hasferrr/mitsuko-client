@@ -4,17 +4,15 @@ import { memo } from "react"
 import { Input } from "@/components/ui/input"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SPLIT_SIZE_MIN, SPLIT_SIZE_MAX } from "@/constants/limits"
-import { SettingsParentType } from "@/types/project"
 
 interface Props {
   advancedSettingsId: string
-  parent: SettingsParentType
 }
 
-export const SplitSizeInput = memo(({ advancedSettingsId, parent }: Props) => {
+export const SplitSizeInput = memo(({ advancedSettingsId }: Props) => {
   const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize(advancedSettingsId))
   const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setSplitSize = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "splitSize", value, parent)
+  const setSplitSize = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "splitSize", value)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
@@ -22,13 +20,13 @@ export const SplitSizeInput = memo(({ advancedSettingsId, parent }: Props) => {
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10) // Prevent NaN
       num = Math.min(num, SPLIT_SIZE_MAX)
-      setSplitSize(value === "" ? 0 : num, parent)
+      setSplitSize(value === "" ? 0 : num)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setSplitSize(Math.min(Math.max(parseInt(value, 10), SPLIT_SIZE_MIN), SPLIT_SIZE_MAX), parent)
+    setSplitSize(Math.min(Math.max(parseInt(value, 10), SPLIT_SIZE_MIN), SPLIT_SIZE_MAX))
   }
 
   return (

@@ -4,20 +4,18 @@ import { memo } from "react"
 import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { SettingsParentType } from "@/types/project"
 
 interface Props {
   basicSettingsId: string
   advancedSettingsId: string
-  parent: SettingsParentType
 }
 
-export const StructuredOutputSwitch = memo(({ basicSettingsId, advancedSettingsId, parent }: Props) => {
+export const StructuredOutputSwitch = memo(({ basicSettingsId, advancedSettingsId }: Props) => {
   const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
   const useStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput(advancedSettingsId))
   const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setUseStructuredOutput = (value: boolean, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "isUseStructuredOutput", value, parent)
+  const setUseStructuredOutput = (value: boolean) => setAdvancedSettingsValue(advancedSettingsId, "isUseStructuredOutput", value)
 
   const disabled = !isUseCustomModel && !modelDetail?.structuredOutput
 
@@ -28,7 +26,7 @@ export const StructuredOutputSwitch = memo(({ basicSettingsId, advancedSettingsI
         <Switch
           disabled={disabled}
           checked={useStructuredOutput}
-          onCheckedChange={(value) => setUseStructuredOutput(value, parent)}
+          onCheckedChange={(value) => setUseStructuredOutput(value)}
         />
       </div>
       <p className="text-xs text-muted-foreground">

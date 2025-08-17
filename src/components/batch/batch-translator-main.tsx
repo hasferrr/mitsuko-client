@@ -1292,27 +1292,22 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
                 <CardContent className="p-4 space-y-4">
                   <LanguageSelection
                     basicSettingsId={basicSettingsId}
-                    parent="project"
                   />
                   <ModelSelection
                     basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
-                    parent="project"
                   />
                   <ContextDocumentInput
                     basicSettingsId={basicSettingsId}
-                    parent="project"
                   />
                   <div className="m-[2px]">
                     <CustomInstructionsInput
                       basicSettingsId={basicSettingsId}
-                      parent="project"
                     />
                   </div>
                   <div className="m-[2px]">
                     <FewShotInput
                       basicSettingsId={basicSettingsId}
-                      parent="project"
                     />
                   </div>
                 </CardContent>
@@ -1327,7 +1322,6 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
                   />
                   <TemperatureSlider
                     advancedSettingsId={advancedSettingsId}
-                    parent="project"
                   />
                   <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
                     <AdvancedReasoningSwitch />
@@ -1335,30 +1329,24 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
                   <div className="text-sm font-semibold">Technical Options</div>
                   <SplitSizeInput
                     advancedSettingsId={advancedSettingsId}
-                    parent="project"
                   />
                   <MaxCompletionTokenInput
                     basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
-                    parent="project"
                   />
                   <StructuredOutputSwitch
                     basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
-                    parent="project"
                   />
                   <FullContextMemorySwitch
                     advancedSettingsId={advancedSettingsId}
-                    parent="project"
                   />
                   <BetterContextCachingSwitch
                     advancedSettingsId={advancedSettingsId}
-                    parent="project"
                   />
                   <AdvancedSettingsResetButton
                     basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
-                    parent="project"
                   />
                 </CardContent>
               </Card>

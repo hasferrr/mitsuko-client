@@ -6,6 +6,9 @@ import {
   getExtraction as getDB,
   deleteExtraction as deleteDB,
 } from "@/lib/db/extraction"
+import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
+import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 
 export interface ExtractionDataStore {
   currentId: string | null
@@ -46,6 +49,15 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
   createExtractionDb: async (projectId, data, basicSettingsData, advancedSettingsData) => {
     const extraction = await createDB(projectId, data, basicSettingsData, advancedSettingsData)
     set(state => ({ data: { ...state.data, [extraction.id]: extraction } }))
+
+    // upsert associated settings into stores
+    const settingsStore = useSettingsStore.getState()
+    const advancedSettingsStore = useAdvancedSettingsStore.getState()
+    const bs = await getBasicSettings(extraction.basicSettingsId)
+    if (bs) settingsStore.upsertData(bs.id, bs)
+    const ads = await getAdvancedSettings(extraction.advancedSettingsId)
+    if (ads) advancedSettingsStore.upsertData(ads.id, ads)
+
     return extraction
   },
   getExtractionDb: async (extractionId) => {

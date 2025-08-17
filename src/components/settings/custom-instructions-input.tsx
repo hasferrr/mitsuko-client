@@ -11,17 +11,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Label } from "@/components/ui/label"
 import { customInstructionPresets } from "@/constants/custom-instructions"
 import { useCustomInstructionStore } from "@/stores/data/use-custom-instruction-store"
-import { SettingsParentType } from "@/types/project"
 
 interface Props {
   basicSettingsId: string
-  parent: SettingsParentType
 }
 
-export const CustomInstructionsInput = memo(({ basicSettingsId, parent }: Props) => {
+export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
   const customInstructions = useSettingsStore((state) => state.getCustomInstructions(basicSettingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
-  const setCustomInstructions = (instructions: string, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "customInstructions", instructions, parent)
+  const setCustomInstructions = (instructions: string) => setBasicSettingsValue(basicSettingsId, "customInstructions", instructions)
 
   const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
   const [isLibraryDialogOpen, setIsLibraryDialogOpen] = useState(false)
@@ -41,20 +39,20 @@ export const CustomInstructionsInput = memo(({ basicSettingsId, parent }: Props)
 
   const handleCustomInstructionsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
-    setCustomInstructions(e.target.value, parent)
+    setCustomInstructions(e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`
   }
 
   const handlePresetSelect = (instruction: string) => {
     setHasChanges(true)
-    setCustomInstructions(instruction, parent)
+    setCustomInstructions(instruction)
     setIsPresetsDialogOpen(false)
   }
 
   const handleLibrarySelect = (instruction: string) => {
     setHasChanges(true)
-    setCustomInstructions(instruction, parent)
+    setCustomInstructions(instruction)
     setIsLibraryDialogOpen(false)
   }
 

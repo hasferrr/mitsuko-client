@@ -7,6 +7,9 @@ import {
   getTranslation as getDB,
   deleteTranslation as deleteDB,
 } from "@/lib/db/translation"
+import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
+import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { db } from "@/lib/db/db"
 
 export interface TranslationDataStore {
@@ -49,6 +52,15 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
   createTranslationDb: async (projectId, data, basicSettingsData, advancedSettingsData) => {
     const translation = await createDB(projectId, data, basicSettingsData, advancedSettingsData)
     set(state => ({ data: { ...state.data, [translation.id]: translation } }))
+
+    // upsert associated settings into stores
+    const settingsStore = useSettingsStore.getState()
+    const advSettingsStore = useAdvancedSettingsStore.getState()
+    const bs = await getBasicSettings(translation.basicSettingsId)
+    if (bs) settingsStore.upsertData(bs.id, bs)
+    const ads = await getAdvancedSettings(translation.advancedSettingsId)
+    if (ads) advSettingsStore.upsertData(ads.id, ads)
+
     return translation
   },
   getTranslationDb: async (translationId) => {

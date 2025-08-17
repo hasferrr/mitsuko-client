@@ -7,20 +7,18 @@ import { ChevronsRight } from "lucide-react"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { SettingsParentType } from "@/types/project"
 
 interface Props {
   advancedSettingsId: string
-  parent: SettingsParentType
 }
 
-export const StartIndexInput = memo(({ advancedSettingsId, parent }: Props) => {
+export const StartIndexInput = memo(({ advancedSettingsId }: Props) => {
   const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex(advancedSettingsId))
   const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex(advancedSettingsId))
 
   const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setStartIndex = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "startIndex", value, parent)
-  const setEndIndex = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "endIndex", value, parent)
+  const setStartIndex = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "startIndex", value)
+  const setEndIndex = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "endIndex", value)
 
   const currentId = useTranslationDataStore((state) => state.currentId)
   const translationData = useTranslationDataStore((state) => state.data)
@@ -32,15 +30,15 @@ export const StartIndexInput = memo(({ advancedSettingsId, parent }: Props) => {
       let num = parseInt(value, 10)
       num = Math.min(num, subtitles.length)
       num = value === "" ? 0 : num
-      setStartIndex(num, parent)
+      setStartIndex(num)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setStartIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length), parent)
+    setStartIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
     if (startIndex > endIndex) {
-      setEndIndex(Math.max(1, startIndex), parent)
+      setEndIndex(Math.max(1, startIndex))
     }
   }
 
@@ -50,8 +48,8 @@ export const StartIndexInput = memo(({ advancedSettingsId, parent }: Props) => {
         subtitles[i].translated.trim() === "" &&
         subtitles[i].content.trim() !== ""
       ) {
-        setStartIndex(i + 1, parent)
-        setEndIndex(subtitles.length, parent)
+        setStartIndex(i + 1)
+        setEndIndex(subtitles.length)
         break
       }
     }

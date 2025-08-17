@@ -4,20 +4,18 @@ import { memo } from "react"
 import { Input } from "@/components/ui/input"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
-import { SettingsParentType } from "@/types/project"
 
 interface Props {
   advancedSettingsId: string
-  parent: SettingsParentType
 }
 
-export const EndIndexInput = memo(({ advancedSettingsId, parent }: Props) => {
+export const EndIndexInput = memo(({ advancedSettingsId }: Props) => {
   const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex(advancedSettingsId))
   const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex(advancedSettingsId))
 
   const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setEndIndex = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "endIndex", value, parent)
-  const setStartIndex = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "startIndex", value, parent)
+  const setEndIndex = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "endIndex", value)
+  const setStartIndex = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "startIndex", value)
 
   const currentId = useTranslationDataStore((state) => state.currentId)
   const translationData = useTranslationDataStore((state) => state.data)
@@ -29,15 +27,15 @@ export const EndIndexInput = memo(({ advancedSettingsId, parent }: Props) => {
       let num = parseInt(value, 10)
       num = Math.min(num, subtitles.length)
       num = value === "" ? 0 : num
-      setEndIndex(num, parent)
+      setEndIndex(num)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setEndIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length), parent)
+    setEndIndex(Math.min(Math.max(parseInt(value, 10), 1), subtitles.length))
     if (endIndex < startIndex) {
-      setStartIndex(Math.max(1, endIndex), parent)
+      setStartIndex(Math.max(1, endIndex))
     }
   }
 

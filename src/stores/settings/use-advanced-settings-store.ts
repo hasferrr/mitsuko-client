@@ -1,17 +1,13 @@
 import { create } from "zustand"
-import { AdvancedSettings, SettingsParentType } from "@/types/project"
+import { AdvancedSettings } from "@/types/project"
 import { Model } from "@/types/model"
 import { useTranslationDataStore } from "../data/use-translation-data-store"
 import {
-  createAdvancedSettings,
   updateAdvancedSettings,
-  getAdvancedSettings,
   getAllAdvancedSettings,
 } from "@/lib/db/settings"
 import { useSettingsStore } from "./use-settings-store"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
-import { useExtractionDataStore } from "../data/use-extraction-data-store"
-import { useProjectStore } from "../data/use-project-store"
 
 interface AdvancedSettingsStore {
   data: Record<string, AdvancedSettings>
@@ -33,95 +29,20 @@ interface AdvancedSettingsStore {
     id: string,
     key: keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>,
     value: AdvancedSettings[keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>],
-    parent: SettingsParentType
   ) => void
   resetIndex: (
     id: string,
     s: number | null,
     e: number | null,
-    parent: SettingsParentType,
   ) => void
   resetAdvancedSettings: (
     advancedSettingsId: string,
     basicSettingsId: string,
-    parent: SettingsParentType,
   ) => void
   applyModelDefaults: (
     newSettingsInput: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>,
     modelDetail: Model | null
   ) => Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>
-}
-
-const getOrCreateAdvancedSettings = async <T>(
-  store: { getState: () => { currentId: string | null; data: Record<string, T> } },
-  currentId: string | null,
-  getSettingsId: (data: T) => string | null | undefined,
-  createAndUpdate: (newSettings: AdvancedSettings) => void
-): Promise<AdvancedSettings | null> => {
-  if (!currentId) return null
-  const data = store.getState().data[currentId]
-  if (!data) return null
-
-  let advancedSettings = getSettingsId(data)
-    ? await getAdvancedSettings(getSettingsId(data)!) ?? null
-    : null
-
-  if (!advancedSettings) {
-    advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
-    createAndUpdate(advancedSettings)
-  }
-
-  return advancedSettings
-}
-
-const updateSettings = async <K extends keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>>(
-  field: K,
-  value: AdvancedSettings[K],
-  parent: SettingsParentType,
-) => {
-  try {
-    let advancedSettings: AdvancedSettings | null = null
-
-    if (parent === 'translation') {
-      const store = useTranslationDataStore
-      const currentId = store.getState().currentId
-      advancedSettings = await getOrCreateAdvancedSettings(
-        store,
-        currentId,
-        (data) => data.advancedSettingsId,
-        (newSettings) => store.getState().mutateData(currentId!, "advancedSettingsId", newSettings.id)
-      )
-    } else if (parent === 'extraction') {
-      const store = useExtractionDataStore
-      const currentId = store.getState().currentId
-      advancedSettings = await getOrCreateAdvancedSettings(
-        store,
-        currentId,
-        (data) => data.advancedSettingsId,
-        (newSettings) => store.getState().mutateData(currentId!, "advancedSettingsId", newSettings.id)
-      )
-    } else if (parent === 'project') {
-      const store = useProjectStore
-      const data = store.getState().currentProject
-      if (!data) return
-
-      const advancedSettingsId = data.defaultAdvancedSettingsId
-      advancedSettings = advancedSettingsId
-        ? await getAdvancedSettings(advancedSettingsId) ?? null
-        : null
-
-      if (!advancedSettings) {
-        advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
-        store.getState().updateProject(data.id, { defaultAdvancedSettingsId: advancedSettings.id })
-      }
-    }
-
-    if (advancedSettings) {
-      await updateAdvancedSettings(advancedSettings.id, { [field]: value })
-    }
-  } catch (error) {
-    console.error(`Failed to update advanced settings for ${parent}:`, error)
-  }
 }
 
 export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
@@ -202,11 +123,11 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
           console.error("Failed to save settings data:", error)
         }
       },
-      setAdvancedSettingsValue: (id, key, value, parent) => {
+      setAdvancedSettingsValue: (id, key, value) => {
         get().mutateData(id, key, value)
-        updateSettings(key, value, parent)
+        get().saveData(id)
       },
-      resetIndex: (id, s, e, parent) => {
+      resetIndex: (id, s, e) => {
         const translationData = useTranslationDataStore.getState().data[id]
         const subtitles = translationData?.subtitles ?? []
 
@@ -219,11 +140,9 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         store.mutateData(id, "startIndex", startIndex)
         store.mutateData(id, "endIndex", endIndex)
 
-        // Update both indices in the database
-        updateSettings("startIndex", startIndex, parent)
-        updateSettings("endIndex", endIndex, parent)
+        get().saveData(id)
       },
-      resetAdvancedSettings: (advancedSettingsId, basicSettingsId, parent) => {
+      resetAdvancedSettings: (advancedSettingsId, basicSettingsId) => {
         const settingsData = useSettingsStore.getState().data
         const modelDetail = settingsData[basicSettingsId]?.modelDetail ?? null
         const isUseCustomModel = settingsData[basicSettingsId]?.isUseCustomModel ?? false
@@ -246,10 +165,7 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
           store.mutateData(advancedSettingsId, key as keyof AdvancedSettings, value)
         })
 
-        // Update all settings in the database
-        Object.entries(newSettings).forEach(([key, value]) => {
-          updateSettings(key as keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>, value, parent)
-        })
+        get().saveData(advancedSettingsId)
       },
       applyModelDefaults: (newSettingsInput, modelDetail) => {
         const updatedSettings = { ...newSettingsInput }

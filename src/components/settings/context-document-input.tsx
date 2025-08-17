@@ -11,18 +11,16 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { Extraction } from "@/types/project"
 import { db } from "@/lib/db/db"
 import { getContent } from "@/lib/parser/parser"
-import { SettingsParentType } from "@/types/project"
 
 interface Props {
   basicSettingsId: string
-  parent: SettingsParentType
 }
 
-export const ContextDocumentInput = memo(({ basicSettingsId, parent }: Props) => {
+export const ContextDocumentInput = memo(({ basicSettingsId }: Props) => {
   const currentProject = useProjectStore((state) => state.currentProject)
   const contextDocument = useSettingsStore((state) => state.getContextDocument(basicSettingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
-  const setContextDocument = (doc: string, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc, parent)
+  const setContextDocument = (doc: string) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc)
 
   const [isContextDialogOpen, setIsContextDialogOpen] = useState(false)
   const [projectExtractions, setProjectExtractions] = useState<Extraction[]>([])
@@ -37,14 +35,14 @@ export const ContextDocumentInput = memo(({ basicSettingsId, parent }: Props) =>
 
   const handleContextDocumentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
-    setContextDocument(e.target.value, parent)
+    setContextDocument(e.target.value)
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`
   }
 
   const handleContextSelect = (contextResult: string) => {
     setHasChanges(true)
-    setContextDocument(getContent(contextResult).trim(), parent)
+    setContextDocument(getContent(contextResult).trim())
     setIsContextDialogOpen(false)
   }
 

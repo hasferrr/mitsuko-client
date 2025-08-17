@@ -106,7 +106,7 @@ import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-g
 import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { SettingsParentType, Translation } from "@/types/project"
+import { Translation } from "@/types/project"
 import { DownloadSection } from "../download-section"
 import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { convertSubtitle } from "@/lib/subtitles/utils/convert-subtitle"
@@ -158,7 +158,7 @@ export default function SubtitleTranslatorMain({
   const customInstructions = useSettingsStore((state) => state.getCustomInstructions(basicSettingsId))
   const fewShot = useSettingsStore((state) => state.getFewShot(basicSettingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
-  const setContextDocument = (doc: string, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc, parent)
+  const setContextDocument = (doc: string) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc)
 
   // Advanced Settings Store
   const temperature = useAdvancedSettingsStore((state) => state.getTemperature(advancedSettingsId))
@@ -675,7 +675,7 @@ export default function SubtitleTranslatorMain({
         }
 
         setSubtitles(currentId, parsedSubtitles)
-        resetIndex(advancedSettingsId, 1, parsedSubtitles.length, "translation")
+        resetIndex(advancedSettingsId, 1, parsedSubtitles.length)
 
         const fileName = pendingFile.name.split('.')
         fileName.pop()
@@ -697,7 +697,7 @@ export default function SubtitleTranslatorMain({
     if (!pendingContextFile) return
     try {
       const text = await pendingContextFile.text()
-      setContextDocument(text, "translation")
+      setContextDocument(text)
     } catch (error) {
       console.error("Error reading context file:", error)
     } finally {
@@ -1011,29 +1011,24 @@ export default function SubtitleTranslatorMain({
                 <CardContent className="p-4 space-y-4">
                   <LanguageSelection
                     basicSettingsId={basicSettingsId}
-                    parent="translation"
                   />
                   <ModelSelection
                     basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
-                    parent="translation"
                   />
                   <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
                     <ContextDocumentInput
                       basicSettingsId={basicSettingsId}
-                      parent="translation"
                     />
                   </DragAndDrop>
                   <div className="m-[2px]">
                     <CustomInstructionsInput
                       basicSettingsId={basicSettingsId}
-                      parent="translation"
                     />
                   </div>
                   <div className="m-[2px]">
                     <FewShotInput
                       basicSettingsId={basicSettingsId}
-                      parent="translation"
                     />
                   </div>
                 </CardContent>
@@ -1048,15 +1043,12 @@ export default function SubtitleTranslatorMain({
                   />
                   <TemperatureSlider
                     advancedSettingsId={advancedSettingsId}
-                    parent="translation"
                   />
                   <StartIndexInput
                     advancedSettingsId={advancedSettingsId}
-                    parent="translation"
                   />
                   <EndIndexInput
                     advancedSettingsId={advancedSettingsId}
-                    parent="translation"
                   />
                   <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
                     <AdvancedReasoningSwitch />
@@ -1064,30 +1056,24 @@ export default function SubtitleTranslatorMain({
                   <div className="text-sm font-semibold">Technical Options</div>
                   <SplitSizeInput
                     advancedSettingsId={advancedSettingsId}
-                    parent="translation"
                   />
                   <MaxCompletionTokenInput
                     basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
-                    parent="translation"
                   />
                   <StructuredOutputSwitch
                     basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
-                    parent="translation"
                   />
                   <FullContextMemorySwitch
                     advancedSettingsId={advancedSettingsId}
-                    parent="translation"
                   />
                   <BetterContextCachingSwitch
                     advancedSettingsId={advancedSettingsId}
-                    parent="translation"
                   />
                   <AdvancedSettingsResetButton
                     basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
-                    parent="translation"
                   />
                 </CardContent>
               </Card>

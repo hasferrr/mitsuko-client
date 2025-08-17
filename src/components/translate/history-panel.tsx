@@ -89,7 +89,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
       setJsonResponse(currentId, selectedHistoryItem.json)
       await saveData(currentId)
       setIsHistoryOpen(false)
-      resetIndex(advancedSettingsId, 1, selectedHistoryItem.subtitles.length, "translation")
+      resetIndex(advancedSettingsId, 1, selectedHistoryItem.subtitles.length)
     } catch (error) {
       console.error("Error applying history:", error)
     }

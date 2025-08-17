@@ -6,22 +6,20 @@ import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constants/limits"
-import { SettingsParentType } from "@/types/project"
 
 interface MaxCompletionTokenInputProps {
   basicSettingsId: string
   advancedSettingsId: string
-  parent: SettingsParentType
 }
 
-export const MaxCompletionTokenInput = memo(({ basicSettingsId, advancedSettingsId, parent }: MaxCompletionTokenInputProps) => {
+export const MaxCompletionTokenInput = memo(({ basicSettingsId, advancedSettingsId }: MaxCompletionTokenInputProps) => {
   const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
   const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens(advancedSettingsId))
   const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto(advancedSettingsId))
   const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setMaxCompletionTokens = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "maxCompletionTokens", value, parent)
-  const setIsMaxCompletionTokensAuto = (value: boolean, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "isMaxCompletionTokensAuto", value, parent)
+  const setMaxCompletionTokens = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "maxCompletionTokens", value)
+  const setIsMaxCompletionTokensAuto = (value: boolean) => setAdvancedSettingsValue(advancedSettingsId, "isMaxCompletionTokensAuto", value)
 
   const maxToken = isUseCustomModel || !modelDetail
     ? MAX_COMPLETION_TOKENS_MAX
@@ -33,13 +31,13 @@ export const MaxCompletionTokenInput = memo(({ basicSettingsId, advancedSettings
     if (/^\d*$/.test(value)) {
       let num = parseInt(value, 10) // Prevent NaN
       num = Math.min(num, maxToken)
-      setMaxCompletionTokens(value === "" ? 0 : num, parent)
+      setMaxCompletionTokens(value === "" ? 0 : num)
     }
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setMaxCompletionTokens(Math.min(Math.max(parseInt(value, 10), MAX_COMPLETION_TOKENS_MIN), maxToken), parent)
+    setMaxCompletionTokens(Math.min(Math.max(parseInt(value, 10), MAX_COMPLETION_TOKENS_MIN), maxToken))
   }
 
   return (
@@ -48,7 +46,7 @@ export const MaxCompletionTokenInput = memo(({ basicSettingsId, advancedSettings
         <label className="text-sm font-medium">Max Completion Token</label>
         <Switch
           checked={!isMaxCompletionTokensAuto}
-          onCheckedChange={(checked) => setIsMaxCompletionTokensAuto(!checked, parent)}
+          onCheckedChange={(checked) => setIsMaxCompletionTokensAuto(!checked)}
         />
       </div>
       <Input

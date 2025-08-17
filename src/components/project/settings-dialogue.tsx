@@ -53,12 +53,10 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
         <div className="space-y-4">
           <LanguageSelection
             basicSettingsId={basicSettingsId}
-            parent="project"
           />
           <ModelSelection
             basicSettingsId={basicSettingsId}
             advancedSettingsId={advancedSettingsId}
-            parent="project"
             showUseCustomModelSwitch={false}
           />
           <Accordion type="single" collapsible className="border-none">
@@ -71,7 +69,6 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
                   <div className="border border-muted-foreground/20 rounded-md p-4">
                     <TemperatureSlider
                       advancedSettingsId={advancedSettingsId}
-                      parent="project"
                     />
                   </div>
                 </div>

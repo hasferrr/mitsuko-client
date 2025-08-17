@@ -24,7 +24,6 @@ import { Model, ModelProvider } from "@/types/model"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { MODEL_COLLECTION } from "@/constants/model-collection"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { SettingsParentType } from "@/types/project"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useModelCosts } from "@/contexts/model-cost-context"
 import { ModelCreditCost } from "@/types/model-cost"
@@ -60,7 +59,6 @@ const ModelProviderIcon = ({ provider }: { provider: ModelProvider }) => {
 interface ModelSelectorProps extends PopoverProps {
   basicSettingsId: string
   advancedSettingsId: string
-  type: SettingsParentType
   disabled?: boolean
   className?: string
 }
@@ -68,7 +66,6 @@ interface ModelSelectorProps extends PopoverProps {
 export function ModelSelector({
   basicSettingsId,
   advancedSettingsId,
-  type,
   disabled,
   className,
   ...props
@@ -79,14 +76,14 @@ export function ModelSelector({
   // Settings Store
   const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
-  const setModelDetail = (model: Model | null, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "modelDetail", model, parent)
+  const setModelDetail = (model: Model | null) => setBasicSettingsValue(basicSettingsId, "modelDetail", model)
 
   // Advanced Settings Store
   const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setTemperature = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "temperature", value, parent)
-  const setIsUseStructuredOutput = (value: boolean, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "isUseStructuredOutput", value, parent)
-  const setIsMaxCompletionTokensAuto = (value: boolean, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "isMaxCompletionTokensAuto", value, parent)
-  const setMaxCompletionTokens = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "maxCompletionTokens", value, parent)
+  const setTemperature = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "temperature", value)
+  const setIsUseStructuredOutput = (value: boolean) => setAdvancedSettingsValue(advancedSettingsId, "isUseStructuredOutput", value)
+  const setIsMaxCompletionTokensAuto = (value: boolean) => setAdvancedSettingsValue(advancedSettingsId, "isMaxCompletionTokensAuto", value)
+  const setMaxCompletionTokens = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "maxCompletionTokens", value)
 
   // Local Settings Store
   const isAutoTemperatureEnabled = useLocalSettingsStore((state) => state.isAutoTemperatureEnabled)
@@ -95,34 +92,34 @@ export function ModelSelector({
   const modelCostsMap = useModelCosts()
 
   const handleSelect = (model: Model) => {
-    setModelDetail(model, type)
+    setModelDetail(model)
     setOpen(false)
 
     // Only adjust temperature if auto temperature is enabled
     if (isAutoTemperatureEnabled) {
       if (model.default?.temperature !== undefined) {
-        setTemperature(model.default.temperature, type)
+        setTemperature(model.default.temperature)
       } else {
-        setTemperature(DEFAULT_ADVANCED_SETTINGS.temperature, type)
+        setTemperature(DEFAULT_ADVANCED_SETTINGS.temperature)
       }
     }
 
     if (model.default?.isUseStructuredOutput !== undefined) {
-      setIsUseStructuredOutput(model.default.isUseStructuredOutput, type)
+      setIsUseStructuredOutput(model.default.isUseStructuredOutput)
     } else {
-      setIsUseStructuredOutput(model.structuredOutput, type)
+      setIsUseStructuredOutput(model.structuredOutput)
     }
 
     if (model.default?.isMaxCompletionTokensAuto !== undefined) {
-      setIsMaxCompletionTokensAuto(model.default.isMaxCompletionTokensAuto, type)
+      setIsMaxCompletionTokensAuto(model.default.isMaxCompletionTokensAuto)
     } else {
-      setIsMaxCompletionTokensAuto(DEFAULT_ADVANCED_SETTINGS.isMaxCompletionTokensAuto, type)
+      setIsMaxCompletionTokensAuto(DEFAULT_ADVANCED_SETTINGS.isMaxCompletionTokensAuto)
     }
 
     if (model.default?.maxCompletionTokens !== undefined) {
-      setMaxCompletionTokens(model.default.maxCompletionTokens, type)
+      setMaxCompletionTokens(model.default.maxCompletionTokens)
     } else {
-      setMaxCompletionTokens(DEFAULT_ADVANCED_SETTINGS.maxCompletionTokens, type)
+      setMaxCompletionTokens(DEFAULT_ADVANCED_SETTINGS.maxCompletionTokens)
     }
   }
 

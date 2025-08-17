@@ -6,17 +6,15 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { useLocalSettingsStore } from '@/stores/use-local-settings-store'
 import { TEMPERATURE_MIN, TEMPERATURE_MAX } from "@/constants/limits"
-import { SettingsParentType } from "@/types/project"
 
 interface TemperatureSliderProps {
   advancedSettingsId: string
-  parent: SettingsParentType
 }
 
-export const TemperatureSlider = memo(({ advancedSettingsId, parent }: TemperatureSliderProps) => {
+export const TemperatureSlider = memo(({ advancedSettingsId }: TemperatureSliderProps) => {
   const temperature = useAdvancedSettingsStore((state) => state.getTemperature(advancedSettingsId))
   const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setTemperature = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "temperature", value, parent)
+  const setTemperature = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "temperature", value)
 
   const isAutoTemperatureEnabled = useLocalSettingsStore((state) => state.isAutoTemperatureEnabled)
   const setIsAutoTemperatureEnabled = useLocalSettingsStore((state) => state.setIsAutoTemperatureEnabled)
@@ -31,7 +29,7 @@ export const TemperatureSlider = memo(({ advancedSettingsId, parent }: Temperatu
       </div>
       <Slider
         value={[temperature]}
-        onValueChange={([value]) => setTemperature(value, parent)}
+        onValueChange={([value]) => setTemperature(value)}
         max={TEMPERATURE_MAX}
         min={TEMPERATURE_MIN}
         step={0.1}

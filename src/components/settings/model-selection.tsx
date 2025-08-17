@@ -10,26 +10,22 @@ import { useLocalSettingsStore } from '@/stores/use-local-settings-store'
 import { ModelSelector } from "@/components/model-selector"
 import WhichModels from "@/components/pricing/which-models"
 import { CustomApiConfigManager } from "./custom-api-config-manager"
-import { SettingsParentType } from "@/types/project"
-
 interface ModelSelectionProps {
   basicSettingsId: string
   advancedSettingsId: string
-  parent: SettingsParentType
   showUseCustomModelSwitch?: boolean
 }
 
 export const ModelSelection = memo(({
   basicSettingsId,
   advancedSettingsId,
-  parent,
   showUseCustomModelSwitch = true
 }: ModelSelectionProps) => {
   // Settings Store
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
-  const setIsUseCustomModel = useCallback((value: boolean, parent: SettingsParentType) => {
-    setBasicSettingsValue(basicSettingsId, "isUseCustomModel", value, parent)
+  const setIsUseCustomModel = useCallback((value: boolean) => {
+    setBasicSettingsValue(basicSettingsId, "isUseCustomModel", value)
   }, [basicSettingsId, setBasicSettingsValue])
 
   // API Settings Store
@@ -38,9 +34,9 @@ export const ModelSelection = memo(({
 
   useEffect(() => {
     if (!isThirdPartyModelEnabled && isUseCustomModel) {
-      setIsUseCustomModel(false, parent)
+      setIsUseCustomModel(false)
     }
-  }, [isThirdPartyModelEnabled, isUseCustomModel, setIsUseCustomModel, parent])
+  }, [isThirdPartyModelEnabled, isUseCustomModel, setIsUseCustomModel])
 
   return (
     <>
@@ -52,7 +48,6 @@ export const ModelSelection = memo(({
               basicSettingsId={basicSettingsId}
               advancedSettingsId={advancedSettingsId}
               disabled={isUseCustomModel}
-              type={parent}
               className="w-full"
             />
           </div>
@@ -69,7 +64,7 @@ export const ModelSelection = memo(({
       </div>
       {showUseCustomModelSwitch && isThirdPartyModelEnabled && (
         <div className="flex items-center space-x-2">
-          <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={(checked) => setIsUseCustomModel(checked, parent)} />
+          <Switch id="custom-model" checked={isUseCustomModel} onCheckedChange={(checked) => setIsUseCustomModel(checked)} />
           <label htmlFor="custom-model" className="text-sm font-medium">
             Use Custom Model
           </label>

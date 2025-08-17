@@ -628,12 +628,10 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                 <ModelSelection
                   basicSettingsId={basicSettingsId}
                   advancedSettingsId={advancedSettingsId}
-                  parent="extraction"
                 />
                 <MaxCompletionTokenInput
                   basicSettingsId={basicSettingsId}
                   advancedSettingsId={advancedSettingsId}
-                  parent="extraction"
                 />
               </CardContent>
             </Card>

@@ -13,6 +13,9 @@ import { useTranscriptionDataStore } from "./use-transcription-data-store"
 import { useTranslationDataStore } from "./use-translation-data-store"
 import { useExtractionDataStore } from "./use-extraction-data-store"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
+import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
+import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SubtitleTranslated } from "@/types/subtitles"
 import { createTranslation, deleteTranslation } from "@/lib/db/translation"
 import { db } from "@/lib/db/db"
@@ -74,6 +77,15 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     set({ loading: true })
     try {
       const newProject = await createProjectDB(name, isBatch)
+
+      // upsert associated settings into stores
+      const settingsStore = useSettingsStore.getState()
+      const advancedSettingsStore = useAdvancedSettingsStore.getState()
+      const bs = await getBasicSettings(newProject.defaultBasicSettingsId)
+      if (bs) settingsStore.upsertData(bs.id, bs)
+      const ads = await getAdvancedSettings(newProject.defaultAdvancedSettingsId)
+      if (ads) advancedSettingsStore.upsertData(ads.id, ads)
+
       set((state) => ({
         projects: [newProject, ...state.projects],
         loading: false
@@ -233,6 +245,14 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
         const translationStore = useTranslationDataStore.getState()
         translationStore.upsertData(updatedTranslation.id, updatedTranslation)
       }
+
+      // ensure shared project settings are present in in-memory stores
+      const settingsStore = useSettingsStore.getState()
+      const advancedSettingsStore = useAdvancedSettingsStore.getState()
+      const bs = await getBasicSettings(currentProject.defaultBasicSettingsId)
+      if (bs) settingsStore.upsertData(bs.id, bs)
+      const ads = await getAdvancedSettings(currentProject.defaultAdvancedSettingsId)
+      if (ads) advancedSettingsStore.upsertData(ads.id, ads)
 
       await db.transaction('rw', db.basicSettings, db.advancedSettings, async () => {
         await db.basicSettings.delete(originalBasicSettingsId)
