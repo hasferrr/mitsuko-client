@@ -52,3 +52,11 @@ export const updateAdvancedSettings = async (id: string, settings: Partial<Omit<
 export const getAdvancedSettings = async (id: string): Promise<AdvancedSettings | undefined> => {
   return db.advancedSettings.get(id)
 }
+
+export const getAllBasicSettings = async (): Promise<BasicSettings[]> => {
+  return db.basicSettings.toArray()
+}
+
+export const getAllAdvancedSettings = async (): Promise<AdvancedSettings[]> => {
+  return db.advancedSettings.toArray()
+}

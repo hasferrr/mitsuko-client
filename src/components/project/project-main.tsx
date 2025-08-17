@@ -43,7 +43,6 @@ import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { SettingsDialogue } from "./settings-dialogue"
-import { useSettings } from "@/hooks/use-settings"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
@@ -118,11 +117,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
-
-  useSettings({
-    basicSettingsId: currentProject?.defaultBasicSettingsId || "",
-    advancedSettingsId: currentProject?.defaultAdvancedSettingsId || ""
-  })
 
   useEffect(() => {
     if (!currentProject) return

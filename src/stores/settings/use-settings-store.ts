@@ -2,7 +2,12 @@ import { create } from "zustand"
 import { Model } from "@/types/model"
 import { BasicSettings, SettingsParentType } from "@/types/project"
 import { persist } from "zustand/middleware"
-import { createBasicSettings, updateBasicSettings, getBasicSettings } from "@/lib/db/settings"
+import {
+  createBasicSettings,
+  updateBasicSettings,
+  getBasicSettings,
+  getAllBasicSettings,
+} from "@/lib/db/settings"
 import { DEFAULT_BASIC_SETTINGS } from "@/constants/default"
 import { useTranslationDataStore } from "../data/use-translation-data-store"
 import { useExtractionDataStore } from "../data/use-extraction-data-store"
@@ -10,8 +15,7 @@ import { useProjectStore } from "../data/use-project-store"
 
 interface SettingsStore {
   data: Record<string, BasicSettings>
-  currentId: string | null
-  setCurrentId: (id: string) => void
+  loadSettings: () => Promise<void>
   upsertData: (id: string, value: BasicSettings) => void
   mutateData: <T extends keyof BasicSettings>(id: string, key: T, value: BasicSettings[T]) => void
   saveData: (id: string) => Promise<void>
@@ -118,8 +122,15 @@ export const useSettingsStore = create<SettingsStore>()(
   persist(
     (set, get) => ({
       data: {},
-      currentId: null,
-      setCurrentId: (id) => set({ currentId: id }),
+      loadSettings: async () => {
+        try {
+          const list = await getAllBasicSettings()
+          const mapped = Object.fromEntries(list.map(s => [s.id, s])) as Record<string, BasicSettings>
+          set(state => ({ ...state, data: { ...state.data, ...mapped } }))
+        } catch (error) {
+          console.error("Failed to load settings", error)
+        }
+      },
       getBasicSettings: (id) => {
         return get().data[id] ?? null
       },

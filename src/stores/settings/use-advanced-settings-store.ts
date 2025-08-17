@@ -2,7 +2,12 @@ import { create } from "zustand"
 import { AdvancedSettings, SettingsParentType } from "@/types/project"
 import { Model } from "@/types/model"
 import { useTranslationDataStore } from "../data/use-translation-data-store"
-import { createAdvancedSettings, updateAdvancedSettings, getAdvancedSettings } from "@/lib/db/settings"
+import {
+  createAdvancedSettings,
+  updateAdvancedSettings,
+  getAdvancedSettings,
+  getAllAdvancedSettings,
+} from "@/lib/db/settings"
 import { useSettingsStore } from "./use-settings-store"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useExtractionDataStore } from "../data/use-extraction-data-store"
@@ -10,8 +15,7 @@ import { useProjectStore } from "../data/use-project-store"
 
 interface AdvancedSettingsStore {
   data: Record<string, AdvancedSettings>
-  currentId: string | null
-  setCurrentId: (id: string) => void
+  loadSettings: () => Promise<void>
   upsertData: (id: string, value: AdvancedSettings) => void
   mutateData: <T extends keyof AdvancedSettings>(id: string, key: T, value: AdvancedSettings[T]) => void
   saveData: (id: string) => Promise<void>
@@ -37,7 +41,11 @@ interface AdvancedSettingsStore {
     e: number | null,
     parent: SettingsParentType,
   ) => void
-  resetAdvancedSettings: (id: string, parent: SettingsParentType) => void
+  resetAdvancedSettings: (
+    advancedSettingsId: string,
+    basicSettingsId: string,
+    parent: SettingsParentType,
+  ) => void
   applyModelDefaults: (
     newSettingsInput: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>,
     modelDetail: Model | null
@@ -120,8 +128,15 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
   (set, get) => (
     {
       data: {},
-      currentId: null,
-      setCurrentId: (id) => set({ currentId: id }),
+      loadSettings: async () => {
+        try {
+          const list = await getAllAdvancedSettings()
+          const mapped = Object.fromEntries(list.map(s => [s.id, s])) as Record<string, AdvancedSettings>
+          set(state => ({ ...state, data: { ...state.data, ...mapped } }))
+        } catch (error) {
+          console.error("Failed to load advanced settings", error)
+        }
+      },
       getAdvancedSettings: (id) => {
         return get().data[id] ?? null
       },
@@ -208,11 +223,10 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
         updateSettings("startIndex", startIndex, parent)
         updateSettings("endIndex", endIndex, parent)
       },
-      resetAdvancedSettings: (id, parent) => {
-        const settingsCurrentId = useSettingsStore.getState().currentId
+      resetAdvancedSettings: (advancedSettingsId, basicSettingsId, parent) => {
         const settingsData = useSettingsStore.getState().data
-        const modelDetail = settingsCurrentId ? settingsData[settingsCurrentId]?.modelDetail ?? null : null
-        const isUseCustomModel = settingsCurrentId ? settingsData[settingsCurrentId]?.isUseCustomModel ?? false : false
+        const modelDetail = settingsData[basicSettingsId]?.modelDetail ?? null
+        const isUseCustomModel = settingsData[basicSettingsId]?.isUseCustomModel ?? false
 
         // Start with DEFAULT_ADVANCED_SETTINGS
         let newSettings: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'> = {
@@ -229,7 +243,7 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
 
         // Update all settings in the data record
         Object.entries(newSettings).forEach(([key, value]) => {
-          store.mutateData(id, key as keyof AdvancedSettings, value)
+          store.mutateData(advancedSettingsId, key as keyof AdvancedSettings, value)
         })
 
         // Update all settings in the database

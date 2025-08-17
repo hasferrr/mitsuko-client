@@ -8,7 +8,6 @@ import {
   Plus,
 } from "lucide-react"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { useSettings } from "@/hooks/use-settings"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import BatchTranslatorMain from "./batch-translator-main"
 
@@ -39,11 +38,6 @@ export default function BatchTranslator() {
     const newBatch = await createProject(`Batch ${new Date().toLocaleDateString()}`, true)
     setCurrentProject(newBatch)
   }
-
-  useSettings({
-    basicSettingsId: batch?.defaultBasicSettingsId ?? "",
-    advancedSettingsId: batch?.defaultAdvancedSettingsId ?? "",
-  })
 
   if (!batch || !batch.isBatch) {
     return (

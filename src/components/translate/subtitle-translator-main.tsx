@@ -1085,6 +1085,7 @@ export default function SubtitleTranslatorMain({
                     parent="translation"
                   />
                   <AdvancedSettingsResetButton
+                    basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
                     parent="translation"
                   />

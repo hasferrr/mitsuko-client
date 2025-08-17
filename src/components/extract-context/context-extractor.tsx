@@ -2,7 +2,6 @@
 
 import { useEffect } from "react"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
-import { useSettings } from "@/hooks/use-settings"
 import { ContextExtractorMain } from "./context-extractor-main"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { Extraction } from "@/types/project"
@@ -11,11 +10,6 @@ export const ContextExtractor = () => {
   const currentId = useExtractionDataStore((state) => state.currentId)
   const extractionData = useExtractionDataStore((state) => state.data)
   const extraction = (extractionData[currentId ?? ""] || null) as Extraction | null
-
-  useSettings({
-    basicSettingsId: extraction?.basicSettingsId ?? null,
-    advancedSettingsId: extraction?.advancedSettingsId ?? null,
-  })
 
   useEffect(() => {
     if (!currentId || !extraction) return

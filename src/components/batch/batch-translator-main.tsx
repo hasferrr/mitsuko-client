@@ -1356,6 +1356,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
                     parent="project"
                   />
                   <AdvancedSettingsResetButton
+                    basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
                     parent="project"
                   />
