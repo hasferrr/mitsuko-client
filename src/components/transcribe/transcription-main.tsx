@@ -199,7 +199,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     await saveData(currentId)
 
     if (!selectedUploadId) {
-      toast.error("No uploaded file selected")
+      toast.error("Please upload or select an uploaded file first")
       return
     }
     if (!models) {
@@ -335,6 +335,11 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     setIsClearDialogOpen(false)
   }
 
+  const handleDragAndDropClick = () => {
+    setSelectedUploadId(null)
+    fileInputRef.current?.click()
+  }
+
   const handleDropFiles = (files: FileList) => {
     const selectedFile = files[0]
     if (!selectedFile) return
@@ -361,6 +366,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   }
 
   const handleUploadSelectedFile = () => {
+    setSelectedUploadId(null)
     if (!file) return
     handleUpload(file)
   }
@@ -457,7 +463,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                     className="rounded-lg"
                   >
                     <div
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={handleDragAndDropClick}
                       className="border-2 border-dashed border-border rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
                     >
                       <Upload className="h-10 w-10 text-muted-foreground mb-3" />
@@ -510,7 +516,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                       variant="outline"
                       onClick={handleUploadSelectedFile}
                       disabled={isUploading || !session}
-                      className="w-full"
+                      className="w-full border-primary/25 hover:border-primary/50"
                     >
                       {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                       Upload Selected File {uploadProgress && `(${uploadProgress.percentage}%)`}
@@ -594,7 +600,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                       onCheckedChange={v => setDeleteAfterTranscription(v === true)}
                     />
                     <Label htmlFor="delete-after-transcription" className="text-sm text-muted-foreground">
-                      Delete file after transcription
+                      Delete uploaded file after transcription
                     </Label>
                   </div>
                 )}
@@ -624,7 +630,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                 {/* Start Button */}
                 <Button
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                  disabled={!selectedUploadId || isTranscribing || !session}
+                  disabled={isTranscribing || !session}
                   onClick={handleStartTranscription}
                 >
                   {isTranscribing ? (
