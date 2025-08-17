@@ -4,7 +4,9 @@ import { useState, useRef, useEffect, useMemo } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,6 +49,7 @@ import { DownloadOption, CombinedFormat, SubtitleType } from "@/types/subtitles"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { useBatchSettingsStore } from "@/stores/use-batch-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import {
@@ -140,6 +143,10 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
   const renameProject = useProjectStore((state) => state.renameProject)
   const removeTranslationFromBatch = useProjectStore((state) => state.removeTranslationFromBatch)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
+
+  // Settings Mode Store (shared vs individual)
+  const isUseSharedSettings = useBatchSettingsStore(state => !state.individualIds.has(currentProject?.id ?? ""))
+  const setUseSharedSettings = useBatchSettingsStore(state => state.setUseSharedSettings)
 
   const [order, setOrder] = useState<string[]>(currentProject?.translations ?? [])
 
@@ -527,6 +534,30 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
     const subtitles = translationData[currentId]?.subtitles ?? []
     const title = translationData[currentId]?.title ?? ""
     const parsed = translationData[currentId]?.parsed
+
+    // Determine settings IDs based on toggle
+    const bsIdToUse = isUseSharedSettings ? basicSettingsId : (translationData[currentId]?.basicSettingsId || basicSettingsId)
+    const adsIdToUse = isUseSharedSettings ? advancedSettingsId : (translationData[currentId]?.advancedSettingsId || advancedSettingsId)
+
+    // Pull current settings values
+    const settingsStoreState = useSettingsStore.getState()
+    const advStoreState = useAdvancedSettingsStore.getState()
+
+    const sourceLanguage = settingsStoreState.getSourceLanguage(bsIdToUse)
+    const targetLanguage = settingsStoreState.getTargetLanguage(bsIdToUse)
+    const modelDetail = settingsStoreState.getModelDetail(bsIdToUse)
+    const isUseCustomModel = settingsStoreState.getIsUseCustomModel(bsIdToUse)
+    const contextDocument = settingsStoreState.getContextDocument(bsIdToUse)
+    const customInstructions = settingsStoreState.getCustomInstructions(bsIdToUse)
+    const fewShot = settingsStoreState.getFewShot(bsIdToUse)
+
+    const temperature = advStoreState.getTemperature(adsIdToUse)
+    const maxCompletionTokens = advStoreState.getMaxCompletionTokens(adsIdToUse)
+    const isMaxCompletionTokensAuto = advStoreState.getIsMaxCompletionTokensAuto(adsIdToUse)
+    const splitSize = advStoreState.getSplitSize(adsIdToUse)
+    const isUseStructuredOutput = advStoreState.getIsUseStructuredOutput(adsIdToUse)
+    const isUseFullContextMemory = advStoreState.getIsUseFullContextMemory(adsIdToUse)
+    const isBetterContextCaching = advStoreState.getIsBetterContextCaching(adsIdToUse)
 
     const firstChunk = (size: number, s: number, e: number) => {
       const subtitleChunks: SubtitleNoTime[][] = []
@@ -1287,9 +1318,25 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
               <TabsTrigger value="advanced">Advanced</TabsTrigger>
             </TabsList>
 
+            <div className="flex items-center justify-between w-full p-4 mt-4 rounded-xl border border-input bg-card shadow-sm">
+              <label htmlFor="shared-settings-switch" className="flex flex-col">
+                <span className="text-sm font-semibold">Settings Mode</span>
+                <span className="text-xs text-muted-foreground">
+                  {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
+                </span>
+              </label>
+              <Switch
+                id="shared-settings-switch"
+                checked={isUseSharedSettings}
+                onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
+                disabled={isBatchTranslating}
+                className="data-[state=checked]:bg-primary"
+              />
+            </div>
+
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
-                <CardContent className="p-4 space-y-4">
+                <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                   <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                   <LanguageSelection
                     basicSettingsId={basicSettingsId}
@@ -1317,7 +1364,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
 
             <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
-                <CardContent className="p-4 space-y-4">
+                <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                   <ModelDetail
                     basicSettingsId={basicSettingsId}
                   />
@@ -1440,9 +1487,15 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
               <span className="block">
                 Are you sure you want to start translating <strong>{batchFiles.length}</strong> files with <strong>{translatedStats.total}</strong> subtitles?
               </span>
-              <span className="block">
-                This will process up to <strong>{concurrentTranslations}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{modelDetail?.name}</strong>.
-              </span>
+              {isUseSharedSettings ? (
+                <span className="block">
+                  This will process up to <strong>{concurrentTranslations}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{modelDetail?.name}</strong>.
+                </span>
+              ) : (
+                <span className="block">
+                  Each file will be processed with its own settings, which may differ in model or languages.
+                </span>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1493,9 +1546,9 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
               <SubtitleTranslatorMain
                 currentId={previewTranslationId}
                 translation={translationData[previewTranslationId]}
-                basicSettingsId={basicSettingsId}
-                advancedSettingsId={advancedSettingsId}
-                isSharedSettings
+                basicSettingsId={isUseSharedSettings ? basicSettingsId : translationData[previewTranslationId].basicSettingsId}
+                advancedSettingsId={isUseSharedSettings ? advancedSettingsId : translationData[previewTranslationId].advancedSettingsId}
+                isSharedSettings={isUseSharedSettings}
               />
             </div>
           )}
