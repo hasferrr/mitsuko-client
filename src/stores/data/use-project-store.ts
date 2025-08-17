@@ -18,7 +18,6 @@ import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SubtitleTranslated } from "@/types/subtitles"
 import { createTranslation, deleteTranslation } from "@/lib/db/translation"
-import { db } from "@/lib/db/db"
 
 interface ProjectStore {
   currentProject: Project | null
@@ -231,33 +230,17 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
         {}
       )
 
-      const originalBasicSettingsId = translation.basicSettingsId
-      const originalAdvancedSettingsId = translation.advancedSettingsId
+      // upsert translation into in-memory store
+      const translationStore = useTranslationDataStore.getState()
+      translationStore.upsertData(translation.id, translation)
 
-      await db.translations.update(translation.id, {
-        basicSettingsId: currentProject.defaultBasicSettingsId,
-        advancedSettingsId: currentProject.defaultAdvancedSettingsId,
-        updatedAt: new Date(),
-      })
-
-      const updatedTranslation = await db.translations.get(translation.id)
-      if (updatedTranslation) {
-        const translationStore = useTranslationDataStore.getState()
-        translationStore.upsertData(updatedTranslation.id, updatedTranslation)
-      }
-
-      // ensure shared project settings are present in in-memory stores
+      // ensure translation-specific settings are present in in-memory stores
       const settingsStore = useSettingsStore.getState()
       const advancedSettingsStore = useAdvancedSettingsStore.getState()
-      const bs = await getBasicSettings(currentProject.defaultBasicSettingsId)
+      const bs = await getBasicSettings(translation.basicSettingsId)
       if (bs) settingsStore.upsertData(bs.id, bs)
-      const ads = await getAdvancedSettings(currentProject.defaultAdvancedSettingsId)
+      const ads = await getAdvancedSettings(translation.advancedSettingsId)
       if (ads) advancedSettingsStore.upsertData(ads.id, ads)
-
-      await db.transaction('rw', db.basicSettings, db.advancedSettings, async () => {
-        await db.basicSettings.delete(originalBasicSettingsId)
-        await db.advancedSettings.delete(originalAdvancedSettingsId)
-      })
 
       const updatedTranslations = [...currentProject.translations, translation.id]
       await updateProjectItemsDB(projectId, updatedTranslations, 'translations')
@@ -282,14 +265,8 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       const currentProject = get().projects.find(p => p.id === projectId)
       if (!currentProject) throw new Error('Project not found')
 
-      const isBatchProject = currentProject.isBatch
-
-      if (isBatchProject) {
-        // Only delete the translation record; keep shared settings intact
-        await db.translations.delete(translationId)
-      } else {
-        await deleteTranslation(projectId, translationId)
-      }
+      // Delete translation along with its own settings
+      await deleteTranslation(projectId, translationId)
 
       const updatedTranslations = currentProject.translations.filter(id => id !== translationId)
       await updateProjectItemsDB(projectId, updatedTranslations, 'translations')

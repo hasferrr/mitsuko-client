@@ -312,9 +312,8 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         )
         loadProjects()
       }}
-      disabled={currentProject.isBatch}
     >
-      {currentProject.isBatch ? "Disabled in Batch Projects" : "New Translation"}
+      New Translation
     </Button>
   )
 
@@ -453,7 +452,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
           <div className="space-y-6">
             <div className="bg-card border border-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium">Translations {currentProject.isBatch && "(Shared Settings)"}</h3>
+                <h3 className="text-sm font-medium">Translations</h3>
                 {NewTranslationButton}
               </div>
               <DndContext

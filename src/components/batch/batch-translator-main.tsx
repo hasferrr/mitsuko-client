@@ -1290,6 +1290,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className="p-4 space-y-4">
+                  <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                   <LanguageSelection
                     basicSettingsId={basicSettingsId}
                   />
@@ -1320,13 +1321,14 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
                   <ModelDetail
                     basicSettingsId={basicSettingsId}
                   />
+                  <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                   <TemperatureSlider
                     advancedSettingsId={advancedSettingsId}
                   />
                   <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
                     <AdvancedReasoningSwitch />
                   </div>
-                  <div className="text-sm font-semibold">Technical Options</div>
+                  <p className="text-sm font-semibold">Technical Options</p>
                   <SplitSizeInput
                     advancedSettingsId={advancedSettingsId}
                   />
@@ -1493,6 +1495,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
                 translation={translationData[previewTranslationId]}
                 basicSettingsId={basicSettingsId}
                 advancedSettingsId={advancedSettingsId}
+                isSharedSettings
               />
             </div>
           )}
