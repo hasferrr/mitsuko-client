@@ -137,7 +137,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
       },
       {
         name: "Mistral Small 3",
-        subName: "Mistral Small 3.2 24B",
+        subName: "mistral-small-3.2-24b-instruct",
         maxInput: 128000,
         maxOutput: 128000,
         structuredOutput: true,
@@ -509,6 +509,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     models: [
       {
         name: "Mistral Medium 3",
+        subName: "mistral-medium-3.1",
         maxInput: 128000,
         maxOutput: 128000,
         structuredOutput: true,
@@ -521,7 +522,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       },
       {
         name: "Mistral Small 3",
-        subName: "Mistral Small 3.2 24B",
+        subName: "mistral-small-3.2-24b-instruct",
         maxInput: 128000,
         maxOutput: 128000,
         structuredOutput: true,
