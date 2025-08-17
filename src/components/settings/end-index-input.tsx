@@ -7,14 +7,18 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { SettingsParentType } from "@/types/project"
 
 interface Props {
+  advancedSettingsId: string
   parent: SettingsParentType
 }
 
-export const EndIndexInput = memo(({ parent }: Props) => {
-  const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex())
-  const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex())
-  const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
-  const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
+export const EndIndexInput = memo(({ advancedSettingsId, parent }: Props) => {
+  const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex(advancedSettingsId))
+  const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex(advancedSettingsId))
+
+  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setEndIndex = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "endIndex", value, parent)
+  const setStartIndex = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "startIndex", value, parent)
+
   const currentId = useTranslationDataStore((state) => state.currentId)
   const translationData = useTranslationDataStore((state) => state.data)
   const subtitles = currentId ? translationData[currentId]?.subtitles ?? [] : []

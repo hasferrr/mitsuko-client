@@ -6,13 +6,15 @@ import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-setting
 import { SettingsParentType } from "@/types/project"
 
 interface Props {
+  advancedSettingsId: string
   parent: SettingsParentType
 }
 
-export const BetterContextCachingSwitch = memo(({ parent }: Props) => {
-  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching())
-  const setIsBetterContextCaching = useAdvancedSettingsStore((state) => state.setIsBetterContextCaching)
-  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
+export const BetterContextCachingSwitch = memo(({ advancedSettingsId, parent }: Props) => {
+  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching(advancedSettingsId))
+  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory(advancedSettingsId))
+  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setIsBetterContextCaching = (value: boolean, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "isBetterContextCaching", value, parent)
 
   const isMinimalContextMode = !isBetterContextCaching
 

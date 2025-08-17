@@ -38,6 +38,7 @@ export default function SubtitleTranslator() {
       currentId={currentId}
       translation={translation}
       basicSettingsId={translation.basicSettingsId}
+      advancedSettingsId={translation.advancedSettingsId}
     />
   )
 }

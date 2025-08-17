@@ -61,9 +61,10 @@ interface FileItem {
 interface ContextExtractorMainProps {
   currentId: string
   basicSettingsId: string
+  advancedSettingsId: string
 }
 
-export const ContextExtractorMain = ({ currentId, basicSettingsId }: ContextExtractorMainProps) => {
+export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSettingsId }: ContextExtractorMainProps) => {
   const [activeTab, setActiveTab] = useState("result")
   const [isEpisodeNumberValid, setIsEpisodeNumberValid] = useState(true)
   const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
@@ -87,8 +88,8 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId }: ContextExtr
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
 
   // Advanced Settings Store
-  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
-  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())
+  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens(advancedSettingsId))
+  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto(advancedSettingsId))
 
   // Extraction Data Store
   const episodeNumber = useExtractionDataStore((state) => state.getEpisodeNumber())
@@ -626,10 +627,12 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId }: ContextExtr
               <CardContent className="p-4 space-y-4">
                 <ModelSelection
                   basicSettingsId={basicSettingsId}
+                  advancedSettingsId={advancedSettingsId}
                   parent="extraction"
                 />
                 <MaxCompletionTokenInput
                   basicSettingsId={basicSettingsId}
+                  advancedSettingsId={advancedSettingsId}
                   parent="extraction"
                 />
               </CardContent>

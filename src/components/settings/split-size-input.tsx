@@ -7,12 +7,14 @@ import { SPLIT_SIZE_MIN, SPLIT_SIZE_MAX } from "@/constants/limits"
 import { SettingsParentType } from "@/types/project"
 
 interface Props {
+  advancedSettingsId: string
   parent: SettingsParentType
 }
 
-export const SplitSizeInput = memo(({ parent }: Props) => {
-  const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize())
-  const setSplitSize = useAdvancedSettingsStore((state) => state.setSplitSize)
+export const SplitSizeInput = memo(({ advancedSettingsId, parent }: Props) => {
+  const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize(advancedSettingsId))
+  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setSplitSize = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "splitSize", value, parent)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value

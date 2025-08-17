@@ -26,6 +26,7 @@ interface SettingsDialogueProps {
   onOpenChange: (isOpen: boolean) => void
   projectName: string
   basicSettingsId: string
+  advancedSettingsId: string
 }
 
 export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
@@ -33,6 +34,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
   onOpenChange,
   projectName,
   basicSettingsId,
+  advancedSettingsId,
 }) => {
   return (
     <DialogCustom
@@ -55,6 +57,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
           />
           <ModelSelection
             basicSettingsId={basicSettingsId}
+            advancedSettingsId={advancedSettingsId}
             parent="project"
             showUseCustomModelSwitch={false}
           />
@@ -66,7 +69,10 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
               <AccordionContent className="pt-4 pb-0">
                 <div className="space-y-4">
                   <div className="border border-muted-foreground/20 rounded-md p-4">
-                    <TemperatureSlider parent="project" />
+                    <TemperatureSlider
+                      advancedSettingsId={advancedSettingsId}
+                      parent="project"
+                    />
                   </div>
                 </div>
               </AccordionContent>

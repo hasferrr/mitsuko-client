@@ -9,12 +9,15 @@ import { TEMPERATURE_MIN, TEMPERATURE_MAX } from "@/constants/limits"
 import { SettingsParentType } from "@/types/project"
 
 interface TemperatureSliderProps {
+  advancedSettingsId: string
   parent: SettingsParentType
 }
 
-export const TemperatureSlider = memo(({ parent }: TemperatureSliderProps) => {
-  const temperature = useAdvancedSettingsStore((state) => state.getTemperature())
-  const setTemperature = useAdvancedSettingsStore((state) => state.setTemperature)
+export const TemperatureSlider = memo(({ advancedSettingsId, parent }: TemperatureSliderProps) => {
+  const temperature = useAdvancedSettingsStore((state) => state.getTemperature(advancedSettingsId))
+  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setTemperature = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "temperature", value, parent)
+
   const isAutoTemperatureEnabled = useLocalSettingsStore((state) => state.isAutoTemperatureEnabled)
   const setIsAutoTemperatureEnabled = useLocalSettingsStore((state) => state.setIsAutoTemperatureEnabled)
 

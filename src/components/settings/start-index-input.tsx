@@ -10,14 +10,18 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { SettingsParentType } from "@/types/project"
 
 interface Props {
+  advancedSettingsId: string
   parent: SettingsParentType
 }
 
-export const StartIndexInput = memo(({ parent }: Props) => {
-  const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex())
-  const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex())
-  const setStartIndex = useAdvancedSettingsStore((state) => state.setStartIndex)
-  const setEndIndex = useAdvancedSettingsStore((state) => state.setEndIndex)
+export const StartIndexInput = memo(({ advancedSettingsId, parent }: Props) => {
+  const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex(advancedSettingsId))
+  const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex(advancedSettingsId))
+
+  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setStartIndex = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "startIndex", value, parent)
+  const setEndIndex = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "endIndex", value, parent)
+
   const currentId = useTranslationDataStore((state) => state.currentId)
   const translationData = useTranslationDataStore((state) => state.data)
   const subtitles = currentId ? translationData[currentId]?.subtitles ?? [] : []

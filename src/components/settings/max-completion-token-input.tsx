@@ -10,16 +10,18 @@ import { SettingsParentType } from "@/types/project"
 
 interface MaxCompletionTokenInputProps {
   basicSettingsId: string
+  advancedSettingsId: string
   parent: SettingsParentType
 }
 
-export const MaxCompletionTokenInput = memo(({ basicSettingsId, parent }: MaxCompletionTokenInputProps) => {
+export const MaxCompletionTokenInput = memo(({ basicSettingsId, advancedSettingsId, parent }: MaxCompletionTokenInputProps) => {
   const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
-  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
-  const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
-  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())
-  const setIsMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.setIsMaxCompletionTokensAuto)
+  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens(advancedSettingsId))
+  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto(advancedSettingsId))
+  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setMaxCompletionTokens = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "maxCompletionTokens", value, parent)
+  const setIsMaxCompletionTokensAuto = (value: boolean, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "isMaxCompletionTokensAuto", value, parent)
 
   const maxToken = isUseCustomModel || !modelDetail
     ? MAX_COMPLETION_TOKENS_MAX

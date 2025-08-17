@@ -59,6 +59,7 @@ const ModelProviderIcon = ({ provider }: { provider: ModelProvider }) => {
 
 interface ModelSelectorProps extends PopoverProps {
   basicSettingsId: string
+  advancedSettingsId: string
   type: SettingsParentType
   disabled?: boolean
   className?: string
@@ -66,6 +67,7 @@ interface ModelSelectorProps extends PopoverProps {
 
 export function ModelSelector({
   basicSettingsId,
+  advancedSettingsId,
   type,
   disabled,
   className,
@@ -80,10 +82,11 @@ export function ModelSelector({
   const setModelDetail = (model: Model | null, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "modelDetail", model, parent)
 
   // Advanced Settings Store
-  const setTemperature = useAdvancedSettingsStore((state) => state.setTemperature)
-  const setIsUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
-  const setIsMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.setIsMaxCompletionTokensAuto)
-  const setMaxCompletionTokens = useAdvancedSettingsStore((state) => state.setMaxCompletionTokens)
+  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setTemperature = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "temperature", value, parent)
+  const setIsUseStructuredOutput = (value: boolean, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "isUseStructuredOutput", value, parent)
+  const setIsMaxCompletionTokensAuto = (value: boolean, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "isMaxCompletionTokensAuto", value, parent)
+  const setMaxCompletionTokens = (value: number, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "maxCompletionTokens", value, parent)
 
   // Local Settings Store
   const isAutoTemperatureEnabled = useLocalSettingsStore((state) => state.isAutoTemperatureEnabled)

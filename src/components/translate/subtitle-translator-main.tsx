@@ -115,12 +115,14 @@ interface SubtitleTranslatorMainProps {
   currentId: string
   translation: Translation
   basicSettingsId: string
+  advancedSettingsId: string
 }
 
 export default function SubtitleTranslatorMain({
   currentId,
   translation,
   basicSettingsId,
+  advancedSettingsId,
 }: SubtitleTranslatorMainProps) {
   // Translation Data Store
   const setTitle = useTranslationDataStore((state) => state.setTitle)
@@ -159,13 +161,13 @@ export default function SubtitleTranslatorMain({
   const setContextDocument = (doc: string, parent: SettingsParentType) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc, parent)
 
   // Advanced Settings Store
-  const temperature = useAdvancedSettingsStore((state) => state.getTemperature())
-  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
-  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())
-  const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize())
-  const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput())
-  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
-  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching())
+  const temperature = useAdvancedSettingsStore((state) => state.getTemperature(advancedSettingsId))
+  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens(advancedSettingsId))
+  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto(advancedSettingsId))
+  const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize(advancedSettingsId))
+  const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput(advancedSettingsId))
+  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory(advancedSettingsId))
+  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching(advancedSettingsId))
   const resetIndex = useAdvancedSettingsStore((state) => state.resetIndex)
 
   // Translation Store
@@ -292,8 +294,8 @@ export default function SubtitleTranslatorMain({
     const allRawResponses: string[] = []
 
     // Split subtitles into chunks, starting from startIndex - 1
-    const storeStartIndex = useAdvancedSettingsStore.getState().getStartIndex()
-    const storeEndIndex = useAdvancedSettingsStore.getState().getEndIndex()
+    const storeStartIndex = useAdvancedSettingsStore.getState().getStartIndex(advancedSettingsId)
+    const storeEndIndex = useAdvancedSettingsStore.getState().getEndIndex(advancedSettingsId)
 
     const sIndexToUse = overrideStartIndexParam !== undefined
       ? overrideStartIndexParam
@@ -673,7 +675,7 @@ export default function SubtitleTranslatorMain({
         }
 
         setSubtitles(currentId, parsedSubtitles)
-        resetIndex(1, parsedSubtitles.length, "translation")
+        resetIndex(advancedSettingsId, 1, parsedSubtitles.length, "translation")
 
         const fileName = pendingFile.name.split('.')
         fileName.pop()
@@ -1013,6 +1015,7 @@ export default function SubtitleTranslatorMain({
                   />
                   <ModelSelection
                     basicSettingsId={basicSettingsId}
+                    advancedSettingsId={advancedSettingsId}
                     parent="translation"
                   />
                   <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
@@ -1043,25 +1046,48 @@ export default function SubtitleTranslatorMain({
                   <ModelDetail
                     basicSettingsId={basicSettingsId}
                   />
-                  <TemperatureSlider parent="translation" />
-                  <StartIndexInput parent="translation" />
-                  <EndIndexInput parent="translation" />
+                  <TemperatureSlider
+                    advancedSettingsId={advancedSettingsId}
+                    parent="translation"
+                  />
+                  <StartIndexInput
+                    advancedSettingsId={advancedSettingsId}
+                    parent="translation"
+                  />
+                  <EndIndexInput
+                    advancedSettingsId={advancedSettingsId}
+                    parent="translation"
+                  />
                   <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
                     <AdvancedReasoningSwitch />
                   </div>
                   <div className="text-sm font-semibold">Technical Options</div>
-                  <SplitSizeInput parent="translation" />
+                  <SplitSizeInput
+                    advancedSettingsId={advancedSettingsId}
+                    parent="translation"
+                  />
                   <MaxCompletionTokenInput
                     basicSettingsId={basicSettingsId}
+                    advancedSettingsId={advancedSettingsId}
                     parent="translation"
                   />
                   <StructuredOutputSwitch
                     basicSettingsId={basicSettingsId}
+                    advancedSettingsId={advancedSettingsId}
                     parent="translation"
                   />
-                  <FullContextMemorySwitch parent="translation" />
-                  <BetterContextCachingSwitch parent="translation" />
-                  <AdvancedSettingsResetButton parent="translation" />
+                  <FullContextMemorySwitch
+                    advancedSettingsId={advancedSettingsId}
+                    parent="translation"
+                  />
+                  <BetterContextCachingSwitch
+                    advancedSettingsId={advancedSettingsId}
+                    parent="translation"
+                  />
+                  <AdvancedSettingsResetButton
+                    advancedSettingsId={advancedSettingsId}
+                    parent="translation"
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -1077,6 +1103,7 @@ export default function SubtitleTranslatorMain({
       <HistoryPanel
         isHistoryOpen={isHistoryOpen}
         setIsHistoryOpen={setIsHistoryOpen}
+        advancedSettingsId={advancedSettingsId}
       />
 
       {/* Initial Upload Dialog */}

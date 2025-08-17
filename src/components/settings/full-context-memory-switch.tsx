@@ -8,12 +8,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { SettingsParentType } from "@/types/project"
 
 interface Props {
+  advancedSettingsId: string
   parent: SettingsParentType
 }
 
-export const FullContextMemorySwitch = memo(({ parent }: Props) => {
-  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
-  const setIsUseFullContextMemory = useAdvancedSettingsStore((state) => state.setIsUseFullContextMemory)
+export const FullContextMemorySwitch = memo(({ advancedSettingsId, parent }: Props) => {
+  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory(advancedSettingsId))
+  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setIsUseFullContextMemory = (value: boolean, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "isUseFullContextMemory", value, parent)
+
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
 
   const handleCheckedChange = (checked: boolean) => {

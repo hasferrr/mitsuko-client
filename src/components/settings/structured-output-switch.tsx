@@ -8,14 +8,16 @@ import { SettingsParentType } from "@/types/project"
 
 interface Props {
   basicSettingsId: string
+  advancedSettingsId: string
   parent: SettingsParentType
 }
 
-export const StructuredOutputSwitch = memo(({ basicSettingsId, parent }: Props) => {
+export const StructuredOutputSwitch = memo(({ basicSettingsId, advancedSettingsId, parent }: Props) => {
   const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
   const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
-  const useStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput())
-  const setUseStructuredOutput = useAdvancedSettingsStore((state) => state.setIsUseStructuredOutput)
+  const useStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput(advancedSettingsId))
+  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setUseStructuredOutput = (value: boolean, parent: SettingsParentType) => setAdvancedSettingsValue(advancedSettingsId, "isUseStructuredOutput", value, parent)
 
   const disabled = !isUseCustomModel && !modelDetail?.structuredOutput
 

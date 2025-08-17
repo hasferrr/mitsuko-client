@@ -29,9 +29,10 @@ import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-setting
 interface HistoryPanelProps {
   isHistoryOpen: boolean
   setIsHistoryOpen: (value: boolean) => void
+  advancedSettingsId: string
 }
 
-export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelProps) {
+export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettingsId }: HistoryPanelProps) {
   const currentId = useTranslationDataStore((state) => state.currentId)
   const setTitle = useTranslationDataStore((state) => state.setTitle)
   const setSubtitles = useTranslationDataStore((state) => state.setSubtitles)
@@ -88,7 +89,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen }: HistoryPanelPr
       setJsonResponse(currentId, selectedHistoryItem.json)
       await saveData(currentId)
       setIsHistoryOpen(false)
-      resetIndex(1, selectedHistoryItem.subtitles.length, "translation")
+      resetIndex(advancedSettingsId, 1, selectedHistoryItem.subtitles.length, "translation")
     } catch (error) {
       console.error("Error applying history:", error)
     }

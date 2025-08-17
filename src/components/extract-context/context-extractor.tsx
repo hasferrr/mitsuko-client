@@ -36,6 +36,7 @@ export const ContextExtractor = () => {
     <ContextExtractorMain
       currentId={currentId}
       basicSettingsId={extraction.basicSettingsId}
+      advancedSettingsId={extraction.advancedSettingsId}
     />
   )
 }

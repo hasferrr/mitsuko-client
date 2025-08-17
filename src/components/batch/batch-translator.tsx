@@ -101,6 +101,9 @@ export default function BatchTranslator() {
   }
 
   return (
-    <BatchTranslatorMain basicSettingsId={batch.defaultBasicSettingsId} />
+    <BatchTranslatorMain
+      basicSettingsId={batch.defaultBasicSettingsId}
+      advancedSettingsId={batch.defaultAdvancedSettingsId}
+    />
   )
 }

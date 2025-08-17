@@ -103,9 +103,10 @@ const MAX_CONCURRENT_TRANSLATION = 5
 
 interface BatchTranslatorMainProps {
   basicSettingsId: string
+  advancedSettingsId: string
 }
 
-export default function BatchTranslatorMain({ basicSettingsId }: BatchTranslatorMainProps) {
+export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsId }: BatchTranslatorMainProps) {
   const [activeTab, setActiveTab] = useState("basic")
   const [concurrentTranslations, setConcurrentTranslations] = useState(3)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
@@ -173,13 +174,13 @@ export default function BatchTranslatorMain({ basicSettingsId }: BatchTranslator
   const customInstructions = useSettingsStore((state) => state.getCustomInstructions(basicSettingsId))
   const fewShot = useSettingsStore((state) => state.getFewShot(basicSettingsId))
 
-  const temperature = useAdvancedSettingsStore((state) => state.getTemperature())
-  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens())
-  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto())
-  const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize())
-  const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput())
-  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory())
-  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching())
+  const temperature = useAdvancedSettingsStore((state) => state.getTemperature(advancedSettingsId))
+  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens(advancedSettingsId))
+  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto(advancedSettingsId))
+  const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize(advancedSettingsId))
+  const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput(advancedSettingsId))
+  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory(advancedSettingsId))
+  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching(advancedSettingsId))
 
   const customApiConfigs = useLocalSettingsStore((state) => state.customApiConfigs)
   const selectedApiConfigIndex = useLocalSettingsStore((state) => state.selectedApiConfigIndex)
@@ -599,8 +600,8 @@ export default function BatchTranslatorMain({ basicSettingsId }: BatchTranslator
     const allRawResponses: string[] = []
 
     // Split subtitles into chunks, starting from startIndex - 1
-    const storeStartIndex = useAdvancedSettingsStore.getState().getStartIndex()
-    const storeEndIndex = useAdvancedSettingsStore.getState().getEndIndex()
+    const storeStartIndex = useAdvancedSettingsStore.getState().getStartIndex(advancedSettingsId)
+    const storeEndIndex = useAdvancedSettingsStore.getState().getEndIndex(advancedSettingsId)
 
     const sIndexToUse = overrideStartIndexParam !== undefined
       ? overrideStartIndexParam
@@ -1295,6 +1296,7 @@ export default function BatchTranslatorMain({ basicSettingsId }: BatchTranslator
                   />
                   <ModelSelection
                     basicSettingsId={basicSettingsId}
+                    advancedSettingsId={advancedSettingsId}
                     parent="project"
                   />
                   <ContextDocumentInput
@@ -1323,23 +1325,40 @@ export default function BatchTranslatorMain({ basicSettingsId }: BatchTranslator
                   <ModelDetail
                     basicSettingsId={basicSettingsId}
                   />
-                  <TemperatureSlider parent="project" />
+                  <TemperatureSlider
+                    advancedSettingsId={advancedSettingsId}
+                    parent="project"
+                  />
                   <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
                     <AdvancedReasoningSwitch />
                   </div>
                   <div className="text-sm font-semibold">Technical Options</div>
-                  <SplitSizeInput parent="project" />
+                  <SplitSizeInput
+                    advancedSettingsId={advancedSettingsId}
+                    parent="project"
+                  />
                   <MaxCompletionTokenInput
                     basicSettingsId={basicSettingsId}
+                    advancedSettingsId={advancedSettingsId}
                     parent="project"
                   />
                   <StructuredOutputSwitch
                     basicSettingsId={basicSettingsId}
+                    advancedSettingsId={advancedSettingsId}
                     parent="project"
                   />
-                  <FullContextMemorySwitch parent="project" />
-                  <BetterContextCachingSwitch parent="project" />
-                  <AdvancedSettingsResetButton parent="project" />
+                  <FullContextMemorySwitch
+                    advancedSettingsId={advancedSettingsId}
+                    parent="project"
+                  />
+                  <BetterContextCachingSwitch
+                    advancedSettingsId={advancedSettingsId}
+                    parent="project"
+                  />
+                  <AdvancedSettingsResetButton
+                    advancedSettingsId={advancedSettingsId}
+                    parent="project"
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -1484,6 +1503,7 @@ export default function BatchTranslatorMain({ basicSettingsId }: BatchTranslator
                 currentId={previewTranslationId}
                 translation={translationData[previewTranslationId]}
                 basicSettingsId={basicSettingsId}
+                advancedSettingsId={advancedSettingsId}
               />
             </div>
           )}

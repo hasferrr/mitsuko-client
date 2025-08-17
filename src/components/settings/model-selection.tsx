@@ -14,12 +14,14 @@ import { SettingsParentType } from "@/types/project"
 
 interface ModelSelectionProps {
   basicSettingsId: string
+  advancedSettingsId: string
   parent: SettingsParentType
   showUseCustomModelSwitch?: boolean
 }
 
 export const ModelSelection = memo(({
   basicSettingsId,
+  advancedSettingsId,
   parent,
   showUseCustomModelSwitch = true
 }: ModelSelectionProps) => {
@@ -48,6 +50,7 @@ export const ModelSelection = memo(({
           <div className="flex-grow">
             <ModelSelector
               basicSettingsId={basicSettingsId}
+              advancedSettingsId={advancedSettingsId}
               disabled={isUseCustomModel}
               type={parent}
               className="w-full"
