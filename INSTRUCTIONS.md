@@ -197,6 +197,8 @@ This is the main source code folder for the Next.js application. All application
     - `use-auto-scroll.ts`: A simple hook that automatically scrolls a text area to the bottom when its content changes, useful for displaying real-time logs or streaming responses.
     - `use-email-link.ts`: A hook to safely display a `mailto:` link, revealing the email address only upon user interaction to prevent scraping.
     - `use-mobile.tsx`: A hook that detects if the user is on a mobile device based on screen width.
+    - `use-extraction-handler.tsx`: Centralizes `handleStartExtraction` and `handleStopExtraction` logic for context extraction, keeping container components declarative
+    - `use-translation-handler.tsx`: Centralizes `handleStartTranslation`, `handleStopTranslation`, and related helpers like `generateSubtitleContent` to keep translation container components declarative
 
 - **`lib/`**: Contains utility functions, helper scripts, and the core application logic that is not tied to a specific component. This is where the bulk of the "heavy lifting" happens.
   - **Style:** Files primarily export functions.
