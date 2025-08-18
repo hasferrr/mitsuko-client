@@ -23,6 +23,8 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useRouter } from "next/navigation"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
+import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 
 interface ExportImportDialogueProps {
   isOpen: boolean
@@ -39,6 +41,8 @@ export function ExportImportDialogue({
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [deleteExisting, setDeleteExisting] = useState(false)
   const loadProjects = useProjectStore(state => state.loadProjects)
+  const loadSettings = useSettingsStore((state) => state.loadSettings)
+  const loadAdvancedSettings = useAdvancedSettingsStore((state) => state.loadSettings)
 
   useEffect(() => {
     if (isOpen) {
@@ -100,7 +104,11 @@ export function ExportImportDialogue({
             router.push("/dashboard")
           }
           await importDatabase(content, deleteExisting)
-          await loadProjects()
+          await Promise.all([
+            loadProjects(),
+            loadSettings(),
+            loadAdvancedSettings(),
+          ])
           toast.success("Database imported successfully")
           setIsOpen(false)
         } catch (error) {
