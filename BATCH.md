@@ -6,7 +6,6 @@ PLEASE READ THESE INSTRUCTIONS BEFORE YOU START WORKING ON THE BATCH TRANSLATOR 
 - Each batch is now just a **Project** with `isBatch: true`.
 - When a file is selected, dropped, or deleted, create a new Translation and push its ID to the parent Project’s `translations` array via **`useProjectStore`**.
 - When a file is reordered, update the `translations` array order on the same Project via **`useProjectStore.updateProjectItems`**.
-- Translation `basicSettings` and `advancedSettings` are copied from the Project’s `defaultBasicSettingsId` and `defaultAdvancedSettingsId`.
 
 ## Store
 
