@@ -111,7 +111,6 @@ interface BatchTranslatorMainProps {
 
 export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsId }: BatchTranslatorMainProps) {
   const [activeTab, setActiveTab] = useState("basic")
-  const [concurrentTranslations, setConcurrentTranslations] = useState(3)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
   const [toType, setToType] = useState<SubtitleType | "no-change">("no-change")
@@ -144,9 +143,11 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
   const removeTranslationFromBatch = useProjectStore((state) => state.removeTranslationFromBatch)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
 
-  // Settings Mode Store (shared vs individual)
+  // Batch Settings Store
   const isUseSharedSettings = useBatchSettingsStore(state => !state.individualIds.has(currentProject?.id ?? ""))
   const setUseSharedSettings = useBatchSettingsStore(state => state.setUseSharedSettings)
+  const concurrentTranslations = useBatchSettingsStore(state => state.concurrentMap[currentProject?.id ?? ""] ?? 3)
+  const setConcurrentTranslations = useBatchSettingsStore(state => state.setConcurrentTranslations)
 
   const [order, setOrder] = useState<string[]>(currentProject?.translations ?? [])
 
@@ -1270,7 +1271,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
                 variant="ghost"
                 size="sm"
                 className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
-                onClick={() => setConcurrentTranslations(prev => Math.max(1, prev - 1))}
+                onClick={() => setConcurrentTranslations(currentProject?.id ?? "", Math.max(1, concurrentTranslations - 1))}
                 disabled={concurrentTranslations <= 1}
               >
                 -
@@ -1280,14 +1281,14 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
                 min={1}
                 max={MAX_CONCURRENT_TRANSLATION}
                 value={concurrentTranslations}
-                onChange={(e) => setConcurrentTranslations(Math.max(1, Math.min(MAX_CONCURRENT_TRANSLATION, parseInt(e.target.value) || 1)))}
+                onChange={(e) => setConcurrentTranslations(currentProject?.id ?? "", Math.max(1, Math.min(MAX_CONCURRENT_TRANSLATION, parseInt(e.target.value) || 1)))}
                 className="w-10 h-7 text-center border-0 bg-transparent shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
-                onClick={() => setConcurrentTranslations(prev => Math.min(MAX_CONCURRENT_TRANSLATION, prev + 1))}
+                onClick={() => setConcurrentTranslations(currentProject?.id ?? "", Math.min(MAX_CONCURRENT_TRANSLATION, concurrentTranslations + 1))}
                 disabled={concurrentTranslations >= MAX_CONCURRENT_TRANSLATION}
               >
                 +
