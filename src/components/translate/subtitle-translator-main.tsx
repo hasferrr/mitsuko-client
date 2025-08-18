@@ -185,7 +185,7 @@ export default function SubtitleTranslatorMain({
   const handleStartTranslation = async (
     overrideStartIndexParam?: number,
     overrideEndIndexParam?: number,
-    partOfBatch?: boolean
+    isContinuation?: boolean
   ) => {
     await handleStart({
       currentId,
@@ -193,7 +193,7 @@ export default function SubtitleTranslatorMain({
       advancedSettingsId,
       overrideStartIndexParam,
       overrideEndIndexParam,
-      partOfBatch,
+      isContinuation,
     })
   }
 

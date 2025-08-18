@@ -47,7 +47,7 @@ interface UseTranslationHandlerProps {
   options: {
     isBatch: boolean
     onSuccessTranslation?: () => void
-    onErrorTranslation?: (args: { currentId: string, partOfBatch: boolean }) => void
+    onErrorTranslation?: (args: { currentId: string, isContinuation: boolean }) => void
   }
 }
 
@@ -104,7 +104,7 @@ export const useTranslationHandler = ({
     advancedSettingsId: string
     overrideStartIndexParam?: number
     overrideEndIndexParam?: number
-    partOfBatch?: boolean
+    isContinuation?: boolean
   }
 
   const handleStart = async ({
@@ -113,7 +113,7 @@ export const useTranslationHandler = ({
     advancedSettingsId,
     overrideStartIndexParam,
     overrideEndIndexParam,
-    partOfBatch,
+    isContinuation,
   }: HandleStartParams) => {
     // Get current translation data
     const translation = useTranslationDataStore.getState().data[currentId]
@@ -155,7 +155,7 @@ export const useTranslationHandler = ({
     setIsTranslating(currentId, true)
     setHasChanges(true)
 
-    if (!partOfBatch) {
+    if (!isContinuation) {
       if (!isBatch) {
         setActiveTab("result")
       }
@@ -347,7 +347,7 @@ export const useTranslationHandler = ({
 
         onSuccessTranslation?.()
       } catch {
-        onErrorTranslation?.({ currentId, partOfBatch: !!partOfBatch })
+        onErrorTranslation?.({ currentId, isContinuation: !!isContinuation })
 
         setIsTranslating(currentId, false)
 
@@ -367,7 +367,7 @@ export const useTranslationHandler = ({
           setResponse(currentId, rawResponse + "\n\n[Failed to parse]")
           // If part of a batch, don't set isTranslating to false here, let the batch handler do it.
           // The error is logged, and the loop in handleContinueTranslation should ideally break.
-          if (!partOfBatch) {
+          if (!isContinuation) {
             setIsTranslating(currentId, false)
           }
           break
@@ -463,7 +463,7 @@ export const useTranslationHandler = ({
 
     // Only set isTranslating to false if not part of a batch operation,
     // or if it was stopped (in which case it would already be false or will be set by stopTranslation)
-    if (!partOfBatch) {
+    if (!isContinuation) {
       // Check if it was stopped during the process by looking at the store state
       const stillTranslating = useTranslationStore.getState().isTranslatingSet.has(currentId)
       if (stillTranslating) {

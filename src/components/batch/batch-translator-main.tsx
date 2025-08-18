@@ -225,8 +225,8 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
       onSuccessTranslation: () => {
         errorCountRef.current = Math.max(0, errorCountRef.current - 1)
       },
-      onErrorTranslation: ({ partOfBatch }) => {
-        if (partOfBatch) {
+      onErrorTranslation: ({ isContinuation }) => {
+        if (isContinuation) {
           errorCountRef.current += 1
           if (errorCountRef.current >= 5) {
             handleStopBatchTranslation()
@@ -504,7 +504,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
     currentId: string,
     overrideStartIndexParam?: number,
     overrideEndIndexParam?: number,
-    partOfBatch?: boolean
+    isContinuation?: boolean
   ) => {
     // Delegate to centralized translation handler
     const bsIdToUse = isUseSharedSettings
@@ -521,7 +521,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
       advancedSettingsId: adsIdToUse,
       overrideStartIndexParam,
       overrideEndIndexParam,
-      partOfBatch
+      isContinuation
     })
   }
 
