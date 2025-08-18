@@ -283,6 +283,7 @@ This is the main source code folder for the Next.js application. All application
         -   `use-snap-store.ts`: Manages payment transaction data from Midtrans/Snap.
         -   `use-client-id-store.ts`: Stores a unique client ID for the session.
         -   `use-upload-store.ts`: Tracks upload progress and status for file uploads used in Cloud and Transcription.
+        -   `use-batch-settings-store.ts`: Manages Batch Translation view settings — toggles shared vs. individual project settings (`individualIds`) and per-project concurrent translation limits (`concurrentMap`).
 
   - **How to Add or Modify State:**
     When you need to add a new piece of client-side state, follow these steps:
