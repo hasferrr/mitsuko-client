@@ -47,7 +47,7 @@ interface UseTranslationHandlerProps {
   options: {
     isBatch: boolean
     onSuccessTranslation?: () => void
-    onErrorTranslation?: () => void
+    onErrorTranslation?: (args: { currentId: string, partOfBatch: boolean }) => void
   }
 }
 
@@ -347,7 +347,7 @@ export const useTranslationHandler = ({
 
         onSuccessTranslation?.()
       } catch {
-        onErrorTranslation?.()
+        onErrorTranslation?.({ currentId, partOfBatch: !!partOfBatch })
 
         setIsTranslating(currentId, false)
 
