@@ -1,22 +1,15 @@
 "use client"
 
 import { useState, useRef, useCallback, useEffect } from "react"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import {
-  File,
-  XCircle,
-  ArrowUpCircle,
-  ArrowDownCircle,
   Upload,
   Save,
   Play,
   Square,
   Loader2,
-  ArrowUpDown,
-  Trash2,
   Check,
   Edit,
   FolderDown,
@@ -30,7 +23,6 @@ import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
-import { useExtractionInputStore } from "@/stores/services/use-extraction-input-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constants/limits"
 import { getContent } from "@/lib/parser/parser"
@@ -51,12 +43,6 @@ import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { toast } from "sonner"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
 import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
-
-interface FileItem {
-  id: string
-  name: string
-  content: string
-}
 
 interface ContextExtractorMainProps {
   currentId: string
@@ -108,12 +94,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   const stopExtraction = useExtractionStore((state) => state.stopExtraction)
   const setIsExtracting = useExtractionStore((state) => state.setIsExtracting)
   const isExtracting = isExtractingSet.has(currentId)
-
-  // Extraction Input Store
-  const selectedFiles = useExtractionInputStore((state) => state.selectedFiles)
-  const isBatchMode = useExtractionInputStore((state) => state.isBatchMode)
-  const setSelectedFiles = useExtractionInputStore((state) => state.setSelectedFiles)
-  // const setIsBatchMode = useExtractionInputStore((state) => state.setIsBatchMode)
 
   // Other Store
   const session = useSessionStore((state) => state.session)
@@ -227,59 +207,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
     await saveData(currentId)
   }
 
-  // Note: Batch mode files are saved to localStorage which is shared across extraction projects
-  const handleFileUploadBatch = async (files: FileList | null) => {
-    if (!files || files.length === 0) return
-    setHasChanges(true)
-
-    // Batch Mode Logic (Existing)
-    const newFiles: FileItem[] = []
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const text = await file.text()
-      newFiles.push({
-        id: `${Date.now()}-${i}`, // Unique ID
-        name: file.name,
-        content: text,
-      })
-    }
-    setSelectedFiles([...selectedFiles, ...newFiles])
-  }
-
-  const removeFile = (id: string) => {
-    setSelectedFiles(selectedFiles.filter((file) => file.id !== id))
-  }
-
-  const moveFileUp = (index: number) => {
-    if (index > 0) {
-      const newFiles = [...selectedFiles]
-      const temp = newFiles[index - 1]
-      newFiles[index - 1] = newFiles[index]
-      newFiles[index] = temp
-      setSelectedFiles(newFiles)
-    }
-  }
-
-  const moveFileDown = (index: number) => {
-    if (index < selectedFiles.length - 1) {
-      const newFiles = [...selectedFiles]
-      const temp = newFiles[index + 1]
-      newFiles[index + 1] = newFiles[index]
-      newFiles[index] = temp
-      setSelectedFiles(newFiles)
-    }
-  }
-
-  const handleCopyAndSortFiles = () => {
-    const sortedFiles = [...selectedFiles]
-      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }))
-    setSelectedFiles(sortedFiles)
-  }
-
-  const handleClearFiles = () => {
-    setSelectedFiles([])
-  }
-
   // Extraction Handlers
 
   const handleStartExtraction = async () => {
@@ -296,7 +223,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
       setIsEpisodeNumberValid(false)
       return
     }
-    if (subtitleContent.trim() === "" && !isBatchMode) {
+    if (subtitleContent.trim() === "") {
       setIsSubtitleContentValid(false)
       return
     }
@@ -424,194 +351,112 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
           />
         </div>
 
-        {!isBatchMode && ( // Show single-mode inputs when isBatchMode is false
-          <>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium">Subtitle Content</label>
-                <input
-                  type="file"
-                  accept={ACCEPTED_FORMATS.join(",")}
-                  onChange={(e) => {
-                    if (e.target.files) {
-                      handleFileUploadSingle(
-                        e.target.files,
-                        (text) => setSubtitleContent(currentId, text),
-                        subtitleContentRef.current
-                      )
-                    }
-                  }}
-                  className="hidden"
-                  id="subtitle-content-upload"
-                />
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-2 py-3 px-2"
-                  onClick={() => document.getElementById("subtitle-content-upload")?.click()}
-                  disabled={isExtracting}
-                >
-                  <Upload className="h-4 w-4" />
-                  Upload
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    loadProjectTranslations()
-                    setIsSubtitleImportDialogOpen(true)
-                  }}
-                  className="h-2 py-3 px-2"
-                  disabled={isExtracting}
-                >
-                  <FolderDown className="h-4 w-4" />
-                  Import
-                </Button>
-              </div>
-              <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, (text) => setSubtitleContent(currentId, text), subtitleContentRef.current)} disabled={isExtracting}>
-                <Textarea
-                  ref={subtitleContentRef}
-                  value={subtitleContent}
-                  onChange={handleSubtitleContentChange}
-                  className={cn(
-                    "min-h-[181px] h-[181px] max-h-[250px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
-                    !isSubtitleContentValid && "outline outline-red-500"
-                  )}
-                  placeholder="Paste subtitle content here..."
-                  onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
-                />
-              </DragAndDrop>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium">Previous Context</label>
-                <input
-                  type="file"
-                  accept=".txt,.md"
-                  onChange={(e) => {
-                    if (e.target.files) {
-                      handleFileUploadSingle(e.target.files, (text) => setPreviousContext(currentId, text), previousContextRef.current)
-                    }
-                  }}
-                  className="hidden"
-                  id="previous-context-upload"
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-2 py-3 px-2"
-                  onClick={() => document.getElementById("previous-context-upload")?.click()}
-                  disabled={isExtracting}
-                >
-                  <Upload className="h-4 w-4" />
-                  Upload
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    loadProjectExtractions()
-                    setIsPreviousContextDialogOpen(true)
-                  }}
-                  className="h-2 py-3 px-2"
-                  disabled={isExtracting}
-                >
-                  <FolderDown className="h-4 w-4" />
-                  Import
-                </Button>
-              </div>
-              <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, (text) => setPreviousContext(currentId, text), previousContextRef.current)} disabled={isExtracting}>
-                <Textarea
-                  ref={previousContextRef}
-                  value={previousContext}
-                  onChange={handlePreviousContextChange}
-                  className="min-h-[130px] h-[130px] max-h-[250px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
-                  placeholder="Paste previous context here..."
-                  onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
-                />
-              </DragAndDrop>
-            </div>
-          </>
-        )}
-
-        {isBatchMode && ( // Show batch-mode inputs when isBatchMode is true
-          <div className="space-y-2">
-            <div className="flex gap-2 items-center">
-              <label className="text-sm font-medium">Subtitle Files</label>
-              <input
-                type="file"
-                multiple
-                accept={ACCEPTED_FORMATS.join(",")}
-                onChange={(e) => {
-                  if (e.target.files) {
-                    handleFileUploadBatch(e.target.files)
-                  }
-                }}
-                className="hidden"
-                id="subtitle-files-upload"
-              />
-              <Button
-                variant="outline"
-                className="gap-2"
-                size="sm"
-                onClick={() => document.getElementById("subtitle-files-upload")?.click()}
-                disabled={isExtracting}
-              >
-                <Upload className="h-4 w-4" />
-                Select Files
-              </Button>
-              {/* Sort Button */}
-              <Button
-                variant="outline"
-                className="gap-2"
-                size="sm"
-                onClick={handleCopyAndSortFiles}
-                disabled={isExtracting}
-              >
-                <ArrowUpDown className="h-4 w-4" />
-                Sort
-              </Button>
-              {/* Clear Button */}
-              <Button
-                variant="outline"
-                className="gap-2"
-                size="sm"
-                onClick={handleClearFiles}
-                disabled={isExtracting}
-              >
-                <Trash2 className="h-4 w-4" />
-                Clear
-              </Button>
-            </div>
-
-            <DragAndDrop onDropFiles={handleFileUploadBatch} disabled={isExtracting}>
-              <ScrollArea className="h-[350px] border rounded-md">
-                <div className="space-y-1 p-2">
-                  {selectedFiles.map((file, index) => (
-                    <div key={file.id} className="flex items-center justify-between border rounded-md p-2">
-                      <div className="flex items-center gap-2">
-                        <File className="h-4 w-4" />
-                        <div className="text-sm w-fit block break-all">{file.name}</div>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => moveFileUp(index)} disabled={isExtracting}>
-                          <ArrowUpCircle className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => moveFileDown(index)} disabled={isExtracting}>
-                          <ArrowDownCircle className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => removeFile(file.id)} disabled={isExtracting}>
-                          <XCircle className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </DragAndDrop>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Subtitle Content</label>
+            <input
+              type="file"
+              accept={ACCEPTED_FORMATS.join(",")}
+              onChange={(e) => {
+                if (e.target.files) {
+                  handleFileUploadSingle(
+                    e.target.files,
+                    (text) => setSubtitleContent(currentId, text),
+                    subtitleContentRef.current
+                  )
+                }
+              }}
+              className="hidden"
+              id="subtitle-content-upload"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-2 py-3 px-2"
+              onClick={() => document.getElementById("subtitle-content-upload")?.click()}
+              disabled={isExtracting}
+            >
+              <Upload className="h-4 w-4" />
+              Upload
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                loadProjectTranslations()
+                setIsSubtitleImportDialogOpen(true)
+              }}
+              className="h-2 py-3 px-2"
+              disabled={isExtracting}
+            >
+              <FolderDown className="h-4 w-4" />
+              Import
+            </Button>
           </div>
-        )}
+          <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, (text) => setSubtitleContent(currentId, text), subtitleContentRef.current)} disabled={isExtracting}>
+            <Textarea
+              ref={subtitleContentRef}
+              value={subtitleContent}
+              onChange={handleSubtitleContentChange}
+              className={cn(
+                "min-h-[181px] h-[181px] max-h-[250px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
+                !isSubtitleContentValid && "outline outline-red-500"
+              )}
+              placeholder="Paste subtitle content here..."
+              onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
+            />
+          </DragAndDrop>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Previous Context</label>
+            <input
+              type="file"
+              accept=".txt,.md"
+              onChange={(e) => {
+                if (e.target.files) {
+                  handleFileUploadSingle(e.target.files, (text) => setPreviousContext(currentId, text), previousContextRef.current)
+                }
+              }}
+              className="hidden"
+              id="previous-context-upload"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-2 py-3 px-2"
+              onClick={() => document.getElementById("previous-context-upload")?.click()}
+              disabled={isExtracting}
+            >
+              <Upload className="h-4 w-4" />
+              Upload
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                loadProjectExtractions()
+                setIsPreviousContextDialogOpen(true)
+              }}
+              className="h-2 py-3 px-2"
+              disabled={isExtracting}
+            >
+              <FolderDown className="h-4 w-4" />
+              Import
+            </Button>
+          </div>
+          <DragAndDrop onDropFiles={(files) => handleFileUploadSingle(files, (text) => setPreviousContext(currentId, text), previousContextRef.current)} disabled={isExtracting}>
+            <Textarea
+              ref={previousContextRef}
+              value={previousContext}
+              onChange={handlePreviousContextChange}
+              className="min-h-[130px] h-[130px] max-h-[250px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+              placeholder="Paste previous context here..."
+              onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
+            />
+          </DragAndDrop>
+        </div>
       </div>
 
       {/* Right Pane */}
@@ -672,7 +517,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
         <Button
           className="gap-2 w-[152px]"
           onClick={() => handleStartExtraction()}
-          disabled={isExtracting || isBatchMode || !session}
+          disabled={isExtracting || !session}
         >
           {isExtracting ? (
             <>
@@ -682,9 +527,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
           ) : (
             <>
               <Play className="h-4 w-4" />
-              {isBatchMode ? "Coming Soon" : (
-                !!session ? "Start Extraction" : "Sign In to Start"
-              )}
+              {!!session ? "Start Extraction" : "Sign In to Start"}
             </>
           )}
         </Button>
@@ -693,14 +536,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
           <Square className="h-4 w-4" />
           Stop
         </Button>
-
-        {/* Batch Mode is disabled for now */}
-        {/* <div className="flex items-center space-x-2">
-          <Switch id="batch-mode" checked={isBatchMode} onCheckedChange={setIsBatchMode} />
-          <label htmlFor="batch-mode" className="text-sm font-medium">
-            Batch Mode
-          </label>
-        </div> */}
 
         <Button variant="outline" className="gap-2" onClick={handleSaveToFile}>
           <Save className="h-4 w-4" />

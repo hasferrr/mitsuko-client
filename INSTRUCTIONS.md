@@ -269,7 +269,6 @@ This is the main source code folder for the Next.js application. All application
         -   `use-translation-store.ts`: Handles the state of the translation process itself, including loading states (`isTranslatingSet`) and abort controllers for network requests.
         -   `use-transcription-store.ts`: Manages the transcription process, including file handling, loading states, and abort controllers.
         -   `use-extraction-store.ts`: Manages the context extraction process, loading states, and abort controllers.
-        -   `use-extraction-input-store.ts`: Manages the state of file inputs for batch context extraction.
 
     -   **`settings/`**: Stores that manage user-defined settings, both for the application and for specific tasks.
         -   `use-settings-store.ts`: Stores multiple `BasicSettings` objects keyed by `basicSettingsId`. Provides `setBasicSettingsValue()` for granular updates and `loadSettings()` for initialization.
