@@ -177,6 +177,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))
   const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(basicSettingsId))
   const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
 
   const customApiConfigs = useLocalSettingsStore((state) => state.customApiConfigs)
   const selectedApiConfigIndex = useLocalSettingsStore((state) => state.selectedApiConfigIndex)
@@ -1478,7 +1479,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
               </span>
               {isUseSharedSettings ? (
                 <span className="block">
-                  This will process up to <strong>{concurrentTranslations}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{modelDetail?.name}</strong>.
+                  This will process up to <strong>{concurrentTranslations}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{isUseCustomModel ? "Custom Model" : modelDetail?.name}</strong>.
                 </span>
               ) : (
                 <span className="block">
