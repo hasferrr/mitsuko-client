@@ -33,6 +33,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Translation, Transcription, Extraction, Project } from "@/types/project"
 import { ProjectItemList } from "./project-item-list"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { useRouter } from "next/navigation"
 import { EditDialogue } from "../ui-custom/edit-dialogue"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { db } from "@/lib/db/db"
@@ -72,6 +73,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
+  const router = useRouter()
 
   const loadProjects = useProjectStore((state) => state.loadProjects)
   const renameProject = useProjectStore((state) => state.renameProject)
@@ -199,6 +201,11 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       console.error("Error exporting project:", error)
       toast.error("Failed to export project")
     }
+  }
+
+  const handleBack = () => {
+    if (currentProject.isBatch) router.push("/batch")
+    else setCurrentProject(null)
   }
 
   const translationComponentList = translations.map((translation) => {
@@ -364,7 +371,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       <div className="mb-6">
         <div className="text-2xl font-medium mb-2 flex gap-4 items-center">
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={() => setCurrentProject(null)}>
+            <Button variant="ghost" size="icon" onClick={handleBack}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <h1>{currentProject.name}</h1>
