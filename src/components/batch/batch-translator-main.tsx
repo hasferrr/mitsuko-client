@@ -177,18 +177,6 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))
   const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(basicSettingsId))
   const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
-  const contextDocument = useSettingsStore((state) => state.getContextDocument(basicSettingsId))
-  const customInstructions = useSettingsStore((state) => state.getCustomInstructions(basicSettingsId))
-  const fewShot = useSettingsStore((state) => state.getFewShot(basicSettingsId))
-
-  const temperature = useAdvancedSettingsStore((state) => state.getTemperature(advancedSettingsId))
-  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens(advancedSettingsId))
-  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto(advancedSettingsId))
-  const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize(advancedSettingsId))
-  const isUseStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput(advancedSettingsId))
-  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory(advancedSettingsId))
-  const isBetterContextCaching = useAdvancedSettingsStore((state) => state.getIsBetterContextCaching(advancedSettingsId))
 
   const customApiConfigs = useLocalSettingsStore((state) => state.customApiConfigs)
   const selectedApiConfigIndex = useLocalSettingsStore((state) => state.selectedApiConfigIndex)
