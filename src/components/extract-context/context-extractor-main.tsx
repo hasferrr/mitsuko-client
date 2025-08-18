@@ -16,33 +16,23 @@ import {
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
-import { SubtitleNoTime } from "@/types/subtitles"
-import { removeTimestamp } from "@/lib/subtitles/timestamp"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
-import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constants/limits"
 import { getContent } from "@/lib/parser/parser"
-import { minMax, cn } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { MaxCompletionTokenInput, ModelSelection } from "../settings"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { fetchUserCreditData } from "@/lib/api/user-credit"
-import { UserCreditData } from "@/types/user"
-import { useQuery } from "@tanstack/react-query"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { db } from "@/lib/db/db"
 import { Extraction, Translation } from "@/types/project"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
-import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
-import { toast } from "sonner"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
 import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
+import { useExtractionHandler } from "@/hooks/use-extraction-handler"
 
 interface ContextExtractorMainProps {
   currentId: string
@@ -60,23 +50,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   const [isSubtitleImportDialogOpen, setIsSubtitleImportDialogOpen] = useState(false)
   const [projectTranslations, setProjectTranslations] = useState<Translation[]>([])
 
-  // API Settings Store
-  const customApiConfigs = useLocalSettingsStore((state) => state.customApiConfigs)
-  const selectedApiConfigIndex = useLocalSettingsStore((state) => state.selectedApiConfigIndex)
-  const selectedConfig =
-    selectedApiConfigIndex !== null ? customApiConfigs[selectedApiConfigIndex] : null
-  const apiKey = selectedConfig?.apiKey ?? ""
-  const customBaseUrl = selectedConfig?.customBaseUrl ?? ""
-  const customModel = selectedConfig?.customModel ?? ""
-
-  // Settings Store
-  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
-
-  // Advanced Settings Store
-  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens(advancedSettingsId))
-  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto(advancedSettingsId))
-
   // Extraction Data Store
   const episodeNumber = useExtractionDataStore((state) => state.getEpisodeNumber())
   const subtitleContent = useExtractionDataStore((state) => state.getSubtitleContent())
@@ -90,21 +63,11 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
 
   // Extraction Store
   const isExtractingSet = useExtractionStore((state) => state.isExtractingSet)
-  const extractContext = useExtractionStore((state) => state.extractContext)
-  const stopExtraction = useExtractionStore((state) => state.stopExtraction)
-  const setIsExtracting = useExtractionStore((state) => state.setIsExtracting)
   const isExtracting = isExtractingSet.has(currentId)
 
   // Other Store
+  const currentProject = useProjectStore((state) => state.currentProject)
   const session = useSessionStore((state) => state.session)
-
-  // Add lazy user data query that only executes manually
-  const { refetch: refetchUserData } = useQuery<UserCreditData>({
-    queryKey: ["user", session?.user?.id],
-    queryFn: fetchUserCreditData,
-    enabled: false, // Lazy query - won't run automatically
-    staleTime: 0, // Always refetch when requested
-  })
 
   const episodeNumberInputRef = useRef<HTMLInputElement | null>(null)
   const subtitleContentRef = useRef<HTMLTextAreaElement | null>(null)
@@ -113,7 +76,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   const contextResultEditRef = useRef<HTMLTextAreaElement | null>(null)
 
   const { setHasChanges } = useUnsavedChanges()
-  const currentProject = useProjectStore((state) => state.currentProject)
   useAutoScroll(contextResult, contextResultRef)
 
   useEffect(() => {
@@ -151,6 +113,18 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
     e.target.style.height = "auto"
     e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`
   }, [setHasChanges, setPreviousContext, currentId])
+
+  // Extraction Hook
+
+  const { handleStart, handleStop } = useExtractionHandler({
+    setActiveTab,
+    setIsEpisodeNumberValid,
+    setIsSubtitleContentValid,
+    setIsEditingResult,
+  })
+
+  const handleStartExtraction = async () => await handleStart(currentId, basicSettingsId, advancedSettingsId)
+  const handleStopExtraction = () => handleStop(currentId)
 
   // Import Select Handlers
 
@@ -207,82 +181,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
     await saveData(currentId)
   }
 
-  // Extraction Handlers
-
-  const handleStartExtraction = async () => {
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }, 300)
-
-    await saveData(currentId)
-
-    if (episodeNumber.trim() === "") {
-      setIsEpisodeNumberValid(false)
-      return
-    }
-    if (subtitleContent.trim() === "") {
-      setIsSubtitleContentValid(false)
-      return
-    }
-
-    setIsExtracting(currentId, true)
-    setHasChanges(true)
-    setActiveTab("result")
-    setIsEditingResult(false)
-
-    if (subtitleContent.trim() === "") {
-      throw new Error("Empty content")
-    }
-
-    try {
-      const data = parseSubtitle({ content: subtitleContent })
-      const subtitles: SubtitleNoTime[] = removeTimestamp(data.subtitles)
-
-      const requestBody = {
-        input: {
-          episode: episodeNumber.trim(),
-          subtitles: subtitles,
-          previous_context: previousContext,
-        },
-        baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
-        model: isUseCustomModel ? customModel : modelDetail?.name || "",
-        maxCompletionTokens: isMaxCompletionTokensAuto ? undefined : minMax(
-          maxCompletionTokens,
-          MAX_COMPLETION_TOKENS_MIN,
-          MAX_COMPLETION_TOKENS_MAX
-        ),
-      }
-
-      await extractContext(
-        requestBody,
-        isUseCustomModel ? apiKey : "",
-        (isUseCustomModel || modelDetail === null)
-          ? "custom"
-          : (modelDetail.isPaid ? "paid" : "free"),
-        currentId,
-        (response) => setContextResult(currentId, response),
-      )
-    } catch (error) {
-      console.error(error)
-      toast.error("Error extracting context, please make sure the subtitle content is valid")
-    } finally {
-      setIsExtracting(currentId, false)
-
-      // Refetch user data after extraction completes to update credits
-      refetchUserData()
-
-      await saveData(currentId)
-    }
-  }
-
-  const handleStopExtraction = async () => {
-    stopExtraction(currentId)
-    setIsExtracting(currentId, false)
-    await saveData(currentId)
-  }
+  // File Handlers
 
   const handleSaveToFile = async () => {
     await saveData(currentId)
@@ -516,7 +415,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
       <div className="lg:col-span-2 flex items-center justify-center gap-4 flex-wrap">
         <Button
           className="gap-2 w-[152px]"
-          onClick={() => handleStartExtraction()}
+          onClick={handleStartExtraction}
           disabled={isExtracting || !session}
         >
           {isExtracting ? (
