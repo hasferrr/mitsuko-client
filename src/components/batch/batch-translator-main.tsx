@@ -324,7 +324,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
     fileInputRef.current?.click()
   }
 
-  const handleInitiateBatchTranslation = () => {
+  const handleOpenStartBatchTranslationDialog = () => {
     if (batchFiles.length === 0 || isBatchTranslating) return
 
     let totalSubtitles = 0
@@ -348,6 +348,17 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
       })
       setIsStartTranslationDialogOpen(true)
     }
+  }
+
+  const handleOpenContinueBatchTranslationDialog = () => {
+    if (batchFiles.length === 0 || isBatchTranslating) return
+
+    setTranslatedStats({
+      translated: batchFiles.reduce((acc, file) => acc + file.translatedCount, 0),
+      total: batchFiles.reduce((acc, file) => acc + file.subtitlesCount, 0)
+    })
+
+    setIsContinueTranslationDialogOpen(true)
   }
 
   const handleStartBatchTranslation = () => {
@@ -418,17 +429,6 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
   }
 
   const handleContinueBatchTranslation = () => {
-    if (batchFiles.length === 0 || isBatchTranslating) return
-
-    setTranslatedStats({
-      translated: batchFiles.reduce((acc, file) => acc + file.translatedCount, 0),
-      total: batchFiles.reduce((acc, file) => acc + file.subtitlesCount, 0)
-    })
-
-    setIsContinueTranslationDialogOpen(true)
-  }
-
-  const handleStartContinueBatchTranslation = () => {
     setIsContinueTranslationDialogOpen(false)
 
     setTimeout(() => {
@@ -808,7 +808,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
           <div className="flex flex-wrap items-center gap-4 w-full">
             <Button
               className="h-10 flex-1"
-              onClick={handleInitiateBatchTranslation}
+              onClick={handleOpenStartBatchTranslationDialog}
               disabled={isBatchTranslating || !session || batchFiles.length === 0}
             >
               {isBatchTranslating ? (
@@ -837,7 +837,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
           <Button
             variant="outline"
             className="h-10 w-full border-primary/25 hover:border-primary/50"
-            onClick={handleContinueBatchTranslation}
+            onClick={handleOpenContinueBatchTranslationDialog}
             disabled={isBatchTranslating || !session || batchFiles.length === 0}
           >
             <FastForward className="h-4 w-4" />
@@ -1105,7 +1105,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleStartContinueBatchTranslation}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={handleContinueBatchTranslation}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
