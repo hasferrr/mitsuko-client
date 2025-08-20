@@ -85,11 +85,19 @@ export const SubtitleResultOutput = memo(() => {
     }
 
     const merged = [...subtitles]
-    for (let i = 0; i < tlChunk.length; i++) {
-      const index = tlChunk[i].index - 1
-      merged[index] = {
-        ...merged[index],
-        translated: tlChunk[i].translated || merged[index].translated,
+    for (const { index: idx, translated } of tlChunk) {
+      if (typeof idx !== 'number' || typeof translated !== 'string') {
+        console.log('skipping invalid data: ', { index: idx, translated })
+        continue
+      }
+      const targetIndex = idx - 1
+      if (targetIndex < 0 || targetIndex >= merged.length) {
+        console.log('skipping out of bounds at index: ', idx)
+        continue
+      }
+      merged[targetIndex] = {
+        ...merged[targetIndex],
+        translated: translated || merged[targetIndex].translated,
       }
     }
     setSubtitles(currentId, merged)
