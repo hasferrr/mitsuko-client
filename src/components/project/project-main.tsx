@@ -51,18 +51,24 @@ import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
 import { Badge } from "../ui/badge"
 
-const countTranslatedLines = (subtitles: Translation['subtitles']) => {
+const countTranslatedLines = (subtitles: Translation['subtitles']): { count: number, hasError: boolean } => {
   if (!subtitles || subtitles.length === 0) {
-    return 0
+    return { count: 0, hasError: false }
   }
+
+  let hasError = false
   let count = 0
   for (const sub of subtitles) {
+    if (!sub || !sub.timestamp) {
+      hasError = true
+      continue
+    }
     if ((sub.translated && sub.translated.trim() !== "") ||
       (sub.content.trim() === "" && sub.translated.trim() === "")) {
       count++
     }
   }
-  return count
+  return { count, hasError }
 }
 
 interface ProjectMainProps {
@@ -211,13 +217,14 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const translationComponentList = translations.map((translation) => {
     const totalLines = translation.subtitles.length
 
-    const translatedLines = countTranslatedLines(translation.subtitles)
+    const { count: translatedLines, hasError } = countTranslatedLines(translation.subtitles)
     const allTranslated = totalLines > 0 && totalLines === translatedLines
     const type = translation.parsed.type.toUpperCase()
+    const errorBadge = hasError ? " (Unexpected error, please delete this translation)" : ""
 
     const description = allTranslated
-      ? `${type} • ${totalLines} Lines`
-      : `${type} • ${translatedLines}/${totalLines} Lines`
+      ? `${type} • ${totalLines} Lines` + errorBadge
+      : `${type} • ${translatedLines}/${totalLines} Lines` + errorBadge
 
     return (
       <ProjectItemList
