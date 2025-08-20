@@ -9,8 +9,6 @@ import { useThemeStore } from "@/stores/use-theme-store"
 import { ModelCostProvider } from "@/contexts/model-cost-context"
 import { ModelCreditCost } from "@/types/model-cost"
 import { ClientIdProvider } from "@/contexts/client-id-context"
-import { StagewiseToolbar } from '@stagewise/toolbar-next'
-import ReactPlugin from '@stagewise-plugins/react'
 
 interface ProvidersProps extends PropsWithChildren {
   modelCosts: Map<string, ModelCreditCost>
@@ -59,7 +57,6 @@ export default function ProvidersClient({ children, modelCosts }: ProvidersProps
             <ModelCostProvider value={modelCosts}>
               <ClientIdProvider>
                 {children}
-                <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
               </ClientIdProvider>
             </ModelCostProvider>
           </UnsavedChangesProvider>

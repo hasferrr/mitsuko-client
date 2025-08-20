@@ -81,8 +81,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@next/eslint-plugin-next": "^15.4.6",
-    "@stagewise-plugins/react": "^0.5.2",
-    "@stagewise/toolbar-next": "^0.5.2",
     "@types/bun": "latest",
     "@types/node": "^22.17.1",
     "@types/react": "^19.1.10",
