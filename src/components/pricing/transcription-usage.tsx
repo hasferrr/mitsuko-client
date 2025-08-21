@@ -1,20 +1,9 @@
-import React from "react"
-
-const TOKENS_PER_MINUTE = 1920
-const TOKEN_THRESHOLD = 200000 - 8000
-const MINUTE_THRESHOLD = Math.floor(TOKEN_THRESHOLD / TOKENS_PER_MINUTE)
-
-const costsTier115 = {
+const credit = {
   "creditPerInputToken": 1.4375,
   "creditPerOutputToken": 12
 }
-const costsTier215 = {
-  "creditPerInputToken": 2.875,
-  "creditPerOutputToken": 18
-}
 
-const INPUT_CREDITS_PER_MINUTE_LOW = costsTier115.creditPerInputToken * TOKENS_PER_MINUTE
-const INPUT_CREDITS_PER_MINUTE_HIGH = costsTier215.creditPerInputToken * TOKENS_PER_MINUTE
+const INPUT_CREDITS_PER_MINUTE = credit.creditPerInputToken * 1920
 
 export default async function TranscriptionUsage() {
   return (
@@ -24,9 +13,8 @@ export default async function TranscriptionUsage() {
       </h3>
       <div className="flex flex-col gap-4">
         <p>
-          Transcription tasks consume credits based on the duration of the audio processed.
-          The credit cost differs when the audio is less than {MINUTE_THRESHOLD} minutes compared to when it is more than {MINUTE_THRESHOLD} minutes.
-          Yes, you can split your audio first for better pricing.
+          Audio transcription tasks consume credits based on the duration of the audio and the number of output tokens generated.
+          More models will be added in the future.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -56,15 +44,9 @@ export default async function TranscriptionUsage() {
               </tr>
               {/* Premium Models Row */}
               <tr className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Premium ({"<="} {MINUTE_THRESHOLD} minutes)</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{INPUT_CREDITS_PER_MINUTE_LOW}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{costsTier115?.creditPerOutputToken ?? 'N/A'}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Soon</td>
-              </tr>
-              <tr className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Premium ({">"} {MINUTE_THRESHOLD} minutes)</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{INPUT_CREDITS_PER_MINUTE_HIGH}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{costsTier215?.creditPerOutputToken ?? 'N/A'}</td>
+                <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Premium</td>
+                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{INPUT_CREDITS_PER_MINUTE}</td>
+                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{credit?.creditPerOutputToken ?? 'N/A'}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Soon</td>
               </tr>
             </tbody>

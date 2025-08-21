@@ -62,7 +62,7 @@ import { SubtitleTranslated } from "@/types/subtitles"
 import { useRouter } from "next/navigation"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
-import { cn } from "@/lib/utils"
+import { cn, calculateAudioDuration } from "@/lib/utils"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { Label } from "../ui/label"
@@ -176,6 +176,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const [activeTab, setActiveTab] = useState("upload")
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  const [localAudioDuration, setLocalAudioDuration] = useState<number | null>(null)
 
   // Refs
   const transcriptionAreaRef = useRef<HTMLTextAreaElement>(null)
@@ -194,6 +195,22 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       saveData(currentId)
     }
   }, [currentId, saveData])
+
+  useEffect(() => {
+    let isCancelled = false
+    if (file) {
+      calculateAudioDuration(file)
+        .then((seconds) => {
+          if (!isCancelled) setLocalAudioDuration(seconds)
+        })
+        .catch(() => {
+          if (!isCancelled) setLocalAudioDuration(null)
+        })
+    } else {
+      setLocalAudioDuration(null)
+    }
+    return () => { isCancelled = true }
+  }, [file])
 
   const handleStartTranscription = async () => {
     await saveData(currentId)
@@ -512,10 +529,21 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                           <p className="text-red-500">File size exceeds {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB</p>}
                       </div>
                     </div>
+                    {localAudioDuration !== null && localAudioDuration > 35 * 60 && (
+                      <div className="flex items-center gap-2 text-red-600 text-xs">
+                        <div className="h-3 w-3">
+                          <Clock className="h-3 w-3" />
+                        </div>
+                        <p>
+                          Audio duration exceeds Mitsuko transcription 35 minutes limit.
+                          Please reduce the audio duration.
+                        </p>
+                      </div>
+                    )}
                     <Button
                       variant="outline"
                       onClick={handleUploadSelectedFile}
-                      disabled={isUploading || !session}
+                      disabled={isUploading || !session || (localAudioDuration !== null && localAudioDuration > 35 * 60)}
                       className="w-full border-primary/25 hover:border-primary/50"
                     >
                       {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
