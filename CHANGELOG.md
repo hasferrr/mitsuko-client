@@ -14,6 +14,11 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### August 22
+
+- 🤖 **Model Updates:** Added DeepSeek V3.1 to free and paid tiers. Comparable to DeepSeek‑R1, succeeding V3‑0324, with strong all‑round performance.
+- 🎙️ **Transcription:** Added a duration limit to ensure output reliability with clearer messaging when limits are exceeded.
+
 ### August 16
 
 - 🎙️ **Reliable Transcription & Uploads:** Fixed an issue with transcription and file uploads.
