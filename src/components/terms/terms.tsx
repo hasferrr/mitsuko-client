@@ -23,7 +23,7 @@ export const Terms = ({ terms }: TermsProps) => {
   }
 
   return (
-    <div className="p-4 max-w-5xl grid mx-auto text-justify">
+    <div className="p-4 max-w-5xl grid mx-auto text-justify mt-6">
       <div>
         <Markdown
           rehypePlugins={[rehypeRaw]}
