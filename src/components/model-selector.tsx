@@ -28,6 +28,7 @@ import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useModelCosts } from "@/contexts/model-cost-context"
 import { ModelCreditCost } from "@/types/model-cost"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+import { UsageLevel } from "@/types/model"
 import Link from "next/link"
 import {
   Anthropic,
@@ -284,6 +285,11 @@ function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
               </>
             ) : (
               <>
+                <p>
+                  Credit Usage: <span className="capitalize font-semibold">
+                    {model.usage}
+                  </span>
+                </p>
                 <p>Input: {cost.creditPerInputToken} credits/token</p>
                 <p>Output: {cost.creditPerOutputToken} credits/token</p>
               </>

@@ -1,10 +1,12 @@
+import { UsageLevel } from "./model"
+
 export interface ModelCost {
   name: string
   creditPerInputToken: number
   creditPerOutputToken: number
   contextLength: string
   maxCompletion: string
-  score: string
+  usage: UsageLevel
   discount: number
 }
 

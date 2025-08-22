@@ -58,6 +58,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 64000,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
@@ -72,6 +73,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 64000,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
@@ -86,6 +88,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 64000,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
@@ -99,6 +102,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 40000,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
@@ -118,6 +122,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 65536,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -131,6 +136,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 65536,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -143,6 +149,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 8192,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -156,6 +163,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 128000,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -168,6 +176,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 128000,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -181,6 +190,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 64000,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
@@ -195,6 +205,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 64000,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
@@ -208,6 +219,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 40000,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -220,6 +232,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         maxOutput: 40000,
         structuredOutput: true,
         isPaid: false,
+        usage: "N/A",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -241,6 +254,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 65536,
         structuredOutput: true,
         isPaid: true,
+        usage: "high",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -254,6 +268,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 65536,
         structuredOutput: true,
         isPaid: true,
+        usage: "medium",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -267,6 +282,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 65536,
         structuredOutput: true,
         isPaid: true,
+        usage: "very low",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -279,6 +295,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 8192,
         structuredOutput: true,
         isPaid: true,
+        usage: "very low",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -291,6 +308,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 8192,
         structuredOutput: true,
         isPaid: true,
+        usage: "very low",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -308,6 +326,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 64_000,
         structuredOutput: true,
         isPaid: true,
+        usage: "very high",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -320,6 +339,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 64_000,
         structuredOutput: true,
         isPaid: true,
+        usage: "very high",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -332,6 +352,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 8_129,
         structuredOutput: true,
         isPaid: true,
+        usage: "high",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -344,6 +365,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 8_129,
         structuredOutput: true,
         isPaid: true,
+        usage: "medium",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -361,6 +383,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 256_000,
         structuredOutput: true,
         isPaid: true,
+        usage: "high",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -373,6 +396,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 131_072,
         structuredOutput: true,
         isPaid: true,
+        usage: "high",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -385,6 +409,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 131_072,
         structuredOutput: true,
         isPaid: true,
+        usage: "low",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -402,6 +427,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 128_000,
         structuredOutput: true,
         isPaid: true,
+        usage: "above medium",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -414,6 +440,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 128_000,
         structuredOutput: true,
         isPaid: true,
+        usage: "low",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -426,6 +453,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 128_000,
         structuredOutput: true,
         isPaid: true,
+        usage: "very low",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -438,6 +466,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 100_000,
         structuredOutput: true,
         isPaid: true,
+        usage: "above medium",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -450,6 +479,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 100_000,
         structuredOutput: true,
         isPaid: true,
+        usage: "above medium",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -462,6 +492,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 32_768,
         structuredOutput: true,
         isPaid: true,
+        usage: "above medium",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -474,6 +505,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 32_768,
         structuredOutput: true,
         isPaid: true,
+        usage: "low",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -486,6 +518,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 32_768,
         structuredOutput: true,
         isPaid: true,
+        usage: "very low",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -498,6 +531,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 16_384,
         structuredOutput: true,
         isPaid: true,
+        usage: "above medium",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -510,6 +544,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 16_384,
         structuredOutput: true,
         isPaid: true,
+        usage: "low",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -528,6 +563,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 128000,
         structuredOutput: true,
         isPaid: true,
+        usage: "below medium",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -541,6 +577,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 128000,
         structuredOutput: true,
         isPaid: true,
+        usage: "very low",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -553,6 +590,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 128000,
         structuredOutput: true,
         isPaid: true,
+        usage: "very low",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
@@ -570,6 +608,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 40000,
         structuredOutput: true,
         isPaid: true,
+        usage: "low",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
@@ -583,6 +622,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 40000,
         structuredOutput: true,
         isPaid: true,
+        usage: "very low",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
@@ -602,6 +642,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 64000,
         structuredOutput: true,
         isPaid: true,
+        usage: "medium",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
@@ -616,6 +657,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 64000,
         structuredOutput: true,
         isPaid: true,
+        usage: "high",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
@@ -630,6 +672,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 64000,
         structuredOutput: true,
         isPaid: true,
+        usage: "low",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
@@ -644,6 +687,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 64000,
         structuredOutput: true,
         isPaid: true,
+        usage: "low",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,

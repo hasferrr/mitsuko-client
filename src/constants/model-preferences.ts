@@ -2,6 +2,7 @@ let i = 0
 export const priorityModels = new Map<string, number>([
   ["DeepSeek R1", i++],
   ["DeepSeek R1 (Fast)", i++],
+  ["DeepSeek V3.1", i++],
   ["DeepSeek V3", i++],
 ])
 

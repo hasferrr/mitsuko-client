@@ -10,6 +10,16 @@ export type ModelProvider =
   | "xai"
   | "unknown"
 
+export type UsageLevel =
+  | "very low"
+  | "low"
+  | "below medium"
+  | "medium"
+  | "above medium"
+  | "high"
+  | "very high"
+  | "N/A"
+
 export interface Model {
   name: string
   subName?: string
@@ -17,6 +27,7 @@ export interface Model {
   maxOutput: number
   structuredOutput: boolean
   isPaid: boolean
+  usage: UsageLevel
   default?: Partial<Pick<AdvancedSettings,
     | 'temperature'
     | 'isUseStructuredOutput'

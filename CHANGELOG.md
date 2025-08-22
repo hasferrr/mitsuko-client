@@ -16,7 +16,7 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ### August 22
 
-- 🤖 **Model Updates:** Added DeepSeek V3.1 to free and paid tiers. Comparable to DeepSeek‑R1, succeeding V3‑0324, with strong all‑round performance.
+- 🤖 **Model Updates:** Added DeepSeek V3.1, comparable to DeepSeek R1, succeeding V3-0324, with strong all-round performance. Usage level indicators now shown for each model.
 - 🎙️ **Transcription:** Added a duration limit to ensure output reliability with clearer messaging when limits are exceeded.
 
 ### August 16

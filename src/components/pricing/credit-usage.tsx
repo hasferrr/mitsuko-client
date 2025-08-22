@@ -31,7 +31,7 @@ export default async function CreditUsage() {
         creditPerOutputToken: costs?.creditPerOutputToken ?? -1,
         contextLength: contextLength,
         maxCompletion: maxCompletion,
-        score: "-",
+        usage: paidModel.usage,
         discount: costs?.discount ?? 0,
       }
     })
@@ -52,7 +52,7 @@ export default async function CreditUsage() {
       creditPerOutputToken: 0,
       contextLength: 'Varies',
       maxCompletion: 'Varies',
-      score: '-',
+      usage: 'N/A',
       discount: 0,
     },
   ]
@@ -74,9 +74,9 @@ export default async function CreditUsage() {
               <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Model</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Credit per <br /> Input Token</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Credit per <br /> Output Token</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Credit Usage</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Context Length</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Max Completion</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Score</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -135,9 +135,13 @@ export default async function CreditUsage() {
                     </span>
                   )}
                 </td>
+                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">
+                  <span className="capitalize font-medium">
+                    {model.usage}
+                  </span>
+                </td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.contextLength}</td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.maxCompletion}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.score}</td>
               </tr>
             ))}
           </tbody>
