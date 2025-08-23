@@ -78,7 +78,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 64000,
-          isUseStructuredOutput: true
+          isUseStructuredOutput: false
         }
       },
       {
@@ -677,7 +677,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 64000,
-          isUseStructuredOutput: true
+          isUseStructuredOutput: false
         }
       },
       {
