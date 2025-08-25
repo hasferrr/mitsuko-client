@@ -22,6 +22,7 @@ interface UseExtractionHandlerProps {
   setIsEpisodeNumberValid?: (valid: boolean) => void
   setIsSubtitleContentValid?: (valid: boolean) => void
   setIsEditingResult?: (editing: boolean) => void
+  isBatch?: boolean
 }
 
 export const useExtractionHandler = ({
@@ -29,6 +30,7 @@ export const useExtractionHandler = ({
   setIsEpisodeNumberValid,
   setIsSubtitleContentValid,
   setIsEditingResult,
+  isBatch = false,
 }: UseExtractionHandlerProps) => {
   // API Settings Store
   const customApiConfigs = useLocalSettingsStore((state) => state.customApiConfigs)
@@ -78,12 +80,14 @@ export const useExtractionHandler = ({
     const subtitleContent = data.subtitleContent
     const previousContext = data.previousContext
 
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }, 300)
+    if (!isBatch) {
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        })
+      }, 300)
+    }
 
     await saveData(currentId)
 
@@ -98,8 +102,9 @@ export const useExtractionHandler = ({
 
     setIsExtracting(currentId, true)
     setHasChanges(true)
-    setActiveTab("result")
     setIsEditingResult?.(false)
+
+    if (!isBatch) setActiveTab("result")
 
     if (subtitleContent.trim() === "") {
       throw new Error("Empty content")

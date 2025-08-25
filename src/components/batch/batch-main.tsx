@@ -86,6 +86,7 @@ import { useBatchExtractionFiles } from "@/hooks/use-batch-extraction-files"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionHandler } from "@/hooks/use-extraction-handler"
 import useBatchTranslationHandler from "@/hooks/use-batch-translation-handler"
+import useBatchExtractionHandler from "@/hooks/use-batch-extraction-handler"
 
 const MAX_CONCURRENT_OPERATION = 5
 
@@ -181,7 +182,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const finishedCount = operationMode === 'translation' ? translationFinishedCount : extractionFinishedCount
   const isProcessing = operationMode === 'translation' ? isBatchTranslating : isBatchExtracting
 
-  // Batch translation handler
+  // Batch hooks
   const {
     handleStartBatchTranslation,
     handleContinueBatchTranslation,
@@ -196,6 +197,20 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       toType,
       setIsRestartTranslationDialogOpen: setIsRestartDialogOpen,
       setIsContinueTranslationDialogOpen: setIsContinueDialogOpen,
+      setActiveTab,
+      setQueueSet,
+    },
+  })
+
+  const {
+    handleStartBatchExtraction,
+    handleStopBatchExtraction,
+  } = useBatchExtractionHandler({
+    basicSettingsId,
+    advancedSettingsId,
+    batchFiles: extractionBatchFiles,
+    isBatchExtracting,
+    state: {
       setActiveTab,
       setQueueSet,
     },
