@@ -1017,6 +1017,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
         </div>
       </div>
 
+      {/* Delete Batch Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -1032,6 +1033,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Delete Single File Dialog */}
       <AlertDialog open={!!deleteFileId} onOpenChange={(open) => !open && setDeleteFileId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -1142,6 +1144,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Translation Preview Dialog */}
       <Dialog open={!!previewTranslationId} onOpenChange={(open) => {
         if (!open) {
           setPreviewTranslationId(null)
