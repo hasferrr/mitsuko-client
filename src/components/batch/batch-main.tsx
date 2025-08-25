@@ -713,11 +713,11 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 variant="outline"
                 size="sm"
                 className="gap-2 rounded-lg"
-                onClick={() => setIsImportSubDialogOpen(true)}
-                disabled={isProcessing || translationBatchFiles.length === 0}
+                onClick={() => setIsRenameDialogOpen(true)}
+                disabled={isProcessing || batchFiles.length === 0}
               >
-                <FolderInput className="h-4 w-4" />
-                Import
+                <SquarePen className="h-4 w-4" />
+                Rename
               </Button>
             )}
             {!isSelecting && operationMode === 'extraction' && (
@@ -725,11 +725,11 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 variant="outline"
                 size="sm"
                 className="gap-2 rounded-lg"
-                onClick={() => setIsRenameDialogOpen(true)}
-                disabled={isProcessing || batchFiles.length === 0}
+                onClick={() => setIsImportSubDialogOpen(true)}
+                disabled={isProcessing || translationBatchFiles.length === 0}
               >
-                <SquarePen className="h-4 w-4" />
-                Rename
+                <FolderInput className="h-4 w-4" />
+                Import
               </Button>
             )}
             {!isSelecting && operationMode === 'translation' && (
