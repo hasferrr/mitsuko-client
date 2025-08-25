@@ -8,6 +8,8 @@ interface BatchSettingsStore {
   individualIds: Set<string>
   /** Concurrent translation count per batch project */
   concurrentMap: Record<string, number>
+  /** Extraction mode per batch project */
+  extractionModeMap: Record<string, "independent" | "sequential">
 
   /**
    * Enable/disable shared settings for a given batch project.
@@ -15,11 +17,13 @@ interface BatchSettingsStore {
    */
   setUseSharedSettings: (projectId: string, useShared: boolean) => void
   setConcurrentTranslations: (projectId: string, value: number) => void
+  setExtractionMode: (projectId: string, mode: "independent" | "sequential") => void
 }
 
 export const useBatchSettingsStore = create<BatchSettingsStore>((set) => ({
   individualIds: new Set<string>(),
   concurrentMap: {} as Record<string, number>,
+  extractionModeMap: {} as Record<string, "independent" | "sequential">,
   setUseSharedSettings: (projectId, useShared) =>
     set((state) => {
       const newSet = new Set(state.individualIds)
@@ -31,5 +35,7 @@ export const useBatchSettingsStore = create<BatchSettingsStore>((set) => ({
       return { individualIds: newSet }
     }),
   setConcurrentTranslations: (projectId, value) =>
-    set((state) => ({ concurrentMap: { ...state.concurrentMap, [projectId]: value } }))
+    set((state) => ({ concurrentMap: { ...state.concurrentMap, [projectId]: value } })),
+  setExtractionMode: (projectId, mode) =>
+    set((state) => ({ extractionModeMap: { ...state.extractionModeMap, [projectId]: mode } })),
 }))

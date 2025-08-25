@@ -2,9 +2,9 @@
 
 - [x] Rename in batch
 - [x] Get subtitles from translations
-- [ ] Modes:
-  - [ ] Sequential
-  - [ ] Independent
+- [x] Modes:
+  - [x] Sequential
+  - [x] Independent
 - [ ] Populate extraction to translation context
 - [ ] Backend: batch api route option
 - [ ] Change the buttons name content

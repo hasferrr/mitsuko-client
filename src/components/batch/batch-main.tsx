@@ -144,6 +144,8 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const setUseSharedSettings = useBatchSettingsStore(state => state.setUseSharedSettings)
   const concurrentOperation = useBatchSettingsStore(state => state.concurrentMap[currentProject?.id ?? ""] ?? 3)
   const setConcurrentOperation = useBatchSettingsStore(state => state.setConcurrentTranslations)
+  const extractionMode = useBatchSettingsStore(state => state.extractionModeMap[currentProject?.id ?? ""] ?? "sequential")
+  const setExtractionMode = useBatchSettingsStore(state => state.setExtractionMode)
 
   const [order, setOrder] = useState<string[]>([])
 
@@ -154,6 +156,9 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       setOrder(currentProject?.extractions ?? [])
     }
   }, [currentProject?.extractions, currentProject?.translations, operationMode])
+
+  // Note: when extraction mode is sequential, we only SHOW 1 in the UI,
+  // but do not mutate the stored concurrency value.
 
   // Translation Data Store
   const translationData = useTranslationDataStore((state) => state.data)
@@ -199,6 +204,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const batchFiles = operationMode === 'translation' ? translationBatchFiles : extractionBatchFiles
   const finishedCount = operationMode === 'translation' ? translationFinishedCount : extractionFinishedCount
   const isProcessing = operationMode === 'translation' ? isBatchTranslating : isBatchExtracting
+  const isSequentialExtraction = operationMode === 'extraction' && extractionMode === 'sequential'
 
   // Batch hooks
   const {
@@ -829,14 +835,14 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           </Button>
 
           <div className="flex items-center justify-between w-full h-9 px-3 py-2 rounded-md border border-input">
-            <span className="text-sm font-medium">Max Concurrent Translations</span>
+            <span className="text-sm font-medium">Max Concurrent {operationMode === 'translation' ? 'Translations' : 'Extractions'}</span>
             <div className="flex items-center gap-[0.5]">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
                 onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, concurrentOperation - 1))}
-                disabled={concurrentOperation <= 1}
+                disabled={isSequentialExtraction || concurrentOperation <= 1}
               >
                 -
               </Button>
@@ -844,8 +850,9 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 type="number"
                 min={1}
                 max={MAX_CONCURRENT_OPERATION}
-                value={concurrentOperation}
+                value={isSequentialExtraction ? 1 : concurrentOperation}
                 onChange={(e) => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, Math.min(MAX_CONCURRENT_OPERATION, parseInt(e.target.value) || 1)))}
+                disabled={isSequentialExtraction}
                 className="w-10 h-7 text-center border-0 bg-transparent shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <Button
@@ -853,7 +860,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 size="sm"
                 className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
                 onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_CONCURRENT_OPERATION, concurrentOperation + 1))}
-                disabled={concurrentOperation >= MAX_CONCURRENT_OPERATION}
+                disabled={isSequentialExtraction || concurrentOperation >= MAX_CONCURRENT_OPERATION}
               >
                 +
               </Button>
@@ -883,20 +890,50 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
               <TabsTrigger value="advanced">Advanced</TabsTrigger>
             </TabsList>
 
-            <div className="flex items-center justify-between w-full p-4 mt-4 rounded-xl border border-input bg-card shadow-sm">
-              <label htmlFor="shared-settings-switch" className="flex flex-col">
-                <span className="text-sm font-semibold">Settings Mode</span>
-                <span className="text-xs text-muted-foreground">
-                  {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
-                </span>
-              </label>
-              <Switch
-                id="shared-settings-switch"
-                checked={isUseSharedSettings}
-                onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                disabled={isProcessing}
-                className="data-[state=checked]:bg-primary"
-              />
+            <div className="space-y-4 w-full p-4 mt-4 rounded-xl border border-input bg-card shadow-sm">
+              <div className="flex items-center justify-between">
+                <label htmlFor="shared-settings-switch" className="flex flex-col">
+                  <span className="text-sm font-semibold">Settings Mode</span>
+                  <span className="text-xs text-muted-foreground">
+                    {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
+                  </span>
+                </label>
+                <Switch
+                  id="shared-settings-switch"
+                  checked={isUseSharedSettings}
+                  onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
+                  disabled={isProcessing}
+                  className="data-[state=checked]:bg-primary"
+                />
+              </div>
+
+              {operationMode === 'extraction' && (
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold">Extraction Mode</span>
+                    <span className="text-xs text-muted-foreground">
+                      {extractionMode === 'sequential'
+                        ? 'Sequential: process one-by-one using previous context'
+                        : 'Independent: process files concurrently without sharing context'}
+                    </span>
+                  </div>
+                  <Select
+                    value={extractionMode}
+                    onValueChange={(value: "independent" | "sequential") => {
+                      setExtractionMode(currentProject?.id ?? "", value)
+                    }}
+                    disabled={isProcessing}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sequential">Sequential</SelectItem>
+                      <SelectItem value="independent">Independent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
