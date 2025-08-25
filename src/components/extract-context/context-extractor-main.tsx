@@ -51,11 +51,11 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   const [projectTranslations, setProjectTranslations] = useState<Translation[]>([])
 
   // Extraction Data Store
-  const title = useExtractionDataStore((state) => state.getTitle())
-  const episodeNumber = useExtractionDataStore((state) => state.getEpisodeNumber())
-  const subtitleContent = useExtractionDataStore((state) => state.getSubtitleContent())
-  const previousContext = useExtractionDataStore((state) => state.getPreviousContext())
-  const contextResult = useExtractionDataStore((state) => state.getContextResult())
+  const title = useExtractionDataStore((state) => state.getTitle(currentId))
+  const episodeNumber = useExtractionDataStore((state) => state.getEpisodeNumber(currentId))
+  const subtitleContent = useExtractionDataStore((state) => state.getSubtitleContent(currentId))
+  const previousContext = useExtractionDataStore((state) => state.getPreviousContext(currentId))
+  const contextResult = useExtractionDataStore((state) => state.getContextResult(currentId))
   const setTitle = useExtractionDataStore((state) => state.setTitle)
   const setEpisodeNumber = useExtractionDataStore((state) => state.setEpisodeNumber)
   const setSubtitleContent = useExtractionDataStore((state) => state.setSubtitleContent)

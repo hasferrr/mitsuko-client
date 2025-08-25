@@ -24,11 +24,11 @@ export interface ExtractionDataStore {
   updateExtractionDb: (extractionId: string, changes: Partial<Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext">>) => Promise<Extraction>
   deleteExtractionDb: (projectId: string, extractionId: string) => Promise<void>
   // getters
-  getTitle: () => string
-  getEpisodeNumber: () => string
-  getSubtitleContent: () => string
-  getPreviousContext: () => string
-  getContextResult: () => string
+  getTitle: (id: string) => string
+  getEpisodeNumber: (id: string) => string
+  getSubtitleContent: (id: string) => string
+  getPreviousContext: (id: string) => string
+  getContextResult: (id: string) => string
   // setters and other methods
   setCurrentId: (id: string | null) => void
   setTitle: (id: string, title: string) => void
@@ -86,25 +86,20 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
     }
   },
   // getters implementation
-  getTitle: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.title ?? "" : ""
+  getTitle: (id: string) => {
+    return get().data[id]?.title ?? ""
   },
-  getEpisodeNumber: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.episodeNumber : ""
+  getEpisodeNumber: (id: string) => {
+    return get().data[id]?.episodeNumber ?? ""
   },
-  getSubtitleContent: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.subtitleContent : ""
+  getSubtitleContent: (id: string) => {
+    return get().data[id]?.subtitleContent ?? ""
   },
-  getPreviousContext: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.previousContext : ""
+  getPreviousContext: (id: string) => {
+    return get().data[id]?.previousContext ?? ""
   },
-  getContextResult: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.contextResult : ""
+  getContextResult: (id: string) => {
+    return get().data[id]?.contextResult ?? ""
   },
 
   // existing methods
