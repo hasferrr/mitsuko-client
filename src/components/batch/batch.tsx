@@ -10,12 +10,11 @@ import {
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
-import BatchTranslatorMain from "./batch-translator-main"
+import BatchMain from "./batch-main"
 
-export default function BatchTranslator() {
+export default function Batch() {
   const batch = useProjectStore((state) => state.currentProject)
   const projects = useProjectStore((state) => state.projects)
-  const loadProjects = useProjectStore((state) => state.loadProjects)
   const createProject = useProjectStore((state) => state.createProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
 
@@ -24,10 +23,6 @@ export default function BatchTranslator() {
   const extractionData = useExtractionDataStore(state => state.data)
   const loadTranslations = useTranslationDataStore((state) => state.getTranslationsDb)
   const loadExtractions = useExtractionDataStore(state => state.getExtractionsDb)
-
-  useEffect(() => {
-    loadProjects()
-  }, [loadProjects])
 
   // Ensure translations are loaded for current batch project
   useEffect(() => {
@@ -106,7 +101,7 @@ export default function BatchTranslator() {
   }
 
   return (
-    <BatchTranslatorMain
+    <BatchMain
       basicSettingsId={batch.defaultBasicSettingsId}
       advancedSettingsId={batch.defaultAdvancedSettingsId}
     />

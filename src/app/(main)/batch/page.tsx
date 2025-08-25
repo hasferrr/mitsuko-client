@@ -1,4 +1,4 @@
-import BatchTranslator from "@/components/batch/batch-translator"
+import Batch from "@/components/batch/batch"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
 import { Metadata } from "next"
 
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function BatchPage() {
-  return <BatchTranslator />
+  return <Batch />
 }

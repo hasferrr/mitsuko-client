@@ -80,25 +80,16 @@ import Link from "next/link"
 import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import SubtitleTranslatorMain from "../translate/subtitle-translator-main"
 import { useTranslationHandler } from "@/hooks/use-translation-handler"
-
-interface BatchFile {
-  id: string
-  status: "pending" | "partial" | "translating" | "queued" | "done" | "error"
-  progress: number
-  title: string
-  subtitlesCount: number
-  translatedCount: number
-  type: string
-}
+import { BatchFile } from "../../types/batch"
 
 const MAX_CONCURRENT_TRANSLATION = 5
 
-interface BatchTranslatorMainProps {
+interface BatchMainProps {
   basicSettingsId: string
   advancedSettingsId: string
 }
 
-export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsId }: BatchTranslatorMainProps) {
+export default function BatchMain({ basicSettingsId, advancedSettingsId }: BatchMainProps) {
   const [activeTab, setActiveTab] = useState("basic")
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")

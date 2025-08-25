@@ -13,16 +13,7 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
 import { DownloadOption } from "@/types/subtitles"
-
-interface BatchFile {
-  id: string
-  status: "pending" | "partial" | "translating" | "queued" | "done" | "error"
-  progress: number
-  title: string
-  subtitlesCount: number
-  translatedCount: number
-  type: string
-}
+import { BatchFile } from "../../types/batch"
 
 interface SortableBatchFileProps {
   batchFile: BatchFile
