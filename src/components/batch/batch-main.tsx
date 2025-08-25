@@ -87,6 +87,7 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionHandler } from "@/hooks/use-extraction-handler"
 import useBatchTranslationHandler from "@/hooks/use-batch-translation-handler"
 import useBatchExtractionHandler from "@/hooks/use-batch-extraction-handler"
+import { ContextExtractorMain } from "../extract-context/context-extractor-main"
 
 const MAX_CONCURRENT_OPERATION = 5
 
@@ -485,14 +486,23 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
 
   const handlePreview = async (id: string) => {
     if (operationMode === 'translation') {
-      await loadTranslation(id)
       setCurrentTranslationId(id)
       setPreviewId(id)
     } else {
-      await loadExtraction(id)
       setCurrentExtractionId(id)
-      // No preview dialog for extraction mode yet
-      alert('Not implemented yet')
+      setPreviewId(id)
+    }
+  }
+
+  const handlePreviewDialogOpenChange = (open: boolean) => {
+    if (!open) {
+      setPreviewId(null)
+      if (!previewId) return
+      if (operationMode === 'translation') {
+        saveTranslationData(previewId)
+      } else {
+        saveExtractionData(previewId)
+      }
     }
   }
 
@@ -995,28 +1005,33 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Translation Preview Dialog */}
-      <Dialog open={!!previewId} onOpenChange={(open) => {
-        if (!open) {
-          setPreviewId(null)
-          if (previewId) {
-            saveTranslationData(previewId)
-          }
-        }
-      }}>
+      {/* Preview Dialog */}
+      <Dialog open={!!previewId} onOpenChange={handlePreviewDialogOpenChange}>
         <DialogContent className="max-w-6xl w-full">
           <DialogHeader>
-            <DialogTitle>Translation Preview</DialogTitle>
+            <DialogTitle>
+              {operationMode === 'translation'
+                ? 'Translation Preview'
+                : 'Extraction Preview'}
+            </DialogTitle>
           </DialogHeader>
           {previewId && (
             <div className="max-h-[80vh] overflow-y-auto">
-              <SubtitleTranslatorMain
-                currentId={previewId}
-                translation={translationData[previewId]}
-                basicSettingsId={isUseSharedSettings ? basicSettingsId : translationData[previewId].basicSettingsId}
-                advancedSettingsId={isUseSharedSettings ? advancedSettingsId : translationData[previewId].advancedSettingsId}
-                isSharedSettings={isUseSharedSettings}
-              />
+              {operationMode === 'translation' ? (
+                <SubtitleTranslatorMain
+                  currentId={previewId}
+                  translation={translationData[previewId]}
+                  basicSettingsId={isUseSharedSettings ? basicSettingsId : translationData[previewId].basicSettingsId}
+                  advancedSettingsId={isUseSharedSettings ? advancedSettingsId : translationData[previewId].advancedSettingsId}
+                  isSharedSettings={isUseSharedSettings}
+                />
+              ) : (
+                <ContextExtractorMain
+                  currentId={previewId}
+                  basicSettingsId={isUseSharedSettings ? basicSettingsId : extractionData[previewId].basicSettingsId}
+                  advancedSettingsId={isUseSharedSettings ? advancedSettingsId : extractionData[previewId].advancedSettingsId}
+                />
+              )}
             </div>
           )}
         </DialogContent>
