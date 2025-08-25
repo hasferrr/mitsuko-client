@@ -39,6 +39,7 @@ import {
   Languages,
   Layers,
   SquarePen,
+  FolderInput,
 } from "lucide-react"
 import {
   LanguageSelection,
@@ -71,6 +72,7 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-ki
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { SortableBatchFile } from "./sortable-batch-file"
 import { RenameEpisodesDialog } from "./rename-episodes-dialog"
+import { ImportSubDialog } from "./import-sub-dialog"
 import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-gap"
 import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
 import { DownloadSection } from "@/components/download-section"
@@ -120,6 +122,8 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const [isContinueDialogOpen, setIsContinueDialogOpen] = useState(false)
   const [translatedStats, setTranslatedStats] = useState({ translated: 0, total: 0 })
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
+  const [isImportSubDialogOpen, setIsImportSubDialogOpen] = useState(false)
+  const [isImportSubLoading, setIsImportSubLoading] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -178,13 +182,19 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
     batchFiles: translationBatchFiles,
     finishedCount: translationFinishedCount,
     isBatchTranslating,
-  } = useBatchTranslationFiles(order, queueSet)
+  } = useBatchTranslationFiles(
+    operationMode === 'translation' ? order : currentProject?.translations ?? [],
+    queueSet
+  )
 
   const {
     batchFiles: extractionBatchFiles,
     finishedCount: extractionFinishedCount,
     isBatchExtracting,
-  } = useBatchExtractionFiles(order, queueSet)
+  } = useBatchExtractionFiles(
+    operationMode === 'extraction' ? order : currentProject?.extractions ?? [],
+    queueSet
+  )
 
   const batchFiles = operationMode === 'translation' ? translationBatchFiles : extractionBatchFiles
   const finishedCount = operationMode === 'translation' ? translationFinishedCount : extractionFinishedCount
@@ -248,6 +258,60 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       handleStopBatchTranslation()
     } else {
       handleStopBatchExtraction()
+    }
+  }
+
+  const handleConfirmImportSub = async () => {
+    if (!currentProject) return
+    setIsImportSubLoading(true)
+    let success = 0
+    let failed = 0
+    try {
+      for (const file of translationBatchFiles) {
+        const translation = translationData[file.id]
+        if (!translation) {
+          failed += 1
+          continue
+        }
+        try {
+          const originalContent = generateSubtitleContent(
+            file.id,
+            "original",
+            "o-n-t",
+            translation.parsed?.type,
+          )
+          if (!originalContent || !originalContent.trim()) {
+            failed += 1
+            continue
+          }
+
+          // Build a File object for API shape, keep original extension
+          const ext = translation.parsed?.type || "srt"
+          const hasExt = translation.title.toLowerCase().endsWith(`.${ext}`)
+          const fileName = hasExt ? translation.title : `${translation.title}.${ext}`
+          const newFile = new File([originalContent], fileName, { type: "text/plain" })
+
+          const extractionId = await createExtractionForBatch(currentProject.id, newFile, originalContent)
+          await loadExtraction(extractionId)
+          success += 1
+        } catch (error) {
+          console.error("Import Subtitle: Failed to create extraction for", file.title, error)
+          failed += 1
+          toast.error(`Failed to create extraction for ${file.title}`)
+        }
+      }
+
+      if (success > 0) {
+        toast.success(`Created ${success} extraction${success === 1 ? "" : "s"} from original subtitles`)
+      }
+      if (failed > 0 && success === 0) {
+        toast.error("Failed to create extractions from original subtitles")
+      } else if (failed > 0) {
+        toast.info(`Some files failed: ${failed}`)
+      }
+      setIsImportSubDialogOpen(false)
+    } finally {
+      setIsImportSubLoading(false)
     }
   }
 
@@ -646,6 +710,18 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 variant="outline"
                 size="sm"
                 className="gap-2 rounded-lg"
+                onClick={() => setIsImportSubDialogOpen(true)}
+                disabled={isProcessing || translationBatchFiles.length === 0}
+              >
+                <FolderInput className="h-4 w-4" />
+                Import
+              </Button>
+            )}
+            {!isSelecting && operationMode === 'extraction' && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 rounded-lg"
                 onClick={() => setIsRenameDialogOpen(true)}
                 disabled={isProcessing || batchFiles.length === 0}
               >
@@ -914,6 +990,15 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
         open={isRenameDialogOpen}
         onOpenChange={setIsRenameDialogOpen}
         batchFiles={batchFiles}
+      />
+
+      {/* Import Subtitle (from translations) Dialog */}
+      <ImportSubDialog
+        open={isImportSubDialogOpen}
+        onOpenChange={(open) => { if (!isImportSubLoading) setIsImportSubDialogOpen(open) }}
+        totalFiles={translationBatchFiles.length}
+        onConfirm={handleConfirmImportSub}
+        isLoading={isImportSubLoading}
       />
 
       {/* Delete Single File Dialog */}
