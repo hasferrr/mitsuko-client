@@ -308,7 +308,11 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
     if (!currentProject) return
     for (const id of Array.from(selectedIds)) {
       try {
-        await removeTranslationFromBatch(currentProject.id, id)
+        if (operationMode === 'translation') {
+          await removeTranslationFromBatch(currentProject.id, id)
+        } else {
+          await removeExtractionFromBatch(currentProject.id, id)
+        }
       } catch {
         toast.error('Failed to delete file')
       }
@@ -329,12 +333,13 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
     const { active, over } = event
     if (!over || !currentProject) return
     if (active.id === over.id) return
-    const oldIndex = currentProject.translations.indexOf(active.id as string)
-    const newIndex = currentProject.translations.indexOf(over.id as string)
+    const ids = operationMode === 'translation' ? currentProject.translations : currentProject.extractions
+    const oldIndex = ids.indexOf(active.id as string)
+    const newIndex = ids.indexOf(over.id as string)
     if (oldIndex === -1 || newIndex === -1) return
     const newOrder = arrayMove(order, oldIndex, newIndex)
     setOrder(newOrder)
-    updateProjectItems(currentProject.id, newOrder, 'translations')
+    updateProjectItems(currentProject.id, newOrder, operationMode === 'translation' ? 'translations' : 'extractions')
   }
 
   const handleFileDrop = async (droppedFiles: FileList | File[]) => {
@@ -351,8 +356,13 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
 
       try {
         const content = await file.text()
-        const translationId = await createTranslationForBatch(currentProject.id, file, content)
-        await loadTranslation(translationId)
+        if (operationMode === 'translation') {
+          const translationId = await createTranslationForBatch(currentProject.id, file, content)
+          await loadTranslation(translationId)
+        } else {
+          const extractionId = await createExtractionForBatch(currentProject.id, file, content)
+          await loadExtraction(extractionId)
+        }
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error)
         toast.error(`Failed to add ${file.name} to batch`)
@@ -373,17 +383,33 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   }
 
   const handleSingleFileDownload = (batchFileId: string) => {
-    const translation = translationData[batchFileId]
-    if (!translation) return
+    let content: string | null = null
+    let fileName: string | null = null
 
-    const fileContent = generateSubtitleContent(batchFileId, downloadOption, combinedFormat)
-    if (!fileContent) return
+    if (operationMode === 'translation') {
+      const translation = translationData[batchFileId]
+      if (!translation) return
+      content = generateSubtitleContent(batchFileId, downloadOption, combinedFormat)
+      if (!content) return
+      const ext = translation.parsed?.type || "srt"
+      const hasExt = translation.title.toLowerCase().endsWith(`.${ext}`)
+      fileName = hasExt ? translation.title : `${translation.title}.${ext}`
 
-    const ext = translation.parsed?.type || "srt"
-    const hasExt = translation.title.toLowerCase().endsWith(`.${ext}`)
-    const fileName = hasExt ? translation.title : `${translation.title}.${ext}`
+    } else {
+      const extraction = extractionData[batchFileId]
+      if (!extraction) return
+      content = extraction.contextResult || ''
+      content = content.replace(/<finished>\s*$/, '')
+      if (!content.trim()) return
+      const baseTitle = extraction.title || 'extraction'
+      const dotIdx = baseTitle.lastIndexOf('.')
+      const baseName = dotIdx > 0 ? baseTitle.slice(0, dotIdx) : baseTitle
+      fileName = `${baseName}.txt`
+    }
 
-    const blob = new Blob([fileContent], { type: "text/plain" })
+    if (!content || !fileName) return
+
+    const blob = new Blob([content], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
@@ -402,46 +428,82 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
 
     const nameCountMap = new Map<string, number>()
 
-    for (const batchFile of batchFiles) {
-      const translation = translationData[batchFile.id]
-      if (!translation) continue
-      const fileContent = generateSubtitleContent(batchFile.id, option, format)
+    if (operationMode === 'translation') {
+      for (const batchFile of batchFiles) {
+        const translation = translationData[batchFile.id]
+        if (!translation) continue
+        const content = generateSubtitleContent(batchFile.id, option, format)
 
-      let ext = translation.parsed.type
-      const hasExt = translation.title.toLowerCase().endsWith(`.${ext}`)
-      const baseName = hasExt
-        ? translation.title.slice(0, -(`.${ext}`.length))
-        : translation.title
+        let ext = translation.parsed.type
+        const hasExt = translation.title.toLowerCase().endsWith(`.${ext}`)
+        const baseName = hasExt
+          ? translation.title.slice(0, -(`.${ext}`.length))
+          : translation.title
 
-      if (ext !== toType && toType !== "no-change") {
-        ext = toType
+        if (ext !== toType && toType !== "no-change") {
+          ext = toType
+        }
+
+        const fileKey = `${baseName}.${ext}`
+        const currentCount = nameCountMap.get(fileKey) ?? 0
+        const newCount = currentCount + 1
+        nameCountMap.set(fileKey, newCount)
+
+        const uniqueFileName = newCount === 1
+          ? fileKey
+          : `${baseName} (${newCount}).${ext}`
+
+        zip.file(uniqueFileName, content)
       }
+    } else {
+      for (const batchFile of batchFiles) {
+        const extraction = extractionData[batchFile.id]
+        if (!extraction) continue
+        let content = extraction.contextResult || ''
+        content = content.replace(/<finished>\s*$/, '')
 
-      const fileKey = `${baseName}.${ext}`
-      const currentCount = nameCountMap.get(fileKey) ?? 0
-      const newCount = currentCount + 1
-      nameCountMap.set(fileKey, newCount)
+        const baseTitle = extraction.title || 'extraction'
+        const dotIdx = baseTitle.lastIndexOf('.')
+        const baseName = dotIdx > 0 ? baseTitle.slice(0, dotIdx) : baseTitle
+        const ext = 'txt'
 
-      const uniqueFileName = newCount === 1
-        ? fileKey
-        : `${baseName} (${newCount}).${ext}`
+        const fileKey = `${baseName}.${ext}`
+        const currentCount = nameCountMap.get(fileKey) ?? 0
+        const newCount = currentCount + 1
+        nameCountMap.set(fileKey, newCount)
 
-      zip.file(uniqueFileName, fileContent)
+        const uniqueFileName = newCount === 1
+          ? fileKey
+          : `${baseName} (${newCount}).${ext}`
+
+        zip.file(uniqueFileName, content)
+      }
     }
 
     return await zip.generateAsync({ type: "blob" })
   }
 
   const handlePreview = async (id: string) => {
-    await loadTranslation(id)
-    setCurrentTranslationId(id)
-    setPreviewId(id)
+    if (operationMode === 'translation') {
+      await loadTranslation(id)
+      setCurrentTranslationId(id)
+      setPreviewId(id)
+    } else {
+      await loadExtraction(id)
+      setCurrentExtractionId(id)
+      // No preview dialog for extraction mode yet
+      alert('Not implemented yet')
+    }
   }
 
   const confirmDeleteFile = async () => {
     if (!currentProject || !deleteFileId) return
     try {
-      await removeTranslationFromBatch(currentProject.id, deleteFileId)
+      if (operationMode === 'translation') {
+        await removeTranslationFromBatch(currentProject.id, deleteFileId)
+      } else {
+        await removeExtractionFromBatch(currentProject.id, deleteFileId)
+      }
       setDeleteFileId(null)
     } catch {
       toast.error('Failed to delete file')
