@@ -14,6 +14,14 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### August 25
+
+- 🚀 **Batch Extraction Overhaul:** Continue interrupted jobs, mark items as done, toggle sequential vs independent modes, and auto-pause on errors for full control.
+- 🔄 **Batch ↔︎ Normal Project Conversion:** Convert a batch project to a normal one (and back) in a single click.
+- 🎛️ **Smarter Batch Settings & UI:** Mode-aware download options, clearer confirmation dialogs, and the ability to copy shared settings to every file.
+- 📥 **Improved Batch Import & Context Linking:** Select specific files to import and automatically link extractions to their translations.
+- ✨ **Episode & Preview Enhancements:** Bulk rename episode numbers with live preview, add descriptions, show fallback titles, and preview extractions before processing.
+
 ### August 22
 
 - 🤖 **Model Updates:** Added DeepSeek V3.1, comparable to DeepSeek R1, succeeding V3-0324, with strong all-round performance. Usage level indicators now shown for each model.
