@@ -1129,6 +1129,19 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   </span>
                   <span className="block">Are you sure you want to translate from the beginning?</span>
                   <span className="block">Use the <strong>Continue</strong> button instead to translate only the remaining content.</span>
+                  {isUseSharedSettings ? (
+                    <>
+                      <span className="block font-semibold">Shared Settings:</span>
+                      <span className="list-item ml-4">This will process up to <strong>{concurrentOperation}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong>.</span>
+                      <span className="list-item ml-4">A shared context document (if set) will be applied to all files.</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="block font-semibold">Individual Settings:</span>
+                      <span className="list-item ml-4">Each file will be processed with its own settings, which may differ in model or languages.</span>
+                      <span className="list-item ml-4">Each file will use its own context document (if set).</span>
+                    </>
+                  )}
                 </>
               ) : (
                 <>
@@ -1137,6 +1150,17 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   </span>
                   <span className="block">Are you sure you want to start extraction from the beginning?</span>
                   <span className="block">Use the <strong>Continue</strong> button instead to process only the remaining files.</span>
+                  {isUseSharedSettings ? (
+                    <>
+                      <span className="block font-semibold">Shared Settings:</span>
+                      <span className="list-item ml-4">This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="block font-semibold">Individual Settings:</span>
+                      <span className="list-item ml-4">Each file will be processed with its own settings, which may differ in model or parameters.</span>
+                    </>
+                  )}
                 </>
               )}
             </AlertDialogDescription>
@@ -1161,18 +1185,32 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 <>
                   <span className="block">Are you sure you want to start translating <strong>{batchFiles.length}</strong> files with <strong>{translatedStats.total}</strong> subtitles?</span>
                   {isUseSharedSettings ? (
-                    <span className="block">This will process up to <strong>{concurrentOperation}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong>.</span>
+                    <>
+                      <span className="block font-semibold">Shared Settings:</span>
+                      <span className="list-item ml-4">This will process up to <strong>{concurrentOperation}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong>.</span>
+                      <span className="list-item ml-4">A shared context document (if set) will be applied to all files.</span>
+                    </>
                   ) : (
-                    <span className="block">Each file will be processed with its own settings, which may differ in model or languages.</span>
+                    <>
+                      <span className="block font-semibold">Individual Settings:</span>
+                      <span className="list-item ml-4">Each file will be processed with its own settings, which may differ in model or languages.</span>
+                      <span className="list-item ml-4">Each file will use its own context document (if set).</span>
+                    </>
                   )}
                 </>
               ) : (
                 <>
                   <span className="block">Are you sure you want to start extracting <strong>{batchFiles.length}</strong> files?</span>
                   {isUseSharedSettings ? (
-                    <span className="block">This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</span>
+                    <>
+                      <span className="block font-semibold">Shared Settings:</span>
+                      <span className="list-item ml-4">This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</span>
+                    </>
                   ) : (
-                    <span className="block">Each file will be processed with its own settings, which may differ in model or parameters.</span>
+                    <>
+                      <span className="block font-semibold">Individual Settings:</span>
+                      <span className="list-item ml-4">Each file will be processed with its own settings, which may differ in model or parameters.</span>
+                    </>
                   )}
                 </>
               )}
@@ -1199,9 +1237,17 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   <span className="block">Are you sure you want to continue translating <strong>{batchFiles.length - finishedCount}</strong> remaining files?</span>
                   <span className="block">Only untranslated portions of each file will be processed.</span>
                   {isUseSharedSettings ? (
-                    <span className="block">This will process up to <strong>{concurrentOperation}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong>.</span>
+                    <>
+                      <span className="block font-semibold">Shared Settings:</span>
+                      <span className="list-item ml-4">This will process up to <strong>{concurrentOperation}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong>.</span>
+                      <span className="list-item ml-4">A shared context document (if set) will be applied to all files.</span>
+                    </>
                   ) : (
-                    <span className="block">Each file will be processed with its own settings, which may differ in model or languages.</span>
+                    <>
+                      <span className="block font-semibold">Individual Settings:</span>
+                      <span className="list-item ml-4">Each file will be processed with its own settings, which may differ in model or languages.</span>
+                      <span className="list-item ml-4">Each file will use its own context document (if set).</span>
+                    </>
                   )}
                 </>
               ) : (
@@ -1209,9 +1255,15 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   <span className="block">Are you sure you want to continue extracting <strong>{batchFiles.length - finishedCount}</strong> remaining files?</span>
                   <span className="block">Only files that are not yet done will be processed.</span>
                   {isUseSharedSettings ? (
-                    <span className="block">This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</span>
+                    <>
+                      <span className="block font-semibold">Shared Settings:</span>
+                      <span className="list-item ml-4">This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</span>
+                    </>
                   ) : (
-                    <span className="block">Each file will be processed with its own settings, which may differ in model or parameters.</span>
+                    <>
+                      <span className="block font-semibold">Individual Settings:</span>
+                      <span className="list-item ml-4">Each file will be processed with its own settings, which may differ in model or parameters.</span>
+                    </>
                   )}
                 </>
               )}
