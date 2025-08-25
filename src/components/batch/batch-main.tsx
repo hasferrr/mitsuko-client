@@ -123,10 +123,13 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const currentProject = useProjectStore((state) => state.currentProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
-  const createTranslationForBatch = useProjectStore((state) => state.createTranslationForBatch)
   const renameProject = useProjectStore((state) => state.renameProject)
-  const removeTranslationFromBatch = useProjectStore((state) => state.removeTranslationFromBatch)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
+
+  const createTranslationForBatch = useProjectStore((state) => state.createTranslationForBatch)
+  const removeTranslationFromBatch = useProjectStore((state) => state.removeTranslationFromBatch)
+  const createExtractionForBatch = useProjectStore((state) => state.createExtractionForBatch)
+  const removeExtractionFromBatch = useProjectStore((state) => state.removeExtractionFromBatch)
 
   // Batch Settings Store
   const isUseSharedSettings = useBatchSettingsStore(state => !state.individualIds.has(currentProject?.id ?? ""))
@@ -153,9 +156,10 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   // Extraction Data Store
   const extractionData = useExtractionDataStore((state) => state.data)
   const loadExtraction = useExtractionDataStore((state) => state.getExtractionDb)
+  const setCurrentExtractionId = useExtractionDataStore((state) => state.setCurrentId)
   const saveExtractionData = useExtractionDataStore((state) => state.saveData)
 
-  // Settings Stores
+  // Batch Settings Stores
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))
   const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(basicSettingsId))
   const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
@@ -216,7 +220,72 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
     },
   })
 
+  // --------------------- Operation handlers ---------------------
+
+  const handleStart = () => {
+    if (operationMode === 'translation') {
+      handleStartBatchTranslation()
+    } else {
+      handleStartBatchExtraction()
+    }
+  }
+
+  const handleContinue = () => {
+    if (operationMode === 'translation') {
+      handleContinueBatchTranslation()
+    } else {
+      // handleContinueBatchExtraction()
+      alert('Not implemented yet')
+    }
+  }
+
+  const handleStop = () => {
+    if (operationMode === 'translation') {
+      handleStopBatchTranslation()
+    } else {
+      handleStopBatchExtraction()
+    }
+  }
+
+  const handleOpenStartBatchDialog = () => {
+    if (batchFiles.length === 0 || isProcessing) return
+
+    let totalSubtitles = 0
+    let translatedSubtitles = 0
+
+    batchFiles.forEach(file => {
+      totalSubtitles += file.subtitlesCount
+      translatedSubtitles += file.translatedCount
+    })
+
+    if (translatedSubtitles > 0) {
+      setTranslatedStats({
+        translated: translatedSubtitles,
+        total: totalSubtitles
+      })
+      setIsRestartDialogOpen(true)
+    } else {
+      setTranslatedStats({
+        translated: 0,
+        total: totalSubtitles
+      })
+      setIsStartDialogOpen(true)
+    }
+  }
+
+  const handleOpenContinueBatchDialog = () => {
+    if (batchFiles.length === 0 || isProcessing) return
+
+    setTranslatedStats({
+      translated: batchFiles.reduce((acc, file) => acc + file.translatedCount, 0),
+      total: batchFiles.reduce((acc, file) => acc + file.subtitlesCount, 0)
+    })
+
+    setIsContinueDialogOpen(true)
+  }
+
   // --------------------- Selection helpers ---------------------
+
   const toggleSelectMode = () => {
     setIsSelecting(prev => {
       if (prev) {
@@ -301,43 +370,6 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
 
   const handleClickFileUpload = () => {
     fileInputRef.current?.click()
-  }
-
-  const handleOpenStartBatchDialog = () => {
-    if (batchFiles.length === 0 || isProcessing) return
-
-    let totalSubtitles = 0
-    let translatedSubtitles = 0
-
-    batchFiles.forEach(file => {
-      totalSubtitles += file.subtitlesCount
-      translatedSubtitles += file.translatedCount
-    })
-
-    if (translatedSubtitles > 0) {
-      setTranslatedStats({
-        translated: translatedSubtitles,
-        total: totalSubtitles
-      })
-      setIsRestartDialogOpen(true)
-    } else {
-      setTranslatedStats({
-        translated: 0,
-        total: totalSubtitles
-      })
-      setIsStartDialogOpen(true)
-    }
-  }
-
-  const handleOpenContinueBatchDialog = () => {
-    if (batchFiles.length === 0 || isProcessing) return
-
-    setTranslatedStats({
-      translated: batchFiles.reduce((acc, file) => acc + file.translatedCount, 0),
-      total: batchFiles.reduce((acc, file) => acc + file.subtitlesCount, 0)
-    })
-
-    setIsContinueDialogOpen(true)
   }
 
   const handleSingleFileDownload = (batchFileId: string) => {
@@ -615,7 +647,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
             <Button
               variant="outline"
               className="h-10 flex-1"
-              onClick={handleStopBatchTranslation}
+              onClick={handleStop}
               disabled={!isProcessing}
             >
               <Square className="h-4 w-4" />
@@ -842,7 +874,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleStartBatchTranslation}>Restart Translation</AlertDialogAction>
+            <AlertDialogAction onClick={handleStart}>Restart Translation</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -872,7 +904,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleStartBatchTranslation}>Start Translation</AlertDialogAction>
+            <AlertDialogAction onClick={handleStart}>Start Translation</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -896,7 +928,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleContinueBatchTranslation}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={handleContinue}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
