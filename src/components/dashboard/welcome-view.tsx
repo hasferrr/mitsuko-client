@@ -115,6 +115,7 @@ export function WelcomeView() {
       }
       case "extract-context": {
         const extraction = await createExtractionDb(defaultProject.id, {
+          title: "",
           episodeNumber: "",
           subtitleContent: "",
           previousContext: "",

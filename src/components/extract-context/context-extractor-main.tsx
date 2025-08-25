@@ -51,10 +51,12 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   const [projectTranslations, setProjectTranslations] = useState<Translation[]>([])
 
   // Extraction Data Store
+  const title = useExtractionDataStore((state) => state.getTitle())
   const episodeNumber = useExtractionDataStore((state) => state.getEpisodeNumber())
   const subtitleContent = useExtractionDataStore((state) => state.getSubtitleContent())
   const previousContext = useExtractionDataStore((state) => state.getPreviousContext())
   const contextResult = useExtractionDataStore((state) => state.getContextResult())
+  const setTitle = useExtractionDataStore((state) => state.setTitle)
   const setEpisodeNumber = useExtractionDataStore((state) => state.setEpisodeNumber)
   const setSubtitleContent = useExtractionDataStore((state) => state.setSubtitleContent)
   const setPreviousContext = useExtractionDataStore((state) => state.setPreviousContext)
@@ -231,7 +233,17 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   }, [currentProject])
 
   return (
-    <div className="grid md:grid-cols-2 gap-6 container mx-auto py-2 px-4 mt-2 mb-6 max-w-5xl">
+    <div className="grid md:grid-cols-2 gap-6 gap-y-4 container mx-auto py-2 px-4 mt-2 mb-6 max-w-5xl">
+      {/* Header */}
+      <div className="md:col-span-2 flex flex-wrap items-center gap-4">
+        <Input
+          value={title}
+          onChange={(e) => setTitle(currentId, e.target.value)}
+          onBlur={() => saveData(currentId)}
+          className="text-xl font-semibold h-12"
+        />
+      </div>
+
       {/* Left Pane */}
       <div className="space-y-2">
         <div className="space-y-2">

@@ -219,6 +219,7 @@ function transcriptionConstructor(transcription: Partial<Transcription>): Transc
 function extractionConstructor(extraction: Partial<Extraction>): Extraction {
   return {
     id: extraction.id ?? uuidv4(),
+    title: extraction.title ?? "",
     episodeNumber: extraction.episodeNumber ?? "",
     subtitleContent: extraction.subtitleContent ?? "",
     previousContext: extraction.previousContext ?? "",

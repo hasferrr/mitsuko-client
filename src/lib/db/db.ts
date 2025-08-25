@@ -142,6 +142,13 @@ class MyDatabase extends Dexie {
         delete (transcription as Record<string, unknown>).isOverOneHour
       })
     })
+    this.version(17).stores({}).upgrade(async tx => {
+      await tx.table('extractions').toCollection().modify(extraction => {
+        if (typeof extraction.title === 'undefined') {
+          extraction.title = ''
+        }
+      })
+    })
   }
 }
 

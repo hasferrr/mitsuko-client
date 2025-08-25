@@ -16,20 +16,22 @@ export interface ExtractionDataStore {
   // CRUD methods
   createExtractionDb: (
     projectId: string,
-    data: Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">,
+    data: Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">,
     basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
     advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Extraction>
   getExtractionDb: (extractionId: string) => Promise<Extraction | undefined>
-  updateExtractionDb: (extractionId: string, changes: Partial<Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext">>) => Promise<Extraction>
+  updateExtractionDb: (extractionId: string, changes: Partial<Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext">>) => Promise<Extraction>
   deleteExtractionDb: (projectId: string, extractionId: string) => Promise<void>
   // getters
+  getTitle: () => string
   getEpisodeNumber: () => string
   getSubtitleContent: () => string
   getPreviousContext: () => string
   getContextResult: () => string
   // setters and other methods
   setCurrentId: (id: string | null) => void
+  setTitle: (id: string, title: string) => void
   setEpisodeNumber: (id: string, episodeNumber: string) => void
   setSubtitleContent: (id: string, subtitleContent: string) => void
   setPreviousContext: (id: string, previousContext: string) => void
@@ -84,6 +86,10 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
     }
   },
   // getters implementation
+  getTitle: () => {
+    const id = get().currentId
+    return id ? get().data[id]?.title ?? "" : ""
+  },
   getEpisodeNumber: () => {
     const id = get().currentId
     return id ? get().data[id]?.episodeNumber : ""
@@ -103,6 +109,9 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
 
   // existing methods
   setCurrentId: (id) => set({ currentId: id }),
+  setTitle: (id: string, title: string) => {
+    get().mutateData(id, "title", title)
+  },
   setEpisodeNumber: (id, episodeNumber) => {
     get().mutateData(id, "episodeNumber", episodeNumber)
   },

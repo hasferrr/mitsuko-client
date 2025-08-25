@@ -287,6 +287,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         ? <Loader2 className="h-5 w-5 text-purple-500 animate-spin" />
         : <FileText className="h-5 w-5 text-purple-500" />}
       title={`Episode ${extraction.episodeNumber || "X"}`}
+      subtitle={extraction.title}
       description={extraction.contextResult}
       date={extraction.updatedAt.toLocaleDateString()}
       handleEdit={async (newName) => {
@@ -358,6 +359,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         await createExtractionDb(
           currentProject.id,
           {
+            title: "",
             episodeNumber: "",
             subtitleContent: "",
             previousContext: "",

@@ -7,7 +7,7 @@ import { createBasicSettings, createAdvancedSettings } from "./settings"
 // Extraction CRUD functions
 export const createExtraction = async (
   projectId: string,
-  data: Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">,
+  data: Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">,
   basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
   advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
 ): Promise<Extraction> => {
@@ -51,7 +51,7 @@ export const getExtraction = async (extractionId: string): Promise<Extraction | 
 
 export const updateExtraction = async (
   extractionId: string,
-  changes: Partial<Pick<Extraction, "episodeNumber" | "subtitleContent" | "previousContext">>
+  changes: Partial<Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext">>
 ): Promise<Extraction> => {
   await db.extractions.update(extractionId, {
     ...changes,

@@ -52,6 +52,7 @@ export interface Transcription {
 
 export interface Extraction {
   id: string
+  title: string
   episodeNumber: string
   subtitleContent: string
   previousContext: string

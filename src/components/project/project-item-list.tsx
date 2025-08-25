@@ -21,6 +21,7 @@ interface ProjectItemListProps {
   type: "translation" | "transcription" | "extraction"
   icon: React.ReactNode
   title: string
+  subtitle?: string
   description: string
   date: string
   handleEdit: (newName: string) => Promise<void>
@@ -33,6 +34,7 @@ export const ProjectItemList = ({
   type,
   icon,
   title,
+  subtitle,
   description,
   date,
   handleEdit,
@@ -180,19 +182,24 @@ export const ProjectItemList = ({
       style={style}
       className="border border-border rounded-lg p-3 bg-background touch-none"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-3">
           <button {...attributes} {...listeners} className="cursor-grab">
             <GripVertical className="h-5 w-5 text-muted-foreground" />
           </button>
           <div className="bg-secondary p-2 rounded-lg">{icon}</div>
           <div>
-            <h4
-              className="text-sm font-medium line-clamp-2 hover:underline cursor-pointer"
-              onClick={handleTitleClick}
-            >
-              {title}
-            </h4>
+            <div className="flex items-center">
+              <h4
+                className="text-sm font-medium line-clamp-2 hover:underline cursor-pointer"
+                onClick={handleTitleClick}
+              >
+                {title}
+              </h4>
+              {subtitle && (
+                <span className="text-xs text-muted-foreground font-extralight ml-2">{subtitle}</span>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground line-clamp-2">
               {description}
             </p>
