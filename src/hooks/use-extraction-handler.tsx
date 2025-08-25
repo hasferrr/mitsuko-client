@@ -23,6 +23,8 @@ interface UseExtractionHandlerProps {
   setIsSubtitleContentValid?: (valid: boolean) => void
   setIsEditingResult?: (editing: boolean) => void
   isBatch?: boolean
+  onSuccessTranslation?: (args: { currentId: string }) => void
+  onErrorTranslation?: (args: { currentId: string }) => void
 }
 
 export const useExtractionHandler = ({
@@ -31,6 +33,8 @@ export const useExtractionHandler = ({
   setIsSubtitleContentValid,
   setIsEditingResult,
   isBatch = false,
+  onSuccessTranslation,
+  onErrorTranslation,
 }: UseExtractionHandlerProps) => {
   // API Settings Store
   const customApiConfigs = useLocalSettingsStore((state) => state.customApiConfigs)
@@ -75,10 +79,10 @@ export const useExtractionHandler = ({
     const isMaxCompletionTokensAuto = useAdvancedSettingsStore.getState().getIsMaxCompletionTokensAuto(advancedSettingsId)
 
     // Extraction Data Store
-    const data = useExtractionDataStore.getState().data[currentId]
-    const episodeNumber = data.episodeNumber
-    const subtitleContent = data.subtitleContent
-    const previousContext = data.previousContext
+    const extData = useExtractionDataStore.getState().data[currentId]
+    const episodeNumber = extData.episodeNumber
+    const subtitleContent = extData.subtitleContent
+    const previousContext = extData.previousContext
 
     if (!isBatch) {
       setTimeout(() => {
@@ -111,7 +115,15 @@ export const useExtractionHandler = ({
     }
 
     try {
-      const data = parseSubtitle({ content: subtitleContent })
+      let data
+
+      try {
+        data = parseSubtitle({ content: subtitleContent })
+      } catch (error) {
+        toast.error("Error parsing subtitle content, please make sure the subtitle content is valid")
+        throw error
+      }
+
       const subtitles: SubtitleNoTime[] = removeTimestamp(data.subtitles)
 
       const requestBody = {
@@ -138,9 +150,12 @@ export const useExtractionHandler = ({
         currentId,
         (response) => setContextResult(currentId, response),
       )
+
+      onSuccessTranslation?.({ currentId })
     } catch (error) {
+      onErrorTranslation?.({ currentId })
+
       console.error(error)
-      toast.error("Error extracting context, please make sure the subtitle content is valid")
     } finally {
       setIsExtracting(currentId, false)
 
