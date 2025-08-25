@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import BatchTranslatorMain from "./batch-translator-main"
 
 export default function BatchTranslator() {
@@ -18,9 +19,11 @@ export default function BatchTranslator() {
   const createProject = useProjectStore((state) => state.createProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
 
-  // Load translation data for selected batch
+  // Load data for selected batch
   const translationData = useTranslationDataStore((state) => state.data)
+  const extractionData = useExtractionDataStore(state => state.data)
   const loadTranslations = useTranslationDataStore((state) => state.getTranslationsDb)
+  const loadExtractions = useExtractionDataStore(state => state.getExtractionsDb)
 
   useEffect(() => {
     loadProjects()
@@ -33,6 +36,14 @@ export default function BatchTranslator() {
     if (missing.length === 0) return
     loadTranslations(missing).catch(err => console.error('Failed to load translations', err))
   }, [batch, translationData, loadTranslations])
+
+  // Ensure extractions are loaded for current batch project
+  useEffect(() => {
+    if (!batch || !batch.isBatch) return
+    const missing = batch.extractions.filter(id => !extractionData[id])
+    if (missing.length === 0) return
+    loadExtractions(missing).catch(err => console.error('Failed to load extractions', err))
+  }, [batch, extractionData, loadExtractions])
 
   const handleCreateBatch = async () => {
     const newBatch = await createProject(`Batch ${new Date().toLocaleDateString()}`, true)

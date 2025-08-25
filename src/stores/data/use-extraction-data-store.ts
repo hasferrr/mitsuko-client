@@ -9,6 +9,7 @@ import {
 import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { db } from "@/lib/db/db"
 
 export interface ExtractionDataStore {
   currentId: string | null
@@ -21,6 +22,7 @@ export interface ExtractionDataStore {
     advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Extraction>
   getExtractionDb: (extractionId: string) => Promise<Extraction | undefined>
+  getExtractionsDb: (extractionIds: string[]) => Promise<Extraction[]>
   updateExtractionDb: (extractionId: string, changes: Partial<Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext">>) => Promise<Extraction>
   deleteExtractionDb: (projectId: string, extractionId: string) => Promise<void>
   // getters
@@ -73,6 +75,20 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
     const extraction = await updateDB(extractionId, changes)
     set(state => ({ data: { ...state.data, [extractionId]: extraction } }))
     return extraction
+  },
+  getExtractionsDb: async (extractionIds) => {
+    if (extractionIds.length === 0) return []
+    const extractions = await db.extractions.bulkGet(extractionIds)
+    const found: Extraction[] = extractions.filter((e): e is Extraction => e !== undefined)
+    if (found.length) {
+      set(state => ({
+        data: {
+          ...state.data,
+          ...Object.fromEntries(found.map(e => [e.id, e]))
+        }
+      }))
+    }
+    return found
   },
   deleteExtractionDb: async (projectId, extractionId) => {
     await deleteDB(projectId, extractionId)

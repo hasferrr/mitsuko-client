@@ -18,6 +18,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   Play,
   Upload,
   Loader2,
@@ -29,6 +36,8 @@ import {
   ListChecks,
   AlertTriangle,
   FileText,
+  Languages,
+  Layers,
 } from "lucide-react"
 import {
   LanguageSelection,
@@ -94,6 +103,7 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
   const [toType, setToType] = useState<SubtitleType | "no-change">("no-change")
+  const [operationMode, setOperationMode] = useState<"translation" | "extraction">("translation")
 
   // Selection state
   const [isSelecting, setIsSelecting] = useState(false)
@@ -682,6 +692,29 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
             onChange={(e) => handleBatchNameChange(e.target.value)}
           />
         </div>
+        <Select value={operationMode} onValueChange={(value: "translation" | "extraction") => setOperationMode(value)}>
+          <SelectTrigger className="w-fit h-10">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="translation">
+              <div className="flex items-center gap-2 pr-1">
+                <div className="h-4 w-4">
+                  <Languages className="h-4 w-4" />
+                </div>
+                Translation
+              </div>
+            </SelectItem>
+            <SelectItem value="extraction">
+              <div className="flex items-center gap-2 pr-1">
+                <div className="h-4 w-4">
+                  <Layers className="h-4 w-4" />
+                </div>
+                Extraction
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
         <Link href="/project">
           <Button variant="outline" className="h-10">
             <FileText className="h-5 w-5" />
@@ -694,7 +727,6 @@ export default function BatchTranslatorMain({ basicSettingsId, advancedSettingsI
           onClick={() => setIsDeleteDialogOpen(true)}
         >
           <Trash className="h-5 w-5" />
-          Delete
         </Button>
       </div>
 

@@ -18,6 +18,7 @@ import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SubtitleTranslated } from "@/types/subtitles"
 import { createTranslation, deleteTranslation } from "@/lib/db/translation"
+import { createExtraction, deleteExtraction } from "@/lib/db/extraction"
 
 interface ProjectStore {
   currentProject: Project | null
@@ -35,6 +36,8 @@ interface ProjectStore {
 
   createTranslationForBatch: (projectId: string, file: File, content: string) => Promise<string>
   removeTranslationFromBatch: (projectId: string, translationId: string) => Promise<void>
+  createExtractionForBatch: (projectId: string, file: File, content: string) => Promise<string>
+  removeExtractionFromBatch: (projectId: string, extractionId: string) => Promise<void>
 }
 
 export const useProjectStore = create<ProjectStore>((set, get) => ({
@@ -284,6 +287,76 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     } catch (err) {
       console.error('Failed to remove translation from batch', err)
       set({ loading: false, error: 'Failed to remove translation from batch' })
+      throw err
+    }
+  },
+
+  /* ------------------ Batch Extraction Helpers ------------------ */
+  createExtractionForBatch: async (projectId, file, content) => {
+    set({ loading: true })
+    try {
+      const currentProject = get().projects.find(p => p.id === projectId)
+      if (!currentProject) throw new Error('Project not found')
+
+      const extraction = await createExtraction(
+        projectId,
+        {
+          title: file.name,
+          episodeNumber: '',
+          subtitleContent: content,
+          previousContext: '',
+          contextResult: '',
+        },
+        {},
+        {}
+      )
+
+      // upsert extraction into store
+      const extractionStore = useExtractionDataStore.getState()
+      extractionStore.upsertData(extraction.id, extraction)
+
+      const updatedExtractions = [...currentProject.extractions, extraction.id]
+      await updateProjectItemsDB(projectId, updatedExtractions, 'extractions')
+
+      set(state => ({
+        projects: state.projects.map(p => p.id === projectId ? { ...p, extractions: updatedExtractions, updatedAt: new Date() } : p),
+        currentProject: state.currentProject?.id === projectId ? { ...state.currentProject, extractions: updatedExtractions, updatedAt: new Date() } : state.currentProject,
+        loading: false
+      }))
+
+      return extraction.id
+    } catch (err) {
+      console.error('Failed to create extraction for batch', err)
+      set({ loading: false, error: 'Failed to create extraction for batch' })
+      throw err
+    }
+  },
+
+  removeExtractionFromBatch: async (projectId, extractionId) => {
+    set({ loading: true })
+    try {
+      const currentProject = get().projects.find(p => p.id === projectId)
+      if (!currentProject) throw new Error('Project not found')
+
+      // Delete extraction and its settings
+      await deleteExtraction(projectId, extractionId)
+
+      const updatedExtractions = currentProject.extractions.filter(id => id !== extractionId)
+      await updateProjectItemsDB(projectId, updatedExtractions, 'extractions')
+
+      // update extraction store
+      const extractionStore = useExtractionDataStore.getState()
+      extractionStore.removeData(extractionId)
+
+      // update local project state
+      set(state => ({
+        projects: state.projects.map(p => p.id === projectId ? { ...p, extractions: updatedExtractions, updatedAt: new Date() } : p),
+        currentProject: state.currentProject?.id === projectId ? { ...state.currentProject, extractions: updatedExtractions, updatedAt: new Date() } : state.currentProject,
+        loading: false
+      }))
+    } catch (err) {
+      console.error('Failed to remove extraction from batch', err)
+      set({ loading: false, error: 'Failed to remove extraction from batch' })
       throw err
     }
   }
