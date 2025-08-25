@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useMemo } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -58,9 +58,7 @@ import {
 } from "../settings"
 import { DownloadOption, CombinedFormat, SubtitleType } from "@/types/subtitles"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useBatchSettingsStore } from "@/stores/use-batch-settings-store"
-import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { ModelDetail } from "../translate/model-detail"
 import { toast } from "sonner"
@@ -73,22 +71,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { SortableBatchFile } from "./sortable-batch-file"
 import { RenameEpisodesDialog } from "./rename-episodes-dialog"
 import { ImportSubDialog } from "./import-sub-dialog"
-import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-gap"
-import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
 import { DownloadSection } from "@/components/download-section"
 import JSZip from "jszip"
-import { UserCreditData } from "@/types/user"
-import { fetchUserCreditData } from "@/lib/api/user-credit"
-import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import SubtitleTranslatorMain from "../translate/subtitle-translator-main"
-import { useTranslationHandler } from "@/hooks/use-translation-handler"
-import { BatchFile } from "../../types/batch"
 import { useBatchTranslationFiles } from "@/hooks/use-batch-translation-files"
 import { useBatchExtractionFiles } from "@/hooks/use-batch-extraction-files"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
-import { useExtractionHandler } from "@/hooks/use-extraction-handler"
 import useBatchTranslationHandler from "@/hooks/use-batch-translation-handler"
 import useBatchExtractionHandler from "@/hooks/use-batch-extraction-handler"
 import { ContextExtractorMain } from "../extract-context/context-extractor-main"
@@ -156,9 +146,6 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       setOrder(currentProject?.extractions ?? [])
     }
   }, [currentProject?.extractions, currentProject?.translations, operationMode])
-
-  // Note: when extraction mode is sequential, we only SHOW 1 in the UI,
-  // but do not mutate the stored concurrency value.
 
   // Translation Data Store
   const translationData = useTranslationDataStore((state) => state.data)
