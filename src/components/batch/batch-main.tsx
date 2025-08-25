@@ -821,39 +821,6 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
             Continue Batch Translation ({batchFiles.length - finishedCount} remaining)
           </Button>
 
-          <div className="flex items-center justify-between w-full h-9 px-3 py-2 rounded-md border border-input">
-            <span className="text-sm font-medium">Max Concurrent {operationMode === 'translation' ? 'Translations' : 'Extractions'}</span>
-            <div className="flex items-center gap-[0.5]">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
-                onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, concurrentOperation - 1))}
-                disabled={isSequentialExtraction || concurrentOperation <= 1}
-              >
-                -
-              </Button>
-              <Input
-                type="number"
-                min={1}
-                max={MAX_CONCURRENT_OPERATION}
-                value={isSequentialExtraction ? 1 : concurrentOperation}
-                onChange={(e) => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, Math.min(MAX_CONCURRENT_OPERATION, parseInt(e.target.value) || 1)))}
-                disabled={isSequentialExtraction}
-                className="w-10 h-7 text-center border-0 bg-transparent shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
-                onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_CONCURRENT_OPERATION, concurrentOperation + 1))}
-                disabled={isSequentialExtraction || concurrentOperation >= MAX_CONCURRENT_OPERATION}
-              >
-                +
-              </Button>
-            </div>
-          </div>
-
           {/* Download All Subtitles */}
           <DownloadSection
             generateContent={handleGenerateZip}
@@ -877,6 +844,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
               <TabsTrigger value="advanced">Advanced</TabsTrigger>
             </TabsList>
 
+            {/* Batch Settings */}
             <div className="space-y-4 w-full p-4 mt-4 rounded-xl border border-input bg-card shadow-sm">
               <div className="flex items-center justify-between">
                 <label htmlFor="shared-settings-switch" className="flex flex-col">
@@ -892,6 +860,52 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   disabled={isProcessing}
                   className="data-[state=checked]:bg-primary"
                 />
+              </div>
+
+              <div className="mt-3 flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">Max Concurrent {operationMode === 'translation' ? 'Translations' : 'Extractions'}</span>
+                  <span className="text-xs text-muted-foreground">
+                    Files processed simultaneously
+                    {isSequentialExtraction
+                      ? ' (forced to 1)'
+                      : ` (max ${MAX_CONCURRENT_OPERATION})`}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
+                    onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, concurrentOperation - 1))}
+                    disabled={isSequentialExtraction || concurrentOperation <= 1}
+                    title="Decrease"
+                  >
+                    -
+                  </Button>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={MAX_CONCURRENT_OPERATION}
+                    value={isSequentialExtraction ? 1 : concurrentOperation}
+                    onChange={(e) => setConcurrentOperation(
+                      currentProject?.id ?? "",
+                      Math.max(1, Math.min(MAX_CONCURRENT_OPERATION, parseInt(e.target.value) || 1))
+                    )}
+                    disabled={isSequentialExtraction}
+                    className="w-12 h-8 text-center border border-input rounded-md bg-background shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
+                    onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_CONCURRENT_OPERATION, concurrentOperation + 1))}
+                    disabled={isSequentialExtraction || concurrentOperation >= MAX_CONCURRENT_OPERATION}
+                    title="Increase"
+                  >
+                    +
+                  </Button>
+                </div>
               </div>
 
               {operationMode === 'extraction' && (
