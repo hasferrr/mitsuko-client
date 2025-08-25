@@ -139,6 +139,7 @@ export const useExtractionHandler = ({
           MAX_COMPLETION_TOKENS_MIN,
           MAX_COMPLETION_TOKENS_MAX
         ),
+        isBatch,
       }
 
       await extractContext(
