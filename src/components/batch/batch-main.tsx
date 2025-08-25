@@ -260,13 +260,14 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
     }
   }
 
-  const handleConfirmImportSub = async () => {
+  const handleConfirmImportSub = async (selectedIds: string[]) => {
     if (!currentProject) return
     setIsImportSubLoading(true)
     let success = 0
     let failed = 0
     try {
-      for (const file of translationBatchFiles) {
+      const filesToImport = translationBatchFiles.filter(f => selectedIds.includes(f.id))
+      for (const file of filesToImport) {
         const translation = translationData[file.id]
         if (!translation) {
           failed += 1
@@ -1091,7 +1092,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       <ImportSubDialog
         open={isImportSubDialogOpen}
         onOpenChange={(open) => { if (!isImportSubLoading) setIsImportSubDialogOpen(open) }}
-        totalFiles={translationBatchFiles.length}
+        translationBatchFiles={translationBatchFiles}
         onConfirm={handleConfirmImportSub}
         isLoading={isImportSubLoading}
       />
