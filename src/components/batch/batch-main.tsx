@@ -38,6 +38,7 @@ import {
   FileText,
   Languages,
   Layers,
+  SquarePen,
 } from "lucide-react"
 import {
   LanguageSelection,
@@ -69,6 +70,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { SortableBatchFile } from "./sortable-batch-file"
+import { RenameEpisodesDialog } from "./rename-episodes-dialog"
 import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-gap"
 import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
 import { DownloadSection } from "@/components/download-section"
@@ -117,6 +119,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const [isStartDialogOpen, setIsStartDialogOpen] = useState(false)
   const [isContinueDialogOpen, setIsContinueDialogOpen] = useState(false)
   const [translatedStats, setTranslatedStats] = useState({ translated: 0, total: 0 })
+  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -638,6 +641,18 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 </Button>
               </>
             )}
+            {!isSelecting && operationMode === 'extraction' && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 rounded-lg"
+                onClick={() => setIsRenameDialogOpen(true)}
+                disabled={isProcessing || batchFiles.length === 0}
+              >
+                <SquarePen className="h-4 w-4" />
+                Rename
+              </Button>
+            )}
             {!isSelecting && (
               <Button
                 variant="outline"
@@ -893,6 +908,13 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Rename Episodes (Extraction) Dialog */}
+      <RenameEpisodesDialog
+        open={isRenameDialogOpen}
+        onOpenChange={setIsRenameDialogOpen}
+        batchFiles={batchFiles}
+      />
 
       {/* Delete Single File Dialog */}
       <AlertDialog open={!!deleteFileId} onOpenChange={(open) => !open && setDeleteFileId(null)}>

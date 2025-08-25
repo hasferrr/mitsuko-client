@@ -1,6 +1,6 @@
 # Batch Context Extractor TODO
 
-- [ ] Rename in batch
+- [x] Rename in batch
 - [ ] Modes:
   - [ ] Sequential
   - [ ] Independent
