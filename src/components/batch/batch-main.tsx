@@ -71,6 +71,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { SortableBatchFile } from "./sortable-batch-file"
 import { RenameEpisodesDialog } from "./rename-episodes-dialog"
 import { ImportSubDialog } from "./import-sub-dialog"
+import { PopulateContextDialog } from "./populate-context-dialog"
 import { DownloadSection } from "@/components/download-section"
 import JSZip from "jszip"
 import Link from "next/link"
@@ -114,6 +115,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [isImportSubDialogOpen, setIsImportSubDialogOpen] = useState(false)
   const [isImportSubLoading, setIsImportSubLoading] = useState(false)
+  const [isPopulateDialogOpen, setIsPopulateDialogOpen] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -722,6 +724,18 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 Rename
               </Button>
             )}
+            {!isSelecting && operationMode === 'translation' && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 rounded-lg"
+                onClick={() => setIsPopulateDialogOpen(true)}
+                disabled={isProcessing || translationBatchFiles.length === 0}
+              >
+                <FolderInput className="h-4 w-4" />
+                Get Context
+              </Button>
+            )}
             {!isSelecting && (
               <Button
                 variant="outline"
@@ -1051,6 +1065,14 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
         totalFiles={translationBatchFiles.length}
         onConfirm={handleConfirmImportSub}
         isLoading={isImportSubLoading}
+      />
+
+      {/* Populate Translation Context Dialog */}
+      <PopulateContextDialog
+        open={isPopulateDialogOpen}
+        onOpenChange={setIsPopulateDialogOpen}
+        translationBatchFiles={translationBatchFiles}
+        extractionBatchFiles={extractionBatchFiles}
       />
 
       {/* Delete Single File Dialog */}
