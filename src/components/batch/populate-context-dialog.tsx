@@ -100,9 +100,28 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
     setSelected(prev => ({ ...prev, [tId]: checked }))
   }
 
-  const handleSelectAll = (checked: boolean) => {
+  const handleSelectAllToggle = () => {
+    // Determine current selection state
+    const isAllSelected = translationIds.length > 0 && translationIds.every(tid => !!selected[tid])
+    const isSomeState = translationIds.every(tid => (!!selected[tid]) === (!!mapping[tid]))
+
     const next: Record<string, boolean> = {}
-    translationIds.forEach(tid => { next[tid] = checked && !!mapping[tid] })
+    if (isAllSelected) {
+      // When currently "all", toggle back to "some" (only items with a mapping)
+      translationIds.forEach(tid => { next[tid] = !!mapping[tid] })
+    } else if (isSomeState) {
+      // When currently "some", toggle to "all"
+      translationIds.forEach(tid => { next[tid] = true })
+    } else {
+      // From any other mixed state, go to "some" first
+      translationIds.forEach(tid => { next[tid] = !!mapping[tid] })
+    }
+    setSelected(next)
+  }
+
+  const handleDeselectAll = () => {
+    const next: Record<string, boolean> = {}
+    translationIds.forEach(tid => { next[tid] = false })
     setSelected(next)
   }
 
@@ -163,11 +182,11 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
         <div className="space-y-3">
           {/* Controls */}
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => handleSelectAll(true)} disabled={isLoading || translationIds.length === 0}>
+            <Button variant="outline" size="sm" onClick={handleSelectAllToggle} disabled={isLoading || translationIds.length === 0}>
               <ListChecks className="h-4 w-4" />
               Select All
             </Button>
-            <Button variant="outline" size="sm" onClick={() => handleSelectAll(false)} disabled={isLoading || translationIds.length === 0}>
+            <Button variant="outline" size="sm" onClick={handleDeselectAll} disabled={isLoading || translationIds.length === 0}>
               <ListX className="h-4 w-4" />
               Deselect All
             </Button>
