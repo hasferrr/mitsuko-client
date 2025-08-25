@@ -10,3 +10,4 @@
 - [ ] Change the buttons name content
 - [x] Only show important settings
 - [ ] Simplify the download section
+- [ ] Implement continue extraction
