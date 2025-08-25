@@ -19,9 +19,9 @@ import { toast } from "sonner"
 
 interface UseExtractionHandlerProps {
   setActiveTab: (tab: string) => void
-  setIsEpisodeNumberValid: (valid: boolean) => void
-  setIsSubtitleContentValid: (valid: boolean) => void
-  setIsEditingResult: (editing: boolean) => void
+  setIsEpisodeNumberValid?: (valid: boolean) => void
+  setIsSubtitleContentValid?: (valid: boolean) => void
+  setIsEditingResult?: (editing: boolean) => void
 }
 
 export const useExtractionHandler = ({
@@ -88,18 +88,18 @@ export const useExtractionHandler = ({
     await saveData(currentId)
 
     if (episodeNumber.trim() === "") {
-      setIsEpisodeNumberValid(false)
+      setIsEpisodeNumberValid?.(false)
       return
     }
     if (subtitleContent.trim() === "") {
-      setIsSubtitleContentValid(false)
+      setIsSubtitleContentValid?.(false)
       return
     }
 
     setIsExtracting(currentId, true)
     setHasChanges(true)
     setActiveTab("result")
-    setIsEditingResult(false)
+    setIsEditingResult?.(false)
 
     if (subtitleContent.trim() === "") {
       throw new Error("Empty content")

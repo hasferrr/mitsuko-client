@@ -81,6 +81,10 @@ import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-format
 import SubtitleTranslatorMain from "../translate/subtitle-translator-main"
 import { useTranslationHandler } from "@/hooks/use-translation-handler"
 import { BatchFile } from "../../types/batch"
+import { useBatchTranslationFiles } from "@/hooks/use-batch-translation-files"
+import { useBatchExtractionFiles } from "@/hooks/use-batch-extraction-files"
+import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
+import { useExtractionHandler } from "@/hooks/use-extraction-handler"
 
 const MAX_CONCURRENT_TRANSLATION = 5
 
@@ -130,20 +134,27 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const concurrentTranslations = useBatchSettingsStore(state => state.concurrentMap[currentProject?.id ?? ""] ?? 3)
   const setConcurrentTranslations = useBatchSettingsStore(state => state.setConcurrentTranslations)
 
-  const [order, setOrder] = useState<string[]>(currentProject?.translations ?? [])
+  const [order, setOrder] = useState<string[]>([])
 
   useEffect(() => {
-    if (currentProject?.translations) {
-      setOrder(currentProject.translations)
+    if (operationMode === 'translation') {
+      setOrder(currentProject?.translations ?? [])
+    } else {
+      setOrder(currentProject?.extractions ?? [])
     }
-  }, [currentProject?.translations])
+  }, [currentProject?.extractions, currentProject?.translations, operationMode])
 
   // Translation Data Store
   const translationData = useTranslationDataStore((state) => state.data)
   const loadTranslation = useTranslationDataStore((state) => state.getTranslationDb)
   const setCurrentTranslationId = useTranslationDataStore((state) => state.setCurrentId)
   const setJsonResponse = useTranslationDataStore((state) => state.setJsonResponse)
-  const saveData = useTranslationDataStore((state) => state.saveData)
+  const saveTranslationData = useTranslationDataStore((state) => state.saveData)
+
+  // Extraction Data Store
+  const extractionData = useExtractionDataStore((state) => state.data)
+  const loadExtraction = useExtractionDataStore((state) => state.getExtractionDb)
+  const saveExtractionData = useExtractionDataStore((state) => state.saveData)
 
   // Translation Store
   const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
@@ -170,54 +181,27 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
     staleTime: 0,
   })
 
-  // Get batch files from translationData
-  const batchFiles: BatchFile[] = useMemo(() => {
-    if (!currentProject?.isBatch) return []
-    return order.map(id => {
-      const translation = translationData[id]
-
-      const totalSubtitles = translation?.subtitles?.length || 0
-      const translatedCount = translation?.subtitles?.filter(s => s.translated && s.translated.trim() !== "").length || 0
-      const progress = totalSubtitles ? (translatedCount / totalSubtitles) * 100 : 0
-
-      let status: BatchFile["status"]
-
-      if (isTranslatingSet.has(id)) {
-        status = "translating"
-      } else if (queueSet.has(id)) {
-        status = "queued"
-      } else if (translatedCount === 0) {
-        status = "pending"
-      } else if (translatedCount < totalSubtitles) {
-        status = "partial"
-      } else {
-        status = "done"
-      }
-
-      return {
-        id,
-        title: translation?.title || "Loading...",
-        subtitlesCount: totalSubtitles,
-        translatedCount,
-        status,
-        progress,
-        type: translation?.parsed?.type || "srt",
-      }
-    })
-  }, [currentProject?.isBatch, order, translationData, isTranslatingSet, queueSet])
-
-  const finishedCount = useMemo(() => {
-    return batchFiles.filter(file => file.status === "done").length
-  }, [batchFiles])
-
-  const isBatchTranslating = useMemo(() => {
-    return batchFiles.some(file => file.status === "translating" || file.status === "queued")
-  }, [batchFiles])
-
-  // Translation handler hook
+  // Get batch files
   const {
-    handleStart: baseHandleStart,
-    handleStop: baseHandleStop,
+    batchFiles: translationBatchFiles,
+    finishedCount: translationFinishedCount,
+    isBatchTranslating,
+  } = useBatchTranslationFiles(order, queueSet)
+
+  const {
+    batchFiles: extractionBatchFiles,
+    finishedCount: extractionFinishedCount,
+    isBatchExtracting,
+  } = useBatchExtractionFiles(order, queueSet)
+
+  const batchFiles = operationMode === 'translation' ? translationBatchFiles : extractionBatchFiles
+  const finishedCount = operationMode === 'translation' ? translationFinishedCount : extractionFinishedCount
+  const isProcessing = operationMode === 'translation' ? isBatchTranslating : isBatchExtracting
+
+  // Translation hook
+  const {
+    handleStart: baseStartTranslation,
+    handleStop: baseStopTranslation,
     generateSubtitleContent,
   } = useTranslationHandler({
     state: { toType, setActiveTab },
@@ -236,6 +220,14 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
         }
       },
     }
+  })
+
+  // Extraction hook
+  const {
+    handleStart: baseStartExtraction,
+    handleStop: baseStopExtraction,
+  } = useExtractionHandler({
+    setActiveTab,
   })
 
   // --------------------- Selection helpers ---------------------
@@ -326,7 +318,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   }
 
   const handleOpenStartBatchTranslationDialog = () => {
-    if (batchFiles.length === 0 || isBatchTranslating) return
+    if (batchFiles.length === 0 || isProcessing) return
 
     let totalSubtitles = 0
     let translatedSubtitles = 0
@@ -352,7 +344,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   }
 
   const handleOpenContinueBatchTranslationDialog = () => {
-    if (batchFiles.length === 0 || isBatchTranslating) return
+    if (batchFiles.length === 0 || isProcessing) return
 
     setTranslatedStats({
       translated: batchFiles.reduce((acc, file) => acc + file.translatedCount, 0),
@@ -363,7 +355,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   }
 
   const handleStartBatchTranslation = () => {
-    if (batchFiles.length === 0 || isBatchTranslating) return
+    if (batchFiles.length === 0 || isProcessing) return
 
     setTimeout(() => {
       window.scrollTo({
@@ -498,7 +490,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const handleStopBatchTranslation = () => {
     queueAbortRef.current = true
     setQueueSet(new Set())
-    batchFiles.forEach(f => baseHandleStop(f.id))
+    batchFiles.forEach(f => baseStopTranslation(f.id))
   }
 
   const handleStartTranslation = async (
@@ -516,7 +508,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       ? advancedSettingsId
       : (translationData[currentId]?.advancedSettingsId || advancedSettingsId)
 
-    await baseHandleStart({
+    await baseStartTranslation({
       currentId,
       basicSettingsId: bsIdToUse,
       advancedSettingsId: adsIdToUse,
@@ -774,7 +766,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 size="sm"
                 className="gap-2 rounded-lg"
                 onClick={handleClickFileUpload}
-                disabled={isBatchTranslating || batchFiles.length === 0}
+                disabled={isProcessing || batchFiles.length === 0}
               >
                 <Upload className="h-4 w-4" />
                 Upload
@@ -785,14 +777,14 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
               size="sm"
               className="gap-2 rounded-lg"
               onClick={toggleSelectMode}
-              disabled={isBatchTranslating || batchFiles.length === 0}
+              disabled={isProcessing || batchFiles.length === 0}
             >
               <CheckSquare className="h-4 w-4" />
               {isSelecting ? 'Cancel' : 'Select'}
             </Button>
           </div>
 
-          <DragAndDrop onDropFiles={handleFileDrop} disabled={isBatchTranslating}>
+          <DragAndDrop onDropFiles={handleFileDrop} disabled={isProcessing}>
             <div className="space-y-2 h-[510px] pr-2 overflow-x-hidden overflow-y-auto">
               {batchFiles.length ? (
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -832,9 +824,9 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
             <Button
               className="h-10 flex-1"
               onClick={handleOpenStartBatchTranslationDialog}
-              disabled={isBatchTranslating || !session || batchFiles.length === 0}
+              disabled={isProcessing || !session || batchFiles.length === 0}
             >
-              {isBatchTranslating ? (
+              {isProcessing ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Translating...
@@ -850,7 +842,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
               variant="outline"
               className="h-10 flex-1"
               onClick={handleStopBatchTranslation}
-              disabled={!isBatchTranslating}
+              disabled={!isProcessing}
             >
               <Square className="h-4 w-4" />
               Stop All
@@ -861,7 +853,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
             variant="outline"
             className="h-10 w-full border-primary/25 hover:border-primary/50"
             onClick={handleOpenContinueBatchTranslationDialog}
-            disabled={isBatchTranslating || !session || batchFiles.length === 0}
+            disabled={isProcessing || !session || batchFiles.length === 0}
           >
             <FastForward className="h-4 w-4" />
             Continue Batch Translation ({batchFiles.length - finishedCount} remaining)
@@ -933,7 +925,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 id="shared-settings-switch"
                 checked={isUseSharedSettings}
                 onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                disabled={isBatchTranslating}
+                disabled={isProcessing}
                 className="data-[state=checked]:bg-primary"
               />
             </div>
@@ -1140,7 +1132,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
         if (!open) {
           setPreviewTranslationId(null)
           if (previewTranslationId) {
-            saveData(previewTranslationId)
+            saveTranslationData(previewTranslationId)
           }
         }
       }}>
