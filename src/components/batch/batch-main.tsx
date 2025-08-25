@@ -217,6 +217,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
 
   const {
     handleStartBatchExtraction,
+    handleContinueBatchExtraction,
     handleStopBatchExtraction,
   } = useBatchExtractionHandler({
     basicSettingsId,
@@ -232,6 +233,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   // --------------------- Operation handlers ---------------------
 
   const handleStart = () => {
+    setIsStartDialogOpen(false)
     if (operationMode === 'translation') {
       handleStartBatchTranslation()
     } else {
@@ -240,11 +242,11 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   }
 
   const handleContinue = () => {
+    setIsContinueDialogOpen(false)
     if (operationMode === 'translation') {
       handleContinueBatchTranslation()
     } else {
-      // handleContinueBatchExtraction()
-      alert('Not implemented yet')
+      handleContinueBatchExtraction()
     }
   }
 
@@ -313,26 +315,32 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const handleOpenStartBatchDialog = () => {
     if (batchFiles.length === 0 || isProcessing) return
 
-    let totalSubtitles = 0
-    let translatedSubtitles = 0
+    if (operationMode === 'translation') {
+      let totalSubtitles = 0
+      let translatedSubtitles = 0
 
-    batchFiles.forEach(file => {
-      totalSubtitles += file.subtitlesCount
-      translatedSubtitles += file.translatedCount
-    })
-
-    if (translatedSubtitles > 0) {
-      setTranslatedStats({
-        translated: translatedSubtitles,
-        total: totalSubtitles
+      batchFiles.forEach(file => {
+        totalSubtitles += file.subtitlesCount
+        translatedSubtitles += file.translatedCount
       })
-      setIsRestartDialogOpen(true)
+
+      if (translatedSubtitles > 0) {
+        setTranslatedStats({ translated: translatedSubtitles, total: totalSubtitles })
+        setIsRestartDialogOpen(true)
+      } else {
+        setTranslatedStats({ translated: 0, total: totalSubtitles })
+        setIsStartDialogOpen(true)
+      }
     } else {
-      setTranslatedStats({
-        translated: 0,
-        total: totalSubtitles
-      })
-      setIsStartDialogOpen(true)
+      const touchedCount = batchFiles.filter(f => f.status === 'partial' || f.status === 'done').length
+      const totalFiles = batchFiles.length
+      if (touchedCount > 0) {
+        setTranslatedStats({ translated: touchedCount, total: totalFiles })
+        setIsRestartDialogOpen(true)
+      } else {
+        setTranslatedStats({ translated: 0, total: totalFiles })
+        setIsStartDialogOpen(true)
+      }
     }
   }
 
@@ -610,7 +618,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <Input
-            defaultValue={currentProject?.name || "Batch Translation"}
+            defaultValue={currentProject?.name || (operationMode === 'translation' ? "Batch Translation" : "Batch Extraction")}
             className="text-xl font-semibold h-12"
             onChange={(e) => handleBatchNameChange(e.target.value)}
           />
@@ -686,7 +694,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   disabled={selectedIds.size === 0}
                 >
                   <Trash className="h-4 w-4" />
-                  Delete Subtitle
+                  Delete
                 </Button>
                 <Button
                   variant="outline"
@@ -742,7 +750,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 size="sm"
                 className="gap-2 rounded-lg"
                 onClick={handleClickFileUpload}
-                disabled={isProcessing || batchFiles.length === 0}
+                disabled={isProcessing}
               >
                 <Upload className="h-4 w-4" />
                 Upload
@@ -805,12 +813,12 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
               {isProcessing ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Translating...
+                  {operationMode === 'translation' ? 'Translating...' : 'Extracting...'}
                 </>
               ) : (
                 <>
                   <Play className="h-4 w-4" />
-                  {session ? `Translate ${batchFiles.length} files` : "Sign In to Start"}
+                  {session ? `${operationMode === 'translation' ? 'Translate' : 'Extract'} ${batchFiles.length} files` : "Sign In to Start"}
                 </>
               )}
             </Button>
@@ -829,10 +837,10 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
             variant="outline"
             className="h-10 w-full border-primary/25 hover:border-primary/50"
             onClick={handleOpenContinueBatchDialog}
-            disabled={isProcessing || !session || batchFiles.length === 0}
+            disabled={isProcessing || !session || batchFiles.length === 0 || (batchFiles.length - finishedCount <= 0)}
           >
             <FastForward className="h-4 w-4" />
-            Continue Batch Translation ({batchFiles.length - finishedCount} remaining)
+            {operationMode === 'translation' ? 'Continue Batch Translation' : 'Continue Batch Extraction'} ({batchFiles.length - finishedCount} remaining)
           </Button>
 
           {/* Download All Subtitles */}
@@ -1093,9 +1101,9 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       <AlertDialog open={isDeleteSelectedDialogOpen} onOpenChange={(open) => !open && setIsDeleteSelectedDialogOpen(false)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Selected Subtitles</AlertDialogTitle>
+            <AlertDialogTitle>Delete Selected Files</AlertDialogTitle>
             <AlertDialogDescription>
-              {`Are you sure you want to delete ${selectedIds.size} selected subtitle${selectedIds.size === 1 ? "" : "s"}? This action cannot be undone.`}
+              {`Are you sure you want to delete ${selectedIds.size} selected file${selectedIds.size === 1 ? "" : "s"}? This action cannot be undone.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1111,23 +1119,31 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-500" />
-              Already Translated Content
+              {operationMode === 'translation' ? 'Already Translated Content' : 'Already Extracted Content'}
             </AlertDialogTitle>
             <AlertDialogDescription className="pt-2 space-y-2">
-              <span className="block">
-                You have already translated <strong>{translatedStats.translated}</strong> of <strong>{translatedStats.total}</strong> subtitles in this batch.
-              </span>
-              <span className="block">
-                Are you sure you want to translate from the beginning?
-              </span>
-              <span className="block">
-                Use the <strong>Continue</strong> button instead to translate only the remaining content.
-              </span>
+              {operationMode === 'translation' ? (
+                <>
+                  <span className="block">
+                    You have already translated <strong>{translatedStats.translated}</strong> of <strong>{translatedStats.total}</strong> subtitles in this batch.
+                  </span>
+                  <span className="block">Are you sure you want to translate from the beginning?</span>
+                  <span className="block">Use the <strong>Continue</strong> button instead to translate only the remaining content.</span>
+                </>
+              ) : (
+                <>
+                  <span className="block">
+                    You have already processed <strong>{translatedStats.translated}</strong> of <strong>{translatedStats.total}</strong> files in this batch.
+                  </span>
+                  <span className="block">Are you sure you want to start extraction from the beginning?</span>
+                  <span className="block">Use the <strong>Continue</strong> button instead to process only the remaining files.</span>
+                </>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleStart}>Restart Translation</AlertDialogAction>
+            <AlertDialogAction onClick={handleStart}>{operationMode === 'translation' ? 'Restart Translation' : 'Restart Extraction'}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -1138,26 +1154,33 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Play className="h-5 w-5 text-primary" />
-              Start Batch Translation
+              {operationMode === 'translation' ? 'Start Batch Translation' : 'Start Batch Extraction'}
             </AlertDialogTitle>
             <AlertDialogDescription className="pt-2 space-y-2">
-              <span className="block">
-                Are you sure you want to start translating <strong>{batchFiles.length}</strong> files with <strong>{translatedStats.total}</strong> subtitles?
-              </span>
-              {isUseSharedSettings ? (
-                <span className="block">
-                  This will process up to <strong>{concurrentOperation}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{isUseCustomModel ? "Custom Model" : modelDetail?.name}</strong>.
-                </span>
+              {operationMode === 'translation' ? (
+                <>
+                  <span className="block">Are you sure you want to start translating <strong>{batchFiles.length}</strong> files with <strong>{translatedStats.total}</strong> subtitles?</span>
+                  {isUseSharedSettings ? (
+                    <span className="block">This will process up to <strong>{concurrentOperation}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong>.</span>
+                  ) : (
+                    <span className="block">Each file will be processed with its own settings, which may differ in model or languages.</span>
+                  )}
+                </>
               ) : (
-                <span className="block">
-                  Each file will be processed with its own settings, which may differ in model or languages.
-                </span>
+                <>
+                  <span className="block">Are you sure you want to start extracting <strong>{batchFiles.length}</strong> files?</span>
+                  {isUseSharedSettings ? (
+                    <span className="block">This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</span>
+                  ) : (
+                    <span className="block">Each file will be processed with its own settings, which may differ in model or parameters.</span>
+                  )}
+                </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleStart}>Start Translation</AlertDialogAction>
+            <AlertDialogAction onClick={handleStart}>{operationMode === 'translation' ? 'Start Translation' : 'Start Extraction'}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -1168,15 +1191,30 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <FastForward className="h-5 w-5 text-primary" />
-              Continue Batch Translation
+              {operationMode === 'translation' ? 'Continue Batch Translation' : 'Continue Batch Extraction'}
             </AlertDialogTitle>
             <AlertDialogDescription className="pt-2 space-y-2">
-              <span className="block">
-                Are you sure you want to continue translating <strong>{batchFiles.length - finishedCount}</strong> remaining files?
-              </span>
-              <span className="block">
-                Only untranslated portions of each file will be processed.
-              </span>
+              {operationMode === 'translation' ? (
+                <>
+                  <span className="block">Are you sure you want to continue translating <strong>{batchFiles.length - finishedCount}</strong> remaining files?</span>
+                  <span className="block">Only untranslated portions of each file will be processed.</span>
+                  {isUseSharedSettings ? (
+                    <span className="block">This will process up to <strong>{concurrentOperation}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong>.</span>
+                  ) : (
+                    <span className="block">Each file will be processed with its own settings, which may differ in model or languages.</span>
+                  )}
+                </>
+              ) : (
+                <>
+                  <span className="block">Are you sure you want to continue extracting <strong>{batchFiles.length - finishedCount}</strong> remaining files?</span>
+                  <span className="block">Only files that are not yet done will be processed.</span>
+                  {isUseSharedSettings ? (
+                    <span className="block">This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</span>
+                  ) : (
+                    <span className="block">Each file will be processed with its own settings, which may differ in model or parameters.</span>
+                  )}
+                </>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

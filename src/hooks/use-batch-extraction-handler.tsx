@@ -90,6 +90,14 @@ export default function useBatchExtractionHandler({
     }
   }
 
+  const handleContinueBatchExtraction = () => {
+    if (extractionMode === "sequential") {
+      sequentialContinue()
+    } else {
+      independentContinue()
+    }
+  }
+
   /**
    * Independent extraction: process files without sharing context.
    * For each file, extract without using previous context.
@@ -145,6 +153,71 @@ export default function useBatchExtractionHandler({
       active++
       handleStartExtraction(id).finally(() => {
         setIsExtracting(id, false) // ensure cleanup in case inner handler was interrupted
+        active--
+        launch()
+      })
+    }
+
+    for (let i = 0; i < concurrentExtractions && i < ids.length; i++) {
+      launch()
+    }
+  }
+
+  /**
+   * Continue independently: only process files that are not done yet.
+   */
+  const independentContinue = () => {
+    if (batchFiles.length === 0 || isBatchExtracting) return
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }, 300)
+
+    queueAbortRef.current = false
+    setHasChanges(true)
+
+    const ids = batchFiles
+      .filter(f => f.status !== "done")
+      .map(f => f.id)
+      .filter(id => !isExtractingSet.has(id))
+
+    if (ids.length === 0) return
+
+    setQueueSet(new Set(ids.slice(concurrentExtractions)))
+
+    let index = 0
+    let active = 0
+
+    const launch = () => {
+      if (queueAbortRef.current) {
+        if (active === 0) {
+          setQueueSet(new Set())
+        }
+        return
+      }
+      if (index >= ids.length) {
+        if (active === 0) {
+          setQueueSet(new Set())
+        }
+        return
+      }
+
+      const id = ids[index++]
+
+      if (isExtractingSet.has(id)) {
+        launch()
+        return
+      }
+
+      setQueueSet(prev => {
+        const next = new Set(prev)
+        next.delete(id)
+        return next
+      })
+
+      active++
+      handleStartExtraction(id).finally(() => {
+        setIsExtracting(id, false)
         active--
         launch()
       })
@@ -217,6 +290,85 @@ export default function useBatchExtractionHandler({
     setQueueSet(new Set())
   }
 
+  /**
+   * Continue sequentially: start from the first file that isn't done yet,
+   * using the nearest previous done file as previousContext seed.
+   */
+  const sequentialContinue = async () => {
+    if (batchFiles.length === 0 || isBatchExtracting) return
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }, 300)
+
+    queueAbortRef.current = false
+    setHasChanges(true)
+
+    const firstIdx = batchFiles.findIndex(f => f.status !== "done")
+    if (firstIdx === -1) return
+
+    const continueIds = batchFiles
+      .slice(firstIdx)
+      .map(f => f.id)
+      .filter(id => !isExtractingSet.has(id))
+
+    if (continueIds.length === 0) return
+
+    // Determine the nearest previous done id (if any) to seed previousContext
+    let prevDoneId: string | null = null
+    for (let i = firstIdx - 1; i >= 0; i--) {
+      if (batchFiles[i].status === "done") {
+        prevDoneId = batchFiles[i].id
+        break
+      }
+    }
+
+    // Queue shows all but the first item to process
+    setQueueSet(new Set(continueIds.slice(1)))
+
+    // Seed previousContext for the first item if we have a previous done
+    if (prevDoneId) {
+      const seed = getContent(getContextResult(prevDoneId)).replace(/\s*<done>\s*$/, "").trim()
+      setPreviousContext(continueIds[0], seed)
+    }
+
+    let prevId: string | null = prevDoneId
+
+    for (let i = 0; i < continueIds.length; i++) {
+      if (queueAbortRef.current) {
+        setQueueSet(new Set())
+        return
+      }
+
+      const currentId = continueIds[i]
+
+      // If this isn't the very first processed item and we have a prevId from this run,
+      // propagate context chain
+      if (prevId && prevId !== prevDoneId) {
+        const prevContext = getContent(getContextResult(prevId)).replace(/\s*<done>\s*$/, "").trim()
+        setPreviousContext(currentId, prevContext)
+      }
+
+      try {
+        await handleStartExtraction(currentId)
+      } finally {
+        setIsExtracting(currentId, false)
+      }
+
+      // Remove next id from queue (we are moving on)
+      setQueueSet(prev => {
+        const next = new Set(prev)
+        const upcoming = continueIds[i + 1]
+        if (upcoming) next.delete(upcoming)
+        return next
+      })
+
+      prevId = currentId
+    }
+
+    setQueueSet(new Set())
+  }
+
   const handleStopBatchExtraction = () => {
     queueAbortRef.current = true
     setQueueSet(new Set())
@@ -244,6 +396,7 @@ export default function useBatchExtractionHandler({
 
   return {
     handleStartBatchExtraction,
+    handleContinueBatchExtraction,
     handleStopBatchExtraction,
   }
 }

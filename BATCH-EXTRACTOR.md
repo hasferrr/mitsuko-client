@@ -7,7 +7,7 @@
   - [x] Independent
 - [x] Populate extraction to translation context
 - [x] Backend: batch api route option
-- [ ] Change the buttons name content
+- [x] Change the buttons name content
 - [x] Only show important settings
 - [ ] Simplify the download section
-- [ ] Implement continue extraction
+- [x] Implement continue extraction
