@@ -903,26 +903,32 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                   <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
-                  <LanguageSelection
-                    basicSettingsId={basicSettingsId}
-                  />
+                  {operationMode === 'translation' && (
+                    <LanguageSelection
+                      basicSettingsId={basicSettingsId}
+                    />
+                  )}
                   <ModelSelection
                     basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
                   />
-                  <ContextDocumentInput
-                    basicSettingsId={basicSettingsId}
-                  />
-                  <div className="m-[2px]">
-                    <CustomInstructionsInput
-                      basicSettingsId={basicSettingsId}
-                    />
-                  </div>
-                  <div className="m-[2px]">
-                    <FewShotInput
-                      basicSettingsId={basicSettingsId}
-                    />
-                  </div>
+                  {operationMode === 'translation' && (
+                    <>
+                      <ContextDocumentInput
+                        basicSettingsId={basicSettingsId}
+                      />
+                      <div className="m-[2px]">
+                        <CustomInstructionsInput
+                          basicSettingsId={basicSettingsId}
+                        />
+                      </div>
+                      <div className="m-[2px]">
+                        <FewShotInput
+                          basicSettingsId={basicSettingsId}
+                        />
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -934,34 +940,42 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                     basicSettingsId={basicSettingsId}
                   />
                   <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
-                  <TemperatureSlider
-                    advancedSettingsId={advancedSettingsId}
-                  />
-                  <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
-                    <AdvancedReasoningSwitch />
-                  </div>
-                  <p className="text-sm font-semibold">Technical Options</p>
-                  <SplitSizeInput
-                    advancedSettingsId={advancedSettingsId}
-                  />
+                  {operationMode === 'translation' && (
+                    <>
+                      <TemperatureSlider
+                        advancedSettingsId={advancedSettingsId}
+                      />
+                      <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
+                        <AdvancedReasoningSwitch />
+                      </div>
+                      <p className="text-sm font-semibold">Technical Options</p>
+                      <SplitSizeInput
+                        advancedSettingsId={advancedSettingsId}
+                      />
+                    </>
+                  )}
                   <MaxCompletionTokenInput
                     basicSettingsId={basicSettingsId}
                     advancedSettingsId={advancedSettingsId}
                   />
-                  <StructuredOutputSwitch
-                    basicSettingsId={basicSettingsId}
-                    advancedSettingsId={advancedSettingsId}
-                  />
-                  <FullContextMemorySwitch
-                    advancedSettingsId={advancedSettingsId}
-                  />
-                  <BetterContextCachingSwitch
-                    advancedSettingsId={advancedSettingsId}
-                  />
-                  <AdvancedSettingsResetButton
-                    basicSettingsId={basicSettingsId}
-                    advancedSettingsId={advancedSettingsId}
-                  />
+                  {operationMode === 'translation' && (
+                    <>
+                      <StructuredOutputSwitch
+                        basicSettingsId={basicSettingsId}
+                        advancedSettingsId={advancedSettingsId}
+                      />
+                      <FullContextMemorySwitch
+                        advancedSettingsId={advancedSettingsId}
+                      />
+                      <BetterContextCachingSwitch
+                        advancedSettingsId={advancedSettingsId}
+                      />
+                      <AdvancedSettingsResetButton
+                        basicSettingsId={basicSettingsId}
+                        advancedSettingsId={advancedSettingsId}
+                      />
+                    </>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
