@@ -72,6 +72,7 @@ import { SortableBatchFile } from "./sortable-batch-file"
 import { RenameEpisodesDialog } from "./rename-episodes-dialog"
 import { ImportSubDialog } from "./import-sub-dialog"
 import { PopulateContextDialog } from "./populate-context-dialog"
+import { CopySharedSettingsDialog } from "./copy-shared-settings-dialog"
 import { DownloadSection } from "@/components/download-section"
 import JSZip from "jszip"
 import Link from "next/link"
@@ -116,6 +117,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const [isImportSubDialogOpen, setIsImportSubDialogOpen] = useState(false)
   const [isImportSubLoading, setIsImportSubLoading] = useState(false)
   const [isPopulateDialogOpen, setIsPopulateDialogOpen] = useState(false)
+  const [isCopySharedDialogOpen, setIsCopySharedDialogOpen] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -958,6 +960,24 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   </Select>
                 </div>
               )}
+
+              {/* Copy Shared Settings trigger */}
+              <div className="flex items-center justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 rounded-lg"
+                  onClick={() => setIsCopySharedDialogOpen(true)}
+                  disabled={
+                    isProcessing || (operationMode === 'translation'
+                      ? translationBatchFiles.length === 0
+                      : extractionBatchFiles.length === 0)
+                  }
+                >
+                  <ListChecks className="h-4 w-4" />
+                  Copy Shared Settings...
+                </Button>
+              </div>
             </div>
 
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
@@ -1082,6 +1102,17 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
         onOpenChange={setIsPopulateDialogOpen}
         translationBatchFiles={translationBatchFiles}
         extractionBatchFiles={extractionBatchFiles}
+      />
+
+      {/* Copy Shared Settings Dialog */}
+      <CopySharedSettingsDialog
+        open={isCopySharedDialogOpen}
+        onOpenChange={setIsCopySharedDialogOpen}
+        operationMode={operationMode}
+        translationBatchFiles={translationBatchFiles}
+        extractionBatchFiles={extractionBatchFiles}
+        sharedBasicSettingsId={basicSettingsId}
+        sharedAdvancedSettingsId={advancedSettingsId}
       />
 
       {/* Delete Single File Dialog */}

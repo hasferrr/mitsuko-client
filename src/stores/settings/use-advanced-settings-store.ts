@@ -5,6 +5,7 @@ import { useTranslationDataStore } from "../data/use-translation-data-store"
 import {
   updateAdvancedSettings,
   getAllAdvancedSettings,
+  getAdvancedSettings,
 } from "@/lib/db/settings"
 import { useSettingsStore } from "./use-settings-store"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
@@ -43,6 +44,11 @@ interface AdvancedSettingsStore {
     newSettingsInput: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>,
     modelDetail: Model | null
   ) => Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>
+  copyAdvancedSettingsKeys: <K extends keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>>(
+    fromId: string,
+    toId: string,
+    keys: K[],
+  ) => Promise<void>
 }
 
 export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
@@ -184,6 +190,66 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
           }
         }
         return updatedSettings
+      },
+      copyAdvancedSettingsKeys: async <K extends keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>>(
+        fromId: string,
+        toId: string,
+        keys: K[],
+      ) => {
+        if (!keys || keys.length === 0) return
+        // Load source/target into store if missing
+        let from = get().data[fromId]
+        if (!from) {
+          try {
+            const fetched = await getAdvancedSettings(fromId)
+            if (fetched) {
+              get().upsertData(fetched.id, fetched)
+              from = fetched
+            }
+          } catch (e) {
+            console.error("Failed to fetch source advanced settings", fromId, e)
+          }
+        }
+        if (!from) {
+          console.error("Source advanced settings not found in store or DB", fromId)
+          return
+        }
+        let to = get().data[toId]
+        if (!to) {
+          try {
+            const fetched = await getAdvancedSettings(toId)
+            if (fetched) {
+              get().upsertData(fetched.id, fetched)
+              to = fetched
+            }
+          } catch (e) {
+            console.error("Failed to fetch target advanced settings", toId, e)
+          }
+        }
+        if (!to) {
+          console.error("Target advanced settings not found in store or DB", toId)
+          return
+        }
+
+        // Update selected keys in-memory
+        set(state => {
+          const current = state.data[toId]
+          if (!current) return state
+          const updated: AdvancedSettings = { ...current }
+          keys.forEach((k) => {
+            updated[k] = from[k]
+          })
+          return {
+            ...state,
+            data: {
+              ...state.data,
+              [toId]: updated,
+            }
+          }
+        })
+
+        // Persist to DB
+        await get().saveData(toId)
       },
     }
   )

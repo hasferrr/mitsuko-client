@@ -11,3 +11,4 @@
 - [x] Only show important settings
 - [x] Simplify the download section
 - [x] Implement continue extraction
+- [ ] Copy shared settings to individual file settings
