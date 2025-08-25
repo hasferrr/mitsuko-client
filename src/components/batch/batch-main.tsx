@@ -87,7 +87,7 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionHandler } from "@/hooks/use-extraction-handler"
 import useBatchTranslationHandler from "@/hooks/use-batch-translation-handler"
 
-const MAX_CONCURRENT_TRANSLATION = 5
+const MAX_CONCURRENT_OPERATION = 5
 
 interface BatchMainProps {
   basicSettingsId: string
@@ -107,13 +107,13 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const [isDeleteSelectedDialogOpen, setIsDeleteSelectedDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
-  const [previewTranslationId, setPreviewTranslationId] = useState<string | null>(null)
+  const [previewId, setPreviewId] = useState<string | null>(null)
   const [queueSet, setQueueSet] = useState<Set<string>>(new Set())
 
   // Confirmation dialog for starting translation
-  const [isRestartTranslationDialogOpen, setIsRestartTranslationDialogOpen] = useState(false)
-  const [isStartTranslationDialogOpen, setIsStartTranslationDialogOpen] = useState(false)
-  const [isContinueTranslationDialogOpen, setIsContinueTranslationDialogOpen] = useState(false)
+  const [isRestartDialogOpen, setIsRestartDialogOpen] = useState(false)
+  const [isStartDialogOpen, setIsStartDialogOpen] = useState(false)
+  const [isContinueDialogOpen, setIsContinueDialogOpen] = useState(false)
   const [translatedStats, setTranslatedStats] = useState({ translated: 0, total: 0 })
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -130,8 +130,8 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   // Batch Settings Store
   const isUseSharedSettings = useBatchSettingsStore(state => !state.individualIds.has(currentProject?.id ?? ""))
   const setUseSharedSettings = useBatchSettingsStore(state => state.setUseSharedSettings)
-  const concurrentTranslations = useBatchSettingsStore(state => state.concurrentMap[currentProject?.id ?? ""] ?? 3)
-  const setConcurrentTranslations = useBatchSettingsStore(state => state.setConcurrentTranslations)
+  const concurrentOperation = useBatchSettingsStore(state => state.concurrentMap[currentProject?.id ?? ""] ?? 3)
+  const setConcurrentOperation = useBatchSettingsStore(state => state.setConcurrentTranslations)
 
   const [order, setOrder] = useState<string[]>([])
 
@@ -194,8 +194,8 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
     isBatchTranslating,
     state: {
       toType,
-      setIsRestartTranslationDialogOpen,
-      setIsContinueTranslationDialogOpen,
+      setIsRestartTranslationDialogOpen: setIsRestartDialogOpen,
+      setIsContinueTranslationDialogOpen: setIsContinueDialogOpen,
       setActiveTab,
       setQueueSet,
     },
@@ -288,7 +288,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
     fileInputRef.current?.click()
   }
 
-  const handleOpenStartBatchTranslationDialog = () => {
+  const handleOpenStartBatchDialog = () => {
     if (batchFiles.length === 0 || isProcessing) return
 
     let totalSubtitles = 0
@@ -304,17 +304,17 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
         translated: translatedSubtitles,
         total: totalSubtitles
       })
-      setIsRestartTranslationDialogOpen(true)
+      setIsRestartDialogOpen(true)
     } else {
       setTranslatedStats({
         translated: 0,
         total: totalSubtitles
       })
-      setIsStartTranslationDialogOpen(true)
+      setIsStartDialogOpen(true)
     }
   }
 
-  const handleOpenContinueBatchTranslationDialog = () => {
+  const handleOpenContinueBatchDialog = () => {
     if (batchFiles.length === 0 || isProcessing) return
 
     setTranslatedStats({
@@ -322,7 +322,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       total: batchFiles.reduce((acc, file) => acc + file.subtitlesCount, 0)
     })
 
-    setIsContinueTranslationDialogOpen(true)
+    setIsContinueDialogOpen(true)
   }
 
   const handleSingleFileDownload = (batchFileId: string) => {
@@ -388,7 +388,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const handlePreview = async (id: string) => {
     await loadTranslation(id)
     setCurrentTranslationId(id)
-    setPreviewTranslationId(id)
+    setPreviewId(id)
   }
 
   const confirmDeleteFile = async () => {
@@ -582,7 +582,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           <div className="flex flex-wrap items-center gap-4 w-full">
             <Button
               className="h-10 flex-1"
-              onClick={handleOpenStartBatchTranslationDialog}
+              onClick={handleOpenStartBatchDialog}
               disabled={isProcessing || !session || batchFiles.length === 0}
             >
               {isProcessing ? (
@@ -611,7 +611,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           <Button
             variant="outline"
             className="h-10 w-full border-primary/25 hover:border-primary/50"
-            onClick={handleOpenContinueBatchTranslationDialog}
+            onClick={handleOpenContinueBatchDialog}
             disabled={isProcessing || !session || batchFiles.length === 0}
           >
             <FastForward className="h-4 w-4" />
@@ -625,25 +625,25 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 variant="ghost"
                 size="sm"
                 className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
-                onClick={() => setConcurrentTranslations(currentProject?.id ?? "", Math.max(1, concurrentTranslations - 1))}
-                disabled={concurrentTranslations <= 1}
+                onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, concurrentOperation - 1))}
+                disabled={concurrentOperation <= 1}
               >
                 -
               </Button>
               <Input
                 type="number"
                 min={1}
-                max={MAX_CONCURRENT_TRANSLATION}
-                value={concurrentTranslations}
-                onChange={(e) => setConcurrentTranslations(currentProject?.id ?? "", Math.max(1, Math.min(MAX_CONCURRENT_TRANSLATION, parseInt(e.target.value) || 1)))}
+                max={MAX_CONCURRENT_OPERATION}
+                value={concurrentOperation}
+                onChange={(e) => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, Math.min(MAX_CONCURRENT_OPERATION, parseInt(e.target.value) || 1)))}
                 className="w-10 h-7 text-center border-0 bg-transparent shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-7 w-7 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
-                onClick={() => setConcurrentTranslations(currentProject?.id ?? "", Math.min(MAX_CONCURRENT_TRANSLATION, concurrentTranslations + 1))}
-                disabled={concurrentTranslations >= MAX_CONCURRENT_TRANSLATION}
+                onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_CONCURRENT_OPERATION, concurrentOperation + 1))}
+                disabled={concurrentOperation >= MAX_CONCURRENT_OPERATION}
               >
                 +
               </Button>
@@ -806,7 +806,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       </AlertDialog>
 
       {/* Restart Translation Confirmation Dialog */}
-      <AlertDialog open={isRestartTranslationDialogOpen} onOpenChange={setIsRestartTranslationDialogOpen}>
+      <AlertDialog open={isRestartDialogOpen} onOpenChange={setIsRestartDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -833,7 +833,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       </AlertDialog>
 
       {/* Start Translation Confirmation Dialog */}
-      <AlertDialog open={isStartTranslationDialogOpen} onOpenChange={setIsStartTranslationDialogOpen}>
+      <AlertDialog open={isStartDialogOpen} onOpenChange={setIsStartDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -846,7 +846,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
               </span>
               {isUseSharedSettings ? (
                 <span className="block">
-                  This will process up to <strong>{concurrentTranslations}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{isUseCustomModel ? "Custom Model" : modelDetail?.name}</strong>.
+                  This will process up to <strong>{concurrentOperation}</strong> files simultaneously from <strong>{sourceLanguage}</strong> to <strong>{targetLanguage}</strong> using <strong>{isUseCustomModel ? "Custom Model" : modelDetail?.name}</strong>.
                 </span>
               ) : (
                 <span className="block">
@@ -863,7 +863,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       </AlertDialog>
 
       {/* Continue Translation Confirmation Dialog */}
-      <AlertDialog open={isContinueTranslationDialogOpen} onOpenChange={setIsContinueTranslationDialogOpen}>
+      <AlertDialog open={isContinueDialogOpen} onOpenChange={setIsContinueDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -887,11 +887,11 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       </AlertDialog>
 
       {/* Translation Preview Dialog */}
-      <Dialog open={!!previewTranslationId} onOpenChange={(open) => {
+      <Dialog open={!!previewId} onOpenChange={(open) => {
         if (!open) {
-          setPreviewTranslationId(null)
-          if (previewTranslationId) {
-            saveTranslationData(previewTranslationId)
+          setPreviewId(null)
+          if (previewId) {
+            saveTranslationData(previewId)
           }
         }
       }}>
@@ -899,13 +899,13 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           <DialogHeader>
             <DialogTitle>Translation Preview</DialogTitle>
           </DialogHeader>
-          {previewTranslationId && (
+          {previewId && (
             <div className="max-h-[80vh] overflow-y-auto">
               <SubtitleTranslatorMain
-                currentId={previewTranslationId}
-                translation={translationData[previewTranslationId]}
-                basicSettingsId={isUseSharedSettings ? basicSettingsId : translationData[previewTranslationId].basicSettingsId}
-                advancedSettingsId={isUseSharedSettings ? advancedSettingsId : translationData[previewTranslationId].advancedSettingsId}
+                currentId={previewId}
+                translation={translationData[previewId]}
+                basicSettingsId={isUseSharedSettings ? basicSettingsId : translationData[previewId].basicSettingsId}
+                advancedSettingsId={isUseSharedSettings ? advancedSettingsId : translationData[previewId].advancedSettingsId}
                 isSharedSettings={isUseSharedSettings}
               />
             </div>
