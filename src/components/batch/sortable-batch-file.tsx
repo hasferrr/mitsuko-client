@@ -97,7 +97,7 @@ export function SortableBatchFile({
             )}
           </p>
           <p className="text-sm text-muted-foreground">
-            {batchFile.translatedCount === batchFile.subtitlesCount
+            {batchFile.description ? batchFile.description : batchFile.translatedCount === batchFile.subtitlesCount
               ? `${batchFile.subtitlesCount} lines`
               : `${batchFile.translatedCount}/${batchFile.subtitlesCount} lines`}
           </p>

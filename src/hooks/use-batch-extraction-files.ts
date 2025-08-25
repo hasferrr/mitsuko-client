@@ -34,7 +34,10 @@ export const useBatchExtractionFiles = (order: string[], queueSet: Set<string>) 
 
       return {
         id,
-        title: extraction?.episodeNumber || "",
+        title: extraction?.episodeNumber
+          ? "Episode " + extraction.episodeNumber
+          : "Episode ??",
+        description: extraction?.title || "",
         subtitlesCount: 0,
         translatedCount: 0,
         status,

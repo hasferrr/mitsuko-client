@@ -3,6 +3,7 @@ export interface BatchFile {
   status: "pending" | "partial" | "translating" | "queued" | "done" | "error"
   progress: number
   title: string
+  description: string
   subtitlesCount: number
   translatedCount: number
   type: string
