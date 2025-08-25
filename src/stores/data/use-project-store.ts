@@ -302,7 +302,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
         projectId,
         {
           title: file.name,
-          episodeNumber: '',
+          episodeNumber: file.name.split('.').slice(0, -1).join('.') || file.name,
           subtitleContent: content,
           previousContext: '',
           contextResult: '',
