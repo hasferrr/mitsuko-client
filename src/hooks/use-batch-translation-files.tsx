@@ -34,7 +34,7 @@ export const useBatchTranslationFiles = (order: string[], queueSet: Set<string>)
 
       return {
         id,
-        title: translation?.title || "Loading...",
+        title: translation?.title || "",
         subtitlesCount: totalSubtitles,
         translatedCount,
         status,
