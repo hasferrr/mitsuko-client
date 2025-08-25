@@ -8,6 +8,7 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useExtractionHandler } from "@/hooks/use-extraction-handler"
 import { BatchFile } from "@/types/batch"
+import { toast } from "sonner"
 
 interface UseBatchExtractionHandlerProps {
   basicSettingsId: string
@@ -56,6 +57,16 @@ export default function useBatchExtractionHandler({
   } = useExtractionHandler({
     setActiveTab,
     isBatch: true,
+    onSuccessTranslation: () => { },
+    onErrorTranslation: () => {
+      // On first error: empty the queue and halt scheduling.
+      // Do NOT stop currently running extractions.
+      if (!queueAbortRef.current) {
+        queueAbortRef.current = true
+        setQueueSet(new Set())
+        toast.error("Encountered an error. Halting queue; running extractions will finish")
+      }
+    },
   })
 
   const handleStartBatchExtraction = () => {
