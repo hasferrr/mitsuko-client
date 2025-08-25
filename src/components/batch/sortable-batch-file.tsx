@@ -92,11 +92,16 @@ export function SortableBatchFile({
             className={cn("text-sm", !selectMode && "hover:underline cursor-pointer")}
             onClick={handleTitleClick}
           >
-            {!!batchFile.title ? batchFile.title : (
-              <span className="italic">No title</span>
+            {!!batchFile.title ? (
+              <>
+                {batchFile.showEpisodePrefix && "Episode "}
+                {batchFile.title}
+              </>
+            ) : (
+              <span className="italic">Empty</span>
             )}
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground font-light">
             {batchFile.description ? batchFile.description : batchFile.translatedCount === batchFile.subtitlesCount
               ? `${batchFile.subtitlesCount} lines`
               : `${batchFile.translatedCount}/${batchFile.subtitlesCount} lines`}

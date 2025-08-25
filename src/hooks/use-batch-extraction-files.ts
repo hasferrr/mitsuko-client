@@ -34,15 +34,14 @@ export const useBatchExtractionFiles = (order: string[], queueSet: Set<string>) 
 
       return {
         id,
-        title: extraction?.episodeNumber
-          ? "Episode " + extraction.episodeNumber
-          : "Episode ??",
-        description: extraction?.title || "",
+        title: extraction?.episodeNumber || "",
+        description: extraction?.title || "No title",
         subtitlesCount: 0,
         translatedCount: 0,
         status,
         progress,
         type: "txt",
+        showEpisodePrefix: !!extraction?.episodeNumber
       }
     })
   }, [currentProject?.isBatch, order, extractionData, isExtractingSet, queueSet])

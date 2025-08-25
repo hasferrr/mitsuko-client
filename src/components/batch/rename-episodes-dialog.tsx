@@ -272,13 +272,13 @@ export function RenameEpisodesDialog({ open, onOpenChange, batchFiles }: RenameE
                       <div className="min-w-0">
                         <p className="text-sm shrink-0 flex items-center gap-2">
                           <span className="font-medium text-muted-foreground">
-                            {showEpisodePrefix && <span className="font-bold">Episode </span>}
-                            {oldVal || "??"}
+                            {oldVal && showEpisodePrefix && <span className="font-bold">Episode </span>}
+                            {oldVal || <span className="italic font-light">Empty</span>}
                           </span>
                           <span className="text-muted-foreground">→</span>
                           <span className="font-medium">
-                            {showEpisodePrefix && <span className="font-bold">Episode </span>}
-                            {newVal || "??"}
+                            {newVal && showEpisodePrefix && <span className="font-bold">Episode </span>}
+                            {newVal || <span className="italic font-light">Empty</span>}
                           </span>
                         </p>
                         <p className="text-xs text-muted-foreground truncate font-extralight mt-1">

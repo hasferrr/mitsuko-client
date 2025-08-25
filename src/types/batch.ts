@@ -7,4 +7,5 @@ export interface BatchFile {
   subtitlesCount: number
   translatedCount: number
   type: string
+  showEpisodePrefix?: boolean
 }
