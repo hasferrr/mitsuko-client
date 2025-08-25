@@ -42,7 +42,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId }: Props) => {
 
   const handleContextSelect = (contextResult: string) => {
     setHasChanges(true)
-    setContextDocument(getContent(contextResult).trim())
+    setContextDocument(getContent(contextResult).replace(/<done>\s*$/, "").trim())
     setIsContextDialogOpen(false)
   }
 
