@@ -9,5 +9,5 @@
 - [x] Backend: batch api route option
 - [x] Change the buttons name content
 - [x] Only show important settings
-- [ ] Simplify the download section
+- [x] Simplify the download section
 - [x] Implement continue extraction

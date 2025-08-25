@@ -855,6 +855,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
             toType={toType}
             setToType={setToType}
             noChangeOption
+            showSelectors={operationMode === 'translation'}
           />
         </div>
 
