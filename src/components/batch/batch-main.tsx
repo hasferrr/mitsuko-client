@@ -40,6 +40,7 @@ import {
   Layers,
   SquarePen,
   FolderInput,
+  SquareCheckBig,
 } from "lucide-react"
 import {
   LanguageSelection,
@@ -162,6 +163,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const loadExtraction = useExtractionDataStore((state) => state.getExtractionDb)
   const setCurrentExtractionId = useExtractionDataStore((state) => state.setCurrentId)
   const saveExtractionData = useExtractionDataStore((state) => state.saveData)
+  const setContextResult = useExtractionDataStore((state) => state.setContextResult)
 
   // Batch Settings Stores
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))
@@ -393,6 +395,21 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
     }
     setSelectedIds(new Set())
     setIsSelecting(false)
+  }
+
+  const handleToggleMarkSelected = async () => {
+    if (operationMode !== 'extraction') return
+    const ids = Array.from(selectedIds)
+    if (ids.length === 0) return
+    await Promise.all(ids.map(async (id) => {
+      const extraction = extractionData[id]
+      if (!extraction) return
+      const raw = extraction.contextResult || ''
+      const hasDone = /\s*<done>\s*$/.test(raw)
+      const next = hasDone ? raw.replace(/\s*<done>\s*$/, '') : (raw ? `${raw}\n\n<done>` : '<done>')
+      setContextResult(id, next)
+      await saveExtractionData(id)
+    }))
   }
 
   const handleSelectAllToggle = () => {
@@ -699,6 +716,18 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   <Trash className="h-4 w-4" />
                   Delete
                 </Button>
+                {operationMode === 'extraction' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 rounded-lg bg-green-500 hover:bg-green-600 text-white border-0"
+                    onClick={handleToggleMarkSelected}
+                    disabled={isProcessing || batchFiles.length === 0 || selectedIds.size === 0}
+                  >
+                    <SquareCheckBig className="h-4 w-4" />
+                    Mark
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
