@@ -62,9 +62,9 @@ export default function useBatchExtractionHandler({
     onSuccessTranslation: ({ currentId }) => {
       try {
         const raw = getContextResult(currentId)
-        const hasFinished = /\s*<finished>\s*$/.test(raw)
+        const hasFinished = /\s*<done>\s*$/.test(raw)
         if (!hasFinished) {
-          const withMarker = raw ? `${raw}\n\n<finished>` : "<finished>"
+          const withMarker = raw ? `${raw}\n\n<done>` : "<done>"
           setContextResult(currentId, withMarker)
         }
       } catch (e) {
@@ -191,7 +191,7 @@ export default function useBatchExtractionHandler({
 
       // Set previousContext from previous file's contextResult
       if (prevId) {
-        const prevContext = getContent(getContextResult(prevId)).replace(/\s*<finished>\s*$/, "").trim()
+        const prevContext = getContent(getContextResult(prevId)).replace(/\s*<done>\s*$/, "").trim()
         setPreviousContext(currentId, prevContext)
       }
 

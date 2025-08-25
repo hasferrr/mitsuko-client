@@ -15,7 +15,7 @@ export const useBatchExtractionFiles = (order: string[], queueSet: Set<string>) 
       const extraction = extractionData[id]
 
       const partial = extraction?.contextResult && extraction.contextResult.trim() !== ""
-      const extracted = partial && extraction.contextResult.trim().endsWith("<finished>")
+      const extracted = partial && extraction.contextResult.trim().endsWith("<done>")
       const progress = extracted ? 100 : 0
 
       let status: BatchFile["status"]

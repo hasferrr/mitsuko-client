@@ -460,7 +460,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       const extraction = extractionData[batchFileId]
       if (!extraction) return
       content = extraction.contextResult || ''
-      content = content.replace(/<finished>\s*$/, '')
+      content = content.replace(/<done>\s*$/, '')
       if (!content.trim()) return
       const baseTitle = extraction.title || 'extraction'
       const dotIdx = baseTitle.lastIndexOf('.')
@@ -521,7 +521,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
         const extraction = extractionData[batchFile.id]
         if (!extraction) continue
         let content = extraction.contextResult || ''
-        content = content.replace(/<finished>\s*$/, '')
+        content = content.replace(/<done>\s*$/, '')
 
         const baseTitle = extraction.title || 'extraction'
         const dotIdx = baseTitle.lastIndexOf('.')
