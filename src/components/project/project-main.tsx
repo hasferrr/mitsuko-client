@@ -26,6 +26,7 @@ import {
   Loader2,
   Settings,
   ArrowLeft,
+  ArrowLeftRight,
   Upload,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -50,6 +51,7 @@ import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-setting
 import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
 import { Badge } from "../ui/badge"
+import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter, DialogDescription } from "../ui/dialog"
 
 const countTranslatedLines = (subtitles: Translation['subtitles']): { count: number, hasError: boolean } => {
   if (!subtitles || subtitles.length === 0) {
@@ -79,6 +81,8 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
+  const [isConvertModalOpen, setIsConvertModalOpen] = useState(false)
+  const [isProcessingConvert, setIsProcessingConvert] = useState(false)
   const router = useRouter()
 
   const loadProjects = useProjectStore((state) => state.loadProjects)
@@ -86,6 +90,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const deleteProject = useProjectStore((state) => state.deleteProject)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
   const setCurrentProject = useProjectStore(state => state.setCurrentProject)
+  const updateProjectStore = useProjectStore(state => state.updateProject)
 
   const [translations, setTranslations] = useState<Translation[]>([])
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
@@ -212,6 +217,21 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const handleBack = () => {
     if (currentProject.isBatch) router.push("/batch")
     else setCurrentProject(null)
+  }
+
+  const handleToggleBatch = async (): Promise<boolean> => {
+    try {
+      const updated = await updateProjectStore(currentProject.id, { isBatch: !currentProject.isBatch })
+      if (updated) {
+        setCurrentProject(updated)
+        toast.success(`Converted to ${updated.isBatch ? 'Batch' : 'Normal'} project`)
+        return true
+      }
+    } catch (error) {
+      console.error('Failed to toggle batch mode', error)
+      toast.error('Failed to convert project')
+    }
+    return false
   }
 
   const translationComponentList = translations.map((translation) => {
@@ -409,6 +429,13 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
               Export
             </button>
             <button
+              onClick={() => setIsConvertModalOpen(true)}
+              className="flex items-center gap-2 hover:underline"
+            >
+              <ArrowLeftRight size={4 * 5} />
+              Convert
+            </button>
+            <button
               onClick={() => setIsDeleteModalOpen(true)}
               className="flex items-center gap-2 hover:underline"
             >
@@ -442,6 +469,35 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         basicSettingsId={currentProject.defaultBasicSettingsId}
         advancedSettingsId={currentProject.defaultAdvancedSettingsId}
       />
+
+      {/* Convert Confirmation Dialog */}
+      <Dialog open={isConvertModalOpen} onOpenChange={setIsConvertModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Convert Project</DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="hidden" />
+          <p className="text-sm">
+            {`Are you sure you want to convert this project to ${currentProject.isBatch ? 'Normal' : 'Batch'} project?`}
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsConvertModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                setIsProcessingConvert(true)
+                const ok = await handleToggleBatch()
+                setIsProcessingConvert(false)
+                if (ok) setIsConvertModalOpen(false)
+              }}
+              disabled={isProcessingConvert}
+            >
+              {isProcessingConvert ? 'Converting...' : 'Convert'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Tabs defaultValue="overview" className="mb-6">
         <TabsList className="bg-card border border-border p-1 rounded-lg w-fit h-fit flex flex-wrap">
