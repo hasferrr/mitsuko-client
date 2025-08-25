@@ -1,6 +1,7 @@
 # Batch Context Extractor TODO
 
 - [x] Rename in batch
+- [ ] Get subtitles from translations
 - [ ] Modes:
   - [ ] Sequential
   - [ ] Independent
