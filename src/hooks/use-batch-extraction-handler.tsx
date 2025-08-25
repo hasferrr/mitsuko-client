@@ -9,6 +9,7 @@ import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useExtractionHandler } from "@/hooks/use-extraction-handler"
 import { BatchFile } from "@/types/batch"
 import { toast } from "sonner"
+import { getContent } from "@/lib/parser/parser"
 
 interface UseBatchExtractionHandlerProps {
   basicSettingsId: string
@@ -39,6 +40,7 @@ export default function useBatchExtractionHandler({
   const extractionMode = useBatchSettingsStore(state => state.extractionModeMap[currentProject?.id ?? ""] ?? "sequential")
   const getContextResult = useExtractionDataStore(state => state.getContextResult)
   const setPreviousContext = useExtractionDataStore(state => state.setPreviousContext)
+  const setContextResult = useExtractionDataStore(state => state.setContextResult)
 
   // Extraction Data Store
   const extractionData = useExtractionDataStore((state) => state.data)
@@ -57,7 +59,18 @@ export default function useBatchExtractionHandler({
   } = useExtractionHandler({
     setActiveTab,
     isBatch: true,
-    onSuccessTranslation: () => { },
+    onSuccessTranslation: ({ currentId }) => {
+      try {
+        const raw = getContextResult(currentId)
+        const hasFinished = /\s*<finished>\s*$/.test(raw)
+        if (!hasFinished) {
+          const withMarker = raw ? `${raw}\n\n<finished>` : "<finished>"
+          setContextResult(currentId, withMarker)
+        }
+      } catch (e) {
+        console.error("Failed to append finished marker (batch):", e)
+      }
+    },
     onErrorTranslation: () => {
       // On first error: empty the queue and halt scheduling.
       // Do NOT stop currently running extractions.
@@ -178,7 +191,7 @@ export default function useBatchExtractionHandler({
 
       // Set previousContext from previous file's contextResult
       if (prevId) {
-        const prevContext = getContextResult(prevId)
+        const prevContext = getContent(getContextResult(prevId)).replace(/\s*<finished>\s*$/, "").trim()
         setPreviousContext(currentId, prevContext)
       }
 
