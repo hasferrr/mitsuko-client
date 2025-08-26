@@ -161,9 +161,13 @@ This is the main source code folder for the Next.js application. All application
       - `library/import-instructions-dialog.tsx`: Dialog for importing instructions from JSON with schema validation, selectable items, and ID conflict handling.
       - `library/my-library.tsx`: Implements the “My Library” view with search, CRUD, export, and publish capabilities for the user’s own instructions.
       - `library/public-library.tsx`: Implements the “Public Library” view for browsing, searching, paginating, importing, and deleting public instructions (owner-only delete).
-      - `batch/batch-translator.tsx`: A wrapper component that manages batch projects and renders `BatchTranslatorMain`.
-      - `batch/batch-translator-main.tsx`: The primary container for batch subtitle translation, handling file upload, selection, concurrent translation, and downloads.
-      - `batch/sortable-batch-file.tsx`: A sortable list item component representing an individual subtitle file within a batch with status indicators and actions.
+      - `batch/batch.tsx`: Wrapper that manages batch projects (create/select) and loads batch data, then renders `BatchMain`.
+      - `batch/batch-main.tsx`: Main batch UI handling Translation vs Extraction modes, file upload and drag-and-drop ordering, selection, concurrency controls, and dialogs.
+      - `batch/sortable-batch-file.tsx`: Sortable list item for a batch file with status indicators and actions.
+      - `batch/import-sub-dialog.tsx`: Dialog to import subtitles as extractions with per-item selection (returns `selectedIds` on confirm).
+      - `batch/populate-context-dialog.tsx`: Dialog to map extractions to translations and populate context documents into Basic Settings.
+      - `batch/rename-episodes-dialog.tsx`: Dialog to batch rename episode numbers (sequential numbering, text removal, regex replace) with live preview.
+      - `batch/copy-shared-settings-dialog.tsx`: Dialog to copy shared settings into individual project settings for the batch.
 
 - **`constants/`**: Contains static, hard-coded values used throughout the application. This prevents magic strings and numbers in the codebase, making maintenance easier.
   - **Style:** Files export `const` variables.
@@ -199,6 +203,10 @@ This is the main source code folder for the Next.js application. All application
     - `use-mobile.tsx`: A hook that detects if the user is on a mobile device based on screen width.
     - `use-extraction-handler.tsx`: Centralizes `handleStartExtraction` and `handleStopExtraction` logic for context extraction, keeping container components declarative
     - `use-translation-handler.tsx`: Centralizes `handleStartTranslation`, `handleStopTranslation`, and related helpers like `generateSubtitleContent` to keep translation container components declarative
+    - `use-batch-translation-files.tsx`: Derives batch translation file metadata (status, progress, counts) from project and translation stores.
+    - `use-batch-extraction-files.ts`: Derives batch extraction file metadata and status from project and extraction stores.
+    - `use-batch-translation-handler.tsx`: Coordinates batch translation (start/continue/stop), concurrency, queueing, and error handling, delegating to the translation handler/store.
+    - `use-batch-extraction-handler.tsx`: Coordinates batch extraction with `sequential` or `independent` modes, context propagation, concurrency, and error handling, delegating to the extraction handler/store.
 
 - **`lib/`**: Contains utility functions, helper scripts, and the core application logic that is not tied to a specific component. This is where the bulk of the "heavy lifting" happens.
   - **Style:** Files primarily export functions.
@@ -284,7 +292,7 @@ This is the main source code folder for the Next.js application. All application
         -   `use-snap-store.ts`: Manages payment transaction data from Midtrans/Snap.
         -   `use-client-id-store.ts`: Stores a unique client ID for the session.
         -   `use-upload-store.ts`: Tracks upload progress and status for file uploads used in Cloud and Transcription.
-        -   `use-batch-settings-store.ts`: Manages Batch Translation view settings — toggles shared vs. individual project settings (`individualIds`) and per-project concurrent translation limits (`concurrentMap`).
+        -   `use-batch-settings-store.ts`: Manages Batch view settings — toggles shared vs. individual project settings (`individualIds`), per-project concurrent translation limits (`concurrentMap`), and the extraction mode per project via `extractionModeMap` (`"sequential" | "independent"`). If a project has no mode set, the UI and handlers default to `"sequential"`.
 
   - **How to Add or Modify State:**
     When you need to add a new piece of client-side state, follow these steps:
@@ -418,6 +426,30 @@ The transcription flow has been upgraded to work with cloud uploads and a stream
 5. **History**
    - The `Transcription History` tab in `/cloud` renders `src/components/history/history-view.tsx`
    - The legacy `/history` route redirects to `/cloud`
+
+#### Batch Translation & Extraction Workflow (Updated)
+
+1. **Batch Selection & Data Load**
+   - Component: `src/components/batch/batch.tsx` selects/creates batch projects and loads missing translations/extractions, then renders `BatchMain` with default settings IDs.
+
+2. **Main Batch UI**
+   - Component: `src/components/batch/batch-main.tsx` controls modes (Translation vs Extraction), file upload and drag-and-drop order, selection, and per-project concurrency using `useBatchSettingsStore.concurrentMap`.
+   - Derives file lists via `use-batch-translation-files.tsx` and `use-batch-extraction-files.ts`.
+   - Dialogs:
+     - `ImportSubDialog` (`translationBatchFiles` -> confirm returns `selectedIds`), to create extractions from translations.
+     - `PopulateContextDialog`, to map extractions to translations and update context documents in Basic Settings.
+     - `RenameEpisodesDialog`, to batch rename episode numbers (start/step/pad, remove text, regex replace with g/i) with live preview.
+     - `CopySharedSettingsDialog`, to copy shared settings into individual settings for the batch.
+
+3. **Batch Translation**
+   - Hook: `use-batch-translation-handler.tsx` handles start/continue/stop, concurrency and queueing, error handling, and delegates to `use-translation-handler.tsx` / `use-translation-store.ts` for per-item processing and persistence.
+
+4. **Batch Context Extraction**
+   - Hook: `use-batch-extraction-handler.tsx` supports `sequential` and `independent` modes (defaults to `sequential` when unset in `use-batch-settings-store.ts`). Handles queueing, optional context propagation between items, and delegates to `use-extraction-handler.tsx` / `use-extraction-store.ts`.
+
+5. **Key Notes**
+   - Import dialog defaults to all items selected; users can select/deselect before confirming. Only the returned `selectedIds` are used to create extractions.
+   - Episode renaming applies via `use-extraction-data-store.updateExtractionDb` to persist changes.
 
 ### 6. Data Management & Migrations
 
