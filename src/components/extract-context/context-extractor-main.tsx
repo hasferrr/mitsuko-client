@@ -162,6 +162,9 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
       subtitles: translation.subtitles,
       parsed: translation.parsed,
     })
+    if (translation.title) {
+      setTitle(currentId, translation.title)
+    }
     handleSubtitleSelect(generatedContent)
   }
 
