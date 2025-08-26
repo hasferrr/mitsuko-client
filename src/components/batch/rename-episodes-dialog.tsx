@@ -42,7 +42,7 @@ export function RenameEpisodesDialog({ open, onOpenChange, batchFiles }: RenameE
   const [regexReplace, setRegexReplace] = useState("")
   const [regexGlobal, setRegexGlobal] = useState(true)
   const [regexCaseInsensitive, setRegexCaseInsensitive] = useState(false)
-  const [showEpisodePrefix, setShowEpisodePrefix] = useState(false)
+  const [showEpisodePrefix, setShowEpisodePrefix] = useState(true)
 
   // Load extractions when opened
   useEffect(() => {
@@ -68,7 +68,7 @@ export function RenameEpisodesDialog({ open, onOpenChange, batchFiles }: RenameE
         setRegexReplace("")
         setRegexGlobal(true)
         setRegexCaseInsensitive(false)
-        setShowEpisodePrefix(false)
+        setShowEpisodePrefix(true)
       } catch (e) {
         console.error("Failed to load extractions for rename dialog", e)
         toast.error("Failed to load extractions")
