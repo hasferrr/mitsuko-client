@@ -29,6 +29,19 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
+import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 
 interface SettingsDialogueProps {
   isGlobal?: boolean
@@ -47,6 +60,14 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
   basicSettingsId,
   advancedSettingsId,
 }) => {
+  const resetBasicSettings = useSettingsStore((s) => s.resetBasicSettings)
+  const resetAdvancedSettings = useAdvancedSettingsStore((s) => s.resetAdvancedSettings)
+
+  const handleResetAll = () => {
+    resetBasicSettings(basicSettingsId)
+    resetAdvancedSettings(advancedSettingsId, basicSettingsId)
+  }
+
   return (
     <DialogCustom
       isOpen={isOpen}
@@ -126,6 +147,25 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
           </Accordion>
         </div>
         <DialogFooter>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline">
+                Reset All
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Reset all settings?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will reset Basic and Advanced settings to defaults for this project.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleResetAll}>Reset</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Close</Button>
         </DialogFooter>
       </DialogContent>

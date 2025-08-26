@@ -29,6 +29,7 @@ interface SettingsStore {
   getFewShotType: (id: string) => 'manual' | 'linked'
   getFewShotStartIndex: (id: string) => number | undefined
   getFewShotEndIndex: (id: string) => number | undefined
+  resetBasicSettings: (id: string) => void
   setBasicSettingsValue: (
     id: string,
     key: keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>,
@@ -138,6 +139,24 @@ export const useSettingsStore = create<SettingsStore>()(
         } catch (error) {
           console.error("Failed to save settings data:", error)
         }
+      },
+      resetBasicSettings: (id) => {
+        // Reset all basic settings fields back to DEFAULT_BASIC_SETTINGS and persist
+        set(state => {
+          const current = state.data[id]
+          if (!current) return state
+          return {
+            ...state,
+            data: {
+              ...state.data,
+              [id]: {
+                ...current,
+                ...DEFAULT_BASIC_SETTINGS,
+              },
+            },
+          }
+        })
+        get().saveData(id)
       },
       setBasicSettingsValue: (id, key, value) => {
         get().mutateData(id, key, value)

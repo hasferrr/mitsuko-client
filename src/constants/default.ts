@@ -26,11 +26,11 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
   startIndex: 1,
   endIndex: 100000,
   splitSize: 100,
-  maxCompletionTokens: 8129,
+  maxCompletionTokens: 64000,
   isUseStructuredOutput: false,
   isUseFullContextMemory: false,
   isBetterContextCaching: true, // true means it is NOT using Minimal Context Mode
-  isMaxCompletionTokensAuto: true,
+  isMaxCompletionTokensAuto: false,
 }
 
 export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models"> = {
