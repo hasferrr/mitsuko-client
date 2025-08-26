@@ -21,7 +21,9 @@ import {
   Eye,
   EyeOff,
   FastForward,
+  ArrowLeft,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { SubtitleList } from "./subtitle-list"
 import {
   LanguageSelection,
@@ -159,6 +161,7 @@ export default function SubtitleTranslatorMain({
   const [toType, setToType] = useState<SubtitleType>(parsed.type)
 
   // Custom Hooks
+  const router = useRouter()
   const { setHasChanges } = useUnsavedChanges()
 
   // Auto-show subtitles if count is less than 1000
@@ -406,7 +409,14 @@ export default function SubtitleTranslatorMain({
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center gap-4 mb-2">
+      <div className="flex flex-wrap items-center gap-2 mb-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.push('/project')}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <div className="flex-1 min-w-40">
           <Input
             value={title}

@@ -13,10 +13,12 @@ import {
   Check,
   Edit,
   FolderDown,
+  ArrowLeft,
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { useAutoScroll } from "@/hooks/use-auto-scroll"
+import { useRouter } from "next/navigation"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { getContent } from "@/lib/parser/parser"
@@ -71,6 +73,8 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   const currentProject = useProjectStore((state) => state.currentProject)
   const session = useSessionStore((state) => state.session)
 
+  // Hooks
+  const router = useRouter()
   const episodeNumberInputRef = useRef<HTMLInputElement | null>(null)
   const subtitleContentRef = useRef<HTMLTextAreaElement | null>(null)
   const previousContextRef = useRef<HTMLTextAreaElement | null>(null)
@@ -235,7 +239,14 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   return (
     <div className="grid md:grid-cols-2 gap-6 gap-y-4 container mx-auto py-2 px-4 mt-2 mb-6 max-w-5xl">
       {/* Header */}
-      <div className="md:col-span-2 flex flex-wrap items-center gap-4">
+      <div className="md:col-span-2 flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.push('/project')}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <Input
           value={title}
           onChange={(e) => setTitle(currentId, e.target.value)}

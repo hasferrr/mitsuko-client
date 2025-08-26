@@ -20,6 +20,7 @@ import {
   RefreshCw,
   Upload,
   X,
+  ArrowLeft,
 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -446,13 +447,20 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   }
 
   return (
-    <div className="mx-auto py-8 px-4 max-w-5xl">
-      <div className="mb-6">
+    <div className="mx-auto pt-4 pb-8 px-4 max-w-5xl">
+      <div className="mb-4 flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.push('/project')}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <Input
           type="text"
           value={title}
           onChange={(e) => setTitle(currentId, e.target.value)}
-          className="text-base md:text-base font-semibold h-12"
+          className="text-xl font-semibold h-12"
           placeholder="Enter title..."
         />
       </div>
