@@ -4,6 +4,7 @@ import { useProjectStore } from '@/stores/data/use-project-store'
 import { createContext, PropsWithChildren, useEffect } from 'react'
 import { useSettingsStore } from '@/stores/settings/use-settings-store'
 import { useAdvancedSettingsStore } from '@/stores/settings/use-advanced-settings-store'
+import { ensureGlobalDefaultsExist } from '@/lib/db/global-settings'
 
 const ProjectStoreContext = createContext(undefined)
 
@@ -13,14 +14,19 @@ export default function ProjectStoreProvider({ children }: PropsWithChildren) {
   const loadAdvancedSettings = useAdvancedSettingsStore((state) => state.loadSettings)
 
   useEffect(() => {
-    const loadAll = async () => {
+    const init = async () => {
+      try {
+        await ensureGlobalDefaultsExist()
+      } catch (e) {
+        console.error('Failed to ensure global defaults exist', e)
+      }
       await Promise.all([
         loadProjects(),
         loadSettings(),
         loadAdvancedSettings(),
       ])
     }
-    loadAll()
+    init()
   }, [loadProjects, loadSettings, loadAdvancedSettings])
 
   return (

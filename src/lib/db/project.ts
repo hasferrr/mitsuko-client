@@ -1,21 +1,34 @@
 import { Project } from "@/types/project"
 import { db } from "./db"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
-import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import { getOrCreateGlobalBasicSettings, getOrCreateGlobalAdvancedSettings } from "./global-settings"
 import { FREE_MODELS } from "@/constants/model-collection"
+
+const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(obj: T) => {
+  const { id, createdAt, updatedAt, ...rest } = obj
+  void id; void createdAt; void updatedAt
+  return rest as Omit<T, 'id' | 'createdAt' | 'updatedAt'>
+}
 
 // Project CRUD functions
 export const createProject = async (name: string, isBatch = false): Promise<Project> => {
   return db.transaction('rw', [db.projects, db.projectOrders, db.basicSettings, db.advancedSettings], async () => {
     const id = crypto.randomUUID()
 
-    const basicSettings = await createBasicSettings(!isBatch
-      ? DEFAULT_BASIC_SETTINGS
-      : {
-        ...DEFAULT_BASIC_SETTINGS,
-        modelDetail: FREE_MODELS["Free Limited"].models.find(m => m.name === "Gemini 2.0 Flash") || null,
-      })
-    const advancedSettings = await createAdvancedSettings(DEFAULT_ADVANCED_SETTINGS)
+    const globalBasic = await getOrCreateGlobalBasicSettings()
+    const basicTemplate = stripMeta(globalBasic)
+    const basicSettings = await createBasicSettings(
+      !isBatch
+        ? basicTemplate
+        : {
+          ...basicTemplate,
+          modelDetail: FREE_MODELS["Free Limited"].models.find(m => m.name === "Gemini 2.0 Flash") || null,
+        }
+    )
+
+    const globalAdvanced = await getOrCreateGlobalAdvancedSettings()
+    const advancedTemplate = stripMeta(globalAdvanced)
+    const advancedSettings = await createAdvancedSettings(advancedTemplate)
 
     const project: Project = {
       id,

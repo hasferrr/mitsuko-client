@@ -2,6 +2,7 @@ import { db } from './db'
 import { DatabaseExport, databaseExportConstructor, generateNewIds } from './db-constructor'
 import { Project, BasicSettings, AdvancedSettings } from '@/types/project'
 import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from '@/constants/default'
+import { GLOBAL_ADVANCED_SETTINGS_ID, GLOBAL_BASIC_SETTINGS_ID } from '@/constants/global-settings'
 
 export async function exportDatabase(): Promise<string> {
   const exportData: DatabaseExport = {
@@ -10,8 +11,8 @@ export async function exportDatabase(): Promise<string> {
     transcriptions: await db.transcriptions.toArray(),
     extractions: await db.extractions.toArray(),
     projectOrders: await db.projectOrders.toArray(),
-    basicSettings: await db.basicSettings.toArray(),
-    advancedSettings: await db.advancedSettings.toArray(),
+    basicSettings: (await db.basicSettings.toArray()).filter(s => s.id !== GLOBAL_BASIC_SETTINGS_ID),
+    advancedSettings: (await db.advancedSettings.toArray()).filter(s => s.id !== GLOBAL_ADVANCED_SETTINGS_ID),
   }
 
   if (process.env.NODE_ENV === 'development') {
@@ -64,10 +65,10 @@ export async function exportProject(
 
   const basicSettings = (
     await db.basicSettings.bulkGet(Array.from(basicSettingsIds))
-  ).filter((s): s is BasicSettings => s !== undefined)
+  ).filter((s): s is BasicSettings => s !== undefined && s.id !== GLOBAL_BASIC_SETTINGS_ID)
   const advancedSettings = (
     await db.advancedSettings.bulkGet(Array.from(advancedSettingsIds))
-  ).filter((s): s is AdvancedSettings => s !== undefined)
+  ).filter((s): s is AdvancedSettings => s !== undefined && s.id !== GLOBAL_ADVANCED_SETTINGS_ID)
 
   const projectOrders = await db.projectOrders.limit(1).toArray()
   const projectOrder =
