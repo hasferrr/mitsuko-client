@@ -14,6 +14,11 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### August 26
+
+- ⚙️ **Global Settings Modal:** Access global default settings that apply to all new projects from the User Settings panel with a reset-all confirmation dialog.
+- 📤 **Back Navigation:** Added back navigation to project page in all main features.
+
 ### August 25
 
 - 🚀 **Batch Extraction Overhaul:** Continue interrupted jobs, mark items as done, toggle sequential vs independent modes, and auto-pause on errors for full control.
