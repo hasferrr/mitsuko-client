@@ -1215,7 +1215,11 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   {isUseSharedSettings ? (
                     <>
                       <span className="block font-semibold">Shared Settings:</span>
-                      <span className="list-item ml-4">This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</span>
+                      <span className="list-item ml-4">{
+                        isSequentialExtraction
+                          ? <>This will process files <strong>one-by-one</strong> using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</>
+                          : <>This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</>}
+                      </span>
                     </>
                   ) : (
                     <>
@@ -1266,7 +1270,11 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   {isUseSharedSettings ? (
                     <>
                       <span className="block font-semibold">Shared Settings:</span>
-                      <span className="list-item ml-4">This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</span>
+                      <span className="list-item ml-4">{
+                        isSequentialExtraction
+                          ? <>This will process files <strong>one-by-one</strong> using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</>
+                          : <>This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</>}
+                      </span>
                     </>
                   ) : (
                     <>
@@ -1319,7 +1327,11 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   {isUseSharedSettings ? (
                     <>
                       <span className="block font-semibold">Shared Settings:</span>
-                      <span className="list-item ml-4">This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</span>
+                      <span className="list-item ml-4">{
+                        isSequentialExtraction
+                          ? <>This will process files <strong>one-by-one</strong> using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</>
+                          : <>This will process up to <strong>{concurrentOperation}</strong> files simultaneously using <strong>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</strong> in <strong>{extractionMode}</strong> mode.</>}
+                      </span>
                     </>
                   ) : (
                     <>
