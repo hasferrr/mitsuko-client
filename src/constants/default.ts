@@ -22,7 +22,7 @@ export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "u
 }
 
 export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {
-  temperature: 1,
+  temperature: 0.6,
   startIndex: 1,
   endIndex: 100000,
   splitSize: 100,
