@@ -144,7 +144,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
 
   const handlePreviousContextSelect = (contextResult: string) => {
     setHasChanges(true)
-    setPreviousContext(currentId, getContent(contextResult).trim())
+    setPreviousContext(currentId, getContent(contextResult).replace(/<done>\s*$/, "").trim())
     setIsPreviousContextDialogOpen(false)
     if (previousContextRef.current) {
       previousContextRef.current.style.height = "auto"
