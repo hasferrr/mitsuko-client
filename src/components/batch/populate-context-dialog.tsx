@@ -91,6 +91,28 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
     setSelected(prev => ({ ...prev, [tId]: true }))
   }
 
+  const handleShiftAll = (dir: -1 | 1) => {
+    if (!extractionIds.length) return
+    setMapping(prev => {
+      const next: Record<string, string | null> = {}
+      for (const tId of translationIds) {
+        const cur = prev[tId]
+        const curIdx = cur ? (extractionIndexById.get(cur) ?? 0) : 0
+        let nextIdx = (curIdx + dir) % extractionIds.length
+        if (nextIdx < 0) nextIdx = extractionIds.length - 1
+        next[tId] = extractionIds[nextIdx]
+      }
+      return next
+    })
+    setSelected(() => {
+      const nextSel: Record<string, boolean> = {}
+      for (const tId of translationIds) {
+        nextSel[tId] = true
+      }
+      return nextSel
+    })
+  }
+
   const handleSelectChange = (tId: string, eId: string | null) => {
     setMapping(prev => ({ ...prev, [tId]: eId }))
     setSelected(prev => ({ ...prev, [tId]: !!eId }))
@@ -194,6 +216,34 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
               <ListRestart className="h-4 w-4" />
               Reset Mapping
             </Button>
+
+            {/* Shift all mappings */}
+            <div className="ml-auto flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => handleShiftAll(-1)}
+                disabled={isLoading || extractionIds.length === 0}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <div
+                className="h-8 px-4 text-xs cursor-default select-none pointer-events-none border border-input bg-background rounded-md inline-flex items-center justify-center"
+                aria-hidden
+              >
+                Shift All
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => handleShiftAll(+1)}
+                disabled={isLoading || extractionIds.length === 0}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           {/* Mapping list */}
