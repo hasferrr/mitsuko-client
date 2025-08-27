@@ -72,8 +72,8 @@ export function CustomApiConfigManager() {
           value={selectedApiConfigIndex !== null ? String(selectedApiConfigIndex) : ""}
           onValueChange={(value) => selectApiConfig(Number(value))}
         >
-          <SelectTrigger className="flex-grow">
-            <SelectValue placeholder="Select a configuration" />
+          <SelectTrigger className="w-0 flex-1 min-w-0">
+            <SelectValue placeholder="Select a configuration" className="truncate" />
           </SelectTrigger>
           <SelectContent>
             {customApiConfigs.map((config, index) => (

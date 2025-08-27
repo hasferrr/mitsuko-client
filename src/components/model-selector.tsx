@@ -132,21 +132,23 @@ export function ModelSelector({
             role="combobox"
             aria-expanded={open}
             aria-label="Select a model"
-            className="w-full justify-between"
+            className="w-full justify-between relative pr-8"
             disabled={disabled}
           >
-            <div className="flex items-center gap-2">
-              {modelDetail ? modelDetail.name : "Select a model..."}
+            <div className="flex items-center gap-2 w-0 flex-1 min-w-0">
+              <span className="truncate" title={modelDetail ? modelDetail.name : undefined}>
+                {modelDetail ? modelDetail.name : "Select a model..."}
+              </span>
               {modelDetail && (
                 <Badge
                   variant={modelDetail.isPaid ? "default" : "secondary"}
-                  className="text-xs px-2 h-[1.125rem]"
+                  className="text-xs px-2 h-[1.125rem] shrink-0"
                 >
                   {modelDetail.isPaid ? "Premium" : "Free"}
                 </Badge>
               )}
             </div>
-            <ChevronsUpDown className="opacity-50" />
+            <ChevronsUpDown className="h-4 w-4 opacity-50 absolute right-3 top-1/2 -translate-y-1/2" />
           </Button>
         </PopoverTrigger>
 

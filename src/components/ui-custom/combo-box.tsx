@@ -41,10 +41,10 @@ export function ComboBox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="w-full justify-between relative pr-6"
         >
-          {value}
-          <ChevronsUpDown className="opacity-50" />
+          <span className="truncate">{value}</span>
+          <ChevronsUpDown className="opacity-50 absolute right-3 top-1/2 -translate-y-1/2" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
