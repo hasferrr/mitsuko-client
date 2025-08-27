@@ -38,14 +38,15 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
           customApiConfigs: [...state.customApiConfigs, config],
         })),
 
-      updateApiConfig: async (index, updates) =>
+      updateApiConfig: async (index, updates) => {
         set((state) => {
           const newConfigs = [...state.customApiConfigs]
           if (newConfigs[index]) {
             newConfigs[index] = { ...newConfigs[index], ...updates }
           }
           return { customApiConfigs: newConfigs }
-        }),
+        })
+      },
 
       removeApiConfig: (index) =>
         set((state) => {
