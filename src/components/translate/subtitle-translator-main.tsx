@@ -616,7 +616,7 @@ export default function SubtitleTranslatorMain({
 
             <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
-                <CardContent className="p-4 space-y-4">
+                <CardContent className={cn("p-4 space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
                   {isSharedSettings && (
                     <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                   )}
@@ -648,7 +648,7 @@ export default function SubtitleTranslatorMain({
 
             <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
-                <CardContent className="p-4 space-y-4">
+                <CardContent className={cn("p-4 space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
                   <ModelDetail
                     basicSettingsId={basicSettingsId}
                   />

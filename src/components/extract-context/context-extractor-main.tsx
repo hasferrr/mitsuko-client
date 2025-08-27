@@ -40,9 +40,10 @@ interface ContextExtractorMainProps {
   currentId: string
   basicSettingsId: string
   advancedSettingsId: string
+  isSharedSettings?: boolean
 }
 
-export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSettingsId }: ContextExtractorMainProps) => {
+export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSettingsId, isSharedSettings }: ContextExtractorMainProps) => {
   const [activeTab, setActiveTab] = useState("result")
   const [isEpisodeNumberValid, setIsEpisodeNumberValid] = useState(true)
   const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
@@ -394,7 +395,10 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
 
           <TabsContent value="settings" className="flex-grow space-y-4 mt-4">
             <Card className="border border-border bg-card text-card-foreground">
-              <CardContent className="p-4 space-y-4">
+              <CardContent className={cn("p-4 space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
+                {isSharedSettings && (
+                  <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
+                )}
                 <ModelSelection
                   basicSettingsId={basicSettingsId}
                   advancedSettingsId={advancedSettingsId}

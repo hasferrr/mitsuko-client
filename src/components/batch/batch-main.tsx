@@ -1375,6 +1375,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                   currentId={previewId}
                   basicSettingsId={isUseSharedSettings ? basicSettingsId : extractionData[previewId].basicSettingsId}
                   advancedSettingsId={isUseSharedSettings ? advancedSettingsId : extractionData[previewId].advancedSettingsId}
+                  isSharedSettings={isUseSharedSettings}
                 />
               )}
             </div>
