@@ -28,7 +28,6 @@ import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useModelCosts } from "@/contexts/model-cost-context"
 import { ModelCreditCost } from "@/types/model-cost"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
-import { UsageLevel } from "@/types/model"
 import Link from "next/link"
 import {
   Anthropic,

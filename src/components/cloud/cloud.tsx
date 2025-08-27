@@ -20,7 +20,6 @@ import {
   Upload,
   Clock,
   HardDrive,
-  Plus,
 } from 'lucide-react'
 import {
   Table,
@@ -81,7 +80,6 @@ export default function CloudFilesList() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
   const uploadProgress = useUploadStore(state => state.uploadProgress)
-  const isUploading = useUploadStore(state => state.isUploading)
   const setUploadProgress = useUploadStore(state => state.setUploadProgress)
   const setIsUploading = useUploadStore(state => state.setIsUploading)
 
@@ -196,10 +194,6 @@ export default function CloudFilesList() {
     }
 
     handleUpload(file)
-  }
-
-  const handleUploadClick = () => {
-    fileInputRef.current?.click()
   }
 
   return (
