@@ -2,7 +2,6 @@ import { Project } from "@/types/project"
 import { db } from "./db"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
 import { getOrCreateGlobalBasicSettings, getOrCreateGlobalAdvancedSettings } from "./global-settings"
-import { FREE_MODELS } from "@/constants/model-collection"
 
 const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(obj: T) => {
   const { id, createdAt, updatedAt, ...rest } = obj
@@ -17,14 +16,7 @@ export const createProject = async (name: string, isBatch = false): Promise<Proj
 
     const globalBasic = await getOrCreateGlobalBasicSettings()
     const basicTemplate = stripMeta(globalBasic)
-    const basicSettings = await createBasicSettings(
-      !isBatch
-        ? basicTemplate
-        : {
-          ...basicTemplate,
-          modelDetail: FREE_MODELS["Free Limited"].models.find(m => m.name === "Gemini 2.0 Flash") || null,
-        }
-    )
+    const basicSettings = await createBasicSettings(basicTemplate)
 
     const globalAdvanced = await getOrCreateGlobalAdvancedSettings()
     const advancedTemplate = stripMeta(globalAdvanced)
