@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
+import { getAllPostsMeta } from '@/lib/blog'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const base: MetadataRoute.Sitemap = [
     {
       url: DEPLOYMENT_URL,
       lastModified: new Date(),
@@ -51,5 +52,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
+    {
+      url: `${DEPLOYMENT_URL}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
   ]
+
+  const posts = await getAllPostsMeta()
+  const postEntries: MetadataRoute.Sitemap = posts.map(p => ({
+    url: `${DEPLOYMENT_URL}/blog/${p.slug}`,
+    lastModified: new Date(p.updated || p.date),
+    changeFrequency: 'weekly',
+    priority: 0.5,
+  }))
+
+  return [...base, ...postEntries]
 }

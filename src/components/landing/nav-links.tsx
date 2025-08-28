@@ -103,6 +103,13 @@ export default function NavLinks({
       >
         FAQ
       </Link>
+      <Link
+        href="/blog"
+        className="block text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors scroll-smooth py-2"
+        onClick={handleLinkClick}
+      >
+        Blog
+      </Link>
     </>
   )
 }

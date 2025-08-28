@@ -1,6 +1,7 @@
 import { DISCORD_LINK, GITHUB_LINK } from "@/constants/external-links"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { getAllPostsMeta } from "@/lib/blog"
 
 const badges = [
   {
@@ -41,7 +42,9 @@ const badges = [
   },
 ]
 
-export default function Footer() {
+export default async function Footer() {
+  const posts = await getAllPostsMeta()
+  const latest = posts.slice(0, 4)
   return (
     <footer className="border-t border-gray-200 dark:border-gray-800 py-12 px-4">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-11 gap-8">
@@ -68,7 +71,7 @@ export default function Footer() {
           <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Resources</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <Link href="/blog" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                 Blog
               </Link>
             </li>
@@ -133,14 +136,13 @@ export default function Footer() {
         </div>
 
         <div className="lg:col-span-2">
-          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Partner</h3>
+          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Articles</h3>
           <ul className="flex flex-col gap-2">
-            <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <a target="_blank" rel="noopener" title="All The Best AI Tools" href="https://allinai.tools">All in AI Tools</a>
-            </li>
-            <li className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <a target="_blank" rel="noopener" href="https://aistage.net" title="AIStage">AIStage</a>
-            </li>
+            {latest.map(p => (
+              <li key={p.slug} className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <Link href={`/blog/${p.slug}`} className="line-clamp-2">{p.title.split(":")[0] || p.title}</Link>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
