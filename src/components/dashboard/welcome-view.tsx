@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { DEFAULT_SUBTITLES, DEFAULT_TITLE, DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import { DEFAULT_SUBTITLES, DEFAULT_TITLE } from "@/constants/default"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
@@ -34,8 +34,7 @@ import {
 } from "@dnd-kit/sortable"
 import { SortableProjectItem } from "./sortable-project-item"
 import { cn } from "@/lib/utils"
-import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+
 
 export function WelcomeView() {
   const router = useRouter()
@@ -63,10 +62,7 @@ export function WelcomeView() {
   const upsertTranscriptionData = useTranscriptionDataStore(state => state.upsertData)
   const upsertExtractionData = useExtractionDataStore(state => state.upsertData)
 
-  const getBasicSettings = useSettingsStore(state => state.getBasicSettings)
-  const getAdvancedSettings = useAdvancedSettingsStore(state => state.getAdvancedSettings)
-  const applyModelDefaults = useAdvancedSettingsStore(state => state.applyModelDefaults)
-  const getModelDetail = useSettingsStore(state => state.getModelDetail)
+ 
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -95,11 +91,7 @@ export function WelcomeView() {
       defaultProject = await createProject("Default")
     }
 
-    const basicDefaults = getBasicSettings(defaultProject.defaultBasicSettingsId) ?? DEFAULT_BASIC_SETTINGS
-    const advancedDefaults = applyModelDefaults(
-      getAdvancedSettings(defaultProject.defaultAdvancedSettingsId) ?? DEFAULT_ADVANCED_SETTINGS,
-      getModelDetail(defaultProject.defaultBasicSettingsId) ?? null
-    )
+    
 
     // Create new item based on option
     switch (option) {
@@ -111,7 +103,7 @@ export function WelcomeView() {
             type: "srt",
             data: null
           }
-        }, basicDefaults, advancedDefaults)
+        }, undefined, undefined)
         setCurrentTranslationId(translation.id)
         upsertTranslationData(translation.id, translation)
         break
@@ -133,7 +125,7 @@ export function WelcomeView() {
           subtitleContent: "",
           previousContext: "",
           contextResult: ""
-        }, basicDefaults, advancedDefaults)
+        }, undefined, undefined)
         setCurrentExtractionId(extraction.id)
         upsertExtractionData(extraction.id, extraction)
         break

@@ -10,6 +10,7 @@ import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { db } from "@/lib/db/db"
+import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 
 export interface ExtractionDataStore {
   currentId: string | null
@@ -18,8 +19,8 @@ export interface ExtractionDataStore {
   createExtractionDb: (
     projectId: string,
     data: Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">,
-    basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
-    advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
+    basicSettingsData?: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
+    advancedSettingsData?: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Extraction>
   getExtractionDb: (extractionId: string) => Promise<Extraction | undefined>
   getExtractionsDb: (extractionIds: string[]) => Promise<Extraction[]>
@@ -51,7 +52,37 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
   data: {},
   // CRUD methods
   createExtractionDb: async (projectId, data, basicSettingsData, advancedSettingsData) => {
-    const extraction = await createDB(projectId, data, basicSettingsData, advancedSettingsData)
+    let bsInput = basicSettingsData
+    let advInput = advancedSettingsData
+
+    if (bsInput === undefined || advInput === undefined) {
+      const project = await db.projects.get(projectId)
+      if (!project) throw new Error('Project not found')
+
+      const bsFromDb = await getBasicSettings(project.defaultBasicSettingsId)
+      const adsFromDb = await getAdvancedSettings(project.defaultAdvancedSettingsId)
+
+      const modelDetail = (bsInput?.modelDetail ?? bsFromDb?.modelDetail) ?? null
+      const applyModelDefaults = useAdvancedSettingsStore.getState().applyModelDefaults
+
+      if (bsInput === undefined) {
+        if (bsFromDb) {
+          bsInput = bsFromDb
+        } else {
+          bsInput = DEFAULT_BASIC_SETTINGS
+        }
+      }
+
+      if (advInput === undefined) {
+        if (adsFromDb) {
+          advInput = applyModelDefaults(adsFromDb, modelDetail)
+        } else {
+          advInput = applyModelDefaults(DEFAULT_ADVANCED_SETTINGS, modelDetail)
+        }
+      }
+    }
+
+    const extraction = await createDB(projectId, data, bsInput ?? {}, advInput ?? {})
     set(state => ({ data: { ...state.data, [extraction.id]: extraction } }))
 
     // upsert associated settings into stores

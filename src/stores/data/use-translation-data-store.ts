@@ -11,6 +11,7 @@ import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { db } from "@/lib/db/db"
+import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 
 export interface TranslationDataStore {
   currentId: string | null
@@ -19,8 +20,8 @@ export interface TranslationDataStore {
   createTranslationDb: (
     projectId: string,
     data: Pick<Translation, "title" | "subtitles" | "parsed">,
-    basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
-    advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
+    basicSettingsData?: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
+    advancedSettingsData?: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Translation>
   getTranslationDb: (translationId: string) => Promise<Translation | undefined>
   getTranslationsDb: (translationIds: string[]) => Promise<Translation[]>
@@ -50,7 +51,37 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
   data: {},
   // CRUD methods
   createTranslationDb: async (projectId, data, basicSettingsData, advancedSettingsData) => {
-    const translation = await createDB(projectId, data, basicSettingsData, advancedSettingsData)
+    let bsInput = basicSettingsData
+    let advInput = advancedSettingsData
+
+    if (bsInput === undefined || advInput === undefined) {
+      const project = await db.projects.get(projectId)
+      if (!project) throw new Error('Project not found')
+
+      const bsFromDb = await getBasicSettings(project.defaultBasicSettingsId)
+      const adsFromDb = await getAdvancedSettings(project.defaultAdvancedSettingsId)
+
+      const modelDetail = (bsInput?.modelDetail ?? bsFromDb?.modelDetail) ?? null
+      const applyModelDefaults = useAdvancedSettingsStore.getState().applyModelDefaults
+
+      if (bsInput === undefined) {
+        if (bsFromDb) {
+          bsInput = bsFromDb
+        } else {
+          bsInput = DEFAULT_BASIC_SETTINGS
+        }
+      }
+
+      if (advInput === undefined) {
+        if (adsFromDb) {
+          advInput = applyModelDefaults(adsFromDb, modelDetail)
+        } else {
+          advInput = applyModelDefaults(DEFAULT_ADVANCED_SETTINGS, modelDetail)
+        }
+      }
+    }
+
+    const translation = await createDB(projectId, data, bsInput ?? {}, advInput ?? {})
     set(state => ({ data: { ...state.data, [translation.id]: translation } }))
 
     // upsert associated settings into stores

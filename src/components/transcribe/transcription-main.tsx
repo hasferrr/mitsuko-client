@@ -55,12 +55,10 @@ import { useClientIdStore } from "@/stores/use-client-id-store"
 import { Input } from "@/components/ui/input"
 import { SettingsTranscription } from "./settings-transcription"
 import { uploadFile } from "@/lib/api/file-upload"
-import { MAX_FILE_SIZE, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import { MAX_FILE_SIZE } from "@/constants/default"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SubtitleTranslated } from "@/types/subtitles"
 import { useRouter } from "next/navigation"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
@@ -111,11 +109,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const session = useSessionStore((state) => state.session)
   const deleteAfterTranscription = useLocalSettingsStore(state => state.deleteAfterTranscription)
   const setDeleteAfterTranscription = useLocalSettingsStore(state => state.setDeleteAfterTranscription)
-
-  const getBasicSettings = useSettingsStore(state => state.getBasicSettings)
-  const getAdvancedSettings = useAdvancedSettingsStore(state => state.getAdvancedSettings)
-  const applyModelDefaults = useAdvancedSettingsStore(state => state.applyModelDefaults)
-  const getModelDetail = useSettingsStore(state => state.getModelDetail)
+ 
 
   // React Query
   const queryClient = useQueryClient()
@@ -440,11 +434,8 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
           subtitles,
           parsed: { type: "srt", data: null },
         },
-        getBasicSettings(currentProject.defaultBasicSettingsId) ?? {},
-        applyModelDefaults(
-          getAdvancedSettings(currentProject.defaultAdvancedSettingsId) ?? DEFAULT_ADVANCED_SETTINGS,
-          getModelDetail(currentProject.defaultBasicSettingsId) ?? null
-        ),
+        undefined,
+        undefined,
       )
 
       setTranslationCurrentId(translation.id)

@@ -45,9 +45,6 @@ import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { SettingsDialogue } from "../settings-dialogue"
-import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
-import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
 import { Badge } from "../ui/badge"
@@ -114,11 +111,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const createTranscriptionDb = useTranscriptionDataStore((state) => state.createTranscriptionDb)
   const updateTranscriptionDb = useTranscriptionDataStore((state) => state.updateTranscriptionDb)
   const deleteTranscriptionDb = useTranscriptionDataStore((state) => state.deleteTranscriptionDb)
-
-  const getBasicSettings = useSettingsStore((state) => state.getBasicSettings)
-  const getAdvancedSettings = useAdvancedSettingsStore((state) => state.getAdvancedSettings)
-  const applyModelDefaults = useAdvancedSettingsStore((state) => state.applyModelDefaults)
-  const getModelDetail = useSettingsStore((state) => state.getModelDetail)
 
   const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
   const isExtractingSet = useExtractionStore(state => state.isExtractingSet)
@@ -339,11 +331,8 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
               data: null
             }
           },
-          getBasicSettings(currentProject.defaultBasicSettingsId) ?? {},
-          applyModelDefaults(
-            getAdvancedSettings(currentProject.defaultAdvancedSettingsId) ?? DEFAULT_ADVANCED_SETTINGS,
-            getModelDetail(currentProject.defaultBasicSettingsId) ?? null
-          ),
+          undefined,
+          undefined,
         )
         loadProjects()
       }}
@@ -385,8 +374,8 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
             previousContext: "",
             contextResult: ""
           },
-          getBasicSettings(currentProject.defaultBasicSettingsId) ?? {},
-          getAdvancedSettings(currentProject.defaultAdvancedSettingsId) ?? {},
+          undefined,
+          undefined,
         )
         loadProjects()
       }}
