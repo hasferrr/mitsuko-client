@@ -97,7 +97,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "Qwen3 235B A22B",
+        name: "Qwen3 235B A22B 2507",
         maxInput: 40000,
         maxOutput: 40000,
         structuredOutput: true,
@@ -427,7 +427,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 128_000,
         structuredOutput: true,
         isPaid: true,
-        usage: "above medium",
+        usage: "high",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -603,9 +603,9 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "qwen",
     models: [
       {
-        name: "Qwen3 235B A22B",
-        maxInput: 40000,
-        maxOutput: 40000,
+        name: "Qwen3 235B A22B 2507",
+        maxInput: 262000,
+        maxOutput: 262000,
         structuredOutput: true,
         isPaid: true,
         usage: "low",
@@ -613,13 +613,13 @@ const RAW_PAID_MODELS: PaidModelCollection = {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 16000,
-          isUseStructuredOutput: false,
+          isUseStructuredOutput: true,
         }
       },
       {
-        name: "Qwen3 30B A3B",
-        maxInput: 40000,
-        maxOutput: 40000,
+        name: "Qwen3 30B A3B 2507",
+        maxInput: 262000,
+        maxOutput: 262000,
         structuredOutput: true,
         isPaid: true,
         usage: "very low",
@@ -627,7 +627,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 16000,
-          isUseStructuredOutput: false,
+          isUseStructuredOutput: true,
         }
       },
     ]
