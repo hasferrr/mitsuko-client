@@ -2,7 +2,6 @@
 
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Files,
   Plus,
@@ -11,18 +10,55 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import BatchMain from "./batch-main"
+import { SortableBatchCard } from "./sortable-batch-card"
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable"
 
 export default function Batch() {
   const batch = useProjectStore((state) => state.currentProject)
   const projects = useProjectStore((state) => state.projects)
   const createProject = useProjectStore((state) => state.createProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
+  const reorderProjects = useProjectStore(state => state.reorderProjects)
+  const batchProjects = projects.filter(p => p.isBatch)
 
   // Load data for selected batch
   const translationData = useTranslationDataStore((state) => state.data)
   const extractionData = useExtractionDataStore(state => state.data)
   const loadTranslations = useTranslationDataStore((state) => state.getTranslationsDb)
   const loadExtractions = useExtractionDataStore(state => state.getExtractionsDb)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      const oldIndex = projects.findIndex(p => p.id === active.id)
+      const newIndex = projects.findIndex(p => p.id === over.id)
+      const newOrder = arrayMove(projects.map(p => p.id), oldIndex, newIndex)
+      await reorderProjects(newOrder)
+    }
+  }
+
+  
 
   // Ensure translations are loaded for current batch project
   useEffect(() => {
@@ -67,30 +103,22 @@ export default function Batch() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.filter(p => p.isBatch).map((b) => (
-              <Card
-                key={b.id}
-                className="cursor-pointer hover:border-primary transition-colors overflow-hidden border border-muted h-full flex flex-col"
-                onClick={() => setCurrentProject(b.id)}
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle>{b.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="pb-4 flex flex-col flex-1">
-                  <div className="flex-1"></div>
-                  <div className="flex flex-col gap-1 mt-auto">
-                    <p className="text-sm text-muted-foreground">
-                      {b.translations.length} {b.translations.length === 1 ? "file" : "files"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Created: {new Date(b.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={batchProjects.map(p => p.id)}
+              strategy={rectSortingStrategy}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {batchProjects.map((b) => (
+                  <SortableBatchCard key={b.id} project={b} onSelect={(id) => setCurrentProject(id)} />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
     )
