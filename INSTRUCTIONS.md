@@ -106,10 +106,15 @@ A deep understanding of the project requires knowing the purpose of each key fil
 #### Root Directory
 - `README.md`: The main entry point for a quick project overview and setup instructions.
 - `INSTRUCTIONS.md`: **(This file)** The single source of truth for the project's technical specifications and architecture. It should be the first point of reference.
+- `CHANGELOG.md`: Chronological list of changes, release notes, and user-visible updates.
 - `package.json`: Defines project metadata and lists all frontend dependencies.
 - `next.config.mjs`: Configuration for Next.js, including security headers and build options.
 - `tailwind.config.ts`: Configuration for Tailwind CSS, defining the design system (colors, spacing, fonts).
 - `tsconfig.json`: TypeScript configuration for the project.
+- `public/`: Static assets served directly by Next.js (icons, images, manifest).
+- `content/`: Markdown sources for site content.
+   - `blog/`: Blog posts consumed by the landing blog routes.
+   - `legal/`: Legal docs `terms.md` and `privacy.md` consumed by `src/app/(landing)/terms/page.tsx` and `src/app/(landing)/privacy/page.tsx`.
 
 ---
 
@@ -117,7 +122,7 @@ A deep understanding of the project requires knowing the purpose of each key fil
 
 This is the main source code folder for the Next.js application. All application code resides here. The structure is designed for scalability and clear separation of concerns.
 
-- **`app/`**: The core of the Next.js App Router. This directory is used **exclusively** for routing and layout composition.
+- **`app/`**: The core of the Next.js App Router. This directory is used *exclusively* for defining routes (`page.tsx`, `layout.tsx`). All reusable React components must be located in the `src/components/` directory.
   - **Style:** Files here should be minimal. Page files (`page.tsx`) should ideally be single-line components that import and render a feature component from `src/components/`. Layout files (`layout.tsx`) compose the UI shell with components.
   - **Structure:**
     - `layout.tsx`: The root layout for the entire application. It sets up the HTML shell, including fonts, metadata, and global providers.
@@ -128,6 +133,8 @@ This is the main source code folder for the Next.js application. All application
       - `pricing/page.tsx`: The pricing page.
       - `privacy/page.tsx`: The privacy policy page.
       - `terms/page.tsx`: The terms of service page.
+      - `blog/page.tsx`: Blog index page.
+      - `blog/[slug]/page.tsx`: Individual blog post page.
     - **`(main)/`**: A route group for all authenticated app pages (e.g., dashboard, translate). It has its own `layout.tsx` which includes the main app sidebar and navigation.
       - `dashboard/page.tsx`: The main dashboard page after a user logs in.
       - `project/page.tsx`: Displays the contents and tasks within a single project.
@@ -154,7 +161,8 @@ This is the main source code folder for the Next.js application. All application
       - `history/history-view.tsx`: Transcription History UI with modern table, search, pagination, and a detailed viewer dialog.
       - `dashboard/welcome-view.tsx`: The main component for the dashboard, showing options to start new tasks and recent projects.
       - `sidebar/app-sidebar.tsx`: The main sidebar component for the application.
-      - `auth/login.tsx`: A component handling the user authentication form and user settings display.
+      - `auth/login.tsx`: Authentication form.
+      - `auth/user-settings.tsx`: User settings and entry to Global Settings Dialogue.
       - `library/library-view.tsx`: Composes the Library tabs (`My Library`, `Public Library`) as the entry point for managing instructions.
       - `library/create-edit-instruction-dialog.tsx`: Modal dialog for creating or editing a custom instruction with validation and auto-resizing textarea.
       - `library/export-instructions-controls.tsx`: Toolbar controls for batch selection and export of instructions to a downloadable JSON file.
@@ -165,9 +173,10 @@ This is the main source code folder for the Next.js application. All application
       - `batch/batch-main.tsx`: Main batch UI handling Translation vs Extraction modes, file upload and drag-and-drop ordering, selection, concurrency controls, and dialogs.
       - `batch/sortable-batch-file.tsx`: Sortable list item for a batch file with status indicators and actions.
       - `batch/import-sub-dialog.tsx`: Dialog to import subtitles as extractions with per-item selection (returns `selectedIds` on confirm).
-      - `batch/populate-context-dialog.tsx`: Dialog to map extractions to translations and populate context documents into Basic Settings.
+      - `batch/populate-context-dialog.tsx`: Dialog to map extractions to translations and update context documents in Basic Settings.
       - `batch/rename-episodes-dialog.tsx`: Dialog to batch rename episode numbers (sequential numbering, text removal, regex replace) with live preview.
-      - `batch/copy-shared-settings-dialog.tsx`: Dialog to copy shared settings into individual project settings for the batch.
+      - `batch/copy-shared-settings-dialog.tsx`: Dialog to copy shared settings into individual settings for the batch.
+      - `settings-dialogue.tsx`: Unified Settings modal for Project and Global Defaults; when `isGlobal` it uses `GLOBAL_BASIC_SETTINGS_ID` and `GLOBAL_ADVANCED_SETTINGS_ID`.
 
 - **`constants/`**: Contains static, hard-coded values used throughout the application. This prevents magic strings and numbers in the codebase, making maintenance easier.
   - **Style:** Files export `const` variables.
@@ -182,6 +191,8 @@ This is the main source code folder for the Next.js application. All application
     - `model-collection.ts`: Defines the entire collection of AI models available, separated into free and paid tiers.
     - `model-preferences.ts`: Specifies preferred or recommended models for certain tasks (e.g., favorite, high-quality).
     - `pricing.ts`: Holds all pricing information, including subscription plans and credit pack details.
+    - `global-settings.ts`: IDs for Global Defaults (`GLOBAL_BASIC_SETTINGS_ID`, `GLOBAL_ADVANCED_SETTINGS_ID`).
+    - `subtitle-formats.ts`: Subtitle format constants and helpers.
 
 - **`contexts/`**: Holds React Context providers for sharing state that is global and doesn't change often.
   - **Style:** Uses standard React Context API. A `providers.tsx` file often composes multiple contexts to be used in the root layout.
@@ -189,7 +200,7 @@ This is the main source code folder for the Next.js application. All application
     - `providers.tsx`: A server component that fetches initial data (like model costs) and passes it to the client-side provider.
     - `providers-client.tsx`: The main client-side provider that wraps the entire application. It composes all other context providers and initializes global states like the theme and payment scripts.
     - `session-context.tsx`: Subscribes to Supabase authentication state changes and provides the user session data to the entire component tree.
-    - `project-context.tsx`: Responsible for loading all user projects from IndexedDB when the application starts.
+    - `project-context.tsx`: Ensures Global Defaults exist via `ensureGlobalDefaultsExist()` and then loads projects and settings from IndexedDB on app start.
     - `unsaved-changes-context.tsx`: Manages a global flag (`hasChangesRef`) to detect unsaved work and warn the user with a `beforeunload` event if they try to navigate away.
     - `model-cost-context.tsx`: Provides a map of AI model names to their credit costs, fetched from the server.
     - `client-id-context.tsx`: Manages a unique, persistent client ID for the user's browser, stored in IndexedDB.
@@ -204,7 +215,7 @@ This is the main source code folder for the Next.js application. All application
     - `use-extraction-handler.tsx`: Centralizes `handleStartExtraction` and `handleStopExtraction` logic for context extraction, keeping container components declarative
     - `use-translation-handler.tsx`: Centralizes `handleStartTranslation`, `handleStopTranslation`, and related helpers like `generateSubtitleContent` to keep translation container components declarative
     - `use-batch-translation-files.tsx`: Derives batch translation file metadata (status, progress, counts) from project and translation stores.
-    - `use-batch-extraction-files.ts`: Derives batch extraction file metadata and status from project and extraction stores.
+    - `use-batch-extraction-files.tsx`: Derives batch extraction file metadata and status from project and extraction stores.
     - `use-batch-translation-handler.tsx`: Coordinates batch translation (start/continue/stop), concurrency, queueing, and error handling, delegating to the translation handler/store.
     - `use-batch-extraction-handler.tsx`: Coordinates batch extraction with `sequential` or `independent` modes, context propagation, concurrency, and error handling, delegating to the extraction handler/store.
 
@@ -231,6 +242,7 @@ This is the main source code folder for the Next.js application. All application
       - `custom-instruction.ts`: Handles CRUD operations for public and private custom instructions (publish, fetch, delete).
     - **`db/`**: The entire client-side database layer, built with **Dexie.js**.
       - `db.ts`: Defines the Dexie database schema, including all tables, their versions, and migration logic.
+      - `global-settings.ts`: Ensures Global Defaults exist and provides helpers for cloning defaults when creating projects.
       - `project.ts`, `translation.ts`, `transcription.ts`, `extraction.ts`, `settings.ts`: These files contain all the CRUD (Create, Read, Update, Delete) operations for their respective data models. They use Dexie transactions to ensure data integrity.
       - `custom-instruction.ts`: Contains all CRUD operations for custom instructions stored in Dexie, mirroring logic in `use-custom-instruction-store`.
       - `db-io.ts`: Implements the logic for exporting and importing the entire database as a JSON file.
@@ -256,6 +268,7 @@ This is the main source code folder for the Next.js application. All application
         - `generate.ts`: Generates a valid VTT file string from a `Subtitle[]` array.
       - **`utils/`**: Contains utility functions for working with subtitle data.
         - `combine-subtitle.ts`: Merges original and translated text into a single subtitle entry with various formatting options.
+        - `convert-subtitle.ts`: Converts between subtitle data representations.
         - `count-untranslated.ts`: Counts the number of untranslated lines in a subtitle project.
         - `merge-intervals-w-gap.ts`: Merges numeric intervals that are close to each other, useful for batching translation tasks.
         - `remove-content-between.ts`: Removes text between specified delimiters.
@@ -302,7 +315,7 @@ This is the main source code folder for the Next.js application. All application
     4.  **Keep Actions Co-located:** The function to update a piece of state should always live within the same store as the state itself. This makes the state logic predictable and easy to find.
     5.  **Handle Persistence (If Needed):** If the state needs to persist between user sessions, ensure the `persist` middleware is configured for the store. For sensitive data, use `indexedDBStorage`; for non-sensitive, local settings, `localStorage` is acceptable.
 
-- **`static/`**: Contains static assets that are served directly, such as images and fonts. These files are not processed by the build pipeline.
+- **`static/`**: Static assets served directly by Next.js (images, icons, site manifest).
 
 - **`types/`**: Contains shared TypeScript type definitions and interfaces used across the application.
   - **Style:** Uses `interface` for object shapes and `type` for unions or other complex types. Files are named after the data model they describe.
@@ -450,6 +463,11 @@ The transcription flow has been upgraded to work with cloud uploads and a stream
 5. **Key Notes**
    - Import dialog defaults to all items selected; users can select/deselect before confirming. Only the returned `selectedIds` are used to create extractions.
    - Episode renaming applies via `use-extraction-data-store.updateExtractionDb` to persist changes.
+
+6. **Batch Project Behavior**
+   - Each batch is a `Project` with `isBatch: true`
+   - On file select, drop, or delete in the Batch UI, a new `Translation` is created or removed and its ID is pushed to or removed from the parent `Project.translations` array via `useProjectStore` methods
+   - When files are reordered, `useProjectStore.updateProjectItems(projectId, newOrder)` updates the parent `Project.translations` array order
 
 ### 6. Data Management & Migrations
 
