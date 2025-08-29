@@ -17,8 +17,8 @@ import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SubtitleTranslated } from "@/types/subtitles"
-import { createTranslation, deleteTranslation } from "@/lib/db/translation"
-import { createExtraction, deleteExtraction } from "@/lib/db/extraction"
+import { deleteTranslation } from "@/lib/db/translation"
+import { deleteExtraction } from "@/lib/db/extraction"
 
 interface ProjectStore {
   currentProject: Project | null
@@ -222,28 +222,14 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
         translated: ''
       }))
 
-      const translation = await createTranslation(
+      const translation = await useTranslationDataStore.getState().createTranslationDb(
         projectId,
         {
           title: file.name,
           subtitles: translatedSubtitles,
           parsed: parsedData.parsed,
-        },
-        {},
-        {}
+        }
       )
-
-      // upsert translation into in-memory store
-      const translationStore = useTranslationDataStore.getState()
-      translationStore.upsertData(translation.id, translation)
-
-      // ensure translation-specific settings are present in in-memory stores
-      const settingsStore = useSettingsStore.getState()
-      const advancedSettingsStore = useAdvancedSettingsStore.getState()
-      const bs = await getBasicSettings(translation.basicSettingsId)
-      if (bs) settingsStore.upsertData(bs.id, bs)
-      const ads = await getAdvancedSettings(translation.advancedSettingsId)
-      if (ads) advancedSettingsStore.upsertData(ads.id, ads)
 
       const updatedTranslations = [...currentProject.translations, translation.id]
       await updateProjectItemsDB(projectId, updatedTranslations, 'translations')
@@ -298,7 +284,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       const currentProject = get().projects.find(p => p.id === projectId)
       if (!currentProject) throw new Error('Project not found')
 
-      const extraction = await createExtraction(
+      const extraction = await useExtractionDataStore.getState().createExtractionDb(
         projectId,
         {
           title: file.name,
@@ -306,14 +292,8 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
           subtitleContent: content,
           previousContext: '',
           contextResult: '',
-        },
-        {},
-        {}
+        }
       )
-
-      // upsert extraction into store
-      const extractionStore = useExtractionDataStore.getState()
-      extractionStore.upsertData(extraction.id, extraction)
 
       const updatedExtractions = [...currentProject.extractions, extraction.id]
       await updateProjectItemsDB(projectId, updatedExtractions, 'extractions')
