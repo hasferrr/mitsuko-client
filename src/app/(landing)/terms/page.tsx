@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 }
 
 export default async function TermsPage() {
-  const termsFilePath = path.join(process.cwd(), 'src', 'constants', 'terms.md')
+  const termsFilePath = path.join(process.cwd(), 'content', 'legal', 'terms.md')
   const terms = await fs.readFile(termsFilePath, 'utf-8')
 
   return (

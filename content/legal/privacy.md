@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Last Updated: 16/04/2025
+Last Updated: April 16, 2025
 
 This Privacy Policy describes how Mitsuko ("Mitsuko," "we," "us," or "our") collects, uses, and protects your personal information when you use our AI Subtitle Translator web application ("Service").
 

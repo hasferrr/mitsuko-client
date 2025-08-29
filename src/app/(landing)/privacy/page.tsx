@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 }
 
 export default async function PrivacyPage() {
-  const privacyFilePath = path.join(process.cwd(), 'src', 'constants', 'privacy.md')
+  const privacyFilePath = path.join(process.cwd(), 'content', 'legal', 'privacy.md')
   const privacy = await fs.readFile(privacyFilePath, 'utf-8')
 
   return (
