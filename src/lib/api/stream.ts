@@ -1,5 +1,6 @@
 import { sleep } from "../utils"
 import { supabase } from "../supabase"
+import { fetchEventSource, EventStreamContentType } from "@microsoft/fetch-event-source"
 
 interface handleStreamParams {
   setResponse: (buffer: string) => void,
@@ -39,8 +40,37 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
   abortControllerRef.current = new AbortController()
 
   let buffer = ""
+  let reasoning = ""
+  let result = ""
+
+  const processStreamData = (msg: { event?: string, data: string }) => {
+    const { event, data } = msg
+    if (!data) return
+
+    let text = ""
+    try {
+      text = JSON.parse(data)?.text ?? ""
+    } catch {
+      text = data
+    }
+    if (!text) return
+
+    if (event === "reasoning") {
+      reasoning += text
+    } else {
+      result += text
+    }
+
+    if (reasoning.length > 0) {
+      buffer = `<think>\n${reasoning.trim()}\n</think>\n\n${result}`
+    } else {
+      buffer = result
+    }
+    setResponse(buffer)
+  }
+
   try {
-    const res = await fetch(requestUrl, {
+    await fetchEventSource(requestUrl, {
       method: "POST",
       headers: {
         ...requestHeader,
@@ -49,68 +79,31 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
       },
       body: requestBody,
       signal: abortControllerRef.current.signal,
+      openWhenHidden: true,
+      async onopen(response) {
+        if (response.ok && (response.headers.get("content-type") === EventStreamContentType || response.headers.get("content-type")?.startsWith(EventStreamContentType))) {
+          return
+        } else {
+          try {
+            const errorData = await response.clone().json()
+            console.error("Error details from server:", errorData)
+            throw new Error(`Request failed (${response.status}), ${JSON.stringify(errorData.details) || errorData.error || errorData.message}`)
+          } catch {
+            const errorText = await response.text()
+            console.error("Error details from server (text):", errorText)
+            throw new Error(`Request failed (${response.status}), ${errorText}`)
+          }
+        }
+      },
+      onmessage(msg) {
+        if (!msg?.data) return
+        processStreamData(msg)
+      },
+      onclose() { },
+      onerror(err) {
+        throw err
+      }
     })
-
-    if (!res.ok) {
-      try {
-        const errorData = await res.clone().json()
-        console.error("Error details from server:", errorData)
-        throw new Error(`Request failed (${res.status}), ${JSON.stringify(errorData.details) || errorData.error || errorData.message}`)
-      } catch {
-        const errorText = await res.text()
-        console.error("Error details from server (text):", errorText)
-        throw new Error(`Request failed (${res.status}), ${errorText}`)
-      }
-    }
-
-    const reader = res.body?.getReader()
-    if (!reader) {
-      return ""
-    }
-
-    // Reasoning tags
-    const rStart = "<r>"
-    const rEnd = "</r>"
-
-    let reasoning = ""
-    let result = ""
-
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      let chunk = new TextDecoder().decode(value)
-
-      while (chunk.length > 0) {
-        const rStartIndex = chunk.indexOf(rStart)
-        if (rStartIndex === -1) {
-          result += chunk
-          chunk = ""
-          continue
-        }
-        if (rStartIndex > 0) {
-          result += chunk.slice(0, rStartIndex)
-        }
-        const rEndIndex = chunk.indexOf(rEnd, rStartIndex + rStart.length)
-        if (rEndIndex === -1) {
-          result += chunk.slice(rStartIndex)
-          chunk = ""
-          continue
-        }
-
-        const extractedReasoning = chunk.slice(rStartIndex + rStart.length, rEndIndex)
-        reasoning += extractedReasoning
-
-        chunk = chunk.slice(rEndIndex + rEnd.length)
-      }
-
-      if (reasoning.length > 0) {
-        buffer = `<think>\n${reasoning.trim()}\n</think>\n\n${result}`
-      } else {
-        buffer = result
-      }
-
-      setResponse(buffer)
-    }
 
     if (!buffer.trim() && attempt < 3 && !abortControllerRef.current.signal.aborted) {
       console.log("Retrying...")
