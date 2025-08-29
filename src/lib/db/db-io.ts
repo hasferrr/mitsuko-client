@@ -118,15 +118,19 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
       db.advancedSettings
     ], async () => {
       if (clearExisting) {
-        // Clear all tables
+        // Clear all tables (except global settings)
         await Promise.all([
           db.projects.clear(),
           db.translations.clear(),
           db.transcriptions.clear(),
           db.extractions.clear(),
           db.projectOrders.clear(),
-          db.basicSettings.clear(),
-          db.advancedSettings.clear()
+          db.basicSettings
+            .filter(s => s.id !== GLOBAL_BASIC_SETTINGS_ID)
+            .delete(),
+          db.advancedSettings
+            .filter(s => s.id !== GLOBAL_ADVANCED_SETTINGS_ID)
+            .delete()
         ])
 
         // TODO: Move this to db-constructor.ts
