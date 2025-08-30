@@ -9,6 +9,7 @@ import { useThemeStore } from "@/stores/use-theme-store"
 import { ModelCostProvider } from "@/contexts/model-cost-context"
 import { ModelCreditCost } from "@/types/model-cost"
 import { ClientIdProvider } from "@/contexts/client-id-context"
+import StoragePersistenceProvider from "@/contexts/storage-persistence-context"
 
 interface ProvidersProps extends PropsWithChildren {
   modelCosts: Map<string, ModelCreditCost>
@@ -51,17 +52,19 @@ export default function ProvidersClient({ children, modelCosts }: ProvidersProps
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionStoreProvider>
-        <ProjectStoreProvider>
-          <UnsavedChangesProvider>
-            <ModelCostProvider value={modelCosts}>
-              <ClientIdProvider>
-                {children}
-              </ClientIdProvider>
-            </ModelCostProvider>
-          </UnsavedChangesProvider>
-        </ProjectStoreProvider>
-      </SessionStoreProvider>
+      <StoragePersistenceProvider>
+        <SessionStoreProvider>
+          <ProjectStoreProvider>
+            <UnsavedChangesProvider>
+              <ModelCostProvider value={modelCosts}>
+                <ClientIdProvider>
+                  {children}
+                </ClientIdProvider>
+              </ModelCostProvider>
+            </UnsavedChangesProvider>
+          </ProjectStoreProvider>
+        </SessionStoreProvider>
+      </StoragePersistenceProvider>
     </QueryClientProvider>
   )
 }

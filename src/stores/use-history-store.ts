@@ -34,7 +34,7 @@ export const useHistoryStore = create<HistoryStore>()(
           history: [
             ...state.history,
             { title, content, json, subtitles, parsed, timestamp },
-          ],
+          ].slice(-50),
         }))
       },
       clearHistory: () => set({ history: [] }),
