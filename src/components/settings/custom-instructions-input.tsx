@@ -117,13 +117,13 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
         onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`)}
       />
       <p className="text-xs text-muted-foreground">
-        Guide the model's translation style, tone, or specific terminology usage. This is passed directly to the system prompt.
+        Guide the model's translation style, tone, or specific terminology usage.
         {" "}
         <span
           className="hover:underline cursor-pointer"
           onClick={() => setIsHelpDialogOpen(true)}
         >
-          (Help)
+          (Info)
         </span>
       </p>
 
@@ -233,12 +233,11 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
       <Dialog open={isHelpDialogOpen} onOpenChange={setIsHelpDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>About Custom Instructions</DialogTitle>
+            <DialogTitle>Tips for Custom Instructions</DialogTitle>
           </DialogHeader>
           <div className="pt-2 text-base text-foreground space-y-2">
-            <div>Generally, it's not necessary to use additional instructions.</div>
-            <div>The model is <span className="italic">smart</span> enough to determine how the translation style should be, especially the latest model.</div>
-            <div>However, if you really need it, please be concise, direct, and specific to avoid confusing the model.</div>
+            <p>Custom instructions help guide the model to follow specific patterns, maintain consistent terminology, or adopt particular styles.</p>
+            <p>Be concise, direct, and specific to avoid confusing the model. Focus on clear examples and explicit rules.</p>
           </div>
         </DialogContent>
       </Dialog>
