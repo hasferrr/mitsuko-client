@@ -31,16 +31,16 @@ export default function HeroSection() {
       {/* Main heading */}
       <h1 className="mt-8 max-w-3xl inline-block font-semibold tracking-tighter text-5xl md:text-[4rem] leading-none">
         The Most Accurate AI{" "}
-        <span className="text-purple-500 drop-shadow-[0_0_2px_rgba(168,85,247,0.6)]">
+        <span className="text-purple-500">
           Subtitle Translator
         </span>
       </h1>
 
       {/* Subheading */}
-      <div className="mt-8 text-base md:text-xl text-muted-foreground font-light tracking-wide max-w-xl mx-auto">
+      <div className="mt-8 text-base md:text-xl max-w-xl mx-auto">
         <p>
-          Mitsuko prioritizes meaning over literal translation, adapting for cultural nuance and idiomatic expressions.
-          {/* Get subtitle translation with high-quality results. */}
+          Translate subtitles with high-quality results, faster than ever.
+          Save precious time and reduce costs significantly!
         </p>
       </div>
 
