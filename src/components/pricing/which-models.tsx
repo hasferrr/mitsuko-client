@@ -23,7 +23,7 @@ export default function WhichModels({ className }: WhichModelsProps) {
         <p>Different LLMs (Large Language Models) have varying performance when it comes to different languages and tasks.</p>
         <p>
           For example, <span className="font-semibold">DeepSeek</span> models excel at English and Chinese (surprisingly good at Indonesian too) but may struggle with other languages,
-          while some models like <span className="font-semibold">Gemini</span> and <span className="font-semibold">Claude</span> are multilingual and perform well across many languages.
+          while some models like <span className="font-semibold">Gemini</span> and <span className="font-semibold">GPT</span> are multilingual and perform well across many languages.
         </p>
         <p>It's important to experiment with different models to find the best fit for your specific language and use case.</p>
         <div className="flex flex-col gap-2">
@@ -39,7 +39,7 @@ export default function WhichModels({ className }: WhichModelsProps) {
             <li>If the results meet your needs, you can continue using them.</li>
             <li>If you need higher quality results, you can gradually switch to more expensive models.</li>
           </ul>
-          <p>Generally, <span className="font-semibold">Gemini 2.5 Pro</span>, <span className="font-semibold">GPT 5</span>, and <span className="font-semibold">Claude Sonnet</span> provide excellent results for most use cases and languages.</p>
+          <p>Generally, <span className="font-semibold">Gemini 2.5 Pro</span>, <span className="font-semibold">GPT-5</span>, and <span className="font-semibold">Claude</span> provide excellent results for most use cases and languages.</p>
         </div>
       </div>
     </div>
