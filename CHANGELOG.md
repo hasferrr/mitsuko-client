@@ -14,6 +14,11 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### September 28
+
+- 🧪 **Preview Models:** Added Gemini Flash Latest and Flash-Lite Latest in preview so you can test Google's newest speed-focused models.
+- 🛑 **Model Deprecations:** Retired Gemini 1.5 Flash-8B and Claude 3.5 Sonnet so your go-to list highlights the best-performing options.
+
 ### August 26
 
 - ⚙️ **Global Settings Modal:** Access global default settings that apply to all new projects from the User Settings panel with a reset-all confirmation dialog.
