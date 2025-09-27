@@ -130,6 +130,34 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
+        name: "Gemini Flash Latest",
+        subName: "gemini-flash-latest",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Gemini Flash-Lite Latest",
+        subName: "gemini-flash-lite-latest",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "Gemini 2.5 Flash",
         subName: "gemini-2.5-flash",
         maxInput: 1_048_576,
@@ -262,6 +290,34 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
+        name: "Gemini Flash Latest",
+        subName: "gemini-flash-latest",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "medium",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Gemini Flash-Lite Latest",
+        subName: "gemini-flash-lite-latest",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "very low",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "Gemini 2.5 Flash",
         subName: "gemini-2.5-flash",
         maxInput: 1_048_576,
@@ -277,7 +333,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       },
       {
         name: "Gemini 2.5 Flash Lite",
-        subName: "gemini-2.5-flash-lite-preview-06-17",
+        subName: "gemini-2.5-flash-lite",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
