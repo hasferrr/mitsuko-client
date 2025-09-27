@@ -358,19 +358,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
           isUseStructuredOutput: true
         }
       },
-      {
-        name: "Gemini 1.5 Flash-8B",
-        maxInput: 1_000_000,
-        maxOutput: 8192,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "very low",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
     ]
   },
   Anthropic: {
@@ -396,19 +383,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         usage: "very high",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Claude 3.5 Sonnet",
-        maxInput: 200_000,
-        maxOutput: 8_129,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "high",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
