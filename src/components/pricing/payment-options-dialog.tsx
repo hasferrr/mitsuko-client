@@ -20,7 +20,6 @@ import { sleep } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createSnapPayment } from "@/lib/api/create-snap-payment"
-import { useSessionStore } from "@/stores/use-session-store"
 
 const MIN_QUANTITY = 1
 const MAX_QUANTITY = 10
@@ -50,7 +49,6 @@ export function PaymentOptionsDialog({
   const [isFetchingPayment, startFetchingPayment] = useTransition()
   const [paymentError, setPaymentError] = useState<string | null>(null)
   const [inputQuantity, setInputQuantity] = useState(1)
-  const [lemonSqueezyCache, setLemonSqueezyCache] = useState<Map<string, string>>(new Map())
 
   const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const incrementIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -61,8 +59,6 @@ export function PaymentOptionsDialog({
   const getSnapData = useSnapStore((state) => state.getSnapData)
   const removeSnapData = useSnapStore((state) => state.removeSnapData)
   const setSnapData = useSnapStore((state) => state.setSnapData)
-  const session = useSessionStore((state) => state.session)
-
   const snapData = !!userId ? getSnapData(userId, productId) : undefined
   const currentQuantity = snapData?.quantity ?? inputQuantity
   const basePriceInCurrency = price * currencyRate
@@ -72,12 +68,6 @@ export function PaymentOptionsDialog({
   useEffect(() => {
     setPaymentError(null)
   }, [isOpen, productId])
-
-  useEffect(() => {
-    if (!session) {
-      setLemonSqueezyCache(new Map())
-    }
-  }, [session])
 
   const fetchAndProceed = (paymentType: 'snap' | 'lemonsqueezy') => {
     if (!userId) {
@@ -91,8 +81,6 @@ export function PaymentOptionsDialog({
         const { data: apiResult } = await createSnapPayment(productId, inputQuantity, paymentType)
         if (paymentType === 'snap') {
           setSnapData(userId, productId, apiResult, inputQuantity)
-        } else {
-          setLemonSqueezyCache(prev => new Map(prev).set(`${productId}-${inputQuantity}`, apiResult.redirect_url))
         }
         console.log(`Successfully fetched data for ${productId} (Qty: ${inputQuantity}). Proceeding with ${paymentType}.`)
         if (paymentType === 'snap') {
@@ -129,13 +117,7 @@ export function PaymentOptionsDialog({
   }
 
   const handleNewTab = () => {
-    const cachedUrl = lemonSqueezyCache.get(`${productId}-${inputQuantity}`)
-    if (cachedUrl) {
-      window.open(cachedUrl, '_blank')
-      onClose()
-    } else {
-      fetchAndProceed('lemonsqueezy')
-    }
+    fetchAndProceed('lemonsqueezy')
   }
 
   const handleReset = () => {
@@ -143,7 +125,6 @@ export function PaymentOptionsDialog({
     startResetTransition(async () => {
       await sleep(100)
       removeSnapData(userId, productId)
-      setLemonSqueezyCache(new Map())
       console.log(`Cleared payment data for user ${userId}, product ${productId}`)
       setInputQuantity(1)
       toast.info("Payment session reset.")
@@ -347,7 +328,7 @@ export function PaymentOptionsDialog({
         </div>
 
         <DialogFooter className="flex flex-row justify-between w-full sm:justify-between pt-4 border-t border-border mt-auto">
-          <Button onClick={handleReset} variant="destructive" size="sm" disabled={isResetting || isFetchingPayment || (!snapData && lemonSqueezyCache.size === 0)}>
+          <Button onClick={handleReset} variant="destructive" size="sm" disabled={isResetting || isFetchingPayment || !snapData}>
             {isResetting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
