@@ -62,7 +62,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
+          maxCompletionTokens: 32768,
           isUseStructuredOutput: false
         }
       },
@@ -77,7 +77,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
+          maxCompletionTokens: 32768,
           isUseStructuredOutput: false
         }
       },
@@ -92,14 +92,14 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
+          maxCompletionTokens: 32768,
           isUseStructuredOutput: true
         }
       },
       {
         name: "Qwen3 235B A22B 2507",
-        maxInput: 40000,
-        maxOutput: 40000,
+        maxInput: 262000,
+        maxOutput: 262000,
         structuredOutput: true,
         isPaid: false,
         usage: "N/A",
@@ -676,7 +676,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
+          maxCompletionTokens: 32768,
           isUseStructuredOutput: false
         }
       },
@@ -706,7 +706,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
+          maxCompletionTokens: 32768,
           isUseStructuredOutput: false
         }
       },
@@ -721,7 +721,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
+          maxCompletionTokens: 32768,
           isUseStructuredOutput: true
         }
       },
