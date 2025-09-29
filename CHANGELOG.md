@@ -14,6 +14,10 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### September 29
+
+- 🤖 **Model Updates:** Added Grok 4 Fast, available as both paid and free (limited time) options. Supports up to 2M input tokens and 30k output tokens, xAI's latest multimodal model with SOTA cost-efficiency.
+
 ### September 28
 
 - 🧪 **Preview Models:** Added Gemini Flash Latest and Flash-Lite Latest in preview so you can test Google's newest speed-focused models.

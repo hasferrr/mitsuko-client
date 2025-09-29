@@ -116,6 +116,19 @@ const RAW_FREE_MODELS: FreeModelCollection = {
     provider: "unknown",
     models: [
       {
+        name: "Grok 4 Fast",
+        maxInput: 2_000_000,
+        maxOutput: 30_000,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "Gemini 2.5 Pro",
         subName: "gemini-2.5-pro",
         maxInput: 1_048_576,
@@ -414,6 +427,19 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         usage: "high",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Grok 4 Fast",
+        maxInput: 2_000_000,
+        maxOutput: 30_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "low",
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
