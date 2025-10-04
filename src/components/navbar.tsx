@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun, Loader2, CircleDollarSign, AlertCircle } from "lucide-react"
 import { useThemeStore } from "@/stores/use-theme-store"
@@ -30,7 +29,6 @@ interface Breadcrumb {
 }
 
 export function Navbar() {
-  const _pathname = usePathname()
   const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[]>([])
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
 
@@ -60,10 +58,6 @@ export function Navbar() {
   // Project Store
   const currentProject = useProjectStore(state => state.currentProject)
 
-  const tlId = useTranslationDataStore(state => state.currentId)
-  const tsId = useTranscriptionDataStore(state => state.currentId)
-  const exId = useExtractionDataStore(state => state.currentId)
-
   const tlData = useTranslationDataStore(state => state.data)
   const tsData = useTranscriptionDataStore(state => state.data)
   const exData = useExtractionDataStore(state => state.data)
@@ -74,24 +68,11 @@ export function Navbar() {
       link: "/dashboard",
     }]
 
-    const MAX_TITLE_LENGTH = 40
-    const getTruncatedTitle = (title: string) => (title.length > MAX_TITLE_LENGTH ? `${title.slice(0, MAX_TITLE_LENGTH)}...` : title)
-
     if (currentProject) {
       newBreadcrumbs.push({ name: currentProject.name, link: currentProject.isBatch ? "/batch" : "/project" })
     }
-    if (_pathname === "/translate" && tlId && tlData[tlId]) {
-      newBreadcrumbs.push({ name: getTruncatedTitle(tlData[tlId].title), link: "" })
-    }
-    if (_pathname === "/transcribe" && tsId && tsData[tsId]) {
-      newBreadcrumbs.push({ name: getTruncatedTitle(tsData[tsId].title), link: "" })
-    }
-    if (_pathname === "/extract-context" && exId && exData[exId]) {
-      newBreadcrumbs.push({ name: `Episode ${getTruncatedTitle(exData[exId].episodeNumber)}`, link: "" })
-    }
-
     setBreadcrumbs(newBreadcrumbs)
-  }, [_pathname, tlId, tsId, exId, tlData, tsData, exData, currentProject])
+  }, [currentProject])
 
   useEffect(() => {
     if (!isProcessing) {
