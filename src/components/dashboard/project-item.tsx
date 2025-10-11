@@ -6,7 +6,6 @@ import {
   FileText,
   Headphones,
   Clock,
-  GripVertical,
   Trash2,
   MoreHorizontal
 } from "lucide-react"
@@ -27,37 +26,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
 import { Project } from "@/types/project"
 import { useProjectStore } from "@/stores/data/use-project-store"
 
-export interface SortableProjectItemProps {
+export interface ProjectItemProps {
   project: Project
   isHorizontal: boolean
   onDelete: (projectId: string) => Promise<void>
 }
 
-export const SortableProjectItem = ({ project, isHorizontal, onDelete }: SortableProjectItemProps) => {
+export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProps) => {
   const router = useRouter()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const setCurrentProject = useProjectStore(state => state.setCurrentProject)
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: project.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 1 : 0,
-  }
 
   const handleDelete = async () => {
     await onDelete(project.id)
@@ -72,12 +54,9 @@ export const SortableProjectItem = ({ project, isHorizontal, onDelete }: Sortabl
   return (
     <>
       <div
-        ref={setNodeRef}
-        style={style}
         className={cn(
           "dark:bg-[#111111]",
           "border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-card/80 transition-colors",
-          isDragging && "opacity-50"
         )}
       >
         <div className="flex items-center justify-between gap-2">
@@ -87,13 +66,15 @@ export const SortableProjectItem = ({ project, isHorizontal, onDelete }: Sortabl
           >
             {isHorizontal ? (
               <div className="flex items-center gap-2">
-                {project.transcriptions.length > project.translations.length &&
-                  project.transcriptions.length > project.extractions.length ? (
-                  <Headphones className="h-4 w-4 text-green-500" />
-                ) : (
-                  <FileText className="h-4 w-4 text-blue-500" />
-                )}
-                <span className="text-sm font-medium truncate">{project.name}</span>
+                <div className="h-4 w-4">
+                  {project.transcriptions.length > project.translations.length &&
+                    project.transcriptions.length > project.extractions.length ? (
+                    <Headphones className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <FileText className="h-4 w-4 text-blue-500" />
+                  )}
+                </div>
+                <span className="text-sm font-medium line-clamp-1">{project.name}</span>
                 <span className="text-xs text-muted-foreground mx-2">•</span>
                 <span className="text-xs text-muted-foreground">
                   {project.transcriptions.length > project.translations.length &&
@@ -106,13 +87,15 @@ export const SortableProjectItem = ({ project, isHorizontal, onDelete }: Sortabl
             ) : (
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  {project.transcriptions.length > project.translations.length &&
-                    project.transcriptions.length > project.extractions.length ? (
-                    <Headphones className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <FileText className="h-4 w-4 text-blue-500" />
-                  )}
-                  <span className="text-sm font-medium truncate">{project.name}</span>
+                  <div className="h-4 w-4">
+                    {project.transcriptions.length > project.translations.length &&
+                      project.transcriptions.length > project.extractions.length ? (
+                      <Headphones className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <FileText className="h-4 w-4 text-blue-500" />
+                    )}
+                  </div>
+                  <span className="text-sm font-medium line-clamp-1">{project.name}</span>
                 </div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-muted-foreground">
@@ -147,13 +130,6 @@ export const SortableProjectItem = ({ project, isHorizontal, onDelete }: Sortabl
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <div
-              {...attributes}
-              {...listeners}
-              className="cursor-grab active:cursor-grabbing p-1 hover:bg-accent rounded-md"
-            >
-              <GripVertical className="h-4 w-4 text-muted-foreground" />
-            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import {
   Globe,
@@ -17,22 +17,7 @@ import { DEFAULT_SUBTITLES, DEFAULT_TITLE } from "@/constants/default"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core"
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { SortableProjectItem } from "./sortable-project-item"
+import { ProjectItem } from "./project-item"
 import { cn } from "@/lib/utils"
 
 
@@ -50,7 +35,6 @@ export function WelcomeView() {
   const projects = useProjectStore(state => state.projects)
   const createProject = useProjectStore(state => state.createProject)
   const loadProjects = useProjectStore(state => state.loadProjects)
-  const reorderProjects = useProjectStore(state => state.reorderProjects)
   const deleteProject = useProjectStore(state => state.deleteProject)
   const setCurrentProject = useProjectStore(state => state.setCurrentProject)
 
@@ -62,25 +46,11 @@ export function WelcomeView() {
   const upsertTranscriptionData = useTranscriptionDataStore(state => state.upsertData)
   const upsertExtractionData = useExtractionDataStore(state => state.upsertData)
 
- 
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
+  const sortedProjects = useMemo(() => {
+    return [...projects].sort((a, b) => {
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     })
-  )
-
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event
-
-    if (over && active.id !== over.id) {
-      const oldIndex = projects.findIndex((p) => p.id === active.id)
-      const newIndex = projects.findIndex((p) => p.id === over.id)
-      const newOrder = arrayMove(projects.map(p => p.id), oldIndex, newIndex)
-      await reorderProjects(newOrder)
-    }
-  }
+  }, [projects])
 
   const handleOptionClick = async (option: string) => {
     setSelectedOption(option)
@@ -91,7 +61,7 @@ export function WelcomeView() {
       defaultProject = await createProject("Default")
     }
 
-    
+
 
     // Create new item based on option
     switch (option) {
@@ -369,9 +339,9 @@ export function WelcomeView() {
         <div className="mt-12 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium">
-              {showAllProjects ? "All Projects" : "Recent Projects"}
+              Recent Projects
               <span className="text-muted-foreground ml-2 text-sm">
-                ({showAllProjects ? projects.length : Math.min(projects.length, 4)} of {projects.length})
+                ({showAllProjects ? sortedProjects.length : Math.min(sortedProjects.length, 6)} of {sortedProjects.length})
               </span>
             </h3>
             <div className="flex items-center gap-2">
@@ -404,40 +374,29 @@ export function WelcomeView() {
             </div>
           </div>
 
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <div className={cn(
-              isHorizontal ? 'flex flex-col space-y-2' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4',
-            )}>
-              <SortableContext
-                items={projects.map(p => p.id)}
-                strategy={isHorizontal ? verticalListSortingStrategy : undefined}
-              >
-                {(showAllProjects ? projects : projects.slice(0, 6)).map((project) => (
-                  <SortableProjectItem
-                    key={project.id}
-                    project={project}
-                    isHorizontal={isHorizontal}
-                    onDelete={deleteProject}
-                  />
-                ))}
-              </SortableContext>
-            </div>
+          <div className={cn(
+            isHorizontal ? 'flex flex-col space-y-2' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4',
+          )}>
+            {(showAllProjects ? sortedProjects : sortedProjects.slice(0, 6)).map((project) => (
+              <ProjectItem
+                key={project.id}
+                project={project}
+                isHorizontal={isHorizontal}
+                onDelete={deleteProject}
+              />
+            ))}
+          </div>
 
-            {!showAllProjects && projects.length > 6 && (
-              <div className="flex justify-center mt-6">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowAllProjects(true)}
-                >
-                  View All Projects ({projects.length})
-                </Button>
-              </div>
-            )}
-          </DndContext>
+          {!showAllProjects && sortedProjects.length > 6 && (
+            <div className="flex justify-center mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setShowAllProjects(true)}
+              >
+                View All Projects ({sortedProjects.length})
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
