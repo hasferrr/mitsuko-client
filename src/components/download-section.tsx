@@ -33,6 +33,8 @@ interface DownloadSectionProps {
   setToType: ((type: SubtitleType) => void) | ((type: SubtitleType | "no-change") => void)
   noChangeOption?: boolean
   showSelectors?: boolean
+  hideTextOptionSelector?: boolean
+  inlineLayout?: boolean
 }
 
 export function DownloadSection({
@@ -47,6 +49,8 @@ export function DownloadSection({
   setToType,
   noChangeOption,
   showSelectors = true,
+  hideTextOptionSelector = false,
+  inlineLayout = false,
 }: DownloadSectionProps) {
 
   const handleDownload = async () => {
@@ -72,49 +76,51 @@ export function DownloadSection({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 mt-4 items-center">
-      {showSelectors && (
-        <>
-          <Select
-            value={downloadOption}
-            onValueChange={(value: DownloadOption) => {
-              setDownloadOption(value)
-              if (value !== "combined") {
-                setCombinedFormat("o-n-t")
-              }
-            }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Download As" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="original">Original Text</SelectItem>
-              <SelectItem value="translated">Translated Text</SelectItem>
-              <SelectItem value="combined">Original + Translated</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={toType} onValueChange={(value: SubtitleType) => setToType(value)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Convert Subtitles" />
-            </SelectTrigger>
-            <SelectContent>
-              {[
-                ...(noChangeOption ? [["no-change", "No Change"]] : []),
-                ...SUBTITLE_NAME_MAP.entries(),
-              ].map(([key, value]) => (
-                <SelectItem key={key} value={key}>
-                  <div className="flex items-center gap-2">
-                    {value}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </>
+    <div className={cn(
+      inlineLayout ? "flex gap-2 items-center" : "grid grid-cols-2 gap-4 mt-4 items-center"
+    )}>
+      {showSelectors && !hideTextOptionSelector && (
+        <Select
+          value={downloadOption}
+          onValueChange={(value: DownloadOption) => {
+            setDownloadOption(value)
+            if (value !== "combined") {
+              setCombinedFormat("o-n-t")
+            }
+          }}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Download As" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="original">Original Text</SelectItem>
+            <SelectItem value="translated">Translated Text</SelectItem>
+            <SelectItem value="combined">Original + Translated</SelectItem>
+          </SelectContent>
+        </Select>
       )}
 
-      {showSelectors && downloadOption === "combined" && (
+      {showSelectors && (
+        <Select value={toType} onValueChange={(value: SubtitleType) => setToType(value)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Convert Subtitles" />
+          </SelectTrigger>
+          <SelectContent>
+            {[
+              ...(noChangeOption ? [["no-change", "No Change"]] : []),
+              ...SUBTITLE_NAME_MAP.entries(),
+            ].map(([key, value]) => (
+              <SelectItem key={key} value={key}>
+                <div className="flex items-center gap-2">
+                  {value}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      {showSelectors && !hideTextOptionSelector && downloadOption === "combined" && (
         <Dialog>
           <DialogTrigger className="w-full" asChild>
             <Button variant="outline">
@@ -181,7 +187,7 @@ export function DownloadSection({
         variant="outline"
         className={cn(
           "gap-2 w-full",
-          (!showSelectors || downloadOption !== "combined") && "col-span-2"
+          !inlineLayout && (!showSelectors || downloadOption !== "combined" || hideTextOptionSelector) && "col-span-2"
         )}
         onClick={handleDownload}
       >

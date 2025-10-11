@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
-import type { SubtitleEvent } from "@/types/subtitles"
+import type { SubtitleEvent, SubtitleType, DownloadOption, CombinedFormat, ASSParseOutput } from "@/types/subtitles"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -19,6 +19,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { DownloadSection } from "@/components/download-section"
+import { convertSubtitleEventsToSubtitles } from "@/lib/subtitles/ass/helper"
+import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 
 function parseTimestampToMs(timestampStr: string): number {
   const [h, m, s_cs] = timestampStr.split(':')
@@ -34,16 +37,24 @@ export default function SubtitleViewer() {
   const [subtitleEvents, setSubtitleEvents] = useState<SubtitleEvent[]>([])
   const [ignoreWhitespace, setIgnoreWhitespace] = useState(true)
   const [ignorePunctuation, setIgnorePunctuation] = useState(true)
+  const [fileName, setFileName] = useState<string>("")
+  const [toType, setToType] = useState<SubtitleType>("srt")
+  const [downloadOption] = useState<DownloadOption>("original")
+  const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
+  const [assParseData, setAssParseData] = useState<ASSParseOutput | null>(null)
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
+      setFileName(file.name)
       const fileContent = await file.text()
       const { parsed } = parseSubtitle({ content: fileContent, type: "ass" })
       if (parsed.type === "ass" && parsed.data) {
         setSubtitleEvents(parsed.data.events)
+        setAssParseData(parsed.data)
       } else {
         setSubtitleEvents([])
+        setAssParseData(null)
       }
     }
   }
@@ -105,11 +116,39 @@ export default function SubtitleViewer() {
     return Math.floor(cps)
   }
 
+  const generateContent = () => {
+    if (subtitleEvents.length === 0) return undefined
+
+    const subtitles = convertSubtitleEventsToSubtitles(subtitleEvents)
+    const parsed = {
+      type: toType,
+      data: toType === "ass" ? assParseData : null,
+    }
+
+    return mergeSubtitle({
+      subtitles,
+      parsed,
+    })
+  }
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-medium">Tools</h1>
       <div className="flex items-center space-x-4 my-4">
         <Input type="file" onChange={handleFileChange} accept=".ass" className="max-w-xs" />
+        <DownloadSection
+          generateContent={generateContent}
+          fileName={fileName || "subtitle"}
+          type={toType}
+          downloadOption={downloadOption}
+          setDownloadOption={() => {}}
+          combinedFormat={combinedFormat}
+          setCombinedFormat={setCombinedFormat}
+          toType={toType}
+          setToType={setToType}
+          hideTextOptionSelector
+          inlineLayout
+        />
         <Button onClick={handleExportCSV} disabled={subtitleEvents.length === 0}>Export to CSV</Button>
         <AlertDialog>
           <AlertDialogTrigger asChild>
