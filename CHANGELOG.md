@@ -14,6 +14,14 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### October 12
+
+- 🎨 **Enhanced Subtitle Viewer:** Subtitle tools now support ASS syntax highlighting with theme toggle for better readability. Added remove comment button for cleaner output.
+- 📝 **Raw Text Viewer:** New tabbed interface lets you view subtitle content with syntax highlighting.
+- 📤 **Drag-and-Drop File:** Select subtitle files by simply dragging and dropping them into the tools section.
+- 🔄 **Multi-Format Subtitle Support:** View SRT, VTT, and ASS subtitles directly in the viewer and convert between formats with flexible layout options.
+- 📋 **Smarter Project Dashboard:** Projects now sort by most recently used, keeping active work at the top.
+
 ### September 29
 
 - 🤖 **Model Updates:** Added Grok 4 Fast, available as both paid and free (limited time) options. Supports up to 2M input tokens and 30k output tokens, xAI's latest multimodal model with SOTA cost-efficiency.
