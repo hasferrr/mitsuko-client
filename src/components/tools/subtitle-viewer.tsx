@@ -1,6 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
+import hljs from 'highlight.js/lib/core'
+import ass from 'highlightjs-ass'
+import { useThemeStore } from "@/stores/use-theme-store"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
@@ -35,15 +38,42 @@ function parseTimestampToMs(timestampStr: string): number {
 }
 
 export default function SubtitleViewer() {
+  const highlightInitialized = useRef(false)
+  const isDarkMode = useThemeStore(state => state.isDarkMode)
   const [subtitleEvents, setSubtitleEvents] = useState<SubtitleEvent[]>([])
   const [subtitles, setSubtitles] = useState<Subtitle[]>([])
   const [ignoreWhitespace, setIgnoreWhitespace] = useState(true)
   const [ignorePunctuation, setIgnorePunctuation] = useState(true)
+  const [enableHighlight, setEnableHighlight] = useState(true)
   const [fileName, setFileName] = useState<string>("")
   const [toType, setToType] = useState<SubtitleType>("srt")
   const [downloadOption] = useState<DownloadOption>("original")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
   const [parsedData, setParsedData] = useState<Parsed | null>(null)
+
+  useEffect(() => {
+    if (!highlightInitialized.current) {
+      hljs.registerLanguage('ass', ass)
+      highlightInitialized.current = true
+    }
+  }, [])
+
+  useEffect(() => {
+    const themeLink = document.getElementById('hljs-theme') as HTMLLinkElement
+    const themePath = isDarkMode
+      ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css'
+      : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css'
+
+    if (themeLink) {
+      themeLink.href = themePath
+    } else {
+      const link = document.createElement('link')
+      link.id = 'hljs-theme'
+      link.rel = 'stylesheet'
+      link.href = themePath
+      document.head.appendChild(link)
+    }
+  }, [isDarkMode])
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -166,6 +196,15 @@ export default function SubtitleViewer() {
     return parts.join(".")
   }
 
+  const highlightText = (text: string) => {
+    try {
+      const highlighted = hljs.highlight(text, { language: 'ass' })
+      return highlighted.value
+    } catch {
+      return text
+    }
+  }
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-medium">Tools</h1>
@@ -176,7 +215,7 @@ export default function SubtitleViewer() {
           fileName={getFileNameWithoutExtension(fileName) || "subtitle"}
           type={toType}
           downloadOption={downloadOption}
-          setDownloadOption={() => {}}
+          setDownloadOption={() => { }}
           combinedFormat={combinedFormat}
           setCombinedFormat={setCombinedFormat}
           toType={toType}
@@ -229,6 +268,10 @@ export default function SubtitleViewer() {
           <Checkbox id="ignorePunctuation" checked={ignorePunctuation} onCheckedChange={(checked) => setIgnorePunctuation(Boolean(checked))} />
           <Label htmlFor="ignorePunctuation">Ignore Punctuation</Label>
         </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox id="enableHighlight" checked={enableHighlight} onCheckedChange={(checked) => setEnableHighlight(Boolean(checked))} />
+          <Label htmlFor="enableHighlight">Syntax Highlight</Label>
+        </div>
       </div>
       {subtitleEvents.length > 0 && (
         <Table>
@@ -254,7 +297,17 @@ export default function SubtitleViewer() {
                   <TableCell>{cps === -1 ? 'Invalid' : cps}</TableCell>
                   <TableCell>{event.style}</TableCell>
                   <TableCell>{event.name}</TableCell>
-                  <TableCell>{event.text}</TableCell>
+                  <TableCell>
+                    {enableHighlight ? (
+                      <pre
+                        className="hljs"
+                        style={{ background: 'transparent' }}
+                        dangerouslySetInnerHTML={{ __html: highlightText(event.text) }}
+                      />
+                    ) : (
+                      <pre>{event.text}</pre>
+                    )}
+                  </TableCell>
                 </TableRow>
               )
             })}

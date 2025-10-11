@@ -51,6 +51,8 @@
         "dexie": "^4.2.0",
         "embla-carousel-react": "^8.6.0",
         "framer-motion": "^12.23.22",
+        "highlight.js": "^11.11.1",
+        "highlightjs-ass": "^1.0.1",
         "idb-keyval": "^6.2.2",
         "input-otp": "^1.4.2",
         "jszip": "^3.10.1",
@@ -1220,6 +1222,10 @@
     "hast-util-whitespace": ["hast-util-whitespace@3.0.0", "", { "dependencies": { "@types/hast": "^3.0.0" } }, "sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw=="],
 
     "hastscript": ["hastscript@9.0.1", "", { "dependencies": { "@types/hast": "^3.0.0", "comma-separated-tokens": "^2.0.0", "hast-util-parse-selector": "^4.0.0", "property-information": "^7.0.0", "space-separated-tokens": "^2.0.0" } }, "sha512-g7df9rMFX/SPi34tyGCyUBREQoKkapwdY/T04Qn9TDWfHhAYt4/I0gMVirzK5wEzeUqIjEB+LXC/ypb7Aqno5w=="],
+
+    "highlight.js": ["highlight.js@11.11.1", "", {}, "sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w=="],
+
+    "highlightjs-ass": ["highlightjs-ass@1.0.1", "", {}, "sha512-ZhHAUrlt9PSbzI/uX6yGlukCW444xsjWHBdcS0I7dilZqEAaARxzuQwZ35rEIY3zkSu3Ne7PKxxX47GAF6WSew=="],
 
     "hoist-non-react-statics": ["hoist-non-react-statics@3.3.2", "", { "dependencies": { "react-is": "^16.7.0" } }, "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw=="],
 
