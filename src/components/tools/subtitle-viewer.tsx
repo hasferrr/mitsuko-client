@@ -50,15 +50,15 @@ export default function SubtitleViewer() {
     if (file) {
       setFileName(file.name)
       const fileContent = await file.text()
-      
+
       const fileExtension = file.name.split('.').pop()?.toLowerCase() as SubtitleType
       const fileType: SubtitleType = ['srt', 'ass', 'vtt'].includes(fileExtension) ? fileExtension : 'ass'
-      
+
       const parseResult = parseSubtitle({ content: fileContent, type: fileType })
       setParsedData(parseResult.parsed)
       setSubtitles(parseResult.subtitles)
       setToType(fileType)
-      
+
       if (parseResult.parsed.type === "ass" && parseResult.parsed.data) {
         setSubtitleEvents(parseResult.parsed.data.events)
       } else {
@@ -170,7 +170,7 @@ export default function SubtitleViewer() {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-medium">Tools</h1>
       <div className="flex items-center space-x-4 my-4">
-        <Input type="file" onChange={handleFileChange} accept={ACCEPTED_FORMATS.join(',')} className="max-w-xs" />
+        <Input type="file" onChange={handleFileChange} accept={ACCEPTED_FORMATS.join(',')} className="max-w-xs min-w-48" />
         <DownloadSection
           generateContent={generateContent}
           fileName={getFileNameWithoutExtension(fileName) || "subtitle"}
