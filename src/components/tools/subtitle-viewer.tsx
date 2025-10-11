@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
-import type { SubtitleEvent, SubtitleType, DownloadOption, CombinedFormat, ASSParseOutput } from "@/types/subtitles"
+import type { SubtitleEvent, SubtitleType, DownloadOption, CombinedFormat, Parsed, Subtitle } from "@/types/subtitles"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -20,8 +20,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { DownloadSection } from "@/components/download-section"
-import { convertSubtitleEventsToSubtitles } from "@/lib/subtitles/ass/helper"
+import { convertSubtitlesToSubtitleEvents } from "@/lib/subtitles/ass/helper"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
+import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 
 function parseTimestampToMs(timestampStr: string): number {
   const [h, m, s_cs] = timestampStr.split(':')
@@ -35,26 +36,33 @@ function parseTimestampToMs(timestampStr: string): number {
 
 export default function SubtitleViewer() {
   const [subtitleEvents, setSubtitleEvents] = useState<SubtitleEvent[]>([])
+  const [subtitles, setSubtitles] = useState<Subtitle[]>([])
   const [ignoreWhitespace, setIgnoreWhitespace] = useState(true)
   const [ignorePunctuation, setIgnorePunctuation] = useState(true)
   const [fileName, setFileName] = useState<string>("")
   const [toType, setToType] = useState<SubtitleType>("srt")
   const [downloadOption] = useState<DownloadOption>("original")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
-  const [assParseData, setAssParseData] = useState<ASSParseOutput | null>(null)
+  const [parsedData, setParsedData] = useState<Parsed | null>(null)
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       setFileName(file.name)
       const fileContent = await file.text()
-      const { parsed } = parseSubtitle({ content: fileContent, type: "ass" })
-      if (parsed.type === "ass" && parsed.data) {
-        setSubtitleEvents(parsed.data.events)
-        setAssParseData(parsed.data)
+      
+      const fileExtension = file.name.split('.').pop()?.toLowerCase() as SubtitleType
+      const fileType: SubtitleType = ['srt', 'ass', 'vtt'].includes(fileExtension) ? fileExtension : 'ass'
+      
+      const parseResult = parseSubtitle({ content: fileContent, type: fileType })
+      setParsedData(parseResult.parsed)
+      setSubtitles(parseResult.subtitles)
+      setToType(fileType)
+      
+      if (parseResult.parsed.type === "ass" && parseResult.parsed.data) {
+        setSubtitleEvents(parseResult.parsed.data.events)
       } else {
-        setSubtitleEvents([])
-        setAssParseData(null)
+        setSubtitleEvents(convertSubtitlesToSubtitleEvents(parseResult.subtitles))
       }
     }
   }
@@ -87,6 +95,12 @@ export default function SubtitleViewer() {
       text: event.text.replace(/{\\[^}]*}/g, ""),
     }))
     setSubtitleEvents(newSubtitleEvents)
+
+    const newSubtitles = subtitles.map(subtitle => ({
+      ...subtitle,
+      content: subtitle.content.replace(/{\\[^}]*}/g, ""),
+    }))
+    setSubtitles(newSubtitles)
   }
 
   const calculateCPS = (event: SubtitleEvent): number => {
@@ -117,12 +131,11 @@ export default function SubtitleViewer() {
   }
 
   const generateContent = () => {
-    if (subtitleEvents.length === 0) return undefined
+    if (!parsedData || subtitles.length === 0) return undefined
 
-    const subtitles = convertSubtitleEventsToSubtitles(subtitleEvents)
     const parsed = {
       type: toType,
-      data: toType === "ass" ? assParseData : null,
+      data: toType === "ass" && parsedData.type === "ass" ? parsedData.data : null,
     }
 
     return mergeSubtitle({
@@ -131,14 +144,22 @@ export default function SubtitleViewer() {
     })
   }
 
+  const getFileNameWithoutExtension = (name: string) => {
+    const parts = name.split(".")
+    if (parts.length > 1) {
+      parts.pop()
+    }
+    return parts.join(".")
+  }
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-medium">Tools</h1>
       <div className="flex items-center space-x-4 my-4">
-        <Input type="file" onChange={handleFileChange} accept=".ass" className="max-w-xs" />
+        <Input type="file" onChange={handleFileChange} accept={ACCEPTED_FORMATS.join(',')} className="max-w-xs" />
         <DownloadSection
           generateContent={generateContent}
-          fileName={fileName || "subtitle"}
+          fileName={getFileNameWithoutExtension(fileName) || "subtitle"}
           type={toType}
           downloadOption={downloadOption}
           setDownloadOption={() => {}}
