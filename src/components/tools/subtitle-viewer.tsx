@@ -103,6 +103,20 @@ export default function SubtitleViewer() {
     setSubtitles(newSubtitles)
   }
 
+  const handleRemoveComments = () => {
+    const newSubtitleEvents = subtitleEvents.map(event => ({
+      ...event,
+      text: event.text.replace(/{(?!\\)[^}]*}/g, ""),
+    }))
+    setSubtitleEvents(newSubtitleEvents)
+
+    const newSubtitles = subtitles.map(subtitle => ({
+      ...subtitle,
+      content: subtitle.content.replace(/{(?!\\)[^}]*}/g, ""),
+    }))
+    setSubtitles(newSubtitles)
+  }
+
   const calculateCPS = (event: SubtitleEvent): number => {
     if (!event.text) return 0
 
@@ -185,6 +199,23 @@ export default function SubtitleViewer() {
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction onClick={handleRemoveTags}>Continue</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" disabled={subtitleEvents.length === 0}>Remove Comments</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently remove all comments (text wrapped by curly braces) from the subtitle data.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleRemoveComments}>Continue</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
