@@ -22,6 +22,7 @@ import {
 import { DownloadSection } from "@/components/download-section"
 import { convertSubtitlesToSubtitleEvents } from "@/lib/subtitles/ass/helper"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
+import { convertSubtitle } from "@/lib/subtitles/utils/convert-subtitle"
 import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import SubtitleViewer from "./subtitle-viewer"
@@ -210,15 +211,12 @@ export default function Tools() {
   const generateContent = () => {
     if (!parsedData || subtitles.length === 0) return undefined
 
-    const parsed = {
-      type: toType,
-      data: toType === "ass" && parsedData.type === "ass" ? parsedData.data : null,
-    }
-
-    return mergeSubtitle({
+    const fileContent = mergeSubtitle({
       subtitles,
-      parsed,
+      parsed: parsedData,
     })
+
+    return convertSubtitle(fileContent, parsedData.type, toType)
   }
 
   const getFileNameWithoutExtension = (name: string) => {
