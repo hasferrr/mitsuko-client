@@ -133,6 +133,16 @@ export default function Tools() {
       content: subtitle.content.replace(/{\\[^}]*}/g, ""),
     }))
     setSubtitles(newSubtitles)
+
+    const parsed = {
+      type: toType,
+      data: toType === "ass" && parsedData?.type === "ass" ? parsedData.data : null,
+    }
+    const updatedContent = mergeSubtitle({
+      subtitles: newSubtitles,
+      parsed,
+    })
+    setRawContent(updatedContent)
   }
 
   const handleRemoveComments = () => {
@@ -147,6 +157,16 @@ export default function Tools() {
       content: subtitle.content.replace(/{(?!\\)[^}]*}/g, ""),
     }))
     setSubtitles(newSubtitles)
+
+    const parsed = {
+      type: toType,
+      data: toType === "ass" && parsedData?.type === "ass" ? parsedData.data : null,
+    }
+    const updatedContent = mergeSubtitle({
+      subtitles: newSubtitles,
+      parsed,
+    })
+    setRawContent(updatedContent)
   }
 
   const calculateCPS = (event: SubtitleEvent): number => {
