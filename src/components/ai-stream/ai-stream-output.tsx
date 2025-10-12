@@ -7,6 +7,7 @@ import { ChevronDown, ChevronRight } from "lucide-react"
 import { SubOnlyTranslated, SubtitleNoTimeTranslated } from "@/types/subtitles"
 import { AiStreamSubtitle } from "./ai-stream-subtitle"
 import { parseTranslationJson } from "@/lib/parser/parser"
+import ReactMarkdown from "react-markdown"
 
 interface AiStreamOutputProps {
   content: string
@@ -168,8 +169,27 @@ export const AiStreamOutput = ({
             )}
           >
             <div className="overflow-hidden">
-              <div className="whitespace-pre-wrap text-sm pt-3">
-                {parsedContent.think}
+              <div className="text-sm pt-3 prose prose-sm dark:prose-invert max-w-none">
+                <ReactMarkdown
+                  components={{
+                    p: props => <p className="mb-3 whitespace-pre-line" {...props} />,
+                    ul: props => <ul className="mb-3 list-disc pl-5 space-y-1" {...props} />,
+                    ol: props => <ol className="mb-3 list-decimal pl-5 space-y-1" {...props} />,
+                    li: props => <li className="" {...props} />,
+                    code: ({ className, children, ...props }) => (
+                      <code className={"rounded bg-muted/50 px-1 py-0.5 text-xs " + (className || "")} {...props}>{children}</code>
+                    ),
+                    pre: props => <pre className="mb-3 overflow-x-auto rounded bg-muted/50 p-2 text-xs" {...props} />,
+                    strong: props => <strong className="font-semibold" {...props} />,
+                    em: props => <em className="italic" {...props} />,
+                    h1: props => <h1 className="text-base font-semibold mt-3 mb-2" {...props} />,
+                    h2: props => <h2 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                    h3: props => <h3 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                    blockquote: props => <blockquote className="mb-3 border-l-2 border-border pl-3 text-muted-foreground italic" {...props} />,
+                  }}
+                >
+                  {parsedContent.think}
+                </ReactMarkdown>
               </div>
             </div>
           </div>
