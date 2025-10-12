@@ -26,6 +26,7 @@ import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import SubtitleViewer from "./subtitle-viewer"
 import SubtitleRawViewer from "./subtitle-raw-viewer"
+import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 
 function parseTimestampToMs(timestampStr: string): number {
   const [h, m, s_cs] = timestampStr.split(':')
@@ -76,26 +77,36 @@ export default function Tools() {
     }
   }, [isDarkMode])
 
+  const processFile = async (file: File) => {
+    setFileName(file.name)
+    const fileContent = await file.text()
+    setRawContent(fileContent)
+
+    const fileExtension = file.name.split('.').pop()?.toLowerCase() as SubtitleType
+    const fileType: SubtitleType = ['srt', 'ass', 'vtt'].includes(fileExtension) ? fileExtension : 'ass'
+
+    const parseResult = parseSubtitle({ content: fileContent, type: fileType })
+    setParsedData(parseResult.parsed)
+    setSubtitles(parseResult.subtitles)
+    setToType(fileType)
+
+    if (parseResult.parsed.type === "ass" && parseResult.parsed.data) {
+      setSubtitleEvents(parseResult.parsed.data.events)
+    } else {
+      setSubtitleEvents(convertSubtitlesToSubtitleEvents(parseResult.subtitles))
+    }
+  }
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      setFileName(file.name)
-      const fileContent = await file.text()
-      setRawContent(fileContent)
+      await processFile(file)
+    }
+  }
 
-      const fileExtension = file.name.split('.').pop()?.toLowerCase() as SubtitleType
-      const fileType: SubtitleType = ['srt', 'ass', 'vtt'].includes(fileExtension) ? fileExtension : 'ass'
-
-      const parseResult = parseSubtitle({ content: fileContent, type: fileType })
-      setParsedData(parseResult.parsed)
-      setSubtitles(parseResult.subtitles)
-      setToType(fileType)
-
-      if (parseResult.parsed.type === "ass" && parseResult.parsed.data) {
-        setSubtitleEvents(parseResult.parsed.data.events)
-      } else {
-        setSubtitleEvents(convertSubtitlesToSubtitleEvents(parseResult.subtitles))
-      }
+  const handleDropFiles = async (files: FileList) => {
+    if (files.length > 0) {
+      await processFile(files[0])
     }
   }
 
@@ -219,8 +230,9 @@ export default function Tools() {
   }
 
   return (
-    <div className="p-4">
-      <Tabs defaultValue="raw-text">
+    <DragAndDrop onDropFiles={handleDropFiles}>
+      <div className="p-4">
+        <Tabs defaultValue="raw-text">
         <div className="flex justify-between items-center pb-4">
           <TabsList>
             <TabsTrigger value="raw-text">Raw Text</TabsTrigger>
@@ -300,7 +312,8 @@ export default function Tools() {
           />
         </TabsContent>
 
-      </Tabs>
-    </div>
+        </Tabs>
+      </div>
+    </DragAndDrop>
   )
 }
