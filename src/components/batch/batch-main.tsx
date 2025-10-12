@@ -1047,10 +1047,10 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
             <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+                  <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                   <ModelDetail
                     basicSettingsId={basicSettingsId}
                   />
-                  <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                   {operationMode === 'translation' && (
                     <>
                       <TemperatureSlider

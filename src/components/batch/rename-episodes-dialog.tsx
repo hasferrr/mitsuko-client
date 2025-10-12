@@ -281,7 +281,7 @@ export function RenameEpisodesDialog({ open, onOpenChange, batchFiles }: RenameE
                             {newVal || <span className="italic font-light">Empty</span>}
                           </span>
                         </p>
-                        <p className="text-xs text-muted-foreground truncate font-extralight mt-1">
+                        <p className="text-xs text-muted-foreground font-extralight mt-1">
                           {b.description || 'No title'}
                         </p>
                       </div>
