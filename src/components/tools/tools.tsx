@@ -126,7 +126,8 @@ export default function Tools() {
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', 'subtitles.csv')
+    const baseName = getFileNameWithoutExtension(fileName) || 'subtitle'
+    link.setAttribute('download', `${baseName}.csv`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
