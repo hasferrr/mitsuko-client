@@ -24,8 +24,9 @@ import { DISCORD_LINK } from "@/constants/external-links"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { SidebarHeaderIcon } from "./sidebar-header-icon"
 import { IconBrandDiscord } from "@tabler/icons-react"
+import { cn } from "@/lib/utils"
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ className, ...props }: React.ComponentProps<typeof Sidebar>) {
   const projects = useProjectStore((state) => state.projects)
   const visibleProjects = projects.filter(p => !p.isBatch)
   const createProject = useProjectStore((state) => state.createProject)
@@ -80,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   return (
-    <Sidebar collapsible="icon" variant="floating" {...props}>
+    <Sidebar className={cn("z-[60]", className)} collapsible="icon" variant="floating" {...props}>
       <SidebarHeader>
         <Link href="/">
           <SidebarHeaderIcon />
