@@ -1,4 +1,4 @@
-import SubtitleViewer from "@/components/tools/subtitle-viewer"
+import Tools from "@/components/tools/tools"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
 import { Metadata } from "next"
 
@@ -10,6 +10,6 @@ export const metadata: Metadata = {
 
 export default function ToolsPage() {
   return (
-    <SubtitleViewer />
+    <Tools />
   )
 }
