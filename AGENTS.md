@@ -11,7 +11,7 @@ Mitsuko is an AI-powered subtitle translation and audio transcription platform f
 - **Outputs**
   - Translated subtitles: SRT, ASS, VTT
   - Transcribed subtitles: timed text from audio
-  - Context documents: reusable JSON for series-wide consistency
+  - Context documents: reusable text for series-wide consistency
 
 - **Core features**
   - Project workspace with drag-and-drop, categorized tabs, history, import/export
@@ -24,7 +24,7 @@ Mitsuko is an AI-powered subtitle translation and audio transcription platform f
 - **Tech stack**
   - Frontend: Next.js 15 (App Router), React 19, Tailwind, Shadcn/Radix UI, Zustand, React Query, Dexie.js (indexedDB), @dnd-kit, Bun runtime
   - Backend: separate Express.js (TypeScript, Bun) service with multi-provider AI (OpenAI, Gemini, Claude) and custom subtitle parsers
-  - Payments: Midtrans/Snap
+  - Payments: Midtrans/Snap, LemonSqueezy
   - Deployment: Vercel (frontend), Google Cloud Run (backend)
 
 - **Data & auth**
@@ -39,7 +39,7 @@ Mitsuko is an AI-powered subtitle translation and audio transcription platform f
 
 ## Global instructions
 
-- Always use Bun runtime
+- Always use Bun as runtime and package manager
 - Do not write semicolon at the end of the line
 - Do not write any single comments
 - Do not run to build the project, use compiler checker like `bun tsc` instead
