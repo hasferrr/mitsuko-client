@@ -263,7 +263,7 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
                     />
                     <div className="flex-1 min-w-0">
                       <label htmlFor={`checkbox-${t.id}`} className="cursor-pointer">
-                        <p className="text-sm font-medium line-clamp-2">{t.title || "Untitled"}</p>
+                        <p className="text-sm font-medium break-words break-all line-clamp-2">{t.title || "Untitled"}</p>
                         <p className="text-xs text-muted-foreground">{t.subtitlesCount} lines, status: {t.status}</p>
                       </label>
                     </div>

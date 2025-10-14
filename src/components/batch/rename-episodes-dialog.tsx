@@ -271,17 +271,17 @@ export function RenameEpisodesDialog({ open, onOpenChange, batchFiles }: RenameE
                     <div key={b.id} className="py-2 flex items-center justify-between gap-4">
                       <div className="min-w-0">
                         <p className="text-sm shrink-0 flex items-center gap-2">
-                          <span className="font-medium text-muted-foreground">
+                          <span className="font-medium text-muted-foreground break-words break-all">
                             {oldVal && showEpisodePrefix && <span className="font-bold">Episode </span>}
                             {oldVal || <span className="italic font-light">Empty</span>}
                           </span>
                           <span className="text-muted-foreground">→</span>
-                          <span className="font-medium">
+                          <span className="font-medium break-words break-all min-w-28">
                             {newVal && showEpisodePrefix && <span className="font-bold">Episode </span>}
                             {newVal || <span className="italic font-light">Empty</span>}
                           </span>
                         </p>
-                        <p className="text-xs text-muted-foreground font-extralight mt-1">
+                        <p className="text-xs text-muted-foreground font-extralight mt-1 break-words break-all line-clamp-2">
                           {b.description || 'No title'}
                         </p>
                       </div>

@@ -87,7 +87,7 @@ export function ImportSubDialog({
                     disabled={!!isLoading}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium line-clamp-2">{t.title || "Untitled"}</p>
+                    <p className="text-sm font-medium break-words break-all line-clamp-2">{t.title || "Untitled"}</p>
                     <p className="text-xs text-muted-foreground">{t.subtitlesCount} lines, status: {t.status}</p>
                   </div>
                 </label>

@@ -89,7 +89,7 @@ export function SortableBatchFile({
       <CardContent className="p-4 flex-1 flex items-center justify-between">
         <div>
           <p
-            className={cn("text-sm", !selectMode && "hover:underline cursor-pointer")}
+            className={cn("text-sm break-words break-all pr-2 line-clamp-4", !selectMode && "hover:underline cursor-pointer")}
             onClick={handleTitleClick}
           >
             {!!batchFile.title ? (
@@ -98,10 +98,10 @@ export function SortableBatchFile({
                 {batchFile.title}
               </>
             ) : (
-              <span className="italic">Empty</span>
+              <span className="italic">No title</span>
             )}
           </p>
-          <p className="text-sm text-muted-foreground font-light">
+          <p className="text-sm break-words break-all pr-2 line-clamp-4 text-muted-foreground font-light">
             {batchFile.description ? batchFile.description : batchFile.translatedCount === batchFile.subtitlesCount
               ? `${batchFile.subtitlesCount} lines`
               : `${batchFile.translatedCount}/${batchFile.subtitlesCount} lines`}

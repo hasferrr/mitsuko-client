@@ -14,6 +14,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { db } from "@/lib/db/db"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { cn } from "@/lib/utils"
 
 interface ProjectItemListProps {
   id: string
@@ -189,15 +190,17 @@ export const ProjectItemList = ({
           </button>
           <div className="bg-secondary p-2 rounded-lg">{icon}</div>
           <div>
-            <div className="flex items-center">
+            <div className="flex items-center pr-2">
               <h4
-                className="text-sm font-medium line-clamp-2 hover:underline cursor-pointer"
+                className={cn("text-sm font-medium break-words break-all line-clamp-1 min-w-fit hover:underline cursor-pointer", (!title || title === "Episode X") && "italic pr-1")}
                 onClick={handleTitleClick}
               >
-                {title}
+                {title || "No title"}
               </h4>
               {subtitle && (
-                <span className="text-xs text-muted-foreground font-extralight ml-2">{subtitle}</span>
+                <span className="text-xs text-muted-foreground font-extralight ml-2 break-words break-all line-clamp-1">
+                  {subtitle}
+                </span>
               )}
             </div>
             <p className="text-xs text-muted-foreground line-clamp-2">
