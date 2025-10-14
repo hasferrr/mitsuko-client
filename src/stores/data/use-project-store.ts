@@ -25,6 +25,7 @@ interface ProjectStore {
   projects: Project[]
   loading: boolean
   error: string | null
+  hasLoaded: boolean
   setCurrentProject: (project: Project | string | null) => void
   loadProjects: () => Promise<void>
   createProject: (name: string, isBatch?: boolean) => Promise<Project>
@@ -45,6 +46,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   projects: [],
   loading: false,
   error: null,
+  hasLoaded: false,
 
   setCurrentProject: (project: Project | string | null) => {
     if (typeof project === 'string') {
@@ -58,7 +60,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   },
 
   loadProjects: async () => {
-    set({ loading: true, error: null })
+    set({ loading: true, error: null, hasLoaded: false })
     try {
       const projects = await getAllProjectsDB()
       set((state) => ({
@@ -68,10 +70,11 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
           return curr ? projects.find((pr) => pr.id === curr.id) : null
         })(),
         loading: false,
+        hasLoaded: true,
       }))
     } catch (error) {
       console.error('Failed to load projects', error)
-      set({ error: 'Failed to load projects', loading: false })
+      set({ error: 'Failed to load projects', loading: false, hasLoaded: true })
     }
   },
 
