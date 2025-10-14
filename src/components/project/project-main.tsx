@@ -49,6 +49,7 @@ import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
 import { Badge } from "../ui/badge"
 import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter, DialogDescription } from "../ui/dialog"
+import { Skeleton } from "../ui/skeleton"
 
 const countTranslatedLines = (subtitles: Translation['subtitles']): { count: number, hasError: boolean } => {
   if (!subtitles || subtitles.length === 0) {
@@ -92,6 +93,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const [translations, setTranslations] = useState<Translation[]>([])
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
   const [extractions, setExtractions] = useState<Extraction[]>([])
+  const [isLoadingData, setIsLoadingData] = useState(true)
 
   const mutateTranslationData = useTranslationDataStore((state) => state.mutateData)
   const removeTranslationData = useTranslationDataStore((state) => state.removeData)
@@ -127,6 +129,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     if (!currentProject) return
 
     const loadData = async () => {
+      setIsLoadingData(true)
       const [translationsData, transcriptionsData, extractionsData] = await Promise.all([
         db.translations.bulkGet(currentProject.translations),
         db.transcriptions.bulkGet(currentProject.transcriptions),
@@ -136,6 +139,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       setTranslations(translationsData.filter((t): t is Translation => !!t).reverse())
       setTranscriptions(transcriptionsData.filter((t): t is Transcription => !!t).reverse())
       setExtractions(extractionsData.filter((e): e is Extraction => !!e).reverse())
+      setIsLoadingData(false)
     }
 
     loadData()
@@ -384,6 +388,41 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     </Button>
   )
 
+  const ProjectItemSkeleton = () => (
+    <div className="border border-border rounded-lg p-3 bg-background">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-5 w-5 rounded" />
+          <Skeleton className="bg-secondary p-2 rounded-lg">
+            <div className="h-5 w-5 rounded" />
+          </Skeleton>
+          <div className="space-y-1">
+            <Skeleton className="h-[14px] w-32" />
+            <Skeleton className="h-3 w-48" />
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-6 w-6 rounded" />
+          <Skeleton className="h-6 w-6 rounded" />
+          <Skeleton className="h-6 w-6 rounded" />
+        </div>
+      </div>
+    </div>
+  )
+
+  const translationSkeletons = Array.from({ length: 3 }).map((_, i) => (
+    <ProjectItemSkeleton key={`translation-skeleton-${i}`} />
+  ))
+
+  const transcriptionSkeletons = Array.from({ length: 3 }).map((_, i) => (
+    <ProjectItemSkeleton key={`transcription-skeleton-${i}`} />
+  ))
+
+  const extractionSkeletons = Array.from({ length: 3 }).map((_, i) => (
+    <ProjectItemSkeleton key={`extraction-skeleton-${i}`} />
+  ))
+
   return (
     <div className="flex-1 p-6">
       <div className="mb-6">
@@ -526,7 +565,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-3">
-                    {translationComponentList}
+                    {isLoadingData ? translationSkeletons : translationComponentList}
                   </div>
                 </SortableContext>
               </DndContext>
@@ -547,7 +586,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-3">
-                    {transcriptionComponentList}
+                    {isLoadingData ? transcriptionSkeletons : transcriptionComponentList}
                   </div>
                 </SortableContext>
               </DndContext>
@@ -568,7 +607,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-3">
-                    {extractionComponentList}
+                    {isLoadingData ? extractionSkeletons : extractionComponentList}
                   </div>
                 </SortableContext>
               </DndContext>
@@ -593,7 +632,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
                 strategy={verticalListSortingStrategy}
               >
                 <div className="space-y-3">
-                  {translationComponentList}
+                  {isLoadingData ? translationSkeletons : translationComponentList}
                 </div>
               </SortableContext>
             </DndContext>
@@ -617,7 +656,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
                 strategy={verticalListSortingStrategy}
               >
                 <div className="space-y-3">
-                  {transcriptionComponentList}
+                  {isLoadingData ? transcriptionSkeletons : transcriptionComponentList}
                 </div>
               </SortableContext>
             </DndContext>
@@ -641,7 +680,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
                 strategy={verticalListSortingStrategy}
               >
                 <div className="space-y-3">
-                  {extractionComponentList}
+                  {isLoadingData ? extractionSkeletons : extractionComponentList}
                 </div>
               </SortableContext>
             </DndContext>
