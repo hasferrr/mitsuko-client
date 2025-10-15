@@ -6,7 +6,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: DEPLOYMENT_URL + '/project',
   },
-  title: 'Projects - Mitsuko',
   description: 'Create a new project to manage your subtitle translations. Organize, edit, and track all your work in one place.'
 }
 

@@ -6,7 +6,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: DEPLOYMENT_URL + '/batch',
   },
-  title: 'Batch Projects - Mitsuko',
   description: 'Create subtitle batch translation projects to translate multiple subtitle files at once. Translate SRT, VTT, and ASS files with a single click.'
 }
 
