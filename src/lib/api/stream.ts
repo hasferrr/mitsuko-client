@@ -10,7 +10,6 @@ interface handleStreamParams {
   requestUrl: string,
   requestHeader: Record<string, string>,
   requestBody: BodyInit,
-  attempt?: number,
 }
 
 export const handleStream = async (params: handleStreamParams): Promise<string> => {
@@ -22,7 +21,6 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
     requestUrl,
     requestHeader,
     requestBody,
-    attempt = 0,
   } = params
 
   const { data: { session } } = await supabase.auth.getSession()
@@ -105,10 +103,8 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
       }
     })
 
-    if (!buffer.trim() && attempt < 3 && !abortControllerRef.current.signal.aborted) {
-      console.log("Retrying...")
-      await sleep(3000)
-      return await handleStream({ ...params, attempt: attempt + 1 })
+    if (!buffer.trim() && !abortControllerRef.current.signal.aborted) {
+      throw new Error("Provider returned empty response, check your input content or try again")
     }
 
     abortControllerRef.current.abort()
