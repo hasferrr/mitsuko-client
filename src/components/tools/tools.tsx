@@ -162,8 +162,8 @@ export default function Tools() {
     setSubtitles(newSubtitles)
 
     const parsed = {
-      type: toType,
-      data: toType === "ass" && parsedData?.type === "ass" ? parsedData.data : null,
+      type: parsedData?.type ?? toType,
+      data: parsedData?.data ?? null,
     }
     const updatedContent = mergeSubtitle({
       subtitles: newSubtitles,
@@ -186,8 +186,8 @@ export default function Tools() {
     setSubtitles(newSubtitles)
 
     const parsed = {
-      type: toType,
-      data: toType === "ass" && parsedData?.type === "ass" ? parsedData.data : null,
+      type: parsedData?.type ?? toType,
+      data: parsedData?.data ?? null,
     }
     const updatedContent = mergeSubtitle({
       subtitles: newSubtitles,
