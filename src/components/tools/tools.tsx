@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useEffect, useRef } from "react"
 import hljs from 'highlight.js/lib/core'
 import ass from 'highlightjs-ass'
 import { useThemeStore } from "@/stores/use-theme-store"
+import { useToolsStore } from "@/stores/use-tools-store"
 import { Input } from "@/components/ui/input"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
-import type { SubtitleEvent, SubtitleType, DownloadOption, CombinedFormat, Parsed, Subtitle } from "@/types/subtitles"
+import type { SubtitleEvent, SubtitleType } from "@/types/subtitles"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -43,17 +44,27 @@ function parseTimestampToMs(timestampStr: string): number {
 export default function Tools() {
   const highlightInitialized = useRef(false)
   const isDarkMode = useThemeStore(state => state.isDarkMode)
-  const [subtitleEvents, setSubtitleEvents] = useState<SubtitleEvent[]>([])
-  const [subtitles, setSubtitles] = useState<Subtitle[]>([])
-  const [ignoreWhitespace, setIgnoreWhitespace] = useState(true)
-  const [ignorePunctuation, setIgnorePunctuation] = useState(true)
-  const [enableHighlight, setEnableHighlight] = useState(true)
-  const [fileName, setFileName] = useState<string>("")
-  const [toType, setToType] = useState<SubtitleType>("srt")
-  const [downloadOption] = useState<DownloadOption>("original")
-  const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
-  const [parsedData, setParsedData] = useState<Parsed | null>(null)
-  const [rawContent, setRawContent] = useState<string>("")
+  const subtitleEvents = useToolsStore(state => state.subtitleEvents)
+  const setSubtitleEvents = useToolsStore(state => state.setSubtitleEvents)
+  const subtitles = useToolsStore(state => state.subtitles)
+  const setSubtitles = useToolsStore(state => state.setSubtitles)
+  const ignoreWhitespace = useToolsStore(state => state.ignoreWhitespace)
+  const setIgnoreWhitespace = useToolsStore(state => state.setIgnoreWhitespace)
+  const ignorePunctuation = useToolsStore(state => state.ignorePunctuation)
+  const setIgnorePunctuation = useToolsStore(state => state.setIgnorePunctuation)
+  const enableHighlight = useToolsStore(state => state.enableHighlight)
+  const setEnableHighlight = useToolsStore(state => state.setEnableHighlight)
+  const fileName = useToolsStore(state => state.fileName)
+  const setFileName = useToolsStore(state => state.setFileName)
+  const toType = useToolsStore(state => state.toType)
+  const setToType = useToolsStore(state => state.setToType)
+  const downloadOption = useToolsStore(state => state.downloadOption)
+  const combinedFormat = useToolsStore(state => state.combinedFormat)
+  const setCombinedFormat = useToolsStore(state => state.setCombinedFormat)
+  const parsedData = useToolsStore(state => state.parsedData)
+  const setParsedData = useToolsStore(state => state.setParsedData)
+  const rawContent = useToolsStore(state => state.rawContent)
+  const setRawContent = useToolsStore(state => state.setRawContent)
 
   useEffect(() => {
     if (!highlightInitialized.current) {
