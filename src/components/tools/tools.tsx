@@ -191,19 +191,43 @@ export default function Tools() {
       return -1
     }
 
+    const rawTextSize = event.text.length
+    if (rawTextSize > durationMs) {
+      return -1
+    }
+
     let text = event.text
     text = text.replace(/{\\[^}]*}/g, "")
-    text = text.replace(/\\n|\\N/gi, "")
+    text = text.replace(/\\n|\\N/gi, "\n")
+    text = text.replace(/{(?!\\)[^}]*}/g, "")
 
     if (ignoreWhitespace) {
       text = text.replace(/\s/g, "")
     }
 
     if (ignorePunctuation) {
-      text = text.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "")
+      try {
+        text = text.replace(/\p{P}+/gu, "")
+      } catch {
+        text = text.replace(/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/g, "")
+      }
     }
 
-    const characterCount = text.length
+    let characterCount = 0
+    const hasSegmenter = typeof (Intl as { Segmenter?: unknown }).Segmenter === "function"
+    if (hasSegmenter) {
+      const SegmenterCtor = (Intl as {
+        Segmenter: new (
+          locales?: string | string[],
+          options?: { granularity?: "grapheme" | "word" | "sentence" }
+        ) => { segment: (input: string) => Iterable<unknown> }
+      }).Segmenter
+      const seg = new SegmenterCtor(undefined, { granularity: "grapheme" })
+      characterCount = Array.from(seg.segment(text)).length
+    } else {
+      characterCount = Array.from(text).length
+    }
+
     const cps = (characterCount * 1000) / durationMs
 
     return Math.floor(cps)
