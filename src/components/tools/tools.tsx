@@ -28,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import SubtitleViewer from "./subtitle-viewer"
 import SubtitleRawViewer from "./subtitle-raw-viewer"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
+import { toast } from "sonner"
 
 function parseTimestampToMs(timestampStr: string): number {
   const [h, m, s_cs] = timestampStr.split(':')
@@ -101,13 +102,26 @@ export default function Tools() {
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
+      const fileNameLower = file.name.toLowerCase()
+      const isAccepted = ACCEPTED_FORMATS.some(format => fileNameLower.endsWith(format))
+      if (!isAccepted) {
+        toast.error("Unsupported file type", { description: "Please upload an SRT, ASS, or VTT file" })
+        return
+      }
       await processFile(file)
     }
   }
 
   const handleDropFiles = async (files: FileList) => {
     if (files.length > 0) {
-      await processFile(files[0])
+      const file = files[0]
+      const fileNameLower = file.name.toLowerCase()
+      const isAccepted = ACCEPTED_FORMATS.some(format => fileNameLower.endsWith(format))
+      if (!isAccepted) {
+        toast.error("Unsupported file type", { description: "Please upload an SRT, ASS, or VTT file" })
+        return
+      }
+      await processFile(file)
     }
   }
 
