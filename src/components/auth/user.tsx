@@ -10,7 +10,7 @@ import { useSessionStore } from "@/stores/use-session-store"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { fetchTransactions, PaginatedTransactions, AmountFilter } from "@/lib/api/transaction"
-import { fetchCreditBatches, CreditBatch } from "@/lib/api/credit-batch"
+import { fetchCreditBatches, PaginatedCreditBatches } from "@/lib/api/credit-batch"
 import { useState } from "react"
 import {
   Pagination,
@@ -34,6 +34,8 @@ export function User() {
   const [page, setPage] = useState(1)
   const [amountFilter, setAmountFilter] = useState<AmountFilter>("non-zero")
   const pageSize = 10
+  const [creditPage, setCreditPage] = useState(1)
+  const creditPageSize = 5
 
   const {
     data: user,
@@ -70,14 +72,14 @@ export function User() {
   })
 
   const {
-    data: creditBatches,
+    data: paginatedCreditBatches,
     isLoading: isCreditBatchesLoading,
     isError: isCreditBatchesError,
     isFetching: isCreditBatchesFetching,
     refetch: refetchCreditBatches,
-  } = useQuery<CreditBatch[]>({
-    queryKey: ["creditBatches", session?.user?.id],
-    queryFn: fetchCreditBatches,
+  } = useQuery<PaginatedCreditBatches>({
+    queryKey: ["creditBatches", session?.user?.id, creditPage, creditPageSize],
+    queryFn: () => fetchCreditBatches(creditPage, creditPageSize),
     enabled: !!session?.user?.id,
     staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // 1 hour
@@ -89,9 +91,13 @@ export function User() {
   const transactions = paginatedTransactions?.data || []
   const totalCount = paginatedTransactions?.count || 0
   const totalPages = Math.ceil(totalCount / pageSize)
+  const creditBatches = paginatedCreditBatches?.data || []
+  const creditTotalCount = paginatedCreditBatches?.count || 0
+  const creditTotalPages = Math.ceil(creditTotalCount / creditPageSize)
 
   const handleRefresh = () => {
     setPage(1)
+    setCreditPage(1)
     refetchUser()
     refetchTransactions()
     refetchCreditBatches()
@@ -99,6 +105,10 @@ export function User() {
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage)
+  }
+
+  const handleCreditPageChange = (newPage: number) => {
+    setCreditPage(newPage)
   }
 
   const handleAmountFilterChange = (value: AmountFilter) => {
@@ -346,7 +356,7 @@ export function User() {
           </thead>
           <tbody>
             {isCreditBatchesLoading ? (
-              Array.from({ length: 3 }).map((_, index) => (
+              Array.from({ length: 5 }).map((_, index) => (
                 <tr key={index} className="border-b last:border-0">
                   <td className="px-4 py-2 h-10">
                     <Skeleton className="h-4 w-20" />
@@ -414,6 +424,72 @@ export function User() {
             )}
           </tbody>
         </table>
+        {creditTotalPages > 1 && (
+          <div className="py-4 border-t">
+            <Pagination>
+              <PaginationContent>
+                {creditPage > 1 && (
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => handleCreditPageChange(creditPage - 1)}
+                      className="cursor-pointer"
+                    />
+                  </PaginationItem>
+                )}
+
+                {Array.from({ length: Math.min(5, creditTotalPages) }, (_, i) => {
+                  let pageNum
+                  if (creditTotalPages <= 5) {
+                    pageNum = i + 1
+                  } else if (creditPage <= 3) {
+                    pageNum = i + 1
+                  } else if (creditPage >= creditTotalPages - 2) {
+                    pageNum = creditTotalPages - 4 + i
+                  } else {
+                    pageNum = creditPage - 2 + i
+                  }
+
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        isActive={pageNum === creditPage}
+                        onClick={() => handleCreditPageChange(pageNum)}
+                        className="cursor-pointer"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                })}
+
+                {creditTotalPages > 5 && creditPage < creditTotalPages - 2 && (
+                  <>
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink
+                        onClick={() => handleCreditPageChange(creditTotalPages)}
+                        className="cursor-pointer"
+                      >
+                        {creditTotalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  </>
+                )}
+
+                {creditPage < creditTotalPages && (
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => handleCreditPageChange(creditPage + 1)}
+                      className="cursor-pointer"
+                    />
+                  </PaginationItem>
+                )}
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -10,24 +10,36 @@ export interface CreditBatch {
   expires_at: string
 }
 
-export const fetchCreditBatches = async (): Promise<CreditBatch[]> => {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export type PaginatedCreditBatches = {
+  data: CreditBatch[]
+  count: number
+}
 
-  if (!user) {
-    throw new Error("User not authenticated")
+export async function fetchCreditBatches(
+  page: number = 1,
+  limit: number = 10
+): Promise<PaginatedCreditBatches> {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.user?.id) {
+    throw new Error("No user ID found")
   }
 
-  const { data, error } = await supabase
+  const from = (page - 1) * limit
+  const to = from + limit - 1
+
+  const { data, error, count } = await supabase
     .from("credit_batches")
-    .select("*")
-    .eq("user_id", user.id)
+    .select("*", { count: "exact" })
+    .eq("user_id", session.user.id)
     .order("created_at", { ascending: false })
+    .range(from, to)
 
   if (error) {
     throw new Error(error.message)
   }
 
-  return data as CreditBatch[]
+  return {
+    data: data || [],
+    count: count || 0
+  }
 }
