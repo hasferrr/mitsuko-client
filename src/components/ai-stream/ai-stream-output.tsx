@@ -191,7 +191,9 @@ export const AiStreamOutput = ({
                     ol: props => <ol className="mb-3 list-decimal pl-5 space-y-1" {...props} />,
                     li: props => <li className="" {...props} />,
                     code: ({ className, children, ...props }) => (
-                      <code className={"rounded bg-muted/50 px-1 py-0.5 text-xs " + (className || "")} {...props}>{children}</code>
+                      <code className={cn("inline-block max-w-full rounded bg-muted/50 px-1 py-0.5 text-xs whitespace-pre-line", className)} {...props}>
+                        {children}
+                      </code>
                     ),
                     pre: props => <pre className="mb-3 overflow-x-auto rounded bg-muted/50 p-2 text-xs" {...props} />,
                     strong: props => <strong className="font-semibold" {...props} />,
