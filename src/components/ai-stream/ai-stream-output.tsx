@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { SubOnlyTranslated, SubtitleNoTimeTranslated } from "@/types/subtitles"
@@ -31,10 +30,10 @@ export const AiStreamOutput = ({
 }: AiStreamOutputProps) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(defaultCollapsed)
   const [translatedSubtitles, setTranslatedSubtitles] = useState<SubOnlyTranslated[]>([])
-  const initialSubtitlesRef = useRef<SubtitleNoTimeTranslated[]>(subtitlesProp)
-  const lastParseTimeRef = useRef<number>(Date.now())
+  const [initialSubtitles] = useState<SubtitleNoTimeTranslated[]>(subtitlesProp)
+  const lastParseTimeRef = useRef<number>(0)
   const parseTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const prevIsTranslatingRef = useRef<boolean | undefined>(undefined)
+  const prevIsProcessingRef = useRef<boolean | undefined>(undefined)
 
   const parse = (content: string) => {
     try {
@@ -49,7 +48,10 @@ export const AiStreamOutput = ({
       }
       const parsed = parseTranslationJson(split.join("\n"))
       parsed.push(...message)
-      if (translatedSubtitles.length !== parsed.length) {
+      const changed =
+        translatedSubtitles.length !== parsed.length ||
+        translatedSubtitles.some((s, i) => s.index !== parsed[i]?.index || s.translated !== parsed[i]?.translated)
+      if (changed) {
         setTranslatedSubtitles(parsed)
       }
     } catch {
@@ -64,20 +66,21 @@ export const AiStreamOutput = ({
     }
   }
 
-  useEffect(() => {
+  const onInit = useEffectEvent(() => {
+    lastParseTimeRef.current = Date.now()
     if (subtitlesProp.length) {
       parse(content)
     }
-  }, [])
+  })
 
-  useEffect(() => {
-    if (prevIsTranslatingRef.current && isProcessing === false && subtitlesProp.length) {
+  const onProcessingChange = useEffectEvent((isProcessing: boolean) => {
+    if (prevIsProcessingRef.current && isProcessing === false && subtitlesProp.length) {
       parse(content)
     }
-    prevIsTranslatingRef.current = isProcessing
-  }, [isProcessing])
+    prevIsProcessingRef.current = isProcessing
+  })
 
-  useEffect(() => {
+  const onContentChange = useEffectEvent((content: string) => {
     if (!subtitlesProp.length) return
 
     const NOW = Date.now()
@@ -99,7 +102,18 @@ export const AiStreamOutput = ({
       cleanup()
       parse(content)
     }
+  })
 
+  useEffect(() => {
+    onInit()
+  }, [])
+
+  useEffect(() => {
+    onProcessingChange(isProcessing)
+  }, [isProcessing])
+
+  useEffect(() => {
+    onContentChange(content)
     return () => {
       cleanup()
     }
@@ -197,7 +211,7 @@ export const AiStreamOutput = ({
       )}
       {parsedContent.output && translatedSubtitles.length > 0 && (
         <AiStreamSubtitle
-          initialSubtitles={initialSubtitlesRef.current}
+          initialSubtitles={initialSubtitles}
           translatedSubtitles={translatedSubtitles}
         />
       )}
