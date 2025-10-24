@@ -83,7 +83,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const [isProcessingConvert, setIsProcessingConvert] = useState(false)
   const router = useRouter()
 
-  const loadProjects = useProjectStore((state) => state.loadProjects)
   const renameProject = useProjectStore((state) => state.renameProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
@@ -126,8 +125,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   )
 
   useEffect(() => {
-    if (!currentProject) return
-
     const loadData = async () => {
       setIsLoadingData(true)
       const [translationsData, transcriptionsData, extractionsData] = await Promise.all([
@@ -143,7 +140,8 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     }
 
     loadData()
-  }, [currentProject])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentProject.id])
 
   // Drag and drop handlers
   function handleDragEnd(event: DragEndEvent, type: 'translation' | 'transcription' | 'extraction') {
@@ -255,14 +253,23 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         description={description}
         date={translation.updatedAt.toLocaleDateString()}
         handleEdit={async (newName) => {
-          await updateTranslationDb(translation.id, { title: newName })
+          const updated = await updateTranslationDb(translation.id, { title: newName })
           mutateTranslationData(translation.id, "title", newName)
-          loadProjects()
+          setTranslations(prev => prev.map(t => t.id === translation.id ? updated : t))
         }}
         handleDelete={async () => {
           await deleteTranslationDb(currentProject.id, translation.id)
           removeTranslationData(translation.id)
-          loadProjects()
+          {
+            const storeProject = useProjectStore.getState().currentProject
+            const base = storeProject && storeProject.id === currentProject.id ? storeProject.translations : currentProject.translations
+            await updateProjectItems(
+              currentProject.id,
+              base.filter(id => id !== translation.id),
+              'translation'
+            )
+          }
+          setTranslations(prev => prev.filter(t => t.id !== translation.id))
         }}
       />
     )
@@ -281,14 +288,23 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       description={`${transcription.transcriptSubtitles.length} segments`}
       date={transcription.createdAt.toLocaleDateString()}
       handleEdit={async (newName) => {
-        await updateTranscriptionDb(transcription.id, { title: newName })
+        const updated = await updateTranscriptionDb(transcription.id, { title: newName })
         mutateTranscriptionData(transcription.id, "title", newName)
-        loadProjects()
+        setTranscriptions(prev => prev.map(t => t.id === transcription.id ? updated : t))
       }}
       handleDelete={async () => {
         await deleteTranscriptionDb(currentProject.id, transcription.id)
         removeTranscriptionData(transcription.id)
-        loadProjects()
+        {
+          const storeProject = useProjectStore.getState().currentProject
+          const base = storeProject && storeProject.id === currentProject.id ? storeProject.transcriptions : currentProject.transcriptions
+          await updateProjectItems(
+            currentProject.id,
+            base.filter(id => id !== transcription.id),
+            'transcription'
+          )
+        }
+        setTranscriptions(prev => prev.filter(t => t.id !== transcription.id))
       }}
     />
   ))
@@ -307,14 +323,23 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       description={extraction.contextResult}
       date={extraction.updatedAt.toLocaleDateString()}
       handleEdit={async (newName) => {
-        await updateExtractionDb(extraction.id, { episodeNumber: newName })
+        const updated = await updateExtractionDb(extraction.id, { episodeNumber: newName })
         mutateExtractionData(extraction.id, "episodeNumber", newName)
-        loadProjects()
+        setExtractions(prev => prev.map(e => e.id === extraction.id ? updated : e))
       }}
       handleDelete={async () => {
         await deleteExtractionDb(currentProject.id, extraction.id)
         removeExtractionData(extraction.id)
-        loadProjects()
+        {
+          const storeProject = useProjectStore.getState().currentProject
+          const base = storeProject && storeProject.id === currentProject.id ? storeProject.extractions : currentProject.extractions
+          await updateProjectItems(
+            currentProject.id,
+            base.filter(id => id !== extraction.id),
+            'extraction'
+          )
+        }
+        setExtractions(prev => prev.filter(e => e.id !== extraction.id))
       }}
     />
   ))
@@ -325,7 +350,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       variant="outline"
       className="line-clamp-2"
       onClick={async () => {
-        await createTranslationDb(
+        const created = await createTranslationDb(
           currentProject.id,
           {
             title: `Subtitle ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
@@ -338,7 +363,12 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
           undefined,
           undefined,
         )
-        loadProjects()
+        {
+          const storeProject = useProjectStore.getState().currentProject
+          const base = storeProject && storeProject.id === currentProject.id ? storeProject.translations : currentProject.translations
+          await updateProjectItems(currentProject.id, [...base, created.id], 'translation')
+        }
+        setTranslations(prev => [created, ...prev])
       }}
     >
       New Translation
@@ -351,12 +381,17 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       variant="outline"
       className="line-clamp-2"
       onClick={async () => {
-        await createTranscriptionDb(currentProject.id, {
+        const created = await createTranscriptionDb(currentProject.id, {
           title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
           transcriptionText: "",
           transcriptSubtitles: []
         })
-        loadProjects()
+        {
+          const storeProject = useProjectStore.getState().currentProject
+          const base = storeProject && storeProject.id === currentProject.id ? storeProject.transcriptions : currentProject.transcriptions
+          await updateProjectItems(currentProject.id, [...base, created.id], 'transcription')
+        }
+        setTranscriptions(prev => [created, ...prev])
       }}
     >
       New Transcription
@@ -369,7 +404,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       variant="outline"
       className="line-clamp-2"
       onClick={async () => {
-        await createExtractionDb(
+        const created = await createExtractionDb(
           currentProject.id,
           {
             title: "",
@@ -381,7 +416,12 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
           undefined,
           undefined,
         )
-        loadProjects()
+        {
+          const storeProject = useProjectStore.getState().currentProject
+          const base = storeProject && storeProject.id === currentProject.id ? storeProject.extractions : currentProject.extractions
+          await updateProjectItems(currentProject.id, [...base, created.id], 'extraction')
+        }
+        setExtractions(prev => [created, ...prev])
       }}
     >
       New Extraction
