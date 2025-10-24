@@ -2,11 +2,9 @@ import { MODEL_PRICES_URL } from "@/constants/api"
 import { ModelCreditCost, ModelPriceMap } from "@/types/model-cost"
 
 const getModelPrices = async (): Promise<ModelPriceMap> => {
+  console.log("Fetching model prices")
   const response = await fetch(MODEL_PRICES_URL, {
     cache: "force-cache",
-    next: {
-      revalidate: false,
-    },
   })
   return await response.json()
 }
