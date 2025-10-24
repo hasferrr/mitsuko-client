@@ -1,6 +1,6 @@
 # Terms of Service
 
-Last Updated: June 8, 2025
+Last Updated: October 24, 2025
 
 ## 1.  Acceptance of Terms
 
@@ -19,13 +19,14 @@ You agree to use Mitsuko only for lawful purposes and in a way that does not inf
 * Uploading or transmitting any content that contains software viruses or any other computer code, files, or programs designed to interrupt, destroy, or limit the functionality of any computer software or hardware or telecommunications equipment.
 * Impersonating any person or entity, or falsely stating or otherwise misrepresenting your affiliation with a person or entity.
 * Attempting to gain unauthorized access to Mitsuko's servers or network.
-* Using Mitsuko for any commercial purpose without our express prior written consent, unless permitted by the applicable open-source license (GNU General Public License v3.0).
 * Reverse engineering, decompiling, or disassembling any portion of Mitsuko, except as permitted by the applicable open-source license.
 * Interfering with or disrupting the operation of Mitsuko or the servers or networks connected to Mitsuko.
 
 ## 4.  Intellectual Property
 
-The Mitsuko software is open-source and licensed under the GNU GPLv3, which allows you to freely use, modify, and share the code (available on GitHub) as long as you follow the license terms. When you upload content (like subtitle files), you keep ownership but grant Mitsuko a non-exclusive, worldwide license to process and translate it solely to operate the service. You are responsible for ensuring that your use of Mitsuko and any uploaded content complies with applicable laws.
+The Mitsuko software and its underlying technology are developed and maintained by the Mitsuko team. While portions of the software are made publicly available in our open-source repository, the Mitsuko web application and all related services, branding, and content are owned and operated by us.
+
+You retain ownership of any content you upload (such as subtitle files) but grant us a non-exclusive, worldwide license to process and translate that content solely for operating and improving the service. You are responsible for ensuring your use of Mitsuko and any uploaded content complies with applicable laws.
 
 ## 5. Refund Policy
 
