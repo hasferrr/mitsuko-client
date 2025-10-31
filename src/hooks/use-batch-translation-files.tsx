@@ -21,7 +21,7 @@ export const useBatchTranslationFiles = (order: string[], queueSet: Set<string>)
       let status: BatchFile["status"]
 
       if (isTranslatingSet.has(id)) {
-        status = "translating"
+        status = "processing"
       } else if (queueSet.has(id)) {
         status = "queued"
       } else if (translatedCount === 0) {
@@ -50,7 +50,7 @@ export const useBatchTranslationFiles = (order: string[], queueSet: Set<string>)
   }, [batchFiles])
 
   const isBatchTranslating = useMemo(() => {
-    return batchFiles.some(file => file.status === "translating" || file.status === "queued")
+    return batchFiles.some(file => file.status === "processing" || file.status === "queued")
   }, [batchFiles])
 
   return { batchFiles, finishedCount, isBatchTranslating }

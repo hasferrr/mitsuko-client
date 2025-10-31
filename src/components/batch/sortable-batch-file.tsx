@@ -110,7 +110,7 @@ export function SortableBatchFile({
         <div className="flex items-center gap-1">
           {batchFile.status === 'pending' && <Badge variant="secondary">Pending</Badge>}
           {batchFile.status === 'partial' && <Badge variant="outline">Partial</Badge>}
-          {batchFile.status === 'translating' && <Badge variant="outline">Translating ({batchFile.progress.toFixed(0)}%)</Badge>}
+          {batchFile.status === 'processing' && <Badge variant="outline">Processing ({batchFile.progress.toFixed(0)}%)</Badge>}
           {batchFile.status === 'queued' && <Badge variant="secondary" className="bg-transparent">Queued</Badge>}
           {batchFile.status === 'done' && (
             <>
