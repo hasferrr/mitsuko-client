@@ -799,6 +799,9 @@ export default function SubtitleTranslatorMain({
             <AlertDialogTitle>ASS Subtitle Guidelines</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-2">
+                <p>
+                  Translation will only consider <span className="font-bold">Dialogue</span> lines and <span className="font-bold">Comments</span> will be ignored.
+                </p>
                 <p>For best translation results:</p>
                 <ul className="list-disc pl-6 space-y-1">
                   <li>Remove/Comment out karaoke effects</li>
