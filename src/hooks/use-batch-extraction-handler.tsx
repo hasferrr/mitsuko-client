@@ -77,7 +77,13 @@ export default function useBatchExtractionHandler({
       if (!queueAbortRef.current) {
         queueAbortRef.current = true
         setQueueSet(new Set())
-        toast.error("Encountered an error. Halting queue; running extractions will finish")
+        if (extractionMode === "sequential") {
+          const running = Array.from(useExtractionStore.getState().isExtractingSet)
+          running.forEach(id => baseStopExtraction(id))
+          toast.error("Encountered an error. Stopped all extractions")
+        } else {
+          toast.error("Encountered an error. Halting queue; running extractions will finish")
+        }
       }
     },
   })
