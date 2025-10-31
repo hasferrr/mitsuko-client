@@ -30,6 +30,7 @@ export default function useBatchExtractionHandler({
   state: { setActiveTab, setQueueSet },
 }: UseBatchExtractionHandlerProps) {
   const queueAbortRef = useRef(false)
+  const stopRequestedIdsRef = useRef<Set<string>>(new Set())
 
   // Project Store
   const currentProject = useProjectStore((state) => state.currentProject)
@@ -60,10 +61,12 @@ export default function useBatchExtractionHandler({
     setActiveTab,
     isBatch: true,
     onSuccessTranslation: ({ currentId }) => {
+      if (stopRequestedIdsRef.current.has(currentId)) return
       try {
         const raw = getContextResult(currentId)
+        const content = getContent(raw).trim()
         const hasFinished = /\s*<done>\s*$/.test(raw)
-        if (!hasFinished) {
+        if (!hasFinished && content.length > 0) {
           const withMarker = raw ? `${raw}\n\n<done>` : "<done>"
           setContextResult(currentId, withMarker)
         }
@@ -77,6 +80,8 @@ export default function useBatchExtractionHandler({
       if (!queueAbortRef.current) {
         queueAbortRef.current = true
         setQueueSet(new Set())
+        const runningNow = Array.from(useExtractionStore.getState().isExtractingSet)
+        runningNow.forEach(id => stopRequestedIdsRef.current.add(id))
         if (extractionMode === "sequential") {
           const running = Array.from(useExtractionStore.getState().isExtractingSet)
           running.forEach(id => baseStopExtraction(id))
@@ -116,6 +121,7 @@ export default function useBatchExtractionHandler({
     }, 300)
 
     queueAbortRef.current = false
+    stopRequestedIdsRef.current.clear()
     setHasChanges(true)
 
     const ids = batchFiles
@@ -181,6 +187,7 @@ export default function useBatchExtractionHandler({
     }, 300)
 
     queueAbortRef.current = false
+    stopRequestedIdsRef.current.clear()
     setHasChanges(true)
 
     const ids = batchFiles
@@ -248,6 +255,7 @@ export default function useBatchExtractionHandler({
     }, 300)
 
     queueAbortRef.current = false
+    stopRequestedIdsRef.current.clear()
     setHasChanges(true)
 
     const ids = batchFiles
@@ -312,6 +320,7 @@ export default function useBatchExtractionHandler({
     }, 300)
 
     queueAbortRef.current = false
+    stopRequestedIdsRef.current.clear()
     setHasChanges(true)
 
     const firstIdx = batchFiles.findIndex(f => f.status !== "done")
@@ -367,6 +376,8 @@ export default function useBatchExtractionHandler({
   const handleStopBatchExtraction = () => {
     queueAbortRef.current = true
     setQueueSet(new Set())
+    const runningIds = Array.from(isExtractingSet)
+    runningIds.forEach(id => stopRequestedIdsRef.current.add(id))
     batchFiles.forEach(f => baseStopExtraction(f.id))
   }
 
