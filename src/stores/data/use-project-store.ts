@@ -8,6 +8,7 @@ import {
   updateProjectOrder as updateProjectOrderDB,
   updateProjectItems as updateProjectItemsDB,
   updateProject as updateProjectDB,
+  getProject as getOneProjectDB,
 } from "@/lib/db/project"
 import { useTranscriptionDataStore } from "./use-transcription-data-store"
 import { useTranslationDataStore } from "./use-translation-data-store"
@@ -34,6 +35,7 @@ interface ProjectStore {
   updateProjectItems: (id: string, items: string[], type: 'translations' | 'transcriptions' | 'extractions' | ProjectType) => Promise<Project | null>
   deleteProject: (id: string) => Promise<void>
   reorderProjects: (newOrder: string[]) => Promise<void>
+  getProjectDb: (id: string) => Promise<Project | undefined>
 
   createTranslationForBatch: (projectId: string, file: File, content: string) => Promise<string>
   removeTranslationFromBatch: (projectId: string, translationId: string) => Promise<void>
@@ -57,6 +59,10 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     } else {
       set({ currentProject: project })
     }
+  },
+
+  getProjectDb: async (id) => {
+    return await getOneProjectDB(id)
   },
 
   loadProjects: async () => {

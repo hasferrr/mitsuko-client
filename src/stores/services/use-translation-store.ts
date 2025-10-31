@@ -73,7 +73,10 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
       requestHeader: {
         "Content-Type": "application/json"
       },
-      requestBody: JSON.stringify({ ...requestBody, clientId: useClientIdStore.getState().clientId }),
+      requestBody: JSON.stringify({
+        ...requestBody,
+        clientId: useClientIdStore.getState().clientId,
+      }),
     })
 
     let parsedResponse: SubOnlyTranslated[] = []

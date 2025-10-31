@@ -22,6 +22,7 @@ export interface TranslationRequestBody {
   uuid: string
   isBatch: boolean
   clientId?: string
+  projectName?: string
 }
 
 export interface ExtractionRequestBody {
@@ -35,6 +36,7 @@ export interface ExtractionRequestBody {
   maxCompletionTokens?: number
   isBatch: boolean
   clientId?: string
+  projectName?: string
 }
 
 export interface TranscriptionRequestBody {
@@ -44,4 +46,5 @@ export interface TranscriptionRequestBody {
   models: "premium" | "premium-fast" | "free" | null
   clientId: string
   deleteFile: boolean
+  projectName?: string
 }

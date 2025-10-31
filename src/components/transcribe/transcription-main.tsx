@@ -109,7 +109,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const session = useSessionStore((state) => state.session)
   const deleteAfterTranscription = useLocalSettingsStore(state => state.deleteAfterTranscription)
   const setDeleteAfterTranscription = useLocalSettingsStore(state => state.setDeleteAfterTranscription)
- 
+
 
   // React Query
   const queryClient = useQueryClient()
@@ -236,6 +236,11 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     setIsTranscribing(currentId, true)
     setHasChanges(true)
 
+    const t = useTranscriptionDataStore.getState().data[currentId]
+    const pid = t?.projectId
+    const project = pid ? await useProjectStore.getState().getProjectDb(pid) : null
+    const projectName = project?.name || ""
+
     const requestBody = {
       uploadId: selectedUploadId,
       selectedMode,
@@ -243,6 +248,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       models,
       clientId: useClientIdStore.getState().clientId || "",
       deleteFile: deleteAfterTranscription,
+      projectName,
     }
     console.log(requestBody)
 

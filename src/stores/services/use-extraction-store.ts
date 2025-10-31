@@ -70,7 +70,10 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
       requestHeader: {
         "Content-Type": "application/json"
       },
-      requestBody: JSON.stringify({ ...requestBody, clientId: useClientIdStore.getState().clientId }),
+      requestBody: JSON.stringify({
+        ...requestBody,
+        clientId: useClientIdStore.getState().clientId,
+      }),
     })
 
     get().abortControllerMap.delete(extractionId)

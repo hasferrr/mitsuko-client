@@ -38,6 +38,7 @@ import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
 import { convertSubtitle } from "@/lib/subtitles/utils/convert-subtitle"
+import { useProjectStore } from "@/stores/data/use-project-store"
 
 interface UseTranslationHandlerProps {
   state: {
@@ -120,6 +121,8 @@ export const useTranslationHandler = ({
     const title = translation.title
     const subtitles = translation.subtitles
     const parsed = translation.parsed
+    const project = await useProjectStore.getState().getProjectDb(translation.projectId)
+    const projectName = project?.name || ""
 
     // Basic Settings Store
     const bscStoreState = useSettingsStore.getState()
@@ -327,6 +330,7 @@ export const useTranslationHandler = ({
         fewShotExamples: usedFewShot,
         uuid: currentId,
         isBatch,
+        projectName,
       }
 
       let tlChunk: SubOnlyTranslated[] = []

@@ -16,6 +16,7 @@ import { UserCreditData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { toast } from "sonner"
+import { useProjectStore } from "@/stores/data/use-project-store"
 
 interface UseExtractionHandlerProps {
   setActiveTab: (tab: string) => void
@@ -83,6 +84,8 @@ export const useExtractionHandler = ({
     const episodeNumber = extData.episodeNumber
     const subtitleContent = extData.subtitleContent
     const previousContext = extData.previousContext
+    const project = await useProjectStore.getState().getProjectDb(extData.projectId)
+    const projectName = project?.name || ""
 
     if (!isBatch) {
       setTimeout(() => {
@@ -140,6 +143,7 @@ export const useExtractionHandler = ({
           MAX_COMPLETION_TOKENS_MAX
         ),
         isBatch,
+        projectName,
       }
 
       await extractContext(
