@@ -135,7 +135,7 @@ export default function PricingSection({
             </h2>
           )}
           <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Find the perfect plan for your needs. We offer monthly subscription and credit packs.
+            Get exactly what you need with one-time credits. Zero subscriptions, zero hassle.
           </p>
         </div>
 

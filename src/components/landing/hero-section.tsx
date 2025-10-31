@@ -40,7 +40,7 @@ export default function HeroSection() {
       <div className="mt-8 text-base md:text-xl max-w-xl mx-auto">
         <p>
           Translate subtitles with high-quality results, faster than ever.
-          Save precious time and reduce costs significantly!
+          Accelerate your subtitling workflow with Mitsuko!
         </p>
       </div>
 
