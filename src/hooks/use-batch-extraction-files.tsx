@@ -22,10 +22,10 @@ export const useBatchExtractionFiles = (order: string[], queueSet: Set<string>) 
 
       if (isExtractingSet.has(id)) {
         status = "translating"
-      } else if (queueSet.has(id)) {
-        status = "queued"
       } else if (extracted) {
         status = "done"
+      } else if (queueSet.has(id)) {
+        status = "queued"
       } else if (partial) {
         status = "partial"
       } else {

@@ -119,6 +119,7 @@ export default function useBatchExtractionHandler({
     setHasChanges(true)
 
     const ids = batchFiles
+      .filter(f => f.status !== "done")
       .map(f => f.id)
       .filter(id => !isExtractingSet.has(id))
 
@@ -250,6 +251,7 @@ export default function useBatchExtractionHandler({
     setHasChanges(true)
 
     const ids = batchFiles
+      .filter((f) => f.status !== "done")
       .map((f) => f.id)
       .filter((id) => !isExtractingSet.has(id))
 
@@ -257,6 +259,8 @@ export default function useBatchExtractionHandler({
 
     // For sequential, show the queue for remaining items (excluding the first)
     setQueueSet(new Set(ids.slice(1)))
+
+    // TODO: Use the immediate previous file (if any) to seed previousContext, just like in sequentialContinue
 
     let prevId: string | null = null
 
@@ -315,30 +319,16 @@ export default function useBatchExtractionHandler({
 
     const continueIds = batchFiles
       .slice(firstIdx)
+      .filter(f => f.status !== "done")
       .map(f => f.id)
       .filter(id => !isExtractingSet.has(id))
 
     if (continueIds.length === 0) return
 
-    // Determine the nearest previous done id (if any) to seed previousContext
-    let prevDoneId: string | null = null
-    for (let i = firstIdx - 1; i >= 0; i--) {
-      if (batchFiles[i].status === "done") {
-        prevDoneId = batchFiles[i].id
-        break
-      }
-    }
-
     // Queue shows all but the first item to process
     setQueueSet(new Set(continueIds.slice(1)))
 
-    // Seed previousContext for the first item if we have a previous done
-    if (prevDoneId) {
-      const seed = getContent(getContextResult(prevDoneId)).replace(/\s*<done>\s*$/, "").trim()
-      setPreviousContext(continueIds[0], seed)
-    }
-
-    let prevId: string | null = prevDoneId
+    const batchFileIdToIndexMap = new Map(batchFiles.map((f, i) => [f.id, i]))
 
     for (let i = 0; i < continueIds.length; i++) {
       if (queueAbortRef.current) {
@@ -347,10 +337,11 @@ export default function useBatchExtractionHandler({
       }
 
       const currentId = continueIds[i]
+      const currentIndex = batchFileIdToIndexMap.get(currentId)
 
-      // If this isn't the very first processed item and we have a prevId from this run,
-      // propagate context chain
-      if (prevId && prevId !== prevDoneId) {
+      // Always set previousContext from the immediate previous file's contextResult when available
+      if (currentIndex !== undefined && currentIndex > 0) {
+        const prevId = batchFiles[currentIndex - 1].id
         const prevContext = getContent(getContextResult(prevId)).replace(/\s*<done>\s*$/, "").trim()
         setPreviousContext(currentId, prevContext)
       }
@@ -368,8 +359,6 @@ export default function useBatchExtractionHandler({
         if (upcoming) next.delete(upcoming)
         return next
       })
-
-      prevId = currentId
     }
 
     setQueueSet(new Set())
