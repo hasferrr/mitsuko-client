@@ -2,6 +2,7 @@ import { TRANSCRIPT_URL } from "@/constants/api"
 import { handleStream } from "@/lib/api/stream"
 import { create } from "zustand"
 import { RefObject } from "react"
+import { TranscriptionRequestBody } from "@/types/request"
 
 interface TranscriptionStore {
   files: Record<string, File | null>
@@ -14,7 +15,7 @@ interface TranscriptionStore {
   stopTranscription: (id: string) => void
   startTranscription: (
     id: string,
-    requestBody: Record<string, unknown>,
+    requestBody: TranscriptionRequestBody,
     setResponse: (response: string) => void,
   ) => Promise<string>
 }

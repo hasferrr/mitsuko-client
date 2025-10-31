@@ -4,6 +4,7 @@ import { create } from "zustand"
 import { RefObject } from "react"
 import { RequestType } from "@/types/request"
 import { useClientIdStore } from "../use-client-id-store"
+import { ExtractionRequestBody } from "@/types/request"
 
 interface ExtractionStore {
   isExtractingSet: Set<string>
@@ -11,7 +12,7 @@ interface ExtractionStore {
   setIsExtracting: (extractionId: string, isExtracting: boolean) => void
   stopExtraction: (id: string) => void
   extractContext: (
-    requestBody: Record<string, unknown>,
+    requestBody: ExtractionRequestBody,
     apiKey: string,
     requestType: RequestType,
     extractionId: string,
@@ -44,7 +45,7 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
     })
   },
   extractContext: async (
-    requestBody: Record<string, unknown>,
+    requestBody: ExtractionRequestBody,
     apiKey: string,
     requestType: RequestType,
     extractionId: string,

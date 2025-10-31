@@ -6,13 +6,14 @@ import { handleStream } from "@/lib/api/stream"
 import { RefObject } from "react"
 import { RequestType } from "@/types/request"
 import { useClientIdStore } from "../use-client-id-store"
+import { TranslationRequestBody } from "@/types/request"
 interface TranslationStore {
   isTranslatingSet: Set<string>
   abortControllerMap: Map<string, RefObject<AbortController>>
   setIsTranslating: (translationId: string, isTranslating: boolean) => void
   stopTranslation: (id: string) => void
   translateSubtitles: (
-    requestBody: Record<string, unknown>,
+    requestBody: TranslationRequestBody,
     apiKey: string,
     requestType: RequestType,
     id: string,
@@ -47,7 +48,7 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
   },
 
   translateSubtitles: async (
-    requestBody: Record<string, unknown>,
+    requestBody: TranslationRequestBody,
     apiKey: string,
     requestType: RequestType,
     id: string,
