@@ -19,7 +19,7 @@ export interface TranslationDataStore {
   // CRUD methods
   createTranslationDb: (
     projectId: string,
-    data: Pick<Translation, "title" | "subtitles" | "parsed">,
+    data: Parameters<typeof createDB>[1],
     basicSettingsData?: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
     advancedSettingsData?: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Translation>

@@ -13,7 +13,16 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { DEFAULT_SUBTITLES, DEFAULT_TITLE } from "@/constants/default"
+import {
+  DEFAULT_EXTRACTION_RESULT,
+  DEFAULT_EXTRACTION_TITLE,
+  DEFAULT_RESPONSE,
+  DEFAULT_SUBTITLES,
+  DEFAULT_TITLE,
+  DEFAULT_TRANSCRIPTION_JSON,
+  DEFAULT_TRANSCRIPTION_RESULT,
+  DEFAULT_TRANSCRIPTION_TITLE,
+} from "@/constants/default"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
@@ -72,7 +81,8 @@ export function WelcomeView() {
           parsed: {
             type: "srt",
             data: null
-          }
+          },
+          response: DEFAULT_RESPONSE,
         }, undefined, undefined)
         setCurrentTranslationId(translation.id)
         upsertTranslationData(translation.id, translation)
@@ -80,9 +90,9 @@ export function WelcomeView() {
       }
       case "transcribe": {
         const transcription = await createTranscriptionDb(defaultProject.id, {
-          title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
-          transcriptionText: "",
-          transcriptSubtitles: []
+          title: DEFAULT_TRANSCRIPTION_TITLE,
+          transcriptionText: DEFAULT_TRANSCRIPTION_RESULT,
+          transcriptSubtitles: DEFAULT_TRANSCRIPTION_JSON
         })
         setCurrentTranscriptionId(transcription.id)
         upsertTranscriptionData(transcription.id, transcription)
@@ -90,11 +100,11 @@ export function WelcomeView() {
       }
       case "extract-context": {
         const extraction = await createExtractionDb(defaultProject.id, {
-          title: "",
+          title: DEFAULT_EXTRACTION_TITLE,
           episodeNumber: "",
           subtitleContent: "",
           previousContext: "",
-          contextResult: ""
+          contextResult: DEFAULT_EXTRACTION_RESULT
         }, undefined, undefined)
         setCurrentExtractionId(extraction.id)
         upsertExtractionData(extraction.id, extraction)
