@@ -14,6 +14,15 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### November 1
+
+- 🧹 **Extraction Cleanup:** Optionally clean up subtitles before starting extraction to reduce input tokens and prevent hitting context limits.
+- 💡 **Default Example Data:** New projects now include sample data so you can see how the features work.
+- 🐛 **Fixed Batch Extraction:**
+    - Stopped unfinished extractions are no longer marked as done.
+    - Continue batch extraction no longer reruns finished files.
+    - All running extractions stop if an error occurs in sequential mode.
+
 ### October 12
 
 - 🎨 **Enhanced Subtitle Viewer:** Subtitle tools now support ASS syntax highlighting with theme toggle for better readability. Added remove comment button for cleaner output.
