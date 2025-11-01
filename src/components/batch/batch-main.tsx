@@ -56,6 +56,7 @@ import {
   CustomInstructionsInput,
   FewShotInput,
   AdvancedReasoningSwitch,
+  SubtitleCleanupSwitch,
 } from "../settings"
 import { DownloadOption, CombinedFormat, SubtitleType } from "@/types/subtitles"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
@@ -1039,6 +1040,9 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                         />
                       </div>
                     </>
+                  )}
+                  {operationMode === 'extraction' && (
+                    <SubtitleCleanupSwitch />
                   )}
                 </CardContent>
               </Card>

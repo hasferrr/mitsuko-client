@@ -17,6 +17,8 @@ export interface Subtitle {
 
 export type SubtitleNoTime = Omit<Subtitle, 'timestamp'>
 
+export type SubtitleNoTimeNoIndex = Omit<SubtitleNoTime, 'index'>
+
 export type SubtitleTranslated = Subtitle & {
   translated: string
 }

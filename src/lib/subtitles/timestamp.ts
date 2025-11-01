@@ -1,4 +1,4 @@
-import { Subtitle, SubtitleNoTime, SubtitleTranslated, Timestamp } from "@/types/subtitles"
+import { SubtitleTranslated, Timestamp } from "@/types/subtitles"
 
 /**
  * Converts a Timestamp object to a string in the format "HH:MM:SS,MS".
@@ -13,14 +13,6 @@ export function timestampToString(timestamp: Timestamp): string {
   const milliseconds = String(timestamp.ms).padStart(3, '0')
 
   return `${hours}:${minutes}:${seconds},${milliseconds}`
-}
-
-export function removeTimestamp(subtitles: Subtitle[]): SubtitleNoTime[] {
-  return subtitles.map(sub => ({
-    index: sub.index,
-    actor: sub.actor,
-    content: sub.content,
-  }))
 }
 
 export function shiftSubtitles(

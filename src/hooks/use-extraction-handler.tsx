@@ -1,7 +1,6 @@
 "use client"
 
-import { SubtitleNoTime } from "@/types/subtitles"
-import { removeTimestamp } from "@/lib/subtitles/timestamp"
+import { SubtitleNoTimeNoIndex } from "@/types/subtitles"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
@@ -37,7 +36,8 @@ export const useExtractionHandler = ({
   onSuccessTranslation,
   onErrorTranslation,
 }: UseExtractionHandlerProps) => {
-  // API Settings Store
+  // Settings Store
+  const isSubtitleCleanupEnabled = useLocalSettingsStore((state) => state.isSubtitleCleanupEnabled)
   const customApiConfigs = useLocalSettingsStore((state) => state.customApiConfigs)
   const selectedApiConfigIndex = useLocalSettingsStore((state) => state.selectedApiConfigIndex)
   const selectedConfig = selectedApiConfigIndex !== null ? customApiConfigs[selectedApiConfigIndex] : null
@@ -127,13 +127,34 @@ export const useExtractionHandler = ({
         throw error
       }
 
-      const subtitles: SubtitleNoTime[] = removeTimestamp(data.subtitles)
+      const subtitles: SubtitleNoTimeNoIndex[] = []
+
+      if (!isSubtitleCleanupEnabled) {
+        for (let i = 0; i < data.subtitles.length; i++) {
+          subtitles.push({
+            actor: data.subtitles[i].actor,
+            content: data.subtitles[i].content,
+          })
+        }
+      } else {
+        for (let i = 0; i < data.subtitles.length; i++) {
+          const content = data.subtitles[i].content
+            .replace(/{[^}]*}/g, "")
+            .replace(/ {2,}/g, " ")
+            .trim()
+          if (!content) continue
+          subtitles.push({
+            actor: data.subtitles[i].actor,
+            content,
+          })
+        }
+      }
 
       const requestBody = {
         input: {
           episode: episodeNumber.trim(),
           subtitles: subtitles,
-          previous_context: previousContext,
+          previous_context: previousContext.trim(),
         },
         baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
         model: isUseCustomModel ? customModel : modelDetail?.name || "",

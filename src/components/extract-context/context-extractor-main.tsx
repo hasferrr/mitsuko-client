@@ -23,7 +23,7 @@ import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { getContent } from "@/lib/parser/parser"
 import { cn } from "@/lib/utils"
-import { MaxCompletionTokenInput, ModelSelection } from "../settings"
+import { MaxCompletionTokenInput, ModelSelection, SubtitleCleanupSwitch } from "../settings"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
@@ -407,6 +407,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                   basicSettingsId={basicSettingsId}
                   advancedSettingsId={advancedSettingsId}
                 />
+                <SubtitleCleanupSwitch />
               </CardContent>
             </Card>
           </TabsContent>

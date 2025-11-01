@@ -1,4 +1,4 @@
-import { SubtitleNoTime } from "./subtitles"
+import { SubtitleNoTime, SubtitleNoTimeNoIndex } from "./subtitles"
 import { ContextCompletion } from "./completion"
 
 export type RequestType = "free" | "paid" | "custom"
@@ -28,7 +28,7 @@ export interface TranslationRequestBody {
 export interface ExtractionRequestBody {
   input: {
     episode: string
-    subtitles: SubtitleNoTime[]
+    subtitles: SubtitleNoTimeNoIndex[]
     previous_context: string
   }
   baseURL: string
