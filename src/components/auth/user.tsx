@@ -219,6 +219,7 @@ export function User() {
             <tr className="border-b">
               <th className="px-4 py-2 text-left font-medium">Timestamp</th>
               <th className="px-4 py-2 text-left font-medium">Amount</th>
+              <th className="px-4 py-2 text-left font-medium">Event</th>
               <th className="px-4 py-2 text-left font-medium">Description</th>
             </tr>
           </thead>
@@ -235,23 +236,26 @@ export function User() {
                   <td className="px-4 py-2 h-10">
                     <Skeleton className="h-4 w-24" />
                   </td>
+                  <td className="px-4 py-2 h-10">
+                    <Skeleton className="h-4 w-28" />
+                  </td>
                 </tr>
               ))
             ) : isTransactionsError ? (
               <tr>
-                <td colSpan={3} className="p-4 text-center text-red-500">
+                <td colSpan={4} className="p-4 text-center text-red-500">
                   Error loading transactions
                 </td>
               </tr>
             ) : transactions.length === 0 ? (
               <tr>
-                <td colSpan={3} className="p-4 text-center text-muted-foreground">
+                <td colSpan={4} className="p-4 text-center text-muted-foreground">
                   No transaction history
                 </td>
               </tr>
             ) : (
               transactions.map((transaction) => (
-                <tr key={transaction.id} className="border-b last:border-0">
+                <tr key={transaction.id} className="border-b last:border-0 truncate">
                   <td className="px-4 py-2">
                     {new Date(transaction.created_at).toLocaleString()}
                   </td>
@@ -260,7 +264,10 @@ export function User() {
                     {Math.round(transaction.amount).toLocaleString()}
                   </td>
                   <td className="px-4 py-2">
-                    {capitalize(transaction.event.replace(/_/g, " ").toLocaleLowerCase())}
+                    {capitalize(transaction.event?.replace(/_?(REQUEST|TOKENS)\b/g, "").replace(/_/g, " ").toLocaleLowerCase().trim() || "")}
+                  </td>
+                  <td className="px-4 py-2 text-sm">
+                    {transaction.description}
                   </td>
                 </tr>
               ))

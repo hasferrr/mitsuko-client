@@ -13,5 +13,6 @@ export interface Transaction {
   user_id: string
   amount: number
   event: TransactionEvent
+  description: string | null
   created_at: string
 }
