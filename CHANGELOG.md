@@ -16,6 +16,7 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ### November 1
 
+- 📊 **Transaction History:** Transaction history table now shows description columns, so you can not only see how many credits were consumed but also which AI model was used.
 - 🧹 **Extraction Cleanup:** Optionally clean up subtitles before starting extraction to reduce input tokens and prevent hitting context limits.
 - 💡 **Default Example Data:** New projects now include sample data so you can see how the features work.
 - 🐛 **Fixed Batch Extraction:**
