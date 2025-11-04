@@ -4,7 +4,7 @@ import { supabase } from "../supabase"
 import { SUBTITLE_LOG_URL } from "@/constants/api"
 import { useSubtitleLogStore } from "@/stores/use-subtitle-log-store"
 
-export const logSubtitle = async (title: string, content: string, uuid: string, isBatch: boolean = false) => {
+export const logSubtitle = async (title: string, content: string, uuid: string, isBatch: boolean, projectName: string) => {
   const hash = MD5(content).toString()
   const { has, add } = useSubtitleLogStore.getState()
   if (has(hash)) return
@@ -19,7 +19,7 @@ export const logSubtitle = async (title: string, content: string, uuid: string, 
   try {
     await axios.post(
       SUBTITLE_LOG_URL,
-      { title, content, uuid, isBatch },
+      { title, content, uuid, isBatch, projectName },
       {
         headers: {
           "Content-Type": "application/json",

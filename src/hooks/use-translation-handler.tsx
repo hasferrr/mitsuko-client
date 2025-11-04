@@ -293,7 +293,8 @@ export const useTranslationHandler = ({
       title,
       generateSubtitleContent(currentId, "original", "o-n-t", parsed.type),
       currentId,
-      isBatch
+      isBatch,
+      projectName,
     )
 
     // Translate each chunk of subtitles
