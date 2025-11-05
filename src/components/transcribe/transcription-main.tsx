@@ -264,8 +264,8 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     } finally {
       setIsTranscribing(currentId, false)
 
-      // Refetch user data to update credits
-      refetchUserData()
+      const isUsingCredits = models !== "free"
+      if (isUsingCredits) refetchUserData()
 
       // Revalidate uploads list
       queryClient.invalidateQueries({ queryKey: ["uploads"] })

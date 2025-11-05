@@ -3,6 +3,7 @@
 import { useRef } from "react"
 import { SubtitleType } from "@/types/subtitles"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useBatchSettingsStore } from "@/stores/use-batch-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { toast } from "sonner"
@@ -67,6 +68,10 @@ export default function useBatchTranslationHandler({
 
   // Other Hooks
   const { setHasChanges } = useUnsavedChanges()
+
+  // Settings selectors
+  const getModelDetail = useSettingsStore(state => state.getModelDetail)
+  const getIsUseCustomModel = useSettingsStore(state => state.getIsUseCustomModel)
 
   // Lazy user data query
   const { refetch: refetchUserData } = useQuery<UserCreditData>({
@@ -309,7 +314,13 @@ export default function useBatchTranslationHandler({
     }
 
     setIsTranslating(currentId, false)
-    refetchUserData()
+    const bsIdToUse = isUseSharedSettings
+      ? basicSettingsId
+      : (translationData[currentId]?.basicSettingsId || basicSettingsId)
+    const modelDetail = getModelDetail(bsIdToUse)
+    const isUseCustomModel = getIsUseCustomModel(bsIdToUse)
+    const isUsingCredits = !isUseCustomModel && !!modelDetail?.isPaid
+    if (isUsingCredits) refetchUserData()
   }
 
   return {

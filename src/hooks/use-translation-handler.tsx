@@ -396,7 +396,8 @@ export const useTranslationHandler = ({
           }
         }
         setSubtitles(currentId, merged)
-        refetchUserData()
+        const isUsingCredits = !isUseCustomModel && !!modelDetail?.isPaid
+        if (isUsingCredits) refetchUserData()
         await saveData(currentId)
       }
 

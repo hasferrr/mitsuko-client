@@ -126,6 +126,8 @@ export default function SubtitleTranslatorMain({
   // Basic Settings Store
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))
   const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(basicSettingsId))
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
   const setContextDocument = (doc: string) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc)
 
@@ -244,7 +246,8 @@ export default function SubtitleTranslatorMain({
     }
 
     setIsTranslating(currentId, false)
-    refetchUserData()
+    const isUsingCredits = !isUseCustomModel && !!modelDetail?.isPaid
+    if (isUsingCredits) refetchUserData()
   }
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement> | FileList) => {

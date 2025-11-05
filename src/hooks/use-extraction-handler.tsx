@@ -185,8 +185,8 @@ export const useExtractionHandler = ({
     } finally {
       setIsExtracting(currentId, false)
 
-      // Refetch user data after extraction completes to update credits
-      refetchUserData()
+      const isUsingCredits = !isUseCustomModel && !!modelDetail?.isPaid
+      if (isUsingCredits) refetchUserData()
 
       await saveData(currentId)
     }
