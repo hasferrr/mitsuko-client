@@ -16,7 +16,6 @@ const languages = [
 const models = [
   { value: "free", label: "Mitsuko" },
   { value: "premium", label: "Mitsuko" },
-  { value: "premium-fast", label: "Mitsuko-Fast" },
 ]
 
 const modes = [
