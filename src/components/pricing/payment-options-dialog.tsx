@@ -19,7 +19,7 @@ import { useTransition, useState, useEffect, useRef } from "react"
 import { sleep } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { createSnapPayment } from "@/lib/api/create-snap-payment"
+import { createPaymentLink } from "@/lib/api/create-snap-payment"
 import { useSessionStore } from "@/stores/use-session-store"
 
 const MIN_QUANTITY = 1
@@ -88,7 +88,7 @@ export function PaymentOptionsDialog({
     startFetchingPayment(async () => {
       try {
         console.log(`Fetching new payment data for ${productId} (Qty: ${inputQuantity}) before ${paymentType}...`)
-        const { data: apiResult } = await createSnapPayment(productId, inputQuantity, paymentType)
+        const apiResult = await createPaymentLink(productId, inputQuantity, paymentType)
         if (paymentType === 'snap') {
           setSnapData(userId, productId, apiResult, inputQuantity)
         } else {
