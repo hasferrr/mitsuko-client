@@ -47,9 +47,9 @@ export const CREDIT_PACKS: CreditPack[] = [
     discountUSD: 1,
   },
   {
-    productId: "credit_pack_70m",
-    baseCredits: 70_000_000,
+    productId: "credit_pack_65m",
+    baseCredits: 65_000_000,
     basePriceUSD: 59, // Discounted price
-    discountUSD: 11,
+    discountUSD: 6,
   },
 ]
