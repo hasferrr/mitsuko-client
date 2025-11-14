@@ -9,6 +9,25 @@ import {
 } from "@/lib/db/settings"
 import { useSettingsStore } from "./use-settings-store"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import { GLOBAL_ADVANCED_SETTINGS_ID } from "@/constants/global-settings"
+
+type AdvancedKey = keyof Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">
+
+const ADVANCED_KEYS = [
+  "temperature",
+  "splitSize",
+  "startIndex",
+  "endIndex",
+  "isMaxCompletionTokensAuto",
+  "maxCompletionTokens",
+  "isUseStructuredOutput",
+  "isUseFullContextMemory",
+  "isBetterContextCaching",
+] as const
+
+type MissingAdvancedKey = Exclude<AdvancedKey, (typeof ADVANCED_KEYS)[number]>
+const _assertAllAdvancedKeysPresent: MissingAdvancedKey extends never ? true : never = true
+void _assertAllAdvancedKeysPresent
 
 interface AdvancedSettingsStore {
   data: Record<string, AdvancedSettings>
@@ -49,6 +68,7 @@ interface AdvancedSettingsStore {
     toId: string,
     keys: K[],
   ) => Promise<void>
+  resetAdvancedSettingsToGlobal: (id: string) => Promise<void>
 }
 
 export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
@@ -250,6 +270,10 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
 
         // Persist to DB
         await get().saveData(toId)
+      },
+      resetAdvancedSettingsToGlobal: async (id: string) => {
+        const keys: AdvancedKey[] = [...ADVANCED_KEYS]
+        await get().copyAdvancedSettingsKeys(GLOBAL_ADVANCED_SETTINGS_ID, id, keys)
       },
     }
   )

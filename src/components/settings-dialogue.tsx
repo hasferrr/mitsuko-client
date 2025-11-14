@@ -62,10 +62,22 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
 }) => {
   const resetBasicSettings = useSettingsStore((s) => s.resetBasicSettings)
   const resetAdvancedSettings = useAdvancedSettingsStore((s) => s.resetAdvancedSettings)
+  const resetBasicSettingsToGlobal = useSettingsStore((s) => s.resetBasicSettingsToGlobal)
+  const resetAdvancedSettingsToGlobal = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsToGlobal)
 
-  const handleResetAll = () => {
-    resetBasicSettings(basicSettingsId)
-    resetAdvancedSettings(advancedSettingsId, basicSettingsId)
+  const handleResetAll = async () => {
+    if (isGlobal) {
+      await Promise.all([
+        resetBasicSettings(basicSettingsId),
+        resetAdvancedSettings(advancedSettingsId, basicSettingsId),
+      ])
+      return
+    }
+
+    await Promise.all([
+      resetBasicSettingsToGlobal(basicSettingsId),
+      resetAdvancedSettingsToGlobal(advancedSettingsId),
+    ])
   }
 
   return (
