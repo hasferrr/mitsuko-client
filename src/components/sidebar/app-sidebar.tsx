@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   Box,
   Cloud,
@@ -30,6 +31,8 @@ export function AppSidebar({ className, ...props }: React.ComponentProps<typeof 
   const projects = useProjectStore((state) => state.projects)
   const visibleProjects = projects.filter(p => !p.isBatch)
   const createProject = useProjectStore((state) => state.createProject)
+  const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
+  const router = useRouter()
 
   const data = {
     navMain: [
@@ -92,7 +95,11 @@ export function AppSidebar({ className, ...props }: React.ComponentProps<typeof 
         <AppSidebarProjects
           projects={visibleProjects}
           addButtonFn={() => {
-            createProject("Project " + crypto.randomUUID().slice(0, 3))
+            void (async () => {
+              const newProject = await createProject(`Project ${new Date().toLocaleDateString()}`)
+              setCurrentProject(newProject)
+              router.push("/project")
+            })()
           }}
         />
         <AppSidebarMain items={data.links} label="Links" />
