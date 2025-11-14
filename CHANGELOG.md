@@ -14,6 +14,12 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### November 14
+
+- 🤖 **Model Updates:**
+    - Added GPT-5.1, a smarter model with better instruction-following and adaptive reasoning, while being warmer and improved customization options for tone and style.
+    - Readd OpenAI o3 and replace o3-mini.
+
 ### November 1
 
 - 📊 **Transaction History:** Transaction history table now shows description columns, so you can not only see how many credits were consumed but also which AI model was used.
