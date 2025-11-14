@@ -1,7 +1,7 @@
 # Mitsuko - AI Subtitle Translator & Transcriber
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hasferrr/mitsuko-client)
-[![GPLv3 License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
+[![AGPLv3 License](https://img.shields.io/badge/License-AGPLv3-blue.svg)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/TypeScript-✓-blue)
 ![Bun](https://img.shields.io/badge/Bun-✓-000000)
 
@@ -170,4 +170,4 @@ We welcome contributions! Please see our [Contribution Guidelines](CONTRIBUTING.
 
 ## 📜 License
 
-GPLv3 - See [LICENSE](LICENSE)
+AGPLv3 - See [LICENSE](LICENSE)
