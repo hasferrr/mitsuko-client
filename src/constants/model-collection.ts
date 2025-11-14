@@ -116,19 +116,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
     provider: "unknown",
     models: [
       {
-        name: "Grok 4 Fast",
-        maxInput: 2_000_000,
-        maxOutput: 30_000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
         name: "Gemini 2.5 Pro",
         subName: "gemini-2.5-pro",
         maxInput: 1_048_576,
@@ -252,32 +239,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 64000,
           isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Qwen3 235B A22B (free)",
-        maxInput: 40000,
-        maxOutput: 40000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true,
-        }
-      },
-      {
-        name: "Qwen3 30B A3B (free)",
-        maxInput: 40000,
-        maxOutput: 40000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true,
         }
       },
     ]
