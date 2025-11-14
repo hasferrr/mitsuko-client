@@ -38,7 +38,7 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
 export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models"> = {
   selectedMode: "sentence",
   customInstructions: "",
-  models: null,
+  models: "premium",
 }
 
 export const DEFAULT_TITLE = "Blue.Box.S01E16 (example)"

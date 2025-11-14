@@ -325,189 +325,189 @@ Setting:
 export const _transcriptionResult = `
 00:07,450 --> 00:10,450
 月影揺れる夜の小道
-Tsukikage yureru yoru no komichi
+(Tsukikage yureru yoru no komichi)
 
 00:10,700 --> 00:13,850
 ひらり舞い散る花の香り
-Hirari mai chiru hana no kaori
+(Hirari mai chiru hana no kaori)
 
 00:14,300 --> 00:17,300
 からから音鳴る風鈴の音
-Karakara oto naru fuurin no oto
+(Karakara oto naru fuurin no oto)
 
 00:17,650 --> 00:20,650
 淡い夢がそっと囁く
-Awai yume ga sotto sasayaku
+(Awai yume ga sotto sasayaku)
 
 00:28,100 --> 00:31,100
 影絵の中で踊る影
-Kagee no naka de odoru kage
+(Kagee no naka de odoru kage)
 
 00:31,650 --> 00:34,550
 ゆらゆら揺れる灯りの下
-Yurayura yureru akari no shita
+(Yurayura yureru akari no shita)
 
 00:35,050 --> 00:37,950
 彩り豊かな夕焼け空
-Irodori yutaka na yuuyakezora
+(Irodori yutaka na yuuyakezora)
 
 00:38,400 --> 00:41,100
 キラリと光る星の砂
-Kirari to hikaru hoshi no suna
+(Kirari to hikaru hoshi no suna)
 
 00:41,750 --> 00:44,550
 過ぎゆく季節 音もなく
-Sugiyuku kisetsu oto mo naku
+(Sugiyuku kisetsu oto mo naku)
 
 00:45,100 --> 00:47,900
 心の奥に響く声
-Kokoro no oku ni hibiku koe
+(Kokoro no oku ni hibiku koe)
 
 00:48,200 --> 00:51,450
 陽炎の調べに乗せて
-Kagerou no shirabe ni nosete
+(Kagerou no shirabe ni nosete)
 
 00:51,650 --> 00:54,950
 君との記憶 消えないように
-Kimi to no kioku kienai you ni
+(Kimi to no kioku kienai you ni)
 
 00:55,200 --> 00:58,550
 結び合う手が伝う温もり
-Musubiau te ga tsutau nukumori
+(Musubiau te ga tsutau nukumori)
 
 00:58,750 --> 01:02,050
 この瞬間を永遠に刻む
-Kono shunkan o towa ni kizamu
+(Kono shunkan o towa ni kizamu)
 
 01:02,650 --> 01:05,550
 ひらひらと舞う 夜風に乗せて
-Hirahira to mau yokaze ni nosete
+(Hirahira to mau yokaze ni nosete)
 
 01:05,900 --> 01:08,700
 共に歩んだ日々を感じて
-Tomo ni ayunda hibi o kanjite
+(Tomo ni ayunda hibi o kanjite)
 
 01:09,050 --> 01:12,150
 未来を描く 君と二人で
-Mirai o egaku kimi to futari de
+(Mirai o egaku kimi to futari de)
 
 01:12,650 --> 01:15,550
 今宵もまた光の中へ
-Koyoi mo mata hikari no naka e
+(Koyoi mo mata hikari no naka e)
 
 01:23,500 --> 01:26,300
 朝露に濡れる緑の葉
-Asatsuyu ni nureru midori no ha
+(Asatsuyu ni nureru midori no ha)
 
 01:26,750 --> 01:29,750
 静寂の中に潜む息吹
-Seijaku no naka ni hisomu ibuki
+(Seijaku no naka ni hisomu ibuki)
 
 01:30,250 --> 01:33,250
 コトコト音鳴る川の流れ
-Kotokoto oto naru kawa no nagare
+(Kotokoto oto naru kawa no nagare)
 
 01:33,700 --> 01:36,500
 優しい声が風に溶ける
-Yasashii koe ga kaze ni tokeru
+(Yasashii koe ga kaze ni tokeru)
 
 01:37,350 --> 01:40,250
 木漏れ日の中 微笑む君
-Komorebi no naka hohoemu kimi
+(Komorebi no naka hohoemu kimi)
 
 01:40,750 --> 01:43,750
 さらさら流れる時間の中
-Sarasara nagareru jikan no naka
+(Sarasara nagareru jikan no naka)
 
 01:44,200 --> 01:47,100
 色とりどりの風景映し
-Irotoridori no fuukei utsushi
+(Irotoridori no fuukei utsushi)
 
 01:47,550 --> 01:50,250
 キラリと光る未来へと
-Kirari to hikaru mirai e to
+(Kirari to hikaru mirai e to)
 
 01:50,950 --> 01:53,550
 過ぎゆく時を抱きしめて
-Sugiyuku toki o dakishimete
+(Sugiyuku toki o dakishimete)
 
 01:54,250 --> 01:57,050
 心の奥に眠る願い
-Kokoro no oku ni nemuru negai
+(Kokoro no oku ni nemuru negai)
 
 01:57,400 --> 02:00,550
 陽炎の調べに乗せて
-Kagerou no shirabe ni nosete
+(Kagerou no shirabe ni nosete)
 
 02:00,750 --> 02:04,050
 君との夢を忘れないように
-Kimi to no yume o wasurenai you ni
+(Kimi to no yume o wasurenai you ni)
 
 02:04,450 --> 02:07,550
 重ね合う手が伝う想い
-Kasaneau te ga tsutau omoi
+(Kasaneau te ga tsutau omoi)
 
 02:07,800 --> 02:11,050
 この瞬間を永遠に歌う
-Kono shunkan o towa ni utau
+(Kono shunkan o towa ni utau)
 
 02:11,600 --> 02:14,300
 ふわふわ浮かぶ 淡い想い
-Fuwafuwa ukabu awai omoi
+(Fuwafuwa ukabu awai omoi)
 
 02:14,750 --> 02:17,550
 共に刻んだ日々を感じて
-Tomo ni kizanda hibi o kanjite
+(Tomo ni kizanda hibi o kanjite)
 
 02:17,950 --> 02:21,050
 未来を見据え 君と二人で
-Mirai o misue kimi to futari de
+(Mirai o misue kimi to futari de)
 
 02:21,600 --> 02:24,500
 今宵もまた光の中へ
-Koyoi mo mata hikari no naka e
+(Koyoi mo mata hikari no naka e)
 
 02:25,550 --> 02:30,950
 触れるたびに溢れる想い
-Fureru tabi ni afureru omoi
+(Fureru tabi ni afureru omoi)
 
 02:31,650 --> 02:38,450
 未来へと続くこの道を
-Mirai e to tsuzuku kono michi o
+(Mirai e to tsuzuku kono michi o)
 
 02:42,200 --> 02:45,200
 光の中へ
-Hikari no naka e
+(Hikari no naka e)
 
 03:06,000 --> 03:09,450
 陽炎の調べに乗せて
-Kagerou no shirabe ni nosete
+(Kagerou no shirabe ni nosete)
 
 03:09,700 --> 03:12,950
 君との記憶 忘れぬように
-Kimi to no kioku wasurenu you ni
+(Kimi to no kioku wasurenu you ni)
 
 03:13,300 --> 03:16,450
 結び合う手が示す標
-Musubiau te ga shimesu shirube
+(Musubiau te ga shimesu shirube)
 
 03:16,700 --> 03:19,950
 この瞬間を永遠に刻む
-Kono shunkan o towa ni kizamu
+(Kono shunkan o towa ni kizamu)
 
 03:20,550 --> 03:23,250
 そよ風揺れる 柔らかな夢
-Soyokaze yureru yawarakana yume
+(Soyokaze yureru yawarakana yume)
 
 03:23,700 --> 03:26,500
 共に見上げた星を感じて
-Tomo ni miageta hoshi o kanjite
+(Tomo ni miageta hoshi o kanjite)
 
 03:27,050 --> 03:30,150
 未来を描く 君と二人で
-Mirai o egaku kimi to futari de
+(Mirai o egaku kimi to futari de)
 
 03:30,900 --> 03:33,800
 明日もまた光の中へ
-Ashita mo mata hikari no naka e
+(Ashita mo mata hikari no naka e)
 `.trim()
