@@ -26,7 +26,7 @@ interface CopySharedSettingsDialogProps {
 type BasicKey = keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>
 type AdvancedKey = keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>
 
-const BASIC_KEYS: { key: BasicKey; label: string }[] = [
+const BASIC_KEYS = [
   { key: 'sourceLanguage', label: 'Source Language' },
   { key: 'targetLanguage', label: 'Target Language' },
   { key: 'modelDetail', label: 'Model' },
@@ -34,9 +34,14 @@ const BASIC_KEYS: { key: BasicKey; label: string }[] = [
   { key: 'contextDocument', label: 'Context Document' },
   { key: 'customInstructions', label: 'Custom Instructions' },
   { key: 'fewShot', label: 'Few Shot' },
-]
+] as const
 
-const ADVANCED_KEYS: { key: AdvancedKey; label: string }[] = [
+type BasicKeyInList = (typeof BASIC_KEYS)[number]['key']
+type MissingBasicKey = Exclude<BasicKey, BasicKeyInList>
+const _assertAllBasicKeysPresent: MissingBasicKey extends never ? true : never = true
+void _assertAllBasicKeysPresent
+
+const ADVANCED_KEYS = [
   { key: 'temperature', label: 'Temperature' },
   { key: 'splitSize', label: 'Split Size' },
   { key: 'startIndex', label: 'Start Index' },
@@ -46,7 +51,12 @@ const ADVANCED_KEYS: { key: AdvancedKey; label: string }[] = [
   { key: 'isUseStructuredOutput', label: 'Structured Output' },
   { key: 'isUseFullContextMemory', label: 'Full Context Memory' },
   { key: 'isBetterContextCaching', label: 'Minimal Context Memory' },
-]
+] as const
+
+type AdvancedKeyInList = (typeof ADVANCED_KEYS)[number]['key']
+type MissingAdvancedKey = Exclude<AdvancedKey, AdvancedKeyInList>
+const _assertAllAdvancedKeysPresent: MissingAdvancedKey extends never ? true : never = true
+void _assertAllAdvancedKeysPresent
 
 export function CopySharedSettingsDialog({
   open,
