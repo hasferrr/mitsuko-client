@@ -478,6 +478,19 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "openai",
     models: [
       {
+        name: "GPT-5.1",
+        maxInput: 400_000,
+        maxOutput: 128_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "high",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "GPT-5",
         maxInput: 400_000,
         maxOutput: 128_000,
@@ -517,12 +530,12 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "OpenAI o4-mini",
+        name: "OpenAI o3",
         maxInput: 200_000,
         maxOutput: 100_000,
         structuredOutput: true,
         isPaid: true,
-        usage: "above medium",
+        usage: "high",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -530,7 +543,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "OpenAI o3-mini",
+        name: "OpenAI o4-mini",
         maxInput: 200_000,
         maxOutput: 100_000,
         structuredOutput: true,
