@@ -1,6 +1,6 @@
 # Terms of Service
 
-Last Updated: October 24, 2025
+Last Updated: November 15, 2025
 
 ## 1.  Acceptance of Terms
 
@@ -19,7 +19,7 @@ You agree to use Mitsuko only for lawful purposes and in a way that does not inf
 * Uploading or transmitting any content that contains software viruses or any other computer code, files, or programs designed to interrupt, destroy, or limit the functionality of any computer software or hardware or telecommunications equipment.
 * Impersonating any person or entity, or falsely stating or otherwise misrepresenting your affiliation with a person or entity.
 * Attempting to gain unauthorized access to Mitsuko's servers or network.
-* Reverse engineering, decompiling, or disassembling any portion of Mitsuko, except as permitted by the applicable open-source license.
+* Reverse engineering, decompiling, or disassembling any portion of Mitsuko.
 * Interfering with or disrupting the operation of Mitsuko or the servers or networks connected to Mitsuko.
 
 ## 4.  Intellectual Property
