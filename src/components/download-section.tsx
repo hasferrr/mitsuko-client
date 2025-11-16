@@ -17,7 +17,7 @@ import {
 import { AlignCenter, Download } from "lucide-react"
 import { DownloadOption, CombinedFormat, SubtitleType } from "@/types/subtitles"
 import { SUBTITLE_NAME_MAP } from "@/constants/subtitle-formats"
-import { cn } from "@/lib/utils"
+import { cn, createUtf8SubtitleBlob } from "@/lib/utils"
 
 type GenerateContentResult = string | Blob | Promise<string | Blob | undefined> | undefined
 
@@ -64,7 +64,11 @@ export function DownloadSection({
       name = nameArr.join(".")
     }
 
-    const blob = content instanceof Blob ? content : new Blob([content], { type: "text/plain" })
+    const blob = content instanceof Blob
+      ? content
+      : type !== "zip"
+        ? createUtf8SubtitleBlob(content, type)
+        : new Blob([content], { type: "application/zip" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url

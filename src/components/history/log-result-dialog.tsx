@@ -22,7 +22,7 @@ import { TranscriptionLogItem } from "@/types/transcription-log"
 import { parseTranscription } from "@/lib/parser/parser"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
+import { cn, createUtf8SubtitleBlob } from "@/lib/utils"
 
 interface LogResultDialogProps {
   log: TranscriptionLogItem | null
@@ -78,7 +78,7 @@ export default function LogResultDialog({ log, onOpenChange }: LogResultDialogPr
         fileName = "transcription.srt"
       }
 
-      const blob = new Blob([srtContent], { type: "text/plain" })
+      const blob = createUtf8SubtitleBlob(srtContent, "srt")
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url

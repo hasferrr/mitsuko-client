@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+import { cn, createUtf8SubtitleBlob } from "@/lib/utils"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -477,6 +477,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const handleSingleFileDownload = (batchFileId: string) => {
     let content: string | null = null
     let fileName: string | null = null
+    let blob: Blob | null = null
 
     if (operationMode === 'translation') {
       const translation = translationData[batchFileId]
@@ -486,6 +487,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       const ext = translation.parsed?.type || "srt"
       const hasExt = translation.title.toLowerCase().endsWith(`.${ext}`)
       fileName = hasExt ? translation.title : `${translation.title}.${ext}`
+      blob = createUtf8SubtitleBlob(content, ext)
 
     } else {
       const extraction = extractionData[batchFileId]
@@ -497,11 +499,11 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       const dotIdx = baseTitle.lastIndexOf('.')
       const baseName = dotIdx > 0 ? baseTitle.slice(0, dotIdx) : baseTitle
       fileName = `${baseName}.txt`
+      blob = new Blob([content], { type: "text/plain" })
     }
 
     if (!content || !fileName) return
 
-    const blob = new Blob([content], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
@@ -545,7 +547,8 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
           ? fileKey
           : `${baseName} (${newCount}).${ext}`
 
-        zip.file(uniqueFileName, content)
+        const fileContent = ext === "vtt" ? content : "\ufeff" + content
+        zip.file(uniqueFileName, fileContent)
       }
     } else {
       for (const batchFile of batchFiles) {

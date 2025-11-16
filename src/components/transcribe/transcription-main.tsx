@@ -63,7 +63,7 @@ import { SubtitleTranslated } from "@/types/subtitles"
 import { useRouter } from "next/navigation"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
-import { cn, calculateAudioDuration } from "@/lib/utils"
+import { cn, calculateAudioDuration, createUtf8SubtitleBlob } from "@/lib/utils"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { Label } from "../ui/label"
@@ -331,7 +331,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       fileName = "transcription.srt"
     }
 
-    const blob = new Blob([srtContent], { type: "text/plain" })
+    const blob = createUtf8SubtitleBlob(srtContent, "srt")
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url

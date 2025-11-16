@@ -1,3 +1,4 @@
+import { SubtitleType } from "@/types/subtitles"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -40,17 +41,24 @@ export function calculateAudioDuration(file: File): Promise<number> {
   return new Promise((resolve) => {
     const audio = new Audio()
     const objectUrl = URL.createObjectURL(file)
-    
+
     audio.addEventListener('loadedmetadata', () => {
       URL.revokeObjectURL(objectUrl)
       resolve(audio.duration || 0)
     })
-    
+
     audio.addEventListener('error', () => {
       URL.revokeObjectURL(objectUrl)
       resolve(0)
     })
-    
+
     audio.src = objectUrl
   })
+}
+
+export function createUtf8SubtitleBlob(content: string, type: SubtitleType): Blob {
+  if (type === "vtt") {
+    return new Blob([content], { type: "text/vtt;charset=utf-8" })
+  }
+  return new Blob(["\ufeff", content], { type: "text/plain;charset=utf-8" })
 }
