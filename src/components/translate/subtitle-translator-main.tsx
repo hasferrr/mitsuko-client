@@ -312,6 +312,7 @@ export default function SubtitleTranslatorMain({
         }))
 
         setParsed(currentId, data.parsed)
+        setToType(data.parsed.type)
         if (data.parsed.type === "ass") {
           setIsASSGuidanceDialogOpen(true)
         }
