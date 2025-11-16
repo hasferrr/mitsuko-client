@@ -132,3 +132,9 @@ const setIsMaxCompletionTokensAuto = (value: boolean) => setAdvancedSettingsValu
 
 This wrapper pattern is used across settings components (`translate`, `batch`, `extract-context`, etc.) to keep component code declarative while leveraging the centralized setters exposed by the stores.
 As with setters, these getters ensure each component interacts only with the relevant slice of settings, avoiding accidental cross-project state leaks.
+
+### Subtitle text encoding
+
+- Use `createUtf8SubtitleBlob(content, type)` from `src/lib/utils.ts` for all SRT/ASS/VTT downloads
+- VTT uses UTF-8 without BOM; other subtitle types use UTF-8 with BOM
+- For non-subtitle exports (context `.txt`, CSV, JSON), use plain UTF-8 Blobs without BOM
