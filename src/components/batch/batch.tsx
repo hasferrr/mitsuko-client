@@ -63,8 +63,6 @@ export default function Batch() {
     }
   }
 
-  
-
   // Ensure translations are loaded for current batch project
   useEffect(() => {
     if (!batch || !batch.isBatch) return
