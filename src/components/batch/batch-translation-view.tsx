@@ -64,13 +64,12 @@ import useBatchTranslationHandler from "@/hooks/batch/use-batch-translation-hand
 import { BatchFileList } from "./batch-file-list"
 import { useBatchSelection } from "@/hooks/batch/use-batch-selection"
 import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
+import { MAX_BATCH_CONCURRENT_OPERATION } from "@/constants/limits"
 
 interface BatchTranslationViewProps {
   basicSettingsId: string
   advancedSettingsId: string
 }
-
-const MAX_CONCURRENT_OPERATION = 5
 
 export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: BatchTranslationViewProps) {
   const [activeTab, setActiveTab] = useState("basic")
@@ -484,7 +483,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
               <div className="flex flex-col">
                 <span className="text-sm font-semibold">Max Concurrent Translations</span>
                 <span className="text-xs text-muted-foreground">
-                  Files processed simultaneously (max {MAX_CONCURRENT_OPERATION})
+                  Files processed simultaneously (max {MAX_BATCH_CONCURRENT_OPERATION})
                 </span>
               </div>
               <div className="flex items-center gap-1">
@@ -500,11 +499,11 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
                 <input
                   type="number"
                   min={1}
-                  max={MAX_CONCURRENT_OPERATION}
+                  max={MAX_BATCH_CONCURRENT_OPERATION}
                   value={concurrentOperation}
                   onChange={(e) => setConcurrentOperation(
                     currentProject?.id ?? "",
-                    Math.max(1, Math.min(MAX_CONCURRENT_OPERATION, parseInt(e.target.value) || 1))
+                    Math.max(1, Math.min(MAX_BATCH_CONCURRENT_OPERATION, parseInt(e.target.value) || 1))
                   )}
                   className="w-12 h-8 text-center border border-input rounded-md bg-background shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
@@ -512,8 +511,8 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
                   variant="ghost"
                   size="sm"
                   className="h-8 w-8 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
-                  onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_CONCURRENT_OPERATION, concurrentOperation + 1))}
-                  disabled={concurrentOperation >= MAX_CONCURRENT_OPERATION}
+                  onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_BATCH_CONCURRENT_OPERATION, concurrentOperation + 1))}
+                  disabled={concurrentOperation >= MAX_BATCH_CONCURRENT_OPERATION}
                 >
                   +
                 </Button>
