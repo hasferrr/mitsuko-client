@@ -1,4 +1,3 @@
-import { sleep } from "../utils"
 import { supabase } from "../supabase"
 import { fetchEventSource, EventStreamContentType } from "@microsoft/fetch-event-source"
 
@@ -30,12 +29,6 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
   }
 
   setResponse("")
-
-  if (!abortControllerRef.current.signal.aborted) {
-    abortControllerRef.current.abort()
-    await sleep(1000)
-  }
-  abortControllerRef.current = new AbortController()
 
   let buffer = ""
   let reasoning = ""
