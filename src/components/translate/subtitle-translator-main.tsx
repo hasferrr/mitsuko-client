@@ -92,7 +92,7 @@ import { Label } from "@/components/ui/label"
 import { Translation } from "@/types/project"
 import { DownloadSection } from "../download-section"
 import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
-import { useTranslationHandler } from "@/hooks/use-translation-handler"
+import { useTranslationHandler } from "@/hooks/handler/use-translation-handler"
 
 interface SubtitleTranslatorMainProps {
   currentId: string

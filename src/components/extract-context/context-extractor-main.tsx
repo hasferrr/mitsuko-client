@@ -34,7 +34,7 @@ import { Extraction, Translation } from "@/types/project"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
 import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
-import { useExtractionHandler } from "@/hooks/use-extraction-handler"
+import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
 
 interface ContextExtractorMainProps {
   currentId: string

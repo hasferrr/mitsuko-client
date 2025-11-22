@@ -15,7 +15,7 @@ import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated
 import { UserCreditData } from "@/types/user"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { useQuery } from "@tanstack/react-query"
-import { useTranslationHandler } from "@/hooks/use-translation-handler"
+import { useTranslationHandler } from "@/hooks/handler/use-translation-handler"
 import { BatchFile } from "@/types/batch"
 
 interface UseBatchTranslationHandlerProps {
