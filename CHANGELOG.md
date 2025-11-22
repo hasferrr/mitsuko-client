@@ -14,6 +14,11 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### November 22
+
+- 🤖 **Model Updates:** Added Gemini 3 Pro. It is Google's most intelligent model family to date, built on a foundation of state-of-the-art reasoning.
+- 🎙️ **Transcription:** Added library and save custom instructions button on transcription settings.
+
 ### November 14
 
 - 🤖 **Model Updates:**
