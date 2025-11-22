@@ -8,6 +8,8 @@ import { transcriptionInstructionPresets } from "@/constants/custom-instructions
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { Transcription } from "@/types/project"
 import { Badge } from "@/components/ui/badge"
+import { CustomInstructionsLibraryControls } from "@/components/settings/custom-instructions-library-controls"
+import { CustomInstructionsSaveDialog } from "@/components/settings/custom-instructions-save-dialog"
 
 const languages = [
   { value: "auto", label: "Auto-detect" },
@@ -54,6 +56,15 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
   const handlePresetSelect = (instruction: string) => {
     setCustomInstructions(instruction)
     setIsPresetsDialogOpen(false)
+    const textarea = document.querySelector<HTMLTextAreaElement>("textarea[placeholder='Enter custom instructions for transcription...']")
+    if (textarea) {
+      textarea.style.height = "auto"
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`
+    }
+  }
+
+  const handleLibrarySelect = (instruction: string) => {
+    setCustomInstructions(instruction)
     const textarea = document.querySelector<HTMLTextAreaElement>("textarea[placeholder='Enter custom instructions for transcription...']")
     if (textarea) {
       textarea.style.height = "auto"
@@ -127,15 +138,22 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
       <div>
         <div className="flex items-center justify-between mb-1">
           <label className="text-sm text-muted-foreground">Custom Instructions</label>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsPresetsDialogOpen(true)}
-            className="h-7 px-2"
-          >
-            <List className="h-3.5 w-3.5" />
-            <span className="ml-1">Presets</span>
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsPresetsDialogOpen(true)}
+              className="h-8 px-2"
+            >
+              <List className="h-3.5 w-3.5" />
+              <span className="ml-1">Presets</span>
+            </Button>
+            <CustomInstructionsLibraryControls
+              customInstructions={customInstructions}
+              onSelectFromLibrary={handleLibrarySelect}
+            />
+            <CustomInstructionsSaveDialog customInstructions={customInstructions} />
+          </div>
         </div>
         <Textarea
           value={customInstructions}
