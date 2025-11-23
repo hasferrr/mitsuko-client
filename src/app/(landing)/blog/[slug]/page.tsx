@@ -6,7 +6,7 @@ import rehypeRaw from 'rehype-raw'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { getAdjacentPosts, getAllPostsMeta, getPostBySlug } from '@/lib/blog'
 
-export const revalidate = 60
+export const dynamic = 'force-static'
 
 export async function generateStaticParams() {
   const posts = await getAllPostsMeta()

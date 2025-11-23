@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { getAllPostsMeta } from '@/lib/blog'
 
-export const revalidate = 60
+export const dynamic = 'force-static'
 
 export const metadata: Metadata = {
   title: 'Blog - Mitsuko',
