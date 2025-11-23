@@ -82,7 +82,7 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
         }
       })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFewShotEnabled, fewShotType, fewShotLinkedId, setFewShotStartIndex, setFewShotEndIndex, parent])
 
   const handleFewShotValueChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -175,12 +175,12 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
         />
       </div>
 
-      <>
+      <div className={cn(!isFewShotEnabled && "pointer-events-none opacity-50")}>
         <RadioGroup
           disabled={!isFewShotEnabled}
           value={fewShotType}
           onValueChange={(value) => handleTypeChange(value as 'manual' | 'linked')}
-          className={cn("flex space-x-4 mb-2 py-2", !isFewShotEnabled && "opacity-50")}
+          className={cn("flex space-x-4 mb-2 py-2")}
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="linked" id="fewshot-link" />
@@ -211,7 +211,7 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
         {fewShotType === 'linked' && (
           <div className="space-y-3">
             {fewShotLinkedId && linkedTranslationTitle ? (
-              <div className={cn("p-3 border rounded-md space-y-3", !isFewShotEnabled && "opacity-50")}>
+              <div className={cn("p-3 border rounded-md space-y-3")}>
                 <div className="flex flex-row items-center justify-between">
                   <div className="space-y-1">
                     <span className="text-sm font-medium">Linked: {linkedTranslationTitle}</span>
@@ -276,7 +276,7 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
             </p>
           </div>
         )}
-      </>
+      </div>
 
       <Dialog open={isLinkTranslationDialogOpen} onOpenChange={setIsLinkTranslationDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
