@@ -1,13 +1,12 @@
 "use client"
 
-import { useId } from "react"
 import { Upload } from "lucide-react"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { SortableBatchFile } from "./sortable-batch-file"
 import { BatchFile } from "@/types/batch"
-import { SUBTITLE_NAME_MAP } from "@/constants/subtitle-formats"
+import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { DownloadOption } from "@/types/subtitles"
 
 interface BatchFileListProps {
@@ -23,6 +22,7 @@ interface BatchFileListProps {
   onDownload: (id: string) => void
   onClick: (id: string) => void
   onSelectToggle: (id: string) => void
+  uploadInputId?: string
 }
 
 export function BatchFileList({
@@ -38,10 +38,10 @@ export function BatchFileList({
   onDownload,
   onClick,
   onSelectToggle,
+  uploadInputId,
 }: BatchFileListProps) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
-  const id = useId()
-  const inputId = `batch-file-upload-${id}`
+  const inputId = uploadInputId || "batch-file-upload-input"
 
   const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -56,6 +56,7 @@ export function BatchFileList({
       <input
         id={inputId}
         type="file"
+        accept={ACCEPTED_FORMATS.join(",")}
         hidden
         onChange={handleFileInputChange}
         multiple

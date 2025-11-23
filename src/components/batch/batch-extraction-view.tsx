@@ -371,6 +371,8 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
     }
   }
 
+  const uploadInputId = "batch-file-upload-input"
+
   return (
     <div className="grid md:grid-cols-[1fr_402px] gap-6">
       {/* Left Column - Files */}
@@ -448,7 +450,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               variant="outline"
               size="sm"
               className="gap-2 rounded-lg"
-              onClick={() => document.getElementById('batch-file-upload-input')?.click()}
+              onClick={() => document.getElementById(uploadInputId)?.click()}
               disabled={isProcessing}
             >
               <Upload className="h-4 w-4" />
@@ -480,6 +482,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
           onDownload={handleSingleFileDownload}
           onClick={handlePreview}
           onSelectToggle={handleSelectToggle}
+          uploadInputId={uploadInputId}
         />
 
         <div className="flex flex-wrap items-center gap-4 w-full">
