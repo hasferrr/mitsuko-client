@@ -406,7 +406,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
           <Button
             className="h-10 flex-1"
             onClick={handleOpenStartBatchDialog}
-            disabled={isProcessing || !session || batchFiles.length === 0}
+            disabled={isProcessing || !session || batchFiles.length === 0 || isSelecting}
           >
             {isProcessing ? (
               <>
@@ -435,7 +435,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
           variant="outline"
           className="h-10 w-full border-primary/25 hover:border-primary/50"
           onClick={handleOpenContinueBatchDialog}
-          disabled={isProcessing || !session || batchFiles.length === 0 || (batchFiles.length - finishedCount <= 0)}
+          disabled={isProcessing || !session || batchFiles.length === 0 || (batchFiles.length - finishedCount <= 0) || isSelecting}
         >
           <FastForward className="h-4 w-4" />
           Continue Batch Translation ({batchFiles.length - finishedCount} remaining)
