@@ -10,10 +10,6 @@ import { Label } from "@/components/ui/label"
 
 interface SubtitleViewerProps {
   subtitleEvents: SubtitleEvent[]
-  ignoreWhitespace: boolean
-  setIgnoreWhitespace: (value: boolean) => void
-  ignorePunctuation: boolean
-  setIgnorePunctuation: (value: boolean) => void
   enableHighlight: boolean
   setEnableHighlight: (value: boolean) => void
   calculateCPS: (event: SubtitleEvent) => number
@@ -21,10 +17,6 @@ interface SubtitleViewerProps {
 
 export default function SubtitleViewer({
   subtitleEvents,
-  ignoreWhitespace,
-  setIgnoreWhitespace,
-  ignorePunctuation,
-  setIgnorePunctuation,
   enableHighlight,
   setEnableHighlight,
   calculateCPS,
@@ -50,14 +42,6 @@ export default function SubtitleViewer({
   return (
     <div>
       <div className="flex items-center space-x-4 my-4">
-        <div className="flex items-center space-x-2">
-          <Checkbox id="ignoreWhitespace" checked={ignoreWhitespace} onCheckedChange={(checked) => setIgnoreWhitespace(Boolean(checked))} />
-          <Label htmlFor="ignoreWhitespace">Ignore Whitespace</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Checkbox id="ignorePunctuation" checked={ignorePunctuation} onCheckedChange={(checked) => setIgnorePunctuation(Boolean(checked))} />
-          <Label htmlFor="ignorePunctuation">Ignore Punctuation</Label>
-        </div>
         <div className="flex items-center space-x-2">
           <Checkbox id="enableHighlight" checked={enableHighlight} onCheckedChange={(checked) => setEnableHighlight(Boolean(checked))} />
           <Label htmlFor="enableHighlight">Syntax Highlight</Label>

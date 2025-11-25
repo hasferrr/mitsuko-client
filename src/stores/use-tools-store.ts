@@ -4,8 +4,6 @@ import type { SubtitleEvent, SubtitleType, DownloadOption, CombinedFormat, Parse
 interface ToolsStore {
   subtitleEvents: SubtitleEvent[]
   subtitles: Subtitle[]
-  ignoreWhitespace: boolean
-  ignorePunctuation: boolean
   enableHighlight: boolean
   fileName: string
   toType: SubtitleType
@@ -15,8 +13,6 @@ interface ToolsStore {
   rawContent: string
   setSubtitleEvents: (events: SubtitleEvent[]) => void
   setSubtitles: (subs: Subtitle[]) => void
-  setIgnoreWhitespace: (value: boolean) => void
-  setIgnorePunctuation: (value: boolean) => void
   setEnableHighlight: (value: boolean) => void
   setFileName: (name: string) => void
   setToType: (type: SubtitleType) => void
@@ -30,8 +26,6 @@ interface ToolsStore {
 const initialState = {
   subtitleEvents: [] as SubtitleEvent[],
   subtitles: [] as Subtitle[],
-  ignoreWhitespace: true,
-  ignorePunctuation: true,
   enableHighlight: true,
   fileName: "",
   toType: "srt" as SubtitleType,
@@ -45,8 +39,6 @@ export const useToolsStore = create<ToolsStore>()((set) => ({
   ...initialState,
   setSubtitleEvents: (events) => set({ subtitleEvents: events }),
   setSubtitles: (subs) => set({ subtitles: subs }),
-  setIgnoreWhitespace: (value) => set({ ignoreWhitespace: value }),
-  setIgnorePunctuation: (value) => set({ ignorePunctuation: value }),
   setEnableHighlight: (value) => set({ enableHighlight: value }),
   setFileName: (name) => set({ fileName: name }),
   setToType: (type) => set({ toType: type }),

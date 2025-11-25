@@ -48,10 +48,6 @@ export default function Tools() {
   const setSubtitleEvents = useToolsStore(state => state.setSubtitleEvents)
   const subtitles = useToolsStore(state => state.subtitles)
   const setSubtitles = useToolsStore(state => state.setSubtitles)
-  const ignoreWhitespace = useToolsStore(state => state.ignoreWhitespace)
-  const setIgnoreWhitespace = useToolsStore(state => state.setIgnoreWhitespace)
-  const ignorePunctuation = useToolsStore(state => state.ignorePunctuation)
-  const setIgnorePunctuation = useToolsStore(state => state.setIgnorePunctuation)
   const enableHighlight = useToolsStore(state => state.enableHighlight)
   const setEnableHighlight = useToolsStore(state => state.setEnableHighlight)
   const fileName = useToolsStore(state => state.fileName)
@@ -226,16 +222,12 @@ export default function Tools() {
     text = text.replace(/\\n|\\N/gi, "\n")
     text = text.replace(/{(?!\\)[^}]*}/g, "")
 
-    if (ignoreWhitespace) {
-      text = text.replace(/\s/g, "")
-    }
+    text = text.replace(/\s/g, "")
 
-    if (ignorePunctuation) {
-      try {
-        text = text.replace(/\p{P}+/gu, "")
-      } catch {
-        text = text.replace(/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/g, "")
-      }
+    try {
+      text = text.replace(/\p{P}+/gu, "")
+    } catch {
+      text = text.replace(/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/g, "")
     }
 
     let characterCount = 0
@@ -344,16 +336,14 @@ export default function Tools() {
           <SubtitleRawViewer
             content={rawContent}
             fileName={fileName}
+            enableHighlight={enableHighlight}
+            setEnableHighlight={setEnableHighlight}
           />
         </TabsContent>
 
         <TabsContent value="table-view">
           <SubtitleViewer
             subtitleEvents={subtitleEvents}
-            ignoreWhitespace={ignoreWhitespace}
-            setIgnoreWhitespace={setIgnoreWhitespace}
-            ignorePunctuation={ignorePunctuation}
-            setIgnorePunctuation={setIgnorePunctuation}
             enableHighlight={enableHighlight}
             setEnableHighlight={setEnableHighlight}
             calculateCPS={calculateCPS}
