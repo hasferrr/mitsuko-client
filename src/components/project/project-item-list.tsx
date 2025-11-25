@@ -203,8 +203,8 @@ export const ProjectItemList = ({
                 </span>
               )}
             </div>
-            <p className="text-xs text-muted-foreground line-clamp-2">
-              {description}
+            <p className="text-xs text-muted-foreground line-clamp-2 break-words" style={{ overflowWrap: "anywhere" }}>
+              {description.substring(0, 250)}
             </p>
           </div>
         </div>
