@@ -130,36 +130,22 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "Gemini Flash Latest",
-        subName: "gemini-flash-latest",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini Flash-Lite Latest",
-        subName: "gemini-flash-lite-latest",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
         name: "Gemini 2.5 Flash",
-        subName: "gemini-2.5-flash",
+        subName: "gemini-flash-latest\ngemini-2.5-flash-preview-09-2025",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Gemini 2.5 Flash Lite",
+        subName: "gemini-flash-lite-latest\ngemini-2.5-flash-lite-preview-09-2025",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -180,33 +166,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         usage: "N/A",
         default: {
           temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Mistral Small 3",
-        subName: "mistral-small-3.2-24b-instruct",
-        maxInput: 128000,
-        maxOutput: 128000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Mistral Nemo",
-        maxInput: 128000,
-        maxOutput: 128000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -238,6 +197,33 @@ const RAW_FREE_MODELS: FreeModelCollection = {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 64000,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Mistral Small 3",
+        subName: "mistral-small-3.2-24b-instruct",
+        maxInput: 128000,
+        maxOutput: 128000,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Mistral Nemo",
+        maxInput: 128000,
+        maxOutput: 128000,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
       },
@@ -278,36 +264,8 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "Gemini Flash Latest",
-        subName: "gemini-flash-latest",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "medium",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini Flash-Lite Latest",
-        subName: "gemini-flash-lite-latest",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "very low",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
         name: "Gemini 2.5 Flash",
-        subName: "gemini-2.5-flash",
+        subName: "gemini-flash-latest\ngemini-2.5-flash-preview-09-2025",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -321,7 +279,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       },
       {
         name: "Gemini 2.5 Flash Lite",
-        subName: "gemini-2.5-flash-lite",
+        subName: "gemini-flash-lite-latest\ngemini-2.5-flash-lite-preview-09-2025",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
