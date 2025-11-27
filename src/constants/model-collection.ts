@@ -310,7 +310,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "anthropic",
     models: [
       {
-        name: "Claude 4 Sonnet",
+        name: "Claude 4.5 Sonnet",
         maxInput: 200_000,
         maxOutput: 64_000,
         structuredOutput: true,
@@ -336,6 +336,19 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
+        name: "Claude 4.5 Haiku",
+        maxInput: 200_000,
+        maxOutput: 64_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "medium",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "Claude 3.5 Haiku",
         maxInput: 200_000,
         maxOutput: 8_129,
@@ -347,27 +360,14 @@ const RAW_PAID_MODELS: PaidModelCollection = {
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
-      }
+      },
     ]
   },
   xAI: {
     provider: "xai",
     models: [
       {
-        name: "Grok 4",
-        maxInput: 256_000,
-        maxOutput: 256_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "high",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Grok 4 Fast",
+        name: "Grok 4.1 Fast",
         maxInput: 2_000_000,
         maxOutput: 30_000,
         structuredOutput: true,
@@ -380,9 +380,9 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "Grok 3",
-        maxInput: 131_072,
-        maxOutput: 131_072,
+        name: "Grok 4",
+        maxInput: 256_000,
+        maxOutput: 256_000,
         structuredOutput: true,
         isPaid: true,
         usage: "high",
