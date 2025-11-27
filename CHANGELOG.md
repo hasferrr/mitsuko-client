@@ -14,6 +14,13 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### November 27
+
+- 🤖 **Model Updates:**
+    - Upgraded Claude models to the latest Claude 4.5 family for better reasoning and translation quality.
+    - Added Grok 4.1 Fast, an updated, high‑speed option with better performance for subtitles.
+    - Generalized Gemini 2.5 Flash and Flash‑Lite from the "latest" options and they are now always up-to-date.
+
 ### November 22
 
 - 🤖 **Model Updates:** Added Gemini 3 Pro. It is Google's most intelligent model family to date, built on a foundation of state-of-the-art reasoning.
