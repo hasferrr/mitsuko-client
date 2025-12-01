@@ -72,7 +72,7 @@ export default function Tools() {
   useEffect(() => {
     const themeLink = document.getElementById('hljs-theme') as HTMLLinkElement
     const themePath = isDarkMode
-      ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css'
+      ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/felipec.css'
       : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css'
 
     if (themeLink) {
