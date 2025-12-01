@@ -144,7 +144,7 @@ export default function ComparisonSection() {
     <div className="bg-white dark:bg-black py-16">
       <div className="max-w-6xl mx-auto px-4">
         <div>
-          <h2 className="text-4xl font-bold text-center mb-4 text-gray-900 dark:text-white">
+          <h2 className="md:text-4xl text-3xl font-semibold text-center mb-4 tracking-tight">
             Why Choose Mitsuko
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-center max-w-3xl mx-auto mb-12">

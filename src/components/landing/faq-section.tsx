@@ -57,7 +57,7 @@ export default function FAQSection() {
           className="flex flex-col items-center justify-center space-y-4 text-center"
         >
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold tracking-tighter text-gray-900 dark:text-white">
+            <h2 className="text-4xl font-semibold tracking-tighter">
               Frequently Asked Questions
             </h2>
             <p className="max-w-[900px] text-gray-600 dark:text-gray-400 md:text-base/relaxed lg:text-base/relaxed xl:text-base/relaxed">
@@ -71,7 +71,7 @@ export default function FAQSection() {
           <Accordion type="single" collapsible className="w-full">
             {faqData.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 dark:border-gray-800">
-                <AccordionTrigger className="text-left text-base md:text-lg font-medium text-gray-900 dark:text-white hover:text-gray-900 dark:hover:text-white py-4">
+                <AccordionTrigger className="text-left text-base md:text-lg font-medium hover:text-gray-900 dark:hover:text-white py-4">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="pb-4 pt-1" >

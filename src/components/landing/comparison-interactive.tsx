@@ -15,10 +15,10 @@ interface ComparisonDetailText {
 }
 
 interface ComparisonCategoryData {
-    id: ComparisonCategory;
-    label: string;
-    mitsukoLevel: string;
-    mtlLevel: string;
+  id: ComparisonCategory;
+  label: string;
+  mitsukoLevel: string;
+  mtlLevel: string;
 }
 
 interface ComparisonInteractiveProps {
@@ -52,7 +52,7 @@ export default function ComparisonInteractive({
       <div
         className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm"
       >
-        <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+        <h3 className="text-2xl font-semibold mb-6 ">
           Mitsuko vs. Generic Translation
         </h3>
 
@@ -61,7 +61,7 @@ export default function ComparisonInteractive({
             <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mb-2">
               <Target size={24} className="text-white" />
             </div>
-            <span className="text-gray-900 dark:text-white font-medium">Mitsuko</span>
+            <span className="font-medium">Mitsuko</span>
           </div>
 
           <div className="flex flex-col items-center">
@@ -82,13 +82,13 @@ export default function ComparisonInteractive({
             <div
               key={category.id}
               className={cn(
-                "border-b border-gray-300 dark:border-gray-700 transition-colors duration-200 rounded-md p-4 cursor-pointer",
+                "transition-colors duration-200 rounded-md p-4 cursor-pointer",
                 hoveredCategory === category.id && "bg-blue-50 dark:bg-blue-900/20"
               )}
               onMouseEnter={() => handleMouseEnter(category.id)}
             >
               <div className="flex justify-between items-center my-2">
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-medium">
                   {category.label}
                 </span>
                 <div className="flex gap-4">
@@ -111,18 +111,18 @@ export default function ComparisonInteractive({
       >
         {/* Heading with Next Example Button */}
         <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h3 className="text-2xl font-semibold">
             See the Difference
-            </h3>
-            {hasMultipleExamples && (
+          </h3>
+          {hasMultipleExamples && (
             <button
-                onClick={showNextExample}
-                className="flex items-center gap-1 text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-                aria-label="Show next example"
+              onClick={showNextExample}
+              className="flex items-center gap-1 text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              aria-label="Show next example"
             >
-                Next Example <ChevronRight size={16} />
+              Next Example <ChevronRight size={16} />
             </button>
-            )}
+          )}
         </div>
 
 
@@ -205,7 +205,7 @@ export default function ComparisonInteractive({
 
           {/* Render Advantage */}
           <div className="mt-4">
-            <h4 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+            <h4 className="text-xl font-bold mb-4">
               {details.advantage.title}
             </h4>
             {Array.isArray(details.advantage.description) ? (

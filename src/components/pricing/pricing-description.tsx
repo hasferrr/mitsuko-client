@@ -8,7 +8,7 @@ export default function PricingDescription() {
     <div id="pricing" className="py-4">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-semibold mb-4 text-gray-900 dark:text-white">
+          <h2 className="text-4xl font-semibold mb-4 tracking-tight">
             How Credits Work
           </h2>
           <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">

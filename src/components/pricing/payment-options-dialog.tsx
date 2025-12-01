@@ -21,6 +21,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createPaymentLink } from "@/lib/api/create-snap-payment"
 import { useSessionStore } from "@/stores/use-session-store"
+import LemonSqueezyLogo from "@/static/lemonsqueezy.svg"
+import Image from "next/image"
 
 const MIN_QUANTITY = 1
 const MAX_QUANTITY = 10
@@ -268,7 +270,13 @@ export function PaymentOptionsDialog({
               {isFetchingPayment ? (
                 <Loader2 className="w-6 h-6 mr-4 text-gray-500 flex-shrink-0 mt-1 animate-spin" />
               ) : (
-                <img src="/lemonsqueezy.svg" alt="Lemon Squeezy" className="w-6 h-6 mr-4 flex-shrink-0 mt-1" />
+                <Image
+                  src={LemonSqueezyLogo}
+                  alt="Lemon Squeezy"
+                  width={24}
+                  height={24}
+                  className="w-6 h-6 mr-4 flex-shrink-0 mt-1"
+                />
               )}
               <div className="flex-grow">
                 <div className="font-medium text-sm mb-1">Pay with Lemon Squeezy</div>

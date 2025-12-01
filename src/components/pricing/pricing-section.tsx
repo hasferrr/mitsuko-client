@@ -126,12 +126,12 @@ export default function PricingSection({
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
           {useH1Title ? (
-            <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-              Simple, Transparent <span className="text-blue-400">Pricing</span>
+            <h1 className="text-4xl font-semibold mb-4 tracking-tight">
+              Simple, Transparent Pricing
             </h1>
           ) : (
-            <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-              Simple, Transparent <span className="text-blue-400">Pricing</span>
+            <h2 className="text-4xl font-semibold mb-4 tracking-tight">
+              Simple, Transparent Pricing
             </h2>
           )}
           <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">

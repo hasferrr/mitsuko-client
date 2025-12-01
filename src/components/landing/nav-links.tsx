@@ -53,12 +53,12 @@ export default function NavLinks({
             {isMobileSolutionsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
           {isMobileSolutionsOpen && (
-            <div className="flex flex-col pl-4 space-y-1">
+            <div className="flex flex-col space-y-1">
               {solutionItems.map((item, index) => (
                 <Button
                   key={`mobile-solution-${index}`}
                   variant="ghost"
-                  className="font-normal w-full justify-start text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 rounded-md"
+                  className="font-normal w-full justify-start text-left block px-4 text-sm rounded-md"
                 >
                   {item}
                 </Button>
@@ -75,13 +75,13 @@ export default function NavLinks({
             <ChevronDown size={16} />
           </button>
           <div
-            className="absolute left-0 mt-0 w-48 rounded-md bg-white dark:bg-gray-900 p-2 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+            className="absolute left-1/2 transform -translate-x-1/2 mt-0 w-48 rounded-md bg-background p-2 border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
           >
             {solutionItems.map((item, index) => (
               <Button
                 key={`nav-solution-${index}`}
                 variant="ghost"
-                className="font-normal w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 rounded-md"
+                className="font-normal w-full text-left block px-4 py-2 text-sm rounded-md"
               >
                 {item}
               </Button>

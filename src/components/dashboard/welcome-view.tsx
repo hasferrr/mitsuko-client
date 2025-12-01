@@ -126,13 +126,13 @@ export function WelcomeView() {
     <div className="flex-1 p-6 relative">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-medium mb-3">What would you like to do?</h2>
+          <h2 className="text-3xl font-medium mb-3 -tracking-[0.02em]">Get started with Mitsuko</h2>
           <p className="text-muted-foreground mx-auto">
-            Select one of the options below to get started with Mitsuko's AI-powered tools
+            Select one of the options below to get started with AI-powered tools
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 -tracking-[0.02em]">
           {/* Translation Option */}
           <div
             className={cn(

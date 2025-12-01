@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Inter, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { META_DESCRIPTION, META_KEYWORDS, META_TITLE_LONG } from '@/constants/metadata'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
@@ -50,9 +50,9 @@ export const viewport: Viewport = {
   ],
 }
 
-const geistSans = Geist({
+const inter = Inter({
   subsets: ["latin"],
-  variable: '--font-geist-sans',
+  variable: '--font-inter',
 })
 
 const geistMono = Geist_Mono({
@@ -66,7 +66,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={cn(geistSans.variable, geistMono.variable, "dark scroll-smooth")}>
+    <html lang="en" className={cn(inter.variable, geistMono.variable, "dark scroll-smooth")}>
       <link rel="icon" href="/favicon.ico" sizes="any" />
       <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />

@@ -84,7 +84,7 @@ export function AppSidebar({ className, ...props }: React.ComponentProps<typeof 
   }
 
   return (
-    <Sidebar className={cn("z-20", className)} collapsible="icon" variant="floating" {...props}>
+    <Sidebar className={cn("z-20 -tracking-[0.01em]", className)} collapsible="icon" variant="floating" {...props}>
       <SidebarHeader>
         <Link href="/">
           <SidebarHeaderIcon />
