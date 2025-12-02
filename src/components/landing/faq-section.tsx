@@ -50,7 +50,7 @@ const faqData = [
 
 export default function FAQSection() {
   return (
-    <section className="w-full py-16 bg-white dark:bg-black transition-colors">
+    <section className="w-full py-16 transition-colors">
       <div className="relative max-w-6xl mx-auto px-4">
         <div id="faq" className="absolute -top-24" />
         <div

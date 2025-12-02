@@ -68,12 +68,13 @@ export default function NavLinks({
         </>
       ) : (
         <div className="relative group">
-          <button
+          <Link
+            href="/blog/introducing-mitsuko-blog"
             className="flex items-center text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors gap-1 py-2"
           >
             Solutions
             <ChevronDown size={16} />
-          </button>
+          </Link>
           <div
             className="absolute left-1/2 transform -translate-x-1/2 mt-0 w-48 rounded-md bg-background p-2 border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
           >

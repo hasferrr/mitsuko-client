@@ -141,7 +141,7 @@ const comparisonDetailsTextData: Record<ComparisonCategory, ComparisonDetailText
 
 export default function ComparisonSection() {
   return (
-    <div className="bg-white dark:bg-black py-16">
+    <div className="py-16">
       <div className="max-w-6xl mx-auto px-4">
         <div>
           <h2 className="md:text-4xl text-3xl font-semibold text-center mb-4 tracking-tight">
