@@ -23,6 +23,14 @@ export const getModelCostData = async (): Promise<Map<string, ModelCreditCost>> 
       })
     })
 
+    data.transcription.forEach((model) => {
+      modelCreditCosts.set(model.name, {
+        creditPerInputToken: model.creditPerInputToken,
+        creditPerOutputToken: model.creditPerOutputToken,
+        discount: model.discount,
+      })
+    })
+
   } catch {
     console.warn("Failed to fetch model prices, using fallback values")
     modelCreditCosts.set('DeepSeek R1', {
