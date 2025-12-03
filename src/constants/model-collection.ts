@@ -638,6 +638,36 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "deepseek",
     models: [
       {
+        name: "DeepSeek V3.2 Thinking",
+        subName: "deepseek-v3.2",
+        maxInput: 131072,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "low",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 32768,
+          isUseStructuredOutput: false
+        }
+      },
+      {
+        name: "DeepSeek V3.2",
+        subName: "deepseek-v3.2",
+        maxInput: 131072,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "low",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 32768,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "DeepSeek R1",
         subName: "DeepSeek-R1-0528",
         maxInput: 128000,
