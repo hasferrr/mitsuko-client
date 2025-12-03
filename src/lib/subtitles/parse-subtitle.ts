@@ -31,7 +31,7 @@ export const parseSubtitle = ({ content, type }: ParseSubtitleOptions): ParseSub
       subtitles: parsed.subtitles,
       parsed: {
         type: "ass",
-        data: parsed
+        data: parsed.data
       }
     }
   }

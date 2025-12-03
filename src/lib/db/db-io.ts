@@ -16,10 +16,10 @@ export async function exportDatabase(): Promise<string> {
   }
 
   if (process.env.NODE_ENV === 'development') {
-    return JSON.stringify(exportData, null, 2)
+    return JSON.stringify(databaseExportConstructor(exportData), null, 2)
   }
 
-  return JSON.stringify(exportData)
+  return JSON.stringify(databaseExportConstructor(exportData))
 }
 
 export async function exportProject(
@@ -93,8 +93,8 @@ export async function exportProject(
 
   const content =
     process.env.NODE_ENV === "development"
-      ? JSON.stringify(exportData, null, 2)
-      : JSON.stringify(exportData)
+      ? JSON.stringify(databaseExportConstructor(exportData), null, 2)
+      : JSON.stringify(databaseExportConstructor(exportData))
 
   return {
     name: project.name,

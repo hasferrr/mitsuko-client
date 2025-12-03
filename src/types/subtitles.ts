@@ -33,7 +33,6 @@ export interface SubOnlyTranslated {
 }
 
 export interface ASSParseOutput {
-  subtitles: Subtitle[]
   header: string
   events: SubtitleEvent[]
   footer: string

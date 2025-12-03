@@ -191,7 +191,7 @@ function translationConstructor(translation: Partial<Translation>): Translation 
     id: translation.id ?? uuidv4(),
     title: translation.title ?? "Translation X",
     subtitles: translation.subtitles ?? [],
-    parsed: translation.parsed ?? { type: "srt", data: null },
+    parsed: sanitizeParsed(translation.parsed),
     createdAt: translation.createdAt ?? new Date(),
     updatedAt: translation.updatedAt ?? new Date(),
     projectId: translation.projectId ?? "",
@@ -199,6 +199,21 @@ function translationConstructor(translation: Partial<Translation>): Translation 
     advancedSettingsId: translation.advancedSettingsId ?? "",
     response: translation.response ?? { response: "", jsonResponse: [] },
   }
+}
+
+function sanitizeParsed(parsed: Translation['parsed'] | undefined): Translation['parsed'] {
+  const safeParsed = parsed ?? { type: "srt", data: null }
+  if (safeParsed.type === "ass" && safeParsed.data) {
+    const data = { ...safeParsed.data } as typeof safeParsed.data & { subtitles?: unknown }
+    if ("subtitles" in data) {
+      delete data.subtitles
+      return {
+        ...safeParsed,
+        data,
+      }
+    }
+  }
+  return safeParsed
 }
 
 function transcriptionConstructor(transcription: Partial<Transcription>): Transcription {

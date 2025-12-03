@@ -19,11 +19,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 `.trimEnd()
 
 export function _mergeASSback(subtitles: Subtitle[], _parsed: ASSParseOutput | null): string {
-  const parsed = _parsed ? { ..._parsed } : {
+  const parsed: ASSParseOutput = _parsed ? { ..._parsed } : {
     header: defaultHeader,
     events: convertSubtitlesToSubtitleEvents(subtitles),
     footer: "",
-    subtitles: subtitles,
   }
 
   const newEvents = mergeSubtitles(parsed.events, subtitles)
