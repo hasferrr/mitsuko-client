@@ -259,6 +259,10 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
         (text) => setTranscriptionText(currentId, text),
       )
       setTranscriptSubtitles(currentId, parseTranscription(text))
+
+      if (deleteAfterTranscription) {
+        setSelectedUploadId(null)
+      }
     } catch (error) {
       console.error(error)
     } finally {
@@ -270,10 +274,6 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       // Revalidate uploads list
       queryClient.invalidateQueries({ queryKey: ["uploads"] })
       await refetchUploads()
-
-      if (deleteAfterTranscription) {
-        setSelectedUploadId(null)
-      }
       await saveData(currentId)
     }
   }
@@ -719,7 +719,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
             <TabsContent value="transcript" className="mt-4">
               <div className="bg-card border border-border rounded-lg p-6">
                 <div className="flex justify-between items-center mb-4 gap-2">
-                  <h2 className="text-lg font-medium">Transcription Result</h2>
+                  <h2 className="text-lg font-medium">Transcription</h2>
 
                   {(transcriptionText || isEditing) && (
                     <div className="flex flex-wrap gap-2 justify-end">
@@ -760,7 +760,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                         {isEditing
                           ? <Save className="h-3 w-3" />
                           : <Edit className="h-3 w-3" />}
-                        {isEditing ? "Save" : "Edit"}
+                        {isEditing ? "Done" : "Edit"}
                       </Button>
                       <Button
                         size="sm"
@@ -813,7 +813,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
             <TabsContent value="subtitles" className="mt-4">
               <div className="bg-card border border-border rounded-lg p-6">
                 <div className="flex justify-between items-center mb-4 gap-2">
-                  <h2 className="text-lg font-medium">Subtitles with Timestamps</h2>
+                  <h2 className="text-lg font-medium">Subtitle Result</h2>
 
                   {transcriptSubtitles.length > 0 && (
                     <div className="flex flex-wrap gap-2 justify-end">
@@ -826,7 +826,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                             onClick={handleClear}
                             disabled={isTranscribing}
                           >
-                            <Trash className="h-3 w-3 mr-1" /> Clear
+                            <Trash className="h-3 w-3" /> Clear
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
@@ -850,7 +850,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                         className="text-xs border-border"
                         onClick={handleParse}
                       >
-                        <ClipboardPaste className="h-3 w-3" /> Get Subtitle
+                        <ClipboardPaste className="h-3 w-3" /> Parse
                       </Button>
                       <Button
                         size="sm"
