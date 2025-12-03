@@ -21,7 +21,7 @@ export function parseTranslationJson(response: string): SubOnlyTranslated[] {
   }))
 }
 
-export function parseTranscription(response: string): Subtitle[] {
+function parseMitsukoTranscription(response: string): Subtitle[] {
   let text = response.trim()
   text = getContent(text)
   text = keepOnlyWrapped(text, "```", "```") || text
@@ -119,4 +119,12 @@ export function parseTranscription(response: string): Subtitle[] {
   }
 
   return parseSubtitle({ content: srtArr.join("\n") }).subtitles
+}
+
+export function parseTranscription(response: string): Subtitle[] {
+  try {
+    return parseMitsukoTranscription(response)
+  } catch (error) {
+    return parseSubtitle({ content: response }).subtitles
+  }
 }
