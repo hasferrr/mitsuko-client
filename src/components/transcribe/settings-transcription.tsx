@@ -7,23 +7,31 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { transcriptionInstructionPresets } from "@/constants/custom-instructions"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { Transcription } from "@/types/project"
-import { Badge } from "@/components/ui/badge"
 import { CustomInstructionsLibraryControls } from "@/components/settings/custom-instructions-library-controls"
 import { CustomInstructionsSaveDialog } from "@/components/settings/custom-instructions-save-dialog"
+import { ComboBox } from "../ui-custom/combo-box"
+import { TranscriptionModel } from "@/types/project"
 
 const languages = [
   { value: "auto", label: "Auto-detect" },
 ]
 
-const models = [
-  { value: "free", label: "Mitsuko" },
-  { value: "premium", label: "Mitsuko" },
+const models: { value: TranscriptionModel, label: string }[] = [
+  { value: "free", label: "mitsuko-free" },
+  { value: "premium", label: "mitsuko-premium" },
+  { value: "whisper-large-v3", label: "whisper-large-v3" },
+  { value: "whisper-large-v3-turbo", label: "whisper-large-v3-turbo" },
 ]
 
 const modes = [
   { value: "clause", label: "Mode 1: Clauses and sentences (Experimental)" },
   { value: "sentence", label: "Mode 2: Sentences" },
 ]
+
+const asrmodel = new Set([
+  "whisper-large-v3",
+  "whisper-large-v3-turbo",
+])
 
 interface SettingsTranscriptionProps {
   transcriptionId: string
@@ -94,32 +102,19 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
       {/* Model Selection */}
       <div>
         <label className="text-sm text-muted-foreground block mb-1">Model</label>
-        <Select value={selectedModel ?? undefined} onValueChange={setSelectedModel}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select a model" />
-          </SelectTrigger>
-          <SelectContent>
-            {models.map((model) => (
-              <SelectItem key={model.value} value={model.value}>
-                <div className="flex items-center gap-2">
-                  {model.label}
-                  <Badge
-                    variant={model.value.includes("free") ? "secondary" : "default"}
-                    className="text-xs px-2 h-[1.125rem]"
-                  >
-                    {model.value.includes("free") ? "Free" : "Premium"}
-                  </Badge>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <ComboBox
+          data={models.map((model) => model.value)}
+          value={models.find((model) => model.value === selectedModel)?.label || ""}
+          setValue={(m) => setSelectedModel(m as TranscriptionModel)}
+          valueForCheckmark={selectedModel || ""}
+          name="model"
+        />
       </div>
 
       {/* Mode Selection */}
       <div>
         <label className="text-sm text-muted-foreground block mb-1">Mode</label>
-        <Select value={selectedMode} onValueChange={setSelectedMode}>
+        <Select value={selectedMode} onValueChange={setSelectedMode} disabled={asrmodel.has(selectedModel || "")}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a mode" />
           </SelectTrigger>
@@ -137,9 +132,14 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
       {/* Custom Instructions */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label className="text-sm text-muted-foreground">Custom Instructions</label>
+          <label className="text-sm text-muted-foreground">
+            {asrmodel.has(selectedModel || "")
+              ? "Initial Prompt"
+              : "Custom Instructions"}
+          </label>
           <div className="flex items-center gap-1">
             <Button
+              disabled={asrmodel.has(selectedModel || "")}
               variant="outline"
               size="sm"
               onClick={() => setIsPresetsDialogOpen(true)}
@@ -169,7 +169,10 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
           onBlur={() => {
             saveData(transcriptionId)
           }}
-          placeholder="Enter custom instructions for transcription..."
+          placeholder={asrmodel.has(selectedModel || "")
+            ? "Optional text to provide as a prompt for the first window."
+            : "Enter custom instructions for transcription..."
+          }
           className="min-h-[150px] h-[150px] max-h-[250px] resize-none overflow-y-auto"
         />
       </div>

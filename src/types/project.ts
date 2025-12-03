@@ -3,6 +3,7 @@ import { Model } from "./model"
 
 export type ProjectType = 'translation' | 'transcription' | 'extraction'
 export type SettingsParentType = 'project' | 'translation' | 'extraction'
+export type TranscriptionModel = 'premium' | 'free' | 'whisper-large-v3' | 'whisper-large-v3-turbo'
 
 export interface ProjectOrder {
   id: string
@@ -44,7 +45,7 @@ export interface Transcription {
   transcriptSubtitles: Subtitle[]
   selectedMode: "clause" | "sentence"
   customInstructions: string
-  models: "premium" | "premium-fast" | "free" | null
+  models: TranscriptionModel | null
   createdAt: Date
   updatedAt: Date
   projectId: string

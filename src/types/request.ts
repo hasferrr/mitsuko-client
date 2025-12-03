@@ -1,5 +1,6 @@
 import { SubtitleNoTime, SubtitleNoTimeNoIndex } from "./subtitles"
 import { ContextCompletion } from "./completion"
+import { TranscriptionModel } from "./project"
 
 export type RequestType = "free" | "paid" | "custom"
 
@@ -43,7 +44,7 @@ export interface TranscriptionRequestBody {
   uploadId: string
   selectedMode: "clause" | "sentence"
   customInstructions: string
-  models: "premium" | "premium-fast" | "free" | null
+  models: TranscriptionModel | null
   clientId: string
   deleteFile: boolean
   projectName?: string

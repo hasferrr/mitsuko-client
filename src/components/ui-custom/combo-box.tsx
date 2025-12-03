@@ -24,6 +24,7 @@ interface ComboBoxProps<T> {
   value: T
   setValue: (t: T) => void
   name?: string
+  valueForCheckmark?: string
 }
 
 export function ComboBox({
@@ -31,6 +32,7 @@ export function ComboBox({
   value,
   setValue,
   name,
+  valueForCheckmark,
 }: ComboBoxProps<string>) {
   const [open, setOpen] = useState(false)
 
@@ -58,7 +60,7 @@ export function ComboBox({
                   key={label}
                   value={label}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue)
+                    setValue(currentValue)
                     setOpen(false)
                   }}
                 >
@@ -66,7 +68,9 @@ export function ComboBox({
                   <Check
                     className={cn(
                       "ml-auto",
-                      value === label ? "opacity-100" : "opacity-0"
+                      (valueForCheckmark ? valueForCheckmark : value) === label
+                        ? "opacity-100"
+                        : "opacity-0"
                     )}
                   />
                 </CommandItem>
