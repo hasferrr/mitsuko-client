@@ -2,7 +2,7 @@ import ISO6391 from 'iso-639-1'
 import { TranscriptionModel } from "@/types/project"
 
 export const MAX_FILE_SIZE = 512 * 1024 * 1024
-export const GLOBAL_MAX_DURATION_SECONDS = 90 * 60
+export const GLOBAL_MAX_DURATION_SECONDS = 3 * 60 * 60
 
 interface ModelRecord {
   maxDuration: number
@@ -13,8 +13,8 @@ const codes = ['af', 'am', 'ar', 'as', 'az', 'ba', 'be', 'bg', 'bn', 'bo', 'br',
 export const TRANSCRIPTION_MODELS: Record<TranscriptionModel, ModelRecord> = {
   "mitsuko-free": { maxDuration: 35 * 60 },
   "mitsuko-premium": { maxDuration: 35 * 60 },
-  "whisper-large-v3": { maxDuration: 90 * 60 },
-  "whisper-large-v3-turbo": { maxDuration: 90 * 60 },
+  "whisper-large-v3": { maxDuration: 3 * 60 * 60 },
+  "whisper-large-v3-turbo": { maxDuration: 3 * 60 * 60 },
 }
 
 export const LANGUAGES = [
