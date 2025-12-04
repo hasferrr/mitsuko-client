@@ -55,7 +55,7 @@ import { useClientIdStore } from "@/stores/use-client-id-store"
 import { Input } from "@/components/ui/input"
 import { SettingsTranscription } from "./settings-transcription"
 import { uploadFile } from "@/lib/api/file-upload"
-import { MAX_FILE_SIZE } from "@/constants/transcription"
+import { MAX_FILE_SIZE, MAX_DURATION_SECONDS } from "@/constants/transcription"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -544,21 +544,21 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                           <p className="text-red-500">File size exceeds {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB</p>}
                       </div>
                     </div>
-                    {localAudioDuration !== null && localAudioDuration > 35 * 60 && (
+                    {localAudioDuration !== null && localAudioDuration > MAX_DURATION_SECONDS && (
                       <div className="flex items-center gap-2 text-red-600 text-xs">
                         <div className="h-3 w-3">
                           <Clock className="h-3 w-3" />
                         </div>
                         <p>
-                          Audio duration exceeds Mitsuko transcription 35 minutes limit.
-                          Please reduce the audio duration.
+                          Audio duration exceeds {(MAX_DURATION_SECONDS / 60)} minutes limit.
+                          Please reduce duration or select a other model.
                         </p>
                       </div>
                     )}
                     <Button
                       variant="outline"
                       onClick={handleUploadSelectedFile}
-                      disabled={isUploading || !session || (localAudioDuration !== null && localAudioDuration > 35 * 60)}
+                      disabled={isUploading || !session || (localAudioDuration !== null && localAudioDuration > MAX_DURATION_SECONDS)}
                       className="w-full border-primary/25 hover:border-primary/50"
                     >
                       {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}

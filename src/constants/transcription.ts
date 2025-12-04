@@ -2,6 +2,7 @@ import ISO6391 from 'iso-639-1'
 import { TranscriptionModel } from "@/types/project"
 
 export const MAX_FILE_SIZE = 512 * 1024 * 1024
+export const MAX_DURATION_SECONDS = 35 * 60
 
 export const languages = [
   { value: "auto", label: "Auto-detect" },
