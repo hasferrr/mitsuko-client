@@ -17,6 +17,6 @@ export interface ModelCreditCost {
 }
 
 export interface ModelPriceMap {
-  free: (ModelCreditCost & { name: string })[]
   paid: (ModelCreditCost & { name: string })[]
+  transcription: (ModelCreditCost & { name: string })[]
 }

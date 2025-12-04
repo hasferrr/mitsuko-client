@@ -1,11 +1,36 @@
-const credit = {
-  "creditPerInputToken": 1.4375,
-  "creditPerOutputToken": 12
-}
-
-const INPUT_CREDITS_PER_MINUTE = credit.creditPerInputToken * 1920
+import { TRANSCRIPTION_MODELS } from '@/constants/transcription'
+import { getModelCostData } from '@/lib/api/get-model-cost-data'
 
 export default async function TranscriptionUsage() {
+  const creditCostsMap = await getModelCostData()
+
+  const modelCosts = [
+    {
+      name: 'mitsuko-free',
+      input: 0,
+      output: 0,
+      maxDuration: TRANSCRIPTION_MODELS['free'].maxDuration,
+    },
+    {
+      name: 'mitsuko-premium',
+      input: ((creditCostsMap.get('premium')?.creditPerInputToken ?? 0) * 1920) || "N/A",
+      output: creditCostsMap.get('premium')?.creditPerOutputToken ?? "N/A",
+      maxDuration: TRANSCRIPTION_MODELS['premium'].maxDuration,
+    },
+    {
+      name: 'whisper-large-v3',
+      input: ((creditCostsMap.get('whisper-large-v3')?.creditPerInputToken ?? 0) * 1_000_000) || "N/A",
+      output: creditCostsMap.get('whisper-large-v3')?.creditPerOutputToken ?? "N/A",
+      maxDuration: TRANSCRIPTION_MODELS['whisper-large-v3'].maxDuration,
+    },
+    {
+      name: 'whisper-large-v3-turbo',
+      input: ((creditCostsMap.get('whisper-large-v3-turbo')?.creditPerInputToken ?? 0) * 1_000_000) || "N/A",
+      output: creditCostsMap.get('whisper-large-v3-turbo')?.creditPerOutputToken ?? "N/A",
+      maxDuration: TRANSCRIPTION_MODELS['whisper-large-v3-turbo'].maxDuration,
+    },
+  ]
+
   return (
     <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
       <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
@@ -30,25 +55,19 @@ export default async function TranscriptionUsage() {
                   Credit per <br /> Output Token
                 </th>
                 <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
-                  Max File Size
+                  Max Duration
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-              {/* Free Models Row */}
-              <tr className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Free Limited</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">0</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">0</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">100 MB</td>
-              </tr>
-              {/* Premium Models Row */}
-              <tr className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Premium</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{INPUT_CREDITS_PER_MINUTE}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{credit?.creditPerOutputToken ?? 'N/A'}</td>
-                <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">Soon</td>
-              </tr>
+              {modelCosts.map((model) => (
+                <tr key={model.name} className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
+                  <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">{model.name}</td>
+                  <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.input}</td>
+                  <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.output}</td>
+                  <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.maxDuration / 60} minutes</td>
+                </tr>
+              ))}
             </tbody>
           </table>
           <p className="text-xs text-gray-500 dark:text-gray-500 mt-4">

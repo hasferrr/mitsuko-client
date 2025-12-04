@@ -4,8 +4,6 @@ import { AdvancedSettings, BasicSettings, Transcription } from "@/types/project"
 import { _extractionResult, _transcriptionResult, _translationResult } from "./default-result"
 import { parseTranscription, parseTranslationJson } from "@/lib/parser/parser"
 
-export const MAX_FILE_SIZE = 1024 * 1024 * 200
-
 export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> = {
   sourceLanguage: "Japanese",
   targetLanguage: "Indonesian",
@@ -35,10 +33,11 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
   isMaxCompletionTokensAuto: false,
 }
 
-export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models"> = {
+export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models" | "language"> = {
   selectedMode: "sentence",
   customInstructions: "",
   models: "premium",
+  language: "auto",
 }
 
 export const DEFAULT_TITLE = "Blue.Box.S01E16 (example)"

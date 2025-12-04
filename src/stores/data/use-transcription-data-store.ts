@@ -15,13 +15,14 @@ interface TranscriptionDataStore {
   // CRUD methods
   createTranscriptionDb: (projectId: string, data: Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles">) => Promise<Transcription>
   getTranscriptionDb: (transcriptionId: string) => Promise<Transcription | undefined>
-  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models">>) => Promise<Transcription>
+  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
   // getters
   getTitle: () => string
   getTranscriptionText: () => string
   getTranscriptSubtitles: () => Subtitle[]
   getSelectedMode: () => Transcription["selectedMode"]
+  getLanguage: () => string
   getCustomInstructions: () => string
   getModels: () => Transcription["models"]
   // setters
@@ -30,6 +31,7 @@ interface TranscriptionDataStore {
   setTranscriptionText: (id: string, transcriptionText: string) => void
   setTranscriptSubtitles: (id: string, subtitles: Subtitle[]) => void
   setSelectedMode: (id: string, selectedMode: Transcription["selectedMode"]) => void
+  setLanguage: (id: string, language: string) => void
   setCustomInstructions: (id: string, customInstructions: string) => void
   setModels: (id: string, models: Transcription["models"]) => void
   // data manipulation methods
@@ -89,6 +91,10 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     const id = get().currentId
     return id ? get().data[id]?.selectedMode : DEFAULT_TRANSCTIPTION_SETTINGS.selectedMode
   },
+  getLanguage: () => {
+    const id = get().currentId
+    return id ? get().data[id]?.language ?? DEFAULT_TRANSCTIPTION_SETTINGS.language : DEFAULT_TRANSCTIPTION_SETTINGS.language
+  },
   getCustomInstructions: () => {
     const id = get().currentId
     return id ? get().data[id]?.customInstructions : DEFAULT_TRANSCTIPTION_SETTINGS.customInstructions
@@ -114,6 +120,9 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   },
   setSelectedMode: (id, selectedMode) => {
     get().mutateData(id, "selectedMode", selectedMode)
+  },
+  setLanguage: (id, language) => {
+    get().mutateData(id, "language", language)
   },
   setCustomInstructions: (id, customInstructions) => {
     get().mutateData(id, "customInstructions", customInstructions)
@@ -150,6 +159,7 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
         transcriptionText: transcription.transcriptionText,
         transcriptSubtitles: transcription.transcriptSubtitles,
         selectedMode: transcription.selectedMode,
+        language: transcription.language,
         customInstructions: transcription.customInstructions,
         models: transcription.models,
       })

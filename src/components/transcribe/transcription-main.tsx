@@ -55,7 +55,7 @@ import { useClientIdStore } from "@/stores/use-client-id-store"
 import { Input } from "@/components/ui/input"
 import { SettingsTranscription } from "./settings-transcription"
 import { uploadFile } from "@/lib/api/file-upload"
-import { MAX_FILE_SIZE } from "@/constants/default"
+import { MAX_FILE_SIZE, GLOBAL_MAX_DURATION_SECONDS, isModelDurationLimitExceeded, getModel } from "@/constants/transcription"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -80,6 +80,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const selectedMode = useTranscriptionDataStore(state => state.getSelectedMode())
   const customInstructions = useTranscriptionDataStore(state => state.getCustomInstructions())
   const models = useTranscriptionDataStore(state => state.getModels())
+  const language = useTranscriptionDataStore(state => state.getLanguage())
   const setTitle = useTranscriptionDataStore(state => state.setTitle)
   const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)
   const setTranscriptSubtitles = useTranscriptionDataStore(state => state.setTranscriptSubtitles)
@@ -179,6 +180,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [localAudioDuration, setLocalAudioDuration] = useState<number | null>(null)
+  const isGlobalMaxDurationExceeded = localAudioDuration !== null && localAudioDuration > GLOBAL_MAX_DURATION_SECONDS
 
   // Refs
   const transcriptionAreaRef = useRef<HTMLTextAreaElement>(null)
@@ -243,6 +245,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
 
     const requestBody = {
       uploadId: selectedUploadId,
+      language,
       selectedMode,
       customInstructions,
       models,
@@ -259,6 +262,10 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
         (text) => setTranscriptionText(currentId, text),
       )
       setTranscriptSubtitles(currentId, parseTranscription(text))
+
+      if (deleteAfterTranscription) {
+        setSelectedUploadId(null)
+      }
     } catch (error) {
       console.error(error)
     } finally {
@@ -270,10 +277,6 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       // Revalidate uploads list
       queryClient.invalidateQueries({ queryKey: ["uploads"] })
       await refetchUploads()
-
-      if (deleteAfterTranscription) {
-        setSelectedUploadId(null)
-      }
       await saveData(currentId)
     }
   }
@@ -544,21 +547,30 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                           <p className="text-red-500">File size exceeds {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB</p>}
                       </div>
                     </div>
-                    {localAudioDuration !== null && localAudioDuration > 35 * 60 && (
+                    {isGlobalMaxDurationExceeded ? (
                       <div className="flex items-center gap-2 text-red-600 text-xs">
                         <div className="h-3 w-3">
                           <Clock className="h-3 w-3" />
                         </div>
                         <p>
-                          Audio duration exceeds Mitsuko transcription 35 minutes limit.
-                          Please reduce the audio duration.
+                          Audio duration exceeds {(GLOBAL_MAX_DURATION_SECONDS / 60)} minutes limit.
+                          Please reduce duration or select other model.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-xs">
+                        <div className="h-3 w-3">
+                          <Clock className="h-3 w-3" />
+                        </div>
+                        <p>
+                          Please check maximum duration limit for selected model.
                         </p>
                       </div>
                     )}
                     <Button
                       variant="outline"
                       onClick={handleUploadSelectedFile}
-                      disabled={isUploading || !session || (localAudioDuration !== null && localAudioDuration > 35 * 60)}
+                      disabled={isUploading || !session || (isGlobalMaxDurationExceeded)}
                       className="w-full border-primary/25 hover:border-primary/50"
                     >
                       {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
@@ -668,12 +680,24 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
               {/* Transcription Settings */}
               <SettingsTranscription transcriptionId={currentId} />
 
+              {/* Model Duration Exceeded Warning */}
+              {isModelDurationLimitExceeded(models, localAudioDuration || 0) && (
+                <div className="flex items-center gap-2 text-red-600 text-xs">
+                  <div className="h-3 w-3">
+                    <Clock className="h-3 w-3" />
+                  </div>
+                  <p>
+                    {models ? `${getModel(models).label} model has ${getModel(models).maxDuration / 60} minutes limit.` : ""}
+                  </p>
+                </div>
+              )}
+
               {/* Buttons */}
-              <div className="pt-4 flex gap-2">
+              <div className="flex gap-2">
                 {/* Start Button */}
                 <Button
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                  disabled={isTranscribing || !session}
+                  disabled={isTranscribing || !session || isGlobalMaxDurationExceeded}
                   onClick={handleStartTranscription}
                 >
                   {isTranscribing ? (
@@ -719,7 +743,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
             <TabsContent value="transcript" className="mt-4">
               <div className="bg-card border border-border rounded-lg p-6">
                 <div className="flex justify-between items-center mb-4 gap-2">
-                  <h2 className="text-lg font-medium">Transcription Result</h2>
+                  <h2 className="text-lg font-medium">Transcription</h2>
 
                   {(transcriptionText || isEditing) && (
                     <div className="flex flex-wrap gap-2 justify-end">
@@ -760,7 +784,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                         {isEditing
                           ? <Save className="h-3 w-3" />
                           : <Edit className="h-3 w-3" />}
-                        {isEditing ? "Save" : "Edit"}
+                        {isEditing ? "Done" : "Edit"}
                       </Button>
                       <Button
                         size="sm"
@@ -813,7 +837,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
             <TabsContent value="subtitles" className="mt-4">
               <div className="bg-card border border-border rounded-lg p-6">
                 <div className="flex justify-between items-center mb-4 gap-2">
-                  <h2 className="text-lg font-medium">Subtitles with Timestamps</h2>
+                  <h2 className="text-lg font-medium">Subtitle Result</h2>
 
                   {transcriptSubtitles.length > 0 && (
                     <div className="flex flex-wrap gap-2 justify-end">
@@ -826,7 +850,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                             onClick={handleClear}
                             disabled={isTranscribing}
                           >
-                            <Trash className="h-3 w-3 mr-1" /> Clear
+                            <Trash className="h-3 w-3" /> Clear
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
@@ -850,7 +874,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                         className="text-xs border-border"
                         onClick={handleParse}
                       >
-                        <ClipboardPaste className="h-3 w-3" /> Get Subtitle
+                        <ClipboardPaste className="h-3 w-3" /> Parse
                       </Button>
                       <Button
                         size="sm"
