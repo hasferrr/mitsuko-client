@@ -86,8 +86,8 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
       <div>
         <label className="text-sm text-muted-foreground block mb-1">Model</label>
         <ComboBox
-          data={models.map((model) => model.value)}
-          value={models.find((model) => model.value === selectedModel)?.label || ""}
+          data={Object.keys(models)}
+          value={selectedModel ? models[selectedModel || ""]?.label || "" : ""}
           setValue={(m) => setSelectedModel(m as TranscriptionModel)}
           valueForCheckmark={selectedModel || ""}
           name="model"

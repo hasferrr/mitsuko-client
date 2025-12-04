@@ -9,12 +9,17 @@ export const languages = [
   ...ISO6391.getAllCodes().map((c) => ({ value: c, label: `${ISO6391.getName(c)} [${c}]` }))
 ]
 
-export const models: { value: TranscriptionModel; label: string }[] = [
-  { value: "free", label: "mitsuko-free" },
-  { value: "premium", label: "mitsuko-premium" },
-  { value: "whisper-large-v3", label: "whisper-large-v3" },
-  { value: "whisper-large-v3-turbo", label: "whisper-large-v3-turbo" },
-]
+interface ModelRecord {
+  label: string
+  maxDuration: number
+}
+
+export const models: Record<TranscriptionModel, ModelRecord> = {
+  "free": { label: "mitsuko-free", maxDuration: 35 * 60 },
+  "premium": { label: "mitsuko-premium", maxDuration: 35 * 60 },
+  "whisper-large-v3": { label: "whisper-large-v3", maxDuration: 65 * 60 },
+  "whisper-large-v3-turbo": { label: "whisper-large-v3-turbo", maxDuration: 65 * 60 },
+}
 
 export const modes = [
   { value: "clause", label: "Mode 1: Clauses and sentences (Experimental)" },
