@@ -25,6 +25,7 @@ interface ComboBoxProps<T> {
   setValue: (t: T) => void
   name?: string
   valueForCheckmark?: string
+  disabled?: boolean
 }
 
 export function ComboBox({
@@ -33,6 +34,7 @@ export function ComboBox({
   setValue,
   name,
   valueForCheckmark,
+  disabled,
 }: ComboBoxProps<string>) {
   const [open, setOpen] = useState(false)
 
@@ -44,6 +46,7 @@ export function ComboBox({
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between relative pr-6"
+          disabled={disabled}
         >
           <span className="truncate">{value}</span>
           <ChevronsUpDown className="opacity-50 absolute right-3 top-1/2 -translate-y-1/2" />
