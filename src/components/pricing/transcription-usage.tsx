@@ -1,4 +1,4 @@
-import { TRANSCRIPTION_MODELS } from '@/constants/transcription'
+import { getModel } from '@/constants/transcription'
 import { getModelCostData } from '@/lib/api/get-model-cost-data'
 
 export default async function TranscriptionUsage() {
@@ -9,25 +9,25 @@ export default async function TranscriptionUsage() {
       name: 'mitsuko-free',
       input: 0,
       output: 0,
-      maxDuration: TRANSCRIPTION_MODELS['free'].maxDuration,
+      maxDuration: getModel('mitsuko-free')?.maxDuration ?? 0,
     },
     {
       name: 'mitsuko-premium',
-      input: ((creditCostsMap.get('premium')?.creditPerInputToken ?? 0) * 1920) || "N/A",
-      output: creditCostsMap.get('premium')?.creditPerOutputToken ?? "N/A",
-      maxDuration: TRANSCRIPTION_MODELS['premium'].maxDuration,
+      input: ((creditCostsMap.get('mitsuko-premium')?.creditPerInputToken ?? 0) * 1920) || "N/A",
+      output: creditCostsMap.get('mitsuko-premium')?.creditPerOutputToken ?? "N/A",
+      maxDuration: getModel('mitsuko-premium')?.maxDuration ?? 0,
     },
     {
       name: 'whisper-large-v3',
       input: ((creditCostsMap.get('whisper-large-v3')?.creditPerInputToken ?? 0) * 1_000_000) || "N/A",
       output: creditCostsMap.get('whisper-large-v3')?.creditPerOutputToken ?? "N/A",
-      maxDuration: TRANSCRIPTION_MODELS['whisper-large-v3'].maxDuration,
+      maxDuration: getModel('whisper-large-v3')?.maxDuration ?? 0,
     },
     {
       name: 'whisper-large-v3-turbo',
       input: ((creditCostsMap.get('whisper-large-v3-turbo')?.creditPerInputToken ?? 0) * 1_000_000) || "N/A",
       output: creditCostsMap.get('whisper-large-v3-turbo')?.creditPerOutputToken ?? "N/A",
-      maxDuration: TRANSCRIPTION_MODELS['whisper-large-v3-turbo'].maxDuration,
+      maxDuration: getModel('whisper-large-v3-turbo')?.maxDuration ?? 0,
     },
   ]
 

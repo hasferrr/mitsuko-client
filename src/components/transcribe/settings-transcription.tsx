@@ -92,9 +92,8 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
         <label className="text-sm text-muted-foreground block mb-1">Model</label>
         <ComboBox
           data={Object.keys(TRANSCRIPTION_MODELS)}
-          value={selectedModel ? TRANSCRIPTION_MODELS[selectedModel || ""]?.label || "" : ""}
+          value={selectedModel || ""}
           setValue={(m) => setSelectedModel(m as TranscriptionModel)}
-          valueForCheckmark={selectedModel || ""}
           name="model"
         />
       </div>

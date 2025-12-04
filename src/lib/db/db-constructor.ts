@@ -225,11 +225,17 @@ function transcriptionConstructor(transcription: Partial<Transcription>): Transc
     language: transcription.language ?? "auto",
     selectedMode: transcription.selectedMode ?? "sentence",
     customInstructions: transcription.customInstructions ?? "",
-    models: transcription.models ?? "premium",
+    models: migrateModelName(transcription.models) ?? "mitsuko-premium",
     createdAt: transcription.createdAt ?? new Date(),
     updatedAt: transcription.updatedAt ?? new Date(),
     projectId: transcription.projectId ?? "",
   }
+}
+
+function migrateModelName(model: string | null | undefined): Transcription['models'] | null | undefined {
+  if (model === 'free') return 'mitsuko-free'
+  if (model === 'premium') return 'mitsuko-premium'
+  return model as Transcription['models'] | null | undefined
 }
 
 function extractionConstructor(extraction: Partial<Extraction>): Extraction {

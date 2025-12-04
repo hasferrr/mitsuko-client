@@ -3,7 +3,7 @@ import { Model } from "./model"
 
 export type ProjectType = 'translation' | 'transcription' | 'extraction'
 export type SettingsParentType = 'project' | 'translation' | 'extraction'
-export type TranscriptionModel = 'premium' | 'free' | 'whisper-large-v3' | 'whisper-large-v3-turbo'
+export type TranscriptionModel = 'mitsuko-premium' | 'mitsuko-free' | 'whisper-large-v3' | 'whisper-large-v3-turbo'
 
 export interface ProjectOrder {
   id: string

@@ -271,7 +271,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     } finally {
       setIsTranscribing(currentId, false)
 
-      const isUsingCredits = models !== "free"
+      const isUsingCredits = !models.includes("free")
       if (isUsingCredits) refetchUserData()
 
       // Revalidate uploads list
@@ -687,7 +687,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                     <Clock className="h-3 w-3" />
                   </div>
                   <p>
-                    {models ? `${getModel(models).label} model has ${getModel(models).maxDuration / 60} minutes limit.` : ""}
+                    {models ? `${models} model has ${(getModel(models)?.maxDuration || 0) / 60} minutes limit.` : ""}
                   </p>
                 </div>
               )}

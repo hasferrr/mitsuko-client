@@ -156,6 +156,15 @@ class MyDatabase extends Dexie {
         }
       })
     })
+    this.version(19).stores({}).upgrade(async tx => {
+      await tx.table('transcriptions').toCollection().modify(transcription => {
+        if (transcription.models === 'premium') {
+          transcription.models = 'mitsuko-premium'
+        } else if (transcription.models === 'free') {
+          transcription.models = 'mitsuko-free'
+        }
+      })
+    })
   }
 }
 
