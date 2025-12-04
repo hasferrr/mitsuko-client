@@ -42,6 +42,7 @@ export interface ExtractionRequestBody {
 
 export interface TranscriptionRequestBody {
   uploadId: string
+  language: string
   selectedMode: "clause" | "sentence"
   customInstructions: string
   models: TranscriptionModel | null

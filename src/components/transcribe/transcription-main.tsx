@@ -80,6 +80,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const selectedMode = useTranscriptionDataStore(state => state.getSelectedMode())
   const customInstructions = useTranscriptionDataStore(state => state.getCustomInstructions())
   const models = useTranscriptionDataStore(state => state.getModels())
+  const language = useTranscriptionDataStore(state => state.getLanguage())
   const setTitle = useTranscriptionDataStore(state => state.setTitle)
   const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)
   const setTranscriptSubtitles = useTranscriptionDataStore(state => state.setTranscriptSubtitles)
@@ -244,6 +245,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
 
     const requestBody = {
       uploadId: selectedUploadId,
+      language,
       selectedMode,
       customInstructions,
       models,
