@@ -55,7 +55,7 @@ import { useClientIdStore } from "@/stores/use-client-id-store"
 import { Input } from "@/components/ui/input"
 import { SettingsTranscription } from "./settings-transcription"
 import { uploadFile } from "@/lib/api/file-upload"
-import { MAX_FILE_SIZE, MAX_DURATION_SECONDS } from "@/constants/transcription"
+import { MAX_FILE_SIZE, GLOBAL_MAX_DURATION_SECONDS, isModelDurationLimitExceeded, getModel } from "@/constants/transcription"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -179,6 +179,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [localAudioDuration, setLocalAudioDuration] = useState<number | null>(null)
+  const isGlobalMaxDurationExceeded = localAudioDuration !== null && localAudioDuration > GLOBAL_MAX_DURATION_SECONDS
 
   // Refs
   const transcriptionAreaRef = useRef<HTMLTextAreaElement>(null)
@@ -544,21 +545,30 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                           <p className="text-red-500">File size exceeds {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB</p>}
                       </div>
                     </div>
-                    {localAudioDuration !== null && localAudioDuration > MAX_DURATION_SECONDS && (
+                    {isGlobalMaxDurationExceeded ? (
                       <div className="flex items-center gap-2 text-red-600 text-xs">
                         <div className="h-3 w-3">
                           <Clock className="h-3 w-3" />
                         </div>
                         <p>
-                          Audio duration exceeds {(MAX_DURATION_SECONDS / 60)} minutes limit.
-                          Please reduce duration or select a other model.
+                          Audio duration exceeds {(GLOBAL_MAX_DURATION_SECONDS / 60)} minutes limit.
+                          Please reduce duration or select other model.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-xs">
+                        <div className="h-3 w-3">
+                          <Clock className="h-3 w-3" />
+                        </div>
+                        <p>
+                          Please check maximum duration limit for selected model.
                         </p>
                       </div>
                     )}
                     <Button
                       variant="outline"
                       onClick={handleUploadSelectedFile}
-                      disabled={isUploading || !session || (localAudioDuration !== null && localAudioDuration > MAX_DURATION_SECONDS)}
+                      disabled={isUploading || !session || (isGlobalMaxDurationExceeded)}
                       className="w-full border-primary/25 hover:border-primary/50"
                     >
                       {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
@@ -668,12 +678,24 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
               {/* Transcription Settings */}
               <SettingsTranscription transcriptionId={currentId} />
 
+              {/* Model Duration Exceeded Warning */}
+              {isModelDurationLimitExceeded(models, localAudioDuration || 0) && (
+                <div className="flex items-center gap-2 text-red-600 text-xs">
+                  <div className="h-3 w-3">
+                    <Clock className="h-3 w-3" />
+                  </div>
+                  <p>
+                    {models ? `${getModel(models).label} model has ${getModel(models).maxDuration / 60} minutes limit.` : ""}
+                  </p>
+                </div>
+              )}
+
               {/* Buttons */}
-              <div className="pt-4 flex gap-2">
+              <div className="flex gap-2">
                 {/* Start Button */}
                 <Button
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                  disabled={isTranscribing || !session}
+                  disabled={isTranscribing || !session || isGlobalMaxDurationExceeded}
                   onClick={handleStartTranscription}
                 >
                   {isTranscribing ? (
