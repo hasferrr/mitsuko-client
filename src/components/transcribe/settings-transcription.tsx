@@ -12,7 +12,7 @@ import { CustomInstructionsLibraryControls } from "@/components/settings/custom-
 import { CustomInstructionsSaveDialog } from "@/components/settings/custom-instructions-save-dialog"
 import { ComboBox } from "../ui-custom/combo-box"
 import { TranscriptionModel } from "@/types/project"
-import { isAsrModel, languages, models, modes } from "@/constants/transcription"
+import { isAsrModel, LANGUAGES, TRANSCRIPTION_MODELS, MODES } from "@/constants/transcription"
 
 interface SettingsTranscriptionProps {
   transcriptionId: string
@@ -68,12 +68,12 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
         <label className="text-sm text-muted-foreground block mb-1">Language</label>
         <ComboBox
           disabled={!isAsrModel(selectedModel)}
-          data={languages.map((lang) => lang.label)}
+          data={LANGUAGES.map((lang) => lang.label)}
           value={selectedLanguage === 'auto'
             ? 'Auto-detect'
             : `${ISO6391.getName(selectedLanguage)} [${selectedLanguage}]`}
           setValue={(label) => {
-            const language = languages.find((lang) => lang.label === label)
+            const language = LANGUAGES.find((lang) => lang.label === label)
             if (language) {
               setSelectedLanguage(language.value)
             }
@@ -86,8 +86,8 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
       <div>
         <label className="text-sm text-muted-foreground block mb-1">Model</label>
         <ComboBox
-          data={Object.keys(models)}
-          value={selectedModel ? models[selectedModel || ""]?.label || "" : ""}
+          data={Object.keys(TRANSCRIPTION_MODELS)}
+          value={selectedModel ? TRANSCRIPTION_MODELS[selectedModel || ""]?.label || "" : ""}
           setValue={(m) => setSelectedModel(m as TranscriptionModel)}
           valueForCheckmark={selectedModel || ""}
           name="model"
@@ -106,7 +106,7 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
             <SelectValue placeholder="Select a mode" />
           </SelectTrigger>
           <SelectContent>
-            {modes.map((mode) => (
+            {MODES.map((mode) => (
               <SelectItem key={mode.value} value={mode.value}>
                 {mode.label}
               </SelectItem>
