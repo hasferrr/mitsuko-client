@@ -11,27 +11,7 @@ import { CustomInstructionsLibraryControls } from "@/components/settings/custom-
 import { CustomInstructionsSaveDialog } from "@/components/settings/custom-instructions-save-dialog"
 import { ComboBox } from "../ui-custom/combo-box"
 import { TranscriptionModel } from "@/types/project"
-
-const languages = [
-  { value: "auto", label: "Auto-detect" },
-]
-
-const models: { value: TranscriptionModel, label: string }[] = [
-  { value: "free", label: "mitsuko-free" },
-  { value: "premium", label: "mitsuko-premium" },
-  { value: "whisper-large-v3", label: "whisper-large-v3" },
-  { value: "whisper-large-v3-turbo", label: "whisper-large-v3-turbo" },
-]
-
-const modes = [
-  { value: "clause", label: "Mode 1: Clauses and sentences (Experimental)" },
-  { value: "sentence", label: "Mode 2: Sentences" },
-]
-
-const asrmodel = new Set([
-  "whisper-large-v3",
-  "whisper-large-v3-turbo",
-])
+import { languages, models, asrmodel, modes } from "@/constants/transcription"
 
 interface SettingsTranscriptionProps {
   transcriptionId: string

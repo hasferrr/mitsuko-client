@@ -33,7 +33,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 import { DeleteDialogue } from '@/components/ui-custom/delete-dialogue'
 import { useSessionStore } from '@/stores/use-session-store'
-import { MAX_FILE_SIZE } from '@/constants/default'
+import { MAX_FILE_SIZE } from "@/constants/transcription"
 
 const getFileIcon = (contentType?: string) => {
   if (contentType?.startsWith('audio/')) return FileText

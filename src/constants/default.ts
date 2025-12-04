@@ -4,8 +4,6 @@ import { AdvancedSettings, BasicSettings, Transcription } from "@/types/project"
 import { _extractionResult, _transcriptionResult, _translationResult } from "./default-result"
 import { parseTranscription, parseTranslationJson } from "@/lib/parser/parser"
 
-export const MAX_FILE_SIZE = 1024 * 1024 * 200
-
 export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> = {
   sourceLanguage: "Japanese",
   targetLanguage: "Indonesian",
