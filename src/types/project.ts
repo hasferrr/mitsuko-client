@@ -43,6 +43,7 @@ export interface Transcription {
   title: string
   transcriptionText: string
   transcriptSubtitles: Subtitle[]
+  language: string
   selectedMode: "clause" | "sentence"
   customInstructions: string
   models: TranscriptionModel | null

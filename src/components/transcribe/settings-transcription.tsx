@@ -19,15 +19,16 @@ interface SettingsTranscriptionProps {
 }
 
 export function SettingsTranscription({ transcriptionId }: SettingsTranscriptionProps) {
-  const [selectedLanguage, setSelectedLanguage] = useState("auto")
   const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
 
   const saveData = useTranscriptionDataStore((state) => state.saveData)
   const selectedModel = useTranscriptionDataStore((state) => state.getModels())
   const selectedMode = useTranscriptionDataStore((state) => state.getSelectedMode())
+  const selectedLanguage = useTranscriptionDataStore((state) => state.getLanguage())
   const customInstructions = useTranscriptionDataStore((state) => state.getCustomInstructions())
   const _setModels = useTranscriptionDataStore((state) => state.setModels)
   const _setSelectedMode = useTranscriptionDataStore((state) => state.setSelectedMode)
+  const _setLanguage = useTranscriptionDataStore((state) => state.setLanguage)
   const _setCustomInstructions = useTranscriptionDataStore((state) => state.setCustomInstructions)
 
   const setSelectedModel = (model: Exclude<Transcription["models"], null>) => {
@@ -40,6 +41,10 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
   }
   const setCustomInstructions = (instructions: string) => {
     _setCustomInstructions(transcriptionId, instructions)
+  }
+  const setSelectedLanguage = (language: string) => {
+    _setLanguage(transcriptionId, language)
+    saveData(transcriptionId)
   }
 
   const handlePresetSelect = (instruction: string) => {

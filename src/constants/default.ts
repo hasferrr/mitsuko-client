@@ -33,10 +33,11 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
   isMaxCompletionTokensAuto: false,
 }
 
-export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models"> = {
+export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models" | "language"> = {
   selectedMode: "sentence",
   customInstructions: "",
   models: "premium",
+  language: "auto",
 }
 
 export const DEFAULT_TITLE = "Blue.Box.S01E16 (example)"

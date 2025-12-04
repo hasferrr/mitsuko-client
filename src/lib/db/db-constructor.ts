@@ -222,6 +222,7 @@ function transcriptionConstructor(transcription: Partial<Transcription>): Transc
     title: transcription.title ?? "Transcription X",
     transcriptionText: transcription.transcriptionText ?? "",
     transcriptSubtitles: transcription.transcriptSubtitles ?? [],
+    language: transcription.language ?? "auto",
     selectedMode: transcription.selectedMode ?? "sentence",
     customInstructions: transcription.customInstructions ?? "",
     models: transcription.models ?? "premium",
