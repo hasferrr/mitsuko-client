@@ -52,6 +52,36 @@ const RAW_FREE_MODELS: FreeModelCollection = {
     provider: "unknown",
     models: [
       {
+        name: "DeepSeek V3.2 Thinking",
+        subName: "deepseek-v3.2 / deepseek-reasoner",
+        maxInput: 131072,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 32768,
+          isUseStructuredOutput: false
+        }
+      },
+      {
+        name: "DeepSeek V3.2",
+        subName: "deepseek-v3.2 / deepseek-chat",
+        maxInput: 131072,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 32768,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "DeepSeek R1",
         subName: "DeepSeek-R1-0528",
         maxInput: 128000,
@@ -64,50 +94,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 32768,
           isUseStructuredOutput: false
-        }
-      },
-      {
-        name: "DeepSeek V3.1",
-        subName: "DeepSeek-V3.1",
-        maxInput: 128000,
-        maxOutput: 64000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 32768,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "DeepSeek V3",
-        subName: "DeepSeek-V3-0324",
-        maxInput: 128000,
-        maxOutput: 64000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 32768,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Qwen3 235B A22B 2507",
-        maxInput: 262000,
-        maxOutput: 262000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 16000,
-          isUseStructuredOutput: false,
         }
       },
     ]
@@ -203,19 +189,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
       {
         name: "Mistral Small 3",
         subName: "mistral-small-3.2-24b-instruct",
-        maxInput: 128000,
-        maxOutput: 128000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Mistral Nemo",
         maxInput: 128000,
         maxOutput: 128000,
         structuredOutput: true,
@@ -639,7 +612,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     models: [
       {
         name: "DeepSeek V3.2 Thinking",
-        subName: "deepseek-v3.2",
+        subName: "deepseek-v3.2 / deepseek-reasoner",
         maxInput: 131072,
         maxOutput: 65536,
         structuredOutput: true,
@@ -654,7 +627,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       },
       {
         name: "DeepSeek V3.2",
-        subName: "deepseek-v3.2",
+        subName: "deepseek-v3.2 / deepseek-chat",
         maxInput: 131072,
         maxOutput: 65536,
         structuredOutput: true,
@@ -680,36 +653,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
           isMaxCompletionTokensAuto: false,
           maxCompletionTokens: 32768,
           isUseStructuredOutput: false
-        }
-      },
-      {
-        name: "DeepSeek V3.1",
-        subName: "DeepSeek-V3.1",
-        maxInput: 128000,
-        maxOutput: 64000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "low",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 32768,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "DeepSeek V3",
-        subName: "DeepSeek-V3-0324",
-        maxInput: 128000,
-        maxOutput: 64000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "low",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 32768,
-          isUseStructuredOutput: true
         }
       },
     ]
