@@ -178,28 +178,31 @@ export function Navbar() {
             </Popover>
           )}
 
-          {isFetching || isLoading ? (
-            <div className="flex items-center gap-2 text-sm mr-4">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-muted-foreground">Loading credits...</span>
-            </div>
-          ) : isError ? (
-            <div className="flex items-center gap-2 text-sm mr-4">
-              <AlertCircle className="h-4 w-4 text-red-500" />
-              <span className="text-red-500">Error</span>
-            </div>
-          ) : user && (
-            <Link
-              href="/auth/login"
-              className="flex items-center gap-2 text-sm mr-4 cursor-pointer hover:underline"
-              title="Click to add credits"
-            >
-              <CircleDollarSign className="h-4 w-4" />
-              <span className={cn(user.credit < 0 && "text-red-500")}>
-                {Math.round(user.credit).toLocaleString()} credits
-              </span>
-            </Link>
-          )}
+          <Link
+            href="/auth/login"
+            className="flex items-center gap-2 text-sm mr-2 cursor-pointer hover:underline"
+          >
+            {isFetching || isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-muted-foreground">Loading credits...</span>
+              </>
+            ) : isError ? (
+              <>
+                <AlertCircle className="h-4 w-4 text-red-500" />
+                <span className="text-red-500">Error</span>
+              </>
+            ) : user ? (
+              <>
+                <CircleDollarSign className="h-4 w-4" />
+                <span className={cn(user.credit < 0 && "text-red-500")}>
+                  {Math.round(user.credit).toLocaleString()} credits
+                </span>
+              </>
+            ) : (
+              "Sign In"
+            )}
+          </Link>
 
           <Button
             variant="ghost"
