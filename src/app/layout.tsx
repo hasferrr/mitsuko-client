@@ -76,10 +76,6 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
-        {process.env.NODE_ENV === "development" && process.env.REACT_SCAN_ENABLED === "true" && (
-          // eslint-disable-next-line @next/next/no-sync-scripts
-          <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
-        )}
       </head>
       <body suppressHydrationWarning>
         <Providers>

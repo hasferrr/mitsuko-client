@@ -1,6 +1,5 @@
 import Link from "next/link"
-import { Github, Twitter } from "lucide-react"
-import { IconBrandDiscord } from "@tabler/icons-react"
+import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react"
 import { DISCORD_LINK, GITHUB_LINK } from "@/constants/external-links"
 
 export function Footer() {
@@ -31,11 +30,7 @@ export function Footer() {
             rel="noopener noreferrer"
           >
             <span className="sr-only">GitHub</span>
-            <Github className="h-5 w-5" />
-          </Link>
-          <Link href="#" className="text-muted-foreground hover:text-foreground">
-            <span className="sr-only">Twitter</span>
-            <Twitter className="h-5 w-5" />
+            <IconBrandGithub className="h-5 w-5" />
           </Link>
           <Link
             href={DISCORD_LINK}
