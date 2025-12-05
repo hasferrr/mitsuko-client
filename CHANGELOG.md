@@ -14,6 +14,12 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### December 5
+
+- 🎙️ **Transcription Models:** Added Whisper Large V3 and its Turbo variant, giving you faster and higher‑quality options for long duration audio transcription.
+- 🤖 **Model Updates:** Added DeepSeek V3.2 (thinking and non‑thinking variants) with improved efficiency and reasoning performance.
+- 🛑 **Model Deprecations:** Removed the older DeepSeek V3.1 model to keep the lineup focused on the latest versions.
+
 ### November 27
 
 - 🤖 **Model Updates:**
