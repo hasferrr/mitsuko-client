@@ -123,10 +123,11 @@ function parseMitsukoTranscription(response: string): Subtitle[] {
 }
 
 export function parseTranscription(response: string): Subtitle[] {
+  const content = getContent(response)
   try {
-    return parseMitsukoTranscription(response)
+    return parseMitsukoTranscription(content)
   } catch (error) {
-    return parseSubtitle({ content: response }).subtitles
+    return parseSubtitle({ content }).subtitles
   }
 }
 

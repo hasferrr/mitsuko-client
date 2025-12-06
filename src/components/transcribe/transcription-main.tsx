@@ -287,12 +287,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
 
       const cleaned = getContent(text)
       setTranscriptionText(currentId, cleaned)
-
-      if (words.length && segments.length) {
-        handleApplyWhisperSubtitles({ words, segments })
-      } else {
-        setTranscriptSubtitles(currentId, parseTranscription(text))
-      }
+      setTranscriptSubtitles(currentId, parseTranscription(text))
 
       if (deleteAfterTranscription) {
         setSelectedUploadId(null)
@@ -344,7 +339,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     await saveData(currentId)
   }
 
-  const handleApplyWhisperSubtitles = async (ts?: { words: typeof words, segments: typeof segments }) => {
+  const handleApplyWhisperSubtitles = async () => {
     let srtContent = ""
 
     if (subtitleLevel === "words") {
@@ -355,10 +350,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
         return
       }
       srtContent = generateWordsSubtitles(
-        {
-          words: ts ? ts.words : words,
-          segments: ts ? ts.segments : segments,
-        },
+        { words, segments },
         {
           MAX_SILENCE_GAP: whisperConfig.maxSilenceGap,
           TARGET_CPS: whisperConfig.targetCps,
