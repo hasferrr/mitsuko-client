@@ -229,6 +229,8 @@ function transcriptionConstructor(transcription: Partial<Transcription>): Transc
     createdAt: transcription.createdAt ?? new Date(),
     updatedAt: transcription.updatedAt ?? new Date(),
     projectId: transcription.projectId ?? "",
+    words: transcription.words ?? [],
+    segments: transcription.segments ?? [],
   }
 }
 

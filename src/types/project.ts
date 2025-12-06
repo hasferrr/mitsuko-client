@@ -38,6 +38,18 @@ export interface Translation {
   response: ResponseTranslation
 }
 
+export interface TranscriptionWord {
+  word: string
+  start: number
+  end: number
+}
+
+export interface TranscriptionSegment {
+  text: string
+  start: number
+  end: number
+}
+
 export interface Transcription {
   id: string
   title: string
@@ -50,6 +62,8 @@ export interface Transcription {
   createdAt: Date
   updatedAt: Date
   projectId: string
+  words: TranscriptionWord[]
+  segments: TranscriptionSegment[]
 }
 
 export interface Extraction {

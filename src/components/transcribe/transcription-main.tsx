@@ -45,7 +45,7 @@ import {
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
-import { parseTranscription } from "@/lib/parser/parser"
+import { parseTranscription, parseTranscriptionWordsAndSegments, getContent } from "@/lib/parser/parser"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { listUploads, deleteUpload } from "@/lib/api/uploads"
@@ -57,6 +57,7 @@ import { SettingsTranscription } from "./settings-transcription"
 import { uploadFile } from "@/lib/api/file-upload"
 import { MAX_FILE_SIZE, GLOBAL_MAX_DURATION_SECONDS, isModelDurationLimitExceeded, getModel } from "@/constants/transcription"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
+import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { SubtitleTranslated } from "@/types/subtitles"
@@ -67,6 +68,8 @@ import { cn, calculateAudioDuration, createUtf8SubtitleBlob } from "@/lib/utils"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { Label } from "../ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/transcription-segments"
 
 interface TranscriptionMainProps {
   currentId: string
@@ -81,9 +84,13 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const customInstructions = useTranscriptionDataStore(state => state.getCustomInstructions())
   const models = useTranscriptionDataStore(state => state.getModels())
   const language = useTranscriptionDataStore(state => state.getLanguage())
+  const words = useTranscriptionDataStore(state => state.getWords())
+  const segments = useTranscriptionDataStore(state => state.getSegments())
   const setTitle = useTranscriptionDataStore(state => state.setTitle)
   const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)
   const setTranscriptSubtitles = useTranscriptionDataStore(state => state.setTranscriptSubtitles)
+  const setWords = useTranscriptionDataStore(state => state.setWords)
+  const setSegments = useTranscriptionDataStore(state => state.setSegments)
   const saveData = useTranscriptionDataStore(state => state.saveData)
 
   // Transcription store
@@ -180,6 +187,15 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [localAudioDuration, setLocalAudioDuration] = useState<number | null>(null)
+  const [subtitleLevel, setSubtitleLevel] = useState<"words" | "segments">("words")
+  const [rightTab, setRightTab] = useState<"transcript" | "subtitles">("transcript")
+  const [whisperConfig, setWhisperConfig] = useState({
+    maxSilenceGap: 0.5,
+    targetCps: 16,
+    maxCps: 22,
+    maxChars: 85,
+    minDuration: 1,
+  })
   const isGlobalMaxDurationExceeded = localAudioDuration !== null && localAudioDuration > GLOBAL_MAX_DURATION_SECONDS
 
   // Refs
@@ -256,12 +272,27 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     console.log(requestBody)
 
     try {
+      setWords(currentId, [])
+      setSegments(currentId, [])
+
       const text = await startTranscription(
         currentId,
         requestBody,
         (text) => setTranscriptionText(currentId, text),
       )
-      setTranscriptSubtitles(currentId, parseTranscription(text))
+
+      const { words, segments } = parseTranscriptionWordsAndSegments(text)
+      setWords(currentId, words)
+      setSegments(currentId, segments)
+
+      const cleaned = getContent(text)
+      setTranscriptionText(currentId, cleaned)
+
+      if (words.length && segments.length) {
+        handleApplyWhisperSubtitles({ words, segments })
+      } else {
+        setTranscriptSubtitles(currentId, parseTranscription(text))
+      }
 
       if (deleteAfterTranscription) {
         setSelectedUploadId(null)
@@ -311,6 +342,62 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       throw error
     }
     await saveData(currentId)
+  }
+
+  const handleApplyWhisperSubtitles = async (ts?: { words: typeof words, segments: typeof segments }) => {
+    let srtContent = ""
+
+    if (subtitleLevel === "words") {
+      if (!words.length || !segments.length) {
+        toast.error("Whisper words or segments data not available", {
+          description: "Please transcribe again with a Whisper model",
+        })
+        return
+      }
+      srtContent = generateWordsSubtitles(
+        {
+          words: ts ? ts.words : words,
+          segments: ts ? ts.segments : segments,
+        },
+        {
+          MAX_SILENCE_GAP: whisperConfig.maxSilenceGap,
+          TARGET_CPS: whisperConfig.targetCps,
+          MAX_CPS: whisperConfig.maxCps,
+          MAX_CHARS: whisperConfig.maxChars,
+          MIN_DURATION: whisperConfig.minDuration,
+        },
+      )
+    } else {
+      if (!segments.length) {
+        toast.error("Whisper segments data not available", {
+          description: "Please transcribe again with a Whisper model",
+        })
+        return
+      }
+      srtContent = generateSegmentsTranscription(segments)
+    }
+    if (!srtContent.trim()) {
+      toast.error("Failed to generate subtitles from words-level data")
+      return
+    }
+
+    const { subtitles } = parseSubtitle({ content: srtContent, type: "srt" })
+    setTranscriptionText(currentId, srtContent)
+    setTranscriptSubtitles(currentId, subtitles)
+    setRightTab("subtitles")
+    setHasChanges(true)
+    await saveData(currentId)
+    toast.success("Generated subtitles from Whisper word timings")
+  }
+
+  const handleResetWhisperConfig = () => {
+    setWhisperConfig({
+      maxSilenceGap: 0.5,
+      targetCps: 16,
+      maxCps: 22,
+      maxChars: 85,
+      minDuration: 1,
+    })
   }
 
   const handleExport = () => {
@@ -730,7 +817,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
 
         {/* Right Column - Results */}
         <div className="md:col-span-2 space-y-6">
-          <Tabs defaultValue="transcript">
+          <Tabs value={rightTab} onValueChange={value => setRightTab(value as "transcript" | "subtitles")}>
             <TabsList className="w-full">
               <TabsTrigger value="transcript" className="w-full">
                 Transcript
@@ -931,6 +1018,152 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
               </div>
             </TabsContent>
           </Tabs>
+
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h2 className="text-lg font-medium mb-4">Whisper transcription settings</h2>
+
+            <div className={cn("space-y-4", (!words.length || !segments.length) && "pointer-events-none opacity-50")}>
+              <div>
+                <p className="text-sm font-medium mb-2">Subtitle level</p>
+                <RadioGroup
+                  value={subtitleLevel}
+                  onValueChange={value => setSubtitleLevel(value as "words" | "segments")}
+                  className="flex flex-col sm:flex-row gap-4"
+                >
+                  <label className="flex items-center gap-2 cursor-pointer text-sm" htmlFor="whisper-level-words">
+                    <RadioGroupItem id="whisper-level-words" value="words" />
+                    <span>Words</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer text-sm" htmlFor="whisper-level-segments">
+                    <RadioGroupItem id="whisper-level-segments" value="segments" />
+                    <span>Segments</span>
+                  </label>
+                </RadioGroup>
+              </div>
+
+              {subtitleLevel === 'words' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-1">
+                    <Label
+                      htmlFor="whisper-max-silence"
+                      title="Max gap between words (in seconds) to consider them part of the same phrase. Longer gaps force a new subtitle."
+                    >
+                      Max silence gap (seconds)
+                    </Label>
+                    <Input
+                      id="whisper-max-silence"
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      value={whisperConfig.maxSilenceGap}
+                      onChange={e => setWhisperConfig(cfg => ({
+                        ...cfg,
+                        maxSilenceGap: Number(e.target.value) || 0,
+                      }))}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label
+                      htmlFor="whisper-min-duration"
+                      title="Try not to make subtitles shorter than this duration, so they stay on screen long enough to read."
+                    >
+                      Minimum duration (seconds)
+                    </Label>
+                    <Input
+                      id="whisper-min-duration"
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      value={whisperConfig.minDuration}
+                      onChange={e => setWhisperConfig(cfg => ({
+                        ...cfg,
+                        minDuration: Number(e.target.value) || 0,
+                      }))}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label
+                      htmlFor="whisper-target-cps"
+                      title="Character Per Second (CPS). Controls reading speed."
+                    >
+                      Target CPS
+                    </Label>
+                    <Input
+                      id="whisper-target-cps"
+                      type="number"
+                      min="1"
+                      value={whisperConfig.targetCps}
+                      onChange={e => setWhisperConfig(cfg => ({
+                        ...cfg,
+                        targetCps: Number(e.target.value) || 1,
+                      }))}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label
+                      htmlFor="whisper-max-cps"
+                      title="Maximum allowed CPS before forcing split."
+                    >
+                      Max CPS
+                    </Label>
+                    <Input
+                      id="whisper-max-cps"
+                      type="number"
+                      min="1"
+                      value={whisperConfig.maxCps}
+                      onChange={e => setWhisperConfig(cfg => ({
+                        ...cfg,
+                        maxCps: Number(e.target.value) || 1,
+                      }))}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label
+                      htmlFor="whisper-max-chars"
+                      title="Fallback limit for maximum characters per subtitle block. Higher values allow longer lines. Roughly 2 lines of 42 chars"
+                    >
+                      Max characters per subtitle
+                    </Label>
+                    <Input
+                      id="whisper-max-chars"
+                      type="number"
+                      min="1"
+                      value={whisperConfig.maxChars}
+                      onChange={e => setWhisperConfig(cfg => ({
+                        ...cfg,
+                        maxChars: Number(e.target.value) || 1,
+                      }))}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-border"
+                  onClick={() => handleApplyWhisperSubtitles()}
+                  disabled={isTranscribing}
+                >
+                  <Wand2 className="h-3 w-3" />
+                  Apply Whisper subtitles
+                </Button>
+                {subtitleLevel === 'words' && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-border"
+                    onClick={handleResetWhisperConfig}
+                    disabled={isTranscribing}
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                    Reset
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
 
           {/* Always Show What's Next */}
           <div className="bg-card border border-border rounded-lg p-6">

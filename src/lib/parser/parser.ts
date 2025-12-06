@@ -2,6 +2,7 @@ import type { SubOnlyTranslated, Subtitle, SubtitleNoTimeNoActorTranslated } fro
 import { parseSubtitle } from "../subtitles/parse-subtitle"
 import { keepOnlyWrapped, removeWrapped, cleanUpJsonResponse } from "./cleaner"
 import { repairJson } from "./repairer"
+import type { TranscriptionWord, TranscriptionSegment } from "../../types/project"
 
 export function getThink(response: string): string {
   return keepOnlyWrapped(response, '<think>', '</think>')
@@ -127,4 +128,34 @@ export function parseTranscription(response: string): Subtitle[] {
   } catch (error) {
     return parseSubtitle({ content: response }).subtitles
   }
+}
+
+export function parseTranscriptionWordsAndSegments(response: string): { words: TranscriptionWord[]; segments: TranscriptionSegment[] } {
+  const think = getThink(response)
+  if (!think) {
+    return { words: [], segments: [] }
+  }
+  const wordsBlock = keepOnlyWrapped(think, "<words>", "</words>")
+  const segmentsBlock = keepOnlyWrapped(think, "<segments>", "</segments>")
+  const extractInner = (block: string, start: string, end: string) => {
+    if (!block) return ""
+    const startIndex = block.indexOf(start)
+    const endIndex = block.lastIndexOf(end)
+    if (startIndex === -1 || endIndex === -1) return ""
+    return block.slice(startIndex + start.length, endIndex).trim()
+  }
+  const wordsText = extractInner(wordsBlock, "<words>", "</words>")
+  const segmentsText = extractInner(segmentsBlock, "<segments>", "</segments>")
+  const safeParseArray = <T,>(text: string): T[] => {
+    if (!text) return []
+    try {
+      const parsed = JSON.parse(text)
+      return Array.isArray(parsed) ? parsed as T[] : []
+    } catch {
+      return []
+    }
+  }
+  const words = safeParseArray<TranscriptionWord>(wordsText)
+  const segments = safeParseArray<TranscriptionSegment>(segmentsText)
+  return { words, segments }
 }

@@ -165,6 +165,16 @@ class MyDatabase extends Dexie {
         }
       })
     })
+    this.version(20).stores({}).upgrade(async tx => {
+      await tx.table('transcriptions').toCollection().modify(transcription => {
+        if (typeof transcription.words === 'undefined') {
+          transcription.words = []
+        }
+        if (typeof transcription.segments === 'undefined') {
+          transcription.segments = []
+        }
+      })
+    })
   }
 }
 

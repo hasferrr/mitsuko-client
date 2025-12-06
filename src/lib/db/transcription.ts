@@ -14,6 +14,8 @@ export const createTranscription = async (
       projectId,
       ...data,
       ...DEFAULT_TRANSCTIPTION_SETTINGS,
+      words: [],
+      segments: [],
       createdAt: new Date(),
       updatedAt: new Date()
     }
@@ -36,7 +38,7 @@ export const getTranscription = async (transcriptionId: string): Promise<Transcr
 
 export const updateTranscription = async (
   transcriptionId: string,
-  changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language">>
+  changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language" | "words" | "segments">>
 ): Promise<Transcription> => {
   await db.transcriptions.update(transcriptionId, {
     ...changes,

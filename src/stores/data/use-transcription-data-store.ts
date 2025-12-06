@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { Transcription } from "@/types/project"
+import { Transcription, TranscriptionWord, TranscriptionSegment } from "@/types/project"
 import {
   updateTranscription as updateDB,
   createTranscription as createDB,
@@ -25,6 +25,8 @@ interface TranscriptionDataStore {
   getLanguage: () => string
   getCustomInstructions: () => string
   getModels: () => Transcription["models"]
+  getWords: () => TranscriptionWord[]
+  getSegments: () => TranscriptionSegment[]
   // setters
   setCurrentId: (id: string | null) => void
   setTitle: (id: string, title: string) => void
@@ -34,6 +36,8 @@ interface TranscriptionDataStore {
   setLanguage: (id: string, language: string) => void
   setCustomInstructions: (id: string, customInstructions: string) => void
   setModels: (id: string, models: Transcription["models"]) => void
+  setWords: (id: string, words: TranscriptionWord[]) => void
+  setSegments: (id: string, segments: TranscriptionSegment[]) => void
   // data manipulation methods
   mutateData: <T extends keyof Transcription>(id: string, key: T, value: Transcription[T]) => void
   mutateDataNoRender: <T extends keyof Transcription>(id: string, key: T, value: Transcription[T]) => void
@@ -103,6 +107,14 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     const id = get().currentId
     return id ? get().data[id]?.models : DEFAULT_TRANSCTIPTION_SETTINGS.models
   },
+  getWords: () => {
+    const id = get().currentId
+    return id ? get().data[id]?.words ?? [] : []
+  },
+  getSegments: () => {
+    const id = get().currentId
+    return id ? get().data[id]?.segments ?? [] : []
+  },
   // setters implementation
   setCurrentId: (id) => set({ currentId: id }),
   setTitle: (id, title) => {
@@ -129,6 +141,12 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   },
   setModels: (id, models) => {
     get().mutateData(id, "models", models)
+  },
+  setWords: (id, words) => {
+    get().mutateData(id, "words", words)
+  },
+  setSegments: (id, segments) => {
+    get().mutateData(id, "segments", segments)
   },
   // data manipulation methods
   mutateData: (id, key, value) => {
@@ -162,6 +180,8 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
         language: transcription.language,
         customInstructions: transcription.customInstructions,
         models: transcription.models,
+        words: transcription.words,
+        segments: transcription.segments,
       })
       set({ data: { ...get().data, [id]: result } })
     } catch (error) {
