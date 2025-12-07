@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { getTranscriptionLogResult } from "@/lib/api/transcription-log"
 import {
@@ -7,22 +8,29 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+import { AiStreamOutput } from "@/components/ai-stream/ai-stream-output"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Calendar,
   CircleDollarSign,
   Download,
   FileAudio2,
+  FolderPlus,
 } from "lucide-react"
 import { TranscriptionLogItem } from "@/types/transcription-log"
-import { parseTranscription } from "@/lib/parser/parser"
+import { getContent, parseTranscription, parseTranscriptionWordsAndSegments } from "@/lib/parser/parser"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { toast } from "sonner"
 import { cn, createUtf8SubtitleBlob } from "@/lib/utils"
+import { useProjectStore } from "@/stores/data/use-project-store"
+import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Project, TranscriptionModel } from "@/types/project"
 
 interface LogResultDialogProps {
   log: TranscriptionLogItem | null
@@ -37,6 +45,14 @@ export default function LogResultDialog({ log, onOpenChange }: LogResultDialogPr
     staleTime: Infinity,
     refetchOnWindowFocus: false,
   })
+
+  const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
+  const [isApplying, setIsApplying] = useState(false)
+
+  const projects = useProjectStore(state => state.projects)
+  const hasLoadedProjects = useProjectStore(state => state.hasLoaded)
+  const loadingProjects = useProjectStore(state => state.loading)
+  const loadProjects = useProjectStore(state => state.loadProjects)
 
   const formatDate = (iso: string) => {
     return new Date(iso).toLocaleString("en-US", {
@@ -102,6 +118,66 @@ export default function LogResultDialog({ log, onOpenChange }: LogResultDialogPr
           </div>
         </div>
       )
+    }
+  }
+
+  const handleOpenApplyDialog = async () => {
+    if (!data?.result) {
+      toast.error("No transcription result to apply")
+      return
+    }
+
+    if (!hasLoadedProjects && !loadingProjects) {
+      try {
+        await loadProjects()
+      } catch {
+      }
+    }
+
+    setIsApplyDialogOpen(true)
+  }
+
+  const handleApplyToProject = async (projectId: string) => {
+    if (!data?.result || !log) {
+      toast.error("No transcription result to apply")
+      return
+    }
+
+    try {
+      setIsApplying(true)
+
+      const raw = data.result
+      const cleaned = getContent(raw)
+      const transcriptSubtitles = parseTranscription(raw)
+      const { words, segments } = parseTranscriptionWordsAndSegments(raw)
+
+      const title = log.metadata.originalname || "Transcription"
+      const transcriptionStore = useTranscriptionDataStore.getState()
+      const created = await transcriptionStore.createTranscriptionDb(projectId, {
+        title,
+        transcriptionText: cleaned,
+        transcriptSubtitles,
+        models: log.reqModels as TranscriptionModel,
+        words,
+        segments,
+      })
+
+      const projectStore = useProjectStore.getState()
+      const project = projectStore.projects.find(p => p.id === projectId) || await projectStore.getProjectDb(projectId)
+      if (project) {
+        const updatedIds = [...project.transcriptions, created.id]
+        await projectStore.updateProjectItems(projectId, updatedIds, "transcription")
+      } else {
+        await projectStore.loadProjects()
+      }
+
+      toast.success("Transcription applied to project")
+      setIsApplyDialogOpen(false)
+    } catch (error) {
+      console.error("Failed to apply transcription to project:", error)
+      toast.error("Failed to apply transcription to project")
+    } finally {
+      setIsApplying(false)
     }
   }
 
@@ -178,19 +254,30 @@ export default function LogResultDialog({ log, onOpenChange }: LogResultDialogPr
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium">Transcription Result</h4>
                 {data?.result && (
-                  <Button variant="outline" size="sm" onClick={handleExportSRT} className="h-8">
-                    <Download className="h-3 w-3" /> Export SRT
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleOpenApplyDialog}
+                      className="h-8"
+                    >
+                      <FolderPlus className="h-3 w-3" /> Apply to project
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleExportSRT} className="h-8">
+                      <Download className="h-3 w-3" /> Export SRT
+                    </Button>
+                  </div>
                 )}
               </div>
 
               {data?.result ? (
-                <Textarea
-                  value={data.result}
-                  readOnly
-                  className="h-full min-h-96 resize-none overflow-y-auto"
-                  placeholder="No transcription result available"
-                />
+                <div className="max-h-[60vh] min-h-64 overflow-y-auto rounded-md border p-3 pr-2 bg-background dark:bg-muted/30">
+                  <AiStreamOutput
+                    content={data.result}
+                    isProcessing={false}
+                    defaultCollapsed={true}
+                  />
+                </div>
               ) : (
                 <p className="h-full py-16 rounded-lg border bg-muted/10 text-muted-foreground text-center">
                   This transcription result is empty
@@ -199,6 +286,72 @@ export default function LogResultDialog({ log, onOpenChange }: LogResultDialogPr
             </>
           )}
         </div>
+      </DialogContent>
+
+      <ApplyToProjectDialog
+        open={isApplyDialogOpen}
+        onOpenChange={setIsApplyDialogOpen}
+        projects={projects}
+        isProcessing={isApplying}
+        onApply={handleApplyToProject}
+      />
+    </Dialog>
+  )
+}
+
+interface ApplyToProjectDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  projects: Project[]
+  isProcessing: boolean
+  onApply: (projectId: string) => void | Promise<void>
+}
+
+function ApplyToProjectDialog({ open, onOpenChange, projects, isProcessing, onApply }: ApplyToProjectDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Apply to Project</DialogTitle>
+          <DialogDescription>
+            Select a project to add this transcription result
+          </DialogDescription>
+        </DialogHeader>
+        <ScrollArea className="h-[300px] w-full pr-4">
+          <div className="space-y-2">
+            {projects.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No projects available. Create a project first.
+              </p>
+            ) : (
+              projects
+                .sort((project) => project.isBatch ? 1 : -1)
+                .map((project) => (
+                  <Button
+                    key={project.id}
+                    variant="outline"
+                    className="w-full justify-start"
+                    disabled={isProcessing}
+                    onClick={() => onApply(project.id)}
+                  >
+                    {project.name}
+                    {project.isBatch && (
+                      <Badge className="ml-2 h-5 px-2">Batch</Badge>
+                    )}
+                  </Button>
+                ))
+            )}
+          </div>
+        </ScrollArea>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isProcessing}
+          >
+            Cancel
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

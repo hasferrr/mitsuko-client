@@ -2,20 +2,33 @@ import { Transcription } from "@/types/project"
 import { db } from "./db"
 import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
 
+interface TranscriptionData {
+  title: Transcription["title"]
+  transcriptionText: Transcription["transcriptionText"]
+  transcriptSubtitles: Transcription["transcriptSubtitles"]
+  models?: Transcription["models"]
+  words?: Transcription["words"]
+  segments?: Transcription["segments"]
+}
+
 // Transcription CRUD functions
 export const createTranscription = async (
   projectId: string,
-  data: Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles">
+  data: TranscriptionData
 ): Promise<Transcription> => {
+  const newData = {
+    ...data,
+    words: data.words || [],
+    segments: data.segments || [],
+  }
+
   return db.transaction('rw', db.projects, db.transcriptions, async () => {
     const id = crypto.randomUUID()
     const transcription: Transcription = {
       id,
       projectId,
-      ...data,
       ...DEFAULT_TRANSCTIPTION_SETTINGS,
-      words: [],
-      segments: [],
+      ...newData,
       createdAt: new Date(),
       updatedAt: new Date()
     }

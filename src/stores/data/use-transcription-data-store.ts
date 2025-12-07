@@ -13,7 +13,7 @@ interface TranscriptionDataStore {
   currentId: string | null
   data: Record<string, Transcription>
   // CRUD methods
-  createTranscriptionDb: (projectId: string, data: Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles">) => Promise<Transcription>
+  createTranscriptionDb: (projectId: string, data: Parameters<typeof createDB>[1]) => Promise<Transcription>
   getTranscriptionDb: (transcriptionId: string) => Promise<Transcription | undefined>
   updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
