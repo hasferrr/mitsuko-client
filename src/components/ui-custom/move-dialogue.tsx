@@ -40,7 +40,8 @@ export function MoveDialogue({
         <ScrollArea className="h-[300px] w-full pr-4">
           <div className="space-y-2">
             {projects
-              .filter((project) => project.id !== currentProjectId && !project.isBatch)
+              .filter((project) => project.id !== currentProjectId)
+              .sort((project) => project.isBatch ? 1 : -1)
               .map((project) => (
                 <Button
                   key={project.id}
@@ -50,20 +51,9 @@ export function MoveDialogue({
                   onClick={() => onMove(project.id)}
                 >
                   {project.name}
-                </Button>
-              ))}
-            {projects
-              .filter((project) => project.id !== currentProjectId && project.isBatch)
-              .map((project) => (
-                <Button
-                  key={project.id}
-                  variant="outline"
-                  className="w-full justify-start"
-                  disabled={isProcessing}
-                  onClick={() => onMove(project.id)}
-                >
-                  {project.name}
-                  <Badge className="ml-2 h-5 px-2">Batch</Badge>
+                  {project.isBatch && (
+                    <Badge className="ml-2 h-5 px-2">Batch</Badge>
+                  )}
                 </Button>
               ))}
           </div>
