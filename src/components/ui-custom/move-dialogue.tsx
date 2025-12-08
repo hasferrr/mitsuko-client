@@ -40,14 +40,13 @@ export function MoveDialogue({
         <ScrollArea className="h-[300px] w-full pr-4">
           <div className="space-y-2">
             {projects
-              .filter((project) => project.id !== currentProjectId)
-              .sort((project) => project.isBatch ? 1 : -1)
+              .sort((a, b) => a.isBatch === b.isBatch ? 1 : a.isBatch ? 1 : -1)
               .map((project) => (
                 <Button
                   key={project.id}
                   variant="outline"
                   className="w-full justify-start"
-                  disabled={isProcessing}
+                  disabled={isProcessing || project.id === currentProjectId}
                   onClick={() => onMove(project.id)}
                 >
                   {project.name}
