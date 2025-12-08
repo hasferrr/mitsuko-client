@@ -211,7 +211,6 @@ export const useTranslationHandler = ({
       }
       usedFewShot = usedFewShot?.filter((s) => s.content && s.translated)
     }
-    console.log("usedFewShot: ", usedFewShot)
 
     // Accumulate raw responses
     const allRawResponses: string[] = []
@@ -301,9 +300,7 @@ export const useTranslationHandler = ({
     let chunkNumber = 0
     while (subtitleChunks.length > 0) {
       const chunk = subtitleChunks.shift()!
-      console.log(`===== Chunk ${chunkNumber + 1} =====`)
-      console.log(chunk)
-      console.log(JSON.parse(JSON.stringify(context)))
+      console.log(`Translation: ${title} (Chunk ${chunkNumber + 1})`)
 
       const requestBody = {
         title: title.slice(0, 150),
@@ -368,7 +365,6 @@ export const useTranslationHandler = ({
           tlChunk = parseTranslationJson(rawResponse)
         } catch (error) {
           console.error("Error: ", error)
-          console.log("Failed to parse: ", rawResponse)
           setResponse(currentId, rawResponse + "\n\n[Failed to parse]")
           // If part of a batch, don't set isTranslating to false here, let the batch handler do it.
           // The error is logged, and the loop in handleContinueTranslation should ideally break.
@@ -379,7 +375,6 @@ export const useTranslationHandler = ({
         }
 
       } finally {
-        console.log("result: ", tlChunk)
         allRawResponses.push(useTranslationDataStore.getState().data[currentId].response.response)
 
         // Update the parsed json

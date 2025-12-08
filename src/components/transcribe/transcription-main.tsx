@@ -376,7 +376,6 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     const { subtitles } = parseSubtitle({ content: srtContent, type: "srt" })
     setTranscriptionText(currentId, srtContent)
     setTranscriptSubtitles(currentId, subtitles)
-    setRightTab("subtitles")
     setHasChanges(true)
     await saveData(currentId)
     toast.success("Generated subtitles from Whisper word timings")
