@@ -153,7 +153,7 @@ export default function LogResultDialog({ log, onOpenChange }: LogResultDialogPr
 
       const title = log.metadata.originalname || "Transcription"
       const transcriptionStore = useTranscriptionDataStore.getState()
-      const created = await transcriptionStore.createTranscriptionDb(projectId, {
+      await transcriptionStore.createTranscriptionDb(projectId, {
         title,
         transcriptionText: cleaned,
         transcriptSubtitles,
@@ -162,17 +162,9 @@ export default function LogResultDialog({ log, onOpenChange }: LogResultDialogPr
         segments,
       })
 
-      const projectStore = useProjectStore.getState()
-      const project = projectStore.projects.find(p => p.id === projectId) || await projectStore.getProjectDb(projectId)
-      if (project) {
-        const updatedIds = [...project.transcriptions, created.id]
-        await projectStore.updateProjectItems(projectId, updatedIds, "transcription")
-      } else {
-        await projectStore.loadProjects()
-      }
-
       toast.success("Transcription applied to project")
       setIsApplyDialogOpen(false)
+      await loadProjects()
     } catch (error) {
       console.error("Failed to apply transcription to project:", error)
       toast.error("Failed to apply transcription to project")
