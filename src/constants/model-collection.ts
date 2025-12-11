@@ -102,20 +102,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
     provider: "unknown",
     models: [
       {
-        name: "Gemini 2.5 Pro",
-        subName: "gemini-2.5-pro",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
         name: "Gemini 2.5 Flash",
         subName: "gemini-flash-latest\ngemini-2.5-flash-preview-09-2025",
         maxInput: 1_048_576,
@@ -383,6 +369,19 @@ const RAW_PAID_MODELS: PaidModelCollection = {
   OpenAI: {
     provider: "openai",
     models: [
+      {
+        name: "GPT-5.2",
+        maxInput: 400_000,
+        maxOutput: 128_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "high",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
       {
         name: "GPT-5.1",
         maxInput: 400_000,

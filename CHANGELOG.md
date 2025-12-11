@@ -14,6 +14,11 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### December 12
+
+- 🤖 **Model Updates:** Added GPT-5.2, a frontier-grade GPT-5 model with stronger agentic and long‑context performance plus adaptive reasoning for both simple and complex tasks.
+- 🛑 **Model Deprecations:** Removed the free Gemini 2.5 Pro option, as Google no longer offers this model for free.
+
 ### December 5
 
 - 🎙️ **Transcription Models:** Added Whisper Large V3 and its Turbo variant, giving you faster and higher‑quality options for long duration audio transcription.
