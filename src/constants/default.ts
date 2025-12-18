@@ -7,7 +7,11 @@ import { parseTranscription, parseTranslationJson } from "@/lib/parser/parser"
 export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> = {
   sourceLanguage: "Japanese",
   targetLanguage: "Indonesian",
-  modelDetail: FREE_MODELS["Premium Trial"].models[0] || null,
+  modelDetail: (() => {
+    const freeModels = FREE_MODELS["Premium Trial"].models
+    const defaultModel = freeModels.find((model) => model.name === "DeepSeek R1")
+    return defaultModel || freeModels[0] || null
+  })(),
   isUseCustomModel: false,
   contextDocument: "",
   customInstructions: "",
