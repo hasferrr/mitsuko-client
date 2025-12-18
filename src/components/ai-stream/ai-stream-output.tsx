@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react"
+import { Children, isValidElement, useEffect, useEffectEvent, useMemo, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { SubOnlyTranslated, SubtitleNoTimeTranslated } from "@/types/subtitles"
@@ -188,10 +188,28 @@ export const AiStreamOutput = ({
                   components={{
                     p: props => <p className="mb-3 whitespace-pre-line" {...props} />,
                     ul: props => <ul className="mb-3 list-disc pl-5 space-y-1" {...props} />,
-                    ol: props => <ol className="mb-3 list-decimal pl-5 space-y-1" {...props} />,
-                    li: props => <li className="" {...props} />,
+                    ol: props => {
+                      const listItemCount = Children.toArray(props.children).filter(isValidElement).length
+                      const listItemMarginClass =
+                        listItemCount >= 100
+                          ? "[&>li]:ml-4"
+                          : listItemCount >= 10
+                            ? "[&>li]:ml-1.5"
+                            : "[&>li]:ml-0"
+                      return (
+                        <ol
+                          className={cn(
+                            "mb-3 list-decimal pl-5 space-y-1",
+                            listItemMarginClass,
+                            props.className,
+                          )}
+                          {...props}
+                        />
+                      )
+                    },
+                    li: props => <li {...props} />,
                     code: ({ className, children, ...props }) => (
-                      <code className={cn("inline-block max-w-full rounded bg-muted/50 px-1 py-0.5 text-xs whitespace-pre-line", className)} {...props}>
+                      <code className={cn("inline-block max-w-full rounded bg-muted/50 px-1 py-0.5 text-xs whitespace-pre-wrap", className)} {...props}>
                         {children}
                       </code>
                     ),
