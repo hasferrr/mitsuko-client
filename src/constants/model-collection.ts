@@ -209,6 +209,20 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
+        name: "Gemini 3 Flash",
+        subName: "gemini-3-flash-preview",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "medium",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "Gemini 2.5 Pro",
         subName: "gemini-2.5-pro",
         maxInput: 1_048_576,
