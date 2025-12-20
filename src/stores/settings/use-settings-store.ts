@@ -50,6 +50,7 @@ interface SettingsStore {
     keys: K[],
   ) => Promise<void>
   resetBasicSettingsToGlobal: (id: string) => Promise<void>
+  resetBasicSettingsFrom: (fromId: string, toId: string) => Promise<void>
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -261,6 +262,10 @@ export const useSettingsStore = create<SettingsStore>()(
       resetBasicSettingsToGlobal: async (id: string) => {
         const keys: BasicKey[] = [...BASIC_SETTING_KEYS]
         await get().copyBasicSettingsKeys(GLOBAL_BASIC_SETTINGS_ID, id, keys)
+      },
+      resetBasicSettingsFrom: async (fromId: string, toId: string) => {
+        const keys: BasicKey[] = [...BASIC_SETTING_KEYS]
+        await get().copyBasicSettingsKeys(fromId, toId, keys)
       },
     }),
     {

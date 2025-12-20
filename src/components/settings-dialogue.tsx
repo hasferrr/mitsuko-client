@@ -54,6 +54,8 @@ interface SettingsDialogueProps {
   basicSettingsId: string
   advancedSettingsId: string
   settingsParentType?: SettingsParentType
+  resetFromBasicSettingsId?: string
+  resetFromAdvancedSettingsId?: string
 }
 
 export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
@@ -63,12 +65,16 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
   projectName,
   basicSettingsId,
   advancedSettingsId,
+  resetFromBasicSettingsId,
+  resetFromAdvancedSettingsId,
   settingsParentType = 'project',
 }) => {
   const resetBasicSettings = useSettingsStore((s) => s.resetBasicSettings)
   const resetAdvancedSettings = useAdvancedSettingsStore((s) => s.resetAdvancedSettings)
   const resetBasicSettingsToGlobal = useSettingsStore((s) => s.resetBasicSettingsToGlobal)
   const resetAdvancedSettingsToGlobal = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsToGlobal)
+  const resetBasicSettingsFrom = useSettingsStore((s) => s.resetBasicSettingsFrom)
+  const resetAdvancedSettingsFrom = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsFrom)
   const isSeparateSettingsEnabled = useLocalSettingsStore((s) => s.isSeparateSettingsEnabled)
 
   const dialogTitle = isGlobal
@@ -96,9 +102,17 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
       return
     }
 
+    const basicResetPromise = resetFromBasicSettingsId
+      ? resetBasicSettingsFrom(resetFromBasicSettingsId, basicSettingsId)
+      : resetBasicSettingsToGlobal(basicSettingsId)
+
+    const advancedResetPromise = resetFromAdvancedSettingsId
+      ? resetAdvancedSettingsFrom(resetFromAdvancedSettingsId, advancedSettingsId)
+      : resetAdvancedSettingsToGlobal(advancedSettingsId)
+
     await Promise.all([
-      resetBasicSettingsToGlobal(basicSettingsId),
-      resetAdvancedSettingsToGlobal(advancedSettingsId),
+      basicResetPromise,
+      advancedResetPromise,
     ])
   }
 
@@ -224,7 +238,12 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
               <AlertDialogHeader>
                 <AlertDialogTitle>Reset all settings?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will reset Basic and Advanced settings to defaults for this project.
+                  {isGlobal
+                    ? "This will reset settings to defaults."
+                    : settingsParentType === 'project'
+                      ? "This will reset to global settings."
+                      : "This will reset to project settings."
+                  }
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

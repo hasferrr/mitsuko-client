@@ -145,7 +145,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     }
 
     loadData()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentProject.id])
 
   // Drag and drop handlers
@@ -583,6 +583,8 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         projectName={currentProject.name}
         basicSettingsId={currentProject.defaultTranslationBasicSettingsId}
         advancedSettingsId={currentProject.defaultTranslationAdvancedSettingsId}
+        resetFromBasicSettingsId={currentProject.defaultBasicSettingsId}
+        resetFromAdvancedSettingsId={currentProject.defaultAdvancedSettingsId}
         settingsParentType="translation"
       />
 
@@ -592,6 +594,8 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         projectName={currentProject.name}
         basicSettingsId={currentProject.defaultExtractionBasicSettingsId}
         advancedSettingsId={currentProject.defaultExtractionAdvancedSettingsId}
+        resetFromBasicSettingsId={currentProject.defaultBasicSettingsId}
+        resetFromAdvancedSettingsId={currentProject.defaultAdvancedSettingsId}
         settingsParentType="extraction"
       />
 

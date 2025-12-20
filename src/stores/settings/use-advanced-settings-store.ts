@@ -53,6 +53,7 @@ interface AdvancedSettingsStore {
     keys: K[],
   ) => Promise<void>
   resetAdvancedSettingsToGlobal: (id: string) => Promise<void>
+  resetAdvancedSettingsFrom: (fromId: string, toId: string) => Promise<void>
 }
 
 export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
@@ -258,6 +259,10 @@ export const useAdvancedSettingsStore = create<AdvancedSettingsStore>()(
       resetAdvancedSettingsToGlobal: async (id: string) => {
         const keys: AdvancedKey[] = [...ADVANCED_SETTING_KEYS]
         await get().copyAdvancedSettingsKeys(GLOBAL_ADVANCED_SETTINGS_ID, id, keys)
+      },
+      resetAdvancedSettingsFrom: async (fromId: string, toId: string) => {
+        const keys: AdvancedKey[] = [...ADVANCED_SETTING_KEYS]
+        await get().copyAdvancedSettingsKeys(fromId, toId, keys)
       },
     }
   )
