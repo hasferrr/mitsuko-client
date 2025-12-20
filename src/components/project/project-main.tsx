@@ -24,7 +24,7 @@ import {
   Edit,
   Trash,
   Loader2,
-  Settings,
+  Settings2,
   ArrowLeft,
   ArrowLeftRight,
   Upload,
@@ -44,6 +44,7 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
+import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { SettingsDialogue } from "../settings-dialogue"
 import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
@@ -79,9 +80,13 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
+  const [isTranslationSettingsModalOpen, setIsTranslationSettingsModalOpen] = useState(false)
+  const [isExtractionSettingsModalOpen, setIsExtractionSettingsModalOpen] = useState(false)
   const [isConvertModalOpen, setIsConvertModalOpen] = useState(false)
   const [isProcessingConvert, setIsProcessingConvert] = useState(false)
   const router = useRouter()
+
+  const isSeparateSettingsEnabled = useLocalSettingsStore((state) => state.isSeparateSettingsEnabled)
 
   const renameProject = useProjectStore((state) => state.renameProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
@@ -375,6 +380,23 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     </Button>
   )
 
+  const NewTranslationControls = (
+    <div className="flex items-center gap-2">
+      {isSeparateSettingsEnabled && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-8 w-8 p-0"
+          onClick={() => setIsTranslationSettingsModalOpen(true)}
+          title="Translation settings"
+        >
+          <Settings2 className="h-4 w-4" />
+        </Button>
+      )}
+      {NewTranslationButton}
+    </div>
+  )
+
   const NewTranscriptionButton = (
     <Button
       size="sm"
@@ -426,6 +448,23 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     >
       New Extraction
     </Button>
+  )
+
+  const NewExtractionControls = (
+    <div className="flex items-center gap-2">
+      {isSeparateSettingsEnabled && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-8 w-8 p-0"
+          onClick={() => setIsExtractionSettingsModalOpen(true)}
+          title="Extraction settings"
+        >
+          <Settings2 className="h-4 w-4" />
+        </Button>
+      )}
+      {NewExtractionButton}
+    </div>
   )
 
   const ProjectItemSkeleton = () => (
@@ -486,7 +525,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
               onClick={() => setIsSettingsModalOpen(true)}
               className="flex items-center gap-2 hover:underline"
             >
-              <Settings size={4 * 5} />
+              <Settings2 size={4 * 5} />
               Settings
             </button>
             <button
@@ -536,6 +575,24 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         projectName={currentProject.name}
         basicSettingsId={currentProject.defaultBasicSettingsId}
         advancedSettingsId={currentProject.defaultAdvancedSettingsId}
+      />
+
+      <SettingsDialogue
+        isOpen={isTranslationSettingsModalOpen}
+        onOpenChange={setIsTranslationSettingsModalOpen}
+        projectName={currentProject.name}
+        basicSettingsId={currentProject.defaultTranslationBasicSettingsId}
+        advancedSettingsId={currentProject.defaultTranslationAdvancedSettingsId}
+        settingsParentType="translation"
+      />
+
+      <SettingsDialogue
+        isOpen={isExtractionSettingsModalOpen}
+        onOpenChange={setIsExtractionSettingsModalOpen}
+        projectName={currentProject.name}
+        basicSettingsId={currentProject.defaultExtractionBasicSettingsId}
+        advancedSettingsId={currentProject.defaultExtractionAdvancedSettingsId}
+        settingsParentType="extraction"
       />
 
       {/* Convert Confirmation Dialog */}
@@ -593,7 +650,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
             <div className="bg-card border border-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium">Translations</h3>
-                {NewTranslationButton}
+                {NewTranslationControls}
               </div>
               <DndContext
                 sensors={sensors}
@@ -635,7 +692,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
             <div className="bg-card border border-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium">Extractions</h3>
-                {NewExtractionButton}
+                {NewExtractionControls}
               </div>
               <DndContext
                 sensors={sensors}
@@ -660,7 +717,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium">All Translations</h3>
-              {NewTranslationButton}
+              {NewTranslationControls}
             </div>
             <DndContext
               sensors={sensors}
@@ -708,7 +765,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium">All Extractions</h3>
-              {NewExtractionButton}
+              {NewExtractionControls}
             </div>
             <DndContext
               sensors={sensors}

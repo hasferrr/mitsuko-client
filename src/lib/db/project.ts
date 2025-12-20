@@ -17,10 +17,14 @@ export const createProject = async (name: string, isBatch = false): Promise<Proj
     const globalBasic = await getOrCreateGlobalBasicSettings()
     const basicTemplate = stripMeta(globalBasic)
     const basicSettings = await createBasicSettings(basicTemplate)
+    const translationBasicSettings = await createBasicSettings(stripMeta(basicSettings))
+    const extractionBasicSettings = await createBasicSettings(stripMeta(basicSettings))
 
     const globalAdvanced = await getOrCreateGlobalAdvancedSettings()
     const advancedTemplate = stripMeta(globalAdvanced)
     const advancedSettings = await createAdvancedSettings(advancedTemplate)
+    const translationAdvancedSettings = await createAdvancedSettings(stripMeta(advancedSettings))
+    const extractionAdvancedSettings = await createAdvancedSettings(stripMeta(advancedSettings))
 
     const project: Project = {
       id,
@@ -30,6 +34,10 @@ export const createProject = async (name: string, isBatch = false): Promise<Proj
       extractions: [],
       defaultBasicSettingsId: basicSettings.id,
       defaultAdvancedSettingsId: advancedSettings.id,
+      defaultTranslationBasicSettingsId: translationBasicSettings.id,
+      defaultTranslationAdvancedSettingsId: translationAdvancedSettings.id,
+      defaultExtractionBasicSettingsId: extractionBasicSettings.id,
+      defaultExtractionAdvancedSettingsId: extractionAdvancedSettings.id,
       createdAt: new Date(),
       updatedAt: new Date(),
       isBatch,
@@ -140,6 +148,18 @@ export const deleteProject = async (id: string): Promise<void> => {
     ]
     if (project.defaultAdvancedSettingsId) {
       advancedSettingsIds.push(project.defaultAdvancedSettingsId)
+    }
+    if (project.defaultTranslationBasicSettingsId) {
+      basicSettingsIds.push(project.defaultTranslationBasicSettingsId)
+    }
+    if (project.defaultTranslationAdvancedSettingsId) {
+      advancedSettingsIds.push(project.defaultTranslationAdvancedSettingsId)
+    }
+    if (project.defaultExtractionBasicSettingsId) {
+      basicSettingsIds.push(project.defaultExtractionBasicSettingsId)
+    }
+    if (project.defaultExtractionAdvancedSettingsId) {
+      advancedSettingsIds.push(project.defaultExtractionAdvancedSettingsId)
     }
 
     // Delete all related entities in single operations

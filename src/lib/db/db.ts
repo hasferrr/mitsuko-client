@@ -175,6 +175,96 @@ class MyDatabase extends Dexie {
         }
       })
     })
+    this.version(21).stores({}).upgrade(async tx => {
+      const projectsTable = tx.table('projects')
+      const basicSettingsTable = tx.table('basicSettings')
+      const advancedSettingsTable = tx.table('advancedSettings')
+
+      const projects = await projectsTable.toArray() as Project[]
+      const newBasicSettingsList: BasicSettings[] = []
+      const newAdvancedSettingsList: AdvancedSettings[] = []
+      const projectUpdates: { id: string; changes: Partial<Project> }[] = []
+
+      for (const project of projects) {
+        const changes: Partial<Project> = {}
+
+        if (
+          !project.defaultTranslationBasicSettingsId
+          || !project.defaultTranslationAdvancedSettingsId
+          || !project.defaultExtractionBasicSettingsId
+          || !project.defaultExtractionAdvancedSettingsId
+        ) {
+          const existingBasicSettings = await basicSettingsTable.get(project.defaultBasicSettingsId) as BasicSettings | undefined
+          const existingAdvancedSettings = await advancedSettingsTable.get(project.defaultAdvancedSettingsId) as AdvancedSettings | undefined
+
+          const baseBasicSettings = existingBasicSettings ?? { ...DEFAULT_BASIC_SETTINGS }
+          const baseAdvancedSettings = existingAdvancedSettings ?? { ...DEFAULT_ADVANCED_SETTINGS }
+
+          if (!project.defaultTranslationBasicSettingsId) {
+            const basicSettingsId = crypto.randomUUID()
+            const newBasicSettings: BasicSettings = {
+              ...baseBasicSettings,
+              id: basicSettingsId,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }
+            newBasicSettingsList.push(newBasicSettings)
+            changes.defaultTranslationBasicSettingsId = basicSettingsId
+          }
+
+          if (!project.defaultTranslationAdvancedSettingsId) {
+            const advancedSettingsId = crypto.randomUUID()
+            const newAdvancedSettings: AdvancedSettings = {
+              ...baseAdvancedSettings,
+              id: advancedSettingsId,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }
+            newAdvancedSettingsList.push(newAdvancedSettings)
+            changes.defaultTranslationAdvancedSettingsId = advancedSettingsId
+          }
+
+          if (!project.defaultExtractionBasicSettingsId) {
+            const basicSettingsId = crypto.randomUUID()
+            const newBasicSettings: BasicSettings = {
+              ...baseBasicSettings,
+              id: basicSettingsId,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }
+            newBasicSettingsList.push(newBasicSettings)
+            changes.defaultExtractionBasicSettingsId = basicSettingsId
+          }
+
+          if (!project.defaultExtractionAdvancedSettingsId) {
+            const advancedSettingsId = crypto.randomUUID()
+            const newAdvancedSettings: AdvancedSettings = {
+              ...baseAdvancedSettings,
+              id: advancedSettingsId,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }
+            newAdvancedSettingsList.push(newAdvancedSettings)
+            changes.defaultExtractionAdvancedSettingsId = advancedSettingsId
+          }
+
+          if (Object.keys(changes).length > 0) {
+            projectUpdates.push({ id: project.id, changes })
+          }
+        }
+      }
+
+      if (newBasicSettingsList.length > 0) {
+        await basicSettingsTable.bulkAdd(newBasicSettingsList)
+      }
+      if (newAdvancedSettingsList.length > 0) {
+        await advancedSettingsTable.bulkAdd(newAdvancedSettingsList)
+      }
+
+      for (const update of projectUpdates) {
+        await projectsTable.update(update.id, update.changes)
+      }
+    })
   }
 }
 

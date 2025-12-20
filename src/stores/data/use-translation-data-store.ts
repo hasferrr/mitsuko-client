@@ -12,6 +12,7 @@ import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { db } from "@/lib/db/db"
 import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 
 export interface TranslationDataStore {
   currentId: string | null
@@ -58,8 +59,17 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       const project = await db.projects.get(projectId)
       if (!project) throw new Error('Project not found')
 
-      const bsFromDb = await getBasicSettings(project.defaultBasicSettingsId)
-      const adsFromDb = await getAdvancedSettings(project.defaultAdvancedSettingsId)
+      const isSeparateSettingsEnabled = useLocalSettingsStore.getState().isSeparateSettingsEnabled
+
+      const basicSettingsId = isSeparateSettingsEnabled
+        ? (project.defaultTranslationBasicSettingsId || project.defaultBasicSettingsId)
+        : project.defaultBasicSettingsId
+      const advancedSettingsId = isSeparateSettingsEnabled
+        ? (project.defaultTranslationAdvancedSettingsId || project.defaultAdvancedSettingsId)
+        : project.defaultAdvancedSettingsId
+
+      const bsFromDb = await getBasicSettings(basicSettingsId)
+      const adsFromDb = await getAdvancedSettings(advancedSettingsId)
 
       const modelDetail = (bsInput?.modelDetail ?? bsFromDb?.modelDetail) ?? null
       const applyModelDefaults = useAdvancedSettingsStore.getState().applyModelDefaults

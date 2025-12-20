@@ -22,6 +22,8 @@ import { Settings2 } from "lucide-react"
 export function UserSettings() {
   const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
   const toggleThirdPartyModel = useLocalSettingsStore((state) => state.toggleThirdPartyModel)
+  const isSeparateSettingsEnabled = useLocalSettingsStore((state) => state.isSeparateSettingsEnabled)
+  const setIsSeparateSettingsEnabled = useLocalSettingsStore((state) => state.setIsSeparateSettingsEnabled)
   const [isThirdPartyDialogOpen, setIsThirdPartyDialogOpen] = useState(false)
   const [isGlobalDefaultsOpen, setIsGlobalDefaultsOpen] = useState(false)
 
@@ -65,6 +67,16 @@ export function UserSettings() {
               id="third-party-model-switch"
               checked={isThirdPartyModelEnabled}
               onCheckedChange={handleCheckedChange}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>
+              Separate Default Translation & Extraction Settings
+            </Label>
+            <Switch
+              id="separate-settings-switch"
+              checked={isSeparateSettingsEnabled}
+              onCheckedChange={setIsSeparateSettingsEnabled}
             />
           </div>
         </div>

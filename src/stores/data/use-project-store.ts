@@ -97,6 +97,16 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       const ads = await getAdvancedSettings(newProject.defaultAdvancedSettingsId)
       if (ads) advancedSettingsStore.upsertData(ads.id, ads)
 
+      const translationBs = await getBasicSettings(newProject.defaultTranslationBasicSettingsId)
+      if (translationBs) settingsStore.upsertData(translationBs.id, translationBs)
+      const translationAds = await getAdvancedSettings(newProject.defaultTranslationAdvancedSettingsId)
+      if (translationAds) advancedSettingsStore.upsertData(translationAds.id, translationAds)
+
+      const extractionBs = await getBasicSettings(newProject.defaultExtractionBasicSettingsId)
+      if (extractionBs) settingsStore.upsertData(extractionBs.id, extractionBs)
+      const extractionAds = await getAdvancedSettings(newProject.defaultExtractionAdvancedSettingsId)
+      if (extractionAds) advancedSettingsStore.upsertData(extractionAds.id, extractionAds)
+
       set((state) => ({
         projects: [newProject, ...state.projects],
         loading: false

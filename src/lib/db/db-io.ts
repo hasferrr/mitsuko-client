@@ -52,6 +52,18 @@ export async function exportProject(
   if (project.defaultAdvancedSettingsId) {
     advancedSettingsIds.add(project.defaultAdvancedSettingsId)
   }
+  if (project.defaultTranslationBasicSettingsId) {
+    basicSettingsIds.add(project.defaultTranslationBasicSettingsId)
+  }
+  if (project.defaultTranslationAdvancedSettingsId) {
+    advancedSettingsIds.add(project.defaultTranslationAdvancedSettingsId)
+  }
+  if (project.defaultExtractionBasicSettingsId) {
+    basicSettingsIds.add(project.defaultExtractionBasicSettingsId)
+  }
+  if (project.defaultExtractionAdvancedSettingsId) {
+    advancedSettingsIds.add(project.defaultExtractionAdvancedSettingsId)
+  }
 
   translations.forEach((t) => {
     basicSettingsIds.add(t.basicSettingsId)
@@ -107,6 +119,88 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
     const importData = JSON.parse(jsonString)
     const convertedData = databaseExportConstructor(importData)
 
+    const ensureProjectDefaultSettings = (project: Project) => {
+      const now = new Date()
+
+      const getBasicSettingsById = (id: string) => convertedData.basicSettings.find(s => s.id === id)
+      const getAdvancedSettingsById = (id: string) => convertedData.advancedSettings.find(s => s.id === id)
+
+      if (!project.defaultBasicSettingsId || !getBasicSettingsById(project.defaultBasicSettingsId)) {
+        const basicSettingsId = crypto.randomUUID()
+        const newBasicSettings: BasicSettings = {
+          id: basicSettingsId,
+          ...DEFAULT_BASIC_SETTINGS,
+          createdAt: now,
+          updatedAt: now,
+        }
+        convertedData.basicSettings.push(newBasicSettings)
+        project.defaultBasicSettingsId = basicSettingsId
+      }
+
+      if (!project.defaultAdvancedSettingsId || !getAdvancedSettingsById(project.defaultAdvancedSettingsId)) {
+        const advancedSettingsId = crypto.randomUUID()
+        const newAdvancedSettings: AdvancedSettings = {
+          id: advancedSettingsId,
+          ...DEFAULT_ADVANCED_SETTINGS,
+          createdAt: now,
+          updatedAt: now,
+        }
+        convertedData.advancedSettings.push(newAdvancedSettings)
+        project.defaultAdvancedSettingsId = advancedSettingsId
+      }
+
+      const baseBasicSettings = getBasicSettingsById(project.defaultBasicSettingsId) ?? null
+      const baseAdvancedSettings = getAdvancedSettingsById(project.defaultAdvancedSettingsId) ?? null
+
+      if (!project.defaultTranslationBasicSettingsId || !getBasicSettingsById(project.defaultTranslationBasicSettingsId)) {
+        const basicSettingsId = crypto.randomUUID()
+        const newBasicSettings: BasicSettings = {
+          ...(baseBasicSettings ? { ...baseBasicSettings } : { ...DEFAULT_BASIC_SETTINGS }),
+          id: basicSettingsId,
+          createdAt: now,
+          updatedAt: now,
+        }
+        convertedData.basicSettings.push(newBasicSettings)
+        project.defaultTranslationBasicSettingsId = basicSettingsId
+      }
+
+      if (!project.defaultTranslationAdvancedSettingsId || !getAdvancedSettingsById(project.defaultTranslationAdvancedSettingsId)) {
+        const advancedSettingsId = crypto.randomUUID()
+        const newAdvancedSettings: AdvancedSettings = {
+          ...(baseAdvancedSettings ? { ...baseAdvancedSettings } : { ...DEFAULT_ADVANCED_SETTINGS }),
+          id: advancedSettingsId,
+          createdAt: now,
+          updatedAt: now,
+        }
+        convertedData.advancedSettings.push(newAdvancedSettings)
+        project.defaultTranslationAdvancedSettingsId = advancedSettingsId
+      }
+
+      if (!project.defaultExtractionBasicSettingsId || !getBasicSettingsById(project.defaultExtractionBasicSettingsId)) {
+        const basicSettingsId = crypto.randomUUID()
+        const newBasicSettings: BasicSettings = {
+          ...(baseBasicSettings ? { ...baseBasicSettings } : { ...DEFAULT_BASIC_SETTINGS }),
+          id: basicSettingsId,
+          createdAt: now,
+          updatedAt: now,
+        }
+        convertedData.basicSettings.push(newBasicSettings)
+        project.defaultExtractionBasicSettingsId = basicSettingsId
+      }
+
+      if (!project.defaultExtractionAdvancedSettingsId || !getAdvancedSettingsById(project.defaultExtractionAdvancedSettingsId)) {
+        const advancedSettingsId = crypto.randomUUID()
+        const newAdvancedSettings: AdvancedSettings = {
+          ...(baseAdvancedSettings ? { ...baseAdvancedSettings } : { ...DEFAULT_ADVANCED_SETTINGS }),
+          id: advancedSettingsId,
+          createdAt: now,
+          updatedAt: now,
+        }
+        convertedData.advancedSettings.push(newAdvancedSettings)
+        project.defaultExtractionAdvancedSettingsId = advancedSettingsId
+      }
+    }
+
     // Start a transaction to ensure atomic import
     await db.transaction('rw', [
       db.projects,
@@ -136,28 +230,7 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
         // TODO: Move this to db-constructor.ts
         // Ensure projects have default settings
         convertedData.projects.forEach((project: Project) => {
-          if (!project.defaultBasicSettingsId) {
-            const basicSettingsId = crypto.randomUUID()
-            const newBasicSettings: BasicSettings = {
-              id: basicSettingsId,
-              ...DEFAULT_BASIC_SETTINGS,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            }
-            convertedData.basicSettings.push(newBasicSettings)
-            project.defaultBasicSettingsId = basicSettingsId
-          }
-          if (!project.defaultAdvancedSettingsId) {
-            const advancedSettingsId = crypto.randomUUID()
-            const newAdvancedSettings: AdvancedSettings = {
-              id: advancedSettingsId,
-              ...DEFAULT_ADVANCED_SETTINGS,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            }
-            convertedData.advancedSettings.push(newAdvancedSettings)
-            project.defaultAdvancedSettingsId = advancedSettingsId
-          }
+          ensureProjectDefaultSettings(project)
         })
 
         // Add new items
@@ -184,28 +257,7 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
         // TODO: Move this to db-constructor.ts
         // Ensure projects have default settings
         convertedData.projects.forEach((project: Project) => {
-          if (!project.defaultBasicSettingsId) {
-            const basicSettingsId = crypto.randomUUID()
-            const newBasicSettings: BasicSettings = {
-              id: basicSettingsId,
-              ...DEFAULT_BASIC_SETTINGS,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            }
-            convertedData.basicSettings.push(newBasicSettings)
-            project.defaultBasicSettingsId = basicSettingsId
-          }
-          if (!project.defaultAdvancedSettingsId) {
-            const advancedSettingsId = crypto.randomUUID()
-            const newAdvancedSettings: AdvancedSettings = {
-              id: advancedSettingsId,
-              ...DEFAULT_ADVANCED_SETTINGS,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            }
-            convertedData.advancedSettings.push(newAdvancedSettings)
-            project.defaultAdvancedSettingsId = advancedSettingsId
-          }
+          ensureProjectDefaultSettings(project)
         })
 
         // Upadate current project order

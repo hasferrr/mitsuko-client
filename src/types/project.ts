@@ -20,6 +20,10 @@ export interface Project {
   extractions: string[] // Array of Extraction IDs
   defaultBasicSettingsId: string
   defaultAdvancedSettingsId: string
+  defaultTranslationBasicSettingsId: string
+  defaultTranslationAdvancedSettingsId: string
+  defaultExtractionBasicSettingsId: string
+  defaultExtractionAdvancedSettingsId: string
   createdAt: Date
   updatedAt: Date
   isBatch: boolean // Indicates whether this project is a batch-type project

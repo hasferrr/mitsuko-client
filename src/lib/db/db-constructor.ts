@@ -129,6 +129,15 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
     const newDefaultBasicSettingsId = basicSettingsMap.get(project.defaultBasicSettingsId)?.id ?? project.defaultBasicSettingsId
     const newDefaultAdvancedSettingsId = advancedSettingsMap.get(project.defaultAdvancedSettingsId)?.id ?? project.defaultAdvancedSettingsId
 
+    const newDefaultTranslationBasicSettingsId =
+      basicSettingsMap.get(project.defaultTranslationBasicSettingsId)?.id ?? project.defaultTranslationBasicSettingsId
+    const newDefaultTranslationAdvancedSettingsId =
+      advancedSettingsMap.get(project.defaultTranslationAdvancedSettingsId)?.id ?? project.defaultTranslationAdvancedSettingsId
+    const newDefaultExtractionBasicSettingsId =
+      basicSettingsMap.get(project.defaultExtractionBasicSettingsId)?.id ?? project.defaultExtractionBasicSettingsId
+    const newDefaultExtractionAdvancedSettingsId =
+      advancedSettingsMap.get(project.defaultExtractionAdvancedSettingsId)?.id ?? project.defaultExtractionAdvancedSettingsId
+
     return {
       ...project,
       id: newId,
@@ -137,6 +146,10 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       extractions: newExtractionsId,
       defaultBasicSettingsId: newDefaultBasicSettingsId,
       defaultAdvancedSettingsId: newDefaultAdvancedSettingsId,
+      defaultTranslationBasicSettingsId: newDefaultTranslationBasicSettingsId,
+      defaultTranslationAdvancedSettingsId: newDefaultTranslationAdvancedSettingsId,
+      defaultExtractionBasicSettingsId: newDefaultExtractionBasicSettingsId,
+      defaultExtractionAdvancedSettingsId: newDefaultExtractionAdvancedSettingsId,
       isBatch: project.isBatch ?? false,
     }
   })
@@ -182,6 +195,10 @@ function projectConstructor(project: Partial<Project>): Project {
     extractions: project.extractions ?? [],
     defaultBasicSettingsId: project.defaultBasicSettingsId ?? "",
     defaultAdvancedSettingsId: project.defaultAdvancedSettingsId ?? "",
+    defaultTranslationBasicSettingsId: project.defaultTranslationBasicSettingsId ?? "",
+    defaultTranslationAdvancedSettingsId: project.defaultTranslationAdvancedSettingsId ?? "",
+    defaultExtractionBasicSettingsId: project.defaultExtractionBasicSettingsId ?? "",
+    defaultExtractionAdvancedSettingsId: project.defaultExtractionAdvancedSettingsId ?? "",
     isBatch: project.isBatch ?? false,
   }
 }
