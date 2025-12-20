@@ -36,6 +36,8 @@ interface AppSidebarProjectsProps {
   label?: string,
   addButton?: boolean,
   addButtonFn?: () => void,
+  addButtonLabel?: string,
+  showExportImport?: boolean,
 }
 
 export function AppSidebarProjects({
@@ -43,6 +45,8 @@ export function AppSidebarProjects({
   label,
   addButton,
   addButtonFn,
+  addButtonLabel = "Add Project",
+  showExportImport = true,
 }: AppSidebarProjectsProps) {
   const { isMobile } = useSidebar()
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
@@ -120,26 +124,26 @@ export function AppSidebarProjects({
           </SidebarMenuItem>
         ))}
         {!addButton && (
-          <>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                className="text-sidebar-foreground/70"
-                onClick={addButtonFn}
-              >
-                <PlusCircle className="text-sidebar-foreground/70" />
-                <span>Add Project</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                className="text-sidebar-foreground/70"
-                onClick={() => setIsExportImportModalOpen(true)}
-              >
-                <Upload className="text-sidebar-foreground/70" />
-                <span>Export/Import</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              className="text-sidebar-foreground/70"
+              onClick={addButtonFn}
+            >
+              <PlusCircle className="text-sidebar-foreground/70" />
+              <span>{addButtonLabel}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )}
+        {showExportImport && (
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              className="text-sidebar-foreground/70"
+              onClick={() => setIsExportImportModalOpen(true)}
+            >
+              <Upload className="text-sidebar-foreground/70" />
+              <span>Export/Import</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         )}
         <DeleteDialogue
           handleDelete={handleDeleteProject}
