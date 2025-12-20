@@ -298,6 +298,9 @@ export const useTranslationHandler = ({
 
     // Translate each chunk of subtitles
     let chunkNumber = 0
+    let prevIndex: number | null = null
+    let sameChunkCount = 0
+
     while (subtitleChunks.length > 0) {
       const chunk = subtitleChunks.shift()!
       console.log(`Translation: ${title} (Chunk ${chunkNumber + 1})`)
@@ -448,6 +451,19 @@ export const useTranslationHandler = ({
       // Process the next chunk
       const nextIndex = tlChunk[tlChunk.length - 1].index + 1
 
+      // Check for duplicate chunk (stuck in loop)
+      if (nextIndex === prevIndex) {
+        sameChunkCount++
+        if (sameChunkCount >= 3) {
+          console.error("Translation stopped: Stuck on the same chunk")
+          toast.error("Translation stopped: Stuck on the same chunk")
+          break
+        }
+      } else {
+        sameChunkCount = 0
+      }
+      prevIndex = nextIndex
+
       const s = nextIndex - 1
       const e = minMax(adjustedEndIndex, s, subtitles.length - 1)
       if (s > adjustedEndIndex) break
@@ -458,7 +474,7 @@ export const useTranslationHandler = ({
       }
 
       // Delay between each chunk
-      await sleep(3000)
+      await sleep(1000)
       chunkNumber++
     }
 
