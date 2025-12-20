@@ -9,22 +9,8 @@ import {
 } from "@/lib/db/settings"
 import { DEFAULT_BASIC_SETTINGS } from "@/constants/default"
 import { GLOBAL_BASIC_SETTINGS_ID } from "@/constants/global-settings"
-
-type BasicKey = keyof Omit<BasicSettings, "id" | "createdAt" | "updatedAt">
-
-const BASIC_KEYS = [
-  "sourceLanguage",
-  "targetLanguage",
-  "modelDetail",
-  "isUseCustomModel",
-  "contextDocument",
-  "customInstructions",
-  "fewShot",
-] as const
-
-type MissingBasicKey = Exclude<BasicKey, (typeof BASIC_KEYS)[number]>
-const _assertAllBasicKeysPresent: MissingBasicKey extends never ? true : never = true
-void _assertAllBasicKeysPresent
+import { BASIC_SETTING_KEYS } from "./settings-keys"
+import type { BasicKey } from "./settings-keys"
 
 interface SettingsStore {
   data: Record<string, BasicSettings>
@@ -273,7 +259,7 @@ export const useSettingsStore = create<SettingsStore>()(
         await get().saveData(toId)
       },
       resetBasicSettingsToGlobal: async (id: string) => {
-        const keys: BasicKey[] = [...BASIC_KEYS]
+        const keys: BasicKey[] = [...BASIC_SETTING_KEYS]
         await get().copyBasicSettingsKeys(GLOBAL_BASIC_SETTINGS_ID, id, keys)
       },
     }),

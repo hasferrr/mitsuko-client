@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import type { BatchFile } from "@/types/batch"
-import type { BasicSettings, AdvancedSettings } from "@/types/project"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { BASIC_SETTING_KEYS, ADVANCED_SETTING_KEYS } from "@/stores/settings/settings-keys"
+import type { BasicKey, AdvancedKey } from "@/stores/settings/settings-keys"
 import { ListChecks, ListX, Loader2 } from "lucide-react"
 
 interface CopySharedSettingsDialogProps {
@@ -23,40 +24,33 @@ interface CopySharedSettingsDialogProps {
   sharedAdvancedSettingsId: string
 }
 
-type BasicKey = keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>
-type AdvancedKey = keyof Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>
+const BASIC_KEY_LABELS: Record<BasicKey, string> = {
+  sourceLanguage: "Source Language",
+  targetLanguage: "Target Language",
+  modelDetail: "Model",
+  isUseCustomModel: "Use Custom Model",
+  contextDocument: "Context Document",
+  customInstructions: "Custom Instructions",
+  fewShot: "Few Shot",
+}
 
-const BASIC_KEYS = [
-  { key: 'sourceLanguage', label: 'Source Language' },
-  { key: 'targetLanguage', label: 'Target Language' },
-  { key: 'modelDetail', label: 'Model' },
-  { key: 'isUseCustomModel', label: 'Use Custom Model' },
-  { key: 'contextDocument', label: 'Context Document' },
-  { key: 'customInstructions', label: 'Custom Instructions' },
-  { key: 'fewShot', label: 'Few Shot' },
-] as const
+const ADVANCED_KEY_LABELS: Record<AdvancedKey, string> = {
+  temperature: "Temperature",
+  splitSize: "Split Size",
+  startIndex: "Start Index",
+  endIndex: "End Index",
+  isMaxCompletionTokensAuto: "Auto Max Completion Tokens",
+  maxCompletionTokens: "Max Completion Tokens",
+  isUseStructuredOutput: "Structured Output",
+  isUseFullContextMemory: "Full Context Memory",
+  isBetterContextCaching: "Minimal Context Memory",
+}
 
-type BasicKeyInList = (typeof BASIC_KEYS)[number]['key']
-type MissingBasicKey = Exclude<BasicKey, BasicKeyInList>
-const _assertAllBasicKeysPresent: MissingBasicKey extends never ? true : never = true
-void _assertAllBasicKeysPresent
+const BASIC_KEYS = BASIC_SETTING_KEYS.map(key => ({ key, label: BASIC_KEY_LABELS[key] }))
+const ADVANCED_KEYS = ADVANCED_SETTING_KEYS.map(key => ({ key, label: ADVANCED_KEY_LABELS[key] }))
 
-const ADVANCED_KEYS = [
-  { key: 'temperature', label: 'Temperature' },
-  { key: 'splitSize', label: 'Split Size' },
-  { key: 'startIndex', label: 'Start Index' },
-  { key: 'endIndex', label: 'End Index' },
-  { key: 'isMaxCompletionTokensAuto', label: 'Auto Max Completion Tokens' },
-  { key: 'maxCompletionTokens', label: 'Max Completion Tokens' },
-  { key: 'isUseStructuredOutput', label: 'Structured Output' },
-  { key: 'isUseFullContextMemory', label: 'Full Context Memory' },
-  { key: 'isBetterContextCaching', label: 'Minimal Context Memory' },
-] as const
-
-type AdvancedKeyInList = (typeof ADVANCED_KEYS)[number]['key']
-type MissingAdvancedKey = Exclude<AdvancedKey, AdvancedKeyInList>
-const _assertAllAdvancedKeysPresent: MissingAdvancedKey extends never ? true : never = true
-void _assertAllAdvancedKeysPresent
+const BASIC_KEYS_FOR_EXTRACTION = BASIC_KEYS.filter(({ key }) => key === 'modelDetail' || key === 'isUseCustomModel')
+const ADVANCED_KEYS_FOR_EXTRACTION = ADVANCED_KEYS.filter(({ key }) => key === 'isMaxCompletionTokensAuto' || key === 'maxCompletionTokens')
 
 export function CopySharedSettingsDialog({
   open,
@@ -290,7 +284,7 @@ export function CopySharedSettingsDialog({
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  {BASIC_KEYS.map(({ key, label }) => (
+                  {BASIC_KEYS_FOR_EXTRACTION.map(({ key, label }) => (
                     <label key={`e-b-${key}`} className="flex items-center gap-2 text-sm">
                       <Checkbox checked={eBasicSel.has(key)} onCheckedChange={() => toggleKey(setEBasicSel, key)} />
                       {label}
@@ -315,7 +309,7 @@ export function CopySharedSettingsDialog({
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  {ADVANCED_KEYS.map(({ key, label }) => (
+                  {ADVANCED_KEYS_FOR_EXTRACTION.map(({ key, label }) => (
                     <label key={`e-a-${key}`} className="flex items-center gap-2 text-sm">
                       <Checkbox checked={eAdvSel.has(key)} onCheckedChange={() => toggleKey(setEAdvSel, key)} />
                       {label}
