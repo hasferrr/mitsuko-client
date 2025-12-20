@@ -28,6 +28,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import Link from "next/link"
 import { BatchTranslationView } from "./batch-translation-view"
 import { BatchExtractionView } from "./batch-extraction-view"
@@ -46,6 +47,22 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const deleteProject = useProjectStore((state) => state.deleteProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const renameProject = useProjectStore((state) => state.renameProject)
+
+  const isSeparateSettingsEnabled = useLocalSettingsStore((state) => state.isSeparateSettingsEnabled)
+
+  const translationBasicSettingsId = isSeparateSettingsEnabled
+    ? currentProject?.defaultTranslationBasicSettingsId || basicSettingsId
+    : basicSettingsId
+  const translationAdvancedSettingsId = isSeparateSettingsEnabled
+    ? currentProject?.defaultTranslationAdvancedSettingsId || advancedSettingsId
+    : advancedSettingsId
+
+  const extractionBasicSettingsId = isSeparateSettingsEnabled
+    ? currentProject?.defaultExtractionBasicSettingsId || basicSettingsId
+    : basicSettingsId
+  const extractionAdvancedSettingsId = isSeparateSettingsEnabled
+    ? currentProject?.defaultExtractionAdvancedSettingsId || advancedSettingsId
+    : advancedSettingsId
 
   const handleBatchNameChange = (value: string) => {
     if (currentProject?.id && value.trim()) {
@@ -125,13 +142,13 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       {/* Main Content */}
       {operationMode === 'translation' ? (
         <BatchTranslationView
-          basicSettingsId={basicSettingsId}
-          advancedSettingsId={advancedSettingsId}
+          basicSettingsId={translationBasicSettingsId}
+          advancedSettingsId={translationAdvancedSettingsId}
         />
       ) : (
         <BatchExtractionView
-          basicSettingsId={basicSettingsId}
-          advancedSettingsId={advancedSettingsId}
+          basicSettingsId={extractionBasicSettingsId}
+          advancedSettingsId={extractionAdvancedSettingsId}
         />
       )}
 
