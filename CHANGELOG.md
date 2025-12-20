@@ -14,6 +14,10 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2025
 
+### December 20
+
+- ⚙️ **Project-Specific Settings:** You can now set separate default settings for translation and context extraction within each project, providing more granular control over your workflow.
+
 ### December 19
 
 - 🤖 **Model Updates:** Added Gemini 3 Flash, a high speed, high value thinking model that delivers near Pro level reasoning. It provides broad quality improvements over its predecessor.
