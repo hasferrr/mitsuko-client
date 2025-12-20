@@ -189,14 +189,14 @@ export const useTranslationHandler = ({
         try {
           usedFewShot = fewShotSchema.array().parse(JSON.parse(fewShot.value.trim() || "[]"))
         } catch {
-          toast.error(
-            <div className="select-none">
-              <div>Few shot format is invalid! Please follow this format:</div>
-              <div className="font-mono">
-                <pre>{"[" + JSON.stringify({ content: "string", translated: "string" }, null, 2) + "]"}</pre>
-              </div>
-            </div>
-          )
+          toast.error("Few shot format is invalid! Please follow this format:", {
+            description: "[" + JSON.stringify({ content: "string", translated: "string" }, null, 2) + "]",
+            className: "select-none",
+            classNames: {
+              title: "font-normal",
+              description: "font-mono whitespace-pre-wrap text-foreground",
+            },
+          })
           setActiveTab("basic")
           setIsTranslating(currentId, false)
           return
