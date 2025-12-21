@@ -8,7 +8,7 @@ export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "u
   sourceLanguage: "Japanese",
   targetLanguage: "Indonesian",
   modelDetail: (() => {
-    const freeModels = FREE_MODELS["Premium Trial"].models
+    const freeModels = FREE_MODELS["Free Models"].models
     const defaultModel = freeModels.find((model) => model.name === "DeepSeek R1")
     return defaultModel || freeModels[0] || null
   })(),

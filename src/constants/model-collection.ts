@@ -48,9 +48,24 @@ const excludeModelsByName = <T extends ModelCollection>(
 }
 
 const RAW_FREE_MODELS: FreeModelCollection = {
-  "Premium Trial": {
+  "Free Models": {
     provider: "unknown",
     models: [
+      {
+        name: "DeepSeek R1",
+        subName: "DeepSeek-R1-0528",
+        maxInput: 128000,
+        maxOutput: 64000,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: false,
+          maxCompletionTokens: 32768,
+          isUseStructuredOutput: false
+        }
+      },
       {
         name: "DeepSeek V3.2 Thinking",
         subName: "deepseek-v3.2 / deepseek-reasoner",
@@ -82,8 +97,8 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "DeepSeek R1",
-        subName: "DeepSeek-R1-0528",
+        name: "DeepSeek V3",
+        subName: "DeepSeek-V3-0324",
         maxInput: 128000,
         maxOutput: 64000,
         structuredOutput: true,
@@ -92,15 +107,10 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 32768,
-          isUseStructuredOutput: false
+          maxCompletionTokens: 64000,
+          isUseStructuredOutput: true
         }
       },
-    ]
-  },
-  "Free Limited": {
-    provider: "unknown",
-    models: [
       {
         name: "Gemini 2.5 Flash",
         subName: "gemini-flash-latest\ngemini-2.5-flash-preview-09-2025",
@@ -139,36 +149,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "DeepSeek R1 (free)",
-        subName: "DeepSeek-R1-0528",
-        maxInput: 163840,
-        maxOutput: 64000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
-          isUseStructuredOutput: false
-        }
-      },
-      {
-        name: "DeepSeek V3 (free)",
-        subName: "DeepSeek-V3-0324",
-        maxInput: 128000,
-        maxOutput: 64000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
           isUseStructuredOutput: true
         }
       },
