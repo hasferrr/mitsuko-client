@@ -1,5 +1,6 @@
 import { supabase } from "../supabase"
 import { fetchEventSource, EventStreamContentType } from "@microsoft/fetch-event-source"
+import { formatReasoning } from "../format-reasoning"
 
 interface handleStreamParams {
   setResponse: (buffer: string) => void,
@@ -9,6 +10,7 @@ interface handleStreamParams {
   requestUrl: string,
   requestHeader: Record<string, string>,
   requestBody: BodyInit,
+  isFormatReasoning?: boolean,
 }
 
 export const handleStream = async (params: handleStreamParams): Promise<string> => {
@@ -20,6 +22,7 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
     requestUrl,
     requestHeader,
     requestBody,
+    isFormatReasoning,
   } = params
 
   const { data: { session } } = await supabase.auth.getSession()
@@ -53,7 +56,10 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
     }
 
     if (reasoning.length > 0) {
-      buffer = `<think>\n${reasoning.trim()}\n</think>\n\n${result}`
+      const reasoningText = isFormatReasoning
+        ? formatReasoning(reasoning)
+        : reasoning
+      buffer = `<think>\n${reasoningText}\n</think>\n\n${result}`
     } else {
       buffer = result
     }

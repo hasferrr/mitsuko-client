@@ -17,7 +17,8 @@ interface TranslationStore {
     apiKey: string,
     requestType: RequestType,
     id: string,
-    setResponse: (response: string) => void
+    setResponse: (response: string) => void,
+    isFormatReasoning?: boolean
   ) => Promise<{ parsed: SubOnlyTranslated[], raw: string }>
 }
 
@@ -52,7 +53,8 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
     apiKey: string,
     requestType: RequestType,
     id: string,
-    setResponse: (response: string) => void
+    setResponse: (response: string) => void,
+    isFormatReasoning?: boolean
   ): Promise<{ parsed: SubOnlyTranslated[], raw: string }> => {
     const abortControllerRef = { current: new AbortController() }
     get().abortControllerMap.set(id, abortControllerRef)
@@ -77,6 +79,7 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
         ...requestBody,
         clientId: useClientIdStore.getState().clientId,
       }),
+      isFormatReasoning,
     })
 
     let parsedResponse: SubOnlyTranslated[] = []

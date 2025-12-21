@@ -175,6 +175,7 @@ export const useExtractionHandler = ({
           : (modelDetail.isPaid ? "paid" : "free"),
         currentId,
         (response) => setContextResult(currentId, response),
+        modelDetail?.isFormatReasoning,
       )
 
       onSuccessTranslation?.({ currentId })

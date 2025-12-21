@@ -28,6 +28,7 @@ export interface Model {
   structuredOutput: boolean
   isPaid: boolean
   usage: UsageLevel
+  isFormatReasoning?: boolean
   default?: Partial<Pick<AdvancedSettings,
     | 'temperature'
     | 'isUseStructuredOutput'

@@ -345,7 +345,8 @@ export const useTranslationHandler = ({
             ? "custom"
             : (modelDetail.isPaid ? "paid" : "free"),
           currentId,
-          (response) => setResponse(currentId, response)
+          (response) => setResponse(currentId, response),
+          modelDetail?.isFormatReasoning,
         )
         tlChunk = result.parsed
         rawResponse = result.raw

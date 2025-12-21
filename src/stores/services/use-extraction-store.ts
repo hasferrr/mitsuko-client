@@ -17,6 +17,7 @@ interface ExtractionStore {
     requestType: RequestType,
     extractionId: string,
     setResponse: (response: string) => void,
+    isFormatReasoning?: boolean,
   ) => Promise<void>
 }
 
@@ -50,6 +51,7 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
     requestType: RequestType,
     extractionId: string,
     setResponse: (response: string) => void,
+    isFormatReasoning?: boolean,
   ) => {
     const abortControllerRef = { current: new AbortController() }
     get().abortControllerMap.set(extractionId, abortControllerRef)
@@ -74,6 +76,7 @@ export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
         ...requestBody,
         clientId: useClientIdStore.getState().clientId,
       }),
+      isFormatReasoning,
     })
 
     get().abortControllerMap.delete(extractionId)
