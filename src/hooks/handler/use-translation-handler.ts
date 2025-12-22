@@ -458,6 +458,7 @@ export const useTranslationHandler = ({
         if (sameChunkCount >= 3) {
           console.error("Translation stopped: Stuck on the same chunk")
           toast.error("Translation stopped: Stuck on the same chunk")
+          stopTranslation(currentId)
           break
         }
       } else {
