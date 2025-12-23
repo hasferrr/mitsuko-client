@@ -12,7 +12,7 @@ export interface PaginatedInstructions {
 
 export async function getPublicCustomInstructionsPaged(
   page: number = 1,
-  limit: number = 10,
+  limit: number = 9,
   showOnlyMyCreations: boolean = false,
 ): Promise<PaginatedInstructions> {
   const {
@@ -34,10 +34,6 @@ export async function getPublicCustomInstructionsPaged(
 
   if (showOnlyMyCreations) {
     query = query.eq('user_id', session.user.id)
-  } else {
-    query = query.or(
-      `and(is_public.eq.true,force_hide.eq.false),user_id.eq.${session.user.id}`,
-    )
   }
 
   const { data, error, count } = await query
@@ -67,7 +63,6 @@ export async function getPublicCustomInstruction(id: string): Promise<PublicCust
     .from('custom_instructions')
     .select('id, user_id, name, preview, content, created_at')
     .eq('id', id)
-    .or(`and(is_public.eq.true,force_hide.eq.false),user_id.eq.${session.user.id}`)
     .maybeSingle<PublicCustomInstruction>()
 
   if (error) {
@@ -118,7 +113,6 @@ export async function createPublicCustomInstruction(
         user_id: session.user.id,
         name,
         content,
-        is_public: true,
       },
     ])
     .select('id, user_id, name, preview, content, created_at')

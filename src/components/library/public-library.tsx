@@ -63,7 +63,7 @@ export default function PublicLibrary() {
   const [importContent, setImportContent] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [showOnlyMyCreations, setShowOnlyMyCreations] = useState(false)
-  const ITEMS_PER_PAGE = 15
+  const ITEMS_PER_PAGE = 9
   const { create: createCustomInstruction } = useCustomInstructionStore()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -296,16 +296,15 @@ export default function PublicLibrary() {
                     <User className="h-3 w-3 mr-1" />
                     <span>{item.user_id.split('-')[0]}</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-4">
                     <div className="flex items-center">
                       <Calendar className="h-3 w-3 mr-1" />
                       <span>{formatDate(item.created_at)}</span>
                     </div>
                     {session?.user.id === item.user_id && (
                       <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-foreground"
+                        variant="link"
+                        className="text-muted-foreground hover:text-foreground p-0 h-3 w-3 [&_svg]:h-3 [&_svg]:w-3"
                         onClick={e => {
                           e.stopPropagation()
                           if (item.id) handleDeleteClick(item.id)
@@ -313,9 +312,9 @@ export default function PublicLibrary() {
                         disabled={isDeleting && deleteId === item.id}
                       >
                         {isDeleting && deleteId === item.id ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
+                          <Loader2 className="animate-spin" />
                         ) : (
-                          <Trash className="h-3 w-3" />
+                          <Trash />
                         )}
                       </Button>
                     )}
@@ -348,7 +347,7 @@ export default function PublicLibrary() {
                     aria-disabled={currentPage === totalPages}
                     className={cn(
                       currentPage === totalPages &&
-                        'pointer-events-none opacity-50',
+                      'pointer-events-none opacity-50',
                     )}
                   />
                 </PaginationItem>
