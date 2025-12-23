@@ -73,7 +73,7 @@ const getStatusVariant = (state: string) => {
   }
 }
 
-export default function CloudFilesList() {
+export default function UploadedFiles() {
   const [searchQuery, setSearchQuery] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)

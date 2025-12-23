@@ -47,7 +47,7 @@ import { fetchBackgroundTranscriptionCount } from '@/lib/api/credit-reservations
 
 const ITEMS_PER_PAGE = 5
 
-export default function HistoryView() {
+export default function TranscriptionHistory() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedLog, setSelectedLog] = useState<TranscriptionLogItem | null>(null)

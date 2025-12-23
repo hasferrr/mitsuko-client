@@ -1,5 +1,5 @@
-import HistoryView from "@/components/history/history-view"
-import CloudFilesList from "./cloud"
+import TranscriptionHistory from "@/components/cloud/transcription-history"
+import UploadedFiles from "./uploaded-files"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, History } from "lucide-react"
 
@@ -19,11 +19,11 @@ export default function CloudWrapper() {
         </TabsList>
 
         <TabsContent value="storage" className="space-y-0">
-          <CloudFilesList />
+          <UploadedFiles />
         </TabsContent>
 
         <TabsContent value="history" className="space-y-0">
-          <HistoryView />
+          <TranscriptionHistory />
         </TabsContent>
       </Tabs>
     </div>
