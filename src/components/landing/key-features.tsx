@@ -174,7 +174,7 @@ export default function KeyFeatures() {
                   <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
-                  Generate structured context documents
+                  Inform the AI based on the context provided
                 </p>
               </div>
               <div className="flex items-start gap-3">
