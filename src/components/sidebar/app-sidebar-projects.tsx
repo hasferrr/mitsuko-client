@@ -90,7 +90,7 @@ export function AppSidebarProjects({
           <SidebarMenuItem key={project.id}>
             <SidebarMenuButton onClick={() => {
               setCurrentProject(project)
-              redirect("/project")
+              redirect(project.isBatch ? "/batch" : "/project")
             }}>
               <span>{project.name}</span>
             </SidebarMenuButton>
