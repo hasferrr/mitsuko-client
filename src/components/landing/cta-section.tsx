@@ -18,7 +18,7 @@ export default function CtaSection() {
           <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
             <div className="max-w-2xl">
               <h2 className="text-3xl md:text-3xl font-semibold tracking-tighter text-gray-900 dark:text-white">
-                Let Mitsuko translate your subtitles
+                Let Mitsuko translates your subtitles
               </h2>
               <p className="mt-3 text-gray-600 dark:text-gray-400 md:text-base/relaxed">
                 All you need is editing and QA. Mitsuko handles the heavy lifting of the translation step with context-aware AI.

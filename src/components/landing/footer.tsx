@@ -168,7 +168,7 @@ export default async function Footer() {
 
       <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
 
-        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">© 2025 Mitsuko. All rights reserved.</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">© {new Date().getFullYear()} Mitsuko. All rights reserved.</p>
       </div>
     </footer>
   )
