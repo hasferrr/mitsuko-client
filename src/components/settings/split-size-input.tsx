@@ -47,8 +47,8 @@ export const SplitSizeInput = memo(({ advancedSettingsId }: Props) => {
       />
       <p className="text-xs text-muted-foreground">
         Determines the number of dialogues to process in each chunk.
-        Smaller chunks can help with context management and reliability.
-        Larger chunks increase efficiency but may result in response quality degradation.
+        Smaller chunks can help with reliability.
+        Larger chunks increase efficiency and context management.
         ({SPLIT_SIZE_MIN}-{SPLIT_SIZE_MAX})
       </p>
     </div>

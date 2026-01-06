@@ -27,8 +27,8 @@ export const BetterContextCachingSwitch = memo(({ advancedSettingsId }: Props) =
         />
       </div>
       <p className="text-xs text-muted-foreground">
-        Uses minimal context to significantly reduce token usage and cost.
-        When enabled, it will only use 5 dialogues from the previous chunk as context.
+        Uses minimal context to reduce token usage and cost.
+        When enabled, only 5 dialogs from the previous chunk are used as context.
         When disabled, it maintains a balanced approach using the last previous chunk.
       </p>
     </div>

@@ -40,10 +40,10 @@ export const FullContextMemorySwitch = memo(({ advancedSettingsId }: Props) => {
         />
       </div>
       <p className="text-xs text-muted-foreground">
-        When enabled, it's using all previous chunks to improve translation
-        consistency and accuracy, but drastically increases token usage and the risk of hitting
-        input token limits. Only for models with large context windows (128k+ tokens).
-        When disabled, it's only including the last previous chunk.
+        When enabled, it uses all previous chunks as context to improve translation,
+        but drastically increases input token usage and may result in response quality
+        degradation. Only for models with large context windows (128k+ tokens).
+        When disabled, it includes only the last previous chunk.
       </p>
 
       <Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
