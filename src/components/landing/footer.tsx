@@ -1,7 +1,7 @@
 import { DISCORD_LINK, GITHUB_LINK } from "@/constants/external-links"
 import Link from "next/link"
-import { cn } from "@/lib/utils"
 import { getAllPostsMeta } from "@/lib/blog"
+import FooterBadges from "@/components/landing/footer-badges"
 
 const badges = [
   {
@@ -147,24 +147,7 @@ export default async function Footer() {
         </div>
       </div>
 
-      <ul className="flex flex-wrap items-center md:justify-center gap-2 mt-16 mb-8">
-        {badges.map((badge, index) => (
-          <li
-            key={`badge-${index}`}
-            className="w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            <a href={badge.href} target="_blank" rel="noopener">
-              <img
-                src={badge.imgSrc}
-                alt={badge.alt}
-                width="auto"
-                height="auto"
-                className={cn("h-[35px] md:h-[38px] object-contain", badge.className)}
-              />
-            </a>
-          </li>
-        ))}
-      </ul>
+      <FooterBadges badges={badges} />
 
       <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
 
