@@ -29,15 +29,15 @@ export const SUBSCRIPTION_PLANS: {
 
 export const CREDIT_PACKS: CreditPack[] = [
   {
-    productId: "credit_pack_5m",
-    baseCredits: 5_000_000,
-    basePriceUSD: 5,
+    productId: "free",
+    baseCredits: 0,
+    basePriceUSD: 0,
     discountUSD: 0,
   },
   {
-    productId: "credit_pack_10m",
-    baseCredits: 10_000_000,
-    basePriceUSD: 10,
+    productId: "credit_pack_5m",
+    baseCredits: 5_000_000,
+    basePriceUSD: 5,
     discountUSD: 0,
   },
   {

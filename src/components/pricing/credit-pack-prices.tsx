@@ -112,7 +112,7 @@ export function CreditPackPrices({
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
         Need more credits? Purchase additional credit packs starting at just{" "}
         {currency.symbol}
-        {(CREDIT_PACKS[0]?.basePriceUSD * currency.rate || 0).toLocaleString()}
+        {((CREDIT_PACKS.find((pack) => pack.baseCredits !== 0)?.basePriceUSD || 0) * currency.rate).toLocaleString()}
         . These credit packs provide flexibility for your
         usage needs. Credits valid for a whole year from purchase!
       </p>
@@ -130,7 +130,9 @@ export function CreditPackPrices({
             >
               <CardHeader className="pb-0 pt-4">
                 <div className="flex justify-between items-baseline mb-1">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Credit Pack</span>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {pack.baseCredits !== 0 ? "Credit Pack" : "Try for Free!"}
+                  </span>
                   {savings > 0 && (
                     <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 rounded">
                       Save {currency.symbol}{(() => {
@@ -143,8 +145,14 @@ export function CreditPackPrices({
                   )}
                 </div>
                 <div className="text-xl font-medium text-gray-900 dark:text-white">
-                  {pack.baseCredits.toLocaleString()}
-                  <span className="text-gray-500 dark:text-gray-400 text-sm"> credits</span>
+                  {pack.baseCredits !== 0 ? (
+                    <>
+                      {pack.baseCredits.toLocaleString()}
+                      <span className="text-gray-500 dark:text-gray-400 text-sm"> credits</span>
+                    </>
+                  ) : (
+                    "Free"
+                  )}
                 </div>
               </CardHeader>
               <CardContent className="pt-2 pb-4">
@@ -179,7 +187,7 @@ export function CreditPackPrices({
                   >
                     See Details
                   </Button>
-                ) : (
+                ) : pack.baseCredits !== 0 ? (
                   <Button
                     className="w-full bg-blue-500 hover:bg-blue-600 text-white"
                     onClick={() => handlePurchase(pack.productId)}
@@ -193,6 +201,13 @@ export function CreditPackPrices({
                     ) : (
                       "Purchase"
                     )}
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-blue-500 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    onClick={() => router.push("/dashboard")}
+                  >
+                    Get Started
                   </Button>
                 )}
               </CardFooter>
