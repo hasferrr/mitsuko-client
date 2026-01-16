@@ -32,3 +32,6 @@ next-env.d.ts
 
 # other
 diff.txt
+
+# Sentry Config File
+.env.sentry-build-plugin
