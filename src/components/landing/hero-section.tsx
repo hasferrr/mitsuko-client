@@ -54,6 +54,7 @@ export default function HeroSection() {
               width={960}
               height={540}
               src={demoPlaceholderImage}
+              placeholder="blur"
               alt="Play video"
               className="absolute inset-0 w-full h-full object-cover"
             />
