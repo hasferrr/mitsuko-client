@@ -115,8 +115,8 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const currentProject = useProjectStore(state => state.currentProject)
   const loadProjects = useProjectStore(state => state.loadProjects)
   const session = useSessionStore((state) => state.session)
-  const deleteAfterTranscription = useLocalSettingsStore(state => state.deleteAfterTranscription)
-  const setDeleteAfterTranscription = useLocalSettingsStore(state => state.setDeleteAfterTranscription)
+  const deleteAfterTranscription = useLocalSettingsStore(state => state.isDeleteAfterTranscription)
+  const setDeleteAfterTranscription = useLocalSettingsStore(state => state.setIsDeleteAfterTranscription)
 
 
   // React Query

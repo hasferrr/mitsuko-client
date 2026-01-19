@@ -14,7 +14,7 @@ interface LocalSettingsStore {
   isSeparateSettingsEnabled: boolean
   isAutoTemperatureEnabled: boolean
   isSubtitleCleanupEnabled: boolean
-  deleteAfterTranscription: boolean
+  isDeleteAfterTranscription: boolean
   isSubtitlePerformanceModeEnabled: boolean
 
   addApiConfig: (config: CustomApiConfig) => void
@@ -26,7 +26,7 @@ interface LocalSettingsStore {
   setIsSeparateSettingsEnabled: (enabled: boolean) => void
   setIsAutoTemperatureEnabled: (enabled: boolean) => void
   setIsSubtitleCleanupEnabled: (enabled: boolean) => void
-  setDeleteAfterTranscription: (enabled: boolean) => void
+  setIsDeleteAfterTranscription: (enabled: boolean) => void
   setIsSubtitlePerformanceModeEnabled: (enabled: boolean) => void
 }
 
@@ -39,7 +39,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       isSeparateSettingsEnabled: false,
       isAutoTemperatureEnabled: true,
       isSubtitleCleanupEnabled: true,
-      deleteAfterTranscription: true,
+      isDeleteAfterTranscription: true,
       isSubtitlePerformanceModeEnabled: true,
 
       addApiConfig: (config) =>
@@ -76,19 +76,16 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
 
       selectApiConfig: (index) => set({ selectedApiConfigIndex: index }),
 
-      toggleThirdPartyModel: () =>
-        set((state) => ({ isThirdPartyModelEnabled: !state.isThirdPartyModelEnabled })),
-
+      toggleThirdPartyModel: () => set((state) => ({ isThirdPartyModelEnabled: !state.isThirdPartyModelEnabled })),
       setIsSeparateSettingsEnabled: (enabled) => set({ isSeparateSettingsEnabled: enabled }),
-
       setIsAutoTemperatureEnabled: (enabled) => set({ isAutoTemperatureEnabled: enabled }),
       setIsSubtitleCleanupEnabled: (enabled) => set({ isSubtitleCleanupEnabled: enabled }),
-      setDeleteAfterTranscription: (enabled) => set({ deleteAfterTranscription: enabled }),
+      setIsDeleteAfterTranscription: (enabled) => set({ isDeleteAfterTranscription: enabled }),
       setIsSubtitlePerformanceModeEnabled: (enabled) => set({ isSubtitlePerformanceModeEnabled: enabled }),
     }),
     {
       name: "api-settings-storage",
-      version: 1,
+      version: 2,
       migrate: (persistedState, version) => {
         if (version === 0) {
           const oldState = persistedState as {
@@ -113,6 +110,22 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
             delete oldState.customModel
           }
         }
+
+        if (version === 1) {
+          const state = persistedState as {
+            deleteAfterTranscription?: boolean
+            isDeleteAfterTranscription?: boolean
+          }
+
+          if (
+            typeof state.deleteAfterTranscription === "boolean" &&
+            typeof state.isDeleteAfterTranscription !== "boolean"
+          ) {
+            state.isDeleteAfterTranscription = state.deleteAfterTranscription
+            delete state.deleteAfterTranscription
+          }
+        }
+
         return persistedState
       },
     }
