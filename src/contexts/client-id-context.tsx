@@ -3,6 +3,7 @@
 import React, { createContext, useEffect, PropsWithChildren } from 'react'
 import { indexedDBStorage } from '@/lib/indexed-db-storage'
 import { useClientIdStore } from '@/stores/use-client-id-store'
+import { v4 as uuidv4 } from 'uuid'
 
 const CLIENT_ID_KEY = 'client-id'
 
@@ -17,7 +18,10 @@ export const ClientIdProvider: React.FC<PropsWithChildren> = ({ children }) => {
       if (storedClientId && storedClientId.length === 36) {
         setClientId(storedClientId)
       } else {
-        const newClientId = crypto.randomUUID()
+        const newClientId =
+          typeof crypto?.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : uuidv4()
         await indexedDBStorage.setItem(CLIENT_ID_KEY, newClientId)
         setClientId(newClientId)
       }
