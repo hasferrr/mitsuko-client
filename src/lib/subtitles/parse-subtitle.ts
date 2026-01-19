@@ -1,5 +1,5 @@
 import { Subtitle, Parsed, SubtitleType } from "@/types/subtitles"
-import { isASS, isSRT, isVTT } from "./is"
+import { isSubtitle } from "./is-subtitle"
 import { _parseASS } from "./ass/parse"
 import { _parseSRT } from "./srt/parse"
 import { _parseVTT } from "./vtt/parse"
@@ -15,7 +15,7 @@ interface ParseSubtitleResult {
 }
 
 export const parseSubtitle = ({ content, type }: ParseSubtitleOptions): ParseSubtitleResult => {
-  if (type === "srt" || (!type && isSRT(content))) {
+  if (type === "srt" || (!type && isSubtitle(content, "srt"))) {
     return {
       subtitles: _parseSRT(content),
       parsed: {
@@ -25,7 +25,7 @@ export const parseSubtitle = ({ content, type }: ParseSubtitleOptions): ParseSub
     }
   }
 
-  if (type === "ass" || (!type && isASS(content))) {
+  if (type === "ass" || (!type && isSubtitle(content, "ass"))) {
     const parsed = _parseASS(content)
     return {
       subtitles: parsed.subtitles,
@@ -36,7 +36,7 @@ export const parseSubtitle = ({ content, type }: ParseSubtitleOptions): ParseSub
     }
   }
 
-  if (type === "vtt" || (!type && isVTT(content))) {
+  if (type === "vtt" || (!type && isSubtitle(content, "vtt"))) {
     return {
       subtitles: _parseVTT(content),
       parsed: {
