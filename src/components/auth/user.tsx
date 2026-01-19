@@ -214,66 +214,68 @@ export function User() {
           </div>
         </div>
 
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="px-4 py-2 text-left font-medium">Timestamp</th>
-              <th className="px-4 py-2 text-left font-medium">Amount</th>
-              <th className="px-4 py-2 text-left font-medium">Event</th>
-              <th className="px-4 py-2 text-left font-medium">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isTransactionsLoading ? (
-              Array.from({ length: 10 }).map((_, index) => (
-                <tr key={index} className="border-b last:border-0">
-                  <td className="px-4 py-2 h-10">
-                    <Skeleton className="h-4 w-32" />
-                  </td>
-                  <td className="px-4 py-2 h-10">
-                    <Skeleton className="h-4 w-16" />
-                  </td>
-                  <td className="px-4 py-2 h-10">
-                    <Skeleton className="h-4 w-24" />
-                  </td>
-                  <td className="px-4 py-2 h-10">
-                    <Skeleton className="h-4 w-28" />
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b">
+                <th className="px-4 py-2 text-left font-medium">Timestamp</th>
+                <th className="px-4 py-2 text-left font-medium">Amount</th>
+                <th className="px-4 py-2 text-left font-medium">Event</th>
+                <th className="px-4 py-2 text-left font-medium">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isTransactionsLoading ? (
+                Array.from({ length: 10 }).map((_, index) => (
+                  <tr key={index} className="border-b last:border-0">
+                    <td className="px-4 py-2 h-10">
+                      <Skeleton className="h-4 w-32" />
+                    </td>
+                    <td className="px-4 py-2 h-10">
+                      <Skeleton className="h-4 w-16" />
+                    </td>
+                    <td className="px-4 py-2 h-10">
+                      <Skeleton className="h-4 w-24" />
+                    </td>
+                    <td className="px-4 py-2 h-10">
+                      <Skeleton className="h-4 w-28" />
+                    </td>
+                  </tr>
+                ))
+              ) : isTransactionsError ? (
+                <tr>
+                  <td colSpan={4} className="p-4 text-center text-red-500">
+                    Error loading transactions
                   </td>
                 </tr>
-              ))
-            ) : isTransactionsError ? (
-              <tr>
-                <td colSpan={4} className="p-4 text-center text-red-500">
-                  Error loading transactions
-                </td>
-              </tr>
-            ) : transactions.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="p-4 text-center text-muted-foreground">
-                  No transaction history
-                </td>
-              </tr>
-            ) : (
-              transactions.map((transaction) => (
-                <tr key={transaction.id} className="border-b last:border-0 truncate">
-                  <td className="px-4 py-2">
-                    {new Date(transaction.created_at).toLocaleString()}
-                  </td>
-                  <td className={cn("px-4 py-2", transaction.amount >= 0 ? "text-foreground" : "text-red-500")}>
-                    {transaction.amount > 0 ? "+" : ""}
-                    {Math.round(transaction.amount).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2">
-                    {capitalize(transaction.event?.replace(/_?(REQUEST|TOKENS)\b/g, "").replace(/_/g, " ").toLocaleLowerCase().trim() || "")}
-                  </td>
-                  <td className="px-4 py-2 text-sm">
-                    {transaction.description}
+              ) : transactions.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                    No transaction history
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                transactions.map((transaction) => (
+                  <tr key={transaction.id} className="border-b last:border-0 truncate">
+                    <td className="px-4 py-2">
+                      {new Date(transaction.created_at).toLocaleString()}
+                    </td>
+                    <td className={cn("px-4 py-2", transaction.amount >= 0 ? "text-foreground" : "text-red-500")}>
+                      {transaction.amount > 0 ? "+" : ""}
+                      {Math.round(transaction.amount).toLocaleString()}
+                    </td>
+                    <td className="px-4 py-2">
+                      {capitalize(transaction.event?.replace(/_?(REQUEST|TOKENS)\b/g, "").replace(/_/g, " ").toLocaleLowerCase().trim() || "")}
+                    </td>
+                    <td className="px-4 py-2 text-sm">
+                      {transaction.description}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
         {totalPages > 1 && (
           <div className="py-4 border-t">
@@ -352,85 +354,87 @@ export function User() {
         <div className="px-4 py-2 border-b">
           <h2 className="font-medium">Credit Grants</h2>
         </div>
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="px-4 py-2 text-left font-medium">Received</th>
-              <th className="px-4 py-2 text-left font-medium">State</th>
-              <th className="px-4 py-2 text-left font-medium">Balance</th>
-              <th className="px-4 py-2 text-left font-medium">Expires</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isCreditBatchesLoading ? (
-              Array.from({ length: 5 }).map((_, index) => (
-                <tr key={index} className="border-b last:border-0">
-                  <td className="px-4 py-2 h-10">
-                    <Skeleton className="h-4 w-20" />
-                  </td>
-                  <td className="px-4 py-2 h-10">
-                    <Skeleton className="h-4 w-16 rounded-full" />
-                  </td>
-                  <td className="px-4 py-2 h-10">
-                    <Skeleton className="h-4 w-24" />
-                  </td>
-                  <td className="px-4 py-2 h-10">
-                    <Skeleton className="h-4 w-20" />
-                  </td>
-                </tr>
-              ))
-            ) : isCreditBatchesError ? (
-              <tr>
-                <td colSpan={4} className="p-4 text-center text-red-500">
-                  Error loading credit grants
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b">
+                <th className="px-4 py-2 text-left font-medium">Received</th>
+                <th className="px-4 py-2 text-left font-medium">State</th>
+                <th className="px-4 py-2 text-left font-medium">Balance</th>
+                <th className="px-4 py-2 text-left font-medium">Expires</th>
               </tr>
-            ) : creditBatches && creditBatches.length > 0 ? (
-              creditBatches.map((batch) => {
-                const isExpired = new Date(batch.expires_at) < new Date() || batch.remaining_amount <= 0
-                const state = isExpired ? "Expired" : "Available"
-
-                return (
-                  <tr key={batch.id} className="border-b last:border-0">
-                    <td className="px-4 py-2">
-                      {new Date(batch.created_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "2-digit",
-                        year: "numeric",
-                      })}
+            </thead>
+            <tbody>
+              {isCreditBatchesLoading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <tr key={index} className="border-b last:border-0">
+                    <td className="px-4 py-2 h-10">
+                      <Skeleton className="h-4 w-20" />
                     </td>
-                    <td className="px-4 py-2">
-                      <span
-                        className={cn(
-                          "px-2 py-1 rounded-full text-xs font-medium",
-                          isExpired
-                            ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                            : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                        )}
-                      >
-                        {state}
-                      </span>
+                    <td className="px-4 py-2 h-10">
+                      <Skeleton className="h-4 w-16 rounded-full" />
                     </td>
-                    <td className="px-4 py-2">{batch.remaining_amount.toLocaleString()} / {batch.initial_amount.toLocaleString()}</td>
-                    <td className="px-4 py-2">
-                      {new Date(batch.expires_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "2-digit",
-                        year: "numeric",
-                      })}
+                    <td className="px-4 py-2 h-10">
+                      <Skeleton className="h-4 w-24" />
+                    </td>
+                    <td className="px-4 py-2 h-10">
+                      <Skeleton className="h-4 w-20" />
                     </td>
                   </tr>
-                )
-              })
-            ) : (
-              <tr>
-                <td colSpan={4} className="p-4 text-center text-muted-foreground">
-                  No credit grants history
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                ))
+              ) : isCreditBatchesError ? (
+                <tr>
+                  <td colSpan={4} className="p-4 text-center text-red-500">
+                    Error loading credit grants
+                  </td>
+                </tr>
+              ) : creditBatches && creditBatches.length > 0 ? (
+                creditBatches.map((batch) => {
+                  const isExpired = new Date(batch.expires_at) < new Date() || batch.remaining_amount <= 0
+                  const state = isExpired ? "Expired" : "Available"
+
+                  return (
+                    <tr key={batch.id} className="border-b last:border-0">
+                      <td className="px-4 py-2">
+                        {new Date(batch.created_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "2-digit",
+                          year: "numeric",
+                        })}
+                      </td>
+                      <td className="px-4 py-2">
+                        <span
+                          className={cn(
+                            "px-2 py-1 rounded-full text-xs font-medium",
+                            isExpired
+                              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                              : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                          )}
+                        >
+                          {state}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2">{batch.remaining_amount.toLocaleString()} / {batch.initial_amount.toLocaleString()}</td>
+                      <td className="px-4 py-2">
+                        {new Date(batch.expires_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "2-digit",
+                          year: "numeric",
+                        })}
+                      </td>
+                    </tr>
+                  )
+                })
+              ) : (
+                <tr>
+                  <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                    No credit grants history
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
         {creditTotalPages > 1 && (
           <div className="py-4 border-t">
             <Pagination>

@@ -97,24 +97,30 @@
 }
 
 /* Set the default width of the scrollbar to zero */
+.overflow-x-auto::-webkit-scrollbar,
 .overflow-y-auto::-webkit-scrollbar,
 .overflow-auto::-webkit-scrollbar {
+  height: 8px;
   width: 8px;
 }
 
 /* Change the scrollbar width on hover */
+.overflow-x-auto:hover::-webkit-scrollbar,
 .overflow-y-auto:hover::-webkit-scrollbar,
 .overflow-auto:hover::-webkit-scrollbar {
+  height: 8px;
   width: 8px;
 }
 
 /* Set the track color */
+.overflow-x-auto::-webkit-scrollbar-track,
 .overflow-y-auto::-webkit-scrollbar-track,
 .overflow-auto::-webkit-scrollbar-track {
   background: none;
 }
 
 /* Set the thumb color */
+.overflow-x-auto::-webkit-scrollbar-thumb,
 .overflow-y-auto::-webkit-scrollbar-thumb,
 .overflow-auto::-webkit-scrollbar-thumb {
   background: rgba(136, 136, 136, 0.3);
@@ -122,6 +128,7 @@
 }
 
 /* Set the thumb color on hover */
+.overflow-x-auto::-webkit-scrollbar-thumb:hover,
 .overflow-y-auto::-webkit-scrollbar-thumb:hover,
 .overflow-auto::-webkit-scrollbar-thumb:hover {
   background: rgba(175, 175, 175, 0.3);
