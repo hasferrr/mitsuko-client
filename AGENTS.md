@@ -22,7 +22,7 @@ Mitsuko is an AI-powered subtitle translation and audio transcription platform f
   - Instruction Library: personal and public custom instructions
 
 - **Tech stack**
-  - Frontend: Next.js 15 (App Router), React 19, Tailwind, Shadcn/Radix UI, Zustand, React Query, Dexie.js (indexedDB), @dnd-kit, Bun runtime
+  - Frontend: Next.js 16 (App Router), React 19, Tailwind, Shadcn/Radix UI, Zustand, React Query, Dexie.js (indexedDB), @dnd-kit, Bun runtime
   - Backend: separate Express.js (TypeScript, Bun) service with multi-provider AI (OpenAI, Gemini, Claude) and custom subtitle parsers
   - Payments: Midtrans/Snap, LemonSqueezy
   - Deployment: Vercel (frontend), Google Cloud Run (backend)

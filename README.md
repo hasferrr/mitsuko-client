@@ -140,7 +140,7 @@ cd mitsuko-client && bun dev        # Frontend
 
 ### Frontend
 
-- **Framework**: Next.js 15 (App Router) with React 19
+- **Framework**: Next.js 16 (App Router) with React 19
 - **Language**: TypeScript 5.8+
 - **State Management**: Zustand for client-side state
 - **UI Components**: Radix UI with Tailwind CSS
