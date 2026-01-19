@@ -384,7 +384,7 @@ export function WelcomeView() {
             </div>
           </div>
 
-          <div className={cn(
+          <div translate="no" className={cn(
             isHorizontal ? 'flex flex-col space-y-2' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4',
           )}>
             {(showAllProjects ? sortedProjects : sortedProjects.slice(0, 6)).map((project) => (

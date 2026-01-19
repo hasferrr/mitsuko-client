@@ -503,7 +503,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   ))
 
   return (
-    <div className="flex-1 p-6 max-w-5xl mx-auto">
+    <div translate="no" className="flex-1 p-6 max-w-5xl mx-auto">
       <div className="mb-6">
         <div className="text-2xl font-medium mb-4 sm:mb-2 flex flex-col sm:flex-row gap-4">
           <div className="flex items-center gap-1">

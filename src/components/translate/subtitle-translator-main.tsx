@@ -411,7 +411,7 @@ export default function SubtitleTranslatorMain({
   }
 
   return (
-    <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
+    <div translate="no" className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
       {/* Header */}
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <Button

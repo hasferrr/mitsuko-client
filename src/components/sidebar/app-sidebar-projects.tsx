@@ -83,7 +83,7 @@ export function AppSidebarProjects({
   }
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup translate="no" className="notranslate group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>{label ? label : "Projects"}</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((project) => (

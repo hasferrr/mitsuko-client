@@ -535,7 +535,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   }
 
   return (
-    <div className="mx-auto pt-4 pb-8 px-4 max-w-5xl">
+    <div translate="no" className="mx-auto pt-4 pb-8 px-4 max-w-5xl">
       <div className="mb-4 flex items-center gap-2">
         <Button
           variant="ghost"

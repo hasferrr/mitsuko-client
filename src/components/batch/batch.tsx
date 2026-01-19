@@ -146,7 +146,7 @@ export default function Batch() {
               items={batchProjects.map(p => p.id)}
               strategy={rectSortingStrategy}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div translate="no" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {batchProjects.map((b) => (
                   <SortableBatchCard key={b.id} project={b} onSelect={(id) => setCurrentProject(id)} />
                 ))}

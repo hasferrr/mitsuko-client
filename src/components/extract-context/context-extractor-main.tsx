@@ -241,7 +241,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   }, [currentProject])
 
   return (
-    <div className="grid md:grid-cols-2 gap-6 gap-y-4 container mx-auto py-2 px-4 mt-2 mb-6 max-w-5xl">
+    <div translate="no" className="grid md:grid-cols-2 gap-6 gap-y-4 container mx-auto py-2 px-4 mt-2 mb-6 max-w-5xl">
       {/* Header */}
       <div className="md:col-span-2 flex items-center gap-2">
         <Button
