@@ -521,8 +521,22 @@ export default function SubtitleTranslatorMain({
           </div>
 
           {/* Wrap SubtitleList with DragAndDrop */}
-          <DragAndDrop onDropFiles={handleFileUpload} disabled={isTranslating}>
-            <SubtitleList hidden={subtitlesHidden} />
+          <DragAndDrop className="h-[510px]" onDropFiles={handleFileUpload} disabled={isTranslating}>
+            {subtitles.length ? (
+              <SubtitleList hidden={subtitlesHidden} />
+            ) : (
+              <div
+                className="h-full flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
+                onClick={() => document.getElementById("subtitle-upload")?.click()}
+              >
+                <Upload className="h-10 w-10 text-muted-foreground" />
+                <p className="mt-2 text-sm text-muted-foreground text-center">
+                  Drag and drop file here, or click to select a file.
+                  <br />
+                  {Array.from(SUBTITLE_NAME_MAP.keys()).join(", ").toUpperCase()} subtitles file.
+                </p>
+              </div>
+            )}
           </DragAndDrop>
 
           {/* Grid for Start and Stop buttons */}
