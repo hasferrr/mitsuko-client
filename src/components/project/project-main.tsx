@@ -477,14 +477,14 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
           </Skeleton>
           <div className="space-y-1">
             <Skeleton className="h-[14px] w-32" />
-            <Skeleton className="h-3 w-48" />
+            <Skeleton className="h-3 w-20" />
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Skeleton className="h-3 w-16" />
-          <Skeleton className="h-6 w-6 rounded" />
-          <Skeleton className="h-6 w-6 rounded" />
-          <Skeleton className="h-6 w-6 rounded" />
+          <Skeleton className="hidden sm:block h-3 w-16" />
+          <Skeleton className="h-4 w-4 sm:mx-1 rounded" />
+          <Skeleton className="h-4 w-4 sm:mx-1 rounded" />
+          <Skeleton className="h-4 w-4 sm:mx-1 rounded" />
         </div>
       </div>
     </div>
@@ -503,9 +503,9 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   ))
 
   return (
-    <div className="flex-1 p-6">
+    <div className="flex-1 p-6 max-w-5xl mx-auto">
       <div className="mb-6">
-        <div className="text-2xl font-medium mb-2 flex gap-4 items-center">
+        <div className="text-2xl font-medium mb-4 sm:mb-2 flex flex-col sm:flex-row gap-4">
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" onClick={handleBack}>
               <ArrowLeft className="h-5 w-5" />

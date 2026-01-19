@@ -184,21 +184,21 @@ export const ProjectItemList = ({
       className="border border-border rounded-lg p-3 bg-background touch-none"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button {...attributes} {...listeners} className="cursor-grab">
             <GripVertical className="h-5 w-5 text-muted-foreground" />
           </button>
           <div className="bg-secondary p-2 rounded-lg">{icon}</div>
-          <div>
-            <div className="flex items-center pr-2">
-              <h4
-                className={cn("text-sm font-medium break-words break-all line-clamp-1 min-w-fit hover:underline cursor-pointer", (!title || title === "Episode X") && "italic pr-1")}
-                onClick={handleTitleClick}
-              >
+          <div
+            className="cursor-pointer hover:bg-muted/50 rounded-lg py-1 -my-1 px-2 -mx-1 group/title"
+            onClick={handleTitleClick}
+          >
+            <div className="flex items-center gap-2">
+              <h4 className={cn("text-sm font-medium break-words break-all line-clamp-1 min-w-fit group-hover/title:underline cursor-pointer", (!title || title === "Episode X") && "italic pr-1")}>
                 {title || "No title"}
               </h4>
               {subtitle && (
-                <span className="text-xs text-muted-foreground font-extralight ml-2 break-words break-all line-clamp-1">
+                <span className="text-xs text-muted-foreground font-extralight break-words break-all line-clamp-1">
                   {subtitle}
                 </span>
               )}
@@ -206,14 +206,15 @@ export const ProjectItemList = ({
             <p className="text-xs text-muted-foreground line-clamp-2 break-words" style={{ overflowWrap: "anywhere" }}>
               {description.substring(0, 250)}
             </p>
+            <p className="text-xs text-muted-foreground sm:hidden block">{date}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-muted-foreground">{date}</span>
+          <p className="text-xs text-muted-foreground sm:block hidden">{date}</p>
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 min-w-6 p-0"
+            className="h-6 min-w-4 md:min-w-6 p-0"
             onClick={() => setIsMoveOpen(true)}
             disabled={isProcessing}
           >
@@ -222,7 +223,7 @@ export const ProjectItemList = ({
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 min-w-6 p-0"
+            className="h-6 min-w-4 md:min-w-6 p-0"
             onClick={() => setIsEditOpen(true)}
             disabled={isProcessing}
           >
@@ -231,7 +232,7 @@ export const ProjectItemList = ({
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 min-w-6 p-0"
+            className="h-6 min-w-4 md:min-w-6 p-0"
             onClick={() => setIsDeleteOpen(true)}
             disabled={isProcessing}
           >
