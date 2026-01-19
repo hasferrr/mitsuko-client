@@ -61,30 +61,45 @@ export function UserSettings() {
           </Button>
         </div>
         <div className="p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <Label>
-              Enable Third-Party Model
-            </Label>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Enable Third-Party Model
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Allow Mitsuko to access additional custom models from third-party providers using your own API keys. A small fee may apply.
+              </p>
+            </div>
             <Switch
               id="third-party-model-switch"
               checked={isThirdPartyModelEnabled}
               onCheckedChange={handleCheckedChange}
             />
           </div>
-          <div className="flex items-center justify-between">
-            <Label>
-              Separate Default Translation & Extraction Settings
-            </Label>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Separate Default Settings
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Use distinct default settings for translation and context extraction instead of the default project settings. This will also separate sharing settings in batch projects.
+              </p>
+            </div>
             <Switch
               id="separate-settings-switch"
               checked={isSeparateSettingsEnabled}
               onCheckedChange={setIsSeparateSettingsEnabled}
             />
           </div>
-          <div className="flex items-center justify-between">
-            <Label>
-              Disable performance mode
-            </Label>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Disable performance mode
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Turn off performance optimizations for subtitle operations. This can improve quality on some devices but may feel laggy.
+              </p>
+            </div>
             <Switch
               id="subtitle-performance-mode-switch"
               checked={!isSubtitlePerformanceModeEnabled}
