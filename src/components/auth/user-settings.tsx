@@ -24,6 +24,8 @@ export function UserSettings() {
   const toggleThirdPartyModel = useLocalSettingsStore((state) => state.toggleThirdPartyModel)
   const isSeparateSettingsEnabled = useLocalSettingsStore((state) => state.isSeparateSettingsEnabled)
   const setIsSeparateSettingsEnabled = useLocalSettingsStore((state) => state.setIsSeparateSettingsEnabled)
+  const isSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.isSubtitlePerformanceModeEnabled)
+  const setIsSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.setIsSubtitlePerformanceModeEnabled)
   const [isThirdPartyDialogOpen, setIsThirdPartyDialogOpen] = useState(false)
   const [isGlobalDefaultsOpen, setIsGlobalDefaultsOpen] = useState(false)
 
@@ -77,6 +79,16 @@ export function UserSettings() {
               id="separate-settings-switch"
               checked={isSeparateSettingsEnabled}
               onCheckedChange={setIsSeparateSettingsEnabled}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>
+              Disable performance mode
+            </Label>
+            <Switch
+              id="subtitle-performance-mode-switch"
+              checked={!isSubtitlePerformanceModeEnabled}
+              onCheckedChange={(checked) => setIsSubtitlePerformanceModeEnabled(!checked)}
             />
           </div>
         </div>

@@ -15,6 +15,7 @@ interface LocalSettingsStore {
   isAutoTemperatureEnabled: boolean
   isSubtitleCleanupEnabled: boolean
   deleteAfterTranscription: boolean
+  isSubtitlePerformanceModeEnabled: boolean
 
   addApiConfig: (config: CustomApiConfig) => void
   updateApiConfig: (index: number, updates: Partial<CustomApiConfig>) => Promise<void>
@@ -26,6 +27,7 @@ interface LocalSettingsStore {
   setIsAutoTemperatureEnabled: (enabled: boolean) => void
   setIsSubtitleCleanupEnabled: (enabled: boolean) => void
   setDeleteAfterTranscription: (enabled: boolean) => void
+  setIsSubtitlePerformanceModeEnabled: (enabled: boolean) => void
 }
 
 export const useLocalSettingsStore = create<LocalSettingsStore>()(
@@ -38,6 +40,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       isAutoTemperatureEnabled: true,
       isSubtitleCleanupEnabled: true,
       deleteAfterTranscription: true,
+      isSubtitlePerformanceModeEnabled: true,
 
       addApiConfig: (config) =>
         set((state) => ({
@@ -81,6 +84,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       setIsAutoTemperatureEnabled: (enabled) => set({ isAutoTemperatureEnabled: enabled }),
       setIsSubtitleCleanupEnabled: (enabled) => set({ isSubtitleCleanupEnabled: enabled }),
       setDeleteAfterTranscription: (enabled) => set({ deleteAfterTranscription: enabled }),
+      setIsSubtitlePerformanceModeEnabled: (enabled) => set({ isSubtitlePerformanceModeEnabled: enabled }),
     }),
     {
       name: "api-settings-storage",
