@@ -449,11 +449,13 @@ export const useTranslationHandler = ({
         }
       }
 
-      // Process the next chunk
-      const nextIndex = tlChunk[tlChunk.length - 1].index + 1
+      // Process the next chunk (or restart with the same chunk)
+      const nextIndex: number = tlChunk.length > 0
+        ? tlChunk[tlChunk.length - 1].index + 1
+        : prevIndex ?? (chunk.length > 0 ? chunk[0].index : 1)
 
       // Check for duplicate chunk (stuck in loop)
-      if (nextIndex === prevIndex) {
+      if (prevIndex !== null && nextIndex <= prevIndex) {
         sameChunkCount++
         if (sameChunkCount >= 3) {
           console.error("Translation stopped: Stuck on the same chunk")
