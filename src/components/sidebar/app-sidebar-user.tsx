@@ -93,8 +93,8 @@ export function AppSidebarUser() {
                     </Avatar>
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+                    <span className="truncate font-semibold sentry-mask">{user.name}</span>
+                    <span className="truncate text-xs sentry-mask">{user.email}</span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
                 </SidebarMenuButton>
@@ -128,8 +128,8 @@ export function AppSidebarUser() {
                     <AvatarFallback className="rounded-lg">{name}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+                    <span className="truncate font-semibold sentry-mask">{user.name}</span>
+                    <span className="truncate text-xs sentry-mask">{user.email}</span>
                   </div>
                 </div>
               </DropdownMenuLabel>

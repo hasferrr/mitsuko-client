@@ -67,10 +67,10 @@ export default function Navbar() {
                     <AvatarFallback>{session.user?.email?.[0].toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="absolute right-0 mt-2 w-48 p-2 bg-background border rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-[69]">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate sentry-mask">
                       {session.user?.user_metadata?.full_name}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate sentry-mask">
                       {session.user?.email}
                     </p>
                   </div>

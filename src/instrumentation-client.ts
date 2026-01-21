@@ -12,7 +12,7 @@ Sentry.init({
   integrations: [
     Sentry.replayIntegration({
       maskAllText: false,
-      blockAllMedia: false,
+      blockAllMedia: true,
     }),
     Sentry.supabaseIntegration({
       supabaseClient: supabase,
