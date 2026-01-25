@@ -63,7 +63,7 @@ export default function Navbar() {
               {session ? (
                 <div className="group relative">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={session.user?.user_metadata?.avatar_url} />
+                    <AvatarImage className="sentry-block" src={session.user?.user_metadata?.avatar_url} />
                     <AvatarFallback>{session.user?.email?.[0].toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="absolute right-0 mt-2 w-48 p-2 bg-background border rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-[69]">

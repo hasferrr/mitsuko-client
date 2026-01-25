@@ -88,7 +88,7 @@ export function AppSidebarUser() {
                 >
                   <div className="h-8 w-8">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src={user.avatar || null} alt={user.name} />
+                      <AvatarImage className="sentry-block" src={user.avatar || null} alt={user.name} />
                       <AvatarFallback className="rounded-lg">{name}</AvatarFallback>
                     </Avatar>
                   </div>
