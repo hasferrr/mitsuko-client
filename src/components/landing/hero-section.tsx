@@ -57,6 +57,7 @@ export default function HeroSection() {
               placeholder="blur"
               alt="Play video"
               className="absolute inset-0 w-full h-full object-cover"
+              priority
             />
           )}
 
