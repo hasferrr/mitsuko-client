@@ -114,7 +114,7 @@ export function CreditPackPrices({
         {currency.symbol}
         {((CREDIT_PACKS.find((pack) => pack.baseCredits !== 0)?.basePriceUSD || 0) * currency.rate).toLocaleString()}
         . These credit packs provide flexibility for your
-        usage needs. Credits valid for a whole year from purchase!
+        usage needs. Credits are valid for 3 months from purchase.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
