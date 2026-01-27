@@ -21,11 +21,11 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/ingest/static/:path*',
+        source: '/api/occurrunces/static/:path*',
         destination: 'https://us-assets.i.posthog.com/static/:path*',
       },
       {
-        source: '/api/ingest/:path*',
+        source: '/api/occurrunces/:path*',
         destination: 'https://us.i.posthog.com/:path*',
       },
     ]
