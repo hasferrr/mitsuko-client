@@ -63,14 +63,14 @@ export default function Navbar() {
               {session ? (
                 <div className="group relative">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage className="sentry-block" src={session.user?.user_metadata?.avatar_url} />
+                    <AvatarImage className="sentry-block ph-no-capture" src={session.user?.user_metadata?.avatar_url} />
                     <AvatarFallback>{session.user?.email?.[0].toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="absolute right-0 mt-2 w-48 p-2 bg-background border rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-[69]">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate sentry-mask">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate sentry-mask ph-no-capture">
                       {session.user?.user_metadata?.full_name}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate sentry-mask">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate sentry-mask ph-no-capture">
                       {session.user?.email}
                     </p>
                   </div>

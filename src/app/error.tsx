@@ -5,6 +5,7 @@ import { ArrowLeft, RefreshCw } from 'lucide-react'
 import { useEffect } from 'react'
 import Navbar from '@/components/landing/navbar'
 import * as Sentry from '@sentry/nextjs'
+import posthog from 'posthog-js'
 
 export default function Error({
   error,
@@ -16,6 +17,7 @@ export default function Error({
   useEffect(() => {
     console.error('Application error:', error)
     Sentry.captureException(error)
+    posthog.captureException(error)
   }, [error])
 
   return (

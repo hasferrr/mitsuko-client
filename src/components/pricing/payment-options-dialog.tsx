@@ -1,5 +1,6 @@
 "use client"
 
+import posthog from "posthog-js"
 import {
   Dialog,
   DialogContent,
@@ -96,6 +97,16 @@ export function PaymentOptionsDialog({
         lemonSqueezyCache.set(productId, inputQuantity, apiResult.redirect_url)
       }
       console.log(`Successfully fetched data for ${productId} (Qty: ${inputQuantity}). Proceeding with ${paymentType}.`)
+
+      posthog.capture('payment_initiated', {
+        payment_type: paymentType,
+        product_id: productId,
+        quantity: inputQuantity,
+        total_credits: credits * inputQuantity,
+        total_cost: price * currencyRate * inputQuantity,
+        currency_symbol: currencySymbol,
+      })
+
       if (paymentType === 'snap') {
         onClose()
         await sleep(100)

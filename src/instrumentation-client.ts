@@ -1,8 +1,6 @@
-// This file configures the initialization of Sentry on the client.
-// The added config here will be used whenever a users loads a page in their browser.
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/
-
+import "posthog-js/dist/web-vitals"
 import * as Sentry from "@sentry/nextjs"
+import posthog from "posthog-js"
 import { supabase } from "./lib/supabase"
 
 Sentry.init({
@@ -27,7 +25,7 @@ Sentry.init({
   // Define how likely Replay events are sampled.
   // This sets the sample rate to be 10%. You may want this to be 100% while
   // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0.25,
+  replaysSessionSampleRate: 0.1,
 
   // Define how likely Replay events are sampled when an error occurs.
   replaysOnErrorSampleRate: 1.0,
@@ -38,3 +36,11 @@ Sentry.init({
 })
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
+
+posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+  api_host: '/api/ingest',
+  ui_host: 'https://us.posthog.com',
+  defaults: '2025-11-30',
+  capture_exceptions: true,
+  debug: process.env.NODE_ENV === 'development',
+})

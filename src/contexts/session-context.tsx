@@ -1,6 +1,7 @@
 "use client"
 
 import * as Sentry from '@sentry/nextjs'
+import posthog from 'posthog-js'
 import { supabase } from '@/lib/supabase'
 import { useSessionStore } from '@/stores/use-session-store'
 import type { Session } from '@supabase/supabase-js'
@@ -24,10 +25,24 @@ export default function SessionStoreProvider({ children }: PropsWithChildren) {
       }
     }
 
+    const updatePostHogUser = (session: Session | null) => {
+      const user = session?.user
+
+      if (user) {
+        posthog.identify(user.id, {
+          email: user.email,
+          provider: user.app_metadata?.provider,
+        })
+      } else {
+        posthog.reset()
+      }
+    }
+
     supabase.auth.getSession()
       .then(({ data: { session } }) => {
         setSession(session)
         updateSentryUser(session)
+        updatePostHogUser(session)
       })
       .catch((error) => {
         console.error('Failed to fetch session:', error)
@@ -38,6 +53,7 @@ export default function SessionStoreProvider({ children }: PropsWithChildren) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       updateSentryUser(session)
+      updatePostHogUser(session)
     })
 
     return () => subscription.unsubscribe()

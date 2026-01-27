@@ -146,7 +146,7 @@ export function User() {
           <tbody>
             <tr className="border-b">
               <td className="px-4 py-2">Email</td>
-              <td className="px-4 py-2 text-right sentry-mask">{session?.user?.email}</td>
+              <td className="px-4 py-2 text-right sentry-mask ph-no-capture">{session?.user?.email}</td>
             </tr>
             <tr className="border-b">
               <td className="px-4 py-2">Credits</td>
