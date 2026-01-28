@@ -86,12 +86,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   useAutoScroll(contextResult, contextResultRef)
 
   useEffect(() => {
-    if (contextResultRef.current) {
-      contextResultRef.current.scrollTop = contextResultRef.current.scrollHeight
-    }
-  }, [contextResultRef])
-
-  useEffect(() => {
     return () => {
       saveData(currentId)
     }
