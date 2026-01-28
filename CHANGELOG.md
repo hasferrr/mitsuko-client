@@ -17,6 +17,7 @@ If you want to update the changelog, please use the same style. The intent is fo
 ### January 28
 
 - ⚡ **Performance Enhancements:** Optimized the subtitle list in translation and subtitle tools viewer for a smoother and faster experience. Added an option to disable performance mode in User Settings.
+- 🐛 **Bug Fixes:** Resolved several major issues to improve overall application stability and reliability.
 
 ## 2025
 
