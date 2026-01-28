@@ -18,15 +18,15 @@ interface TranscriptionDataStore {
   updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
   // getters
-  getTitle: () => string
-  getTranscriptionText: () => string
-  getTranscriptSubtitles: () => Subtitle[]
-  getSelectedMode: () => Transcription["selectedMode"]
-  getLanguage: () => string
-  getCustomInstructions: () => string
-  getModels: () => Transcription["models"]
-  getWords: () => TranscriptionWord[]
-  getSegments: () => TranscriptionSegment[]
+  getTitle: (id: string) => string
+  getTranscriptionText: (id: string) => string
+  getTranscriptSubtitles: (id: string) => Subtitle[]
+  getSelectedMode: (id: string) => Transcription["selectedMode"]
+  getLanguage: (id: string) => string
+  getCustomInstructions: (id: string) => string
+  getModels: (id: string) => Transcription["models"]
+  getWords: (id: string) => TranscriptionWord[]
+  getSegments: (id: string) => TranscriptionSegment[]
   // setters
   setCurrentId: (id: string | null) => void
   setTitle: (id: string, title: string) => void
@@ -79,41 +79,32 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     }
   },
   // getters implementation
-  getTitle: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.title : ""
+  getTitle: (id) => {
+    return get().data[id]?.title ?? ""
   },
-  getTranscriptionText: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.transcriptionText : ""
+  getTranscriptionText: (id) => {
+    return get().data[id]?.transcriptionText ?? ""
   },
-  getTranscriptSubtitles: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.transcriptSubtitles : []
+  getTranscriptSubtitles: (id) => {
+    return get().data[id]?.transcriptSubtitles ?? []
   },
-  getSelectedMode: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.selectedMode : DEFAULT_TRANSCTIPTION_SETTINGS.selectedMode
+  getSelectedMode: (id) => {
+    return get().data[id]?.selectedMode ?? DEFAULT_TRANSCTIPTION_SETTINGS.selectedMode
   },
-  getLanguage: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.language ?? DEFAULT_TRANSCTIPTION_SETTINGS.language : DEFAULT_TRANSCTIPTION_SETTINGS.language
+  getLanguage: (id) => {
+    return get().data[id]?.language ?? DEFAULT_TRANSCTIPTION_SETTINGS.language
   },
-  getCustomInstructions: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.customInstructions : DEFAULT_TRANSCTIPTION_SETTINGS.customInstructions
+  getCustomInstructions: (id) => {
+    return get().data[id]?.customInstructions ?? DEFAULT_TRANSCTIPTION_SETTINGS.customInstructions
   },
-  getModels: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.models : DEFAULT_TRANSCTIPTION_SETTINGS.models
+  getModels: (id) => {
+    return get().data[id]?.models ?? DEFAULT_TRANSCTIPTION_SETTINGS.models
   },
-  getWords: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.words ?? [] : []
+  getWords: (id) => {
+    return get().data[id]?.words ?? []
   },
-  getSegments: () => {
-    const id = get().currentId
-    return id ? get().data[id]?.segments ?? [] : []
+  getSegments: (id) => {
+    return get().data[id]?.segments ?? []
   },
   // setters implementation
   setCurrentId: (id) => set({ currentId: id }),
@@ -150,15 +141,20 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   },
   // data manipulation methods
   mutateData: (id, key, value) => {
-    set(state => ({
-      data: {
-        ...state.data,
-        [id]: {
-          ...state.data[id],
-          [key]: value
+    set(state => {
+      const data = state.data[id]
+      if (!data) return state
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [id]: {
+            ...data,
+            [key]: value
+          }
         }
       }
-    }))
+    })
   },
   mutateDataNoRender: (id, key, value) => {
     const data = get().data[id]
