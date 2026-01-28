@@ -28,23 +28,22 @@ export interface TranslationDataStore {
   getTranslationsDb: (translationIds: string[]) => Promise<Translation[]>
   updateTranslationDb: (translationId: string, changes: Partial<Pick<Translation, "title" | "subtitles" | "parsed">>) => Promise<Translation>
   deleteTranslationDb: (projectId: string, translationId: string) => Promise<void>
-  // Existing methods
+  // setters
   setCurrentId: (id: string | null) => void
-  mutateData: <T extends keyof Translation>(id: string, key: T, value: Translation[T]) => void
-  mutateDataNoRender: <T extends keyof Translation>(id: string, key: T, value: Translation[T]) => void
-  saveData: (id: string) => Promise<void>
-  upsertData: (id: string, value: Translation) => void
-  removeData: (id: string) => void
-  // Subtitle methods
   setTitle: (id: string, title: string) => void
   setSubtitles: (id: string, subtitles: SubtitleTranslated[]) => void
   setParsed: (id: string, parsed: Parsed) => void
   resetParsed: (id: string) => void
   updateSubtitle: <T extends keyof SubtitleTranslated>(id: string, index: number, field: T, value: SubtitleTranslated[T]) => void
-  // Response methods
   setResponse: (id: string, response: string) => void
   setJsonResponse: (id: string, jsonResponse: SubOnlyTranslated[]) => void
   appendJsonResponse: (id: string, arr: SubOnlyTranslated[]) => void
+  // data manipulation methods
+  mutateData: <T extends keyof Translation>(id: string, key: T, value: Translation[T]) => void
+  mutateDataNoRender: <T extends keyof Translation>(id: string, key: T, value: Translation[T]) => void
+  saveData: (id: string) => Promise<void>
+  upsertData: (id: string, value: Translation) => void
+  removeData: (id: string) => void
 }
 
 export const useTranslationDataStore = create<TranslationDataStore>((set, get) => ({
@@ -141,8 +140,54 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       set({ currentId: null })
     }
   },
-  // Existing methods
+
+  // setters implementation
   setCurrentId: (id) => set({ currentId: id }),
+  setTitle: (id, title) => {
+    get().mutateData(id, "title", title)
+  },
+  setSubtitles: (id, subtitles) => {
+    get().mutateData(id, "subtitles", subtitles)
+  },
+  setParsed: (id, parsed) => {
+    get().mutateData(id, "parsed", parsed)
+  },
+  resetParsed: (id) => {
+    const initialParsed: Parsed = { type: "srt", data: null }
+    get().mutateData(id, "parsed", initialParsed)
+  },
+  updateSubtitle: (id, index, field, value) => {
+    const data = get().data[id]
+    if (data && data.subtitles) {
+      const updated = [...data.subtitles]
+      updated[index - 1] = { ...updated[index - 1], [field]: value }
+      get().mutateData(id, "subtitles", updated)
+    }
+  },
+  setResponse: (id, res) => {
+    const translation = get().data[id]
+    if (!translation) return
+    if (get().currentId === id) {
+      get().mutateData(id, "response", { ...translation.response, response: res })
+    } else {
+      get().mutateDataNoRender(id, "response", { ...translation.response, response: res })
+    }
+  },
+  setJsonResponse: (id, jsonRes) => {
+    const translation = get().data[id]
+    if (!translation) return
+    get().mutateData(id, "response", { ...translation.response, jsonResponse: jsonRes })
+  },
+  appendJsonResponse: (id, arr) => {
+    const translation = get().data[id]
+    if (!translation) return
+    const currentJson = translation.response.jsonResponse || []
+    get().mutateData(id, "response", {
+      ...translation.response,
+      jsonResponse: [...currentJson, ...arr],
+    })
+  },
+  // data manipulation methods
   mutateData: (id, key, value) => {
     set(state => {
       const data = state.data[id]
@@ -189,51 +234,5 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     if (get().currentId === id) {
       set({ currentId: null })
     }
-  },
-  // Subtitle methods
-  setTitle: (id, title) => {
-    get().mutateData(id, "title", title)
-  },
-  setSubtitles: (id, subtitles) => {
-    get().mutateData(id, "subtitles", subtitles)
-  },
-  setParsed: (id, parsed) => {
-    get().mutateData(id, "parsed", parsed)
-  },
-  resetParsed: (id) => {
-    const initialParsed: Parsed = { type: "srt", data: null }
-    get().mutateData(id, "parsed", initialParsed)
-  },
-  updateSubtitle: (id, index, field, value) => {
-    const data = get().data[id]
-    if (data && data.subtitles) {
-      const updated = [...data.subtitles]
-      updated[index - 1] = { ...updated[index - 1], [field]: value }
-      get().mutateData(id, "subtitles", updated)
-    }
-  },
-  // Response methods
-  setResponse: (id, res) => {
-    const translation = get().data[id]
-    if (!translation) return
-    if (get().currentId === id) {
-      get().mutateData(id, "response", { ...translation.response, response: res })
-    } else {
-      get().mutateDataNoRender(id, "response", { ...translation.response, response: res })
-    }
-  },
-  setJsonResponse: (id, jsonRes) => {
-    const translation = get().data[id]
-    if (!translation) return
-    get().mutateData(id, "response", { ...translation.response, jsonResponse: jsonRes })
-  },
-  appendJsonResponse: (id, arr) => {
-    const translation = get().data[id]
-    if (!translation) return
-    const currentJson = translation.response.jsonResponse || []
-    get().mutateData(id, "response", {
-      ...translation.response,
-      jsonResponse: [...currentJson, ...arr],
-    })
   },
 }))
