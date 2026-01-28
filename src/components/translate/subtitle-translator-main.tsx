@@ -523,7 +523,11 @@ export default function SubtitleTranslatorMain({
           {/* Wrap SubtitleList with DragAndDrop */}
           <DragAndDrop className="h-[510px]" onDropFiles={handleFileUpload} disabled={isTranslating}>
             {subtitles.length ? (
-              <SubtitleList hidden={subtitlesHidden} />
+              <SubtitleList
+                translationId={currentId}
+                subtitles={subtitles}
+                hidden={subtitlesHidden}
+              />
             ) : (
               <div
                 className="h-full flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"

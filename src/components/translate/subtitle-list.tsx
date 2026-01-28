@@ -1,26 +1,20 @@
 import { memo } from "react"
 import { SubtitleCard } from "./subtitle-card"
-import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import type { SubtitleTranslated } from "@/types/subtitles"
 import { VirtualizedList } from "../ui-custom/virtualized-list"
 
 interface SubtitleListProps {
+  translationId: string
+  subtitles: SubtitleTranslated[]
   hidden?: boolean
-  translationId?: string
 }
 
 export const SubtitleList = memo(({
-  hidden = false,
   translationId,
+  subtitles,
+  hidden = false,
 }: SubtitleListProps) => {
-  const currentId = useTranslationDataStore((state) => state.currentId)
-  const idToUse = translationId ?? currentId
-  const subtitles = useTranslationDataStore((state) => {
-    if (!idToUse) return [] as SubtitleTranslated[]
-    return state.data[idToUse]?.subtitles ?? ([] as SubtitleTranslated[])
-  })
-
   const isSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.isSubtitlePerformanceModeEnabled)
 
   if (hidden) {
@@ -47,7 +41,7 @@ export const SubtitleList = memo(({
 
   return (
     <VirtualizedList
-      id={idToUse || ""}
+      id={translationId}
       items={subtitles}
       className="h-[510px] pr-4 overflow-y-auto"
       render={{
