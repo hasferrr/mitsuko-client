@@ -271,89 +271,87 @@ export default function Tools() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto p-4">
-      <DragAndDrop onDropFiles={handleDropFiles}>
-        <Tabs defaultValue="raw-text">
-          <div className="flex justify-between items-center pb-4">
-            <TabsList>
-              <TabsTrigger value="raw-text">Raw Text</TabsTrigger>
-              <TabsTrigger value="table-view">Table View</TabsTrigger>
-            </TabsList>
-          </div>
+    <DragAndDrop onDropFiles={handleDropFiles} className="container max-w-6xl mx-auto p-4">
+      <Tabs defaultValue="raw-text">
+        <div className="flex justify-between items-center pb-4">
+          <TabsList>
+            <TabsTrigger value="raw-text">Raw Text</TabsTrigger>
+            <TabsTrigger value="table-view">Table View</TabsTrigger>
+          </TabsList>
+        </div>
 
-          <div className="flex items-center space-x-4 mb-4">
-            <Input type="file" onChange={handleFileChange} accept={ACCEPTED_FORMATS.join(',')} className="max-w-xs min-w-48" />
-            <DownloadSection
-              generateContent={generateContent}
-              fileName={getFileNameWithoutExtension(fileName) || "subtitle"}
-              type={toType}
-              downloadOption={downloadOption}
-              setDownloadOption={() => { }}
-              combinedFormat={combinedFormat}
-              setCombinedFormat={setCombinedFormat}
-              toType={toType}
-              setToType={setToType}
-              hideTextOptionSelector
-              inlineLayout
-            />
-            <Button onClick={handleExportCSV} disabled={subtitleEvents.length === 0}>Export to CSV</Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" disabled={subtitleEvents.length === 0}>Remove Tags</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently remove the Aegisub tags from the subtitle data.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleRemoveTags}>Continue</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" disabled={subtitleEvents.length === 0}>Remove Comment Tags</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently remove all comment tags (text wrapped by curly braces) from the subtitle data.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleRemoveComments}>Continue</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
+        <div className="flex items-center space-x-4 mb-4">
+          <Input type="file" onChange={handleFileChange} accept={ACCEPTED_FORMATS.join(',')} className="max-w-xs min-w-48" />
+          <DownloadSection
+            generateContent={generateContent}
+            fileName={getFileNameWithoutExtension(fileName) || "subtitle"}
+            type={toType}
+            downloadOption={downloadOption}
+            setDownloadOption={() => { }}
+            combinedFormat={combinedFormat}
+            setCombinedFormat={setCombinedFormat}
+            toType={toType}
+            setToType={setToType}
+            hideTextOptionSelector
+            inlineLayout
+          />
+          <Button onClick={handleExportCSV} disabled={subtitleEvents.length === 0}>Export to CSV</Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={subtitleEvents.length === 0}>Remove Tags</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently remove the Aegisub tags from the subtitle data.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleRemoveTags}>Continue</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={subtitleEvents.length === 0}>Remove Comment Tags</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently remove all comment tags (text wrapped by curly braces) from the subtitle data.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleRemoveComments}>Continue</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
 
-          <TabsContent value="raw-text">
-            <SubtitleRawViewer
-              content={rawContent}
-              fileName={fileName}
-              enableHighlight={enableHighlight}
-              setEnableHighlight={setEnableHighlight}
-            />
-          </TabsContent>
+        <TabsContent value="raw-text">
+          <SubtitleRawViewer
+            content={rawContent}
+            fileName={fileName}
+            enableHighlight={enableHighlight}
+            setEnableHighlight={setEnableHighlight}
+          />
+        </TabsContent>
 
-          <TabsContent value="table-view">
-            <SubtitleViewer
-              fileName={fileName}
-              subtitleEvents={subtitleEvents}
-              enableHighlight={enableHighlight}
-              setEnableHighlight={setEnableHighlight}
-              calculateCPS={calculateCPS}
-            />
-          </TabsContent>
+        <TabsContent value="table-view">
+          <SubtitleViewer
+            fileName={fileName}
+            subtitleEvents={subtitleEvents}
+            enableHighlight={enableHighlight}
+            setEnableHighlight={setEnableHighlight}
+            calculateCPS={calculateCPS}
+          />
+        </TabsContent>
 
-        </Tabs>
-      </DragAndDrop>
-    </div>
+      </Tabs>
+    </DragAndDrop>
   )
 }

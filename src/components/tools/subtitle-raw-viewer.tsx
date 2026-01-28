@@ -39,12 +39,11 @@ export default function SubtitleRawViewer({ content, fileName, enableHighlight, 
         <Checkbox id="enableHighlightRaw" checked={enableHighlight} onCheckedChange={(checked) => setEnableHighlight(Boolean(checked))} />
         <Label htmlFor="enableHighlightRaw">Syntax Highlight</Label>
       </div>
-      <div className="rounded-lg border">
+      <div className="rounded-lg border sentry-mask ph-no-capture">
         <VirtualizedList
           id={`subtitle-raw-${fileName}`}
           items={lines.map((line, index) => ({ line, index }))}
           className="h-[510px] overflow-auto p-2"
-          overscan={20}
           estimatedItemHeight={21}
           render={{
             key: (item) => `raw-line-${item.index}`,

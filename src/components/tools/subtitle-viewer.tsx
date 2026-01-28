@@ -50,7 +50,7 @@ export default function SubtitleViewer({
         </div>
       </div>
       {subtitleEvents.length > 0 && (
-        <div className="border rounded-md">
+        <div className="border rounded-md sentry-mask ph-no-capture">
           <div className="grid grid-cols-[48px_96px_96px_60px_120px_120px_1fr] h-10 border-b text-sm text-muted-foreground font-medium pl-2">
             <div className="h-full flex items-center px-2">#</div>
             <div className="h-full flex items-center px-2">Start</div>
@@ -64,7 +64,6 @@ export default function SubtitleViewer({
             id={`subtitle-viewer-${fileName}`}
             items={subtitleEvents.map((event, index) => ({ event, index }))}
             className="h-[510px] overflow-auto"
-            overscan={20}
             estimatedItemHeight={37}
             render={{
               key: (item) => `subtitle-event-${item.index}`,

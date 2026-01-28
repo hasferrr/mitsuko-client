@@ -1,5 +1,6 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState, type UIEvent } from "react"
 import { VirtualizedRenderer } from "./virtualized-renderer"
+import { cn } from "@/lib/utils"
 
 interface VirtualizedListProps<T> {
   id?: string
@@ -85,7 +86,7 @@ export function VirtualizedList<T>({
   }, [items.length, findIndexAtOffset, overscan, scrollTop, viewportHeight])
 
   return (
-    <div className={className} onScroll={handleScroll}>
+    <div className={cn("h-[510px]", className)} onScroll={handleScroll}>
       <div className="relative" style={{ height: totalHeight }}>
         {items.slice(range.startIndex, range.endIndex).map((item, i) => {
           const absoluteIndex = range.startIndex + i
