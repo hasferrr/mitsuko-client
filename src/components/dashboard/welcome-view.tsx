@@ -65,7 +65,7 @@ export function WelcomeView() {
     setSelectedOption(option)
 
     // Find or create default project
-    let defaultProject = projects.find(p => p.name === "Default")
+    let defaultProject = projects.find(p => p.name === "Default" && !p.isBatch)
     if (!defaultProject) {
       defaultProject = await createProject("Default")
     }
