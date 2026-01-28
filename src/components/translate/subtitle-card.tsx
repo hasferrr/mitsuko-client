@@ -104,6 +104,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
               }}
               className="md:min-h-[36px] md:h-[36px] min-h-[40px] h-[40px] max-h-[120px] bg-muted/50 dark:bg-muted/30 resize-none overflow-y-hidden"
               rows={1}
+              dir="auto"
             />
             <Textarea
               ref={translatedRef}
@@ -118,6 +119,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
               }}
               className="md:min-h-[36px] md:h-[36px] min-h-[40px] h-[40px] max-h-[120px] resize-none overflow-y-hidden"
               rows={1}
+              dir="auto"
             />
           </div>
         </div>
