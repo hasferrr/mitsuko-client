@@ -395,8 +395,11 @@ export const useTranslationHandler = ({
           }
         }
         setSubtitles(currentId, merged)
+
+        // Refetch user credits after each chunk for non-batch mode
         const isUsingCredits = !isUseCustomModel && !!modelDetail?.isPaid
-        if (isUsingCredits) refetchUserData()
+        if (isUsingCredits && !isBatch) refetchUserData()
+
         await saveData(currentId)
       }
 

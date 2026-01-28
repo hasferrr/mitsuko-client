@@ -162,6 +162,16 @@ export default function useBatchTranslationHandler({
       active++
       handleStartTranslation(id).finally(() => {
         setIsTranslating(id, false)
+
+        // Refetch user credits after each file completes
+        const bsIdToUse = isUseSharedSettings
+          ? basicSettingsId
+          : (translationData[id]?.basicSettingsId || basicSettingsId)
+        const modelDetail = getModelDetail(bsIdToUse)
+        const isUseCustomModel = getIsUseCustomModel(bsIdToUse)
+        const isUsingCredits = !isUseCustomModel && !!modelDetail?.isPaid
+        if (isUsingCredits) refetchUserData()
+
         active--
         launch()
       })
