@@ -2,34 +2,12 @@
 
 ## Project overview
 
-Mitsuko is an AI-powered subtitle translation and audio transcription platform focused on high-quality, context-aware results for professional workflows
-
-- **Inputs**
-  - Subtitle files: SRT, ASS, VTT with style preservation
-  - Audio files: MP3, WAV, FLAC, AAC, OPUS (transcribed to timed text)
-  - Text content: pasted text for context extraction
-- **Outputs**
-  - Translated subtitles: SRT, ASS, VTT
-  - Transcribed subtitles: timed text from audio
-  - Context documents: reusable text for series-wide consistency
-
-- **Core features**
-  - Project workspace with drag-and-drop, categorized tabs, history, import/export
-  - Context-aware subtitle translation across 100+ languages
-  - Batch translation with queueing, selection, drag-and-drop reordering
-  - Audio-to-subtitle transcription with streaming UI
-  - AI-powered context extraction to build reusable knowledge bases
-  - Instruction Library: personal and public custom instructions
-
 - **Tech stack**
-  - Frontend: Next.js 16 (App Router), React 19, Tailwind, Shadcn/Radix UI, Zustand, React Query, Dexie.js (indexedDB), @dnd-kit, Bun runtime
-  - Backend: separate Express.js (TypeScript, Bun) service with multi-provider AI (OpenAI, Gemini, Claude) and custom subtitle parsers
-  - Payments: Midtrans/Snap, LemonSqueezy
-  - Deployment: Vercel (frontend), Google Cloud Run (backend)
+  - Next.js 16 (App Router), React 19, Tailwind, Shadcn/Radix UI, Zustand, React Query, Dexie.js (indexedDB), @dnd-kit, Bun runtime
 
 - **Data & auth**
   - Client-side persistence via IndexedDB using Dexie.js for offline-first project data
-  - Authentication via Supabase Auth (separate from project data)
+  - Authentication via Supabase Auth
 
 - **Developer conventions**
   - `src/app/` exclusively for routes (`page.tsx`, `layout.tsx`); reusable UI in `src/components/`
