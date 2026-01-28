@@ -68,6 +68,7 @@ export interface Transcription {
   projectId: string
   words: TranscriptionWord[]
   segments: TranscriptionSegment[]
+  selectedUploadId: string | null
 }
 
 export interface Extraction {

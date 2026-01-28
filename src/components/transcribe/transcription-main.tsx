@@ -80,9 +80,11 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const models = useTranscriptionDataStore(state => state.getModels(currentId))
   const words = useTranscriptionDataStore(state => state.getWords(currentId))
   const segments = useTranscriptionDataStore(state => state.getSegments(currentId))
+  const selectedUploadId = useTranscriptionDataStore(state => state.getSelectedUploadId(currentId))
   const setTitle = useTranscriptionDataStore(state => state.setTitle)
   const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)
   const setTranscriptSubtitles = useTranscriptionDataStore(state => state.setTranscriptSubtitles)
+  const setSelectedUploadId = useTranscriptionDataStore(state => state.setSelectedUploadId)
   const saveData = useTranscriptionDataStore(state => state.saveData)
 
   // Transcription store
@@ -137,7 +139,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       setFileAndUrl(currentId, null)
       setActiveTab("select")
       if (uploadId) {
-        setSelectedUploadId(uploadId)
+        setSelectedUploadId(currentId, uploadId)
         if (file) {
           setTitle(currentId, file.name)
         }
@@ -155,7 +157,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     onSuccess: () => {
       toast.success("File deleted")
       queryClient.invalidateQueries({ queryKey: ["uploads"] })
-      setSelectedUploadId(null)
+      setSelectedUploadId(currentId, null)
       setIsDeleteDialogOpen(false)
     },
     onError: (err: Error) => toast.error("Failed to delete", { description: err.message }),
@@ -163,7 +165,6 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
 
   // State
   const [isEditing, setIsEditing] = useState(false)
-  const [selectedUploadId, setSelectedUploadId] = useState<string | null>(null)
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("upload")
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -214,13 +215,19 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     return () => { isCancelled = true }
   }, [file])
 
+  useEffect(() => {
+    if (selectedUploadId) {
+      setActiveTab("select")
+    }
+  }, [selectedUploadId])
+
   const {
     handleStart: handleStartTranscription,
     handleStop: handleStopTranscription,
   } = useTranscriptionHandler({
     state: {
       currentId,
-      selectedUploadId,
+      selectedUploadId: activeTab === "select" ? selectedUploadId : null,
       setSelectedUploadId,
     },
     options: {
@@ -358,7 +365,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   }
 
   const handleDragAndDropClick = () => {
-    setSelectedUploadId(null)
+    setSelectedUploadId(currentId, null)
     fileInputRef.current?.click()
   }
 
@@ -380,15 +387,15 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
 
   const handleSelectUpload = (upload: UploadFileMeta) => {
     if (selectedUploadId === upload.uploadId) {
-      setSelectedUploadId(null)
+      setSelectedUploadId(currentId, null)
     } else {
-      setSelectedUploadId(upload.uploadId)
+      setSelectedUploadId(currentId, upload.uploadId)
       setTitle(currentId, upload.fileName)
     }
   }
 
   const handleUploadSelectedFile = () => {
-    setSelectedUploadId(null)
+    setSelectedUploadId(currentId, null)
     if (!file) return
     handleUpload(file)
   }

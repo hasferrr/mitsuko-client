@@ -265,6 +265,13 @@ class MyDatabase extends Dexie {
         await projectsTable.update(update.id, update.changes)
       }
     })
+    this.version(22).stores({}).upgrade(async tx => {
+      await tx.table('transcriptions').toCollection().modify(transcription => {
+        if (typeof transcription.selectedUploadId === 'undefined') {
+          transcription.selectedUploadId = null
+        }
+      })
+    })
   }
 }
 

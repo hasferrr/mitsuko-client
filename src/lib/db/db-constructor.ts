@@ -248,6 +248,7 @@ function transcriptionConstructor(transcription: Partial<Transcription>): Transc
     projectId: transcription.projectId ?? "",
     words: transcription.words ?? [],
     segments: transcription.segments ?? [],
+    selectedUploadId: transcription.selectedUploadId ?? null,
   }
 }
 

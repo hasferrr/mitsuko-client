@@ -15,7 +15,7 @@ interface TranscriptionDataStore {
   // CRUD methods
   createTranscriptionDb: (projectId: string, data: Parameters<typeof createDB>[1]) => Promise<Transcription>
   getTranscriptionDb: (transcriptionId: string) => Promise<Transcription | undefined>
-  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language">>) => Promise<Transcription>
+  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language" | "selectedUploadId">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
   // getters
   getTitle: (id: string) => string
@@ -27,6 +27,7 @@ interface TranscriptionDataStore {
   getModels: (id: string) => Transcription["models"]
   getWords: (id: string) => TranscriptionWord[]
   getSegments: (id: string) => TranscriptionSegment[]
+  getSelectedUploadId: (id: string) => string | null
   // setters
   setCurrentId: (id: string | null) => void
   setTitle: (id: string, title: string) => void
@@ -38,6 +39,7 @@ interface TranscriptionDataStore {
   setModels: (id: string, models: Transcription["models"]) => void
   setWords: (id: string, words: TranscriptionWord[]) => void
   setSegments: (id: string, segments: TranscriptionSegment[]) => void
+  setSelectedUploadId: (id: string, selectedUploadId: string | null) => void
   // data manipulation methods
   mutateData: <T extends keyof Transcription>(id: string, key: T, value: Transcription[T]) => void
   mutateDataNoRender: <T extends keyof Transcription>(id: string, key: T, value: Transcription[T]) => void
@@ -106,6 +108,9 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   getSegments: (id) => {
     return get().data[id]?.segments ?? []
   },
+  getSelectedUploadId: (id) => {
+    return get().data[id]?.selectedUploadId ?? DEFAULT_TRANSCTIPTION_SETTINGS.selectedUploadId
+  },
   // setters implementation
   setCurrentId: (id) => set({ currentId: id }),
   setTitle: (id, title) => {
@@ -138,6 +143,9 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   },
   setSegments: (id, segments) => {
     get().mutateData(id, "segments", segments)
+  },
+  setSelectedUploadId: (id, selectedUploadId) => {
+    get().mutateData(id, "selectedUploadId", selectedUploadId)
   },
   // data manipulation methods
   mutateData: (id, key, value) => {
@@ -178,6 +186,7 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
         models: transcription.models,
         words: transcription.words,
         segments: transcription.segments,
+        selectedUploadId: transcription.selectedUploadId,
       })
       set({ data: { ...get().data, [id]: result } })
     } catch (error) {

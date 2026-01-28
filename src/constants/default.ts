@@ -37,11 +37,12 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
   isMaxCompletionTokensAuto: false,
 }
 
-export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models" | "language"> = {
+export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models" | "language" | "selectedUploadId"> = {
   selectedMode: "sentence",
   customInstructions: "",
   models: "mitsuko-premium",
   language: "auto",
+  selectedUploadId: null,
 }
 
 export const DEFAULT_TITLE = "Blue.Box.S01E16 (example)"

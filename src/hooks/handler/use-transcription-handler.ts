@@ -17,7 +17,7 @@ interface UseTranscriptionHandlerProps {
   state: {
     currentId: string
     selectedUploadId: string | null
-    setSelectedUploadId: (uploadId: string | null) => void
+    setSelectedUploadId: (id: string, uploadId: string | null) => void
   }
   options: {
     refetchUploads: () => Promise<unknown>
@@ -122,7 +122,7 @@ export const useTranscriptionHandler = ({
       setTranscriptSubtitles(currentId, parseTranscription(text))
 
       if (deleteAfterTranscription) {
-        setSelectedUploadId(null)
+        setSelectedUploadId(currentId, null)
       }
     } catch (error) {
       console.error(error)

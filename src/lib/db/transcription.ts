@@ -51,7 +51,7 @@ export const getTranscription = async (transcriptionId: string): Promise<Transcr
 
 export const updateTranscription = async (
   transcriptionId: string,
-  changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language" | "words" | "segments">>
+  changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language" | "words" | "segments" | "selectedUploadId">>
 ): Promise<Transcription> => {
   await db.transcriptions.update(transcriptionId, {
     ...changes,
