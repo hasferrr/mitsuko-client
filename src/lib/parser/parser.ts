@@ -22,7 +22,15 @@ export function parseTranslationJson(response: string): SubOnlyTranslated[] {
   }))
 }
 
-function parseMitsukoTranscription(response: string): Subtitle[] {
+export function parseMitsukoTranscription(
+  response: string,
+  timeFormatter?: (params: {
+    start: string
+    end: string
+    line: string
+    srtArr: string[]
+  }) => [string, string]
+): Subtitle[] {
   let text = response.trim()
   text = getContent(text)
   text = keepOnlyWrapped(text, "```", "```") || text
@@ -52,6 +60,10 @@ function parseMitsukoTranscription(response: string): Subtitle[] {
       let [start, end] = splitted
       start = start.trim()
       end = end.trim()
+
+      if (timeFormatter) {
+        [start, end] = timeFormatter({ start, end, line, srtArr })
+      }
 
       let startHourStr: string | undefined
       let startMinuteStr: string | undefined
@@ -122,13 +134,45 @@ function parseMitsukoTranscription(response: string): Subtitle[] {
   return parseSubtitle({ content: srtArr.join("\n") }).subtitles
 }
 
+export function leadingTextExtractor({ start, end, line, srtArr }: {
+  start: string
+  end: string
+  line: string
+  srtArr: string[]
+}): [string, string] {
+  // Extract timestamp from lines with leading text (e.g., "some text - 12:42,849" → "12:42,849")
+  // Matches both hh:mm:ss,ms and mm:ss,ms formats
+  const startMatch = start.match(/((?:\d+:)?\d+:\d+,\d+)$/)
+  const endMatch = end.match(/^((?:\d+:)?\d+:\d+,\d+)/)
+  if (!startMatch || !endMatch) {
+    srtArr.push(line)
+    return [start, end]
+  }
+  // Push leading text (e.g., "some text... -") to srtArr first if present
+  // Leading text becomes the content of the previous line
+  const timestampStartIndex = startMatch.index || 0
+  if (timestampStartIndex > 0) {
+    const leadingText = start.substring(0, timestampStartIndex).trim()
+    if (leadingText) {
+      srtArr.push(leadingText)
+    }
+  }
+  return [startMatch[1], endMatch[1]]
+}
+
 export function parseTranscription(response: string): Subtitle[] {
   const content = getContent(response)
   try {
     return parseMitsukoTranscription(content)
   } catch (error) {
-    return parseSubtitle({ content }).subtitles
+    console.error("Failed to parse transcription:", error)
   }
+  try {
+    return parseMitsukoTranscription(content, leadingTextExtractor)
+  } catch (error) {
+    console.error("Failed to parse transcription with leading text extractor:", error)
+  }
+  return parseSubtitle({ content }).subtitles
 }
 
 export function parseTranscriptionWordsAndSegments(response: string): { words: TranscriptionWord[]; segments: TranscriptionSegment[] } {
