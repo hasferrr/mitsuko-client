@@ -14,6 +14,7 @@ interface AiStreamOutputProps {
   subtitles?: SubtitleNoTimeTranslated[]
   isProcessing: boolean
   defaultCollapsed?: boolean
+  showThinking?: boolean
 }
 
 interface ParsedSegment {
@@ -27,6 +28,7 @@ export const AiStreamOutput = ({
   subtitles: subtitlesProp = [],
   isProcessing,
   defaultCollapsed = false,
+  showThinking = true,
 }: AiStreamOutputProps) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(defaultCollapsed)
   const [translatedSubtitles, setTranslatedSubtitles] = useState<SubOnlyTranslated[]>([])
@@ -148,7 +150,7 @@ export const AiStreamOutput = ({
 
   return (
     <div className={cn("text-sm", className)}>
-      {parsedContent.think && (
+      {showThinking && parsedContent.think && (
         <div className="bg-muted/30 p-3 mb-2 rounded-lg border">
           <div
             onClick={toggleCollapse}

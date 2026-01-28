@@ -266,6 +266,7 @@ export default function LogResultDialog({ log, onOpenChange }: LogResultDialogPr
                     content={data.result}
                     isProcessing={false}
                     defaultCollapsed={true}
+                    showThinking={false}
                   />
                 </div>
               ) : (
