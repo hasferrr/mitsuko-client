@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/nextjs"
+import posthog from "posthog-js"
 import { supabase } from "../supabase"
 import { fetchEventSource, EventStreamContentType } from "@microsoft/fetch-event-source"
 import { formatReasoning } from "../format-reasoning"
@@ -115,6 +117,8 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
       setResponse(buffer + "\n\n[Generation stopped by user]")
     } else {
       console.error("Error:", error)
+      Sentry.captureException(error)
+      posthog.captureException(error)
       setResponse(buffer + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]`)
     }
     abortControllerRef.current.abort()
