@@ -12,6 +12,12 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ---
 
+## 2026
+
+### January 28
+
+- ⚡ **Performance Enhancements:** Optimized the subtitle list in translation and subtitle tools viewer for a smoother and faster experience. Added an option to disable performance mode in User Settings.
+
 ## 2025
 
 ### December 20
