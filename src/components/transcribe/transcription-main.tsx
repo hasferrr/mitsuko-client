@@ -45,13 +45,10 @@ import {
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
-import { parseTranscription, parseTranscriptionWordsAndSegments, getContent } from "@/lib/parser/parser"
-import { useQuery } from "@tanstack/react-query"
-import { fetchUserCreditData } from "@/lib/api/user-credit"
+import { parseTranscription } from "@/lib/parser/parser"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { listUploads, deleteUpload } from "@/lib/api/uploads"
-import { UserCreditData } from "@/types/user"
 import { UploadFileMeta } from "@/types/uploads"
-import { useClientIdStore } from "@/stores/use-client-id-store"
 import { Input } from "@/components/ui/input"
 import { SettingsTranscription } from "./settings-transcription"
 import { uploadFile } from "@/lib/api/file-upload"
@@ -62,7 +59,6 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { SubtitleTranslated } from "@/types/subtitles"
 import { useRouter } from "next/navigation"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
 import { cn, calculateAudioDuration, createUtf8SubtitleBlob } from "@/lib/utils"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -70,6 +66,7 @@ import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { Label } from "../ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/transcription-segments"
+import { useTranscriptionHandler } from "@/hooks/handler/use-transcription-handler"
 
 interface TranscriptionMainProps {
   currentId: string
@@ -80,17 +77,12 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const title = useTranscriptionDataStore(state => state.getTitle(currentId))
   const transcriptionText = useTranscriptionDataStore(state => state.getTranscriptionText(currentId))
   const transcriptSubtitles = useTranscriptionDataStore(state => state.getTranscriptSubtitles(currentId))
-  const selectedMode = useTranscriptionDataStore(state => state.getSelectedMode(currentId))
-  const customInstructions = useTranscriptionDataStore(state => state.getCustomInstructions(currentId))
   const models = useTranscriptionDataStore(state => state.getModels(currentId))
-  const language = useTranscriptionDataStore(state => state.getLanguage(currentId))
   const words = useTranscriptionDataStore(state => state.getWords(currentId))
   const segments = useTranscriptionDataStore(state => state.getSegments(currentId))
   const setTitle = useTranscriptionDataStore(state => state.setTitle)
   const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)
   const setTranscriptSubtitles = useTranscriptionDataStore(state => state.setTranscriptSubtitles)
-  const setWords = useTranscriptionDataStore(state => state.setWords)
-  const setSegments = useTranscriptionDataStore(state => state.setSegments)
   const saveData = useTranscriptionDataStore(state => state.saveData)
 
   // Transcription store
@@ -98,9 +90,6 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const audioUrl = useTranscriptionStore((state) => state.audioUrls[currentId])
   const isTranscribingSet = useTranscriptionStore((state) => state.isTranscribingSet)
   const setFileAndUrl = useTranscriptionStore((state) => state.setFileAndUrl)
-  const setIsTranscribing = useTranscriptionStore((state) => state.setIsTranscribing)
-  const startTranscription = useTranscriptionStore((state) => state.startTranscription)
-  const stopTranscription = useTranscriptionStore((state) => state.stopTranscription)
   const isTranscribing = isTranscribingSet.has(currentId)
 
   // Upload & Delete mutations
@@ -172,13 +161,6 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     onError: (err: Error) => toast.error("Failed to delete", { description: err.message }),
   })
 
-  const { refetch: refetchUserData } = useQuery<UserCreditData>({
-    queryKey: ["user", session?.user?.id],
-    queryFn: fetchUserCreditData,
-    enabled: false,
-    staleTime: 0,
-  })
-
   // State
   const [isEditing, setIsEditing] = useState(false)
   const [selectedUploadId, setSelectedUploadId] = useState<string | null>(null)
@@ -232,85 +214,19 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     return () => { isCancelled = true }
   }, [file])
 
-  const handleStartTranscription = async () => {
-    await saveData(currentId)
-
-    if (!selectedUploadId) {
-      toast.error("Please upload or select an uploaded file first")
-      return
-    }
-    if (!models) {
-      toast.error("Please select a model")
-      return
-    }
-
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }, 300)
-
-    setIsTranscribing(currentId, true)
-    setHasChanges(true)
-
-    const t = useTranscriptionDataStore.getState().data[currentId]
-    const pid = t?.projectId
-    const project = pid ? await useProjectStore.getState().getProjectDb(pid) : null
-    const projectName = project?.name || ""
-
-    const requestBody = {
-      uploadId: selectedUploadId,
-      language,
-      selectedMode,
-      customInstructions,
-      models,
-      clientId: useClientIdStore.getState().clientId || "",
-      deleteFile: deleteAfterTranscription,
-      projectName,
-    }
-    console.log(requestBody)
-
-    try {
-      setWords(currentId, [])
-      setSegments(currentId, [])
-
-      const text = await startTranscription(
-        currentId,
-        requestBody,
-        (text) => setTranscriptionText(currentId, text),
-      )
-
-      const { words, segments } = parseTranscriptionWordsAndSegments(text)
-      setWords(currentId, words)
-      setSegments(currentId, segments)
-
-      const cleaned = getContent(text)
-      setTranscriptionText(currentId, cleaned)
-      setTranscriptSubtitles(currentId, parseTranscription(text))
-
-      if (deleteAfterTranscription) {
-        setSelectedUploadId(null)
-      }
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setIsTranscribing(currentId, false)
-
-      const isUsingCredits = !models.includes("free")
-      if (isUsingCredits) refetchUserData()
-
-      // Revalidate uploads list
-      queryClient.invalidateQueries({ queryKey: ["uploads"] })
-      await refetchUploads()
-      await saveData(currentId)
-    }
-  }
-
-  const handleStopTranscription = () => {
-    setIsTranscribing(currentId, false)
-    stopTranscription(currentId)
-  }
+  const {
+    handleStart: handleStartTranscription,
+    handleStop: handleStopTranscription,
+  } = useTranscriptionHandler({
+    state: {
+      currentId,
+      selectedUploadId,
+      setSelectedUploadId,
+    },
+    options: {
+      refetchUploads,
+    },
+  })
 
   const handleTranscriptionTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setTranscriptionText(currentId, e.target.value)
