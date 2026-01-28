@@ -134,6 +134,13 @@
   background: rgba(175, 175, 175, 0.3);
 }
 
+/* Make the scrollbar corner transparent to avoid a visible square */
+.overflow-x-auto::-webkit-scrollbar-corner,
+.overflow-y-auto::-webkit-scrollbar-corner,
+.overflow-auto::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
 /* Custom thinking animation with delay */
 @keyframes thinking {
   0%, 70%, 100% {

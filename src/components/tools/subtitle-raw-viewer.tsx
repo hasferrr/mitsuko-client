@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useMemo } from "react"
 import hljs from 'highlight.js/lib/core'
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { VirtualizedList } from "@/components/ui-custom/virtualized-list"
 
 interface SubtitleRawViewerProps {
   content: string
@@ -13,23 +14,21 @@ interface SubtitleRawViewerProps {
 }
 
 export default function SubtitleRawViewer({ content, fileName, enableHighlight, setEnableHighlight }: SubtitleRawViewerProps) {
-  const codeRef = useRef<HTMLElement>(null)
+  const lines = useMemo(() => content.split(/\r?\n/), [content])
 
-  useEffect(() => {
-    if (codeRef.current && content && enableHighlight) {
-      try {
-        codeRef.current.removeAttribute('data-highlighted')
-        hljs.highlightElement(codeRef.current)
-      } catch (error) {
-        console.error('Highlight error:', error)
-      }
+  const highlightText = (text: string) => {
+    try {
+      const highlighted = hljs.highlight(text, { language: 'ass' })
+      return highlighted.value
+    } catch {
+      return text
     }
-  }, [content, fileName, enableHighlight])
+  }
 
   if (!content) {
     return (
       <div className="text-muted-foreground text-sm">
-        No file loaded. Please select a subtitle file to view its raw content.
+        Please select a subtitle file to view its content.
       </div>
     )
   }
@@ -40,22 +39,34 @@ export default function SubtitleRawViewer({ content, fileName, enableHighlight, 
         <Checkbox id="enableHighlightRaw" checked={enableHighlight} onCheckedChange={(checked) => setEnableHighlight(Boolean(checked))} />
         <Label htmlFor="enableHighlightRaw">Syntax Highlight</Label>
       </div>
-      <div className="rounded-lg border overflow-auto">
-        <pre className="p-2 m-0">
-          {enableHighlight ? (
-            <code
-              ref={codeRef}
-              className="language-ass"
-              style={{ background: 'transparent', fontSize: '0.875rem' }}
-            >
-              {content}
-            </code>
-          ) : (
-            <p className="p-[0.875rem] text-[0.875rem]">
-              {content}
-            </p>
-          )}
-        </pre>
+      <div className="rounded-lg border">
+        <VirtualizedList
+          id={`subtitle-raw-${fileName}`}
+          items={lines.map((line, index) => ({ line, index }))}
+          className="h-[510px] overflow-auto p-2"
+          overscan={20}
+          estimatedItemHeight={21}
+          render={{
+            key: (item) => `raw-line-${item.index}`,
+            children: (item) => {
+              const displayLine = item.line.length === 0 ? "\u00A0" : item.line
+
+              return (
+                <div className="text-[0.875rem] whitespace-pre-wrap break-words">
+                  {enableHighlight ? (
+                    <pre
+                      className="hljs m-0"
+                      style={{ background: 'transparent' }}
+                      dangerouslySetInnerHTML={{ __html: highlightText(displayLine) }}
+                    />
+                  ) : (
+                      <pre className="text-[0.875rem]">{displayLine}</pre>
+                  )}
+                </div>
+              )
+            },
+          }}
+        />
       </div>
     </div>
   )

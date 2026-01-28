@@ -104,13 +104,6 @@ export default function Tools() {
       setSubtitleEvents(convertSubtitlesToSubtitleEvents(parseResult.subtitles))
     }
 
-    if (subtitleEvents.length) {
-      if (subtitleEvents.length >= 1000) {
-        setEnableHighlight(false)
-      }
-    } else if (subtitles.length >= 1000) {
-      setEnableHighlight(false)
-    }
     setRawContent(fileContent)
   }
 
@@ -278,8 +271,8 @@ export default function Tools() {
   }
 
   return (
-    <DragAndDrop onDropFiles={handleDropFiles}>
-      <div className="p-4">
+    <div className="container max-w-6xl mx-auto p-4">
+      <DragAndDrop onDropFiles={handleDropFiles}>
         <Tabs defaultValue="raw-text">
           <div className="flex justify-between items-center pb-4">
             <TabsList>
@@ -351,6 +344,7 @@ export default function Tools() {
 
           <TabsContent value="table-view">
             <SubtitleViewer
+              fileName={fileName}
               subtitleEvents={subtitleEvents}
               enableHighlight={enableHighlight}
               setEnableHighlight={setEnableHighlight}
@@ -359,7 +353,7 @@ export default function Tools() {
           </TabsContent>
 
         </Tabs>
-      </div>
-    </DragAndDrop>
+      </DragAndDrop>
+    </div>
   )
 }
