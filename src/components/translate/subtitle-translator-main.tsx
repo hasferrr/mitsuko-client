@@ -81,6 +81,7 @@ import { SubtitleProgress } from "./subtitle-progress"
 import { SubtitleResultOutput } from "./subtitle-result-output"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { UserCreditData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
@@ -141,6 +142,7 @@ export default function SubtitleTranslatorMain({
 
   // Other Store
   const session = useSessionStore((state) => state.session)
+  const isSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.isSubtitlePerformanceModeEnabled)
 
   // Other State
   const [activeTab, setActiveTab] = useState(isTranslating ? "result" : "basic")
@@ -166,12 +168,11 @@ export default function SubtitleTranslatorMain({
   const router = useRouter()
   const { setHasChanges } = useUnsavedChanges()
 
-  // Auto-show subtitles if count is less than 1000
   useEffect(() => {
-    if (subtitles.length < maxSubtitles) {
+    if (subtitles.length < maxSubtitles || isSubtitlePerformanceModeEnabled) {
       setSubtitlesHidden(false)
     }
-  }, [subtitles.length])
+  }, [subtitles.length, isSubtitlePerformanceModeEnabled])
 
   // Lazy user data query
   const { refetch: refetchUserData } = useQuery<UserCreditData>({
