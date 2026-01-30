@@ -23,6 +23,7 @@ import {
   ArrowLeft,
 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DeleteDialogue } from "@/components/ui-custom/delete-dialogue"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
@@ -599,7 +600,27 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                 </div>
 
                 {isUploadsLoading ? (
-                  <p>Loading uploads...</p>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {[...Array(2)].map((_, index) => (
+                      <div
+                        key={index}
+                        className="border rounded-md p-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-5 w-5" />
+                          <div className="flex-1 min-w-0">
+                            <Skeleton className="h-4 w-3/4 mb-2" />
+                            <div className="flex gap-1">
+                              <Skeleton className="h-3 w-16" />
+                              <Skeleton className="h-3 w-12" />
+                              <Skeleton className="h-3 w-12" />
+                            </div>
+                          </div>
+                          <Skeleton className="h-8 w-8" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 ) : uploads.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No uploaded files found. Please upload a file first.</p>
                 ) : (
