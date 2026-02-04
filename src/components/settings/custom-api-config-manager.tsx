@@ -116,7 +116,7 @@ export function CustomApiConfigManager() {
           onChange={(e) => setApiKey(e.target.value)}
           onBlur={handleBlur}
           placeholder="API Key"
-          className="pr-12"
+          className="pr-12 sentry-block ph-no-capture"
           disabled={selectedApiConfigIndex === null}
         />
         <Button
