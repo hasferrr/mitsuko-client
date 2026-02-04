@@ -6,6 +6,20 @@ export function isEscaped(str: string, index: number): boolean {
   return backslashes > 0 && backslashes % 2 !== 0
 }
 
+function removeTrailingComments(input: string): string {
+  const lines = input.split("\n").map((line) => {
+    let prev: string | null = null
+    for (let i = line.length - 1; i >= 0; i--) {
+      if (prev === '/' && line[i] === '/') {
+        return line.substring(0, i - 1)
+      }
+      prev = line[i]
+    }
+    return line
+  })
+  return lines.join("\n")
+}
+
 export function repairJson(input: string): string {
   let startIndex = input.lastIndexOf('{"subtitles"')
   if (startIndex === -1) {
@@ -73,5 +87,5 @@ export function repairJson(input: string): string {
     input += map.get(stack.pop()![0])
   }
 
-  return input
+  return removeTrailingComments(input)
 }

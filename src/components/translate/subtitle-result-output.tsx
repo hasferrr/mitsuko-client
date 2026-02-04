@@ -65,8 +65,8 @@ export const SubtitleResultOutput = memo(() => {
       const parsed = parseTranslationJson(editValue)
       setJsonResponse(currentId, parsed)
       setIsParseError(false)
-    } catch {
-      console.log("Failed to parse JSON. Please check the format.")
+    } catch (e) {
+      console.log("Failed to parse JSON. Please check the format.", e)
       setIsParseError(true)
       bottomTextareaRef?.current?.focus()
       return

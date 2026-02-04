@@ -6,8 +6,8 @@ function parseAndRepair(input: string): unknown {
   try {
     const repaired = repairJson(input)
     return JSON.parse(repaired)
-  } catch {
-    return "error parsing"
+  } catch (e) {
+    return e
   }
 }
 
@@ -24,7 +24,13 @@ const arr2 = wrapSub(_arr2)
 const arr1 = wrapSub(_arr1)
 
 
-const testData = [
+interface TestDataItem {
+  name?: string
+  input: string
+  expected: { subtitles: SubtitleNoTimeNoActorTranslated[] }
+}
+
+const testData: TestDataItem[] = [
   // empty test
   {
     input: "",
@@ -303,7 +309,31 @@ some stupid explanation
       content: 'test',
       translated: "test"
     }]),
-  }
+  },
+  // Trailing comments tests
+  {
+    name: "output with trailing comments",
+    input: `
+{
+  "subtitles": [
+    {"index": 201, "content": "Wouldn't imagine the strongest of our School is so romantic.", "translated": "Tak kusangka yang terkuat di Sekolah kami begitu romantis."}, // This is comment
+    {"index": 216, "content": "You were selected as \\"The Star of The Sky\\"", "translated": "Kau terpilih sebagai \\"Bintang Langit\\""} // This is comment
+  ]
+}
+`,
+    expected: wrapSub([
+      {
+        "index": 201,
+        "content": "Wouldn't imagine the strongest of our School is so romantic.",
+        "translated": "Tak kusangka yang terkuat di Sekolah kami begitu romantis."
+      },
+      {
+        "index": 216,
+        "content": "You were selected as \"The Star of The Sky\"",
+        "translated": "Kau terpilih sebagai \"Bintang Langit\""
+      },
+    ])
+  },
 ]
 
 describe("isEscaped", () => {
