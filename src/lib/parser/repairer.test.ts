@@ -334,6 +334,23 @@ some stupid explanation
       },
     ])
   },
+  // Trailing comma tests
+  {
+    name: "trailing comma before array close",
+    input: `{"subtitles":[
+      {"index":1,"content":"x","translated":"y"},
+      {"index":2,"content":"v","translated":"w"},
+    ],},`,
+    expected: arr2,
+  },
+  {
+    name: "trailing comma before object close",
+    input: `{"subtitles":[
+      {"index":1,"content":"x","translated":"y",},
+      {"index":2,"content":"v","translated":"w",},
+    ],},`,
+    expected: arr2,
+  },
 ]
 
 describe("isEscaped", () => {

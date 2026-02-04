@@ -6,6 +6,40 @@ export function isEscaped(str: string, index: number): boolean {
   return backslashes > 0 && backslashes % 2 !== 0
 }
 
+function isWhitespace(char: string): boolean {
+  return char === " " || char === "\n" || char === "\t" || char === "\r"
+}
+
+function removeTrailingCommas(input: string): string {
+  let result = ""
+  let inString = false
+
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i]
+
+    if (char === '"' && !isEscaped(input, i)) {
+      inString = !inString
+      result += char
+      continue
+    }
+
+    if (!inString && char === ",") {
+      let j = i + 1
+      while (j < input.length && isWhitespace(input[j])) {
+        j++
+      }
+
+      if (j < input.length && (input[j] === "]" || input[j] === "}")) {
+        continue
+      }
+    }
+
+    result += char
+  }
+
+  return result
+}
+
 function removeTrailingComments(input: string): string {
   const lines = input.split("\n").map((line) => {
     let prev: string | null = null
@@ -87,5 +121,5 @@ export function repairJson(input: string): string {
     input += map.get(stack.pop()![0])
   }
 
-  return removeTrailingComments(input)
+  return removeTrailingCommas(removeTrailingComments(input))
 }
