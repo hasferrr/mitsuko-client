@@ -97,12 +97,17 @@ function removeTrailingCommas(input: string): string {
 
 function removeTrailingComments(input: string): string {
   const lines = input.split("\n").map((line) => {
-    let prev: string | null = null
-    for (let i = line.length - 1; i >= 0; i--) {
-      if (prev === '/' && line[i] === '/') {
+    let inString = false
+    let prevChar = ''
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i]
+      if (char === '"' && prevChar !== '\\') {
+        inString = !inString
+      }
+      if (!inString && prevChar === '/' && char === '/') {
         return line.substring(0, i - 1)
       }
-      prev = line[i]
+      prevChar = char
     }
     return line
   })

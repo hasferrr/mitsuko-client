@@ -334,6 +334,38 @@ some stupid explanation
       },
     ])
   },
+  {
+    name: "double slash inside string should not be treated as comment",
+    input: `{"subtitles":[ // This is comment
+      {"index":1,"content":"Visit https://example.com/path","translated":"Kunjungi https://example.com/path"}, // This is comment
+      {"index":2,"content":"Check //server//folder","translated":"Periksa //server//folder"}
+    ]}`,
+    expected: wrapSub([
+      {
+        index: 1,
+        content: "Visit https://example.com/path",
+        translated: "Kunjungi https://example.com/path"
+      },
+      {
+        index: 2,
+        content: "Check //server//folder",
+        translated: "Periksa //server//folder"
+      }
+    ])
+  },
+  {
+    name: "double slash inside string should not be treated as comment v2",
+    input: `{"subtitles":[ // This is comment
+      {"index":1,"content":"Visit https://example.com/path","translated":"Kunjungi https://example.com/path"}, // This is comment
+      {"index":2,"content":"Check //server//`,
+    expected: wrapSub([
+      {
+        index: 1,
+        content: "Visit https://example.com/path",
+        translated: "Kunjungi https://example.com/path"
+      },
+    ])
+  },
   // Trailing comma tests
   {
     name: "trailing comma before array close",
