@@ -10,6 +10,61 @@ function isWhitespace(char: string): boolean {
   return char === " " || char === "\n" || char === "\t" || char === "\r"
 }
 
+function escapeUnescapedQuotes(input: string): string {
+  let result = ""
+  let inString = false
+  let inKey = false
+  let colonAfterKey = false
+
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i]
+
+    if (char === '"' && !isEscaped(input, i)) {
+      if (!inString) {
+        inString = true
+        inKey = !colonAfterKey
+        result += char
+        continue
+      }
+
+      if (inKey) {
+        inString = false
+        inKey = false
+        result += char
+        continue
+      }
+
+      // We're in a value string, check if this quote is ending the value
+      let j = i + 1
+      while (j < input.length && isWhitespace(input[j])) {
+        j++
+      }
+
+      const nextChar = input[j]
+      if (nextChar === ',' || nextChar === '}' || nextChar === ']') {
+        // This is a legitimate string ending
+        inString = false
+        colonAfterKey = false
+        result += char
+      } else {
+        // This is an unescaped quote inside the string, escape it
+        result += '\\"'
+      }
+      continue
+    }
+
+    if (!inString && char === ':') {
+      colonAfterKey = true
+    } else if (!inString && (char === ',' || char === '{' || char === '[')) {
+      colonAfterKey = false
+    }
+
+    result += char
+  }
+
+  return result
+}
+
 function removeTrailingCommas(input: string): string {
   let result = ""
   let inString = false
@@ -68,6 +123,8 @@ export function repairJson(input: string): string {
   }
 
   input = input.trim()
+
+  input = escapeUnescapedQuotes(input)
 
   type OpenBracket = "{" | "["
   type CloseBracket = "}" | "]"

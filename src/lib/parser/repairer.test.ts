@@ -351,6 +351,96 @@ some stupid explanation
     ],},`,
     expected: arr2,
   },
+  // Unescaped quote in string tests
+  {
+    name: "unescaped quote in string",
+    input: `{"subtitles": [
+      {"index":100,"content":"귀명 선수가 과거의 무시무시한 아이스크림 킥도 보여준 적 있고요.","translated":"Remember her deadly "ice cream" kicks?"},
+    ]}`,
+    expected: wrapSub([{
+      index: 100,
+      content: "귀명 선수가 과거의 무시무시한 아이스크림 킥도 보여준 적 있고요.",
+      translated: "Remember her deadly \"ice cream\" kicks?"
+    }]),
+  },
+  {
+    name: "unescaped nested quote in string",
+    input: `{"subtitles": [
+      {"index":100,"content":"aa"xxx"yy\\"z\\"yy"xxx"a","translated":""ok""}
+    ]}`,
+    expected: wrapSub([
+      {
+        index: 100,
+        content: `aa"xxx"yy"z"yy"xxx"a`,
+        translated: `"ok"`
+      },
+    ]),
+  },
+  {
+    name: "unescaped first quote in string",
+    input: `{"subtitles": [
+      {"index":100,"content":"aa"a\\"aa","translated":""ok""}
+    ]}`,
+    expected: wrapSub([
+      {
+        index: 100,
+        content: `aa"a"aa`,
+        translated: `"ok"`
+      },
+    ]),
+  },
+  {
+    name: "unescaped second quote in string",
+    input: `{"subtitles": [
+      {"index":100,"content":"aa\\"a"aa","translated":""ok""}
+    ]}`,
+    expected: wrapSub([
+      {
+        index: 100,
+        content: `aa"a"aa`,
+        translated: `"ok"`
+      },
+    ]),
+  },
+  {
+    name: "unescaped multiple quotes in string",
+    input: `{"subtitles": [
+      {"index":100,"content":"aaa"""""aa","translated":""ok""}
+    ]}`,
+    expected: wrapSub([
+      {
+        index: 100,
+        content: `aaa"""""aa`,
+        translated: `"ok"`
+      },
+    ]),
+  },
+  {
+    name: "unescaped nested multiple quotes in string",
+    input: `{"subtitles": [
+      {"index":100,"content":"aa"""bb"""""ccc"""""bb"""aa","translated":""ok""}
+    ]}`,
+    expected: wrapSub([
+      {
+        index: 100,
+        content: `aa"""bb"""""ccc"""""bb"""aa`,
+        translated: `"ok"`
+      },
+    ]),
+  },
+  {
+    name: "unescaped complex quotes in string",
+    input: `{"subtitles": [
+      {"index":100,"content":"a"\\"aaa""bbb\\"""\\"\\""""\\""ccc""\\"","translated":""ok""}
+    ]}`,
+    expected: wrapSub([
+      {
+        index: 100,
+        content: `a""aaa""bbb""""""""""ccc"""`,
+        translated: `"ok"`
+      },
+    ]),
+  },
 ]
 
 describe("isEscaped", () => {
