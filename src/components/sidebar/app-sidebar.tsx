@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   Box,
   Cloud,
@@ -83,6 +83,7 @@ export function AppSidebar({ className, ...props }: React.ComponentProps<typeof 
   const createProject = useProjectStore((state) => state.createProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const router = useRouter()
+  const pathname = usePathname()
 
   return (
     <Sidebar className={cn("z-20 -tracking-[0.01em]", className)} collapsible="icon" variant="floating" {...props}>
@@ -92,7 +93,16 @@ export function AppSidebar({ className, ...props }: React.ComponentProps<typeof 
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <AppSidebarMain items={data.navMain} />
+        <AppSidebarMain items={data.navMain.map(item => ({
+          ...item,
+          onClick: (item.url === "/project" || item.url === "/batch")
+            ? () => {
+              if (pathname.startsWith(item.url)) {
+                setCurrentProject(null)
+              }
+            }
+            : undefined
+        }))} />
         <AppSidebarProjects
           projects={visibleProjects}
           addButtonFn={() => {

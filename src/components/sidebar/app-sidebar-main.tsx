@@ -11,7 +11,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { useProjectStore } from "@/stores/data/use-project-store"
 
 interface Item {
   title: string
@@ -30,6 +32,8 @@ export function AppSidebarMain({
   items,
   label,
 }: AppSidebarMainProps) {
+  const pathname = usePathname()
+  const currentProject = useProjectStore((state) => state.currentProject)
   return (
     <SidebarGroup>
       <SidebarGroupLabel>
@@ -44,7 +48,17 @@ export function AppSidebarMain({
               rel={cn(item.newTab && "noopener noreferrer")}
               onClick={item.onClick}
             >
-              <SidebarMenuButton tooltip={item.title}>
+              <SidebarMenuButton
+                tooltip={item.title}
+                isActive={
+                  pathname.startsWith(item.url)
+                  && (
+                    item.url === "/batch"
+                      ? !currentProject?.isBatch || !currentProject
+                      : item.url === "/project" ? !currentProject : true
+                  )
+                }
+              >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
               </SidebarMenuButton>

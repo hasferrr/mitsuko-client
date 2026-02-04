@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Project } from "@/types/project"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { redirect } from "next/navigation"
+import { redirect, usePathname } from "next/navigation"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { ExportImportDialogue } from "../ui-custom/export-import-dialogue"
 import { useState } from "react"
@@ -49,6 +49,8 @@ export function AppSidebarProjects({
   showExportImport = true,
 }: AppSidebarProjectsProps) {
   const { isMobile } = useSidebar()
+  const pathname = usePathname()
+  const currentProject = useProjectStore((state) => state.currentProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
 
@@ -88,10 +90,22 @@ export function AppSidebarProjects({
       <SidebarMenu>
         {projects.map((project) => (
           <SidebarMenuItem key={project.id}>
-            <SidebarMenuButton onClick={() => {
-              setCurrentProject(project)
-              redirect(project.isBatch ? "/batch" : "/project")
-            }}>
+            <SidebarMenuButton
+              isActive={
+                currentProject?.id === project.id && (
+                  (project.isBatch
+                    ? (pathname.startsWith("/batch") || pathname.startsWith("/project"))
+                    : pathname.startsWith("/project"))
+                  || pathname.startsWith("/translate")
+                  || pathname.startsWith("/transcribe")
+                  || pathname.startsWith("/extract-context")
+                )
+              }
+              onClick={() => {
+                setCurrentProject(project)
+                redirect(project.isBatch ? "/batch" : "/project")
+              }}
+            >
               <span>{project.name}</span>
             </SidebarMenuButton>
             <DropdownMenu>
