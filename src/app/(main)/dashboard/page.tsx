@@ -1,4 +1,4 @@
-import { WelcomeView } from "@/components/dashboard/welcome-view"
+import { Dashboard } from "@/components/dashboard/dashboard"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
 import { Metadata } from "next"
 
@@ -10,6 +10,6 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <WelcomeView />
+    <Dashboard />
   )
 }
