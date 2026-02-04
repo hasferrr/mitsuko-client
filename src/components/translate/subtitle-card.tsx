@@ -8,6 +8,8 @@ import { SubtitleTranslated } from "@/types/subtitles"
 import { timestampToString } from "@/lib/subtitles/timestamp"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
+import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+import { cn } from "@/lib/utils"
 
 interface SubtitleCardProps {
   subtitle: SubtitleTranslated
@@ -19,6 +21,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
   const currentId = useTranslationDataStore((state) => state.currentId)
   const updateSubtitle = useTranslationDataStore((state) => state.updateSubtitle)
   const saveData = useTranslationDataStore((state) => state.saveData)
+  const isSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.isSubtitlePerformanceModeEnabled)
 
   const { setHasChanges } = useUnsavedChanges()
 
@@ -71,7 +74,10 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
   }, [])
 
   return (
-    <Card className="border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow">
+    <Card className={cn(
+      "border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow",
+      !isSubtitlePerformanceModeEnabled && subtitle.index > 10 && "sentry-block ph-no-capture",
+    )}>
       <CardContent className="p-4">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
