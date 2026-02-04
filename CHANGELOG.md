@@ -14,6 +14,10 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2026
 
+### February 4
+
+- 🐛 **More Reliable Translations:** Fixed rare issues where some AI models produced output that caused parse failures. Your translations should now complete more reliably!
+
 ### January 28
 
 - ⚡ **Performance Enhancements:** Optimized the subtitle list in translation and subtitle tools viewer for a smoother and faster experience. Added an option to disable performance mode in User Settings.
