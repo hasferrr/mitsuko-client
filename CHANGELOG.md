@@ -16,6 +16,7 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ### February 4
 
+- ↔️ **Resizable Sidebar:** You can now adjust the sidebar width by dragging the border and reset it with a middle-click.
 - 🐛 **More Reliable Translations:** Fixed rare issues where some AI models produced output that caused parse failures. Your translations should now complete more reliably!
 
 ### January 28
