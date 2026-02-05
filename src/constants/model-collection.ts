@@ -61,8 +61,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         usage: "N/A",
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 32768,
+          isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false
         }
       },
@@ -76,8 +75,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         usage: "N/A",
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 32768,
+          isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false
         }
       },
@@ -91,8 +89,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         usage: "N/A",
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 32768,
+          isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
       },
@@ -106,8 +103,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         usage: "N/A",
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 64000,
+          isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
       },
@@ -586,8 +582,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         usage: "low",
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 16000,
+          isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true,
         }
       },
@@ -600,8 +595,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         usage: "very low",
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 16000,
+          isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true,
         }
       },
@@ -620,8 +614,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         usage: "low",
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 32768,
+          isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false
         }
       },
@@ -635,8 +628,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         usage: "low",
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 32768,
+          isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
       },
@@ -650,8 +642,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         usage: "medium",
         default: {
           temperature: 0.6,
-          isMaxCompletionTokensAuto: false,
-          maxCompletionTokens: 32768,
+          isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false
         }
       },
