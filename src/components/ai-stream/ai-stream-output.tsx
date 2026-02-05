@@ -3,9 +3,9 @@
 import { Children, isValidElement, useEffect, useEffectEvent, useMemo, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { ChevronDown, ChevronRight } from "lucide-react"
-import { SubOnlyTranslated, SubtitleNoTimeTranslated } from "@/types/subtitles"
+import { SubtitleNoTimeNoActorTranslated, SubtitleNoTimeTranslated } from "@/types/subtitles"
 import { AiStreamSubtitle } from "./ai-stream-subtitle"
-import { parseTranslationJson } from "@/lib/parser/parser"
+import { parseTranslationJsonWithContent } from "@/lib/parser/parser"
 import ReactMarkdown from "react-markdown"
 
 interface AiStreamOutputProps {
@@ -31,7 +31,7 @@ export const AiStreamOutput = ({
   showThinking = true,
 }: AiStreamOutputProps) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(defaultCollapsed)
-  const [translatedSubtitles, setTranslatedSubtitles] = useState<SubOnlyTranslated[]>([])
+  const [translatedSubtitles, setTranslatedSubtitles] = useState<SubtitleNoTimeNoActorTranslated[]>([])
   const [initialSubtitles] = useState<SubtitleNoTimeTranslated[]>(subtitlesProp)
   const lastParseTimeRef = useRef<number>(0)
   const parseTimerRef = useRef<NodeJS.Timeout | null>(null)
@@ -44,11 +44,12 @@ export const AiStreamOutput = ({
       if (split[split.length - 1].startsWith("[")) {
         message.push({
           index: NaN,
-          translated: split[split.length - 1],
+          content: split[split.length - 1],
+          translated: "",
         })
         split.pop()
       }
-      const parsed = parseTranslationJson(split.join("\n"))
+      const parsed = parseTranslationJsonWithContent(split.join("\n"))
       parsed.push(...message)
       const changed =
         translatedSubtitles.length !== parsed.length ||

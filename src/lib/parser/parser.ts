@@ -22,6 +22,17 @@ export function parseTranslationJson(response: string): SubOnlyTranslated[] {
   }))
 }
 
+export function parseTranslationJsonWithContent(response: string): SubtitleNoTimeNoActorTranslated[] {
+  const repaired = repairJson(cleanUpJsonResponse(response))
+  const parsed = JSON.parse(repaired) as Record<"subtitles", SubtitleNoTimeNoActorTranslated[]> | SubtitleNoTimeNoActorTranslated[]
+  const subtitles = Array.isArray(parsed) ? parsed : parsed.subtitles
+  return subtitles.map((sub) => ({
+    index: sub.index,
+    content: sub.content || "",
+    translated: sub.translated || "",
+  }))
+}
+
 export function parseMitsukoTranscription(
   response: string,
   timeFormatter?: (params: {
