@@ -162,7 +162,7 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
           }}
           placeholder={isAsrModel(selectedModel)
             ? "Optional text to provide as a prompt for the first window."
-            : "Enter custom instructions for transcription..."
+            : "Enter custom instructions for transcription (leaving empty is recommended)"
           }
           className="min-h-[150px] h-[150px] max-h-[250px] resize-none overflow-y-auto"
         />
