@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import {
   DndContext,
   closestCenter,
@@ -37,7 +37,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useRouter } from "next/navigation"
 import { EditDialogue } from "../ui-custom/edit-dialogue"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
-import { db } from "@/lib/db/db"
+
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
@@ -99,24 +99,23 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const [extractions, setExtractions] = useState<Extraction[]>([])
   const [isLoadingData, setIsLoadingData] = useState(true)
 
-  const mutateTranslationData = useTranslationDataStore((state) => state.mutateData)
-  const removeTranslationData = useTranslationDataStore((state) => state.removeData)
-  const mutateTranscriptionData = useTranscriptionDataStore((state) => state.mutateData)
-  const removeTranscriptionData = useTranscriptionDataStore((state) => state.removeData)
-  const mutateExtractionData = useExtractionDataStore((state) => state.mutateData)
-  const removeExtractionData = useExtractionDataStore((state) => state.removeData)
-
   const createTranslationDb = useTranslationDataStore((state) => state.createTranslationDb)
   const updateTranslationDb = useTranslationDataStore((state) => state.updateTranslationDb)
   const deleteTranslationDb = useTranslationDataStore((state) => state.deleteTranslationDb)
+  const getTranslationDb = useTranslationDataStore((state) => state.getTranslationDb)
+  const getTranslationsDb = useTranslationDataStore((state) => state.getTranslationsDb)
 
   const createExtractionDb = useExtractionDataStore((state) => state.createExtractionDb)
   const updateExtractionDb = useExtractionDataStore((state) => state.updateExtractionDb)
   const deleteExtractionDb = useExtractionDataStore((state) => state.deleteExtractionDb)
+  const getExtractionDb = useExtractionDataStore((state) => state.getExtractionDb)
+  const getExtractionsDb = useExtractionDataStore((state) => state.getExtractionsDb)
 
   const createTranscriptionDb = useTranscriptionDataStore((state) => state.createTranscriptionDb)
   const updateTranscriptionDb = useTranscriptionDataStore((state) => state.updateTranscriptionDb)
   const deleteTranscriptionDb = useTranscriptionDataStore((state) => state.deleteTranscriptionDb)
+  const getTranscriptionDb = useTranscriptionDataStore((state) => state.getTranscriptionDb)
+  const getTranscriptionsDb = useTranscriptionDataStore((state) => state.getTranscriptionsDb)
 
   const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
   const isExtractingSet = useExtractionStore(state => state.isExtractingSet)
@@ -133,20 +132,66 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     const loadData = async () => {
       setIsLoadingData(true)
       const [translationsData, transcriptionsData, extractionsData] = await Promise.all([
-        db.translations.bulkGet(currentProject.translations),
-        db.transcriptions.bulkGet(currentProject.transcriptions),
-        db.extractions.bulkGet(currentProject.extractions)
+        getTranslationsDb(currentProject.translations),
+        getTranscriptionsDb(currentProject.transcriptions),
+        getExtractionsDb(currentProject.extractions)
       ])
 
-      setTranslations(translationsData.filter((t): t is Translation => !!t).reverse())
-      setTranscriptions(transcriptionsData.filter((t): t is Transcription => !!t).reverse())
-      setExtractions(extractionsData.filter((e): e is Extraction => !!e).reverse())
+      setTranslations(translationsData.reverse())
+      setTranscriptions(transcriptionsData.reverse())
+      setExtractions(extractionsData.reverse())
       setIsLoadingData(false)
     }
 
     loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentProject.id])
+
+  const prevTranslatingRef = useRef<Set<string>>(new Set())
+  const prevExtractingRef = useRef<Set<string>>(new Set())
+  const prevTranscribingRef = useRef<Set<string>>(new Set())
+
+  useEffect(() => {
+    const prevSet = prevTranslatingRef.current
+    for (const id of prevSet) {
+      if (!isTranslatingSet.has(id)) {
+        getTranslationDb(id, true).then(updated => {
+          if (updated) {
+            setTranslations(prev => prev.map(t => t.id === id ? updated : t))
+          }
+        })
+      }
+    }
+    prevTranslatingRef.current = new Set(isTranslatingSet)
+  }, [getTranslationDb, isTranslatingSet])
+
+  useEffect(() => {
+    const prevSet = prevExtractingRef.current
+    for (const id of prevSet) {
+      if (!isExtractingSet.has(id)) {
+        getExtractionDb(id, true).then(updated => {
+          if (updated) {
+            setExtractions(prev => prev.map(e => e.id === id ? updated : e))
+          }
+        })
+      }
+    }
+    prevExtractingRef.current = new Set(isExtractingSet)
+  }, [getExtractionDb, isExtractingSet])
+
+  useEffect(() => {
+    const prevSet = prevTranscribingRef.current
+    for (const id of prevSet) {
+      if (!isTranscribingSet.has(id)) {
+        getTranscriptionDb(id, true).then(updated => {
+          if (updated) {
+            setTranscriptions(prev => prev.map(t => t.id === id ? updated : t))
+          }
+        })
+      }
+    }
+    prevTranscribingRef.current = new Set(isTranscribingSet)
+  }, [getTranscriptionDb, isTranscribingSet])
 
   // Drag and drop handlers
   function handleDragEnd(event: DragEndEvent, type: 'translation' | 'transcription' | 'extraction') {
@@ -259,12 +304,10 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         date={translation.updatedAt.toLocaleDateString()}
         handleEdit={async (newName) => {
           const updated = await updateTranslationDb(translation.id, { title: newName })
-          mutateTranslationData(translation.id, "title", newName)
           setTranslations(prev => prev.map(t => t.id === translation.id ? updated : t))
         }}
         handleDelete={async () => {
           await deleteTranslationDb(currentProject.id, translation.id)
-          removeTranslationData(translation.id)
           {
             const storeProject = useProjectStore.getState().currentProject
             const base = storeProject && storeProject.id === currentProject.id ? storeProject.translations : currentProject.translations
@@ -294,12 +337,10 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       date={transcription.createdAt.toLocaleDateString()}
       handleEdit={async (newName) => {
         const updated = await updateTranscriptionDb(transcription.id, { title: newName })
-        mutateTranscriptionData(transcription.id, "title", newName)
         setTranscriptions(prev => prev.map(t => t.id === transcription.id ? updated : t))
       }}
       handleDelete={async () => {
         await deleteTranscriptionDb(currentProject.id, transcription.id)
-        removeTranscriptionData(transcription.id)
         {
           const storeProject = useProjectStore.getState().currentProject
           const base = storeProject && storeProject.id === currentProject.id ? storeProject.transcriptions : currentProject.transcriptions
@@ -329,12 +370,10 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       date={extraction.updatedAt.toLocaleDateString()}
       handleEdit={async (newName) => {
         const updated = await updateExtractionDb(extraction.id, { episodeNumber: newName })
-        mutateExtractionData(extraction.id, "episodeNumber", newName)
         setExtractions(prev => prev.map(e => e.id === extraction.id ? updated : e))
       }}
       handleDelete={async () => {
         await deleteExtractionDb(currentProject.id, extraction.id)
-        removeExtractionData(extraction.id)
         {
           const storeProject = useProjectStore.getState().currentProject
           const base = storeProject && storeProject.id === currentProject.id ? storeProject.extractions : currentProject.extractions

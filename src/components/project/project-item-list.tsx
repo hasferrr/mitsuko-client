@@ -85,30 +85,21 @@ export const ProjectItemList = ({
     switch (type) {
       case "translation":
         if (!(id in translationData)) {
-          const translation = await getTranslationDb(id)
-          if (translation) {
-            upsertTranslationData(id, translation)
-          }
+          await getTranslationDb(id)
         }
         setCurrentTranslationId(id)
         router.push("/translate")
         break
       case "transcription":
         if (!(id in transcriptionData)) {
-          const transcription = await getTranscriptionDb(id)
-          if (transcription) {
-            upsertTranscriptionData(id, transcription)
-          }
+          await getTranscriptionDb(id)
         }
         setCurrentTranscriptionId(id)
         router.push("/transcribe")
         break
       case "extraction":
         if (!(id in extractionData)) {
-          const extraction = await getExtractionDb(id)
-          if (extraction) {
-            upsertExtractionData(id, extraction)
-          }
+          await getExtractionDb(id)
         }
         setCurrentExtractionId(id)
         router.push("/extract-context")

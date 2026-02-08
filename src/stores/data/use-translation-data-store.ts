@@ -24,7 +24,7 @@ export interface TranslationDataStore {
     basicSettingsData?: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
     advancedSettingsData?: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Translation>
-  getTranslationDb: (translationId: string) => Promise<Translation | undefined>
+  getTranslationDb: (translationId: string, skipStoreUpdate?: boolean) => Promise<Translation | undefined>
   getTranslationsDb: (translationIds: string[]) => Promise<Translation[]>
   updateTranslationDb: (translationId: string, changes: Partial<Pick<Translation, "title" | "subtitles" | "parsed">>) => Promise<Translation>
   deleteTranslationDb: (projectId: string, translationId: string) => Promise<void>
@@ -103,9 +103,9 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
 
     return translation
   },
-  getTranslationDb: async (translationId) => {
+  getTranslationDb: async (translationId, skipStoreUpdate) => {
     const translation = await getDB(translationId)
-    if (translation) {
+    if (translation && !skipStoreUpdate) {
       set(state => ({ data: { ...state.data, [translationId]: translation } }))
     }
     return translation

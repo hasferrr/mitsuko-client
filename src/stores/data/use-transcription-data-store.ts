@@ -6,6 +6,7 @@ import {
   getTranscription as getDB,
   deleteTranscription as deleteDB,
 } from "@/lib/db/transcription"
+import { db } from "@/lib/db/db"
 import { Subtitle } from "@/types/subtitles"
 import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
 
@@ -14,7 +15,8 @@ interface TranscriptionDataStore {
   data: Record<string, Transcription>
   // CRUD methods
   createTranscriptionDb: (projectId: string, data: Parameters<typeof createDB>[1]) => Promise<Transcription>
-  getTranscriptionDb: (transcriptionId: string) => Promise<Transcription | undefined>
+  getTranscriptionDb: (transcriptionId: string, skipStoreUpdate?: boolean) => Promise<Transcription | undefined>
+  getTranscriptionsDb: (transcriptionIds: string[]) => Promise<Transcription[]>
   updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language" | "selectedUploadId">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
   // getters
@@ -57,12 +59,26 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     set(state => ({ data: { ...state.data, [transcription.id]: transcription } }))
     return transcription
   },
-  getTranscriptionDb: async (transcriptionId) => {
+  getTranscriptionDb: async (transcriptionId, skipStoreUpdate) => {
     const transcription = await getDB(transcriptionId)
-    if (transcription) {
+    if (transcription && !skipStoreUpdate) {
       set(state => ({ data: { ...state.data, [transcriptionId]: transcription } }))
     }
     return transcription
+  },
+  getTranscriptionsDb: async (transcriptionIds) => {
+    if (transcriptionIds.length === 0) return []
+    const transcriptions = await db.transcriptions.bulkGet(transcriptionIds)
+    const found: Transcription[] = transcriptions.filter((t): t is Transcription => t !== undefined)
+    if (found.length) {
+      set(state => ({
+        data: {
+          ...state.data,
+          ...Object.fromEntries(found.map(t => [t.id, t]))
+        }
+      }))
+    }
+    return found
   },
   updateTranscriptionDb: async (transcriptionId, changes) => {
     const transcription = await updateDB(transcriptionId, changes)

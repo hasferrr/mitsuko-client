@@ -23,7 +23,7 @@ export interface ExtractionDataStore {
     basicSettingsData?: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
     advancedSettingsData?: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Extraction>
-  getExtractionDb: (extractionId: string) => Promise<Extraction | undefined>
+  getExtractionDb: (extractionId: string, skipStoreUpdate?: boolean) => Promise<Extraction | undefined>
   getExtractionsDb: (extractionIds: string[]) => Promise<Extraction[]>
   updateExtractionDb: (extractionId: string, changes: Partial<Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext">>) => Promise<Extraction>
   deleteExtractionDb: (projectId: string, extractionId: string) => Promise<void>
@@ -105,9 +105,9 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
 
     return extraction
   },
-  getExtractionDb: async (extractionId) => {
+  getExtractionDb: async (extractionId, skipStoreUpdate) => {
     const extraction = await getDB(extractionId)
-    if (extraction) {
+    if (extraction && !skipStoreUpdate) {
       set(state => ({ data: { ...state.data, [extractionId]: extraction } }))
     }
     return extraction
