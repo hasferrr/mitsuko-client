@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useSnapStore } from "@/stores/use-snap-store"
 import { ProductId } from "@/types/product"
-import { CreditCard, Loader2, Minus, Plus } from "lucide-react"
+import { CreditCard, Info, Loader2, Minus, Plus } from "lucide-react"
 import { useSnapPayment } from "@/hooks/use-snap-payment"
 import { useLemonSqueezyCache } from "@/hooks/use-lemonsqueezy-cache"
 import { toast } from "sonner"
@@ -21,6 +21,8 @@ import { useState, useEffect, useRef } from "react"
 import { sleep } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { createPaymentLink } from "@/lib/api/create-snap-payment"
 import LemonSqueezyLogo from "@/static/lemonsqueezy.svg"
 import Image from "next/image"
@@ -53,6 +55,7 @@ export function PaymentOptionsDialog({
   const [isFetchingPayment, setIsFetchingPayment] = useState(false)
   const [paymentError, setPaymentError] = useState<string | null>(null)
   const [inputQuantity, setInputQuantity] = useState(1)
+  const [hasConsented, setHasConsented] = useState(false)
   const lemonSqueezyCache = useLemonSqueezyCache()
 
   const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -82,6 +85,10 @@ export function PaymentOptionsDialog({
   }, [isOpen, productId])
 
   const fetchAndProceed = async (paymentType: 'snap' | 'lemonsqueezy') => {
+    if (!hasConsented) {
+      toast.error("Please agree to the terms before proceeding.")
+      return
+    }
     if (!userId) {
       toast.error("Please sign in to proceed.")
       return
@@ -248,12 +255,12 @@ export function PaymentOptionsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col sm:flex-row gap-8 py-4 px-1 overflow-y-auto">
+        <div className="flex flex-col sm:flex-row gap-8 py-2 px-1 overflow-y-auto">
           <div className="flex-1 space-y-4">
             <h3 className="text-lg font-semibold mb-3">Payment Method</h3>
             <button
               onClick={handlePopup}
-              disabled={isFetchingPayment}
+              disabled={isFetchingPayment || !hasConsented}
               className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isFetchingPayment ? (
@@ -274,7 +281,7 @@ export function PaymentOptionsDialog({
 
             <button
               onClick={handleNewTab}
-              disabled={isFetchingPayment}
+              disabled={isFetchingPayment || !hasConsented}
               className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isFetchingPayment ? (
@@ -295,6 +302,33 @@ export function PaymentOptionsDialog({
                 </p>
               </div>
             </button>
+
+            <div className="flex items-center space-x-2 border-border">
+              <Checkbox
+                id="consent"
+                checked={hasConsented}
+                onCheckedChange={(checked) => setHasConsented(checked === true)}
+                disabled={isFetchingPayment}
+              />
+              <div className="flex items-center gap-1">
+                <Label htmlFor="consent" className="text-xs text-[11px] text-muted-foreground leading-tight cursor-pointer">
+                  I expressly request immediate access and acknowledge I lose any statutory right of withdrawal or any cooling-off period once credits are delivered.
+                </Label>
+                <TooltipProvider delayDuration={50}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0 cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs text-[11px]">
+                      <p>
+                        Digital credits are delivered immediately and cannot be returned once accessed.
+                        By checking this box, you confirm waiver of any refund rights under applicable consumer protection laws, including 14-day cooling-off periods where applicable.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
           </div>
 
           <div className="flex-1 space-y-4 sm:border-l border-border sm:pl-8 px-2">
