@@ -7,7 +7,7 @@ interface WhichModelsProps {
 export default function WhichModels({ className }: WhichModelsProps) {
   const costEffectiveModels = [
     'Gemini 2.0 Flash',
-    'GPT-4.1 mini',
+    'GPT-5 mini',
   ]
 
   return (

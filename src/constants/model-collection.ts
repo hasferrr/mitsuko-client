@@ -66,7 +66,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "DeepSeek V3.2 Thinking",
+        name: "DeepSeek V3.2 (Thinking)",
         subName: "deepseek-v3.2 / deepseek-reasoner",
         maxInput: 131072,
         maxOutput: 65536,
@@ -103,6 +103,20 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         usage: "N/A",
         default: {
           temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Gemini 3 Flash",
+        subName: "gemini-3-flash-preview",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -148,20 +162,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
           isUseStructuredOutput: true
         }
       },
-      {
-        name: "Mistral Small 3",
-        subName: "mistral-small-3.2-24b-instruct",
-        maxInput: 128000,
-        maxOutput: 128000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
     ]
   },
 }
@@ -172,6 +172,20 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     models: [
       {
         name: "Gemini 3 Pro",
+        subName: "gemini-3-pro-preview",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "high",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Gemini 3 Pro (Low)",
         subName: "gemini-3-pro-preview",
         maxInput: 1_048_576,
         maxOutput: 65536,
@@ -524,88 +538,11 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       },
     ]
   },
-  Mistral: {
-    provider: "mistral",
-    models: [
-      {
-        name: "Mistral Medium 3",
-        subName: "mistral-medium-3.1",
-        maxInput: 128000,
-        maxOutput: 128000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "below medium",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Mistral Small 3",
-        subName: "mistral-small-3.2-24b-instruct",
-        maxInput: 128000,
-        maxOutput: 128000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "very low",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Mistral Nemo",
-        maxInput: 128000,
-        maxOutput: 128000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "very low",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      }
-    ]
-  },
-  Qwen: {
-    provider: "qwen",
-    models: [
-      {
-        name: "Qwen3 235B A22B 2507",
-        maxInput: 262000,
-        maxOutput: 262000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "low",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true,
-        }
-      },
-      {
-        name: "Qwen3 30B A3B 2507",
-        maxInput: 262000,
-        maxOutput: 262000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "very low",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true,
-        }
-      },
-    ]
-  },
   DeepSeek: {
     provider: "deepseek",
     models: [
       {
-        name: "DeepSeek V3.2 Thinking",
+        name: "DeepSeek V3.2 (Thinking)",
         subName: "deepseek-v3.2 / deepseek-reasoner",
         maxInput: 131072,
         maxOutput: 65536,

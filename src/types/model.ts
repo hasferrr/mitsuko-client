@@ -4,9 +4,7 @@ export type ModelProvider =
   | "google"
   | "anthropic"
   | "openai"
-  | "mistral"
   | "deepseek"
-  | "qwen"
   | "xai"
   | "unknown"
 
