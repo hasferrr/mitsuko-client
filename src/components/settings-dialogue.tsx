@@ -134,7 +134,6 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
               <ModelSelection
                 basicSettingsId={basicSettingsId}
                 advancedSettingsId={advancedSettingsId}
-                showUseCustomModelSwitch={false}
               />
               <Accordion type="multiple" className="border-none space-y-4">
                 <AccordionItem value="advanced-settings" className="border-none">
@@ -160,7 +159,6 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
               <ModelSelection
                 basicSettingsId={basicSettingsId}
                 advancedSettingsId={advancedSettingsId}
-                showUseCustomModelSwitch={false}
               />
               <Accordion type="multiple" className="border-none space-y-4">
                 <AccordionItem value="context-settings" className="border-none">
