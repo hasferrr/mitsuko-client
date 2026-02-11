@@ -307,13 +307,11 @@ export const useTranslationHandler = ({
 
       const requestBody = {
         title: title.slice(0, 150),
-        subtitles: {
-          subtitles: chunk.map((s) => ({
-            index: s.index,
-            actor: s.actor,
-            content: s.content,
-          }))
-        },
+        subtitles: chunk.map((s) => ({
+          index: s.index,
+          actor: s.actor,
+          content: s.content,
+        })),
         sourceLanguage,
         targetLanguage,
         contextDocument,
@@ -440,8 +438,8 @@ export const useTranslationHandler = ({
             )
           }
 
-          const lastUser = requestBody.subtitles.subtitles
-          const lastAssistant = requestBody.subtitles.subtitles.map((s, subIndex) => ({
+          const lastUser = requestBody.subtitles
+          const lastAssistant = requestBody.subtitles.map((s, subIndex) => ({
             index: s.index,
             content: s.content,
             translated: tlChunk[subIndex]?.translated || "",

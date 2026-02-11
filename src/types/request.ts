@@ -6,9 +6,7 @@ export type RequestType = "free" | "paid" | "custom"
 
 export interface TranslationRequestBody {
   title: string
-  subtitles: {
-    subtitles: SubtitleNoTime[]
-  }
+  subtitles: SubtitleNoTime[]
   sourceLanguage: string
   targetLanguage: string
   contextDocument: string
