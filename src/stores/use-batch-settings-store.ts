@@ -1,29 +1,26 @@
 import { create } from "zustand"
 
 interface BatchSettingsStore {
-  /**
-   * Set of batch project IDs that are in individual-settings mode
-   * (i.e. NOT using shared batch settings).
-   */
   individualIds: Set<string>
-  /** Concurrent translation count per batch project */
   concurrentMap: Record<string, number>
-  /** Extraction mode per batch project */
   extractionModeMap: Record<string, "independent" | "sequential">
 
-  /**
-   * Enable/disable shared settings for a given batch project.
-   * If `useShared` is false the ID is placed into `individualIds`.
-   */
+  getIsUseSharedSettings: (projectId: string | null | undefined) => boolean
+  getConcurrent: (projectId: string | null | undefined) => number
+  getExtractionMode: (projectId: string | null | undefined) => "independent" | "sequential"
+
   setUseSharedSettings: (projectId: string, useShared: boolean) => void
   setConcurrentTranslations: (projectId: string, value: number) => void
   setExtractionMode: (projectId: string, mode: "independent" | "sequential") => void
 }
 
-export const useBatchSettingsStore = create<BatchSettingsStore>((set) => ({
+export const useBatchSettingsStore = create<BatchSettingsStore>((set, get) => ({
   individualIds: new Set<string>(),
   concurrentMap: {} as Record<string, number>,
   extractionModeMap: {} as Record<string, "independent" | "sequential">,
+  getIsUseSharedSettings: (projectId) => !get().individualIds.has(projectId ?? ""),
+  getConcurrent: (projectId) => get().concurrentMap[projectId ?? ""] ?? 3,
+  getExtractionMode: (projectId) => get().extractionModeMap[projectId ?? ""] ?? "sequential",
   setUseSharedSettings: (projectId, useShared) =>
     set((state) => {
       const newSet = new Set(state.individualIds)

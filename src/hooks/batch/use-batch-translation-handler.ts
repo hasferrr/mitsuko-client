@@ -52,8 +52,8 @@ export default function useBatchTranslationHandler({
   const currentProject = useProjectStore((state) => state.currentProject)
 
   // Batch Settings Store
-  const isUseSharedSettings = useBatchSettingsStore(state => !state.individualIds.has(currentProject?.id ?? ""))
-  const concurrentTranslations = useBatchSettingsStore(state => state.concurrentMap[currentProject?.id ?? ""] ?? 3)
+  const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
+  const concurrentTranslations = useBatchSettingsStore(state => state.getConcurrent(currentProject?.id))
 
   // Translation Data Store
   const translationData = useTranslationDataStore((state) => state.data)

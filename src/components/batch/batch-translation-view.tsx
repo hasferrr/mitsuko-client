@@ -102,9 +102,9 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
   }, [currentProject?.translations])
 
   // Settings Stores
-  const isUseSharedSettings = useBatchSettingsStore(state => !state.individualIds.has(currentProject?.id ?? ""))
+  const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
   const setUseSharedSettings = useBatchSettingsStore(state => state.setUseSharedSettings)
-  const concurrentOperation = useBatchSettingsStore(state => state.concurrentMap[currentProject?.id ?? ""] ?? 3)
+  const concurrentOperation = useBatchSettingsStore(state => state.getConcurrent(currentProject?.id))
   const setConcurrentOperation = useBatchSettingsStore(state => state.setConcurrentTranslations)
 
   const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))

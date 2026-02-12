@@ -107,11 +107,11 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
   }, [currentProject?.extractions])
 
   // Settings Stores
-  const isUseSharedSettings = useBatchSettingsStore(state => !state.individualIds.has(currentProject?.id ?? ""))
+  const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
   const setUseSharedSettings = useBatchSettingsStore(state => state.setUseSharedSettings)
-  const concurrentOperation = useBatchSettingsStore(state => state.concurrentMap[currentProject?.id ?? ""] ?? 3)
+  const concurrentOperation = useBatchSettingsStore(state => state.getConcurrent(currentProject?.id))
   const setConcurrentOperation = useBatchSettingsStore(state => state.setConcurrentTranslations)
-  const extractionMode = useBatchSettingsStore(state => state.extractionModeMap[currentProject?.id ?? ""] ?? "sequential")
+  const extractionMode = useBatchSettingsStore(state => state.getExtractionMode(currentProject?.id))
   const setExtractionMode = useBatchSettingsStore(state => state.setExtractionMode)
 
   const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
