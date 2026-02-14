@@ -158,7 +158,9 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     onSuccess: () => {
       toast.success("File deleted")
       queryClient.invalidateQueries({ queryKey: ["uploads"] })
-      setSelectedUploadId(currentId, null)
+      if (pendingDeleteId === selectedUploadId) {
+        setSelectedUploadId(currentId, null)
+      }
       setIsDeleteDialogOpen(false)
     },
     onError: (err: Error) => toast.error("Failed to delete", { description: err.message }),
