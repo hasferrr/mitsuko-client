@@ -5,7 +5,7 @@ import { Card, CardHeader } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Loader2 } from 'lucide-react'
 
-export function GlobalUploadIndicator() {
+export function UploadIndicator() {
   const uploadProgress = useUploadStore(state => state.uploadProgress)
   const isUploading = useUploadStore(state => state.isUploading)
 

@@ -1,11 +1,11 @@
 import { Footer } from "@/components/footer"
-import { GlobalUploadIndicator } from "@/components/ui-custom/global-upload-indicator"
+import { UploadIndicator } from "@/components/upload-indicator"
 import { Navbar } from "@/components/navbar"
 import { PropsWithChildren } from "react"
 import { AppSidebarWrapper } from "@/components/sidebar/app-sidebar-wrapper"
 import { Metadata } from "next"
 import { META_TITLE } from "@/constants/metadata"
-import { RoutePrefetcher } from "@/components/route-prefetcher"
+import { FeaturesPrefetcher } from "@/components/features-prefetcher"
 
 export const metadata: Metadata = {
   title: META_TITLE,
@@ -16,8 +16,8 @@ export default function Layout({ children }: PropsWithChildren) {
     <div className="bg-background text-foreground min-h-screen">
       <AppSidebarWrapper header={<Navbar />}>
         <div className="flex flex-col min-h-[calc(100vh-3.6rem)]">
-          <GlobalUploadIndicator />
-          <RoutePrefetcher />
+          <UploadIndicator />
+          <FeaturesPrefetcher />
           <div className="md:mx-8 flex flex-grow">
             {children}
           </div>

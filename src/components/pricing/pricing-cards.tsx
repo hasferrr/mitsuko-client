@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Check, X } from "lucide-react"
 import { Button } from "../ui/button"
 import { cn } from "@/lib/utils"
-import { ComingSoonTooltipWrapper } from "@/components/ui-custom/coming-soon-tooltip-wrapper"
+import { ComingSoonTooltipWrapper } from "@/components/coming-soon-tooltip-wrapper"
 import { useRouter } from "next/navigation"
 
 interface Currency {

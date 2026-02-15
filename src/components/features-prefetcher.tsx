@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 
-export function useRoutePrefetch() {
+export const FeaturesPrefetcher = () => {
   const router = useRouter()
 
   useEffect(() => {
@@ -11,4 +11,6 @@ export function useRoutePrefetch() {
     router.prefetch('/transcribe')
     router.prefetch('/extract-context')
   }, [router])
+
+  return null
 }
