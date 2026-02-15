@@ -96,9 +96,10 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const isTranscribing = isTranscribingSet.has(currentId)
 
   // Upload & Delete mutations
-  const uploadProgress = useUploadStore((state) => state.uploadProgress)
-  const isUploading = useUploadStore((state) => state.isUploading)
-  const setUploadProgress = useUploadStore((state) => state.setUploadProgress)
+  const upload = useUploadStore((state) => state.getUpload(currentId))
+  const uploadProgress = upload?.progress
+  const isUploading = useUploadStore((state) => state.getIsUploading(currentId))
+  const setUpload = useUploadStore((state) => state.setUpload)
   const setIsUploading = useUploadStore((state) => state.setIsUploading)
 
   // Other stores
@@ -127,15 +128,14 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   })
 
   const { mutate: handleUpload } = useMutation({
-    mutationFn: (file: File) => uploadFile(file, setUploadProgress),
+    mutationFn: (file: File) => uploadFile(file, (progress) => setUpload(currentId, { progress, fileName: file.name })),
     onMutate: () => {
-      setIsUploading(true)
-      setUploadProgress(null)
+      setIsUploading(currentId, true)
     },
     onSuccess: (uploadId) => {
       toast.success("File uploaded successfully")
       queryClient.invalidateQueries({ queryKey: ["uploads"] })
-      setUploadProgress(null)
+      setUpload(currentId, null)
       if (fileInputRef.current) fileInputRef.current.value = ""
       setFileAndUrl(currentId, null)
       setActiveTab("select")
@@ -148,9 +148,9 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     },
     onError: (err: Error) => {
       toast.error("Failed to upload file", { description: err.message })
-      setUploadProgress(null)
+      setUpload(currentId, null)
     },
-    onSettled: () => setIsUploading(false),
+    onSettled: () => setIsUploading(currentId, false),
   })
 
   const { mutate: deleteFile, isPending: isDeleting } = useMutation({

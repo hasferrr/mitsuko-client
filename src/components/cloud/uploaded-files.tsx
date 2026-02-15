@@ -79,8 +79,11 @@ export default function UploadedFiles() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
-  const uploadProgress = useUploadStore(state => state.uploadProgress)
-  const setUploadProgress = useUploadStore(state => state.setUploadProgress)
+  const CLOUD_UPLOAD_ID = 'cloud'
+
+  const upload = useUploadStore(state => state.getUpload(CLOUD_UPLOAD_ID))
+  const uploadProgress = upload?.progress
+  const setUpload = useUploadStore(state => state.setUpload)
   const setIsUploading = useUploadStore(state => state.setIsUploading)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -109,15 +112,14 @@ export default function UploadedFiles() {
   })
 
   const { mutate: handleUpload } = useMutation({
-    mutationFn: (file: File) => uploadFile(file, setUploadProgress),
+    mutationFn: (file: File) => uploadFile(file, (progress) => setUpload(CLOUD_UPLOAD_ID, { progress, fileName: file.name })),
     onMutate: () => {
-      setIsUploading(true)
-      setUploadProgress(null)
+      setIsUploading(CLOUD_UPLOAD_ID, true)
     },
     onSuccess: () => {
       toast.success('File uploaded successfully')
       queryClient.invalidateQueries({ queryKey: ['uploads'] })
-      setUploadProgress(null)
+      setUpload(CLOUD_UPLOAD_ID, null)
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
@@ -126,10 +128,10 @@ export default function UploadedFiles() {
       toast.error('Failed to upload file', {
         description: error.message,
       })
-      setUploadProgress(null)
+      setUpload(CLOUD_UPLOAD_ID, null)
     },
     onSettled: () => {
-      setIsUploading(false)
+      setIsUploading(CLOUD_UPLOAD_ID, false)
     },
   })
 

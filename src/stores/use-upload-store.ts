@@ -1,16 +1,26 @@
 import { create } from 'zustand'
-import type { UploadProgress } from '@/lib/api/file-upload'
+import type { ClientUploadState } from '@/types/uploads'
 
 interface UploadStore {
-  uploadProgress: UploadProgress | null
-  isUploading: boolean
-  setUploadProgress: (progress: UploadProgress | null) => void
-  setIsUploading: (value: boolean) => void
+  uploadMap: Record<string, ClientUploadState | undefined>
+  isUploadingMap: Record<string, boolean>
+  setUpload: (id: string, upload: ClientUploadState | null) => void
+  setIsUploading: (id: string, value: boolean) => void
+  getUpload: (id: string) => ClientUploadState | undefined
+  getIsUploading: (id: string) => boolean
 }
 
-export const useUploadStore = create<UploadStore>()((set) => ({
-  uploadProgress: null,
-  isUploading: false,
-  setUploadProgress: (progress) => set({ uploadProgress: progress }),
-  setIsUploading: (value) => set({ isUploading: value }),
+export const useUploadStore = create<UploadStore>()((set, get) => ({
+  uploadMap: {},
+  isUploadingMap: {},
+  setUpload: (id, upload) => set((state) => ({
+    uploadMap: upload
+      ? { ...state.uploadMap, [id]: upload }
+      : Object.fromEntries(Object.entries(state.uploadMap).filter(([key]) => key !== id))
+  })),
+  setIsUploading: (id, value) => set((state) => ({
+    isUploadingMap: { ...state.isUploadingMap, [id]: value }
+  })),
+  getUpload: (id) => get().uploadMap[id],
+  getIsUploading: (id) => get().isUploadingMap[id] ?? false,
 }))

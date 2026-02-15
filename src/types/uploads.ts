@@ -29,3 +29,14 @@ export interface UploadFileMeta {
   state: UploadState
   createdAt: string
 }
+
+export interface UploadProgress {
+  loaded: number
+  total: number
+  percentage: number
+}
+
+export interface ClientUploadState {
+  progress: UploadProgress
+  fileName: string
+}
