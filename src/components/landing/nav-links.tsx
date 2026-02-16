@@ -15,7 +15,7 @@ const solutionItems = [
   "For Translators",
   "For Studios",
   "For Subbers",
-  "For Individuals",
+  "For Personal Use",
 ]
 
 export default function NavLinks({
@@ -55,13 +55,18 @@ export default function NavLinks({
           {isMobileSolutionsOpen && (
             <div className="flex flex-col space-y-1">
               {solutionItems.map((item, index) => (
-                <Button
+                <Link
+                  href="/blog/introducing-mitsuko-blog"
                   key={`mobile-solution-${index}`}
-                  variant="ghost"
-                  className="font-normal w-full justify-start text-left block px-4 text-sm rounded-md"
                 >
-                  {item}
-                </Button>
+                  <Button
+                    key={`mobile-solution-${index}`}
+                    variant="ghost"
+                    className="font-normal w-full justify-start text-left block px-4 text-sm rounded-md"
+                  >
+                    {item}
+                  </Button>
+                </Link>
               ))}
             </div>
           )}
@@ -79,13 +84,18 @@ export default function NavLinks({
             className="absolute left-1/2 transform -translate-x-1/2 mt-0 w-48 rounded-md bg-background p-2 border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
           >
             {solutionItems.map((item, index) => (
-              <Button
+              <Link
+                href="/blog/introducing-mitsuko-blog"
                 key={`nav-solution-${index}`}
-                variant="ghost"
-                className="font-normal w-full text-left block px-4 py-2 text-sm rounded-md"
               >
-                {item}
-              </Button>
+                <Button
+                  key={`nav-solution-${index}`}
+                  variant="ghost"
+                  className="font-normal w-full text-left block px-4 py-2 text-sm rounded-md"
+                >
+                  {item}
+                </Button>
+              </Link>
             ))}
           </div>
         </div>
