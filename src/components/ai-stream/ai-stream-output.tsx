@@ -39,17 +39,16 @@ export const AiStreamOutput = ({
 
   const parse = (content: string) => {
     try {
-      const split = content.split("\n")
+      const errorMatch = content.match(/<error>([\s\S]*?)<\/error>/)
       const message = []
-      if (split[split.length - 1].startsWith("[")) {
+      if (errorMatch) {
         message.push({
           index: NaN,
-          content: split[split.length - 1],
+          content: errorMatch[1].trim(),
           translated: "",
         })
-        split.pop()
       }
-      const parsed = parseTranslationJsonWithContent(split.join("\n"))
+      const parsed = parseTranslationJsonWithContent(content)
       parsed.push(...message)
       const changed =
         translatedSubtitles.length !== parsed.length ||
@@ -145,7 +144,7 @@ export const AiStreamOutput = ({
 
     return {
       think: result.think.trim(),
-      output: result.output.trim()
+      output: result.output.replace(/<\/?error>/g, '').trim()
     }
   }, [content])
 

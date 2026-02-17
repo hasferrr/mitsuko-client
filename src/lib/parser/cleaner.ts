@@ -17,7 +17,8 @@ export function removeWrapped(text: string, a: string, b: string): string {
 export function cleanUpJsonResponse(response: string): string {
   const a = '```json'
   const b = '```'
-  const removedThink = removeWrapped(response, '<think>', '</think>')
+  const removedError = removeWrapped(response, '<error>', '</error>')
+  const removedThink = removeWrapped(removedError, '<think>', '</think>')
   const jsonString = keepOnlyWrapped(removedThink, a, b).replace(a, '').replace(b, '')
     || keepOnlyWrapped(removedThink, b, b).replaceAll(b, '')
 

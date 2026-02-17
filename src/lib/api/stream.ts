@@ -113,13 +113,13 @@ export const handleStream = async (params: handleStreamParams): Promise<string> 
   } catch (error: unknown) {
     if (error instanceof Error && error.name === "AbortError") {
       console.log("Request aborted")
-      setResponse(buffer + "\n\n[Generation stopped by user]")
+      setResponse(buffer + "\n\n<error>[Generation stopped by user]</error>")
     } else {
       console.error("Error:", error)
       Sentry.logger.warn("Stream error", {
         error: error instanceof Error ? error.message : error,
       })
-      setResponse(buffer + `\n\n[An error occurred: ${error instanceof Error ? error.message : error}]`)
+      setResponse(buffer + `\n\n<error>[An error occurred: ${error instanceof Error ? error.message : error}]</error>`)
     }
     abortControllerRef.current.abort()
     throw error

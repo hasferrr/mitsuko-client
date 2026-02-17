@@ -88,7 +88,7 @@ export const useTranslationStore = create<TranslationStore>()((set, get) => ({
     } catch (error) {
       console.error("Error: ", error)
       console.log("Failed to parse: ", buffer)
-      setResponse(buffer + "\n\n[Failed to parse]")
+      setResponse(buffer + "\n\n<error>[Failed to parse]</error>")
       throw error
     }
 

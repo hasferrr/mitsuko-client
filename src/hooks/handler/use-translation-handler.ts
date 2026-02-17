@@ -356,18 +356,13 @@ export const useTranslationHandler = ({
         setIsTranslating(currentId, false)
 
         rawResponse = useTranslationDataStore.getState().data[currentId].response.response.trim()
-        const rawResponseArr = rawResponse.split("\n")
-        if (rawResponseArr[rawResponseArr.length - 1].startsWith("[")) {
-          rawResponseArr.pop()
-        }
-        rawResponse = rawResponseArr.join("\n")
 
         // TODO: Refactor to separate function
         try {
           tlChunk = parseTranslationJson(rawResponse)
         } catch (error) {
           console.error("Error: ", error)
-          setResponse(currentId, rawResponse + "\n\n[Failed to parse]")
+          setResponse(currentId, rawResponse + "\n\n<error>[Failed to parse]</error>")
           // If part of a batch, don't set isTranslating to false here, let the batch handler do it.
           // The error is logged, and the loop in handleContinueTranslation should ideally break.
           if (!isContinuation) {
