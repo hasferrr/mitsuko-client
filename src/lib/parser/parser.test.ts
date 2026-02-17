@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test"
-import { parseMitsukoTranscription, leadingTextExtractor } from "@/lib/parser/parser"
+import { parseMitsukoTranscription, leadingTextExtractor, parseTranslationJson, parseTranslationJsonWithContent } from "@/lib/parser/parser"
 
 describe("parseMitsukoTranscription", () => {
   describe("without timeFormatter", () => {
@@ -267,5 +267,81 @@ Custom formatted
         content: "Custom formatted",
       })
     })
+  })
+})
+
+describe("parseTranslationJson", () => {
+  test("parses valid JSON with subtitles array", () => {
+    const input = `{"subtitles":[{"index":1,"translated":"hallo"},{"index":2,"translated":"welt"}]}`
+    const result = parseTranslationJson(input)
+    expect(result).toHaveLength(2)
+    expect(result[0]).toEqual({ index: 1, translated: "hallo" })
+    expect(result[1]).toEqual({ index: 2, translated: "welt" })
+  })
+
+  test("parses JSON wrapped in code block", () => {
+    const input = `\`\`\`json
+{"subtitles":[{"index":1,"translated":"test"}]}
+\`\`\``
+    const result = parseTranslationJson(input)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toEqual({ index: 1, translated: "test" })
+  })
+
+  test("strips error tag before parsing", () => {
+    const input = `{"subtitles":[{"index":1,"translated":"hello"}]}
+
+<error>[An error occurred: Something went wrong]</error>`
+    const result = parseTranslationJson(input)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toEqual({ index: 1, translated: "hello" })
+  })
+
+  test("handles stream error with JSON content", () => {
+    const input = `{"subtitles":[{"index":401,"translated":"Tivoli's"}]}
+
+<error>[Stream error occurred: {"error":{"code":429,"message":"Resource exhausted"}}]</error>`
+    const result = parseTranslationJson(input)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toEqual({ index: 401, translated: "Tivoli's" })
+  })
+
+  test("handles empty translated field", () => {
+    const input = `{"subtitles":[{"index":1,"translated":""}]}`
+    const result = parseTranslationJson(input)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toEqual({ index: 1, translated: "" })
+  })
+})
+
+describe("parseTranslationJsonWithContent", () => {
+  test("parses valid JSON with content and translated fields", () => {
+    const input = `{"subtitles":[{"index":1,"content":"hello","translated":"hallo"}]}`
+    const result = parseTranslationJsonWithContent(input)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toEqual({ index: 1, content: "hello", translated: "hallo" })
+  })
+
+  test("strips error tag before parsing", () => {
+    const input = `{"subtitles":[{"index":1,"content":"test","translated":"uji"}]}
+
+<error>[Generation stopped by user]</error>`
+    const result = parseTranslationJsonWithContent(input)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toEqual({ index: 1, content: "test", translated: "uji" })
+  })
+
+  test("handles missing translated field", () => {
+    const input = `{"subtitles":[{"index":1,"content":"hello"}]}`
+    const result = parseTranslationJsonWithContent(input)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toEqual({ index: 1, content: "hello", translated: "" })
+  })
+
+  test("handles missing content field", () => {
+    const input = `{"subtitles":[{"index":1,"translated":"hallo"}]}`
+    const result = parseTranslationJsonWithContent(input)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toEqual({ index: 1, content: "", translated: "hallo" })
   })
 })
