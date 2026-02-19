@@ -84,18 +84,6 @@ export default async function CreditUsage() {
               <tr key={model.name} className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
                 <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">
                   {model.name}
-                  {favoriteModels.has(model.name) && (
-                    <TooltipProvider>
-                      <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                          <span className="cursor-default ml-1 text-[1rem]">💙</span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Favorite Model</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
                   {highQualityModels.has(model.name) && (
                     <TooltipProvider>
                       <Tooltip delayDuration={0}>
@@ -104,6 +92,18 @@ export default async function CreditUsage() {
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>High Quality</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                  {favoriteModels.has(model.name) && (
+                    <TooltipProvider>
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <span className="cursor-default ml-1 text-[1rem]">💙</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Favorite Model</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>

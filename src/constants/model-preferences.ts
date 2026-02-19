@@ -16,7 +16,7 @@ export const favoriteModels = new Set([
 export const highQualityModels = new Set([
   "Gemini 2.5 Pro",
   "Gemini 3 Pro",
-  "Gemini 3 Pro (Low)",
+  "Gemini 3.1 Pro",
   "Claude 4.5 Sonnet",
   "GPT-5",
   "GPT-5.2",
