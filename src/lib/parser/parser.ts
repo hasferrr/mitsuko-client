@@ -43,16 +43,14 @@ export function parseMitsukoTranscription(
   }) => [string, string]
 ): Subtitle[] {
   let text = response.trim()
+  text = removeWrapped(text, '<error>', '</error>')
   text = getContent(text)
   text = keepOnlyWrapped(text, "```", "```") || text
 
   const lines = text.split("\n").filter((line) => line.trim() !== "")
 
-  const check = (i: number) => lines.length > 0 && (
-    lines[i].trim().startsWith("[") || lines[i].trim().startsWith("```")
-  )
-  while (check(lines.length - 1)) lines.pop()
-  while (check(0)) lines.shift()
+  while (lines.length > 0 && lines[0].trim().startsWith("```")) lines.shift()
+  while (lines.length > 0 && lines[lines.length - 1].trim().startsWith("```")) lines.pop()
 
   let i = 1
   const srtArr: string[] = []

@@ -76,6 +76,30 @@ After think content
       })
     })
 
+    test("strips error tag from transcription", () => {
+      const input = `
+00:00:01,000 --> 00:00:03,500
+Hello, world!
+
+<error>[Generation stopped by user]</error>
+`
+      const result = parseMitsukoTranscription(input)
+      expect(result).toHaveLength(1)
+      expect(result[0].content).toBe("Hello, world!")
+    })
+
+    test("strips error tag with JSON content from transcription", () => {
+      const input = `
+00:00:01,000 --> 00:00:03,500
+Hello!
+
+<error>[Stream error occurred: {"error":{"code":429,"message":"Resource exhausted"}}]</error>
+`
+      const result = parseMitsukoTranscription(input)
+      expect(result).toHaveLength(1)
+      expect(result[0].content).toBe("Hello!")
+    })
+
     test("parses transcription wrapped in code blocks", () => {
       const input = `\`\`\`
 00:00:01,000 --> 00:00:03,000
