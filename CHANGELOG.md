@@ -14,6 +14,11 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2026
 
+### February 21
+
+- 🎙️ **Batch Transcription:** Process multiple audio files at once with shared settings, progress tracking, smart resume, and batch downloads.
+- 🤖 **Model Updates:** Added Gemini 3.1 Pro Preview.
+
 ### February 4
 
 - ↔️ **Resizable Sidebar:** You can now adjust the sidebar width by dragging the border and reset it with a middle-click.
