@@ -500,7 +500,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
 
         <DownloadSection
           generateContent={handleGenerateZip}
-          fileName={`${currentProject?.name || "transcriptions"}.zip`}
+          fileName={`${currentProject?.name}_transcription.zip`}
           type="zip"
           downloadOption={downloadOption}
           setDownloadOption={setDownloadOption}

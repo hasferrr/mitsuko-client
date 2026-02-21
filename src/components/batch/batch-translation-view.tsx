@@ -443,7 +443,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
 
         <DownloadSection
           generateContent={handleGenerateZip}
-          fileName={`${currentProject?.name || "subtitles"}.zip`}
+          fileName={`${currentProject?.name}_translation.zip`}
           type="zip"
           downloadOption={downloadOption}
           setDownloadOption={setDownloadOption}

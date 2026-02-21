@@ -526,7 +526,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
 
         <DownloadSection
           generateContent={handleGenerateZip}
-          fileName={`${currentProject?.name || "extractions"}.zip`}
+          fileName={`${currentProject?.name}_extraction.zip`}
           type="zip"
           downloadOption={downloadOption}
           setDownloadOption={setDownloadOption}
