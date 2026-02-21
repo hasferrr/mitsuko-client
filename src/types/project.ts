@@ -24,6 +24,7 @@ export interface Project {
   defaultTranslationAdvancedSettingsId: string
   defaultExtractionBasicSettingsId: string
   defaultExtractionAdvancedSettingsId: string
+  defaultTranscriptionId: string
   createdAt: Date
   updatedAt: Date
   isBatch: boolean // Indicates whether this project is a batch-type project

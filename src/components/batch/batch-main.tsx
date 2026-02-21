@@ -16,6 +16,7 @@ import {
   FileText,
   Languages,
   Layers,
+  AudioLines,
 } from "lucide-react"
 import {
   AlertDialog,
@@ -32,6 +33,7 @@ import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import Link from "next/link"
 import { BatchTranslationView } from "./batch-translation-view"
 import { BatchExtractionView } from "./batch-extraction-view"
+import { BatchTranscriptionView } from "./batch-transcription-view"
 
 interface BatchMainProps {
   basicSettingsId: string
@@ -39,7 +41,7 @@ interface BatchMainProps {
 }
 
 export default function BatchMain({ basicSettingsId, advancedSettingsId }: BatchMainProps) {
-  const [operationMode, setOperationMode] = useState<"translation" | "extraction">("translation")
+  const [operationMode, setOperationMode] = useState<"translation" | "extraction" | "transcription">("translation")
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   // Project Store
@@ -101,7 +103,7 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
             onChange={(e) => handleBatchNameChange(e.target.value)}
           />
         </div>
-        <Select value={operationMode} onValueChange={(value: "translation" | "extraction") => setOperationMode(value)}>
+        <Select value={operationMode} onValueChange={(value: "translation" | "extraction" | "transcription") => setOperationMode(value)}>
           <SelectTrigger className="w-fit h-10">
             <SelectValue />
           </SelectTrigger>
@@ -122,6 +124,14 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
                 Extraction
               </div>
             </SelectItem>
+            <SelectItem value="transcription">
+              <div className="flex items-center gap-2 pr-1">
+                <div className="h-4 w-4">
+                  <AudioLines className="h-4 w-4" />
+                </div>
+                Transcription
+              </div>
+            </SelectItem>
           </SelectContent>
         </Select>
         <Link href="/project">
@@ -140,15 +150,21 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       </div>
 
       {/* Main Content */}
-      {operationMode === 'translation' ? (
+      {operationMode === 'translation' && (
         <BatchTranslationView
           basicSettingsId={translationBasicSettingsId}
           advancedSettingsId={translationAdvancedSettingsId}
         />
-      ) : (
+      )}
+      {operationMode === 'extraction' && (
         <BatchExtractionView
           basicSettingsId={extractionBasicSettingsId}
           advancedSettingsId={extractionAdvancedSettingsId}
+        />
+      )}
+      {operationMode === 'transcription' && currentProject?.defaultTranscriptionId && (
+        <BatchTranscriptionView
+          defaultTranscriptionId={currentProject.defaultTranscriptionId}
         />
       )}
 

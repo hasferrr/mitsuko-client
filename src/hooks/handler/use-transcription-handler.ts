@@ -12,6 +12,10 @@ import { useSessionStore } from "@/stores/use-session-store"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { UserCreditData } from "@/types/user"
+import { isAsrModel } from "@/constants/transcription"
+import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/transcription-segments"
+import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
+import { useWhisperSettingsStore } from "@/stores/use-whisper-settings-store"
 
 interface UseTranscriptionHandlerProps {
   state: {
@@ -100,6 +104,7 @@ export const useTranscriptionHandler = ({
       clientId: useClientIdStore.getState().clientId || "",
       deleteFile: deleteAfterTranscription,
       projectName,
+      isBatch: false,
     }
     console.log(requestBody)
 
@@ -120,6 +125,32 @@ export const useTranscriptionHandler = ({
       const cleaned = getContent(text)
       setTranscriptionText(currentId, cleaned)
       setTranscriptSubtitles(currentId, parseTranscription(text))
+
+      if (isAsrModel(models) && (words.length > 0 || segments.length > 0)) {
+        const { subtitleLevel, maxSilenceGap, targetCps, maxCps, maxChars, minDuration } = useWhisperSettingsStore.getState()
+        let srtContent = ""
+
+        if (subtitleLevel === "words" && words.length > 0 && segments.length > 0) {
+          srtContent = generateWordsSubtitles(
+            { words, segments },
+            {
+              MAX_SILENCE_GAP: maxSilenceGap,
+              TARGET_CPS: targetCps,
+              MAX_CPS: maxCps,
+              MAX_CHARS: maxChars,
+              MIN_DURATION: minDuration,
+            },
+          )
+        } else if (segments.length > 0) {
+          srtContent = generateSegmentsTranscription(segments)
+        }
+
+        if (srtContent.trim()) {
+          const { subtitles } = parseSubtitle({ content: srtContent, type: "srt" })
+          setTranscriptionText(currentId, srtContent)
+          setTranscriptSubtitles(currentId, subtitles)
+        }
+      }
 
       if (deleteAfterTranscription) {
         setSelectedUploadId(currentId, null)

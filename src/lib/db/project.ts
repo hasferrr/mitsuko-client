@@ -1,7 +1,8 @@
-import { Project } from "@/types/project"
+import { Project, Transcription } from "@/types/project"
 import { db } from "./db"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
 import { getOrCreateGlobalBasicSettings, getOrCreateGlobalAdvancedSettings } from "./global-settings"
+import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
 
 const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(obj: T) => {
   const { id, createdAt, updatedAt, ...rest } = obj
@@ -11,7 +12,7 @@ const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(o
 
 // Project CRUD functions
 export const createProject = async (name: string, isBatch = false): Promise<Project> => {
-  return db.transaction('rw', [db.projects, db.projectOrders, db.basicSettings, db.advancedSettings], async () => {
+  return db.transaction('rw', [db.projects, db.projectOrders, db.basicSettings, db.advancedSettings, db.transcriptions], async () => {
     const id = crypto.randomUUID()
 
     const globalBasic = await getOrCreateGlobalBasicSettings()
@@ -26,6 +27,22 @@ export const createProject = async (name: string, isBatch = false): Promise<Proj
     const translationAdvancedSettings = await createAdvancedSettings(stripMeta(advancedSettings))
     const extractionAdvancedSettings = await createAdvancedSettings(stripMeta(advancedSettings))
 
+    // Create default transcription for batch settings
+    const defaultTranscriptionId = crypto.randomUUID()
+    const defaultTranscription: Transcription = {
+      id: defaultTranscriptionId,
+      projectId: id,
+      title: '',
+      ...DEFAULT_TRANSCTIPTION_SETTINGS,
+      transcriptionText: '',
+      transcriptSubtitles: [],
+      words: [],
+      segments: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    await db.transcriptions.add(defaultTranscription)
+
     const project: Project = {
       id,
       name,
@@ -38,6 +55,7 @@ export const createProject = async (name: string, isBatch = false): Promise<Proj
       defaultTranslationAdvancedSettingsId: translationAdvancedSettings.id,
       defaultExtractionBasicSettingsId: extractionBasicSettings.id,
       defaultExtractionAdvancedSettingsId: extractionAdvancedSettings.id,
+      defaultTranscriptionId,
       createdAt: new Date(),
       updatedAt: new Date(),
       isBatch,
@@ -162,10 +180,16 @@ export const deleteProject = async (id: string): Promise<void> => {
       advancedSettingsIds.push(project.defaultExtractionAdvancedSettingsId)
     }
 
+    // Collect transcription IDs to delete (includes defaultTranscriptionId)
+    const transcriptionIds = [...project.transcriptions]
+    if (project.defaultTranscriptionId) {
+      transcriptionIds.push(project.defaultTranscriptionId)
+    }
+
     // Delete all related entities in single operations
     await Promise.all([
       db.translations.bulkDelete(project.translations),
-      db.transcriptions.bulkDelete(project.transcriptions),
+      db.transcriptions.bulkDelete(transcriptionIds),
       db.extractions.bulkDelete(project.extractions),
       db.basicSettings.bulkDelete(basicSettingsIds),
       db.advancedSettings.bulkDelete(advancedSettingsIds),

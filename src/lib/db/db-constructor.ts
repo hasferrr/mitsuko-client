@@ -137,6 +137,8 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       basicSettingsMap.get(project.defaultExtractionBasicSettingsId)?.id ?? project.defaultExtractionBasicSettingsId
     const newDefaultExtractionAdvancedSettingsId =
       advancedSettingsMap.get(project.defaultExtractionAdvancedSettingsId)?.id ?? project.defaultExtractionAdvancedSettingsId
+    const newDefaultTranscriptionId =
+      transcriptionsMap.get(project.defaultTranscriptionId)?.id ?? project.defaultTranscriptionId
 
     return {
       ...project,
@@ -150,6 +152,7 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       defaultTranslationAdvancedSettingsId: newDefaultTranslationAdvancedSettingsId,
       defaultExtractionBasicSettingsId: newDefaultExtractionBasicSettingsId,
       defaultExtractionAdvancedSettingsId: newDefaultExtractionAdvancedSettingsId,
+      defaultTranscriptionId: newDefaultTranscriptionId,
       isBatch: project.isBatch ?? false,
     }
   })
@@ -199,6 +202,7 @@ function projectConstructor(project: Partial<Project>): Project {
     defaultTranslationAdvancedSettingsId: project.defaultTranslationAdvancedSettingsId ?? "",
     defaultExtractionBasicSettingsId: project.defaultExtractionBasicSettingsId ?? "",
     defaultExtractionAdvancedSettingsId: project.defaultExtractionAdvancedSettingsId ?? "",
+    defaultTranscriptionId: project.defaultTranscriptionId ?? "",
     isBatch: project.isBatch ?? false,
   }
 }

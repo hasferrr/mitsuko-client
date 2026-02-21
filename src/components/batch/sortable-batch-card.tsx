@@ -47,7 +47,10 @@ export function SortableBatchCard({ project, onSelect }: SortableBatchCardProps)
         <div className="flex-1"></div>
         <div className="flex flex-col gap-1 mt-auto">
           <p className="text-sm text-muted-foreground">
-            {project.translations.length} {project.translations.length === 1 ? "file" : "files"}
+            {project.translations.length > 0 && `${project.translations.length} translation${project.translations.length === 1 ? "" : "s"}`}
+            {project.extractions.length > 0 && `${project.translations.length > 0 ? ", " : ""}${project.extractions.length} extraction${project.extractions.length === 1 ? "" : "s"}`}
+            {project.transcriptions.length > 0 && `${project.translations.length > 0 || project.extractions.length > 0 ? ", " : ""}${project.transcriptions.length} transcription${project.transcriptions.length === 1 ? "" : "s"}`}
+            {project.translations.length === 0 && project.extractions.length === 0 && project.transcriptions.length === 0 && "No files"}
           </p>
           <p className="text-xs text-muted-foreground">
             Created: {new Date(project.createdAt).toLocaleDateString()}

@@ -8,7 +8,7 @@ import { BatchFile } from "@/types/batch"
 
 interface UseBatchSelectionProps {
   batchFiles: BatchFile[]
-  operationMode: "translation" | "extraction"
+  operationMode: "translation" | "extraction" | "transcription"
 }
 
 export function useBatchSelection({ batchFiles, operationMode }: UseBatchSelectionProps) {
@@ -19,6 +19,7 @@ export function useBatchSelection({ batchFiles, operationMode }: UseBatchSelecti
   const currentProject = useProjectStore((state) => state.currentProject)
   const removeTranslationFromBatch = useProjectStore((state) => state.removeTranslationFromBatch)
   const removeExtractionFromBatch = useProjectStore((state) => state.removeExtractionFromBatch)
+  const removeTranscriptionFromBatch = useProjectStore((state) => state.removeTranscriptionFromBatch)
 
   const extractionData = useExtractionDataStore((state) => state.data)
   const setContextResult = useExtractionDataStore((state) => state.setContextResult)
@@ -48,8 +49,10 @@ export function useBatchSelection({ batchFiles, operationMode }: UseBatchSelecti
       try {
         if (operationMode === 'translation') {
           await removeTranslationFromBatch(currentProject.id, id)
-        } else {
+        } else if (operationMode === 'extraction') {
           await removeExtractionFromBatch(currentProject.id, id)
+        } else if (operationMode === 'transcription') {
+          await removeTranscriptionFromBatch(currentProject.id, id)
         }
       } catch {
         toast.error('Failed to delete file')

@@ -47,4 +47,5 @@ export interface TranscriptionRequestBody {
   clientId: string
   deleteFile: boolean
   projectName?: string
+  isBatch: boolean
 }

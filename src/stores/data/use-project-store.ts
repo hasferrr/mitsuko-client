@@ -20,6 +20,7 @@ import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-setting
 import { SubtitleTranslated } from "@/types/subtitles"
 import { deleteTranslation } from "@/lib/db/translation"
 import { deleteExtraction } from "@/lib/db/extraction"
+import { deleteTranscription } from "@/lib/db/transcription"
 
 interface ProjectStore {
   currentProject: Project | null
@@ -41,6 +42,8 @@ interface ProjectStore {
   removeTranslationFromBatch: (projectId: string, translationId: string) => Promise<void>
   createExtractionForBatch: (projectId: string, file: File, content: string) => Promise<string>
   removeExtractionFromBatch: (projectId: string, extractionId: string) => Promise<void>
+  createTranscriptionForBatch: (projectId: string, title: string) => Promise<{ id: string; title: string }>
+  removeTranscriptionFromBatch: (projectId: string, transcriptionId: string) => Promise<void>
 }
 
 export const useProjectStore = create<ProjectStore>((set, get) => ({
@@ -356,6 +359,68 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     } catch (err) {
       console.error('Failed to remove extraction from batch', err)
       set({ loading: false, error: 'Failed to remove extraction from batch' })
+      throw err
+    }
+  },
+
+  /* ------------------ Batch Transcription Helpers ------------------ */
+  createTranscriptionForBatch: async (projectId, title) => {
+    set({ loading: true })
+    try {
+      const currentProject = get().projects.find(p => p.id === projectId)
+      if (!currentProject) throw new Error('Project not found')
+
+      const transcription = await useTranscriptionDataStore.getState().createTranscriptionDb(
+        projectId,
+        {
+          title,
+          transcriptionText: '',
+          transcriptSubtitles: [],
+        }
+      )
+
+      const updatedTranscriptions = [...currentProject.transcriptions, transcription.id]
+      await updateProjectItemsDB(projectId, updatedTranscriptions, 'transcriptions')
+
+      set(state => ({
+        projects: state.projects.map(p => p.id === projectId ? { ...p, transcriptions: updatedTranscriptions, updatedAt: new Date() } : p),
+        currentProject: state.currentProject?.id === projectId ? { ...state.currentProject, transcriptions: updatedTranscriptions, updatedAt: new Date() } : state.currentProject,
+        loading: false
+      }))
+
+      return { id: transcription.id, title: transcription.title }
+    } catch (err) {
+      console.error('Failed to create transcription for batch', err)
+      set({ loading: false, error: 'Failed to create transcription for batch' })
+      throw err
+    }
+  },
+
+  removeTranscriptionFromBatch: async (projectId, transcriptionId) => {
+    set({ loading: true })
+    try {
+      const currentProject = get().projects.find(p => p.id === projectId)
+      if (!currentProject) throw new Error('Project not found')
+
+      // Delete transcription
+      await deleteTranscription(projectId, transcriptionId)
+
+      const updatedTranscriptions = currentProject.transcriptions.filter(id => id !== transcriptionId)
+      await updateProjectItemsDB(projectId, updatedTranscriptions, 'transcriptions')
+
+      // update transcription store
+      const transcriptionStore = useTranscriptionDataStore.getState()
+      transcriptionStore.removeData(transcriptionId)
+
+      // update local project state
+      set(state => ({
+        projects: state.projects.map(p => p.id === projectId ? { ...p, transcriptions: updatedTranscriptions, updatedAt: new Date() } : p),
+        currentProject: state.currentProject?.id === projectId ? { ...state.currentProject, transcriptions: updatedTranscriptions, updatedAt: new Date() } : state.currentProject,
+        loading: false
+      }))
+    } catch (err) {
+      console.error('Failed to remove transcription from batch', err)
+      set({ loading: false, error: 'Failed to remove transcription from batch' })
       throw err
     }
   }

@@ -10,6 +10,8 @@ import { db } from "@/lib/db/db"
 import { Subtitle } from "@/types/subtitles"
 import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
 
+export type TranscriptionSettingKey = 'language' | 'selectedMode' | 'customInstructions' | 'models'
+
 interface TranscriptionDataStore {
   currentId: string | null
   data: Record<string, Transcription>
@@ -19,6 +21,8 @@ interface TranscriptionDataStore {
   getTranscriptionsDb: (transcriptionIds: string[]) => Promise<Transcription[]>
   updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language" | "selectedUploadId">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
+  // settings copy method
+  copyTranscriptionSettingsKeys: (sourceId: string, targetId: string, keys: TranscriptionSettingKey[]) => Promise<void>
   // getters
   getTitle: (id: string) => string
   getTranscriptionText: (id: string) => string
@@ -221,5 +225,41 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     if (get().currentId === id) {
       set({ currentId: null })
     }
+  },
+  copyTranscriptionSettingsKeys: async (sourceId, targetId, keys) => {
+    const sourceData = get().data[sourceId]
+    const targetData = get().data[targetId]
+    if (!sourceData || !targetData) {
+      console.error(`Transcription not found: source ${sourceId} or target ${targetId}`)
+      return
+    }
+
+    const changes: Partial<Pick<Transcription, 'language' | 'selectedMode' | 'customInstructions' | 'models'>> = {}
+
+    if (keys.includes('language')) {
+      changes.language = sourceData.language
+    }
+    if (keys.includes('selectedMode')) {
+      changes.selectedMode = sourceData.selectedMode
+    }
+    if (keys.includes('customInstructions')) {
+      changes.customInstructions = sourceData.customInstructions
+    }
+    if (keys.includes('models')) {
+      changes.models = sourceData.models
+    }
+
+    if (Object.keys(changes).length === 0) return
+
+    // Update target transcription in database
+    const result = await updateDB(targetId, changes)
+    
+    // Update local state
+    set(state => ({
+      data: {
+        ...state.data,
+        [targetId]: result
+      }
+    }))
   }
 }))

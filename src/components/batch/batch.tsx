@@ -12,6 +12,7 @@ import {
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
+import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import BatchMain from "./batch-main"
 import { SortableBatchCard } from "./sortable-batch-card"
 import {
@@ -43,8 +44,11 @@ export default function Batch() {
   // Load data for selected batch
   const translationData = useTranslationDataStore((state) => state.data)
   const extractionData = useExtractionDataStore(state => state.data)
+  const transcriptionData = useTranscriptionDataStore(state => state.data)
   const loadTranslations = useTranslationDataStore((state) => state.getTranslationsDb)
   const loadExtractions = useExtractionDataStore(state => state.getExtractionsDb)
+  const loadTranscriptions = useTranscriptionDataStore(state => state.getTranscriptionsDb)
+  const loadTranscription = useTranscriptionDataStore(state => state.getTranscriptionDb)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -78,6 +82,24 @@ export default function Batch() {
     if (missing.length === 0) return
     loadExtractions(missing).catch(err => console.error('Failed to load extractions', err))
   }, [batch, extractionData, loadExtractions])
+
+  // Ensure transcriptions are loaded for current batch project
+  useEffect(() => {
+    if (!batch || !batch.isBatch) return
+    const missing = batch.transcriptions.filter(id => !transcriptionData[id])
+    if (missing.length === 0) return
+    loadTranscriptions(missing).catch(err => console.error('Failed to load transcriptions', err))
+  }, [batch, transcriptionData, loadTranscriptions])
+
+  // Load default transcription data for shared settings
+  useEffect(() => {
+    if (!batch || !batch.isBatch || !batch.defaultTranscriptionId) return
+    if (!transcriptionData[batch.defaultTranscriptionId]) {
+      loadTranscription(batch.defaultTranscriptionId).catch(err => {
+        console.error('Failed to load default transcription:', err)
+      })
+    }
+  }, [batch, transcriptionData, loadTranscription])
 
   const handleCreateBatch = async () => {
     const newBatch = await createProject(`Batch ${new Date().toLocaleDateString()}`, true)
@@ -129,11 +151,11 @@ export default function Batch() {
         ) : batchProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
             <Files className="h-12 w-12 text-muted-foreground mb-4" />
-            <h2 className="text-xl font-medium mb-2 text-center">Subtitle Batch Translation</h2>
+            <h2 className="text-xl font-medium mb-2 text-center">Batch Projects</h2>
             <p className="text-muted-foreground mb-4 text-center text-sm">
-              Create a new batch to translate multiple subtitles at once.
+              Create a new batch to translate, transcribe, or extract multiple files at once.
               <br />
-              Translate SRT, VTT, and ASS files with a single click.
+              Supports subtitles, audio files, and more.
             </p>
           </div>
         ) : (

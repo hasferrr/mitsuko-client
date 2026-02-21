@@ -1,4 +1,4 @@
-import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS } from '@/constants/default'
+import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_TRANSCTIPTION_SETTINGS } from '@/constants/default'
 import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
 import { CustomInstruction } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'
@@ -271,6 +271,42 @@ class MyDatabase extends Dexie {
           transcription.selectedUploadId = null
         }
       })
+    })
+    this.version(23).stores({}).upgrade(async tx => {
+      const projectsTable = tx.table('projects')
+      const transcriptionsTable = tx.table('transcriptions')
+
+      const projects = await projectsTable.toArray() as Project[]
+      const newTranscriptions: Transcription[] = []
+      const projectUpdates: { id: string; changes: Partial<Project> }[] = []
+
+      for (const project of projects) {
+        if (!project.defaultTranscriptionId) {
+          const transcriptionId = crypto.randomUUID()
+          const newTranscription: Transcription = {
+            id: transcriptionId,
+            projectId: project.id,
+            title: '',
+            transcriptionText: '',
+            transcriptSubtitles: [],
+            ...DEFAULT_TRANSCTIPTION_SETTINGS,
+            words: [],
+            segments: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+          newTranscriptions.push(newTranscription)
+          projectUpdates.push({ id: project.id, changes: { defaultTranscriptionId: transcriptionId } })
+        }
+      }
+
+      if (newTranscriptions.length > 0) {
+        await transcriptionsTable.bulkAdd(newTranscriptions)
+      }
+
+      for (const update of projectUpdates) {
+        await projectsTable.update(update.id, update.changes)
+      }
     })
   }
 }

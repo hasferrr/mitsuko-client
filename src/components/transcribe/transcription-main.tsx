@@ -53,7 +53,7 @@ import { UploadFileMeta } from "@/types/uploads"
 import { Input } from "@/components/ui/input"
 import { SettingsTranscription } from "./settings-transcription"
 import { uploadFile } from "@/lib/api/file-upload"
-import { MAX_FILE_SIZE, GLOBAL_MAX_DURATION_SECONDS, isModelDurationLimitExceeded, getModel } from "@/constants/transcription"
+import { MAX_FILE_SIZE, GLOBAL_MAX_DURATION_SECONDS, isModelDurationLimitExceeded, getModel, isAsrModel } from "@/constants/transcription"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
@@ -68,6 +68,8 @@ import { Label } from "../ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/transcription-segments"
 import { useTranscriptionHandler } from "@/hooks/handler/use-transcription-handler"
+import { useWhisperSettingsStore } from "@/stores/use-whisper-settings-store"
+import { WhisperSettingsPanel } from "./whisper-settings-panel"
 
 interface TranscriptionMainProps {
   currentId: string
@@ -173,15 +175,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [localAudioDuration, setLocalAudioDuration] = useState<number | null>(null)
-  const [subtitleLevel, setSubtitleLevel] = useState<"words" | "segments">("words")
   const [rightTab, setRightTab] = useState<"transcript" | "subtitles">("transcript")
-  const [whisperConfig, setWhisperConfig] = useState({
-    maxSilenceGap: 0.5,
-    targetCps: 16,
-    maxCps: 22,
-    maxChars: 85,
-    minDuration: 1,
-  })
   const isGlobalMaxDurationExceeded = localAudioDuration !== null && localAudioDuration > GLOBAL_MAX_DURATION_SECONDS
 
   // Refs
@@ -266,6 +260,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   }
 
   const handleApplyWhisperSubtitles = async () => {
+    const { subtitleLevel, maxSilenceGap, targetCps, maxCps, maxChars, minDuration } = useWhisperSettingsStore.getState()
     let srtContent = ""
 
     if (subtitleLevel === "words") {
@@ -278,11 +273,11 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
       srtContent = generateWordsSubtitles(
         { words, segments },
         {
-          MAX_SILENCE_GAP: whisperConfig.maxSilenceGap,
-          TARGET_CPS: whisperConfig.targetCps,
-          MAX_CPS: whisperConfig.maxCps,
-          MAX_CHARS: whisperConfig.maxChars,
-          MIN_DURATION: whisperConfig.minDuration,
+          MAX_SILENCE_GAP: maxSilenceGap,
+          TARGET_CPS: targetCps,
+          MAX_CPS: maxCps,
+          MAX_CHARS: maxChars,
+          MIN_DURATION: minDuration,
         },
       )
     } else {
@@ -305,16 +300,6 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
     setHasChanges(true)
     await saveData(currentId)
     toast.success("Generated subtitles from Whisper word timings")
-  }
-
-  const handleResetWhisperConfig = () => {
-    setWhisperConfig({
-      maxSilenceGap: 0.5,
-      targetCps: 16,
-      maxCps: 22,
-      maxChars: 85,
-      minDuration: 1,
-    })
   }
 
   const handleExport = () => {
@@ -666,9 +651,20 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
                 )}
 
                 {selectedUploadId && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Selected: <span className="text-foreground">{uploads.find(u => u.uploadId === selectedUploadId)?.fileName || 'Unknown file'}</span>
-                  </p>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
+                    <span>
+                      Selected: <span className="text-foreground">{uploads.find(u => u.uploadId === selectedUploadId)?.fileName || 'Unknown file'}</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedUploadId(currentId, null)}
+                      disabled={isTranscribing}
+                      className="flex items-center gap-1 p-1 hover:bg-muted rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <X className="h-3 w-3" />
+                      <span className="text-xs">Deselect</span>
+                    </button>
+                  </div>
                 )}
 
                 {uploads.length > 0 && (
@@ -956,151 +952,13 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
             </TabsContent>
           </Tabs>
 
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h2 className="text-lg font-medium mb-4">Whisper transcription settings</h2>
-
-            <div className={cn("space-y-4", (!words.length || !segments.length) && "pointer-events-none opacity-50")}>
-              <div>
-                <p className="text-sm font-medium mb-2">Subtitle level</p>
-                <RadioGroup
-                  value={subtitleLevel}
-                  onValueChange={value => setSubtitleLevel(value as "words" | "segments")}
-                  className="flex flex-col sm:flex-row gap-4"
-                >
-                  <label className="flex items-center gap-2 cursor-pointer text-sm" htmlFor="whisper-level-words">
-                    <RadioGroupItem id="whisper-level-words" value="words" />
-                    <span>Words</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer text-sm" htmlFor="whisper-level-segments">
-                    <RadioGroupItem id="whisper-level-segments" value="segments" />
-                    <span>Segments</span>
-                  </label>
-                </RadioGroup>
-              </div>
-
-              {subtitleLevel === 'words' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="whisper-max-silence"
-                      title="Max gap between words (in seconds) to consider them part of the same phrase. Longer gaps force a new subtitle."
-                    >
-                      Max silence gap (seconds)
-                    </Label>
-                    <Input
-                      id="whisper-max-silence"
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      value={whisperConfig.maxSilenceGap}
-                      onChange={e => setWhisperConfig(cfg => ({
-                        ...cfg,
-                        maxSilenceGap: Number(e.target.value) || 0,
-                      }))}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="whisper-min-duration"
-                      title="Try not to make subtitles shorter than this duration, so they stay on screen long enough to read."
-                    >
-                      Minimum duration (seconds)
-                    </Label>
-                    <Input
-                      id="whisper-min-duration"
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      value={whisperConfig.minDuration}
-                      onChange={e => setWhisperConfig(cfg => ({
-                        ...cfg,
-                        minDuration: Number(e.target.value) || 0,
-                      }))}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="whisper-target-cps"
-                      title="Character Per Second (CPS). Controls reading speed."
-                    >
-                      Target CPS
-                    </Label>
-                    <Input
-                      id="whisper-target-cps"
-                      type="number"
-                      min="1"
-                      value={whisperConfig.targetCps}
-                      onChange={e => setWhisperConfig(cfg => ({
-                        ...cfg,
-                        targetCps: Number(e.target.value) || 1,
-                      }))}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="whisper-max-cps"
-                      title="Maximum allowed CPS before forcing split."
-                    >
-                      Max CPS
-                    </Label>
-                    <Input
-                      id="whisper-max-cps"
-                      type="number"
-                      min="1"
-                      value={whisperConfig.maxCps}
-                      onChange={e => setWhisperConfig(cfg => ({
-                        ...cfg,
-                        maxCps: Number(e.target.value) || 1,
-                      }))}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="whisper-max-chars"
-                      title="Fallback limit for maximum characters per subtitle block. Higher values allow longer lines. Roughly 2 lines of 42 chars"
-                    >
-                      Max characters per subtitle
-                    </Label>
-                    <Input
-                      id="whisper-max-chars"
-                      type="number"
-                      min="1"
-                      value={whisperConfig.maxChars}
-                      onChange={e => setWhisperConfig(cfg => ({
-                        ...cfg,
-                        maxChars: Number(e.target.value) || 1,
-                      }))}
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-border"
-                  onClick={() => handleApplyWhisperSubtitles()}
-                  disabled={isTranscribing}
-                >
-                  <Wand2 className="h-3 w-3" />
-                  Apply Whisper subtitles
-                </Button>
-                {subtitleLevel === 'words' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-border"
-                    onClick={handleResetWhisperConfig}
-                    disabled={isTranscribing}
-                  >
-                    <RefreshCw className="h-3 w-3" />
-                    Reset
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
+          {isAsrModel(models) && (
+            <WhisperSettingsPanel
+              showApplyButton
+              onApplyClick={handleApplyWhisperSubtitles}
+              applyDisabled={isTranscribing || !words.length || !segments.length}
+            />
+          )}
 
           {/* Always Show What's Next */}
           <div className="bg-card border border-border rounded-lg p-6">

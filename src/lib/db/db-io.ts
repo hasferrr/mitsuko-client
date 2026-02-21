@@ -1,7 +1,7 @@
 import { db } from './db'
 import { DatabaseExport, databaseExportConstructor, generateNewIds } from './db-constructor'
-import { Project, BasicSettings, AdvancedSettings } from '@/types/project'
-import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from '@/constants/default'
+import { Project, BasicSettings, AdvancedSettings, Transcription } from '@/types/project'
+import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS, DEFAULT_TRANSCTIPTION_SETTINGS } from '@/constants/default'
 import { GLOBAL_ADVANCED_SETTINGS_ID, GLOBAL_BASIC_SETTINGS_ID } from '@/constants/global-settings'
 
 export async function exportDatabase(): Promise<string> {
@@ -198,6 +198,26 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
         }
         convertedData.advancedSettings.push(newAdvancedSettings)
         project.defaultExtractionAdvancedSettingsId = advancedSettingsId
+      }
+
+      // Check if defaultTranscriptionId exists and the transcription exists in import data
+      const getTranscriptionById = (id: string) => convertedData.transcriptions.find(t => t.id === id)
+      if (!project.defaultTranscriptionId || !getTranscriptionById(project.defaultTranscriptionId)) {
+        const transcriptionId = crypto.randomUUID()
+        const newDefaultTranscription: Transcription = {
+          id: transcriptionId,
+          projectId: project.id,
+          title: '',
+          ...DEFAULT_TRANSCTIPTION_SETTINGS,
+          transcriptionText: '',
+          transcriptSubtitles: [],
+          words: [],
+          segments: [],
+          createdAt: now,
+          updatedAt: now,
+        }
+        convertedData.transcriptions.push(newDefaultTranscription)
+        project.defaultTranscriptionId = transcriptionId
       }
     }
 
