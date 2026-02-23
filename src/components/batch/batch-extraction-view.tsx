@@ -814,6 +814,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
                 basicSettingsId={isUseSharedSettings ? basicSettingsId : extractionData[previewId].basicSettingsId}
                 advancedSettingsId={isUseSharedSettings ? advancedSettingsId : extractionData[previewId].advancedSettingsId}
                 isSharedSettings={isUseSharedSettings}
+                hideBackButton
               />
             </div>
           )}

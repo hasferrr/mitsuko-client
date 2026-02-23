@@ -738,6 +738,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               currentId={previewId}
               settingsId={isUseSharedSettings ? defaultTranscriptionId : undefined}
               isSharedSettings={isUseSharedSettings}
+              hideBackButton
             />
           )}
         </DialogContent>

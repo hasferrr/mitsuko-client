@@ -75,9 +75,10 @@ interface TranscriptionMainProps {
   currentId: string
   settingsId?: string
   isSharedSettings?: boolean
+  hideBackButton?: boolean
 }
 
-export function TranscriptionMain({ currentId, settingsId, isSharedSettings }: TranscriptionMainProps) {
+export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hideBackButton }: TranscriptionMainProps) {
   // Transcription data store
   const title = useTranscriptionDataStore(state => state.getTitle(currentId))
   const transcriptionText = useTranscriptionDataStore(state => state.getTranscriptionText(currentId))
@@ -436,13 +437,15 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings }: T
   return (
     <div translate="no" className="mx-auto pt-4 pb-8 px-4 max-w-5xl">
       <div className="mb-4 flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.push('/project')}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
+        {!hideBackButton && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/project')}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        )}
         <Input
           type="text"
           value={title}

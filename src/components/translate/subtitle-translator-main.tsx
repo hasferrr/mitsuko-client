@@ -101,6 +101,7 @@ interface SubtitleTranslatorMainProps {
   basicSettingsId: string
   advancedSettingsId: string
   isSharedSettings?: boolean
+  hideBackButton?: boolean
 }
 
 export default function SubtitleTranslatorMain({
@@ -109,6 +110,7 @@ export default function SubtitleTranslatorMain({
   basicSettingsId,
   advancedSettingsId,
   isSharedSettings,
+  hideBackButton,
 }: SubtitleTranslatorMainProps) {
   // Translation Data Store
   const setTitle = useTranslationDataStore((state) => state.setTitle)
@@ -415,13 +417,15 @@ export default function SubtitleTranslatorMain({
     <div translate="no" className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
       {/* Header */}
       <div className="flex flex-wrap items-center gap-2 mb-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.push('/project')}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
+        {!hideBackButton && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/project')}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        )}
         <div className="flex-1 min-w-40">
           <Input
             value={title}

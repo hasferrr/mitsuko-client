@@ -711,6 +711,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
                 basicSettingsId={isUseSharedSettings ? basicSettingsId : translationData[previewId].basicSettingsId}
                 advancedSettingsId={isUseSharedSettings ? advancedSettingsId : translationData[previewId].advancedSettingsId}
                 isSharedSettings={isUseSharedSettings}
+                hideBackButton
               />
             </div>
           )}

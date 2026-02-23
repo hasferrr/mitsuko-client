@@ -41,9 +41,10 @@ interface ContextExtractorMainProps {
   basicSettingsId: string
   advancedSettingsId: string
   isSharedSettings?: boolean
+  hideBackButton?: boolean
 }
 
-export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSettingsId, isSharedSettings }: ContextExtractorMainProps) => {
+export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSettingsId, isSharedSettings, hideBackButton }: ContextExtractorMainProps) => {
   const [activeTab, setActiveTab] = useState("result")
   const [isEpisodeNumberValid, setIsEpisodeNumberValid] = useState(true)
   const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
@@ -238,13 +239,15 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
     <div translate="no" className="grid md:grid-cols-2 gap-6 gap-y-4 container mx-auto py-2 px-4 mt-2 mb-6 max-w-5xl">
       {/* Header */}
       <div className="md:col-span-2 flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.push('/project')}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
+        {!hideBackButton && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/project')}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        )}
         <Input
           value={title}
           onChange={(e) => setTitle(currentId, e.target.value)}
