@@ -20,6 +20,7 @@ import { useWhisperSettingsStore } from "@/stores/use-whisper-settings-store"
 interface UseTranscriptionHandlerProps {
   state: {
     currentId: string
+    settingsId?: string
     selectedUploadId: string | null
     setSelectedUploadId: (id: string, uploadId: string | null) => void
   }
@@ -31,6 +32,7 @@ interface UseTranscriptionHandlerProps {
 export const useTranscriptionHandler = ({
   state: {
     currentId,
+    settingsId,
     selectedUploadId,
     setSelectedUploadId,
   },
@@ -38,10 +40,11 @@ export const useTranscriptionHandler = ({
     refetchUploads,
   },
 }: UseTranscriptionHandlerProps) => {
-  const selectedMode = useTranscriptionDataStore(state => state.getSelectedMode(currentId))
-  const customInstructions = useTranscriptionDataStore(state => state.getCustomInstructions(currentId))
-  const models = useTranscriptionDataStore(state => state.getModels(currentId))
-  const language = useTranscriptionDataStore(state => state.getLanguage(currentId))
+  const effectiveId = settingsId ?? currentId
+  const selectedMode = useTranscriptionDataStore(state => state.getSelectedMode(effectiveId))
+  const customInstructions = useTranscriptionDataStore(state => state.getCustomInstructions(effectiveId))
+  const models = useTranscriptionDataStore(state => state.getModels(effectiveId))
+  const language = useTranscriptionDataStore(state => state.getLanguage(effectiveId))
 
   const setTranscriptionText = useTranscriptionDataStore(state => state.setTranscriptionText)
   const setTranscriptSubtitles = useTranscriptionDataStore(state => state.setTranscriptSubtitles)

@@ -73,9 +73,11 @@ import { WhisperSettingsPanel } from "./whisper-settings-panel"
 
 interface TranscriptionMainProps {
   currentId: string
+  settingsId?: string
+  isSharedSettings?: boolean
 }
 
-export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
+export function TranscriptionMain({ currentId, settingsId, isSharedSettings }: TranscriptionMainProps) {
   // Transcription data store
   const title = useTranscriptionDataStore(state => state.getTitle(currentId))
   const transcriptionText = useTranscriptionDataStore(state => state.getTranscriptionText(currentId))
@@ -224,6 +226,7 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
   } = useTranscriptionHandler({
     state: {
       currentId,
+      settingsId,
       selectedUploadId: activeTab === "select" ? selectedUploadId : null,
       setSelectedUploadId,
     },
@@ -697,8 +700,13 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
             <h2 className="text-lg font-medium mb-4">Transcription Settings</h2>
 
             <div className="space-y-4">
-              {/* Transcription Settings */}
-              <SettingsTranscription transcriptionId={currentId} />
+              <div className={cn("space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
+                {isSharedSettings && (
+                  <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
+                )}
+                {/* Transcription Settings */}
+                <SettingsTranscription transcriptionId={settingsId ?? currentId} />
+              </div>
 
               {/* Model Duration Exceeded Warning */}
               {isModelDurationLimitExceeded(models, localAudioDuration || 0) && (
@@ -953,11 +961,13 @@ export function TranscriptionMain({ currentId }: TranscriptionMainProps) {
           </Tabs>
 
           {isAsrModel(models) && (
-            <WhisperSettingsPanel
-              showApplyButton
-              onApplyClick={handleApplyWhisperSubtitles}
-              applyDisabled={isTranscribing || !words.length || !segments.length}
-            />
+            <div className={cn(isSharedSettings && "pointer-events-none opacity-50")}>
+              <WhisperSettingsPanel
+                showApplyButton
+                onApplyClick={handleApplyWhisperSubtitles}
+                applyDisabled={isTranscribing || !words.length || !segments.length}
+              />
+            </div>
           )}
 
           {/* Always Show What's Next */}

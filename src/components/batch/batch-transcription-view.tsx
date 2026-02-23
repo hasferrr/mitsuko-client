@@ -733,7 +733,11 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             <DialogTitle>Transcription Preview</DialogTitle>
           </DialogHeader>
           {previewId && transcriptionData[previewId] && (
-            <TranscriptionMain currentId={previewId} />
+            <TranscriptionMain
+              currentId={previewId}
+              settingsId={isUseSharedSettings ? defaultTranscriptionId : undefined}
+              isSharedSettings={isUseSharedSettings}
+            />
           )}
         </DialogContent>
       </Dialog>
