@@ -83,7 +83,7 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
   const title = useTranscriptionDataStore(state => state.getTitle(currentId))
   const transcriptionText = useTranscriptionDataStore(state => state.getTranscriptionText(currentId))
   const transcriptSubtitles = useTranscriptionDataStore(state => state.getTranscriptSubtitles(currentId))
-  const models = useTranscriptionDataStore(state => state.getModels(currentId))
+  const models = useTranscriptionDataStore(state => state.getModels(settingsId ?? currentId))
   const words = useTranscriptionDataStore(state => state.getWords(currentId))
   const segments = useTranscriptionDataStore(state => state.getSegments(currentId))
   const selectedUploadId = useTranscriptionDataStore(state => state.getSelectedUploadId(currentId))
