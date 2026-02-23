@@ -110,6 +110,20 @@ export function SortableBatchTranscriptionFile({
           </p>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
+          {batchFile.hasDurationWarning && (
+            <TooltipProvider delayDuration={50}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center p-1 text-amber-500">
+                    <AlertTriangle className="h-4 w-4" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Exceeds maximum duration for selected model</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           {batchFile.status === 'pending' && <Badge variant="secondary">Pending</Badge>}
           {batchFile.status === 'partial' && <Badge variant="outline">Partial</Badge>}
           {batchFile.status === 'uploading' && (

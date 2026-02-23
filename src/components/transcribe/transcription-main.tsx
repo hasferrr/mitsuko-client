@@ -61,7 +61,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { SubtitleTranslated } from "@/types/subtitles"
 import { useRouter } from "next/navigation"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
-import { cn, calculateAudioDuration, createUtf8SubtitleBlob } from "@/lib/utils"
+import { cn, createUtf8SubtitleBlob } from "@/lib/utils"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { Label } from "../ui/label"
@@ -95,6 +95,7 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings }: T
   // Transcription store
   const file = useTranscriptionStore((state) => state.files[currentId])
   const audioUrl = useTranscriptionStore((state) => state.audioUrls[currentId])
+  const localAudioDuration = useTranscriptionStore((state) => state.fileDurations[currentId])
   const isTranscribingSet = useTranscriptionStore((state) => state.isTranscribingSet)
   const setFileAndUrl = useTranscriptionStore((state) => state.setFileAndUrl)
   const isTranscribing = isTranscribingSet.has(currentId)
@@ -136,12 +137,12 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings }: T
     onMutate: () => {
       setIsUploading(currentId, true)
     },
-    onSuccess: (uploadId) => {
+    onSuccess: async (uploadId) => {
       toast.success("File uploaded successfully")
       queryClient.invalidateQueries({ queryKey: ["uploads"] })
       setUpload(currentId, null)
       if (fileInputRef.current) fileInputRef.current.value = ""
-      setFileAndUrl(currentId, null)
+      await setFileAndUrl(currentId, null)
       setActiveTab("select")
       if (uploadId) {
         setSelectedUploadId(currentId, uploadId)
@@ -176,9 +177,8 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings }: T
   const [activeTab, setActiveTab] = useState("upload")
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-  const [localAudioDuration, setLocalAudioDuration] = useState<number | null>(null)
   const [rightTab, setRightTab] = useState<"transcript" | "subtitles">("transcript")
-  const isGlobalMaxDurationExceeded = localAudioDuration !== null && localAudioDuration > GLOBAL_MAX_DURATION_SECONDS
+  const isGlobalMaxDurationExceeded = localAudioDuration > GLOBAL_MAX_DURATION_SECONDS
 
   // Refs
   const transcriptionAreaRef = useRef<HTMLTextAreaElement>(null)
@@ -198,21 +198,6 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings }: T
     }
   }, [currentId, saveData])
 
-  useEffect(() => {
-    let isCancelled = false
-    if (file) {
-      calculateAudioDuration(file)
-        .then((seconds) => {
-          if (!isCancelled) setLocalAudioDuration(seconds)
-        })
-        .catch(() => {
-          if (!isCancelled) setLocalAudioDuration(null)
-        })
-    } else {
-      setLocalAudioDuration(null)
-    }
-    return () => { isCancelled = true }
-  }, [file])
 
   useEffect(() => {
     if (selectedUploadId) {

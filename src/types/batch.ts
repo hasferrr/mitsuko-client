@@ -9,4 +9,5 @@ export interface BatchFile {
   translatedCount: number
   type: string
   showEpisodePrefix?: boolean
+  hasDurationWarning?: boolean
 }

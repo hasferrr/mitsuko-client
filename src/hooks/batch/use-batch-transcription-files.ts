@@ -5,16 +5,20 @@ import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { useUploadStore } from "@/stores/use-upload-store"
 import { useSessionStore } from "@/stores/use-session-store"
+import { useBatchSettingsStore } from "@/stores/use-batch-settings-store"
 import { BatchFile } from "@/types/batch"
 import { listUploads } from "@/lib/api/uploads"
+import { isModelDurationLimitExceeded } from "@/constants/transcription"
 
-export const useBatchTranscriptionFiles = (order: string[], queueSet: Set<string>) => {
+export const useBatchTranscriptionFiles = (defaultTranscriptionId: string, order: string[], queueSet: Set<string>) => {
   const transcriptionData = useTranscriptionDataStore((state) => state.data)
   const isTranscribingSet = useTranscriptionStore((state) => state.isTranscribingSet)
   const files = useTranscriptionStore((state) => state.files)
+  const fileDurations = useTranscriptionStore((state) => state.fileDurations)
   const uploadProgressMap = useUploadStore((state) => state.uploadMap)
   const currentProject = useProjectStore((state) => state.currentProject)
   const session = useSessionStore((state) => state.session)
+  const isUseSharedSettings = useBatchSettingsStore((state) => state.getIsUseSharedSettings(currentProject?.id))
 
   const { data: uploads = [] } = useQuery({
     queryKey: ["uploads", session?.user?.id],
@@ -60,6 +64,14 @@ export const useBatchTranscriptionFiles = (order: string[], queueSet: Set<string
       const description = uploadExists ? "Uploaded, selected" : hasUploadId ? "Upload not found (file deleted)" : hasLocalFile ? "Ready to upload" : "No audio selected"
       const descriptionColor: BatchFile["descriptionColor"] = uploadExists ? "green" : hasUploadId ? "yellow" : hasLocalFile ? "blue" : "red"
 
+      const settingsModel = isUseSharedSettings
+        ? transcriptionData[defaultTranscriptionId]?.models
+        : transcription?.models
+      const duration = uploadExists
+        ? (uploads.find(u => u.uploadId === transcription?.selectedUploadId)?.duration || 0)
+        : (fileDurations[id] || 0)
+      const hasDurationWarning = isModelDurationLimitExceeded(settingsModel || null, duration)
+
       return {
         id,
         title: transcription?.title || "",
@@ -70,9 +82,10 @@ export const useBatchTranscriptionFiles = (order: string[], queueSet: Set<string
         status,
         progress,
         type: "audio",
+        hasDurationWarning,
       }
     })
-  }, [currentProject?.isBatch, order, transcriptionData, isTranscribingSet, files, uploadProgressMap, queueSet, uploads])
+  }, [currentProject?.isBatch, order, transcriptionData, isTranscribingSet, files, fileDurations, uploadProgressMap, queueSet, uploads, isUseSharedSettings, defaultTranscriptionId])
 
   const finishedCount = useMemo(() => {
     return batchFiles.filter(file => file.status === "done").length

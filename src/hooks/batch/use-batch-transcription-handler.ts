@@ -191,7 +191,7 @@ export default function useBatchTranscriptionHandler({
           setUpload(id, { progress, fileName: localFile.name })
         })
         setUpload(id, null)
-        setFileAndUrl(id, null)
+        await setFileAndUrl(id, null)
         setSelectedUploadId(id, uploadId)
         queryClient.invalidateQueries({ queryKey: ["uploads"] })
       } catch (error) {

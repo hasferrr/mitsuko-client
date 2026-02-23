@@ -119,6 +119,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
     finishedCount,
     isBatchTranscribing: isProcessing,
   } = useBatchTranscriptionFiles(
+    defaultTranscriptionId,
     localOrder,
     queueSet
   )
@@ -169,7 +170,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
       try {
         const transcription = await createTranscriptionForBatch(currentProject.id, file.name)
         // Store the local file in the transcription store
-        setFileAndUrl(transcription.id, file)
+        await setFileAndUrl(transcription.id, file)
         await loadTranscription(transcription.id)
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error)

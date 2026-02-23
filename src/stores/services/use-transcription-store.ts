@@ -3,13 +3,15 @@ import { handleStream } from "@/lib/api/stream"
 import { create } from "zustand"
 import { RefObject } from "react"
 import { TranscriptionRequestBody } from "@/types/request"
+import { calculateAudioDuration } from "@/lib/utils"
 
 interface TranscriptionStore {
   files: Record<string, File | null>
   audioUrls: Record<string, string | null>
+  fileDurations: Record<string, number>
   isTranscribingSet: Set<string>
   abortControllerMap: Map<string, RefObject<AbortController>>
-  setFileAndUrl: (id: string, file: File | null) => void
+  setFileAndUrl: (id: string, file: File | null) => Promise<void>
   setAudioUrl: (id: string, audioUrl: string | null) => void
   setIsTranscribing: (id: string, isTranscribing: boolean) => void
   stopTranscription: (id: string) => void
@@ -25,24 +27,33 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
     return ({
       files: {},
       audioUrls: {},
+      fileDurations: {},
       isTranscribingSet: new Set(),
       abortControllerMap: new Map(),
 
-      setFileAndUrl: (id, file) => {
+      setFileAndUrl: async (id, file) => {
         if (file) {
           const url = URL.createObjectURL(file)
+          let duration = 0
+          try {
+            duration = await calculateAudioDuration(file)
+          } catch { }
           set({
             files: { ...get().files, [id]: file },
-            audioUrls: { ...get().audioUrls, [id]: url }
+            audioUrls: { ...get().audioUrls, [id]: url },
+            fileDurations: { ...get().fileDurations, [id]: duration }
           })
         } else {
           const currentFiles = { ...get().files }
           const currentUrls = { ...get().audioUrls }
+          const currentDurations = { ...get().fileDurations }
           delete currentFiles[id]
           delete currentUrls[id]
+          delete currentDurations[id]
           set({
             files: currentFiles,
-            audioUrls: currentUrls
+            audioUrls: currentUrls,
+            fileDurations: currentDurations
           })
         }
       },
