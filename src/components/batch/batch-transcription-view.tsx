@@ -414,7 +414,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               size="sm"
               className="gap-2 rounded-lg"
               onClick={() => setIsManageFilesDialogOpen(true)}
-              disabled={isProcessing || batchFiles.length === 0}
+              disabled={isProcessing}
             >
               <FolderOpen className="h-4 w-4" />
               Manage Files
