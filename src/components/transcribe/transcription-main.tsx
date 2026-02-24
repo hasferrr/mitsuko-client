@@ -134,7 +134,7 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
   })
 
   const { mutate: handleUpload } = useMutation({
-    mutationFn: (file: File) => uploadFile(file, (progress) => setUpload(currentId, { progress, fileName: file.name })),
+    mutationFn: (file: File) => uploadFile(file, (progress) => setUpload(currentId, { progress, fileName: file.name }), localAudioDuration ?? 0),
     onMutate: () => {
       setIsUploading(currentId, true)
     },

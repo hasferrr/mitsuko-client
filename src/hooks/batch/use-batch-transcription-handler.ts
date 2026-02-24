@@ -69,6 +69,7 @@ export default function useBatchTranscriptionHandler({
   const setIsTranscribing = useTranscriptionStore((state) => state.setIsTranscribing)
   const stopTranscription = useTranscriptionStore((state) => state.stopTranscription)
   const files = useTranscriptionStore((state) => state.files)
+  const fileDurations = useTranscriptionStore((state) => state.fileDurations)
   const setFileAndUrl = useTranscriptionStore((state) => state.setFileAndUrl)
   const startTranscription = useTranscriptionStore((state) => state.startTranscription)
 
@@ -189,7 +190,7 @@ export default function useBatchTranscriptionHandler({
         setIsUploading(id, true)
         uploadId = await uploadFile(localFile, (progress) => {
           setUpload(id, { progress, fileName: localFile.name })
-        })
+        }, fileDurations[id] ?? 0)
         setUpload(id, null)
         await setFileAndUrl(id, null)
         setSelectedUploadId(id, uploadId)

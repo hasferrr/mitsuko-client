@@ -1,11 +1,11 @@
 import axios from "axios"
 import { requestSignedUrl, notifyUploadComplete } from "./uploads"
-import { calculateAudioDuration } from "@/lib/utils"
 import type { UploadProgress } from "@/types/uploads"
 
 export const uploadFile = async (
   file: File,
-  onProgress?: (progress: UploadProgress) => void
+  onProgress?: (progress: UploadProgress) => void,
+  duration = 0
 ): Promise<string> => {
   try {
     // Step 1: Request signed URL from server
@@ -46,7 +46,7 @@ export const uploadFile = async (
     await notifyUploadComplete({
       uploadId,
       size: file.size,
-      duration: await calculateAudioDuration(file),
+      duration,
       contentType: file.type,
     })
 
