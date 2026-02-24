@@ -35,7 +35,6 @@ import JSZip from "jszip"
 import { DownloadSection } from "@/components/download-section"
 import { arrayMove } from "@dnd-kit/sortable"
 import { useBatchSettingsStore } from "@/stores/use-batch-settings-store"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { toast } from "sonner"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -94,8 +93,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
   // Settings Stores
   const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
   const setUseSharedSettings = useBatchSettingsStore(state => state.setUseSharedSettings)
-  const isDeleteAfterTranscription = useLocalSettingsStore(state => state.isDeleteAfterTranscription)
-  const setDeleteAfterTranscription = useLocalSettingsStore(state => state.setIsDeleteAfterTranscription)
+
 
   // Transcription Data Store
   const transcriptionData = useTranscriptionDataStore((state) => state.data)
@@ -288,10 +286,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
     }
   }
 
-  const handleToggleDeleteAfter = (transcriptionId: string, checked: boolean) => {
-    // Global setting - no per-transcription preference
-    setDeleteAfterTranscription(checked)
-  }
+
 
   const handleApplyWhisperToAll = async () => {
     const { subtitleLevel, maxSilenceGap, targetCps, maxCps, maxChars, minDuration } = useWhisperSettingsStore.getState()
@@ -549,9 +544,8 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               </label>
               <Switch
                 id="delete-after-switch"
-                checked={isDeleteAfterTranscription}
-                onCheckedChange={(checked) => setDeleteAfterTranscription(checked)}
-                disabled={isProcessing}
+                checked={true}
+                disabled={true}
                 className="data-[state=checked]:bg-primary"
               />
             </div>
@@ -648,7 +642,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
                     <span className="block font-semibold">Shared Settings:</span>
                     <ul className="list-disc list-inside">
                       <li>Sequential processing (1 file at a time)</li>
-                      <li>{isDeleteAfterTranscription ? "Files will be deleted after transcription" : "Files will be kept after transcription"}</li>
+                      <li>Files will be deleted after transcription</li>
                     </ul>
                   </div>
                 ) : (

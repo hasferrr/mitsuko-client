@@ -8,15 +8,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { File, Trash2, RefreshCw, Loader2 } from "lucide-react"
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
 import { listUploads, deleteUpload } from "@/lib/api/uploads"
 import { UploadFileMeta } from "@/types/uploads"
 import { useSessionStore } from "@/stores/use-session-store"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+
 import { toast } from "sonner"
 import { DeleteDialogue } from "@/components/ui-custom/delete-dialogue"
 import { cn } from "@/lib/utils"
@@ -39,9 +37,6 @@ export function ManageUploadsDialog({
 
   const session = useSessionStore((state) => state.session)
   const queryClient = useQueryClient()
-  const deleteAfterTranscription = useLocalSettingsStore(state => state.isDeleteAfterTranscription)
-  const setDeleteAfterTranscription = useLocalSettingsStore(state => state.setIsDeleteAfterTranscription)
-
   const {
     data: uploads = [],
     isLoading: isUploadsLoading,
@@ -184,19 +179,6 @@ export function ManageUploadsDialog({
             <p className="text-xs text-muted-foreground mt-2">
               Selected: <span className="text-foreground">{uploads.find(u => u.uploadId === selectedUploadId)?.fileName || 'Unknown file'}</span>
             </p>
-          )}
-
-          {uploads.length > 0 && (
-            <div className="flex items-center gap-2 mt-4 pt-4 border-t">
-              <Checkbox
-                id="delete-after-transcription-dialog"
-                checked={deleteAfterTranscription}
-                onCheckedChange={v => setDeleteAfterTranscription(v === true)}
-              />
-              <Label htmlFor="delete-after-transcription-dialog" className="text-sm text-muted-foreground">
-                Delete uploaded file after transcription
-              </Label>
-            </div>
           )}
         </div>
 

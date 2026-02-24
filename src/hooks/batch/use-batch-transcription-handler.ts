@@ -4,13 +4,11 @@ import { useRef } from "react"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useBatchSettingsStore } from "@/stores/use-batch-settings-store"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { useUploadStore } from "@/stores/use-upload-store"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { toast } from "sonner"
 import { uploadFile } from "@/lib/api/file-upload"
-import { deleteUpload } from "@/lib/api/uploads"
 import { useQueryClient, useQuery } from "@tanstack/react-query"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/transcription-segments"
@@ -47,9 +45,6 @@ export default function useBatchTranscriptionHandler({
 
   // Batch Settings Store
   const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
-
-  // Local Settings Store
-  const deleteAfterTranscription = useLocalSettingsStore(state => state.isDeleteAfterTranscription)
 
   // Transcription Data Store
   const transcriptionData = useTranscriptionDataStore((state) => state.data)
@@ -229,7 +224,7 @@ export default function useBatchTranscriptionHandler({
       customInstructions: settings.customInstructions,
       models: settings.models,
       clientId: useClientIdStore.getState().clientId || "",
-      deleteFile: false,
+      deleteFile: true,
       projectName: currentProject?.name || "",
       isBatch: true,
     }
@@ -298,16 +293,10 @@ export default function useBatchTranscriptionHandler({
       setSegments(id, segments)
       await saveData(id)
 
-      // Step 3: Delete uploaded file if enabled
-      if (deleteAfterTranscription && uploadId) {
-        try {
-          await deleteUpload(uploadId)
-          queryClient.invalidateQueries({ queryKey: ["uploads"] })
-          setSelectedUploadId(id, null)
-        } catch {
-          console.error(`Failed to delete upload ${uploadId}`)
-        }
-      }
+      // Backend handles file deletion via deleteFile: true flag
+      // Update UI state only
+      queryClient.invalidateQueries({ queryKey: ["uploads"] })
+      setSelectedUploadId(id, null)
 
       toast.success(`Transcription completed: ${transcriptionData[id]?.title || id}`)
       errorCountRef.current = Math.max(0, errorCountRef.current - 1)
