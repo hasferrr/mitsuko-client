@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useCallback, useEffect } from "react"
+import { useState, useRef, useCallback, useEffect, useEffectEvent } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -45,7 +45,7 @@ interface ContextExtractorMainProps {
 }
 
 export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSettingsId, isSharedSettings, hideBackButton }: ContextExtractorMainProps) => {
-  const [activeTab, setActiveTab] = useState("result")
+  const [activeTab, setActiveTab] = useState("settings")
   const [isEpisodeNumberValid, setIsEpisodeNumberValid] = useState(true)
   const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
   const [isEditingResult, setIsEditingResult] = useState(false)
@@ -91,6 +91,17 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
       saveData(currentId)
     }
   }, [currentId, saveData])
+
+  const onCurrentIdMount = useEffectEvent(() => {
+    const trimmedResult = contextResult?.trim() || ""
+    if (trimmedResult) {
+      setActiveTab("result")
+    }
+  })
+
+  useEffect(() => {
+    onCurrentIdMount()
+  }, [])
 
   // Content Change Handlers
 
