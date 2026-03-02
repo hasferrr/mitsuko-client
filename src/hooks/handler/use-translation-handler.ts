@@ -143,6 +143,7 @@ export const useTranslationHandler = ({
     const isUseStructuredOutput = advStoreState.getIsUseStructuredOutput(advancedSettingsId)
     const isUseFullContextMemory = advStoreState.getIsUseFullContextMemory(advancedSettingsId)
     const isBetterContextCaching = advStoreState.getIsBetterContextCaching(advancedSettingsId)
+    const isUseMinimalContextMemory = !isBetterContextCaching
 
     const firstChunk = (size: number, s: number, e: number) => {
       const subtitleChunks: SubtitleNoTime[][] = []
@@ -235,8 +236,8 @@ export const useTranslationHandler = ({
 
     const subtitleChunks = firstChunk(size, adjustedStartIndex, adjustedEndIndex)
 
-    // Set Limited Context Memory size
-    const limitedContextMemorySize = 5
+    // Set Minimal Context Memory size
+    const minimalContextMemorySize = 5
 
     // Prepare context for the first chunk
     let context: ContextCompletion[] = []
@@ -249,12 +250,12 @@ export const useTranslationHandler = ({
       if (isUseFullContextMemory) {
         // Use all subtitles from beginning
         contextStartIndex = 0
-      } else if (isBetterContextCaching) {
+      } else if (isUseMinimalContextMemory) {
+        // Use minimal context memory size (5)
+        contextStartIndex = Math.max(0, adjustedStartIndex - minimalContextMemorySize)
+      } else {
         // Use split size for context
         contextStartIndex = Math.max(0, adjustedStartIndex - size)
-      } else {
-        // Use limited context memory size (5)
-        contextStartIndex = Math.max(0, adjustedStartIndex - limitedContextMemorySize)
       }
 
       context.push({
@@ -413,20 +414,17 @@ export const useTranslationHandler = ({
         content: getContent(rawResponse),
       })
 
-      // For Limited Context Memory
+      // For Non-Use Full Context Memory
       if (!isUseFullContextMemory) {
-        // When isBetterContextCaching is TRUE
-        // Only wake the last (pair of) context.
         context = [
           context[context.length - 2],
           context[context.length - 1],
         ]
 
-        // When isBetterContextCaching is FALSE
         // Assume: size (split size) >= contextMemorySize
         // Slice maximum of contextMemorySize of dialogues
-        if (!isBetterContextCaching && context.length >= 2) {
-          if (size < limitedContextMemorySize) {
+        if (isUseMinimalContextMemory && context.length >= 2) {
+          if (size < minimalContextMemorySize) {
             console.error(
               "Split size should be greater than or equal to context memory size " +
               "The code below only takes the last (pair of) context"
@@ -440,8 +438,8 @@ export const useTranslationHandler = ({
             translated: tlChunk[subIndex]?.translated || "",
           }))
 
-          context[0].content = createContextMemory(lastUser.slice(-limitedContextMemorySize))
-          context[1].content = createContextMemory(lastAssistant.slice(-limitedContextMemorySize))
+          context[0].content = createContextMemory(lastUser.slice(-minimalContextMemorySize))
+          context[1].content = createContextMemory(lastAssistant.slice(-minimalContextMemorySize))
         }
       }
 
