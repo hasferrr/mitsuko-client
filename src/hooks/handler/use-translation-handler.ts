@@ -411,7 +411,7 @@ export const useTranslationHandler = ({
       })
       context.push({
         role: "assistant",
-        content: getContent(rawResponse),
+        content: getContent(rawResponse).replace(/<error>[\s\S]*?<\/error>/g, "").trimEnd(),
       })
 
       // For Non-Use Full Context Memory
