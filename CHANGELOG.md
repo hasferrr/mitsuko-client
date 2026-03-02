@@ -14,6 +14,16 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2026
 
+### March 6
+
+- 🤖 **Model Updates:**
+  - Added GPT-5.4, a frontier-grade GPT-5 model with massive 1.05M context window.
+  - Added Gemini 3.1 Flash Lite in both free and paid tiers.
+
+### March 2
+
+- 🤖 **Model Updates:** Upgraded Claude 4.5 Sonnet to Claude 4.6 Sonnet and removed deprecated Claude models.
+
 ### February 21
 
 - 🎙️ **Batch Transcription:** Process multiple audio files at once with shared settings, progress tracking, smart resume, and batch downloads.

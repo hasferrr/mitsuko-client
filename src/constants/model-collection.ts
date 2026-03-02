@@ -122,6 +122,20 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
+        name: "Gemini 3.1 Flash Lite",
+        subName: "gemini-3.1-flash-lite-preview",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "Gemini 2.5 Flash",
         subName: "gemini-flash-latest\ngemini-2.5-flash-preview-09-2025",
         maxInput: 1_048_576,
@@ -185,34 +199,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "Gemini 3 Pro",
-        subName: "gemini-3-pro-preview",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "high",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini 3 Pro (Low)",
-        subName: "gemini-3-pro-preview",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "high",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
         name: "Gemini 3 Flash",
         subName: "gemini-3-flash-preview",
         maxInput: 1_048_576,
@@ -220,6 +206,20 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         usage: "medium",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Gemini 3.1 Flash Lite",
+        subName: "gemini-3.1-flash-lite-preview",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "low",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -287,20 +287,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "anthropic",
     models: [
       {
-        name: "Claude 4.5 Sonnet",
-        maxInput: 200_000,
-        maxOutput: 64_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "very high",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Claude 3.7 Sonnet",
+        name: "Claude 4.6 Sonnet",
         maxInput: 200_000,
         maxOutput: 64_000,
         structuredOutput: true,
@@ -316,19 +303,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         name: "Claude 4.5 Haiku",
         maxInput: 200_000,
         maxOutput: 64_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "medium",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Claude 3.5 Haiku",
-        maxInput: 200_000,
-        maxOutput: 8_129,
         structuredOutput: true,
         isPaid: true,
         usage: "medium",
@@ -387,6 +361,20 @@ const RAW_PAID_MODELS: PaidModelCollection = {
   OpenAI: {
     provider: "openai",
     models: [
+      {
+        name: "GPT-5.4",
+        maxInput: 1_050_000,
+        maxOutput: 128_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "high",
+        isFormatReasoning: true,
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
       {
         name: "GPT-5.2",
         maxInput: 400_000,
