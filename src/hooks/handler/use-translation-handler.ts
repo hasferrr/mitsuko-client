@@ -26,7 +26,6 @@ import {
 } from "@/constants/limits"
 import { toast } from "sonner"
 import { getContent, parseTranslationJson } from "@/lib/parser/parser"
-import { createContextMemory } from "@/lib/context-memory"
 import { useSessionStore } from "@/stores/use-session-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
@@ -260,31 +259,33 @@ export const useTranslationHandler = ({
 
       context.push({
         role: "user",
-        content: createContextMemory(subtitles
-          .slice(
-            contextStartIndex,
-            adjustedStartIndex,
-          )
-          .map((chunk) => ({
-            index: chunk.index,
-            actor: chunk.actor,
-            content: chunk.content,
-          }))
-        ),
+        content: {
+          subtitles: subtitles
+            .slice(
+              contextStartIndex,
+              adjustedStartIndex,
+            )
+            .map((chunk) => ({
+              index: chunk.index,
+              actor: chunk.actor,
+              content: chunk.content,
+            }))
+        },
       })
       context.push({
         role: "assistant",
-        content: createContextMemory(subtitles
-          .slice(
-            contextStartIndex,
-            adjustedStartIndex,
-          )
-          .map((chunk) => ({
-            index: chunk.index,
-            content: chunk.content,
-            translated: chunk.translated,
-          }))
-        ),
+        content: {
+          subtitles: subtitles
+            .slice(
+              contextStartIndex,
+              adjustedStartIndex,
+            )
+            .map((chunk) => ({
+              index: chunk.index,
+              content: chunk.content,
+              translated: chunk.translated,
+            }))
+        },
       })
     }
 
@@ -407,7 +408,7 @@ export const useTranslationHandler = ({
       // Update context for next chunk
       context.push({
         role: "user",
-        content: createContextMemory(requestBody.subtitles)
+        content: { subtitles: requestBody.subtitles }
       })
       context.push({
         role: "assistant",
@@ -438,8 +439,8 @@ export const useTranslationHandler = ({
             translated: tlChunk[subIndex]?.translated || "",
           }))
 
-          context[0].content = createContextMemory(lastUser.slice(-minimalContextMemorySize))
-          context[1].content = createContextMemory(lastAssistant.slice(-minimalContextMemorySize))
+          context[0].content = { subtitles: lastUser.slice(-minimalContextMemorySize) }
+          context[1].content = { subtitles: lastAssistant.slice(-minimalContextMemorySize) }
         }
       }
 
