@@ -5,12 +5,12 @@ export default async function TranscriptionUsage() {
   const creditCostsMap = await getModelCostData()
 
   const modelCosts = [
-    {
-      name: 'mitsuko-free',
-      input: 0,
-      output: 0,
-      maxDuration: 30 * 60,
-    },
+    // {
+    //   name: 'mitsuko-free',
+    //   input: 0,
+    //   output: 0,
+    //   maxDuration: 30 * 60,
+    // },
     {
       name: 'mitsuko-premium',
       input: ((creditCostsMap.get('mitsuko-premium')?.creditPerInputToken ?? 0) * 1920) || "N/A",
