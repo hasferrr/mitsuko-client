@@ -1,4 +1,4 @@
-import { DISCORD_LINK, GITHUB_LINK } from "@/constants/external-links"
+import { DISCORD_LINK, GITHUB_LINK, ABOUT_LINK } from "@/constants/external-links"
 import Link from "next/link"
 import { getAllPostsMeta } from "@/lib/blog"
 import FooterBadges from "@/components/landing/footer-badges"
@@ -56,7 +56,7 @@ export default async function Footer() {
             <p>Mitsuko breaks down language barriers to make all content accessible.</p>
             <p>Made with ❤️ by{" "}
               <Link
-                href={GITHUB_LINK}
+                href={ABOUT_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
