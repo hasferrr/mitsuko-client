@@ -47,7 +47,11 @@ import { fetchBackgroundTranscriptionCount } from '@/lib/api/credit-reservations
 
 const ITEMS_PER_PAGE = 5
 
-export default function TranscriptionHistory() {
+interface TranscriptionHistoryProps {
+  onApplyDirect?: (raw: string, log: TranscriptionLogItem) => void
+}
+
+export default function TranscriptionHistory({ onApplyDirect }: TranscriptionHistoryProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedLog, setSelectedLog] = useState<TranscriptionLogItem | null>(null)
@@ -502,6 +506,7 @@ export default function TranscriptionHistory() {
         onOpenChange={(open) => {
           if (!open) setSelectedLog(null)
         }}
+        onApplyDirect={onApplyDirect}
       />
     </div>
   )

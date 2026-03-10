@@ -33,9 +33,10 @@ import { ApplyToProjectDialog } from "./apply-to-project.dialog"
 interface LogResultDialogProps {
   log: TranscriptionLogItem | null
   onOpenChange: (open: boolean) => void
+  onApplyDirect?: (raw: string, log: TranscriptionLogItem) => void
 }
 
-export default function LogResultDialog({ log, onOpenChange }: LogResultDialogProps) {
+export default function LogResultDialog({ log, onOpenChange, onApplyDirect }: LogResultDialogProps) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["transcriptionLogResult", log?._id],
     queryFn: () => getTranscriptionLogResult(log!._id),
@@ -122,6 +123,11 @@ export default function LogResultDialog({ log, onOpenChange }: LogResultDialogPr
   const handleOpenApplyDialog = async () => {
     if (!data?.result) {
       toast.error("No transcription result to apply")
+      return
+    }
+
+    if (onApplyDirect && log) {
+      onApplyDirect(data.result, log)
       return
     }
 
@@ -251,7 +257,7 @@ export default function LogResultDialog({ log, onOpenChange }: LogResultDialogPr
                       onClick={handleOpenApplyDialog}
                       className="h-8"
                     >
-                      <FolderPlus className="h-3 w-3" /> Apply to project
+                      <FolderPlus className="h-3 w-3" /> {onApplyDirect ? "Apply" : "Apply to project"}
                     </Button>
                     <Button variant="outline" size="sm" onClick={handleExportSRT} className="h-8">
                       <Download className="h-3 w-3" /> Export SRT

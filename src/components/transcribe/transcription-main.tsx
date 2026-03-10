@@ -70,6 +70,7 @@ import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/tra
 import { useTranscriptionHandler } from "@/hooks/handler/use-transcription-handler"
 import { useWhisperSettingsStore } from "@/stores/use-whisper-settings-store"
 import { WhisperSettingsPanel } from "./whisper-settings-panel"
+import { TranscriptionHistoryDialog } from "./transcription-history-dialog"
 
 interface TranscriptionMainProps {
   currentId: string
@@ -453,6 +454,7 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
           className="text-xl font-semibold h-12"
           placeholder="Enter title..."
         />
+        <TranscriptionHistoryDialog currentId={currentId} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] lg:grid-cols-[400px_1fr_1fr] gap-8">
