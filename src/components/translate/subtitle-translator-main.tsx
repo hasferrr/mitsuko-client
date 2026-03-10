@@ -136,6 +136,8 @@ export default function SubtitleTranslatorMain({
 
   // Advanced Settings Store
   const resetIndex = useAdvancedSettingsStore((state) => state.resetIndex)
+  const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex(advancedSettingsId))
+  const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex(advancedSettingsId))
 
   // Translation Store
   const isTranslatingSet = useTranslationStore((state) => state.isTranslatingSet)
@@ -553,7 +555,7 @@ export default function SubtitleTranslatorMain({
             {/* Start Translation Button */}
             <Button
               className="gap-2"
-              onClick={() => handleStartTranslation()} // Uses store's startIndex/endIndex
+              onClick={() => handleStartTranslation()}
               disabled={isTranslating || !session || subtitles.length === 0}
             >
               {isTranslating ? (
@@ -564,7 +566,12 @@ export default function SubtitleTranslatorMain({
               ) : (
                 <>
                   <Play className="h-4 w-4" />
-                  {session ? "Start Translation" : "Sign In to Start"}
+                  {session
+                    ? (startIndex !== 1 || endIndex < subtitles.length)
+                      ? `Start (line ${startIndex} to ${Math.min(endIndex, subtitles.length)})`
+                      : "Start Translation"
+                    : "Sign In to Start"
+                  }
                 </>
               )}
             </Button>
