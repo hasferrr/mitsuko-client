@@ -714,7 +714,10 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
                 <Button
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                   disabled={isTranscribing || !session || isGlobalMaxDurationExceeded}
-                  onClick={handleStartTranscription}
+                  onClick={() => {
+                    setRightTab("transcript")
+                    handleStartTranscription()
+                  }}
                 >
                   {isTranscribing ? (
                     <>
