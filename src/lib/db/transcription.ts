@@ -7,6 +7,9 @@ interface TranscriptionData {
   transcriptionText: Transcription["transcriptionText"]
   transcriptSubtitles: Transcription["transcriptSubtitles"]
   models?: Transcription["models"]
+  language?: Transcription["language"]
+  selectedMode?: Transcription["selectedMode"]
+  customInstructions?: Transcription["customInstructions"]
   words?: Transcription["words"]
   segments?: Transcription["segments"]
 }

@@ -46,6 +46,7 @@ import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { SettingsDialogue } from "../settings-dialogue"
+import { TranscriptionSettingsDialogue } from "../transcribe/transcription-settings-dialogue"
 import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
 import { Badge } from "../ui/badge"
@@ -82,6 +83,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
   const [isTranslationSettingsModalOpen, setIsTranslationSettingsModalOpen] = useState(false)
   const [isExtractionSettingsModalOpen, setIsExtractionSettingsModalOpen] = useState(false)
+  const [isTranscriptionSettingsModalOpen, setIsTranscriptionSettingsModalOpen] = useState(false)
   const [isConvertModalOpen, setIsConvertModalOpen] = useState(false)
   const [isProcessingConvert, setIsProcessingConvert] = useState(false)
   const router = useRouter()
@@ -116,6 +118,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const deleteTranscriptionDb = useTranscriptionDataStore((state) => state.deleteTranscriptionDb)
   const getTranscriptionDb = useTranscriptionDataStore((state) => state.getTranscriptionDb)
   const getTranscriptionsDb = useTranscriptionDataStore((state) => state.getTranscriptionsDb)
+  const transcriptionData = useTranscriptionDataStore((state) => state.data)
 
   const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
   const isExtractingSet = useExtractionStore(state => state.isExtractingSet)
@@ -131,10 +134,16 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   useEffect(() => {
     const loadData = async () => {
       setIsLoadingData(true)
-      const [translationsData, transcriptionsData, extractionsData] = await Promise.all([
+      const [
+        translationsData,
+        transcriptionsData,
+        extractionsData,
+        _defaultTranscription,
+      ] = await Promise.all([
         getTranslationsDb(currentProject.translations),
         getTranscriptionsDb(currentProject.transcriptions),
-        getExtractionsDb(currentProject.extractions)
+        getExtractionsDb(currentProject.extractions),
+        getTranscriptionDb(currentProject.defaultTranscriptionId),
       ])
 
       setTranslations(translationsData.reverse())
@@ -442,10 +451,17 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       variant="outline"
       className="line-clamp-2"
       onClick={async () => {
+        const defaultSettings = isSeparateSettingsEnabled
+          ? transcriptionData[currentProject.defaultTranscriptionId]
+          : undefined
         const created = await createTranscriptionDb(currentProject.id, {
           title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
           transcriptionText: "",
-          transcriptSubtitles: []
+          transcriptSubtitles: [],
+          models: defaultSettings?.models,
+          language: defaultSettings?.language,
+          selectedMode: defaultSettings?.selectedMode,
+          customInstructions: defaultSettings?.customInstructions,
         })
         {
           const storeProject = useProjectStore.getState().currentProject
@@ -457,6 +473,23 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     >
       New Transcription
     </Button>
+  )
+
+  const NewTranscriptionControls = (
+    <div className="flex items-center gap-2">
+      {isSeparateSettingsEnabled && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-8 w-8 p-0"
+          onClick={() => setIsTranscriptionSettingsModalOpen(true)}
+          title="Transcription settings"
+        >
+          <Settings2 className="h-4 w-4" />
+        </Button>
+      )}
+      {NewTranscriptionButton}
+    </div>
   )
 
   const NewExtractionButton = (
@@ -638,6 +671,13 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         settingsParentType="extraction"
       />
 
+      <TranscriptionSettingsDialogue
+        isOpen={isTranscriptionSettingsModalOpen}
+        onOpenChange={setIsTranscriptionSettingsModalOpen}
+        projectName={currentProject.name}
+        defaultTranscriptionId={currentProject.defaultTranscriptionId}
+      />
+
       {/* Convert Confirmation Dialog */}
       <Dialog open={isConvertModalOpen} onOpenChange={setIsConvertModalOpen}>
         <DialogContent>
@@ -714,7 +754,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
             <div className="bg-card border border-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium">Transcriptions</h3>
-                {NewTranscriptionButton}
+                {NewTranscriptionControls}
               </div>
               <DndContext
                 sensors={sensors}
@@ -784,7 +824,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium">All Transcriptions</h3>
-              {NewTranscriptionButton}
+              {NewTranscriptionControls}
             </div>
             <DndContext
               sensors={sensors}
