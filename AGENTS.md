@@ -111,6 +111,21 @@ const setIsMaxCompletionTokensAuto = (value: boolean) => setAdvancedSettingsValu
 This wrapper pattern is used across settings components (`translate`, `batch`, `extract-context`, etc.) to keep component code declarative while leveraging the centralized setters exposed by the stores.
 As with setters, these getters ensure each component interacts only with the relevant slice of settings, avoiding accidental cross-project state leaks.
 
+### Disabling UI components visually
+
+When a component or section needs to be visually disabled (e.g., for shared settings that apply to all files), use the Tailwind classes `pointer-events-none opacity-50`:
+
+```tsx
+<div className={cn("space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
+  {isSharedSettings && (
+    <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
+  )}
+  <SettingsComponent />
+</div>
+```
+
+This pattern disables all pointer interactions and reduces opacity to indicate the disabled state while keeping the content visible for reference.
+
 ### Subtitle text encoding
 
 - Use `createUtf8SubtitleBlob(content, type)` from `src/lib/utils.ts` for all SRT/ASS/VTT downloads
