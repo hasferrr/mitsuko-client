@@ -11,7 +11,6 @@ interface LocalSettingsStore {
   customApiConfigs: CustomApiConfig[]
   selectedApiConfigIndex: number | null
   isThirdPartyModelEnabled: boolean
-  isSeparateSettingsEnabled: boolean
   isAutoTemperatureEnabled: boolean
   isSubtitleCleanupEnabled: boolean
   isDeleteAfterTranscription: boolean
@@ -23,7 +22,6 @@ interface LocalSettingsStore {
   selectApiConfig: (index: number | null) => void
 
   toggleThirdPartyModel: () => void
-  setIsSeparateSettingsEnabled: (enabled: boolean) => void
   setIsAutoTemperatureEnabled: (enabled: boolean) => void
   setIsSubtitleCleanupEnabled: (enabled: boolean) => void
   setIsDeleteAfterTranscription: (enabled: boolean) => void
@@ -36,7 +34,6 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       customApiConfigs: [],
       selectedApiConfigIndex: null,
       isThirdPartyModelEnabled: false,
-      isSeparateSettingsEnabled: false,
       isAutoTemperatureEnabled: true,
       isSubtitleCleanupEnabled: true,
       isDeleteAfterTranscription: true,
@@ -77,7 +74,6 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       selectApiConfig: (index) => set({ selectedApiConfigIndex: index }),
 
       toggleThirdPartyModel: () => set((state) => ({ isThirdPartyModelEnabled: !state.isThirdPartyModelEnabled })),
-      setIsSeparateSettingsEnabled: (enabled) => set({ isSeparateSettingsEnabled: enabled }),
       setIsAutoTemperatureEnabled: (enabled) => set({ isAutoTemperatureEnabled: enabled }),
       setIsSubtitleCleanupEnabled: (enabled) => set({ isSubtitleCleanupEnabled: enabled }),
       setIsDeleteAfterTranscription: (enabled) => set({ isDeleteAfterTranscription: enabled }),

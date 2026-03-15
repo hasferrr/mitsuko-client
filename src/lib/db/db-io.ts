@@ -2,17 +2,36 @@ import { db } from './db'
 import { DatabaseExport, databaseExportConstructor, generateNewIds } from './db-constructor'
 import { Project, BasicSettings, AdvancedSettings, Transcription } from '@/types/project'
 import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS, DEFAULT_TRANSCTIPTION_SETTINGS } from '@/constants/default'
-import { GLOBAL_ADVANCED_SETTINGS_ID, GLOBAL_BASIC_SETTINGS_ID } from '@/constants/global-settings'
+import {
+  GLOBAL_ADVANCED_SETTINGS_ID,
+  GLOBAL_BASIC_SETTINGS_ID,
+  GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
+  GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
+  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSCRIPTION_SETTINGS_ID
+} from '@/constants/global-settings'
 
+const GLOBAL_BASIC_IDS = [
+  GLOBAL_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
+]
+
+const GLOBAL_ADVANCED_IDS = [
+  GLOBAL_ADVANCED_SETTINGS_ID,
+  GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
+  GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
+]
 export async function exportDatabase(): Promise<string> {
   const exportData: DatabaseExport = {
     projects: await db.projects.toArray(),
     translations: await db.translations.toArray(),
-    transcriptions: await db.transcriptions.toArray(),
+    transcriptions: (await db.transcriptions.toArray()).filter(t => t.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID),
     extractions: await db.extractions.toArray(),
     projectOrders: await db.projectOrders.toArray(),
-    basicSettings: (await db.basicSettings.toArray()).filter(s => s.id !== GLOBAL_BASIC_SETTINGS_ID),
-    advancedSettings: (await db.advancedSettings.toArray()).filter(s => s.id !== GLOBAL_ADVANCED_SETTINGS_ID),
+    basicSettings: (await db.basicSettings.toArray()).filter(s => !GLOBAL_BASIC_IDS.includes(s.id)),
+    advancedSettings: (await db.advancedSettings.toArray()).filter(s => !GLOBAL_ADVANCED_IDS.includes(s.id)),
   }
 
   if (process.env.NODE_ENV === 'development') {
@@ -77,10 +96,10 @@ export async function exportProject(
 
   const basicSettings = (
     await db.basicSettings.bulkGet(Array.from(basicSettingsIds))
-  ).filter((s): s is BasicSettings => s !== undefined && s.id !== GLOBAL_BASIC_SETTINGS_ID)
+  ).filter((s): s is BasicSettings => s !== undefined && !GLOBAL_BASIC_IDS.includes(s.id))
   const advancedSettings = (
     await db.advancedSettings.bulkGet(Array.from(advancedSettingsIds))
-  ).filter((s): s is AdvancedSettings => s !== undefined && s.id !== GLOBAL_ADVANCED_SETTINGS_ID)
+  ).filter((s): s is AdvancedSettings => s !== undefined && !GLOBAL_ADVANCED_IDS.includes(s.id))
 
   const projectOrders = await db.projectOrders.limit(1).toArray()
   const projectOrder =
@@ -236,14 +255,14 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
         await Promise.all([
           db.projects.clear(),
           db.translations.clear(),
-          db.transcriptions.clear(),
+          db.transcriptions.filter(t => t.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID).delete(),
           db.extractions.clear(),
           db.projectOrders.clear(),
           db.basicSettings
-            .filter(s => s.id !== GLOBAL_BASIC_SETTINGS_ID)
+            .filter(s => !GLOBAL_BASIC_IDS.includes(s.id))
             .delete(),
           db.advancedSettings
-            .filter(s => s.id !== GLOBAL_ADVANCED_SETTINGS_ID)
+            .filter(s => !GLOBAL_ADVANCED_IDS.includes(s.id))
             .delete()
         ])
 

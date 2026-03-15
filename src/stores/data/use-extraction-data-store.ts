@@ -60,14 +60,8 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
       const project = await db.projects.get(projectId)
       if (!project) throw new Error('Project not found')
 
-      const isSeparateSettingsEnabled = useLocalSettingsStore.getState().isSeparateSettingsEnabled
-
-      const basicSettingsId = isSeparateSettingsEnabled
-        ? (project.defaultExtractionBasicSettingsId || project.defaultBasicSettingsId)
-        : project.defaultBasicSettingsId
-      const advancedSettingsId = isSeparateSettingsEnabled
-        ? (project.defaultExtractionAdvancedSettingsId || project.defaultAdvancedSettingsId)
-        : project.defaultAdvancedSettingsId
+      const basicSettingsId = project.defaultExtractionBasicSettingsId
+      const advancedSettingsId = project.defaultExtractionAdvancedSettingsId
 
       const bsFromDb = await getBasicSettings(basicSettingsId)
       const adsFromDb = await getAdvancedSettings(advancedSettingsId)

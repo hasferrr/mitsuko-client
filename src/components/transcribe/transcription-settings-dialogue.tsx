@@ -18,6 +18,7 @@ interface TranscriptionSettingsDialogueProps {
   onOpenChange: (isOpen: boolean) => void
   projectName: string
   defaultTranscriptionId: string
+  isGlobal?: boolean
 }
 
 export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialogueProps> = ({
@@ -25,6 +26,7 @@ export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialog
   onOpenChange,
   projectName,
   defaultTranscriptionId,
+  isGlobal,
 }) => {
   const getTranscriptionDb = useTranscriptionDataStore((s) => s.getTranscriptionDb)
   const data = useTranscriptionDataStore((s) => s.data)
@@ -44,9 +46,11 @@ export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialog
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Transcription Settings</DialogTitle>
+          <DialogTitle>{isGlobal ? "Global Transcription Settings" : "Transcription Settings"}</DialogTitle>
           <DialogDescription>
-            {`Default transcription settings for "${projectName}" will go here.`}
+            {isGlobal
+              ? "Configure the default transcription settings for all new projects."
+              : `Default transcription settings for "${projectName}" will go here.`}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">

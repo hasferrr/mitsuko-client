@@ -50,21 +50,11 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const renameProject = useProjectStore((state) => state.renameProject)
 
-  const isSeparateSettingsEnabled = useLocalSettingsStore((state) => state.isSeparateSettingsEnabled)
+  const translationBasicSettingsId = currentProject?.defaultTranslationBasicSettingsId || basicSettingsId
+  const translationAdvancedSettingsId = currentProject?.defaultTranslationAdvancedSettingsId || advancedSettingsId
 
-  const translationBasicSettingsId = isSeparateSettingsEnabled
-    ? currentProject?.defaultTranslationBasicSettingsId || basicSettingsId
-    : basicSettingsId
-  const translationAdvancedSettingsId = isSeparateSettingsEnabled
-    ? currentProject?.defaultTranslationAdvancedSettingsId || advancedSettingsId
-    : advancedSettingsId
-
-  const extractionBasicSettingsId = isSeparateSettingsEnabled
-    ? currentProject?.defaultExtractionBasicSettingsId || basicSettingsId
-    : basicSettingsId
-  const extractionAdvancedSettingsId = isSeparateSettingsEnabled
-    ? currentProject?.defaultExtractionAdvancedSettingsId || advancedSettingsId
-    : advancedSettingsId
+  const extractionBasicSettingsId = currentProject?.defaultExtractionBasicSettingsId || basicSettingsId
+  const extractionAdvancedSettingsId = currentProject?.defaultExtractionAdvancedSettingsId || advancedSettingsId
 
   const handleBatchNameChange = (value: string) => {
     if (currentProject?.id && value.trim()) {

@@ -58,14 +58,8 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       const project = await db.projects.get(projectId)
       if (!project) throw new Error('Project not found')
 
-      const isSeparateSettingsEnabled = useLocalSettingsStore.getState().isSeparateSettingsEnabled
-
-      const basicSettingsId = isSeparateSettingsEnabled
-        ? (project.defaultTranslationBasicSettingsId || project.defaultBasicSettingsId)
-        : project.defaultBasicSettingsId
-      const advancedSettingsId = isSeparateSettingsEnabled
-        ? (project.defaultTranslationAdvancedSettingsId || project.defaultAdvancedSettingsId)
-        : project.defaultAdvancedSettingsId
+      const basicSettingsId = project.defaultTranslationBasicSettingsId
+      const advancedSettingsId = project.defaultTranslationAdvancedSettingsId
 
       const bsFromDb = await getBasicSettings(basicSettingsId)
       const adsFromDb = await getAdvancedSettings(advancedSettingsId)

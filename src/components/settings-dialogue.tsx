@@ -43,7 +43,6 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { SettingsParentType } from "@/types/project"
 
 interface SettingsDialogueProps {
@@ -75,7 +74,6 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
   const resetAdvancedSettingsToGlobal = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsToGlobal)
   const resetBasicSettingsFrom = useSettingsStore((s) => s.resetBasicSettingsFrom)
   const resetAdvancedSettingsFrom = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsFrom)
-  const isSeparateSettingsEnabled = useLocalSettingsStore((s) => s.isSeparateSettingsEnabled)
 
   const dialogTitle = isGlobal
     ? "Global Settings"
@@ -218,14 +216,6 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
           )}
         </div>
         <DialogFooter>
-          {!isGlobal && settingsParentType === 'project' && isSeparateSettingsEnabled && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <div className="h-3 w-3">
-                <Info className="h-3 w-3" />
-              </div>
-              This settings will not be used because "Separate Default Settings" is enabled.
-            </div>
-          )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline">
@@ -238,9 +228,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
                 <AlertDialogDescription>
                   {isGlobal
                     ? "This will reset settings to defaults."
-                    : settingsParentType === 'project'
-                      ? "This will reset to global settings."
-                      : "This will reset to project settings."
+                    : "This will reset to global settings."
                   }
                 </AlertDialogDescription>
               </AlertDialogHeader>

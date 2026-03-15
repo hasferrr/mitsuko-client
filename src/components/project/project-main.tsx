@@ -47,6 +47,12 @@ import { useTranscriptionStore } from "@/stores/services/use-transcription-store
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { SettingsDialogue } from "../settings-dialogue"
 import { TranscriptionSettingsDialogue } from "../transcribe/transcription-settings-dialogue"
+import {
+  GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
+  GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
+  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID
+} from "@/constants/global-settings"
 import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
 import { Badge } from "../ui/badge"
@@ -80,15 +86,12 @@ interface ProjectMainProps {
 export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
   const [isTranslationSettingsModalOpen, setIsTranslationSettingsModalOpen] = useState(false)
   const [isExtractionSettingsModalOpen, setIsExtractionSettingsModalOpen] = useState(false)
   const [isTranscriptionSettingsModalOpen, setIsTranscriptionSettingsModalOpen] = useState(false)
   const [isConvertModalOpen, setIsConvertModalOpen] = useState(false)
   const [isProcessingConvert, setIsProcessingConvert] = useState(false)
   const router = useRouter()
-
-  const isSeparateSettingsEnabled = useLocalSettingsStore((state) => state.isSeparateSettingsEnabled)
 
   const renameProject = useProjectStore((state) => state.renameProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
@@ -430,17 +433,15 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
 
   const NewTranslationControls = (
     <div className="flex items-center gap-2">
-      {isSeparateSettingsEnabled && (
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-8 w-8 p-0"
-          onClick={() => setIsTranslationSettingsModalOpen(true)}
-          title="Translation settings"
-        >
-          <Settings2 className="h-4 w-4" />
-        </Button>
-      )}
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-8 w-8 p-0"
+        onClick={() => setIsTranslationSettingsModalOpen(true)}
+        title="Translation settings"
+      >
+        <Settings2 className="h-4 w-4" />
+      </Button>
       {NewTranslationButton}
     </div>
   )
@@ -451,9 +452,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       variant="outline"
       className="line-clamp-2"
       onClick={async () => {
-        const defaultSettings = isSeparateSettingsEnabled
-          ? transcriptionData[currentProject.defaultTranscriptionId]
-          : undefined
+        const defaultSettings = transcriptionData[currentProject.defaultTranscriptionId]
         const created = await createTranscriptionDb(currentProject.id, {
           title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
           transcriptionText: "",
@@ -477,17 +476,15 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
 
   const NewTranscriptionControls = (
     <div className="flex items-center gap-2">
-      {isSeparateSettingsEnabled && (
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-8 w-8 p-0"
-          onClick={() => setIsTranscriptionSettingsModalOpen(true)}
-          title="Transcription settings"
-        >
-          <Settings2 className="h-4 w-4" />
-        </Button>
-      )}
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-8 w-8 p-0"
+        onClick={() => setIsTranscriptionSettingsModalOpen(true)}
+        title="Transcription settings"
+      >
+        <Settings2 className="h-4 w-4" />
+      </Button>
       {NewTranscriptionButton}
     </div>
   )
@@ -524,17 +521,15 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
 
   const NewExtractionControls = (
     <div className="flex items-center gap-2">
-      {isSeparateSettingsEnabled && (
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-8 w-8 p-0"
-          onClick={() => setIsExtractionSettingsModalOpen(true)}
-          title="Extraction settings"
-        >
-          <Settings2 className="h-4 w-4" />
-        </Button>
-      )}
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-8 w-8 p-0"
+        onClick={() => setIsExtractionSettingsModalOpen(true)}
+        title="Extraction settings"
+      >
+        <Settings2 className="h-4 w-4" />
+      </Button>
       {NewExtractionButton}
     </div>
   )
@@ -594,13 +589,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
               Rename
             </button>
             <button
-              onClick={() => setIsSettingsModalOpen(true)}
-              className="flex items-center gap-2 hover:underline"
-            >
-              <Settings2 size={4 * 5} />
-              Settings
-            </button>
-            <button
               onClick={handleExportProject}
               className="flex items-center gap-2 hover:underline"
             >
@@ -642,21 +630,13 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       />
 
       <SettingsDialogue
-        isOpen={isSettingsModalOpen}
-        onOpenChange={setIsSettingsModalOpen}
-        projectName={currentProject.name}
-        basicSettingsId={currentProject.defaultBasicSettingsId}
-        advancedSettingsId={currentProject.defaultAdvancedSettingsId}
-      />
-
-      <SettingsDialogue
         isOpen={isTranslationSettingsModalOpen}
         onOpenChange={setIsTranslationSettingsModalOpen}
         projectName={currentProject.name}
         basicSettingsId={currentProject.defaultTranslationBasicSettingsId}
         advancedSettingsId={currentProject.defaultTranslationAdvancedSettingsId}
-        resetFromBasicSettingsId={currentProject.defaultBasicSettingsId}
-        resetFromAdvancedSettingsId={currentProject.defaultAdvancedSettingsId}
+        resetFromBasicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
+        resetFromAdvancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
         settingsParentType="translation"
       />
 
@@ -666,8 +646,8 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         projectName={currentProject.name}
         basicSettingsId={currentProject.defaultExtractionBasicSettingsId}
         advancedSettingsId={currentProject.defaultExtractionAdvancedSettingsId}
-        resetFromBasicSettingsId={currentProject.defaultBasicSettingsId}
-        resetFromAdvancedSettingsId={currentProject.defaultAdvancedSettingsId}
+        resetFromBasicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
+        resetFromAdvancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
         settingsParentType="extraction"
       />
 
