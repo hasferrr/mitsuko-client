@@ -14,6 +14,19 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { SettingsTranscription } from "./settings-transcription"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
+import { GLOBAL_TRANSCRIPTION_SETTINGS_ID } from "@/constants/global-settings"
+import { DEFAULT_TRANSCRIPTION_SETTINGS } from "@/constants/default"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface TranscriptionSettingsDialogueProps {
   isOpen: boolean
@@ -37,7 +50,26 @@ export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialog
   onOpenGlobalSettings,
 }) => {
   const getTranscriptionDb = useTranscriptionDataStore((s) => s.getTranscriptionDb)
+  const updateTranscriptionDb = useTranscriptionDataStore((s) => s.updateTranscriptionDb)
+  const copyTranscriptionSettingsKeys = useTranscriptionDataStore((s) => s.copyTranscriptionSettingsKeys)
   const data = useTranscriptionDataStore((s) => s.data)
+
+  const handleResetAll = async () => {
+    if (isGlobal) {
+      await updateTranscriptionDb(defaultTranscriptionId, {
+        language: DEFAULT_TRANSCRIPTION_SETTINGS.language,
+        selectedMode: DEFAULT_TRANSCRIPTION_SETTINGS.selectedMode,
+        customInstructions: DEFAULT_TRANSCRIPTION_SETTINGS.customInstructions,
+        models: DEFAULT_TRANSCRIPTION_SETTINGS.models,
+      })
+    } else {
+      await copyTranscriptionSettingsKeys(
+        GLOBAL_TRANSCRIPTION_SETTINGS_ID,
+        defaultTranscriptionId,
+        ['language', 'selectedMode', 'customInstructions', 'models']
+      )
+    }
+  }
 
   useEffect(() => {
     if (isOpen && !data[defaultTranscriptionId]) {
@@ -93,6 +125,28 @@ export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialog
               Global Settings
             </Button>
           )}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline">
+                Reset All
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Reset all settings?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {isGlobal
+                    ? "This will reset settings to defaults."
+                    : "This will reset to global settings."
+                  }
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleResetAll}>Reset</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Close</Button>
         </DialogFooter>
       </DialogContent>
