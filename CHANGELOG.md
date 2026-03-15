@@ -14,6 +14,11 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2026
 
+### March 16
+
+- ⚙️ **Independent Feature Settings:** You can now enable custom default settings for Translation, Extraction, and Transcription independently from one another within your projects.
+- 🎛️ **Better Global Settings:** The User Settings panel has been reorganized with dedicated buttons to easily configure your global defaults for each tool individually.
+
 ### March 6
 
 - 🤖 **Model Updates:**
