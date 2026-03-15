@@ -31,6 +31,8 @@ export function UserSettings() {
   const toggleThirdPartyModel = useLocalSettingsStore((state) => state.toggleThirdPartyModel)
   const isSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.isSubtitlePerformanceModeEnabled)
   const setIsSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.setIsSubtitlePerformanceModeEnabled)
+  const isDefaultSettingsEnabledDefault = useLocalSettingsStore((state) => state.isDefaultSettingsEnabledDefault)
+  const setIsDefaultSettingsEnabledDefault = useLocalSettingsStore((state) => state.setIsDefaultSettingsEnabledDefault)
   const [isThirdPartyDialogOpen, setIsThirdPartyDialogOpen] = useState(false)
   const [isGlobalTranslationSettingsOpen, setIsGlobalTranslationSettingsOpen] = useState(false)
   const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
@@ -103,8 +105,8 @@ export function UserSettings() {
             </div>
             <Switch
               id="default-settings-enabled-default-switch"
-              checked={useLocalSettingsStore((state) => state.isDefaultSettingsEnabledDefault)}
-              onCheckedChange={(checked) => useLocalSettingsStore.getState().setIsDefaultSettingsEnabledDefault(checked)}
+              checked={isDefaultSettingsEnabledDefault}
+              onCheckedChange={setIsDefaultSettingsEnabledDefault}
             />
           </div>
 
