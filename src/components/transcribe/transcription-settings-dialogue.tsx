@@ -16,6 +16,7 @@ import { SettingsTranscription } from "./settings-transcription"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { GLOBAL_TRANSCRIPTION_SETTINGS_ID } from "@/constants/global-settings"
 import { DEFAULT_TRANSCRIPTION_SETTINGS } from "@/constants/default"
+import { Settings2 } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -122,6 +123,7 @@ export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialog
         <DialogFooter>
           {!isGlobal && onOpenGlobalSettings && (
             <Button variant="outline" className="mr-auto" onClick={onOpenGlobalSettings}>
+              <Settings2 className="h-4 w-4" />
               Global Settings
             </Button>
           )}
