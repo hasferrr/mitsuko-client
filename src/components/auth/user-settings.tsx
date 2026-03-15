@@ -56,31 +56,8 @@ export function UserSettings() {
   return (
     <>
       <div className="rounded-md overflow-hidden border">
-        <div className="px-4 py-2 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="px-4 py-2 border-b">
           <h2 className="font-medium">User Settings</h2>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsGlobalTranslationSettingsOpen(true)}
-            >
-              <Settings2 className="h-4 w-4 mr-2" />
-              Global Translation
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setIsGlobalTranscriptionSettingsOpen(true)}
-            >
-              <Settings2 className="h-4 w-4 mr-2" />
-              Global Transcription
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setIsGlobalExtractionSettingsOpen(true)}
-            >
-              <Settings2 className="h-4 w-4 mr-2" />
-              Global Extraction
-            </Button>
-          </div>
         </div>
         <div className="p-4 space-y-4">
           <div className="flex items-center justify-between gap-2">
@@ -129,6 +106,60 @@ export function UserSettings() {
               checked={useLocalSettingsStore((state) => state.isDefaultSettingsEnabledDefault)}
               onCheckedChange={(checked) => useLocalSettingsStore.getState().setIsDefaultSettingsEnabledDefault(checked)}
             />
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Global Translation Settings
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Configure default translation settings that apply to all new projects.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setIsGlobalTranslationSettingsOpen(true)}
+            >
+              <Settings2 className="h-4 w-4" />
+              Configure
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Global Transcription Settings
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Configure default transcription settings that apply to all new projects.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setIsGlobalTranscriptionSettingsOpen(true)}
+            >
+              <Settings2 className="h-4 w-4" />
+              Configure
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Global Extraction Settings
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Configure default extraction settings that apply to all new projects.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setIsGlobalExtractionSettingsOpen(true)}
+            >
+              <Settings2 className="h-4 w-4" />
+              Configure
+            </Button>
           </div>
         </div>
       </div>
