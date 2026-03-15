@@ -95,7 +95,7 @@ export function UserSettings() {
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-col gap-2">
               <Label>
-                Auto-enable project settings for new projects
+                Auto-enable custom default settings for new projects
               </Label>
               <p className="text-xs text-muted-foreground max-w-lg">
                 When enabled, the "Enable Settings" option for translation, extraction, and transcription will be automatically turned on for newly created projects.

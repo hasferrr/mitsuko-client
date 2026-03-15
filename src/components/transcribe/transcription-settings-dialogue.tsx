@@ -102,7 +102,7 @@ export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialog
                 Enable Settings
               </Label>
               <p className="text-xs text-muted-foreground">
-                When enabled, new transcriptions in this project will use these custom default settings. When disabled, they will use your Global Transcription Settings.
+                When enabled, new transcriptions will use these custom default settings. When disabled, they will use your Global Transcription Settings.
               </p>
             </div>
             <Switch

@@ -142,7 +142,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
                 Enable Settings
               </Label>
               <p className="text-xs text-muted-foreground">
-                When enabled, new {settingsParentType}s in this project will use these custom default settings. When disabled, they will use your Global settings.
+                When enabled, new {settingsParentType}s will use these custom default settings. When disabled, they will use your Global settings.
               </p>
             </div>
             <Switch
