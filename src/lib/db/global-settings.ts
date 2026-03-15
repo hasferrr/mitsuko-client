@@ -55,12 +55,26 @@ export const getOrCreateGlobalAdvancedSettings = async (): Promise<AdvancedSetti
 export const getOrCreateGlobalTranslationBasicSettings = async (): Promise<BasicSettings> => {
   const existing = await getBasicSettings(GLOBAL_TRANSLATION_BASIC_SETTINGS_ID)
   if (existing) return existing
+  
+  const globalBasic = await getGlobalBasicSettings()
+  if (globalBasic) {
+    const { id, createdAt, updatedAt, ...rest } = globalBasic
+    return upsertBasicSettingsWithId(GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, rest)
+  }
+
   return upsertBasicSettingsWithId(GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, { ...DEFAULT_BASIC_SETTINGS })
 }
 
 export const getOrCreateGlobalTranslationAdvancedSettings = async (): Promise<AdvancedSettings> => {
   const existing = await getAdvancedSettings(GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID)
   if (existing) return existing
+  
+  const globalAdvanced = await getGlobalAdvancedSettings()
+  if (globalAdvanced) {
+    const { id, createdAt, updatedAt, ...rest } = globalAdvanced
+    return upsertAdvancedSettingsWithId(GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, rest)
+  }
+
   return upsertAdvancedSettingsWithId(GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, { ...DEFAULT_ADVANCED_SETTINGS })
 }
 
