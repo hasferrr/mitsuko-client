@@ -1,2 +1,7 @@
 export const GLOBAL_BASIC_SETTINGS_ID = 'global-basic-settings'
 export const GLOBAL_ADVANCED_SETTINGS_ID = 'global-advanced-settings'
+export const GLOBAL_TRANSLATION_BASIC_SETTINGS_ID = 'global-translation-basic-settings'
+export const GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID = 'global-translation-advanced-settings'
+export const GLOBAL_EXTRACTION_BASIC_SETTINGS_ID = 'global-extraction-basic-settings'
+export const GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID = 'global-extraction-advanced-settings'
+export const GLOBAL_TRANSCRIPTION_SETTINGS_ID = 'global-transcription-settings'

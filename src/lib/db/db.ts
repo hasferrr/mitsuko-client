@@ -1,4 +1,4 @@
-import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_TRANSCTIPTION_SETTINGS } from '@/constants/default'
+import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
 import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
 import { CustomInstruction } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'
@@ -289,7 +289,7 @@ class MyDatabase extends Dexie {
             title: '',
             transcriptionText: '',
             transcriptSubtitles: [],
-            ...DEFAULT_TRANSCTIPTION_SETTINGS,
+            ...DEFAULT_TRANSCRIPTION_SETTINGS,
             words: [],
             segments: [],
             createdAt: new Date(),
@@ -307,6 +307,19 @@ class MyDatabase extends Dexie {
       for (const update of projectUpdates) {
         await projectsTable.update(update.id, update.changes)
       }
+    })
+    this.version(24).stores({}).upgrade(async tx => {
+      await tx.table('projects').toCollection().modify(project => {
+        if (typeof project.isDefaultTranslationEnabled === 'undefined') {
+          project.isDefaultTranslationEnabled = false
+        }
+        if (typeof project.isDefaultExtractionEnabled === 'undefined') {
+          project.isDefaultExtractionEnabled = false
+        }
+        if (typeof project.isDefaultTranscriptionEnabled === 'undefined') {
+          project.isDefaultTranscriptionEnabled = false
+        }
+      })
     })
   }
 }

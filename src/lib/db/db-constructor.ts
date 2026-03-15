@@ -154,6 +154,9 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       defaultExtractionAdvancedSettingsId: newDefaultExtractionAdvancedSettingsId,
       defaultTranscriptionId: newDefaultTranscriptionId,
       isBatch: project.isBatch ?? false,
+      isDefaultTranslationEnabled: typeof project.isDefaultTranslationEnabled === 'boolean' ? project.isDefaultTranslationEnabled : false,
+      isDefaultExtractionEnabled: typeof project.isDefaultExtractionEnabled === 'boolean' ? project.isDefaultExtractionEnabled : false,
+      isDefaultTranscriptionEnabled: typeof project.isDefaultTranscriptionEnabled === 'boolean' ? project.isDefaultTranscriptionEnabled : false,
     }
   })
 
@@ -204,6 +207,9 @@ function projectConstructor(project: Partial<Project>): Project {
     defaultExtractionAdvancedSettingsId: project.defaultExtractionAdvancedSettingsId ?? "",
     defaultTranscriptionId: project.defaultTranscriptionId ?? "",
     isBatch: project.isBatch ?? false,
+    isDefaultTranslationEnabled: typeof project.isDefaultTranslationEnabled === 'boolean' ? project.isDefaultTranslationEnabled : false,
+    isDefaultExtractionEnabled: typeof project.isDefaultExtractionEnabled === 'boolean' ? project.isDefaultExtractionEnabled : false,
+    isDefaultTranscriptionEnabled: typeof project.isDefaultTranscriptionEnabled === 'boolean' ? project.isDefaultTranscriptionEnabled : false,
   }
 }
 

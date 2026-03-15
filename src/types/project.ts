@@ -28,6 +28,9 @@ export interface Project {
   createdAt: Date
   updatedAt: Date
   isBatch: boolean // Indicates whether this project is a batch-type project
+  isDefaultTranslationEnabled: boolean
+  isDefaultExtractionEnabled: boolean
+  isDefaultTranscriptionEnabled: boolean
 }
 
 export interface Translation {

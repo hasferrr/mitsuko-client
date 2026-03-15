@@ -180,14 +180,5 @@ export default function Batch() {
     )
   }
 
-  if (!batch.defaultBasicSettingsId || !batch.defaultAdvancedSettingsId) {
-    return <div className="p-4">Invalid settings data</div>
-  }
-
-  return (
-    <BatchMain
-      basicSettingsId={batch.defaultBasicSettingsId}
-      advancedSettingsId={batch.defaultAdvancedSettingsId}
-    />
-  )
+  return <BatchMain />
 }

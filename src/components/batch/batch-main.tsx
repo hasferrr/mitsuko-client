@@ -35,12 +35,7 @@ import { BatchTranslationView } from "./batch-translation-view"
 import { BatchExtractionView } from "./batch-extraction-view"
 import { BatchTranscriptionView } from "./batch-transcription-view"
 
-interface BatchMainProps {
-  basicSettingsId: string
-  advancedSettingsId: string
-}
-
-export default function BatchMain({ basicSettingsId, advancedSettingsId }: BatchMainProps) {
+export default function BatchMain() {
   const [operationMode, setOperationMode] = useState<"translation" | "extraction" | "transcription">("translation")
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
@@ -50,21 +45,11 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const renameProject = useProjectStore((state) => state.renameProject)
 
-  const isSeparateSettingsEnabled = useLocalSettingsStore((state) => state.isSeparateSettingsEnabled)
+  const translationBasicSettingsId = currentProject?.defaultTranslationBasicSettingsId
+  const translationAdvancedSettingsId = currentProject?.defaultTranslationAdvancedSettingsId
 
-  const translationBasicSettingsId = isSeparateSettingsEnabled
-    ? currentProject?.defaultTranslationBasicSettingsId || basicSettingsId
-    : basicSettingsId
-  const translationAdvancedSettingsId = isSeparateSettingsEnabled
-    ? currentProject?.defaultTranslationAdvancedSettingsId || advancedSettingsId
-    : advancedSettingsId
-
-  const extractionBasicSettingsId = isSeparateSettingsEnabled
-    ? currentProject?.defaultExtractionBasicSettingsId || basicSettingsId
-    : basicSettingsId
-  const extractionAdvancedSettingsId = isSeparateSettingsEnabled
-    ? currentProject?.defaultExtractionAdvancedSettingsId || advancedSettingsId
-    : advancedSettingsId
+  const extractionBasicSettingsId = currentProject?.defaultExtractionBasicSettingsId
+  const extractionAdvancedSettingsId = currentProject?.defaultExtractionAdvancedSettingsId
 
   const handleBatchNameChange = (value: string) => {
     if (currentProject?.id && value.trim()) {
@@ -150,13 +135,13 @@ export default function BatchMain({ basicSettingsId, advancedSettingsId }: Batch
       </div>
 
       {/* Main Content */}
-      {operationMode === 'translation' && (
+      {operationMode === 'translation' && translationBasicSettingsId && translationAdvancedSettingsId && (
         <BatchTranslationView
           basicSettingsId={translationBasicSettingsId}
           advancedSettingsId={translationAdvancedSettingsId}
         />
       )}
-      {operationMode === 'extraction' && (
+      {operationMode === 'extraction' && extractionBasicSettingsId && extractionAdvancedSettingsId && (
         <BatchExtractionView
           basicSettingsId={extractionBasicSettingsId}
           advancedSettingsId={extractionAdvancedSettingsId}

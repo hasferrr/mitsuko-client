@@ -1,8 +1,8 @@
 import { Project, Transcription } from "@/types/project"
 import { db } from "./db"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
-import { getOrCreateGlobalBasicSettings, getOrCreateGlobalAdvancedSettings } from "./global-settings"
-import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
+import { getOrCreateGlobalBasicSettings, getOrCreateGlobalAdvancedSettings, getOrCreateGlobalTranslationBasicSettings, getOrCreateGlobalTranslationAdvancedSettings, getOrCreateGlobalExtractionBasicSettings, getOrCreateGlobalExtractionAdvancedSettings, getOrCreateGlobalTranscriptionSettings } from "./global-settings"
+import { DEFAULT_TRANSCRIPTION_SETTINGS } from "@/constants/default"
 
 const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(obj: T) => {
   const { id, createdAt, updatedAt, ...rest } = obj
@@ -11,29 +11,45 @@ const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(o
 }
 
 // Project CRUD functions
-export const createProject = async (name: string, isBatch = false): Promise<Project> => {
+export const createProject = async (name: string, isBatch = false, isAutoEnableProjectSettings = false): Promise<Project> => {
   return db.transaction('rw', [db.projects, db.projectOrders, db.basicSettings, db.advancedSettings, db.transcriptions], async () => {
     const id = crypto.randomUUID()
+
+    // Batch projects always have default settings enabled
+    const enableFlags = isBatch ? true : isAutoEnableProjectSettings
 
     const globalBasic = await getOrCreateGlobalBasicSettings()
     const basicTemplate = stripMeta(globalBasic)
     const basicSettings = await createBasicSettings(basicTemplate)
-    const translationBasicSettings = await createBasicSettings(stripMeta(basicSettings))
-    const extractionBasicSettings = await createBasicSettings(stripMeta(basicSettings))
+
+    const globalTranslationBasic = await getOrCreateGlobalTranslationBasicSettings()
+    const translationBasicSettings = await createBasicSettings(stripMeta(globalTranslationBasic))
+
+    const globalExtractionBasic = await getOrCreateGlobalExtractionBasicSettings()
+    const extractionBasicSettings = await createBasicSettings(stripMeta(globalExtractionBasic))
 
     const globalAdvanced = await getOrCreateGlobalAdvancedSettings()
     const advancedTemplate = stripMeta(globalAdvanced)
     const advancedSettings = await createAdvancedSettings(advancedTemplate)
-    const translationAdvancedSettings = await createAdvancedSettings(stripMeta(advancedSettings))
-    const extractionAdvancedSettings = await createAdvancedSettings(stripMeta(advancedSettings))
+
+    const globalTranslationAdvanced = await getOrCreateGlobalTranslationAdvancedSettings()
+    const translationAdvancedSettings = await createAdvancedSettings(stripMeta(globalTranslationAdvanced))
+
+    const globalExtractionAdvanced = await getOrCreateGlobalExtractionAdvancedSettings()
+    const extractionAdvancedSettings = await createAdvancedSettings(stripMeta(globalExtractionAdvanced))
 
     // Create default transcription for batch settings
+    const globalTranscriptionSettings = await getOrCreateGlobalTranscriptionSettings()
     const defaultTranscriptionId = crypto.randomUUID()
     const defaultTranscription: Transcription = {
       id: defaultTranscriptionId,
       projectId: id,
       title: '',
-      ...DEFAULT_TRANSCTIPTION_SETTINGS,
+      ...DEFAULT_TRANSCRIPTION_SETTINGS,
+      models: globalTranscriptionSettings.models,
+      language: globalTranscriptionSettings.language,
+      selectedMode: globalTranscriptionSettings.selectedMode,
+      customInstructions: globalTranscriptionSettings.customInstructions,
       transcriptionText: '',
       transcriptSubtitles: [],
       words: [],
@@ -59,6 +75,9 @@ export const createProject = async (name: string, isBatch = false): Promise<Proj
       createdAt: new Date(),
       updatedAt: new Date(),
       isBatch,
+      isDefaultTranslationEnabled: enableFlags,
+      isDefaultExtractionEnabled: enableFlags,
+      isDefaultTranscriptionEnabled: enableFlags,
     }
 
     await db.projects.add(project)

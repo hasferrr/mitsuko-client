@@ -5,7 +5,14 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { SettingsDialogue } from "@/components/settings-dialogue"
-import { GLOBAL_ADVANCED_SETTINGS_ID, GLOBAL_BASIC_SETTINGS_ID } from "@/constants/global-settings"
+import {
+  GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
+  GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
+  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSCRIPTION_SETTINGS_ID
+} from "@/constants/global-settings"
+import { TranscriptionSettingsDialogue } from "@/components/transcribe/transcription-settings-dialogue"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,12 +29,14 @@ import { Settings2 } from "lucide-react"
 export function UserSettings() {
   const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
   const toggleThirdPartyModel = useLocalSettingsStore((state) => state.toggleThirdPartyModel)
-  const isSeparateSettingsEnabled = useLocalSettingsStore((state) => state.isSeparateSettingsEnabled)
-  const setIsSeparateSettingsEnabled = useLocalSettingsStore((state) => state.setIsSeparateSettingsEnabled)
   const isSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.isSubtitlePerformanceModeEnabled)
   const setIsSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.setIsSubtitlePerformanceModeEnabled)
+  const isAutoEnableProjectSettings = useLocalSettingsStore((state) => state.isAutoEnableProjectSettings)
+  const setIsAutoEnableProjectSettings = useLocalSettingsStore((state) => state.setIsAutoEnableProjectSettings)
   const [isThirdPartyDialogOpen, setIsThirdPartyDialogOpen] = useState(false)
-  const [isGlobalDefaultsOpen, setIsGlobalDefaultsOpen] = useState(false)
+  const [isGlobalTranslationSettingsOpen, setIsGlobalTranslationSettingsOpen] = useState(false)
+  const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
+  const [isGlobalTranscriptionSettingsOpen, setIsGlobalTranscriptionSettingsOpen] = useState(false)
 
   const handleCheckedChange = (checked: boolean) => {
     if (checked) {
@@ -49,16 +58,8 @@ export function UserSettings() {
   return (
     <>
       <div className="rounded-md overflow-hidden border">
-        <div className="px-4 py-2 border-b flex items-center justify-between">
+        <div className="px-4 py-2 border-b">
           <h2 className="font-medium">User Settings</h2>
-          <Button
-            variant="outline"
-            id="configure-global-defaults-button"
-            onClick={() => setIsGlobalDefaultsOpen(true)}
-          >
-            <Settings2 className="h-4 w-4" />
-            Global Settings
-          </Button>
         </div>
         <div className="p-4 space-y-4">
           <div className="flex items-center justify-between gap-2">
@@ -76,21 +77,7 @@ export function UserSettings() {
               onCheckedChange={handleCheckedChange}
             />
           </div>
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex flex-col gap-2">
-              <Label>
-                Separate Default Settings
-              </Label>
-              <p className="text-xs text-muted-foreground max-w-lg">
-                Use distinct default settings for translation and context extraction instead of the default project settings. This will also separate sharing settings in batch projects.
-              </p>
-            </div>
-            <Switch
-              id="separate-settings-switch"
-              checked={isSeparateSettingsEnabled}
-              onCheckedChange={setIsSeparateSettingsEnabled}
-            />
-          </div>
+
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-col gap-2">
               <Label>
@@ -106,15 +93,102 @@ export function UserSettings() {
               onCheckedChange={(checked) => setIsSubtitlePerformanceModeEnabled(!checked)}
             />
           </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Auto-enable custom default settings for new projects
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                When enabled, the "Enable Settings" option for translation, extraction, and transcription will be automatically turned on for new projects. New batch projects are always turned on.
+              </p>
+            </div>
+            <Switch
+              id="default-settings-enabled-default-switch"
+              checked={isAutoEnableProjectSettings}
+              onCheckedChange={setIsAutoEnableProjectSettings}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Global Translation Settings
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Configure default translation settings that apply to all new projects.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setIsGlobalTranslationSettingsOpen(true)}
+            >
+              <Settings2 className="h-4 w-4" />
+              Configure
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Global Transcription Settings
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Configure default transcription settings that apply to all new projects.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setIsGlobalTranscriptionSettingsOpen(true)}
+            >
+              <Settings2 className="h-4 w-4" />
+              Configure
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Global Extraction Settings
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Configure default extraction settings that apply to all new projects.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setIsGlobalExtractionSettingsOpen(true)}
+            >
+              <Settings2 className="h-4 w-4" />
+              Configure
+            </Button>
+          </div>
         </div>
       </div>
       <SettingsDialogue
         isGlobal
-        isOpen={isGlobalDefaultsOpen}
-        onOpenChange={setIsGlobalDefaultsOpen}
-        projectName="Global Settings"
-        basicSettingsId={GLOBAL_BASIC_SETTINGS_ID}
-        advancedSettingsId={GLOBAL_ADVANCED_SETTINGS_ID}
+        isOpen={isGlobalTranslationSettingsOpen}
+        onOpenChange={setIsGlobalTranslationSettingsOpen}
+        projectName="Global Translation Settings"
+        basicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
+        advancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
+        settingsParentType="translation"
+      />
+      <TranscriptionSettingsDialogue
+        isGlobal
+        isOpen={isGlobalTranscriptionSettingsOpen}
+        onOpenChange={setIsGlobalTranscriptionSettingsOpen}
+        projectName="Global Transcription Settings"
+        defaultTranscriptionId={GLOBAL_TRANSCRIPTION_SETTINGS_ID}
+      />
+      <SettingsDialogue
+        isGlobal
+        isOpen={isGlobalExtractionSettingsOpen}
+        onOpenChange={setIsGlobalExtractionSettingsOpen}
+        projectName="Global Extraction Settings"
+        basicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
+        advancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
+        settingsParentType="extraction"
       />
       <AlertDialog open={isThirdPartyDialogOpen} onOpenChange={setIsThirdPartyDialogOpen}>
         <AlertDialogContent>

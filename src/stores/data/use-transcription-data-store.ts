@@ -8,13 +8,16 @@ import {
 } from "@/lib/db/transcription"
 import { db } from "@/lib/db/db"
 import { Subtitle } from "@/types/subtitles"
-import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
+import { DEFAULT_TRANSCRIPTION_SETTINGS } from "@/constants/default"
+import { GLOBAL_TRANSCRIPTION_SETTINGS_ID } from "@/constants/global-settings"
 
 export type TranscriptionSettingKey = 'language' | 'selectedMode' | 'customInstructions' | 'models'
 
 interface TranscriptionDataStore {
   currentId: string | null
   data: Record<string, Transcription>
+  // Init
+  loadGlobalTranscription: () => Promise<void>
   // CRUD methods
   createTranscriptionDb: (projectId: string, data: Parameters<typeof createDB>[1]) => Promise<Transcription>
   getTranscriptionDb: (transcriptionId: string, skipStoreUpdate?: boolean) => Promise<Transcription | undefined>
@@ -57,9 +60,47 @@ interface TranscriptionDataStore {
 export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, get) => ({
   currentId: null,
   data: {},
+  loadGlobalTranscription: async () => {
+    try {
+      const globalTranscription = await getDB(GLOBAL_TRANSCRIPTION_SETTINGS_ID)
+      if (globalTranscription) {
+        set(state => ({ data: { ...state.data, [GLOBAL_TRANSCRIPTION_SETTINGS_ID]: globalTranscription } }))
+      }
+    } catch (error) {
+      console.error("Failed to load global transcription", error)
+    }
+  },
   // CRUD methods
   createTranscriptionDb: async (projectId, data) => {
-    const transcription = await createDB(projectId, data)
+    let resolvedData = { ...data }
+
+    // Auto-resolve defaults if not explicitly provided
+    if (
+      resolvedData.language === undefined ||
+      resolvedData.models === undefined ||
+      resolvedData.selectedMode === undefined ||
+      resolvedData.customInstructions === undefined
+    ) {
+      const project = await db.projects.get(projectId)
+      if (project) {
+        const defaultId = (project.isBatch || project.isDefaultTranscriptionEnabled)
+          ? project.defaultTranscriptionId
+          : GLOBAL_TRANSCRIPTION_SETTINGS_ID
+
+        const defaultSettings = await getDB(defaultId)
+        if (defaultSettings) {
+          resolvedData = {
+            ...resolvedData,
+            language: resolvedData.language ?? defaultSettings.language,
+            models: resolvedData.models ?? defaultSettings.models,
+            selectedMode: resolvedData.selectedMode ?? defaultSettings.selectedMode,
+            customInstructions: resolvedData.customInstructions ?? defaultSettings.customInstructions,
+          }
+        }
+      }
+    }
+
+    const transcription = await createDB(projectId, resolvedData)
     set(state => ({ data: { ...state.data, [transcription.id]: transcription } }))
     return transcription
   },
@@ -111,16 +152,16 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     return get().data[id]?.transcriptSubtitles ?? []
   },
   getSelectedMode: (id) => {
-    return get().data[id]?.selectedMode ?? DEFAULT_TRANSCTIPTION_SETTINGS.selectedMode
+    return get().data[id]?.selectedMode ?? DEFAULT_TRANSCRIPTION_SETTINGS.selectedMode
   },
   getLanguage: (id) => {
-    return get().data[id]?.language ?? DEFAULT_TRANSCTIPTION_SETTINGS.language
+    return get().data[id]?.language ?? DEFAULT_TRANSCRIPTION_SETTINGS.language
   },
   getCustomInstructions: (id) => {
-    return get().data[id]?.customInstructions ?? DEFAULT_TRANSCTIPTION_SETTINGS.customInstructions
+    return get().data[id]?.customInstructions ?? DEFAULT_TRANSCRIPTION_SETTINGS.customInstructions
   },
   getModels: (id) => {
-    return get().data[id]?.models ?? DEFAULT_TRANSCTIPTION_SETTINGS.models
+    return get().data[id]?.models ?? DEFAULT_TRANSCRIPTION_SETTINGS.models
   },
   getWords: (id) => {
     return get().data[id]?.words ?? []
@@ -129,7 +170,7 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     return get().data[id]?.segments ?? []
   },
   getSelectedUploadId: (id) => {
-    return get().data[id]?.selectedUploadId ?? DEFAULT_TRANSCTIPTION_SETTINGS.selectedUploadId
+    return get().data[id]?.selectedUploadId ?? DEFAULT_TRANSCRIPTION_SETTINGS.selectedUploadId
   },
   // setters implementation
   setCurrentId: (id) => set({ currentId: id }),
@@ -253,7 +294,7 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
 
     // Update target transcription in database
     const result = await updateDB(targetId, changes)
-    
+
     // Update local state
     set(state => ({
       data: {

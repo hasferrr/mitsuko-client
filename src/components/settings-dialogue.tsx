@@ -1,6 +1,6 @@
 "use client"
 
-import { Info } from "lucide-react"
+import { Info, Settings2 } from "lucide-react"
 import { DialogCustom } from "@/components/ui-custom/dialog-custom"
 import {
   DialogContent,
@@ -24,6 +24,8 @@ import {
   TemperatureSlider,
 } from "@/components/settings"
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import {
   Accordion,
   AccordionContent,
@@ -43,7 +45,6 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { SettingsParentType } from "@/types/project"
 
 interface SettingsDialogueProps {
@@ -56,6 +57,9 @@ interface SettingsDialogueProps {
   settingsParentType?: SettingsParentType
   resetFromBasicSettingsId?: string
   resetFromAdvancedSettingsId?: string
+  isDefaultEnabled?: boolean
+  onDefaultEnabledChange?: (enabled: boolean) => void
+  onOpenGlobalSettings?: () => void
 }
 
 export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
@@ -67,6 +71,9 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
   advancedSettingsId,
   resetFromBasicSettingsId,
   resetFromAdvancedSettingsId,
+  isDefaultEnabled,
+  onDefaultEnabledChange,
+  onOpenGlobalSettings,
   settingsParentType = 'project',
 }) => {
   const resetBasicSettings = useSettingsStore((s) => s.resetBasicSettings)
@@ -75,7 +82,6 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
   const resetAdvancedSettingsToGlobal = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsToGlobal)
   const resetBasicSettingsFrom = useSettingsStore((s) => s.resetBasicSettingsFrom)
   const resetAdvancedSettingsFrom = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsFrom)
-  const isSeparateSettingsEnabled = useLocalSettingsStore((s) => s.isSeparateSettingsEnabled)
 
   const dialogTitle = isGlobal
     ? "Global Settings"
@@ -128,7 +134,26 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
+
+        {!isGlobal && settingsParentType !== 'project' && isDefaultEnabled !== undefined && onDefaultEnabledChange && (
+          <div className="flex items-center justify-between gap-2 p-4 border rounded-md mb-4 bg-muted/20">
+            <div className="flex flex-col gap-1">
+              <Label htmlFor={`enable-default-${settingsParentType}`}>
+                Enable Settings
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                When enabled, new {settingsParentType}s will use these custom default settings. When disabled, they will use your Global settings.
+              </p>
+            </div>
+            <Switch
+              id={`enable-default-${settingsParentType}`}
+              checked={isDefaultEnabled}
+              onCheckedChange={onDefaultEnabledChange}
+            />
+          </div>
+        )}
+
+        <div className={`space-y-4 ${!isGlobal && settingsParentType !== 'project' && isDefaultEnabled === false ? 'opacity-50 pointer-events-none' : ''}`}>
           {settingsParentType === 'extraction' ? (
             <div className="space-y-4">
               <ModelSelection
@@ -218,13 +243,11 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
           )}
         </div>
         <DialogFooter>
-          {!isGlobal && settingsParentType === 'project' && isSeparateSettingsEnabled && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <div className="h-3 w-3">
-                <Info className="h-3 w-3" />
-              </div>
-              This settings will not be used because "Separate Default Settings" is enabled.
-            </div>
+          {!isGlobal && settingsParentType !== 'project' && onOpenGlobalSettings && (
+            <Button variant="outline" className="mr-auto" onClick={onOpenGlobalSettings}>
+              <Settings2 className="h-4 w-4" />
+              Global Settings
+            </Button>
           )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -238,9 +261,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
                 <AlertDialogDescription>
                   {isGlobal
                     ? "This will reset settings to defaults."
-                    : settingsParentType === 'project'
-                      ? "This will reset to global settings."
-                      : "This will reset to project settings."
+                    : "This will reset to global settings."
                   }
                 </AlertDialogDescription>
               </AlertDialogHeader>
