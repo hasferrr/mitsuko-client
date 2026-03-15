@@ -308,6 +308,19 @@ class MyDatabase extends Dexie {
         await projectsTable.update(update.id, update.changes)
       }
     })
+    this.version(24).stores({}).upgrade(async tx => {
+      await tx.table('projects').toCollection().modify(project => {
+        if (typeof project.isDefaultTranslationEnabled === 'undefined') {
+          project.isDefaultTranslationEnabled = false
+        }
+        if (typeof project.isDefaultExtractionEnabled === 'undefined') {
+          project.isDefaultExtractionEnabled = false
+        }
+        if (typeof project.isDefaultTranscriptionEnabled === 'undefined') {
+          project.isDefaultTranscriptionEnabled = false
+        }
+      })
+    })
   }
 }
 

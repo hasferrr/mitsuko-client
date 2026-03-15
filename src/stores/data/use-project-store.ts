@@ -21,6 +21,7 @@ import { SubtitleTranslated } from "@/types/subtitles"
 import { deleteTranslation } from "@/lib/db/translation"
 import { deleteExtraction } from "@/lib/db/extraction"
 import { deleteTranscription } from "@/lib/db/transcription"
+import { useLocalSettingsStore } from "../use-local-settings-store"
 
 interface ProjectStore {
   currentProject: Project | null
@@ -90,7 +91,8 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   createProject: async (name, isBatch = false) => {
     set({ loading: true })
     try {
-      const newProject = await createProjectDB(name, isBatch)
+      const isDefaultSettingsEnabledDefault = useLocalSettingsStore.getState().isDefaultSettingsEnabledDefault
+      const newProject = await createProjectDB(name, isBatch, isDefaultSettingsEnabledDefault)
 
       // upsert associated settings into stores
       const settingsStore = useSettingsStore.getState()

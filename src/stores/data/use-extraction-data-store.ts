@@ -12,6 +12,7 @@ import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-setting
 import { db } from "@/lib/db/db"
 import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+import { GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID } from "@/constants/global-settings"
 
 export interface ExtractionDataStore {
   currentId: string | null
@@ -60,8 +61,12 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
       const project = await db.projects.get(projectId)
       if (!project) throw new Error('Project not found')
 
-      const basicSettingsId = project.defaultExtractionBasicSettingsId
-      const advancedSettingsId = project.defaultExtractionAdvancedSettingsId
+      const basicSettingsId = project.isDefaultExtractionEnabled
+        ? project.defaultExtractionBasicSettingsId
+        : GLOBAL_EXTRACTION_BASIC_SETTINGS_ID
+      const advancedSettingsId = project.isDefaultExtractionEnabled
+        ? project.defaultExtractionAdvancedSettingsId
+        : GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID
 
       const bsFromDb = await getBasicSettings(basicSettingsId)
       const adsFromDb = await getAdvancedSettings(advancedSettingsId)

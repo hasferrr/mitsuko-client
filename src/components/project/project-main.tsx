@@ -51,7 +51,8 @@ import {
   GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
   GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
   GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
-  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID
+  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSCRIPTION_SETTINGS_ID,
 } from "@/constants/global-settings"
 import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
@@ -89,6 +90,9 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const [isTranslationSettingsModalOpen, setIsTranslationSettingsModalOpen] = useState(false)
   const [isExtractionSettingsModalOpen, setIsExtractionSettingsModalOpen] = useState(false)
   const [isTranscriptionSettingsModalOpen, setIsTranscriptionSettingsModalOpen] = useState(false)
+  const [isGlobalTranslationSettingsOpen, setIsGlobalTranslationSettingsOpen] = useState(false)
+  const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
+  const [isGlobalTranscriptionSettingsOpen, setIsGlobalTranscriptionSettingsOpen] = useState(false)
   const [isConvertModalOpen, setIsConvertModalOpen] = useState(false)
   const [isProcessingConvert, setIsProcessingConvert] = useState(false)
   const router = useRouter()
@@ -638,6 +642,12 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         resetFromBasicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
         resetFromAdvancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
         settingsParentType="translation"
+        isDefaultEnabled={currentProject.isDefaultTranslationEnabled}
+        onDefaultEnabledChange={(enabled) => updateProjectStore(currentProject.id, { isDefaultTranslationEnabled: enabled })}
+        onOpenGlobalSettings={() => {
+          setIsTranslationSettingsModalOpen(false)
+          setIsGlobalTranslationSettingsOpen(true)
+        }}
       />
 
       <SettingsDialogue
@@ -649,6 +659,12 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         resetFromBasicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
         resetFromAdvancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
         settingsParentType="extraction"
+        isDefaultEnabled={currentProject.isDefaultExtractionEnabled}
+        onDefaultEnabledChange={(enabled) => updateProjectStore(currentProject.id, { isDefaultExtractionEnabled: enabled })}
+        onOpenGlobalSettings={() => {
+          setIsExtractionSettingsModalOpen(false)
+          setIsGlobalExtractionSettingsOpen(true)
+        }}
       />
 
       <TranscriptionSettingsDialogue
@@ -656,6 +672,39 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         onOpenChange={setIsTranscriptionSettingsModalOpen}
         projectName={currentProject.name}
         defaultTranscriptionId={currentProject.defaultTranscriptionId}
+        isDefaultEnabled={currentProject.isDefaultTranscriptionEnabled}
+        onDefaultEnabledChange={(enabled) => updateProjectStore(currentProject.id, { isDefaultTranscriptionEnabled: enabled })}
+        onOpenGlobalSettings={() => {
+          setIsTranscriptionSettingsModalOpen(false)
+          setIsGlobalTranscriptionSettingsOpen(true)
+        }}
+      />
+
+      {/* Global Settings Dialogues */}
+      <SettingsDialogue
+        isGlobal
+        isOpen={isGlobalTranslationSettingsOpen}
+        onOpenChange={setIsGlobalTranslationSettingsOpen}
+        projectName="Global Translation"
+        basicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
+        advancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
+      />
+
+      <SettingsDialogue
+        isGlobal
+        isOpen={isGlobalExtractionSettingsOpen}
+        onOpenChange={setIsGlobalExtractionSettingsOpen}
+        projectName="Global Extraction"
+        basicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
+        advancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
+      />
+
+      <TranscriptionSettingsDialogue
+        isGlobal
+        isOpen={isGlobalTranscriptionSettingsOpen}
+        onOpenChange={setIsGlobalTranscriptionSettingsOpen}
+        projectName="Global Transcription"
+        defaultTranscriptionId={GLOBAL_TRANSCRIPTION_SETTINGS_ID}
       />
 
       {/* Convert Confirmation Dialog */}

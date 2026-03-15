@@ -11,7 +11,7 @@ const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(o
 }
 
 // Project CRUD functions
-export const createProject = async (name: string, isBatch = false): Promise<Project> => {
+export const createProject = async (name: string, isBatch = false, isDefaultSettingsEnabledDefault = false): Promise<Project> => {
   return db.transaction('rw', [db.projects, db.projectOrders, db.basicSettings, db.advancedSettings, db.transcriptions], async () => {
     const id = crypto.randomUUID()
 
@@ -72,6 +72,9 @@ export const createProject = async (name: string, isBatch = false): Promise<Proj
       createdAt: new Date(),
       updatedAt: new Date(),
       isBatch,
+      isDefaultTranslationEnabled: isDefaultSettingsEnabledDefault,
+      isDefaultExtractionEnabled: isDefaultSettingsEnabledDefault,
+      isDefaultTranscriptionEnabled: isDefaultSettingsEnabledDefault,
     }
 
     await db.projects.add(project)

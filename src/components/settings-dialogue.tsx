@@ -24,6 +24,8 @@ import {
   TemperatureSlider,
 } from "@/components/settings"
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import {
   Accordion,
   AccordionContent,
@@ -55,6 +57,9 @@ interface SettingsDialogueProps {
   settingsParentType?: SettingsParentType
   resetFromBasicSettingsId?: string
   resetFromAdvancedSettingsId?: string
+  isDefaultEnabled?: boolean
+  onDefaultEnabledChange?: (enabled: boolean) => void
+  onOpenGlobalSettings?: () => void
 }
 
 export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
@@ -66,6 +71,9 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
   advancedSettingsId,
   resetFromBasicSettingsId,
   resetFromAdvancedSettingsId,
+  isDefaultEnabled,
+  onDefaultEnabledChange,
+  onOpenGlobalSettings,
   settingsParentType = 'project',
 }) => {
   const resetBasicSettings = useSettingsStore((s) => s.resetBasicSettings)
@@ -126,7 +134,26 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
+        
+        {!isGlobal && settingsParentType !== 'project' && isDefaultEnabled !== undefined && onDefaultEnabledChange && (
+          <div className="flex items-center justify-between gap-2 p-4 border rounded-md mb-4 bg-muted/20">
+            <div className="flex flex-col gap-1">
+              <Label htmlFor={`enable-default-${settingsParentType}`}>
+                Enable Default
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                When enabled, new {settingsParentType}s in this project will use these custom default settings. When disabled, they will use your Global settings.
+              </p>
+            </div>
+            <Switch
+              id={`enable-default-${settingsParentType}`}
+              checked={isDefaultEnabled}
+              onCheckedChange={onDefaultEnabledChange}
+            />
+          </div>
+        )}
+
+        <div className={`space-y-4 ${!isGlobal && settingsParentType !== 'project' && isDefaultEnabled === false ? 'opacity-50 pointer-events-none' : ''}`}>
           {settingsParentType === 'extraction' ? (
             <div className="space-y-4">
               <ModelSelection
@@ -216,6 +243,11 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
           )}
         </div>
         <DialogFooter>
+          {!isGlobal && settingsParentType !== 'project' && onOpenGlobalSettings && (
+            <Button variant="outline" className="mr-auto" onClick={onOpenGlobalSettings}>
+              Global Settings
+            </Button>
+          )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline">

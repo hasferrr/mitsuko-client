@@ -114,6 +114,22 @@ export function UserSettings() {
               onCheckedChange={(checked) => setIsSubtitlePerformanceModeEnabled(!checked)}
             />
           </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Enable default settings for new projects
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                When enabled, new projects will have their individual "Enable Default" switches turned on by default for translation, extraction, and transcription.
+              </p>
+            </div>
+            <Switch
+              id="default-settings-enabled-default-switch"
+              checked={useLocalSettingsStore((state) => state.isDefaultSettingsEnabledDefault)}
+              onCheckedChange={(checked) => useLocalSettingsStore.getState().setIsDefaultSettingsEnabledDefault(checked)}
+            />
+          </div>
         </div>
       </div>
       <SettingsDialogue
