@@ -9,6 +9,7 @@ import {
 import { db } from "@/lib/db/db"
 import { Subtitle } from "@/types/subtitles"
 import { DEFAULT_TRANSCRIPTION_SETTINGS } from "@/constants/default"
+import { GLOBAL_TRANSCRIPTION_SETTINGS_ID } from "@/constants/global-settings"
 
 export type TranscriptionSettingKey = 'language' | 'selectedMode' | 'customInstructions' | 'models'
 
@@ -59,7 +60,35 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   data: {},
   // CRUD methods
   createTranscriptionDb: async (projectId, data) => {
-    const transcription = await createDB(projectId, data)
+    let resolvedData = { ...data }
+
+    // Auto-resolve defaults if not explicitly provided
+    if (
+      resolvedData.language === undefined ||
+      resolvedData.models === undefined ||
+      resolvedData.selectedMode === undefined ||
+      resolvedData.customInstructions === undefined
+    ) {
+      const project = await db.projects.get(projectId)
+      if (project) {
+        const defaultId = project.isDefaultTranscriptionEnabled
+          ? project.defaultTranscriptionId
+          : GLOBAL_TRANSCRIPTION_SETTINGS_ID
+
+        const defaultSettings = await getDB(defaultId)
+        if (defaultSettings) {
+          resolvedData = {
+            ...resolvedData,
+            language: resolvedData.language ?? defaultSettings.language,
+            models: resolvedData.models ?? defaultSettings.models,
+            selectedMode: resolvedData.selectedMode ?? defaultSettings.selectedMode,
+            customInstructions: resolvedData.customInstructions ?? defaultSettings.customInstructions,
+          }
+        }
+      }
+    }
+
+    const transcription = await createDB(projectId, resolvedData)
     set(state => ({ data: { ...state.data, [transcription.id]: transcription } }))
     return transcription
   },
