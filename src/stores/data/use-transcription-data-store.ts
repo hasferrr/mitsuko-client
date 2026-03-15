@@ -16,6 +16,8 @@ export type TranscriptionSettingKey = 'language' | 'selectedMode' | 'customInstr
 interface TranscriptionDataStore {
   currentId: string | null
   data: Record<string, Transcription>
+  // Init
+  loadGlobalTranscription: () => Promise<void>
   // CRUD methods
   createTranscriptionDb: (projectId: string, data: Parameters<typeof createDB>[1]) => Promise<Transcription>
   getTranscriptionDb: (transcriptionId: string, skipStoreUpdate?: boolean) => Promise<Transcription | undefined>
@@ -58,6 +60,16 @@ interface TranscriptionDataStore {
 export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, get) => ({
   currentId: null,
   data: {},
+  loadGlobalTranscription: async () => {
+    try {
+      const globalTranscription = await getDB(GLOBAL_TRANSCRIPTION_SETTINGS_ID)
+      if (globalTranscription) {
+        set(state => ({ data: { ...state.data, [GLOBAL_TRANSCRIPTION_SETTINGS_ID]: globalTranscription } }))
+      }
+    } catch (error) {
+      console.error("Failed to load global transcription", error)
+    }
+  },
   // CRUD methods
   createTranscriptionDb: async (projectId, data) => {
     let resolvedData = { ...data }
