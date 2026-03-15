@@ -31,8 +31,8 @@ export function UserSettings() {
   const toggleThirdPartyModel = useLocalSettingsStore((state) => state.toggleThirdPartyModel)
   const isSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.isSubtitlePerformanceModeEnabled)
   const setIsSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.setIsSubtitlePerformanceModeEnabled)
-  const isDefaultSettingsEnabledDefault = useLocalSettingsStore((state) => state.isDefaultSettingsEnabledDefault)
-  const setIsDefaultSettingsEnabledDefault = useLocalSettingsStore((state) => state.setIsDefaultSettingsEnabledDefault)
+  const isAutoEnableProjectSettings = useLocalSettingsStore((state) => state.isAutoEnableProjectSettings)
+  const setIsAutoEnableProjectSettings = useLocalSettingsStore((state) => state.setIsAutoEnableProjectSettings)
   const [isThirdPartyDialogOpen, setIsThirdPartyDialogOpen] = useState(false)
   const [isGlobalTranslationSettingsOpen, setIsGlobalTranslationSettingsOpen] = useState(false)
   const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
@@ -105,8 +105,8 @@ export function UserSettings() {
             </div>
             <Switch
               id="default-settings-enabled-default-switch"
-              checked={isDefaultSettingsEnabledDefault}
-              onCheckedChange={setIsDefaultSettingsEnabledDefault}
+              checked={isAutoEnableProjectSettings}
+              onCheckedChange={setIsAutoEnableProjectSettings}
             />
           </div>
 

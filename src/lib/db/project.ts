@@ -11,12 +11,12 @@ const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(o
 }
 
 // Project CRUD functions
-export const createProject = async (name: string, isBatch = false, isDefaultSettingsEnabledDefault = false): Promise<Project> => {
+export const createProject = async (name: string, isBatch = false, isAutoEnableProjectSettings = false): Promise<Project> => {
   return db.transaction('rw', [db.projects, db.projectOrders, db.basicSettings, db.advancedSettings, db.transcriptions], async () => {
     const id = crypto.randomUUID()
 
     // Batch projects always have default settings enabled
-    const enableFlags = isBatch ? true : isDefaultSettingsEnabledDefault
+    const enableFlags = isBatch ? true : isAutoEnableProjectSettings
 
     const globalBasic = await getOrCreateGlobalBasicSettings()
     const basicTemplate = stripMeta(globalBasic)

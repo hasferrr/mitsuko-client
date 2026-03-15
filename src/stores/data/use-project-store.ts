@@ -91,8 +91,8 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   createProject: async (name, isBatch = false) => {
     set({ loading: true })
     try {
-      const isDefaultSettingsEnabledDefault = useLocalSettingsStore.getState().isDefaultSettingsEnabledDefault
-      const newProject = await createProjectDB(name, isBatch, isDefaultSettingsEnabledDefault)
+      const isAutoEnableProjectSettings = useLocalSettingsStore.getState().isAutoEnableProjectSettings
+      const newProject = await createProjectDB(name, isBatch, isAutoEnableProjectSettings)
 
       // upsert associated settings into stores
       const settingsStore = useSettingsStore.getState()

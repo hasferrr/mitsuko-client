@@ -15,7 +15,7 @@ interface LocalSettingsStore {
   isSubtitleCleanupEnabled: boolean
   isDeleteAfterTranscription: boolean
   isSubtitlePerformanceModeEnabled: boolean
-  isDefaultSettingsEnabledDefault: boolean
+  isAutoEnableProjectSettings: boolean
 
   addApiConfig: (config: CustomApiConfig) => void
   updateApiConfig: (index: number, updates: Partial<CustomApiConfig>) => Promise<void>
@@ -27,7 +27,7 @@ interface LocalSettingsStore {
   setIsSubtitleCleanupEnabled: (enabled: boolean) => void
   setIsDeleteAfterTranscription: (enabled: boolean) => void
   setIsSubtitlePerformanceModeEnabled: (enabled: boolean) => void
-  setIsDefaultSettingsEnabledDefault: (enabled: boolean) => void
+  setIsAutoEnableProjectSettings: (enabled: boolean) => void
 }
 
 export const useLocalSettingsStore = create<LocalSettingsStore>()(
@@ -40,7 +40,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       isSubtitleCleanupEnabled: true,
       isDeleteAfterTranscription: true,
       isSubtitlePerformanceModeEnabled: true,
-      isDefaultSettingsEnabledDefault: false,
+      isAutoEnableProjectSettings: false,
 
       addApiConfig: (config) =>
         set((state) => ({
@@ -81,7 +81,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       setIsSubtitleCleanupEnabled: (enabled) => set({ isSubtitleCleanupEnabled: enabled }),
       setIsDeleteAfterTranscription: (enabled) => set({ isDeleteAfterTranscription: enabled }),
       setIsSubtitlePerformanceModeEnabled: (enabled) => set({ isSubtitlePerformanceModeEnabled: enabled }),
-      setIsDefaultSettingsEnabledDefault: (enabled) => set({ isDefaultSettingsEnabledDefault: enabled }),
+      setIsAutoEnableProjectSettings: (enabled) => set({ isAutoEnableProjectSettings: enabled }),
     }),
     {
       name: "api-settings-storage",
