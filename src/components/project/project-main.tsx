@@ -28,6 +28,7 @@ import {
   ArrowLeft,
   ArrowLeftRight,
   Upload,
+  Plus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -408,7 +409,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     <Button
       size="sm"
       variant="outline"
-      className="line-clamp-2"
       onClick={async () => {
         const created = await createTranslationDb(
           currentProject.id,
@@ -431,6 +431,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         setTranslations(prev => [created, ...prev])
       }}
     >
+      <Plus className="h-4 w-4" />
       New Translation
     </Button>
   )
@@ -440,11 +441,11 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       <Button
         size="sm"
         variant="outline"
-        className="h-8 w-8 p-0"
         onClick={() => setIsTranslationSettingsModalOpen(true)}
         title="Translation settings"
       >
         <Settings2 className="h-4 w-4" />
+        Settings
       </Button>
       {NewTranslationButton}
     </div>
@@ -454,7 +455,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     <Button
       size="sm"
       variant="outline"
-      className="line-clamp-2"
       onClick={async () => {
         const defaultSettings = transcriptionData[currentProject.defaultTranscriptionId]
         const created = await createTranscriptionDb(currentProject.id, {
@@ -474,6 +474,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         setTranscriptions(prev => [created, ...prev])
       }}
     >
+      <Plus className="h-4 w-4" />
       New Transcription
     </Button>
   )
@@ -483,11 +484,11 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       <Button
         size="sm"
         variant="outline"
-        className="h-8 w-8 p-0"
         onClick={() => setIsTranscriptionSettingsModalOpen(true)}
         title="Transcription settings"
       >
         <Settings2 className="h-4 w-4" />
+        Settings
       </Button>
       {NewTranscriptionButton}
     </div>
@@ -497,7 +498,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     <Button
       size="sm"
       variant="outline"
-      className="line-clamp-2"
       onClick={async () => {
         const created = await createExtractionDb(
           currentProject.id,
@@ -519,6 +519,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         setExtractions(prev => [created, ...prev])
       }}
     >
+      <Plus className="h-4 w-4" />
       New Extraction
     </Button>
   )
@@ -528,11 +529,11 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       <Button
         size="sm"
         variant="outline"
-        className="h-8 w-8 p-0"
         onClick={() => setIsExtractionSettingsModalOpen(true)}
         title="Extraction settings"
       >
         <Settings2 className="h-4 w-4" />
+        Settings
       </Button>
       {NewExtractionButton}
     </div>
