@@ -83,7 +83,7 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     ) {
       const project = await db.projects.get(projectId)
       if (project) {
-        const defaultId = project.isDefaultTranscriptionEnabled
+        const defaultId = (project.isBatch || project.isDefaultTranscriptionEnabled)
           ? project.defaultTranscriptionId
           : GLOBAL_TRANSCRIPTION_SETTINGS_ID
 

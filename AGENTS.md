@@ -43,9 +43,11 @@ Projects (including batch projects) maintain separate settings for each feature 
 **Enable Flags Behavior:**
 - `isDefaultXxxEnabled = true`: New items created within the project use the project's default settings for that feature
 - `isDefaultXxxEnabled = false`: New items created within the project use global settings (`GLOBAL_TRANSLATION_BASIC_SETTINGS_ID`, etc.)
+- **Exception for Batch:** Batch projects always use project defaults for new items, regardless of `isDefaultXxxEnabled` flag
 
 **Batch Settings:**
 - Batch projects always use their own feature-specific default settings for the shared settings UI
+- New items uploaded to batch always use project defaults (ignores `isDefaultXxxEnabled` flag)
 - `isUseSharedSettings` (batch-level toggle in `useBatchSettingsStore`) controls whether all files use shared settings or individual file settings
 - Batch never falls back to global settings
 

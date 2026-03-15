@@ -61,10 +61,10 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
       const project = await db.projects.get(projectId)
       if (!project) throw new Error('Project not found')
 
-      const basicSettingsId = project.isDefaultExtractionEnabled
+      const basicSettingsId = (project.isBatch || project.isDefaultExtractionEnabled)
         ? project.defaultExtractionBasicSettingsId
         : GLOBAL_EXTRACTION_BASIC_SETTINGS_ID
-      const advancedSettingsId = project.isDefaultExtractionEnabled
+      const advancedSettingsId = (project.isBatch || project.isDefaultExtractionEnabled)
         ? project.defaultExtractionAdvancedSettingsId
         : GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID
 

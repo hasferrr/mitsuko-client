@@ -15,6 +15,9 @@ export const createProject = async (name: string, isBatch = false, isDefaultSett
   return db.transaction('rw', [db.projects, db.projectOrders, db.basicSettings, db.advancedSettings, db.transcriptions], async () => {
     const id = crypto.randomUUID()
 
+    // Batch projects always have default settings enabled
+    const enableFlags = isBatch ? true : isDefaultSettingsEnabledDefault
+
     const globalBasic = await getOrCreateGlobalBasicSettings()
     const basicTemplate = stripMeta(globalBasic)
     const basicSettings = await createBasicSettings(basicTemplate)
@@ -72,9 +75,9 @@ export const createProject = async (name: string, isBatch = false, isDefaultSett
       createdAt: new Date(),
       updatedAt: new Date(),
       isBatch,
-      isDefaultTranslationEnabled: isDefaultSettingsEnabledDefault,
-      isDefaultExtractionEnabled: isDefaultSettingsEnabledDefault,
-      isDefaultTranscriptionEnabled: isDefaultSettingsEnabledDefault,
+      isDefaultTranslationEnabled: enableFlags,
+      isDefaultExtractionEnabled: enableFlags,
+      isDefaultTranscriptionEnabled: enableFlags,
     }
 
     await db.projects.add(project)

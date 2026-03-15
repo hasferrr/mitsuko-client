@@ -100,7 +100,7 @@ export function UserSettings() {
                 Auto-enable custom default settings for new projects
               </Label>
               <p className="text-xs text-muted-foreground max-w-lg">
-                When enabled, the "Enable Settings" option for translation, extraction, and transcription will be automatically turned on for newly created projects.
+                When enabled, the "Enable Settings" option for translation, extraction, and transcription will be automatically turned on for new projects. New batch projects are always turned on.
               </p>
             </div>
             <Switch

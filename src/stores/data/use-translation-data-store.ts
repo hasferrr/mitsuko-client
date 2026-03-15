@@ -59,10 +59,10 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       const project = await db.projects.get(projectId)
       if (!project) throw new Error('Project not found')
 
-      const basicSettingsId = project.isDefaultTranslationEnabled
+      const basicSettingsId = (project.isBatch || project.isDefaultTranslationEnabled)
         ? project.defaultTranslationBasicSettingsId
         : GLOBAL_TRANSLATION_BASIC_SETTINGS_ID
-      const advancedSettingsId = project.isDefaultTranslationEnabled
+      const advancedSettingsId = (project.isBatch || project.isDefaultTranslationEnabled)
         ? project.defaultTranslationAdvancedSettingsId
         : GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID
 
