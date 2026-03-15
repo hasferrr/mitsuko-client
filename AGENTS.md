@@ -25,6 +25,36 @@
 
 ## Specific instructions
 
+### Project Settings Architecture
+
+Projects (including batch projects) maintain separate settings for each feature type:
+
+| Feature | Basic Settings ID | Advanced Settings ID | Enable Flag |
+|---------|-------------------|---------------------|-------------|
+| Translation | `defaultTranslationBasicSettingsId` | `defaultTranslationAdvancedSettingsId` | `isDefaultTranslationEnabled` |
+| Extraction | `defaultExtractionBasicSettingsId` | `defaultExtractionAdvancedSettingsId` | `isDefaultExtractionEnabled` |
+| Transcription | `defaultTranscriptionId` | — | `isDefaultTranscriptionEnabled` |
+
+**Generic Settings (Legacy):**
+- `defaultBasicSettingsId` and `defaultAdvancedSettingsId` exist for backward compatibility and data migration
+- These are NOT used by batch or project UI for feature-specific operations
+- Feature-specific settings should always be preferred
+
+**Enable Flags Behavior:**
+- `isDefaultXxxEnabled = true`: New items created within the project use the project's default settings for that feature
+- `isDefaultXxxEnabled = false`: New items created within the project use global settings (`GLOBAL_TRANSLATION_BASIC_SETTINGS_ID`, etc.)
+
+**Batch Settings:**
+- Batch projects always use their own feature-specific default settings for the shared settings UI
+- `isUseSharedSettings` (batch-level toggle in `useBatchSettingsStore`) controls whether all files use shared settings or individual file settings
+- Batch never falls back to global settings
+
+**Global Settings IDs:**
+- `GLOBAL_TRANSLATION_BASIC_SETTINGS_ID` / `GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID`
+- `GLOBAL_EXTRACTION_BASIC_SETTINGS_ID` / `GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID`
+- `GLOBAL_TRANSCRIPTION_SETTINGS_ID`
+- `GLOBAL_BASIC_SETTINGS_ID` / `GLOBAL_ADVANCED_SETTINGS_ID` exist for backward compatibility only and are NOT used for feature-specific operations
+
 ### Data Management & Migrations
 
 Given that the application's state is persisted locally in the user's browser via IndexedDB (Dexie.js), managing data schema changes is critical. Follow these guidelines strictly.
