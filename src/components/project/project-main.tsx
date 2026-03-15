@@ -456,7 +456,9 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       size="sm"
       variant="outline"
       onClick={async () => {
-        const defaultSettings = transcriptionData[currentProject.defaultTranscriptionId]
+        const defaultSettings = currentProject.isDefaultTranscriptionEnabled
+          ? transcriptionData[currentProject.defaultTranscriptionId]
+          : transcriptionData[GLOBAL_TRANSCRIPTION_SETTINGS_ID]
         const created = await createTranscriptionDb(currentProject.id, {
           title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
           transcriptionText: "",
