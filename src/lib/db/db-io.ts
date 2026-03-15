@@ -1,7 +1,7 @@
 import { db } from './db'
 import { DatabaseExport, databaseExportConstructor, generateNewIds } from './db-constructor'
 import { Project, BasicSettings, AdvancedSettings, Transcription } from '@/types/project'
-import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS, DEFAULT_TRANSCTIPTION_SETTINGS } from '@/constants/default'
+import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
 import {
   GLOBAL_ADVANCED_SETTINGS_ID,
   GLOBAL_BASIC_SETTINGS_ID,
@@ -227,7 +227,7 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
           id: transcriptionId,
           projectId: project.id,
           title: '',
-          ...DEFAULT_TRANSCTIPTION_SETTINGS,
+          ...DEFAULT_TRANSCRIPTION_SETTINGS,
           transcriptionText: '',
           transcriptSubtitles: [],
           words: [],

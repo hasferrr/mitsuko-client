@@ -37,7 +37,7 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
   isMaxCompletionTokensAuto: false,
 }
 
-export const DEFAULT_TRANSCTIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models" | "language" | "selectedUploadId"> = {
+export const DEFAULT_TRANSCRIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models" | "language" | "selectedUploadId"> = {
   selectedMode: "sentence",
   customInstructions: "",
   models: "mitsuko-premium",

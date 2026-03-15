@@ -8,7 +8,7 @@ import {
 } from "@/lib/db/transcription"
 import { db } from "@/lib/db/db"
 import { Subtitle } from "@/types/subtitles"
-import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
+import { DEFAULT_TRANSCRIPTION_SETTINGS } from "@/constants/default"
 
 export type TranscriptionSettingKey = 'language' | 'selectedMode' | 'customInstructions' | 'models'
 
@@ -111,16 +111,16 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     return get().data[id]?.transcriptSubtitles ?? []
   },
   getSelectedMode: (id) => {
-    return get().data[id]?.selectedMode ?? DEFAULT_TRANSCTIPTION_SETTINGS.selectedMode
+    return get().data[id]?.selectedMode ?? DEFAULT_TRANSCRIPTION_SETTINGS.selectedMode
   },
   getLanguage: (id) => {
-    return get().data[id]?.language ?? DEFAULT_TRANSCTIPTION_SETTINGS.language
+    return get().data[id]?.language ?? DEFAULT_TRANSCRIPTION_SETTINGS.language
   },
   getCustomInstructions: (id) => {
-    return get().data[id]?.customInstructions ?? DEFAULT_TRANSCTIPTION_SETTINGS.customInstructions
+    return get().data[id]?.customInstructions ?? DEFAULT_TRANSCRIPTION_SETTINGS.customInstructions
   },
   getModels: (id) => {
-    return get().data[id]?.models ?? DEFAULT_TRANSCTIPTION_SETTINGS.models
+    return get().data[id]?.models ?? DEFAULT_TRANSCRIPTION_SETTINGS.models
   },
   getWords: (id) => {
     return get().data[id]?.words ?? []
@@ -129,7 +129,7 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     return get().data[id]?.segments ?? []
   },
   getSelectedUploadId: (id) => {
-    return get().data[id]?.selectedUploadId ?? DEFAULT_TRANSCTIPTION_SETTINGS.selectedUploadId
+    return get().data[id]?.selectedUploadId ?? DEFAULT_TRANSCRIPTION_SETTINGS.selectedUploadId
   },
   // setters implementation
   setCurrentId: (id) => set({ currentId: id }),
@@ -253,7 +253,7 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
 
     // Update target transcription in database
     const result = await updateDB(targetId, changes)
-    
+
     // Update local state
     set(state => ({
       data: {

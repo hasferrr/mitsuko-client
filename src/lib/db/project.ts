@@ -2,7 +2,7 @@ import { Project, Transcription } from "@/types/project"
 import { db } from "./db"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
 import { getOrCreateGlobalBasicSettings, getOrCreateGlobalAdvancedSettings, getOrCreateGlobalTranslationBasicSettings, getOrCreateGlobalTranslationAdvancedSettings, getOrCreateGlobalExtractionBasicSettings, getOrCreateGlobalExtractionAdvancedSettings, getOrCreateGlobalTranscriptionSettings } from "./global-settings"
-import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
+import { DEFAULT_TRANSCRIPTION_SETTINGS } from "@/constants/default"
 
 const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(obj: T) => {
   const { id, createdAt, updatedAt, ...rest } = obj
@@ -18,20 +18,20 @@ export const createProject = async (name: string, isBatch = false, isDefaultSett
     const globalBasic = await getOrCreateGlobalBasicSettings()
     const basicTemplate = stripMeta(globalBasic)
     const basicSettings = await createBasicSettings(basicTemplate)
-    
+
     const globalTranslationBasic = await getOrCreateGlobalTranslationBasicSettings()
     const translationBasicSettings = await createBasicSettings(stripMeta(globalTranslationBasic))
-    
+
     const globalExtractionBasic = await getOrCreateGlobalExtractionBasicSettings()
     const extractionBasicSettings = await createBasicSettings(stripMeta(globalExtractionBasic))
 
     const globalAdvanced = await getOrCreateGlobalAdvancedSettings()
     const advancedTemplate = stripMeta(globalAdvanced)
     const advancedSettings = await createAdvancedSettings(advancedTemplate)
-    
+
     const globalTranslationAdvanced = await getOrCreateGlobalTranslationAdvancedSettings()
     const translationAdvancedSettings = await createAdvancedSettings(stripMeta(globalTranslationAdvanced))
-    
+
     const globalExtractionAdvanced = await getOrCreateGlobalExtractionAdvancedSettings()
     const extractionAdvancedSettings = await createAdvancedSettings(stripMeta(globalExtractionAdvanced))
 
@@ -42,7 +42,7 @@ export const createProject = async (name: string, isBatch = false, isDefaultSett
       id: defaultTranscriptionId,
       projectId: id,
       title: '',
-      ...DEFAULT_TRANSCTIPTION_SETTINGS,
+      ...DEFAULT_TRANSCRIPTION_SETTINGS,
       models: globalTranscriptionSettings.models,
       language: globalTranscriptionSettings.language,
       selectedMode: globalTranscriptionSettings.selectedMode,

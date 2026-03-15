@@ -4,7 +4,7 @@ import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS } from '@/constants/d
 import { getBasicSettings, getAdvancedSettings } from './settings'
 import { GLOBAL_ADVANCED_SETTINGS_ID, GLOBAL_BASIC_SETTINGS_ID, GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, GLOBAL_TRANSCRIPTION_SETTINGS_ID } from '@/constants/global-settings'
 import { Transcription } from '@/types/project'
-import { DEFAULT_TRANSCTIPTION_SETTINGS } from '@/constants/default'
+import { DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
 
 export const upsertBasicSettingsWithId = async (
   id: string,
@@ -55,7 +55,7 @@ export const getOrCreateGlobalAdvancedSettings = async (): Promise<AdvancedSetti
 export const getOrCreateGlobalTranslationBasicSettings = async (): Promise<BasicSettings> => {
   const existing = await getBasicSettings(GLOBAL_TRANSLATION_BASIC_SETTINGS_ID)
   if (existing) return existing
-  
+
   const globalBasic = await getGlobalBasicSettings()
   if (globalBasic) {
     const { id, createdAt, updatedAt, ...rest } = globalBasic
@@ -68,7 +68,7 @@ export const getOrCreateGlobalTranslationBasicSettings = async (): Promise<Basic
 export const getOrCreateGlobalTranslationAdvancedSettings = async (): Promise<AdvancedSettings> => {
   const existing = await getAdvancedSettings(GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID)
   if (existing) return existing
-  
+
   const globalAdvanced = await getGlobalAdvancedSettings()
   if (globalAdvanced) {
     const { id, createdAt, updatedAt, ...rest } = globalAdvanced
@@ -93,13 +93,13 @@ export const getOrCreateGlobalExtractionAdvancedSettings = async (): Promise<Adv
 export const getOrCreateGlobalTranscriptionSettings = async (): Promise<Transcription> => {
   const existing = await db.transcriptions.get(GLOBAL_TRANSCRIPTION_SETTINGS_ID)
   if (existing) return existing
-  
+
   const now = new Date()
   const defaultTranscription: Transcription = {
     id: GLOBAL_TRANSCRIPTION_SETTINGS_ID,
     projectId: 'global',
     title: 'Global Transcription Settings',
-    ...DEFAULT_TRANSCTIPTION_SETTINGS,
+    ...DEFAULT_TRANSCRIPTION_SETTINGS,
     transcriptionText: '',
     transcriptSubtitles: [],
     words: [],

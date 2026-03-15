@@ -1,6 +1,6 @@
 import { Transcription } from "@/types/project"
 import { db } from "./db"
-import { DEFAULT_TRANSCTIPTION_SETTINGS } from "@/constants/default"
+import { DEFAULT_TRANSCRIPTION_SETTINGS } from "@/constants/default"
 
 interface TranscriptionData {
   title: Transcription["title"]
@@ -30,7 +30,7 @@ export const createTranscription = async (
     const transcription: Transcription = {
       id,
       projectId,
-      ...DEFAULT_TRANSCTIPTION_SETTINGS,
+      ...DEFAULT_TRANSCRIPTION_SETTINGS,
       ...newData,
       createdAt: new Date(),
       updatedAt: new Date()
