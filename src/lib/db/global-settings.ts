@@ -1,6 +1,6 @@
 import { db } from './db'
 import { BasicSettings, AdvancedSettings } from '@/types/project'
-import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS } from '@/constants/default'
+import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS } from '@/constants/default'
 import { getBasicSettings, getAdvancedSettings } from './settings'
 import { GLOBAL_ADVANCED_SETTINGS_ID, GLOBAL_BASIC_SETTINGS_ID, GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, GLOBAL_TRANSCRIPTION_SETTINGS_ID } from '@/constants/global-settings'
 import { Transcription } from '@/types/project'
@@ -81,7 +81,7 @@ export const getOrCreateGlobalTranslationAdvancedSettings = async (): Promise<Ad
 export const getOrCreateGlobalExtractionBasicSettings = async (): Promise<BasicSettings> => {
   const existing = await getBasicSettings(GLOBAL_EXTRACTION_BASIC_SETTINGS_ID)
   if (existing) return existing
-  return upsertBasicSettingsWithId(GLOBAL_EXTRACTION_BASIC_SETTINGS_ID, { ...DEFAULT_BASIC_SETTINGS })
+  return upsertBasicSettingsWithId(GLOBAL_EXTRACTION_BASIC_SETTINGS_ID, { ...DEFAULT_EXTRACTION_BASIC_SETTINGS })
 }
 
 export const getOrCreateGlobalExtractionAdvancedSettings = async (): Promise<AdvancedSettings> => {

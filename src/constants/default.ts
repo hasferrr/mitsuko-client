@@ -4,14 +4,15 @@ import { AdvancedSettings, BasicSettings, Transcription } from "@/types/project"
 import { _extractionResult, _transcriptionResult, _translationResult } from "./default-result"
 import { parseTranscription, parseTranslationJson } from "@/lib/parser/parser"
 
-export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> = {
+const getDefaultModel = (modelName: string) => {
+  const freeModels = FREE_MODELS["Free Models"].models
+  return freeModels.find((model) => model.name === modelName) || freeModels[0] || null
+}
+
+const createBasicSettings = (modelName: string): Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> => ({
   sourceLanguage: "Japanese",
   targetLanguage: "Indonesian",
-  modelDetail: (() => {
-    const freeModels = FREE_MODELS["Free Models"].models
-    const defaultModel = freeModels.find((model) => model.name === "DeepSeek R1")
-    return defaultModel || freeModels[0] || null
-  })(),
+  modelDetail: getDefaultModel(modelName),
   isUseCustomModel: false,
   contextDocument: "",
   customInstructions: "",
@@ -23,7 +24,10 @@ export const DEFAULT_BASIC_SETTINGS: Omit<BasicSettings, "id" | "createdAt" | "u
     fewShotStartIndex: undefined,
     fewShotEndIndex: undefined,
   },
-}
+})
+
+export const DEFAULT_BASIC_SETTINGS = createBasicSettings("DeepSeek R1")
+export const DEFAULT_EXTRACTION_BASIC_SETTINGS = createBasicSettings("DeepSeek V3.2 (Thinking)")
 
 export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {
   temperature: 0.6,
