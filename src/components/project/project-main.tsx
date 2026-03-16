@@ -686,6 +686,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         onOpenChange={setIsGlobalTranslationSettingsOpen}
         basicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
         advancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
+        settingsParentType="translation"
       />
 
       <SettingsDialogue
@@ -694,6 +695,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         onOpenChange={setIsGlobalExtractionSettingsOpen}
         basicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
         advancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
+        settingsParentType="extraction"
       />
 
       <TranscriptionSettingsDialogue
