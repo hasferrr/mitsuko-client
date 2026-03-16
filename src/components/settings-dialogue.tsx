@@ -47,14 +47,21 @@ import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SettingsParentType } from "@/types/project"
 
-interface SettingsDialogueProps {
-  isGlobal?: boolean
+interface BaseSettingsDialogueProps {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
-  projectName: string
   basicSettingsId: string
   advancedSettingsId: string
   settingsParentType?: SettingsParentType
+}
+
+interface GlobalSettingsDialogueProps extends BaseSettingsDialogueProps {
+  mode: 'global'
+}
+
+interface ProjectSettingsDialogueProps extends BaseSettingsDialogueProps {
+  mode: 'project'
+  projectName: string
   resetFromBasicSettingsId?: string
   resetFromAdvancedSettingsId?: string
   isDefaultEnabled?: boolean
@@ -62,20 +69,24 @@ interface SettingsDialogueProps {
   onOpenGlobalSettings?: () => void
 }
 
-export const SettingsDialogue: React.FC<SettingsDialogueProps> = ({
-  isGlobal,
-  isOpen,
-  onOpenChange,
-  projectName,
-  basicSettingsId,
-  advancedSettingsId,
-  resetFromBasicSettingsId,
-  resetFromAdvancedSettingsId,
-  isDefaultEnabled,
-  onDefaultEnabledChange,
-  onOpenGlobalSettings,
-  settingsParentType = 'project',
-}) => {
+type SettingsDialogueProps = GlobalSettingsDialogueProps | ProjectSettingsDialogueProps
+
+export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
+  const {
+    isOpen,
+    onOpenChange,
+    basicSettingsId,
+    advancedSettingsId,
+    settingsParentType = 'project',
+  } = props
+
+  const isGlobal = props.mode === 'global'
+  const projectName = props.mode === 'project' ? props.projectName : ''
+  const resetFromBasicSettingsId = props.mode === 'project' ? props.resetFromBasicSettingsId : undefined
+  const resetFromAdvancedSettingsId = props.mode === 'project' ? props.resetFromAdvancedSettingsId : undefined
+  const isDefaultEnabled = props.mode === 'project' ? props.isDefaultEnabled : undefined
+  const onDefaultEnabledChange = props.mode === 'project' ? props.onDefaultEnabledChange : undefined
+  const onOpenGlobalSettings = props.mode === 'project' ? props.onOpenGlobalSettings : undefined
   const resetBasicSettings = useSettingsStore((s) => s.resetBasicSettings)
   const resetAdvancedSettings = useAdvancedSettingsStore((s) => s.resetAdvancedSettings)
   const resetBasicSettingsToGlobal = useSettingsStore((s) => s.resetBasicSettingsToGlobal)

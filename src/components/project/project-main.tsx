@@ -630,6 +630,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       />
 
       <SettingsDialogue
+        mode="project"
         isOpen={isTranslationSettingsModalOpen}
         onOpenChange={setIsTranslationSettingsModalOpen}
         projectName={currentProject.name}
@@ -647,6 +648,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       />
 
       <SettingsDialogue
+        mode="project"
         isOpen={isExtractionSettingsModalOpen}
         onOpenChange={setIsExtractionSettingsModalOpen}
         projectName={currentProject.name}
@@ -664,6 +666,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       />
 
       <TranscriptionSettingsDialogue
+        mode="project"
         isOpen={isTranscriptionSettingsModalOpen}
         onOpenChange={setIsTranscriptionSettingsModalOpen}
         projectName={currentProject.name}
@@ -678,28 +681,25 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
 
       {/* Global Settings Dialogues */}
       <SettingsDialogue
-        isGlobal
+        mode="global"
         isOpen={isGlobalTranslationSettingsOpen}
         onOpenChange={setIsGlobalTranslationSettingsOpen}
-        projectName="Global Translation"
         basicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
         advancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
       />
 
       <SettingsDialogue
-        isGlobal
+        mode="global"
         isOpen={isGlobalExtractionSettingsOpen}
         onOpenChange={setIsGlobalExtractionSettingsOpen}
-        projectName="Global Extraction"
         basicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
         advancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
       />
 
       <TranscriptionSettingsDialogue
-        isGlobal
+        mode="global"
         isOpen={isGlobalTranscriptionSettingsOpen}
         onOpenChange={setIsGlobalTranscriptionSettingsOpen}
-        projectName="Global Transcription"
         defaultTranscriptionId={GLOBAL_TRANSCRIPTION_SETTINGS_ID}
       />
 

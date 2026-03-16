@@ -29,27 +29,38 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-interface TranscriptionSettingsDialogueProps {
+interface BaseTranscriptionSettingsDialogueProps {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
-  projectName: string
   defaultTranscriptionId: string
-  isGlobal?: boolean
+}
+
+interface GlobalTranscriptionSettingsDialogueProps extends BaseTranscriptionSettingsDialogueProps {
+  mode: 'global'
+}
+
+interface ProjectTranscriptionSettingsDialogueProps extends BaseTranscriptionSettingsDialogueProps {
+  mode: 'project'
+  projectName: string
   isDefaultEnabled?: boolean
   onDefaultEnabledChange?: (enabled: boolean) => void
   onOpenGlobalSettings?: () => void
 }
 
-export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialogueProps> = ({
-  isOpen,
-  onOpenChange,
-  projectName,
-  defaultTranscriptionId,
-  isGlobal,
-  isDefaultEnabled,
-  onDefaultEnabledChange,
-  onOpenGlobalSettings,
-}) => {
+type TranscriptionSettingsDialogueProps = GlobalTranscriptionSettingsDialogueProps | ProjectTranscriptionSettingsDialogueProps
+
+export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialogueProps> = (props) => {
+  const {
+    isOpen,
+    onOpenChange,
+    defaultTranscriptionId,
+  } = props
+
+  const isGlobal = props.mode === 'global'
+  const projectName = props.mode === 'project' ? props.projectName : ''
+  const isDefaultEnabled = props.mode === 'project' ? props.isDefaultEnabled : undefined
+  const onDefaultEnabledChange = props.mode === 'project' ? props.onDefaultEnabledChange : undefined
+  const onOpenGlobalSettings = props.mode === 'project' ? props.onOpenGlobalSettings : undefined
   const getTranscriptionDb = useTranscriptionDataStore((s) => s.getTranscriptionDb)
   const updateTranscriptionDb = useTranscriptionDataStore((s) => s.updateTranscriptionDb)
   const copyTranscriptionSettingsKeys = useTranscriptionDataStore((s) => s.copyTranscriptionSettingsKeys)
