@@ -12,7 +12,7 @@ import {
   GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
   GLOBAL_TRANSCRIPTION_SETTINGS_ID
 } from "@/constants/global-settings"
-import { TranscriptionSettingsDialogue } from "@/components/transcribe/transcription-settings-dialogue"
+import { TranscriptionSettingsDialogue } from "@/components/transcription-settings-dialogue"
 import {
   AlertDialog,
   AlertDialogAction,

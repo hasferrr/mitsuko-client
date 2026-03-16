@@ -52,7 +52,7 @@ interface BaseSettingsDialogueProps {
   onOpenChange: (isOpen: boolean) => void
   basicSettingsId: string
   advancedSettingsId: string
-  settingsParentType?: SettingsParentType
+  settingsParentType: SettingsParentType
 }
 
 interface GlobalSettingsDialogueProps extends BaseSettingsDialogueProps {
@@ -77,7 +77,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
     onOpenChange,
     basicSettingsId,
     advancedSettingsId,
-    settingsParentType = 'project',
+    settingsParentType,
   } = props
 
   const isGlobal = props.mode === 'global'
@@ -103,7 +103,11 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
         : "Project Settings"
 
   const dialogDescription = isGlobal
-    ? "This is the default settings for all projects."
+    ? settingsParentType === 'translation'
+      ? "This is the default translation settings for all projects."
+      : settingsParentType === 'extraction'
+        ? "This is the default extraction settings for all projects."
+        : "This is the default settings for all projects."
     : settingsParentType === 'translation'
       ? `Default translation settings for "${projectName}" will go here.`
       : settingsParentType === 'extraction'

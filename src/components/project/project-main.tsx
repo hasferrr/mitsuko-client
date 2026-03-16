@@ -47,7 +47,7 @@ import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { SettingsDialogue } from "../settings-dialogue"
-import { TranscriptionSettingsDialogue } from "../transcribe/transcription-settings-dialogue"
+import { TranscriptionSettingsDialogue } from "../transcription-settings-dialogue"
 import {
   GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
   GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
