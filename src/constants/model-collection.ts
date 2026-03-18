@@ -376,6 +376,34 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
+        name: "GPT-5.4 mini",
+        maxInput: 400_000,
+        maxOutput: 128_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "medium",
+        isFormatReasoning: true,
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "GPT-5.4 nano",
+        maxInput: 400_000,
+        maxOutput: 128_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "low",
+        isFormatReasoning: true,
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "GPT-5.2",
         maxInput: 400_000,
         maxOutput: 128_000,
