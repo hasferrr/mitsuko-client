@@ -18,6 +18,8 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 - ⚙️ **Independent Feature Settings:** You can now enable custom default settings for Translation, Extraction, and Transcription independently from one another within your projects.
 - 🎛️ **Better Global Settings:** The User Settings panel has been reorganized with dedicated buttons to easily configure your global defaults for each tool individually.
+- 🤖 **Model Updates:**
+  - Added GPT-5.4, GPT-5.4 mini, and GPT-5.4 nano from OpenAI's latest model family.
 
 ### March 6
 
