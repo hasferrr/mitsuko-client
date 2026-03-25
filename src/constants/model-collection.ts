@@ -52,48 +52,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
     provider: "unknown",
     models: [
       {
-        name: "DeepSeek V3.2 (Thinking)",
-        subName: "deepseek-v3.2 / deepseek-reasoner",
-        maxInput: 131072,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: false
-        }
-      },
-      {
-        name: "DeepSeek V3.2",
-        subName: "deepseek-v3.2 / deepseek-chat",
-        maxInput: 131072,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "DeepSeek R1",
-        subName: "DeepSeek-R1-0528",
-        maxInput: 128000,
-        maxOutput: 64000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: false
-        }
-      },
-      {
         name: "Gemini 3 Flash",
         subName: "gemini-3-flash-preview",
         maxInput: 1_048_576,
@@ -123,7 +81,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
       },
       {
         name: "Gemini 2.5 Flash",
-        subName: "gemini-flash-latest\ngemini-2.5-flash-preview-09-2025",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -137,7 +94,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
       },
       {
         name: "Gemini 2.5 Flash Lite",
-        subName: "gemini-flash-lite-latest\ngemini-2.5-flash-lite-preview-09-2025",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -160,6 +116,48 @@ const RAW_FREE_MODELS: FreeModelCollection = {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "DeepSeek V3.2 (Thinking)",
+        subName: "deepseek-v3.2 / deepseek-reasoner",
+        maxInput: 131072,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: false
+        }
+      },
+      {
+        name: "DeepSeek V3.2",
+        subName: "deepseek-v3.2 / deepseek-chat",
+        maxInput: 131072,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "DeepSeek R1",
+        subName: "deepseek-r1-0528",
+        maxInput: 128000,
+        maxOutput: 64000,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: false
         }
       },
     ]
@@ -228,7 +226,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       },
       {
         name: "Gemini 2.5 Flash",
-        subName: "gemini-flash-latest\ngemini-2.5-flash-preview-09-2025",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -242,7 +239,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       },
       {
         name: "Gemini 2.5 Flash Lite",
-        subName: "gemini-flash-lite-latest\ngemini-2.5-flash-lite-preview-09-2025",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -587,7 +583,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       },
       {
         name: "DeepSeek R1",
-        subName: "DeepSeek-R1-0528",
+        subName: "deepseek-r1-0528",
         maxInput: 128000,
         maxOutput: 64000,
         structuredOutput: true,

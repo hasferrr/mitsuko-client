@@ -20,13 +20,13 @@ const createBasicSettings = (modelName: string): Omit<BasicSettings, "id" | "cre
     isEnabled: false,
     value: "",
     linkedId: "",
-    type: 'linked',
+    type: "linked",
     fewShotStartIndex: undefined,
     fewShotEndIndex: undefined,
   },
 })
 
-export const DEFAULT_BASIC_SETTINGS = createBasicSettings("DeepSeek R1")
+export const DEFAULT_BASIC_SETTINGS = createBasicSettings("Gemini 3 Flash")
 export const DEFAULT_EXTRACTION_BASIC_SETTINGS = createBasicSettings("DeepSeek V3.2 (Thinking)")
 
 export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {
