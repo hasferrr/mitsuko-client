@@ -52,20 +52,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
     provider: "unknown",
     models: [
       {
-        name: "DeepSeek R1",
-        subName: "DeepSeek-R1-0528",
-        maxInput: 128000,
-        maxOutput: 64000,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: false
-        }
-      },
-      {
         name: "DeepSeek V3.2 (Thinking)",
         subName: "deepseek-v3.2 / deepseek-reasoner",
         maxInput: 131072,
@@ -94,8 +80,8 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "DeepSeek V3",
-        subName: "DeepSeek-V3-0324",
+        name: "DeepSeek R1",
+        subName: "DeepSeek-R1-0528",
         maxInput: 128000,
         maxOutput: 64000,
         structuredOutput: true,
@@ -104,7 +90,7 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         default: {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
+          isUseStructuredOutput: false
         }
       },
       {
