@@ -11,9 +11,7 @@ export type ModelProvider =
 export type UsageLevel =
   | "very low"
   | "low"
-  | "below medium"
   | "medium"
-  | "above medium"
   | "high"
   | "very high"
   | "N/A"

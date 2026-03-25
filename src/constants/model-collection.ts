@@ -479,7 +479,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 100_000,
         structuredOutput: true,
         isPaid: true,
-        usage: "above medium",
+        usage: "medium",
         isFormatReasoning: true,
         default: {
           temperature: 1,
@@ -493,7 +493,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 32_768,
         structuredOutput: true,
         isPaid: true,
-        usage: "above medium",
+        usage: "medium",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -532,7 +532,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 16_384,
         structuredOutput: true,
         isPaid: true,
-        usage: "above medium",
+        usage: "medium",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
