@@ -25,7 +25,7 @@ export default function HeroSection() {
       {/* Subheading */}
       <div className="text-text-main md:text-lg/[150%] text-base/[150%] mt-6 text-center md:max-w-xl max-w-lg">
         <p>
-          Translate subtitles with high-quality result, faster than ever.
+          Translate subtitles with high-quality and context-aware result.
           Accelerate your subtitling workflow with Mitsuko!
         </p>
       </div>
