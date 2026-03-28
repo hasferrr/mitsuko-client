@@ -66,7 +66,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={cn(inter.variable, geistMono.variable, "dark scroll-smooth")}>
+    <html lang="en" data-scroll-behavior="smooth" className={cn(inter.variable, geistMono.variable, "dark scroll-smooth")}>
       <link rel="icon" href="/favicon.ico" sizes="any" />
       <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
