@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 bun dev              # Start development server
 bun build            # Production build (rarely used)
-bun tsc              # Type checking (use this instead of build)
+bun typecheck        # Type checking (use this instead of build)
 bun lint             # Run ESLint
 bun test             # Run all tests
 bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.test.ts)
@@ -34,7 +34,7 @@ bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.
 - `src/app/(main)/` - Authenticated app (translate, transcribe, batch, project, extract-context, history, library, cloud, dashboard, tools)
 
 ### Key Directories
-- `src/stores/` - Zustand stores (`useXxxStore` hooks)
+- `src/stores/` - Zustand stores: `settings/` (BasicSettings, AdvancedSettings), `data/` (project data caches), and root-level UI stores
 - `src/lib/db/` - Dexie database schema, migrations, and CRUD operations
 - `src/lib/subtitles/` - SRT/ASS/VTT parsers and generators
 - `src/lib/parser/` - AI response parsing and cleaning
@@ -51,23 +51,24 @@ A **Project** is the central organizational unit. It contains:
 ```
 Project
 ├── translations: Translation[]      # Subtitle translation histories
-├── transcriptions: Transcription[]  # Audio transcription histories
+├── transcriptions: Transcription[]  # Audio transcription histories (settings stored on entity)
 ├── extractions: Extraction[]        # Context extraction histories
 └── Default Settings (per feature)
-    ├── Translation: basicSettingsId + advancedSettingsId
-    ├── Extraction: basicSettingsId + advancedSettingsId
-    └── Transcription: transcriptionId
+    ├── Translation: defaultTranslationBasicSettingsId + defaultTranslationAdvancedSettingsId
+    ├── Extraction: defaultExtractionBasicSettingsId + defaultExtractionAdvancedSettingsId
+    └── Transcription: defaultTranscriptionId (stores settings directly on transcription)
 ```
 
 **Entity Relationships:**
-- `Translation` - Single subtitle file translation with settings, parsed subtitles, and AI response
-- `Transcription` - Audio-to-text with word-level timestamps, segments, and mode settings
-- `Extraction` - Context analysis from subtitles with episode tracking
+- `Translation` - Single subtitle file translation with `basicSettingsId` and `advancedSettingsId`
+- `Transcription` - Audio-to-text with word-level timestamps, segments, and settings stored directly on entity (language, selectedMode, models, customInstructions)
+- `Extraction` - Context analysis from subtitles with `basicSettingsId` and `advancedSettingsId`
 - `BasicSettings` - Source/target language, model selection, context document, custom instructions, few-shot config
 - `AdvancedSettings` - Temperature, split size, token limits, structured output, context caching options
 
 **Settings Inheritance:**
 - Each Translation/Extraction stores its own `basicSettingsId` and `advancedSettingsId`
+- Transcriptions store settings directly on the entity (no separate settings table)
 - When creating a new item, which settings it inherits depends on the project's enable flags:
   - `isDefaultTranslationEnabled = true` → use project's `defaultTranslationBasicSettingsId`
   - `isDefaultTranslationEnabled = false` → use global settings (from `src/constants/global-settings.ts`)
@@ -118,7 +119,7 @@ Use store selectors with settings IDs:
 ```tsx
 const modelDetail = useSettingsStore(state => state.getModelDetail(basicSettingsId))
 const setBasicSettingsValue = useSettingsStore(state => state.setBasicSettingsValue)
-const setSourceLanguage = (lang: string) => setBasicSettingsValue(basicSettingsId, "sourceLanguage", lang)
+// Usage: setBasicSettingsValue(basicSettingsId, "sourceLanguage", "en")
 ```
 
 ## Important Files
