@@ -1,4 +1,4 @@
-import { DEFAULT_BASIC_SETTINGS } from '@/constants/default'
+import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
 import {
   Project,
   Translation,
@@ -249,16 +249,16 @@ function transcriptionConstructor(transcription: Partial<Transcription>): Transc
     title: transcription.title ?? "Transcription X",
     transcriptionText: transcription.transcriptionText ?? "",
     transcriptSubtitles: transcription.transcriptSubtitles ?? [],
-    language: transcription.language ?? "auto",
-    selectedMode: transcription.selectedMode ?? "sentence",
-    customInstructions: transcription.customInstructions ?? "",
-    models: migrateModelName(transcription.models) ?? "mitsuko-premium",
+    language: transcription.language ?? DEFAULT_TRANSCRIPTION_SETTINGS.language,
+    selectedMode: transcription.selectedMode ?? DEFAULT_TRANSCRIPTION_SETTINGS.selectedMode,
+    customInstructions: transcription.customInstructions ?? DEFAULT_TRANSCRIPTION_SETTINGS.customInstructions,
+    models: migrateModelName(transcription.models) ?? DEFAULT_TRANSCRIPTION_SETTINGS.models,
     createdAt: transcription.createdAt ?? new Date(),
     updatedAt: transcription.updatedAt ?? new Date(),
     projectId: transcription.projectId ?? "",
     words: transcription.words ?? [],
     segments: transcription.segments ?? [],
-    selectedUploadId: transcription.selectedUploadId ?? null,
+    selectedUploadId: transcription.selectedUploadId ?? DEFAULT_TRANSCRIPTION_SETTINGS.selectedUploadId,
   }
 }
 
@@ -287,12 +287,12 @@ function extractionConstructor(extraction: Partial<Extraction>): Extraction {
 function basicSettingsConstructor(basicSettings: Partial<BasicSettings>): BasicSettings {
   return {
     id: basicSettings.id ?? uuidv4(),
-    sourceLanguage: basicSettings.sourceLanguage ?? "",
-    targetLanguage: basicSettings.targetLanguage ?? "",
-    modelDetail: basicSettings.modelDetail ?? null,
-    isUseCustomModel: basicSettings.isUseCustomModel ?? false,
-    contextDocument: basicSettings.contextDocument ?? "",
-    customInstructions: basicSettings.customInstructions ?? "",
+    sourceLanguage: basicSettings.sourceLanguage ?? DEFAULT_BASIC_SETTINGS.sourceLanguage,
+    targetLanguage: basicSettings.targetLanguage ?? DEFAULT_BASIC_SETTINGS.targetLanguage,
+    modelDetail: basicSettings.modelDetail ?? DEFAULT_BASIC_SETTINGS.modelDetail,
+    isUseCustomModel: basicSettings.isUseCustomModel ?? DEFAULT_BASIC_SETTINGS.isUseCustomModel,
+    contextDocument: basicSettings.contextDocument ?? DEFAULT_BASIC_SETTINGS.contextDocument,
+    customInstructions: basicSettings.customInstructions ?? DEFAULT_BASIC_SETTINGS.customInstructions,
     fewShot: basicSettings.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot,
     createdAt: basicSettings.createdAt ?? new Date(),
     updatedAt: basicSettings.updatedAt ?? new Date(),
@@ -302,15 +302,15 @@ function basicSettingsConstructor(basicSettings: Partial<BasicSettings>): BasicS
 function advancedSettingsConstructor(advancedSettings: Partial<AdvancedSettings>): AdvancedSettings {
   return {
     id: advancedSettings.id ?? uuidv4(),
-    temperature: advancedSettings.temperature ?? 1,
-    startIndex: advancedSettings.startIndex ?? 1,
-    endIndex: advancedSettings.endIndex ?? 1,
-    splitSize: advancedSettings.splitSize ?? 100,
-    maxCompletionTokens: advancedSettings.maxCompletionTokens ?? 100,
-    isUseStructuredOutput: advancedSettings.isUseStructuredOutput ?? false,
-    isUseFullContextMemory: advancedSettings.isUseFullContextMemory ?? false,
-    isBetterContextCaching: advancedSettings.isBetterContextCaching ?? false,
-    isMaxCompletionTokensAuto: advancedSettings.isMaxCompletionTokensAuto ?? false,
+    temperature: advancedSettings.temperature ?? DEFAULT_ADVANCED_SETTINGS.temperature,
+    startIndex: advancedSettings.startIndex ?? DEFAULT_ADVANCED_SETTINGS.startIndex,
+    endIndex: advancedSettings.endIndex ?? DEFAULT_ADVANCED_SETTINGS.endIndex,
+    splitSize: advancedSettings.splitSize ?? DEFAULT_ADVANCED_SETTINGS.splitSize,
+    maxCompletionTokens: advancedSettings.maxCompletionTokens ?? DEFAULT_ADVANCED_SETTINGS.maxCompletionTokens,
+    isUseStructuredOutput: advancedSettings.isUseStructuredOutput ?? DEFAULT_ADVANCED_SETTINGS.isUseStructuredOutput,
+    isUseFullContextMemory: advancedSettings.isUseFullContextMemory ?? DEFAULT_ADVANCED_SETTINGS.isUseFullContextMemory,
+    isBetterContextCaching: advancedSettings.isBetterContextCaching ?? DEFAULT_ADVANCED_SETTINGS.isBetterContextCaching,
+    isMaxCompletionTokensAuto: advancedSettings.isMaxCompletionTokensAuto ?? DEFAULT_ADVANCED_SETTINGS.isMaxCompletionTokensAuto,
     createdAt: advancedSettings.createdAt ?? new Date(),
     updatedAt: advancedSettings.updatedAt ?? new Date(),
   }
