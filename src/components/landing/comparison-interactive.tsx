@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Check, Globe, Target, ChevronRight } from "lucide-react"
+import { Check, Globe, Target, ChevronRight, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 // Replicate type definitions or import them if shared
@@ -41,6 +41,14 @@ export default function ComparisonInteractive({
     setExampleIndex((prevIndex) => (prevIndex + 1) % currentCategoryExamples.length)
   }
 
+  const showNextCategory = () => {
+    const currentCategoryIndex = comparisonCategoriesData.findIndex(c => c.id === hoveredCategory)
+    const nextCategoryIndex = (currentCategoryIndex + 1) % comparisonCategoriesData.length
+    const nextCategory = comparisonCategoriesData[nextCategoryIndex].id
+    setHoveredCategory(nextCategory)
+    setExampleIndex(0)
+  }
+
   const handleMouseEnter = (category: ComparisonCategory) => {
     setHoveredCategory(category)
     setExampleIndex(0) // Reset example index when changing category
@@ -49,35 +57,40 @@ export default function ComparisonInteractive({
   return (
     <div className="grid md:grid-cols-2 gap-8">
       {/* Left Column - Comparison Table (Interactive) */}
-      <div
-        className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm"
-      >
-        <h3 className="text-2xl font-semibold mb-6 ">
-          Mitsuko vs. Generic Translation
-        </h3>
+      <div className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm flex flex-col">
+        {/* Header */}
+        <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-800">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 mb-2">
+            Comparison
+          </span>
+          <h3 className="text-2xl font-semibold">
+            Mitsuko vs. Generic Translation
+          </h3>
+        </div>
 
-        <div className="flex justify-center gap-16 mb-8">
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mb-2">
-              <Target size={24} className="text-white" />
+        {/* Legend */}
+        <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="flex justify-center gap-16">
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mb-2">
+                <Target size={24} className="text-white" />
+              </div>
+              <span className="font-medium">Mitsuko</span>
             </div>
-            <span className="font-medium">Mitsuko</span>
-          </div>
 
-          <div className="flex flex-col items-center">
-            <div
-              className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center mb-2"
-            >
-              <Globe size={24} className="text-gray-500 dark:text-gray-400" />
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center mb-2">
+                <Globe size={24} className="text-gray-500 dark:text-gray-400" />
+              </div>
+              <span className="text-gray-700 dark:text-gray-300 font-medium">
+                MTL
+              </span>
             </div>
-            <span className="text-gray-700 dark:text-gray-300 font-medium">
-              MTL
-            </span>
           </div>
         </div>
 
         {/* Comparison Rows - Interactive */}
-        <div>
+        <div className="flex-1 p-4 overflow-auto">
           {comparisonCategoriesData.map((category) => (
             <div
               key={category.id}
@@ -106,43 +119,53 @@ export default function ComparisonInteractive({
       </div>
 
       {/* Right Column - See the Difference (Displays based on state) */}
-      <div
-        className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg p-8 shadow-sm"
-      >
-        {/* Heading with Next Example Button */}
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-semibold">
-            See the Difference
-          </h3>
-          {hasMultipleExamples && (
-            <button
-              onClick={showNextExample}
-              className="flex items-center gap-1 text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-              aria-label="Show next example"
-            >
-              Next Example <ChevronRight size={16} />
-            </button>
-          )}
+      <div className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm flex flex-col">
+        {/* Header with category badge */}
+        <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 mb-2">
+                {comparisonCategoriesData.find(c => c.id === hoveredCategory)?.label}
+              </span>
+              <h3 className="text-2xl font-semibold">
+                See the Difference
+              </h3>
+            </div>
+            {hasMultipleExamples && (
+              <div className="flex items-center gap-1.5">
+                {currentCategoryExamples.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setExampleIndex(index)}
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-all",
+                      index === exampleIndex
+                        ? "bg-blue-500 w-6"
+                        : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400"
+                    )}
+                    aria-label={`Go to example ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-
-        {/* Example Content (Renders based on hoveredCategory and exampleIndex) */}
-        {/* Added a key prop to force re-render on category change for animation */}
-        <div key={hoveredCategory + exampleIndex} className="space-y-6 animate-fadeIn">
+        {/* Example Content */}
+        <div key={hoveredCategory + exampleIndex} className="flex-1 p-6 space-y-5 animate-fadeIn overflow-auto">
           {/* Render Original */}
           {details.original && (
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-blue-400"></div>
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-400"></div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   {details.original.label}
                 </span>
               </div>
-              <div className="p-4 rounded-md bg-gray-100 dark:bg-gray-900 whitespace-pre-line">
-                {/* Special handling for timestamp visual placeholder */}
+              <div className="p-4 rounded-lg bg-blue-50/50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 whitespace-pre-line">
                 {hoveredCategory === "timestamp" && details.original.label === "Audio Segment" ? (
                   <div className="italic text-gray-600 dark:text-gray-400">
-                    {details.original.content} {/* Display placeholder text */}
+                    {details.original.content}
                   </div>
                 ) : (
                   <p className="text-gray-800 dark:text-gray-200">{details.original.content}</p>
@@ -154,20 +177,19 @@ export default function ComparisonInteractive({
           {/* Render Mitsuko */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-3 h-3 rounded-full bg-green-400"></div>
-              <div className="flex items-center gap-1">
-                <Target size={16} className="text-blue-400" />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+              <div className="flex items-center gap-1.5">
+                <Target size={14} className="text-blue-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   {details.mitsuko.label}
                 </span>
               </div>
             </div>
-            <div className="p-4 rounded-md bg-gray-100 dark:bg-gray-900 whitespace-pre-line">
+            <div className="p-4 rounded-lg bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 whitespace-pre-line">
               {Array.isArray(details.mitsuko.content) ? (
-                // Handle array content (e.g., timestamp list)
                 <div className="space-y-1">
                   {details.mitsuko.content.map((item, index) => (
-                    <p key={index} className="text-gray-800 dark:text-gray-200 font-mono text-sm"> {/* Use mono for timestamps */}
+                    <p key={index} className="text-gray-800 dark:text-gray-200 font-mono text-sm">
                       {item}
                     </p>
                   ))}
@@ -181,16 +203,15 @@ export default function ComparisonInteractive({
           {/* Render Generic */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-3 h-3 rounded-full bg-red-400"></div>
-              <div className="flex items-center gap-1">
-                <Globe size={16} className="text-gray-500 dark:text-gray-400" />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+              <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+              <div className="flex items-center gap-1.5">
+                <Globe size={14} className="text-gray-400" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   {details.generic.label}
                 </span>
               </div>
             </div>
-            <div className="p-4 rounded-md bg-gray-100 dark:bg-gray-900 whitespace-pre-line">
-              {/* Special handling for timestamp generic content */}
+            <div className="p-4 rounded-lg bg-red-50/50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 whitespace-pre-line">
               {hoveredCategory === "timestamp" ? (
                 <p className="text-gray-800 dark:text-gray-200 font-mono text-sm">
                   {details.generic.content}
@@ -204,24 +225,56 @@ export default function ComparisonInteractive({
           </div>
 
           {/* Render Advantage */}
-          <div className="mt-4">
-            <h4 className="text-xl font-bold mb-4">
-              {details.advantage.title}
-            </h4>
+          <div className="pt-2">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                <Check size={12} className="text-white" />
+              </div>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                {details.advantage.title.replace(" Advantage:", "")}
+              </h4>
+            </div>
             {Array.isArray(details.advantage.description) ? (
-              <ul className="space-y-4">
+              <ul className="space-y-2.5">
                 {details.advantage.description.map((item, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <Check className="text-blue-400 mt-1 flex-shrink-0" size={18} />
-                    <p className="text-gray-700 dark:text-gray-300">{item}</p>
+                  <li key={index} className="flex items-start gap-2.5 text-sm">
+                    <ArrowRight className="text-blue-400 mt-0.5 flex-shrink-0" size={14} />
+                    <p className="text-gray-600 dark:text-gray-400">{item}</p>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-700 dark:text-gray-300 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {details.advantage.description}
               </p>
             )}
+          </div>
+        </div>
+
+        {/* Footer with navigation */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between">
+          <div className="text-xs text-gray-500 dark:text-gray-500">
+            {exampleIndex + 1} of {currentCategoryExamples.length} example{currentCategoryExamples.length > 1 ? "s" : ""}
+          </div>
+          <div className="flex items-center gap-2">
+            {hasMultipleExamples && (
+              <button
+                onClick={showNextExample}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Show next example"
+              >
+                <span>Example</span>
+                <ChevronRight size={14} />
+              </button>
+            )}
+            <button
+              onClick={showNextCategory}
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+              aria-label="Show next category"
+            >
+              <span>Next</span>
+              <ChevronRight size={14} />
+            </button>
           </div>
         </div>
       </div>
