@@ -1,17 +1,17 @@
 import type { RefObject } from "react"
 
-interface ServiceSlice {
-  abortControllerMap: Map<string, RefObject<AbortController>>
-  [key: string]: unknown
-}
-
 export function createServiceSlice<TSetName extends string>(
   setName: TSetName,
 ) {
+  type SliceState = Record<TSetName, Set<string>> & {
+    abortControllerMap: Map<string, RefObject<AbortController>>
+    setActive: (id: string, isActive: boolean) => void
+    stop: (id: string) => void
+  }
+
   return (
-    set: (fn: (state: ServiceSlice & Record<TSetName, Set<string>>) => Partial<ServiceSlice & Record<TSetName, Set<string>>>) => void,
-    get: () => ServiceSlice & Record<TSetName, Set<string>>,
-  ) => ({
+    set: (fn: (state: SliceState) => Partial<SliceState>) => void,
+  ): SliceState => ({
     [setName]: new Set<string>(),
     abortControllerMap: new Map<string, RefObject<AbortController>>(),
 
@@ -23,7 +23,7 @@ export function createServiceSlice<TSetName extends string>(
         } else {
           newSet.delete(id)
         }
-        return { [setName]: newSet } as Partial<ServiceSlice & Record<TSetName, Set<string>>>
+        return { [setName]: newSet } as Partial<SliceState>
       })
     },
 
@@ -33,8 +33,8 @@ export function createServiceSlice<TSetName extends string>(
         newSet.delete(id)
         state.abortControllerMap.get(id)?.current?.abort()
         state.abortControllerMap.delete(id)
-        return { [setName]: newSet } as Partial<ServiceSlice & Record<TSetName, Set<string>>>
+        return { [setName]: newSet } as Partial<SliceState>
       })
     },
-  })
+  } as SliceState)
 }
