@@ -10,7 +10,7 @@ import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { db } from "@/lib/db/db"
-import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import { DEFAULT_EXTRACTION_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID } from "@/constants/global-settings"
 
@@ -78,7 +78,7 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
         if (bsFromDb) {
           bsInput = bsFromDb
         } else {
-          bsInput = DEFAULT_BASIC_SETTINGS
+          bsInput = DEFAULT_EXTRACTION_BASIC_SETTINGS
         }
       }
 

@@ -1,7 +1,6 @@
 import { BasicSettings, Extraction, AdvancedSettings } from "@/types/project"
 import { db } from "./db"
-import { DEFAULT_BASIC_SETTINGS } from "@/constants/default"
-import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import { DEFAULT_EXTRACTION_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
 
 // Extraction CRUD functions
@@ -15,7 +14,7 @@ export const createExtraction = async (
     const id = crypto.randomUUID()
 
     const basicSettings = await createBasicSettings({
-      ...DEFAULT_BASIC_SETTINGS,
+      ...DEFAULT_EXTRACTION_BASIC_SETTINGS,
       ...basicSettingsData,
     })
     const advancedSettings = await createAdvancedSettings({

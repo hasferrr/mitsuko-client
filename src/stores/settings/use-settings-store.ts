@@ -7,8 +7,8 @@ import {
   getAllBasicSettings,
   getBasicSettings,
 } from "@/lib/db/settings"
-import { DEFAULT_BASIC_SETTINGS } from "@/constants/default"
-import { GLOBAL_BASIC_SETTINGS_ID } from "@/constants/global-settings"
+import { DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS } from "@/constants/default"
+import { GLOBAL_BASIC_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID } from "@/constants/global-settings"
 import { BASIC_SETTING_KEYS } from "./settings-keys"
 import type { BasicKey } from "./settings-keys"
 
@@ -146,7 +146,8 @@ export const useSettingsStore = create<SettingsStore>()(
         }
       },
       resetBasicSettings: (id) => {
-        // Reset all basic settings fields back to DEFAULT_BASIC_SETTINGS and persist
+        const isExtraction = id === GLOBAL_EXTRACTION_BASIC_SETTINGS_ID
+        const defaults = isExtraction ? DEFAULT_EXTRACTION_BASIC_SETTINGS : DEFAULT_BASIC_SETTINGS
         set(state => {
           const current = state.data[id]
           if (!current) return state
@@ -156,7 +157,7 @@ export const useSettingsStore = create<SettingsStore>()(
               ...state.data,
               [id]: {
                 ...current,
-                ...DEFAULT_BASIC_SETTINGS,
+                ...defaults,
               },
             },
           }
