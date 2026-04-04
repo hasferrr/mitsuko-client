@@ -21,6 +21,10 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        source: '/blog/:slug.md',
+        destination: '/api/blog/:slug/raw',
+      },
+      {
         source: '/api/occurrunces/static/:path*',
         destination: 'https://us-assets.i.posthog.com/static/:path*',
       },

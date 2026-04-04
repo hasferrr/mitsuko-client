@@ -35,7 +35,7 @@ export type Frontmatter = {
 
 const BLOG_DIR = path.join(process.cwd(), 'content', 'blog')
 
-function toSlug(name: string) {
+export function toSlug(name: string) {
   return name
     .replace(/\\.mdx?$/i, '')
     .trim()

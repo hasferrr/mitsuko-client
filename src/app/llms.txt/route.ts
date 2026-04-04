@@ -6,7 +6,7 @@ export const dynamic = 'force-static'
 
 export async function GET() {
   const posts = await getAllPostsMeta()
-  const blogList = posts.map(p => `- [${p.title}](${DEPLOYMENT_URL}/blog/${p.slug}): ${p.description}`).join('\n')
+  const blogList = posts.map(p => `- [${p.title}](${DEPLOYMENT_URL}/blog/${p.slug}.md): ${p.description}`).join('\n')
   const content = `# ${META_TITLE}
 
 > ${META_DESCRIPTION}
