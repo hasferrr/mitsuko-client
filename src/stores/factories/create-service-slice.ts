@@ -22,6 +22,7 @@ export function createServiceSlice<TSetName extends string>(
           newSet.add(id)
         } else {
           newSet.delete(id)
+          state.abortControllerMap.delete(id)
         }
         return { [setName]: newSet } as Partial<SliceState>
       })
