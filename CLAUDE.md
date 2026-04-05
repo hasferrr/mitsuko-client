@@ -35,12 +35,12 @@ bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.
 
 ### Key Directories
 - `src/stores/` - Zustand stores:
-  - `settings/` - BasicSettings and AdvancedSettings stores
+  - `settings/` - Basic, Advanced, Local, Whisper, and Batch settings stores
   - `services/` - Translation, transcription, extraction service stores (use `createServiceSlice` factory)
   - `factories/` - Store factory functions (e.g., `createServiceSlice` for shared Set + AbortController pattern)
   - `utils/` - Shared store utilities (e.g., `copySettingsKeys` for settings copy/reset)
   - `data/` - Project data caches
-  - Root-level UI stores
+  - `ui/` - UI state stores (history, tools, theme, session, upload, etc.)
 - `src/lib/db/` - Dexie database schema, migrations, and CRUD operations
 - `src/lib/subtitles/` - SRT/ASS/VTT parsers and generators
 - `src/lib/parser/` - AI response parsing and cleaning
