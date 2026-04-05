@@ -5,10 +5,13 @@ import { RefObject } from "react"
 import { RequestType } from "@/types/request"
 import { useClientIdStore } from "../use-client-id-store"
 import { ExtractionRequestBody } from "@/types/request"
+import { createServiceSlice } from "../factories/create-service-slice"
 
 interface ExtractionStore {
   isExtractingSet: Set<string>
   abortControllerMap: Map<string, RefObject<AbortController>>
+  setActive: (id: string, isActive: boolean) => void
+  stop: (id: string) => void
   setIsExtracting: (extractionId: string, isExtracting: boolean) => void
   stopExtraction: (id: string) => void
   extractContext: (
@@ -22,29 +25,11 @@ interface ExtractionStore {
 }
 
 export const useExtractionStore = create<ExtractionStore>()((set, get) => ({
-  isExtractingSet: new Set(),
-  abortControllerMap: new Map(),
-  setIsExtracting: (extractionId, isExtracting) => {
-    set(state => {
-      const newSet = new Set(state.isExtractingSet)
-      if (isExtracting) {
-        newSet.add(extractionId)
-      } else {
-        newSet.delete(extractionId)
-        state.abortControllerMap.delete(extractionId)
-      }
-      return { isExtractingSet: newSet }
-    })
-  },
-  stopExtraction: (id) => {
-    set(state => {
-      const newSet = new Set(state.isExtractingSet)
-      newSet.delete(id)
-      state.abortControllerMap.get(id)?.current.abort()
-      state.abortControllerMap.delete(id)
-      return { isExtractingSet: newSet }
-    })
-  },
+  ...createServiceSlice("isExtractingSet")(set as never),
+
+  setIsExtracting: (extractionId, isExtracting) => get().setActive(extractionId, isExtracting),
+  stopExtraction: (id) => get().stop(id),
+
   extractContext: async (
     requestBody: ExtractionRequestBody,
     apiKey: string,

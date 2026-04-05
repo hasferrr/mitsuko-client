@@ -3,13 +3,17 @@ import { SubOnlyTranslated } from "@/types/subtitles"
 import { parseTranslationJson } from "@/lib/parser/parser"
 import { TRANSLATE_URL, TRANSLATE_URL_FREE, TRANSLATE_URL_PAID } from "@/constants/api"
 import { handleStream } from "@/lib/api/stream"
-import { RefObject } from "react"
 import { RequestType } from "@/types/request"
 import { useClientIdStore } from "../use-client-id-store"
 import { TranslationRequestBody } from "@/types/request"
+import { createServiceSlice } from "../factories/create-service-slice"
+import type { RefObject } from "react"
+
 interface TranslationStore {
   isTranslatingSet: Set<string>
   abortControllerMap: Map<string, RefObject<AbortController>>
+  setActive: (id: string, isActive: boolean) => void
+  stop: (id: string) => void
   setIsTranslating: (translationId: string, isTranslating: boolean) => void
   stopTranslation: (id: string) => void
   translateSubtitles: (
@@ -23,30 +27,10 @@ interface TranslationStore {
 }
 
 export const useTranslationStore = create<TranslationStore>()((set, get) => ({
-  isTranslatingSet: new Set(),
-  abortControllerMap: new Map(),
+  ...createServiceSlice("isTranslatingSet")(set as never),
 
-  setIsTranslating: (translationId, isTranslating) => {
-    set(state => {
-      const newSet = new Set(state.isTranslatingSet)
-      if (isTranslating) {
-        newSet.add(translationId)
-      } else {
-        newSet.delete(translationId)
-      }
-      return { isTranslatingSet: newSet }
-    })
-  },
-
-  stopTranslation: (id: string) => {
-    set(state => {
-      const newSet = new Set(state.isTranslatingSet)
-      newSet.delete(id)
-      state.abortControllerMap.get(id)?.current.abort()
-      state.abortControllerMap.delete(id)
-      return { isTranslatingSet: newSet }
-    })
-  },
+  setIsTranslating: (translationId, isTranslating) => get().setActive(translationId, isTranslating),
+  stopTranslation: (id) => get().stop(id),
 
   translateSubtitles: async (
     requestBody: TranslationRequestBody,

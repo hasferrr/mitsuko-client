@@ -4,6 +4,7 @@ import { create } from "zustand"
 import { RefObject } from "react"
 import { TranscriptionRequestBody } from "@/types/request"
 import { calculateAudioDuration } from "@/lib/utils"
+import { createServiceSlice } from "../factories/create-service-slice"
 
 interface TranscriptionStore {
   files: Record<string, File | null>
@@ -11,6 +12,8 @@ interface TranscriptionStore {
   fileDurations: Record<string, number>
   isTranscribingSet: Set<string>
   abortControllerMap: Map<string, RefObject<AbortController>>
+  setActive: (id: string, isActive: boolean) => void
+  stop: (id: string) => void
   setFileAndUrl: (id: string, file: File | null) => Promise<void>
   setAudioUrl: (id: string, audioUrl: string | null) => void
   setIsTranscribing: (id: string, isTranscribing: boolean) => void
@@ -25,11 +28,11 @@ interface TranscriptionStore {
 export const useTranscriptionStore = create<TranscriptionStore>()(
   (set, get) => {
     return ({
+      ...createServiceSlice("isTranscribingSet")(set as never),
+
       files: {},
       audioUrls: {},
       fileDurations: {},
-      isTranscribingSet: new Set(),
-      abortControllerMap: new Map(),
 
       setFileAndUrl: async (id, file) => {
         if (file) {
@@ -62,27 +65,8 @@ export const useTranscriptionStore = create<TranscriptionStore>()(
         audioUrls: { ...get().audioUrls, [id]: audioUrl }
       }),
 
-      setIsTranscribing: (id, isTranscribing) => {
-        set(state => {
-          const newSet = new Set(state.isTranscribingSet)
-          if (isTranscribing) {
-            newSet.add(id)
-          } else {
-            newSet.delete(id)
-          }
-          return { isTranscribingSet: newSet }
-        })
-      },
-
-      stopTranscription: (id) => {
-        set(state => {
-          const newSet = new Set(state.isTranscribingSet)
-          newSet.delete(id)
-          state.abortControllerMap.get(id)?.current?.abort()
-          state.abortControllerMap.delete(id)
-          return { isTranscribingSet: newSet }
-        })
-      },
+      setIsTranscribing: (id, isTranscribing) => get().setActive(id, isTranscribing),
+      stopTranscription: (id) => get().stop(id),
 
       startTranscription: async (id, requestBody, setResponse) => {
         const abortControllerRef = { current: new AbortController() }
