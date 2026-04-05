@@ -34,15 +34,24 @@ bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.
 - `src/app/(main)/` - Authenticated app (translate, transcribe, batch, project, extract-context, history, library, cloud, dashboard, tools)
 
 ### Key Directories
-- `src/stores/` - Zustand stores: `settings/` (BasicSettings, AdvancedSettings), `data/` (project data caches), and root-level UI stores
+- `src/stores/` - Zustand stores:
+  - `settings/` - BasicSettings and AdvancedSettings stores
+  - `services/` - Translation, transcription, extraction service stores (use `createServiceSlice` factory)
+  - `factories/` - Store factory functions (e.g., `createServiceSlice` for shared Set + AbortController pattern)
+  - `utils/` - Shared store utilities (e.g., `copySettingsKeys` for settings copy/reset)
+  - `data/` - Project data caches
+  - Root-level UI stores
 - `src/lib/db/` - Dexie database schema, migrations, and CRUD operations
 - `src/lib/subtitles/` - SRT/ASS/VTT parsers and generators
 - `src/lib/parser/` - AI response parsing and cleaning
 - `src/lib/api/` - Backend API integration (streaming, credit management)
+- `src/lib/utils/` - Utility modules split by domain (`cn.ts`, `format.ts`, `math.ts`, `audio.ts`, `file.ts`, `async.ts`); barrel re-exported from `src/lib/utils.ts`
 - `src/components/` - Feature components organized by domain (translate, batch, transcribe)
 - `src/components/ui/` - Shadcn/Radix UI primitives (auto-generated, avoid editing)
+- `src/components/transcribe/` - Transcription UI split into sub-components (upload-tab, select-tab, controls, result-panel, next-actions) composed by `transcription-main.tsx`
 - `src/types/` - TypeScript interfaces for Project, Translation, Transcription, etc.
-- `src/constants/` - App constants including model definitions and defaults
+- `src/constants/` - App constants and defaults
+- `src/constants/models/` - AI model definitions split by domain (`types.ts`, `env.ts`, `filters.ts`, `free-models.ts`, `paid-models.ts`); barrel re-exported from `src/constants/model-collection.ts`
 
 ### Project Architecture
 
@@ -109,7 +118,7 @@ Dexie database is at version 24. When modifying data models in `src/types/`:
 - **No comments** in code (unless explaining non-obvious logic)
 - Use named imports from React (e.g., `import { useEffect, useState } from "react"`)
 - Use path alias `@/*` for imports from `src/`
-- Use `cn()` from `@/lib/utils` for conditional Tailwind classes
+- Use `cn()` from `@/lib/utils` for conditional Tailwind classes (or directly from `@/lib/utils/cn`)
 - Use `toast.error()`/`toast.success()` from `sonner` for user feedback
 
 ## Settings Access Pattern
@@ -122,11 +131,23 @@ const setBasicSettingsValue = useSettingsStore(state => state.setBasicSettingsVa
 // Usage: setBasicSettingsValue(basicSettingsId, "sourceLanguage", "en")
 ```
 
+## Service Store Pattern
+
+Service stores (translation, transcription, extraction) use `createServiceSlice()` factory from `src/stores/factories/create-service-slice.ts` to generate shared state:
+- `is*Set: Set<string>` — tracks active operation IDs
+- `abortControllerMap: Map<string, RefObject<AbortController>>` — abort handles
+- `setActive(id, isActive)` — adds/removes from Set, cleans up abortControllerMap on deactivation
+- `stop(id)` — removes from Set, aborts controller, cleans up map
+
+Each store keeps backward-compatible aliases (e.g., `setIsTranslating` → `setActive`, `stopTranslation` → `stop`).
+
 ## Important Files
 
 - `src/lib/db/db.ts` - Database schema and migrations (version 24+)
 - `src/lib/db/global-settings.ts` - Global settings management
 - `src/lib/db/db-io.ts` - Database import/export functionality
 - `src/lib/api/stream.ts` - SSE streaming for AI responses
-- `src/constants/model-collection.ts` - Available AI models (free and paid)
+- `src/constants/model-collection.ts` - Available AI models barrel (re-exports from `src/constants/models/`)
 - `src/constants/default.ts` - Default settings values
+- `src/stores/factories/create-service-slice.ts` - Service store factory
+- `src/stores/utils/copy-settings.ts` - Generic settings copy/reset utility
