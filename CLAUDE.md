@@ -121,6 +121,7 @@ Dexie database is at version 24. When modifying data models in `src/types/`:
 
 - **No semicolons** at line endings
 - **No comments** in code (unless explaining non-obvious logic)
+- **No `any` type** — use specific types, `unknown` with type guards, or proper type definitions
 - Use named imports from React (e.g., `import { useEffect, useState } from "react"`)
 - Use path alias `@/*` for imports from `src/`
 - Use `cn()` from `@/lib/utils` for conditional Tailwind classes (or directly from `@/lib/utils/cn`)
