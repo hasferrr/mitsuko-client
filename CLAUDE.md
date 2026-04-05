@@ -45,13 +45,13 @@ bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.
 - `src/lib/subtitles/` - SRT/ASS/VTT parsers and generators
 - `src/lib/parser/` - AI response parsing and cleaning
 - `src/lib/api/` - Backend API integration (streaming, credit management)
-- `src/lib/utils/` - Utility modules split by domain (`cn.ts`, `format.ts`, `math.ts`, `audio.ts`, `file.ts`, `async.ts`); barrel re-exported from `src/lib/utils.ts`
+- `src/lib/utils/` - Utility modules split by domain (`cn.ts`, `format.ts`, `math.ts`, `audio.ts`, `file.ts`, `async.ts`, `transcription.ts`); barrel re-exported from `src/lib/utils.ts`
 - `src/components/` - Feature components organized by domain (translate, batch, transcribe)
 - `src/components/ui/` - Shadcn/Radix UI primitives (auto-generated, avoid editing)
 - `src/components/transcribe/` - Transcription UI split into sub-components (upload-tab, select-tab, controls, result-panel, next-actions) composed by `transcription-main.tsx`
 - `src/types/` - TypeScript interfaces for Project, Translation, Transcription, etc.
 - `src/constants/` - App constants and defaults
-- `src/constants/models/` - AI model definitions split by domain (`types.ts`, `env.ts`, `filters.ts`, `free-models.ts`, `paid-models.ts`); barrel re-exported from `src/constants/model-collection.ts`
+- `src/constants/model-collection.ts` - AI model definitions (free and paid models with filtering utilities)
 
 ### Project Architecture
 
@@ -147,7 +147,7 @@ Each store keeps backward-compatible aliases (e.g., `setIsTranslating` → `setA
 - `src/lib/db/global-settings.ts` - Global settings management
 - `src/lib/db/db-io.ts` - Database import/export functionality
 - `src/lib/api/stream.ts` - SSE streaming for AI responses
-- `src/constants/model-collection.ts` - Available AI models barrel (re-exports from `src/constants/models/`)
+- `src/constants/model-collection.ts` - Available AI models (free and paid model definitions)
 - `src/constants/default.ts` - Default settings values
 - `src/stores/factories/create-service-slice.ts` - Service store factory
 - `src/stores/utils/copy-settings.ts` - Generic settings copy/reset utility
