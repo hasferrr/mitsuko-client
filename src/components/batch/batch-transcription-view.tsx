@@ -49,7 +49,7 @@ import { BatchTranscriptionFileList } from "./batch-transcription-file-list"
 import { useBatchSelection } from "@/hooks/batch/use-batch-selection"
 import { CopyTranscriptionSettingsDialog } from "./copy-transcription-settings-dialog"
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
-import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/utils/transcription"
+import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/transcription/subtitle-generator"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 
 interface BatchTranscriptionViewProps {
