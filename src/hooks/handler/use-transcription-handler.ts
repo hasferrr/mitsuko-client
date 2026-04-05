@@ -13,7 +13,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { UserCreditData } from "@/types/user"
 import { isAsrModel } from "@/constants/transcription"
-import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/transcription-segments"
+import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/utils/transcription"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
 
