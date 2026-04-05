@@ -21,7 +21,7 @@ import { SubtitleTranslated } from "@/types/subtitles"
 import { deleteTranslation } from "@/lib/db/translation"
 import { deleteExtraction } from "@/lib/db/extraction"
 import { deleteTranscription } from "@/lib/db/transcription"
-import { useLocalSettingsStore } from "../use-local-settings-store"
+import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 
 interface ProjectStore {
   currentProject: Project | null

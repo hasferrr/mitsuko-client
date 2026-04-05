@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { DISCORD_LINK } from "@/constants/external-links"
 import { useEmailLink } from "@/hooks/use-email-link"
-import { useSessionStore } from "@/stores/use-session-store"
+import { useSessionStore } from "@/stores/ui/use-session-store"
 import { Mail } from "lucide-react"
 import { IconBrandDiscord } from "@tabler/icons-react"
 

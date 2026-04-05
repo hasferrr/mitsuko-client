@@ -2,7 +2,7 @@ import axios from "axios"
 import MD5 from "crypto-js/md5"
 import { supabase } from "../supabase"
 import { SUBTITLE_LOG_URL } from "@/constants/api"
-import { useSubtitleLogStore } from "@/stores/use-subtitle-log-store"
+import { useSubtitleLogStore } from "@/stores/ui/use-subtitle-log-store"
 
 export const logSubtitle = async (title: string, content: string, uuid: string, isBatch: boolean, projectName: string) => {
   const hash = MD5(content).toString()

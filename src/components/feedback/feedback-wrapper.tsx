@@ -1,7 +1,7 @@
 "use client"
 
 import { FeedbackDialog } from "@/components/feedback/feedback-dialog"
-import { useSessionStore } from "@/stores/use-session-store"
+import { useSessionStore } from "@/stores/ui/use-session-store"
 
 interface FeedbackWrapperProps {
   children: React.ReactNode

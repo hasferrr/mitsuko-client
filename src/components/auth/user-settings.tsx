@@ -1,6 +1,6 @@
 "use client"
 
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"

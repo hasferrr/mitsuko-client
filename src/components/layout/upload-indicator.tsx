@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useUploadStore } from '@/stores/use-upload-store'
+import { useUploadStore } from '@/stores/ui/use-upload-store'
 import { Card, CardHeader } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Loader2 } from 'lucide-react'

@@ -3,7 +3,7 @@
 import { useCallback } from "react"
 import { ProductId } from "@/types/product"
 import { SnapTransactionResult } from "@/types/snap"
-import { useSnapStore } from "@/stores/use-snap-store"
+import { useSnapStore } from "@/stores/ui/use-snap-store"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 

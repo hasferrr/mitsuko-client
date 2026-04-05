@@ -3,7 +3,7 @@ import { handleStream } from "@/lib/api/stream"
 import { create } from "zustand"
 import { RefObject } from "react"
 import { RequestType } from "@/types/request"
-import { useClientIdStore } from "../use-client-id-store"
+import { useClientIdStore } from "@/stores/ui/use-client-id-store"
 import { ExtractionRequestBody } from "@/types/request"
 import { createServiceSlice } from "../factories/create-service-slice"
 

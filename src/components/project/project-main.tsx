@@ -45,7 +45,7 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { SettingsDialogue } from "../settings/settings-dialogue"
 import { TranscriptionSettingsDialogue } from "../settings/transcription-settings-dialogue"
 import {

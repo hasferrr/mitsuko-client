@@ -8,7 +8,7 @@ import { SubtitleTranslated } from "@/types/subtitles"
 import { timestampToString } from "@/lib/subtitles/timestamp"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { cn } from "@/lib/utils"
 
 interface SubtitleCardProps {

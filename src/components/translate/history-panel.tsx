@@ -7,7 +7,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useHistoryStore } from "@/stores/use-history-store"
+import { useHistoryStore } from "@/stores/ui/use-history-store"
 import { HistoryItemDetails } from "./history-item-details"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"

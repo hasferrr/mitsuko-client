@@ -42,7 +42,7 @@ import LogResultDialog from './log-result-dialog'
 import { deleteTranscriptionLog } from '@/lib/api/transcription-log'
 import { toast } from 'sonner'
 import { DeleteDialogue } from '@/components/ui-custom/delete-dialogue'
-import { useSessionStore } from '@/stores/use-session-store'
+import { useSessionStore } from '@/stores/ui/use-session-store'
 import { fetchBackgroundTranscriptionCount } from '@/lib/api/credit-reservations'
 
 const ITEMS_PER_PAGE = 5
