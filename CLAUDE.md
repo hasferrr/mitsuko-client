@@ -45,7 +45,9 @@ bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.
 - `src/lib/subtitles/` - SRT/ASS/VTT parsers and generators
 - `src/lib/parser/` - AI response parsing and cleaning
 - `src/lib/api/` - Backend API integration (streaming, credit management)
-- `src/lib/utils/` - Utility modules split by domain (`cn.ts`, `format.ts`, `math.ts`, `audio.ts`, `file.ts`, `async.ts`, `transcription.ts`, `done-tag.ts`); barrel re-exported from `src/lib/utils.ts`
+- `src/lib/utils/` - Utility modules split by domain (`cn.ts`, `format.ts`, `math.ts`, `audio.ts`, `file.ts`, `async.ts`, `done-tag.ts`); barrel re-exported from `src/lib/utils.ts`
+- `src/lib/transcription/` - Transcription utilities: subtitle generation from word-level timestamps with CPS optimization
+- `src/lib/translation/` - Translation utilities: context memory strategies (full, minimal, split) for AI completion requests
 - `src/components/` - Feature components organized by domain (translate, batch, transcribe)
 - `src/components/ui/` - Shadcn/Radix UI primitives (auto-generated, avoid editing)
 - `src/components/transcribe/` - Transcription UI split into sub-components (upload-tab, select-tab, controls, result-panel, next-actions) composed by `transcription-main.tsx`
