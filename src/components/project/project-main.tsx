@@ -1,51 +1,9 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core"
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import {
-  Globe,
-  Headphones,
-  LayoutDashboard,
-  FileText,
-  Edit,
-  Trash,
-  Loader2,
-  Settings2,
-  ArrowLeft,
-  ArrowLeftRight,
-  Upload,
-  Plus,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react"
+import { Globe, Headphones, LayoutDashboard, FileText } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Translation, Transcription, Extraction, Project } from "@/types/project"
-import { ProjectItemList } from "./project-item-list"
-import { useProjectStore } from "@/stores/data/use-project-store"
-import { useRouter } from "next/navigation"
-import { EditDialogue } from "../ui-custom/edit-dialogue"
-import { DeleteDialogue } from "../ui-custom/delete-dialogue"
-
-import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
-import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
-import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
-import { useTranslationStore } from "@/stores/services/use-translation-store"
-import { useExtractionStore } from "@/stores/services/use-extraction-store"
-import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
-import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
+import { Project } from "@/types/project"
 import { SettingsDialogue } from "../settings/settings-dialogue"
 import { TranscriptionSettingsDialogue } from "../settings/transcription-settings-dialogue"
 import {
@@ -55,579 +13,41 @@ import {
   GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
   GLOBAL_TRANSCRIPTION_SETTINGS_ID,
 } from "@/constants/global-settings"
-import { exportProject } from "@/lib/db/db-io"
-import { toast } from "sonner"
-import { Badge } from "../ui/badge"
-import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter, DialogDescription } from "../ui/dialog"
-import { Skeleton } from "../ui/skeleton"
-
-const countTranslatedLines = (subtitles: Translation['subtitles']): { count: number, hasError: boolean } => {
-  if (!subtitles || subtitles.length === 0) {
-    return { count: 0, hasError: false }
-  }
-
-  let hasError = false
-  let count = 0
-  for (const sub of subtitles) {
-    if (!sub || !sub.timestamp) {
-      hasError = true
-      continue
-    }
-    if ((sub.translated && sub.translated.trim() !== "") ||
-      (sub.content.trim() === "" && sub.translated.trim() === "")) {
-      count++
-    }
-  }
-  return { count, hasError }
-}
+import { useProjectStore } from "@/stores/data/use-project-store"
+import { useProjectData } from "@/hooks/project/use-project-data"
+import { ProjectHeader } from "./project-header"
+import { ProjectTranslationList } from "./lists/project-translation-list"
+import { ProjectTranscriptionList } from "./lists/project-transcription-list"
+import { ProjectExtractionList } from "./lists/project-extraction-list"
 
 interface ProjectMainProps {
   currentProject: Project
 }
 
 export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isTranslationSettingsModalOpen, setIsTranslationSettingsModalOpen] = useState(false)
   const [isExtractionSettingsModalOpen, setIsExtractionSettingsModalOpen] = useState(false)
   const [isTranscriptionSettingsModalOpen, setIsTranscriptionSettingsModalOpen] = useState(false)
   const [isGlobalTranslationSettingsOpen, setIsGlobalTranslationSettingsOpen] = useState(false)
   const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
   const [isGlobalTranscriptionSettingsOpen, setIsGlobalTranscriptionSettingsOpen] = useState(false)
-  const [isConvertModalOpen, setIsConvertModalOpen] = useState(false)
-  const [isProcessingConvert, setIsProcessingConvert] = useState(false)
-  const router = useRouter()
 
-  const renameProject = useProjectStore((state) => state.renameProject)
-  const deleteProject = useProjectStore((state) => state.deleteProject)
-  const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
-  const setCurrentProject = useProjectStore(state => state.setCurrentProject)
   const updateProjectStore = useProjectStore(state => state.updateProject)
 
-  const [translations, setTranslations] = useState<Translation[]>([])
-  const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
-  const [extractions, setExtractions] = useState<Extraction[]>([])
-  const [isLoadingData, setIsLoadingData] = useState(true)
-
-  const createTranslationDb = useTranslationDataStore((state) => state.createTranslationDb)
-  const updateTranslationDb = useTranslationDataStore((state) => state.updateTranslationDb)
-  const deleteTranslationDb = useTranslationDataStore((state) => state.deleteTranslationDb)
-  const getTranslationDb = useTranslationDataStore((state) => state.getTranslationDb)
-  const getTranslationsDb = useTranslationDataStore((state) => state.getTranslationsDb)
-
-  const createExtractionDb = useExtractionDataStore((state) => state.createExtractionDb)
-  const updateExtractionDb = useExtractionDataStore((state) => state.updateExtractionDb)
-  const deleteExtractionDb = useExtractionDataStore((state) => state.deleteExtractionDb)
-  const getExtractionDb = useExtractionDataStore((state) => state.getExtractionDb)
-  const getExtractionsDb = useExtractionDataStore((state) => state.getExtractionsDb)
-
-  const createTranscriptionDb = useTranscriptionDataStore((state) => state.createTranscriptionDb)
-  const updateTranscriptionDb = useTranscriptionDataStore((state) => state.updateTranscriptionDb)
-  const deleteTranscriptionDb = useTranscriptionDataStore((state) => state.deleteTranscriptionDb)
-  const getTranscriptionDb = useTranscriptionDataStore((state) => state.getTranscriptionDb)
-  const getTranscriptionsDb = useTranscriptionDataStore((state) => state.getTranscriptionsDb)
-  const transcriptionData = useTranscriptionDataStore((state) => state.data)
-
-  const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
-  const isExtractingSet = useExtractionStore(state => state.isExtractingSet)
-  const isTranscribingSet = useTranscriptionStore(state => state.isTranscribingSet)
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
-
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoadingData(true)
-      const [
-        translationsData,
-        transcriptionsData,
-        extractionsData,
-        _defaultTranscription,
-      ] = await Promise.all([
-        getTranslationsDb(currentProject.translations),
-        getTranscriptionsDb(currentProject.transcriptions),
-        getExtractionsDb(currentProject.extractions),
-        getTranscriptionDb(currentProject.defaultTranscriptionId),
-      ])
-
-      setTranslations(translationsData.reverse())
-      setTranscriptions(transcriptionsData.reverse())
-      setExtractions(extractionsData.reverse())
-      setIsLoadingData(false)
-    }
-
-    loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentProject.id])
-
-  const prevTranslatingRef = useRef<Set<string>>(new Set())
-  const prevExtractingRef = useRef<Set<string>>(new Set())
-  const prevTranscribingRef = useRef<Set<string>>(new Set())
-
-  useEffect(() => {
-    const prevSet = prevTranslatingRef.current
-    for (const id of prevSet) {
-      if (!isTranslatingSet.has(id)) {
-        getTranslationDb(id, true).then(updated => {
-          if (updated) {
-            setTranslations(prev => prev.map(t => t.id === id ? updated : t))
-          }
-        })
-      }
-    }
-    prevTranslatingRef.current = new Set(isTranslatingSet)
-  }, [getTranslationDb, isTranslatingSet])
-
-  useEffect(() => {
-    const prevSet = prevExtractingRef.current
-    for (const id of prevSet) {
-      if (!isExtractingSet.has(id)) {
-        getExtractionDb(id, true).then(updated => {
-          if (updated) {
-            setExtractions(prev => prev.map(e => e.id === id ? updated : e))
-          }
-        })
-      }
-    }
-    prevExtractingRef.current = new Set(isExtractingSet)
-  }, [getExtractionDb, isExtractingSet])
-
-  useEffect(() => {
-    const prevSet = prevTranscribingRef.current
-    for (const id of prevSet) {
-      if (!isTranscribingSet.has(id)) {
-        getTranscriptionDb(id, true).then(updated => {
-          if (updated) {
-            setTranscriptions(prev => prev.map(t => t.id === id ? updated : t))
-          }
-        })
-      }
-    }
-    prevTranscribingRef.current = new Set(isTranscribingSet)
-  }, [getTranscriptionDb, isTranscribingSet])
-
-  // Drag and drop handlers
-  function handleDragEnd(event: DragEndEvent, type: 'translation' | 'transcription' | 'extraction') {
-    const { active, over } = event
-
-    if (over && active.id !== over.id) {
-      const updateOrder = <T extends { id: string }>(
-        items: T[],
-        setItems: React.Dispatch<React.SetStateAction<T[]>>
-      ) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over.id)
-        if (oldIndex !== -1 && newIndex !== -1) {
-          const newOrder = arrayMove(items, oldIndex, newIndex)
-          setItems(newOrder)
-          if (currentProject) {
-            updateProjectItems(currentProject.id, newOrder.map((item) => item.id).toReversed(), type)
-          }
-        }
-      }
-
-      switch (type) {
-        case 'translation':
-          updateOrder(translations, setTranslations)
-          break
-        case 'transcription':
-          updateOrder(transcriptions, setTranscriptions)
-          break
-        case 'extraction':
-          updateOrder(extractions, setExtractions)
-          break
-      }
-    }
-  }
-
-  const handleSave = async (newName: string) => {
-    renameProject(currentProject.id, newName.trim())
-    setIsEditModalOpen(false)
-  }
-
-  const handleDelete = async () => {
-    setIsDeleteModalOpen(false)
-    await deleteProject(currentProject.id)
-  }
-
-  const handleExportProject = async () => {
-    try {
-      const result = await exportProject(currentProject.id)
-      if (result) {
-        const blob = new Blob([result.content], { type: "application/json" })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = `mitsuko-project-${result.name.replace(/\s+/g, "_")}-${new Date().toISOString().split("T")[0]}.json`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-        toast.success("Project exported successfully")
-      }
-    } catch (error) {
-      console.error("Error exporting project:", error)
-      toast.error("Failed to export project")
-    }
-  }
-
-  const handleBack = () => {
-    if (currentProject.isBatch) router.push("/batch")
-    else setCurrentProject(null)
-  }
-
-  const handleToggleBatch = async (): Promise<boolean> => {
-    try {
-      const updated = await updateProjectStore(currentProject.id, { isBatch: !currentProject.isBatch })
-      if (updated) {
-        setCurrentProject(updated)
-        toast.success(`Converted to ${updated.isBatch ? 'Batch' : 'Normal'} project`)
-        return true
-      }
-    } catch (error) {
-      console.error('Failed to toggle batch mode', error)
-      toast.error('Failed to convert project')
-    }
-    return false
-  }
-
-  const translationComponentList = translations.map((translation) => {
-    const totalLines = translation.subtitles.length
-
-    const { count: translatedLines, hasError } = countTranslatedLines(translation.subtitles)
-    const allTranslated = totalLines > 0 && totalLines === translatedLines
-    const type = translation.parsed.type.toUpperCase()
-    const errorBadge = hasError ? " (Unexpected error, please delete this translation)" : ""
-
-    const description = allTranslated
-      ? `${type} • ${totalLines} Lines` + errorBadge
-      : `${type} • ${translatedLines}/${totalLines} Lines` + errorBadge
-
-    return (
-      <ProjectItemList
-        key={translation.id}
-        id={translation.id}
-        projectId={currentProject.id}
-        type="translation"
-        icon={isTranslatingSet.has(translation.id)
-          ? <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
-          : <Globe className="h-5 w-5 text-blue-500" />}
-        title={translation.title}
-        description={description}
-        date={translation.updatedAt.toLocaleDateString()}
-        handleEdit={async (newName) => {
-          const updated = await updateTranslationDb(translation.id, { title: newName })
-          setTranslations(prev => prev.map(t => t.id === translation.id ? updated : t))
-        }}
-        handleDelete={async () => {
-          await deleteTranslationDb(currentProject.id, translation.id)
-          {
-            const storeProject = useProjectStore.getState().currentProject
-            const base = storeProject && storeProject.id === currentProject.id ? storeProject.translations : currentProject.translations
-            await updateProjectItems(
-              currentProject.id,
-              base.filter(id => id !== translation.id),
-              'translation'
-            )
-          }
-          setTranslations(prev => prev.filter(t => t.id !== translation.id))
-        }}
-      />
-    )
-  })
-
-  const transcriptionComponentList = transcriptions.map((transcription) => (
-    <ProjectItemList
-      key={transcription.id}
-      id={transcription.id}
-      projectId={currentProject.id}
-      type="transcription"
-      icon={isTranscribingSet.has(transcription.id)
-        ? <Loader2 className="h-5 w-5 text-green-500 animate-spin" />
-        : <Headphones className="h-5 w-5 text-green-500" />}
-      title={transcription.title}
-      description={`${transcription.transcriptSubtitles.length} segments`}
-      date={transcription.createdAt.toLocaleDateString()}
-      handleEdit={async (newName) => {
-        const updated = await updateTranscriptionDb(transcription.id, { title: newName })
-        setTranscriptions(prev => prev.map(t => t.id === transcription.id ? updated : t))
-      }}
-      handleDelete={async () => {
-        await deleteTranscriptionDb(currentProject.id, transcription.id)
-        {
-          const storeProject = useProjectStore.getState().currentProject
-          const base = storeProject && storeProject.id === currentProject.id ? storeProject.transcriptions : currentProject.transcriptions
-          await updateProjectItems(
-            currentProject.id,
-            base.filter(id => id !== transcription.id),
-            'transcription'
-          )
-        }
-        setTranscriptions(prev => prev.filter(t => t.id !== transcription.id))
-      }}
-    />
-  ))
-
-  const extractionComponentList = extractions.map((extraction) => (
-    <ProjectItemList
-      key={extraction.id}
-      id={extraction.id}
-      projectId={currentProject.id}
-      type="extraction"
-      icon={isExtractingSet.has(extraction.id)
-        ? <Loader2 className="h-5 w-5 text-purple-500 animate-spin" />
-        : <FileText className="h-5 w-5 text-purple-500" />}
-      title={`Episode ${extraction.episodeNumber || "X"}`}
-      subtitle={extraction.title}
-      description={extraction.contextResult}
-      date={extraction.updatedAt.toLocaleDateString()}
-      handleEdit={async (newName) => {
-        const updated = await updateExtractionDb(extraction.id, { episodeNumber: newName })
-        setExtractions(prev => prev.map(e => e.id === extraction.id ? updated : e))
-      }}
-      handleDelete={async () => {
-        await deleteExtractionDb(currentProject.id, extraction.id)
-        {
-          const storeProject = useProjectStore.getState().currentProject
-          const base = storeProject && storeProject.id === currentProject.id ? storeProject.extractions : currentProject.extractions
-          await updateProjectItems(
-            currentProject.id,
-            base.filter(id => id !== extraction.id),
-            'extraction'
-          )
-        }
-        setExtractions(prev => prev.filter(e => e.id !== extraction.id))
-      }}
-    />
-  ))
-
-  const NewTranslationButton = (
-    <Button
-      size="sm"
-      variant="outline"
-      onClick={async () => {
-        const created = await createTranslationDb(
-          currentProject.id,
-          {
-            title: `Subtitle ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
-            subtitles: [],
-            parsed: {
-              type: "srt",
-              data: null
-            }
-          },
-          undefined,
-          undefined,
-        )
-        {
-          const storeProject = useProjectStore.getState().currentProject
-          const base = storeProject && storeProject.id === currentProject.id ? storeProject.translations : currentProject.translations
-          await updateProjectItems(currentProject.id, [...base, created.id], 'translation')
-        }
-        setTranslations(prev => [created, ...prev])
-      }}
-    >
-      <Plus className="h-4 w-4" />
-      New Translation
-    </Button>
-  )
-
-  const NewTranslationControls = (
-    <div className="flex items-center gap-2">
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => setIsTranslationSettingsModalOpen(true)}
-        title="Translation settings"
-      >
-        <Settings2 className="h-4 w-4" />
-        Settings
-      </Button>
-      {NewTranslationButton}
-    </div>
-  )
-
-  const NewTranscriptionButton = (
-    <Button
-      size="sm"
-      variant="outline"
-      onClick={async () => {
-        const created = await createTranscriptionDb(currentProject.id, {
-          title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
-          transcriptionText: "",
-          transcriptSubtitles: [],
-        })
-        {
-          const storeProject = useProjectStore.getState().currentProject
-          const base = storeProject && storeProject.id === currentProject.id ? storeProject.transcriptions : currentProject.transcriptions
-          await updateProjectItems(currentProject.id, [...base, created.id], 'transcription')
-        }
-        setTranscriptions(prev => [created, ...prev])
-      }}
-    >
-      <Plus className="h-4 w-4" />
-      New Transcription
-    </Button>
-  )
-
-  const NewTranscriptionControls = (
-    <div className="flex items-center gap-2">
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => setIsTranscriptionSettingsModalOpen(true)}
-        title="Transcription settings"
-      >
-        <Settings2 className="h-4 w-4" />
-        Settings
-      </Button>
-      {NewTranscriptionButton}
-    </div>
-  )
-
-  const NewExtractionButton = (
-    <Button
-      size="sm"
-      variant="outline"
-      onClick={async () => {
-        const created = await createExtractionDb(
-          currentProject.id,
-          {
-            title: "",
-            episodeNumber: "",
-            subtitleContent: "",
-            previousContext: "",
-            contextResult: ""
-          },
-          undefined,
-          undefined,
-        )
-        {
-          const storeProject = useProjectStore.getState().currentProject
-          const base = storeProject && storeProject.id === currentProject.id ? storeProject.extractions : currentProject.extractions
-          await updateProjectItems(currentProject.id, [...base, created.id], 'extraction')
-        }
-        setExtractions(prev => [created, ...prev])
-      }}
-    >
-      <Plus className="h-4 w-4" />
-      New Extraction
-    </Button>
-  )
-
-  const NewExtractionControls = (
-    <div className="flex items-center gap-2">
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => setIsExtractionSettingsModalOpen(true)}
-        title="Extraction settings"
-      >
-        <Settings2 className="h-4 w-4" />
-        Settings
-      </Button>
-      {NewExtractionButton}
-    </div>
-  )
-
-  const ProjectItemSkeleton = () => (
-    <div className="border border-border rounded-lg p-3 bg-background">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-5 w-5 rounded" />
-          <Skeleton className="bg-secondary p-2 rounded-lg">
-            <div className="h-5 w-5 rounded" />
-          </Skeleton>
-          <div className="space-y-1">
-            <Skeleton className="h-[14px] w-32" />
-            <Skeleton className="h-3 w-20" />
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Skeleton className="hidden sm:block h-3 w-16" />
-          <Skeleton className="h-4 w-4 sm:mx-1 rounded" />
-          <Skeleton className="h-4 w-4 sm:mx-1 rounded" />
-          <Skeleton className="h-4 w-4 sm:mx-1 rounded" />
-        </div>
-      </div>
-    </div>
-  )
-
-  const translationSkeletons = Array.from({ length: 3 }).map((_, i) => (
-    <ProjectItemSkeleton key={`translation-skeleton-${i}`} />
-  ))
-
-  const transcriptionSkeletons = Array.from({ length: 3 }).map((_, i) => (
-    <ProjectItemSkeleton key={`transcription-skeleton-${i}`} />
-  ))
-
-  const extractionSkeletons = Array.from({ length: 3 }).map((_, i) => (
-    <ProjectItemSkeleton key={`extraction-skeleton-${i}`} />
-  ))
+  const {
+    translations,
+    setTranslations,
+    transcriptions,
+    setTranscriptions,
+    extractions,
+    setExtractions,
+    isLoadingData,
+    handleDragEnd,
+  } = useProjectData(currentProject)
 
   return (
     <div translate="no" className="flex-1 p-6 max-w-5xl mx-auto">
-      <div className="mb-6">
-        <div className="text-2xl font-medium mb-4 sm:mb-2 flex flex-col sm:flex-row gap-4">
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={handleBack}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <h1>{currentProject.name}</h1>
-            {currentProject.isBatch && <Badge className="ml-2">Batch Project</Badge>}
-          </div>
-          <div className="flex flex-wrap gap-4 text-sm">
-            <button
-              onClick={() => setIsEditModalOpen(true)}
-              className="flex items-center gap-2 hover:underline"
-            >
-              <Edit size={4 * 5} />
-              Rename
-            </button>
-            <button
-              onClick={handleExportProject}
-              className="flex items-center gap-2 hover:underline"
-            >
-              <Upload size={4 * 5} />
-              Export
-            </button>
-            <button
-              onClick={() => setIsConvertModalOpen(true)}
-              className="flex items-center gap-2 hover:underline"
-            >
-              <ArrowLeftRight size={4 * 5} />
-              Convert
-            </button>
-            <button
-              onClick={() => setIsDeleteModalOpen(true)}
-              className="flex items-center gap-2 hover:underline"
-            >
-              <Trash size={4 * 5} />
-              Delete
-            </button>
-          </div>
-        </div>
-        <p className="text-muted-foreground">
-          Last updated: {currentProject.updatedAt.toLocaleDateString()}
-        </p>
-      </div>
-
-      <EditDialogue
-        isOpen={isEditModalOpen}
-        onOpenChange={setIsEditModalOpen}
-        initialValue={currentProject.name}
-        onSave={handleSave}
-      />
-
-      <DeleteDialogue
-        handleDelete={handleDelete}
-        isDeleteModalOpen={isDeleteModalOpen}
-        setIsDeleteModalOpen={setIsDeleteModalOpen}
-      />
+      <ProjectHeader currentProject={currentProject} />
 
       <SettingsDialogue
         mode="project"
@@ -705,35 +125,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         defaultTranscriptionId={GLOBAL_TRANSCRIPTION_SETTINGS_ID}
       />
 
-      {/* Convert Confirmation Dialog */}
-      <Dialog open={isConvertModalOpen} onOpenChange={setIsConvertModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Convert Project</DialogTitle>
-          </DialogHeader>
-          <DialogDescription className="hidden" />
-          <p className="text-sm">
-            {`Are you sure you want to convert this project to ${currentProject.isBatch ? 'Normal' : 'Batch'} project?`}
-          </p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsConvertModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={async () => {
-                setIsProcessingConvert(true)
-                const ok = await handleToggleBatch()
-                setIsProcessingConvert(false)
-                if (ok) setIsConvertModalOpen(false)
-              }}
-              disabled={isProcessingConvert}
-            >
-              {isProcessingConvert ? 'Converting...' : 'Convert'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       <Tabs defaultValue="overview" className="mb-6">
         <TabsList className="bg-card border border-border p-1 rounded-lg w-fit h-fit flex flex-wrap">
           <TabsTrigger value="overview" className="data-[state=active]:bg-secondary rounded-md">
@@ -757,141 +148,73 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         {/* Overview Tab */}
         <TabsContent value="overview" className="mt-4">
           <div className="space-y-6">
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium">Translations</h3>
-                {NewTranslationControls}
-              </div>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={(e) => handleDragEnd(e, 'translation')}
-              >
-                <SortableContext
-                  items={translations.map((t) => t.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-3">
-                    {isLoadingData ? translationSkeletons : translationComponentList}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium">Transcriptions</h3>
-                {NewTranscriptionControls}
-              </div>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={(e) => handleDragEnd(e, 'transcription')}
-              >
-                <SortableContext
-                  items={transcriptions.map((t) => t.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-3">
-                    {isLoadingData ? transcriptionSkeletons : transcriptionComponentList}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium">Extractions</h3>
-                {NewExtractionControls}
-              </div>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={(e) => handleDragEnd(e, 'extraction')}
-              >
-                <SortableContext
-                  items={extractions.map((e) => e.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-3">
-                    {isLoadingData ? extractionSkeletons : extractionComponentList}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            </div>
+            <ProjectTranslationList
+              title="Translations"
+              currentProject={currentProject}
+              translations={translations}
+              setTranslations={setTranslations}
+              isLoadingData={isLoadingData}
+              onDragEnd={handleDragEnd}
+              onOpenSettings={() => setIsTranslationSettingsModalOpen(true)}
+            />
+            <ProjectTranscriptionList
+              title="Transcriptions"
+              currentProject={currentProject}
+              transcriptions={transcriptions}
+              setTranscriptions={setTranscriptions}
+              isLoadingData={isLoadingData}
+              onDragEnd={handleDragEnd}
+              onOpenSettings={() => setIsTranscriptionSettingsModalOpen(true)}
+            />
+            <ProjectExtractionList
+              title="Extractions"
+              currentProject={currentProject}
+              extractions={extractions}
+              setExtractions={setExtractions}
+              isLoadingData={isLoadingData}
+              onDragEnd={handleDragEnd}
+              onOpenSettings={() => setIsExtractionSettingsModalOpen(true)}
+            />
           </div>
         </TabsContent>
 
         {/* Translations Tab */}
         <TabsContent value="translations" className="mt-4">
-          <div className="bg-card border border-border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium">All Translations</h3>
-              {NewTranslationControls}
-            </div>
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={(e) => handleDragEnd(e, 'translation')}
-            >
-              <SortableContext
-                items={translations.map((t) => t.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-3">
-                  {isLoadingData ? translationSkeletons : translationComponentList}
-                </div>
-              </SortableContext>
-            </DndContext>
-          </div>
+          <ProjectTranslationList
+            title="All Translations"
+            currentProject={currentProject}
+            translations={translations}
+            setTranslations={setTranslations}
+            isLoadingData={isLoadingData}
+            onDragEnd={handleDragEnd}
+            onOpenSettings={() => setIsTranslationSettingsModalOpen(true)}
+          />
         </TabsContent>
 
         {/* Transcriptions Tab */}
         <TabsContent value="transcriptions" className="mt-4">
-          <div className="bg-card border border-border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium">All Transcriptions</h3>
-              {NewTranscriptionControls}
-            </div>
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={(e) => handleDragEnd(e, 'transcription')}
-            >
-              <SortableContext
-                items={transcriptions.map((t) => t.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-3">
-                  {isLoadingData ? transcriptionSkeletons : transcriptionComponentList}
-                </div>
-              </SortableContext>
-            </DndContext>
-          </div>
+          <ProjectTranscriptionList
+            title="All Transcriptions"
+            currentProject={currentProject}
+            transcriptions={transcriptions}
+            setTranscriptions={setTranscriptions}
+            isLoadingData={isLoadingData}
+            onDragEnd={handleDragEnd}
+            onOpenSettings={() => setIsTranscriptionSettingsModalOpen(true)}
+          />
         </TabsContent>
 
         {/* Extractions Tab */}
         <TabsContent value="context-extractor" className="mt-4">
-          <div className="bg-card border border-border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium">All Extractions</h3>
-              {NewExtractionControls}
-            </div>
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={(e) => handleDragEnd(e, 'extraction')}
-            >
-              <SortableContext
-                items={extractions.map((e) => e.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-3">
-                  {isLoadingData ? extractionSkeletons : extractionComponentList}
-                </div>
-              </SortableContext>
-            </DndContext>
-          </div>
+          <ProjectExtractionList
+            title="All Extractions"
+            currentProject={currentProject}
+            extractions={extractions}
+            setExtractions={setExtractions}
+            isLoadingData={isLoadingData}
+            onDragEnd={handleDragEnd}
+            onOpenSettings={() => setIsExtractionSettingsModalOpen(true)}
+          />
         </TabsContent>
       </Tabs>
     </div>
