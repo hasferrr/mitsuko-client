@@ -9,7 +9,6 @@ import {
   CombinedFormat,
   SubtitleType,
 } from "@/types/subtitles"
-import { ContextCompletion } from "@/types/completion"
 import { minMax, sleep } from "@/lib/utils"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
@@ -21,9 +20,16 @@ import {
   MAX_COMPLETION_TOKENS_MIN,
   SPLIT_SIZE_MAX,
   SPLIT_SIZE_MIN,
+  STUCK_CHUNK_THRESHOLD,
   TEMPERATURE_MAX,
   TEMPERATURE_MIN,
+  TRANSLATION_CHUNK_DELAY_MS,
 } from "@/constants/limits"
+import {
+  buildInitialContext,
+  determineContextStrategy,
+  updateContextForNextChunk,
+} from "@/lib/translation/context-memory"
 import { toast } from "sonner"
 import { getContent, parseTranslationJson } from "@/lib/parser/parser"
 import { useSessionStore } from "@/stores/ui/use-session-store"
@@ -144,7 +150,6 @@ export const useTranslationHandler = ({
     const isUseStructuredOutput = advStoreState.getIsUseStructuredOutput(advancedSettingsId)
     const isUseFullContextMemory = advStoreState.getIsUseFullContextMemory(advancedSettingsId)
     const isBetterContextCaching = advStoreState.getIsBetterContextCaching(advancedSettingsId)
-    const isUseMinimalContextMemory = !isBetterContextCaching
 
     const firstChunk = (size: number, s: number, e: number) => {
       const subtitleChunks: SubtitleNoTime[][] = []
@@ -232,59 +237,15 @@ export const useTranslationHandler = ({
 
     const subtitleChunks = firstChunk(size, adjustedStartIndex, adjustedEndIndex)
 
-    // Set Minimal Context Memory size
-    const minimalContextMemorySize = 5
+    const contextStrategy = determineContextStrategy(isUseFullContextMemory, isBetterContextCaching)
 
     // Prepare context for the first chunk
-    let context: ContextCompletion[] = []
-
-    // Split by number of split size
-    if (sIndexToUse > 1) {
-      // Calculate the proper context range based on context strategy
-      let contextStartIndex: number
-
-      if (isUseFullContextMemory) {
-        // Use all subtitles from beginning
-        contextStartIndex = 0
-      } else if (isUseMinimalContextMemory) {
-        // Use minimal context memory size (5)
-        contextStartIndex = Math.max(0, adjustedStartIndex - minimalContextMemorySize)
-      } else {
-        // Use split size for context
-        contextStartIndex = Math.max(0, adjustedStartIndex - size)
-      }
-
-      context.push({
-        role: "user",
-        content: {
-          subtitles: subtitles
-            .slice(
-              contextStartIndex,
-              adjustedStartIndex,
-            )
-            .map((chunk) => ({
-              index: chunk.index,
-              actor: chunk.actor,
-              content: chunk.content,
-            }))
-        },
-      })
-      context.push({
-        role: "assistant",
-        content: {
-          subtitles: subtitles
-            .slice(
-              contextStartIndex,
-              adjustedStartIndex,
-            )
-            .map((chunk) => ({
-              index: chunk.index,
-              content: chunk.content,
-              translated: chunk.translated,
-            }))
-        },
-      })
-    }
+    let context = sIndexToUse > 1
+      ? buildInitialContext(subtitles, adjustedStartIndex, {
+          strategy: contextStrategy,
+          splitSize: size,
+        })
+      : []
 
     // Log subtitles
     logSubtitle(
@@ -403,43 +364,14 @@ export const useTranslationHandler = ({
       }
 
       // Update context for next chunk
-      context.push({
-        role: "user",
-        content: { subtitles: requestBody.subtitles }
-      })
-      context.push({
-        role: "assistant",
-        content: getContent(rawResponse).replace(/<error>[\s\S]*?<\/error>/g, "").trimEnd(),
-      })
-
-      // For Non-Use Full Context Memory
-      if (!isUseFullContextMemory) {
-        context = [
-          context[context.length - 2],
-          context[context.length - 1],
-        ]
-
-        // Assume: size (split size) >= contextMemorySize
-        // Slice maximum of contextMemorySize of dialogues
-        if (isUseMinimalContextMemory && context.length >= 2) {
-          if (size < minimalContextMemorySize) {
-            console.error(
-              "Split size should be greater than or equal to context memory size " +
-              "The code below only takes the last (pair of) context"
-            )
-          }
-
-          const lastUser = requestBody.subtitles
-          const lastAssistant = requestBody.subtitles.map((s, subIndex) => ({
-            index: s.index,
-            content: s.content,
-            translated: tlChunk[subIndex]?.translated || "",
-          }))
-
-          context[0].content = { subtitles: lastUser.slice(-minimalContextMemorySize) }
-          context[1].content = { subtitles: lastAssistant.slice(-minimalContextMemorySize) }
-        }
-      }
+      const cleanedRawResponse = getContent(rawResponse).replace(/<error>[\s\S]*?<\/error>/g, "").trimEnd()
+      context = updateContextForNextChunk(
+        context,
+        requestBody.subtitles,
+        cleanedRawResponse,
+        tlChunk,
+        { strategy: contextStrategy, splitSize: size }
+      )
 
       // Process the next chunk (or restart with the same chunk)
       const nextIndex: number = tlChunk.length > 0
@@ -449,7 +381,7 @@ export const useTranslationHandler = ({
       // Check for duplicate chunk (stuck in loop)
       if (prevIndex !== null && nextIndex <= prevIndex) {
         sameChunkCount++
-        if (sameChunkCount >= 3) {
+        if (sameChunkCount >= STUCK_CHUNK_THRESHOLD) {
           console.error("Translation stopped: Stuck on the same chunk")
           toast.error("Translation stopped: Stuck on the same chunk")
           stopTranslation(currentId)
@@ -470,7 +402,7 @@ export const useTranslationHandler = ({
       }
 
       // Delay between each chunk
-      await sleep(1000)
+      await sleep(TRANSLATION_CHUNK_DELAY_MS)
       chunkNumber++
     }
 
