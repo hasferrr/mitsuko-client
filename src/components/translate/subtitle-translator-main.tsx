@@ -91,7 +91,7 @@ import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-g
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Translation } from "@/types/project"
-import { DownloadSection } from "../download-section"
+import { DownloadSection } from "@/components/shared/download-section"
 import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { useTranslationHandler } from "@/hooks/handler/use-translation-handler"
 
@@ -627,7 +627,7 @@ export default function SubtitleTranslatorMain({
           </AlertDialog>
 
           <DownloadSection
-            generateContent={(option, format) => generateSubtitleContent(currentId, option, format)}
+            generateContent={(option: DownloadOption, format: CombinedFormat) => generateSubtitleContent(currentId, option, format)}
             fileName={title}
             type={toType}
             downloadOption={downloadOption}

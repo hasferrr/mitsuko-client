@@ -32,7 +32,7 @@ import {
   FastForward,
 } from "lucide-react"
 import JSZip from "jszip"
-import { DownloadSection } from "@/components/download-section"
+import { DownloadSection } from "@/components/shared/download-section"
 import { arrayMove } from "@dnd-kit/sortable"
 import { useBatchSettingsStore } from "@/stores/use-batch-settings-store"
 import { toast } from "sonner"

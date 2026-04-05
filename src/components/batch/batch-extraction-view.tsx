@@ -57,7 +57,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { RenameEpisodesDialog } from "./rename-episodes-dialog"
 import { ImportSubDialog } from "./import-sub-dialog"
 import { CopySharedSettingsDialog } from "./copy-shared-settings-dialog"
-import { DownloadSection } from "@/components/download-section"
+import { DownloadSection } from "@/components/shared/download-section"
 import JSZip from "jszip"
 import { ContextExtractorMain } from "../extract-context/context-extractor-main"
 import { useBatchExtractionFiles } from "@/hooks/batch/use-batch-extraction-files"

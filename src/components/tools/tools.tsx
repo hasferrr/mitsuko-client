@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { DownloadSection } from "@/components/download-section"
+import { DownloadSection } from "@/components/shared/download-section"
 import { convertSubtitlesToSubtitleEvents } from "@/lib/subtitles/ass/helper"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { convertSubtitle } from "@/lib/subtitles/utils/convert-subtitle"

@@ -55,7 +55,7 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { PopulateContextDialog } from "./populate-context-dialog"
 import { CopySharedSettingsDialog } from "./copy-shared-settings-dialog"
-import { DownloadSection } from "@/components/download-section"
+import { DownloadSection } from "@/components/shared/download-section"
 import JSZip from "jszip"
 import SubtitleTranslatorMain from "../translate/subtitle-translator-main"
 import { useBatchTranslationFiles } from "@/hooks/batch/use-batch-translation-files"
