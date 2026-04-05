@@ -16,6 +16,7 @@ import { isAsrModel } from "@/constants/transcription"
 import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/utils/transcription"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
+import { useScrollToTop } from "@/hooks/use-scroll-to-top"
 
 interface UseTranscriptionHandlerProps {
   state: {
@@ -70,6 +71,7 @@ export const useTranscriptionHandler = ({
   })
 
   const { setHasChanges } = useUnsavedChanges()
+  const scrollToTop = useScrollToTop()
 
   const handleStart = async () => {
     await saveData(currentId)
@@ -83,12 +85,7 @@ export const useTranscriptionHandler = ({
       return
     }
 
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }, 300)
+    scrollToTop()
 
     setIsTranscribing(currentId, true)
     setHasChanges(true)

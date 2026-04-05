@@ -17,6 +17,7 @@ import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { useQuery } from "@tanstack/react-query"
 import { useTranslationHandler } from "@/hooks/handler/use-translation-handler"
 import { BatchFile } from "@/types/batch"
+import { useScrollToTop } from "@/hooks/use-scroll-to-top"
 
 interface UseBatchTranslationHandlerProps {
   basicSettingsId: string
@@ -68,6 +69,7 @@ export default function useBatchTranslationHandler({
 
   // Other Hooks
   const { setHasChanges } = useUnsavedChanges()
+  const scrollToTop = useScrollToTop()
 
   // Settings selectors
   const getModelDetail = useSettingsStore(state => state.getModelDetail)
@@ -108,12 +110,7 @@ export default function useBatchTranslationHandler({
   const handleStartBatchTranslation = () => {
     if (batchFiles.length === 0 || isBatchTranslating) return
 
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }, 300)
+    scrollToTop()
 
     setIsRestartTranslationDialogOpen(false)
     queueAbortRef.current = false
@@ -185,12 +182,7 @@ export default function useBatchTranslationHandler({
   const handleContinueBatchTranslation = () => {
     setIsContinueTranslationDialogOpen(false)
 
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }, 300)
+    scrollToTop()
 
     queueAbortRef.current = false
     errorCountRef.current = 0

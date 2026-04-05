@@ -11,6 +11,7 @@ import { BatchFile } from "@/types/batch"
 import { toast } from "sonner"
 import { getContent } from "@/lib/parser/parser"
 import { hasDoneTag, addDoneTag, removeDoneTag } from "@/lib/utils"
+import { useScrollToTop } from "@/hooks/use-scroll-to-top"
 
 interface UseBatchExtractionHandlerProps {
   basicSettingsId: string
@@ -53,6 +54,7 @@ export default function useBatchExtractionHandler({
 
   // Other Hooks
   const { setHasChanges } = useUnsavedChanges()
+  const scrollToTop = useScrollToTop()
 
   // Extraction hook
   const {
@@ -115,9 +117,7 @@ export default function useBatchExtractionHandler({
   const independentExtraction = () => {
     if (batchFiles.length === 0 || isBatchExtracting) return
 
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: "smooth" })
-    }, 300)
+    scrollToTop()
 
     queueAbortRef.current = false
     stopRequestedIdsRef.current.clear()
@@ -181,9 +181,7 @@ export default function useBatchExtractionHandler({
   const independentContinue = () => {
     if (batchFiles.length === 0 || isBatchExtracting) return
 
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: "smooth" })
-    }, 300)
+    scrollToTop()
 
     queueAbortRef.current = false
     stopRequestedIdsRef.current.clear()
@@ -249,9 +247,7 @@ export default function useBatchExtractionHandler({
   const sequentialExtraction = async () => {
     if (batchFiles.length === 0 || isBatchExtracting) return
 
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: "smooth" })
-    }, 300)
+    scrollToTop()
 
     queueAbortRef.current = false
     stopRequestedIdsRef.current.clear()
@@ -314,9 +310,7 @@ export default function useBatchExtractionHandler({
   const sequentialContinue = async () => {
     if (batchFiles.length === 0 || isBatchExtracting) return
 
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: "smooth" })
-    }, 300)
+    scrollToTop()
 
     queueAbortRef.current = false
     stopRequestedIdsRef.current.clear()

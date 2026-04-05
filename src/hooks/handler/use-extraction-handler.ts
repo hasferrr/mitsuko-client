@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { toast } from "sonner"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { useScrollToTop } from "@/hooks/use-scroll-to-top"
 
 interface UseExtractionHandlerProps {
   setActiveTab: (tab: string) => void
@@ -65,6 +66,7 @@ export const useExtractionHandler = ({
   })
 
   const { setHasChanges } = useUnsavedChanges()
+  const scrollToTop = useScrollToTop()
 
   const handleStart = async (
     currentId: string,
@@ -88,12 +90,7 @@ export const useExtractionHandler = ({
     const projectName = project?.name || ""
 
     if (!isBatch) {
-      setTimeout(() => {
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        })
-      }, 300)
+      scrollToTop()
     }
 
     await saveData(currentId)

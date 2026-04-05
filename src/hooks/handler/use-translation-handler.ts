@@ -38,6 +38,7 @@ import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
 import { convertSubtitle } from "@/lib/subtitles/utils/convert-subtitle"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { useScrollToTop } from "@/hooks/use-scroll-to-top"
 
 interface UseTranslationHandlerProps {
   state: {
@@ -88,6 +89,7 @@ export const useTranslationHandler = ({
 
   // Custom Hooks
   const { setHasChanges } = useUnsavedChanges()
+  const scrollToTop = useScrollToTop()
 
   // Lazy user data query
   const { refetch: refetchUserData } = useQuery<UserCreditData>({
@@ -164,12 +166,7 @@ export const useTranslationHandler = ({
       }
       setJsonResponse(currentId, [])
       if (!isBatch) {
-        setTimeout(() => {
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          })
-        }, 300)
+        scrollToTop()
       }
     }
 

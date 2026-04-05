@@ -18,6 +18,7 @@ import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { UserCreditData } from "@/types/user"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
+import { useScrollToTop } from "@/hooks/use-scroll-to-top"
 
 interface UseBatchTranscriptionHandlerProps {
   defaultTranscriptionId: string
@@ -80,6 +81,7 @@ export default function useBatchTranscriptionHandler({
 
   // Unsaved Changes
   const { setHasChanges } = useUnsavedChanges()
+  const scrollToTop = useScrollToTop()
 
   // Lazy user data query for credit refetching
   const { refetch: refetchUserData } = useQuery<UserCreditData>({
@@ -113,12 +115,7 @@ export default function useBatchTranscriptionHandler({
   const runBatchTranscription = async (options: { skipDone: boolean }) => {
     if (batchFiles.length === 0 || isBatchTranscribing) return
 
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }, 300)
+    scrollToTop()
 
     queueAbortRef.current = false
     errorCountRef.current = 0
