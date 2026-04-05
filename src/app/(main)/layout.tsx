@@ -1,11 +1,11 @@
-import { Footer } from "@/components/footer"
-import { UploadIndicator } from "@/components/upload-indicator"
-import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/layout/footer"
+import { UploadIndicator } from "@/components/layout/upload-indicator"
+import { Navbar } from "@/components/layout/navbar"
 import { PropsWithChildren } from "react"
 import { AppSidebarWrapper } from "@/components/sidebar/app-sidebar-wrapper"
 import { Metadata } from "next"
 import { META_TITLE } from "@/constants/metadata"
-import { FeaturesPrefetcher } from "@/components/features-prefetcher"
+import { FeaturesPrefetcher } from "@/components/layout/features-prefetcher"
 
 export const metadata: Metadata = {
   title: META_TITLE,
