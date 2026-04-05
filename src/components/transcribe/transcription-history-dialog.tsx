@@ -12,7 +12,6 @@ import TranscriptionHistory from "@/components/cloud/transcription-history"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { getContent, parseTranscription, parseTranscriptionWordsAndSegments } from "@/lib/parser/parser"
 import { TranscriptionLogItem } from "@/types/transcription-log"
-import { TranscriptionModel } from "@/types/project"
 import { toast } from "sonner"
 
 interface TranscriptionHistoryDialogProps {

@@ -1,6 +1,6 @@
 "use client"
 
-import { Info, Settings2 } from "lucide-react"
+import { Settings2 } from "lucide-react"
 import { DialogCustom } from "@/components/ui-custom/dialog-custom"
 import {
   DialogContent,

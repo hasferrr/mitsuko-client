@@ -18,7 +18,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import {
-  Play,
   Loader2,
   Square,
   CheckSquare,
@@ -28,7 +27,6 @@ import {
   Upload,
   FolderOpen,
   AudioLines,
-  Download,
   FastForward,
 } from "lucide-react"
 import JSZip from "jszip"
@@ -354,17 +352,6 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
   }
 
   const uploadInputId = "batch-transcription-file-upload-input"
-
-  const getManageFilesData = () => {
-    return localOrder.map(id => {
-      const transcription = transcriptionData[id]
-      return {
-        id,
-        title: transcription?.title || "Untitled",
-        uploadId: transcription?.selectedUploadId || null,
-      }
-    })
-  }
 
   return (
     <div className="grid md:grid-cols-[1fr_402px] gap-6">

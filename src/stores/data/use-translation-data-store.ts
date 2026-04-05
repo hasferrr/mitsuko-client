@@ -12,7 +12,6 @@ import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { db } from "@/lib/db/db"
 import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
-import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, GLOBAL_TRANSLATION_BASIC_SETTINGS_ID } from "@/constants/global-settings"
 
 export interface TranslationDataStore {

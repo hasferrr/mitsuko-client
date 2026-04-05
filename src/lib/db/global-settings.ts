@@ -58,6 +58,7 @@ export const getOrCreateGlobalTranslationBasicSettings = async (): Promise<Basic
 
   const globalBasic = await getGlobalBasicSettings()
   if (globalBasic) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, createdAt, updatedAt, ...rest } = globalBasic
     return upsertBasicSettingsWithId(GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, rest)
   }
@@ -71,6 +72,7 @@ export const getOrCreateGlobalTranslationAdvancedSettings = async (): Promise<Ad
 
   const globalAdvanced = await getGlobalAdvancedSettings()
   if (globalAdvanced) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, createdAt, updatedAt, ...rest } = globalAdvanced
     return upsertAdvancedSettingsWithId(GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, rest)
   }

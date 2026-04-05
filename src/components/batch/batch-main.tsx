@@ -29,7 +29,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import Link from "next/link"
 import { BatchTranslationView } from "./batch-translation-view"
 import { BatchExtractionView } from "./batch-extraction-view"

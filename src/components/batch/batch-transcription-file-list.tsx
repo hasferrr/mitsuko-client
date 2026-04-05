@@ -1,6 +1,6 @@
 "use client"
 
-import { Upload, FileAudio } from "lucide-react"
+import { FileAudio } from "lucide-react"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"

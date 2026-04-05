@@ -187,7 +187,7 @@ export default function useBatchTranscriptionHandler({
         await setFileAndUrl(id, null)
         setSelectedUploadId(id, uploadId)
         queryClient.invalidateQueries({ queryKey: ["uploads"] })
-      } catch (error) {
+      } catch {
         toast.error(`Failed to upload file for ${transcriptionData[id]?.title || id}`)
         setIsUploading(id, false)
         setUpload(id, null)

@@ -12,7 +12,7 @@ interface CustomInstructionsLibraryControlsProps {
   onSelectFromLibrary: (instruction: string) => void
 }
 
-export function CustomInstructionsLibraryControls({ customInstructions, onSelectFromLibrary }: CustomInstructionsLibraryControlsProps) {
+export function CustomInstructionsLibraryControls({ onSelectFromLibrary }: CustomInstructionsLibraryControlsProps) {
   const [isLibraryDialogOpen, setIsLibraryDialogOpen] = useState(false)
   const [librarySearch, setLibrarySearch] = useState("")
 

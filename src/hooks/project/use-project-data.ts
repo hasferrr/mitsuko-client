@@ -38,6 +38,7 @@ export function useProjectData(currentProject: Project) {
         translationsData,
         transcriptionsData,
         extractionsData,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _defaultTranscription,
       ] = await Promise.all([
         getTranslationsDb(currentProject.translations),
