@@ -13,7 +13,7 @@ bun dev              # Start development server
 bun build            # Production build (rarely used)
 bun typecheck        # Type checking (use this instead of build)
 bun lint             # Run ESLint
-bun test             # Run all tests
+bun test             # Run all tests (uses Bun's built-in test runner)
 bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.test.ts)
 ```
 
@@ -45,13 +45,18 @@ bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.
 - `src/lib/subtitles/` - SRT/ASS/VTT parsers and generators
 - `src/lib/parser/` - AI response parsing and cleaning
 - `src/lib/api/` - Backend API integration (streaming, credit management)
-- `src/lib/utils/` - Utility modules split by domain (`cn.ts`, `format.ts`, `math.ts`, `audio.ts`, `file.ts`, `async.ts`, `transcription.ts`); barrel re-exported from `src/lib/utils.ts`
+- `src/lib/utils/` - Utility modules split by domain (`cn.ts`, `format.ts`, `math.ts`, `audio.ts`, `file.ts`, `async.ts`, `transcription.ts`, `done-tag.ts`); barrel re-exported from `src/lib/utils.ts`
 - `src/components/` - Feature components organized by domain (translate, batch, transcribe)
 - `src/components/ui/` - Shadcn/Radix UI primitives (auto-generated, avoid editing)
 - `src/components/transcribe/` - Transcription UI split into sub-components (upload-tab, select-tab, controls, result-panel, next-actions) composed by `transcription-main.tsx`
 - `src/types/` - TypeScript interfaces for Project, Translation, Transcription, etc.
 - `src/constants/` - App constants and defaults
 - `src/constants/model-collection.ts` - AI model definitions (free and paid models with filtering utilities)
+- `src/hooks/` - Custom hooks organized by domain:
+  - `handler/` - Service operation handlers (translation, transcription, extraction)
+  - `batch/` - Batch processing hooks for files, selection, and handlers
+  - `project/` - Project data fetching and management
+  - Root-level utilities (scroll-to-top, mobile detection, auto-scroll)
 
 ### Project Architecture
 

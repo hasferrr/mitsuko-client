@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/nextjs"
 import { supabase } from "../supabase"
 import { fetchEventSource, EventStreamContentType } from "@microsoft/fetch-event-source"
-import { formatReasoning } from "@/lib/utils/format"
+import { formatReasoning } from "@/lib/utils"
 
 interface handleStreamParams {
   setResponse: (buffer: string) => void,
