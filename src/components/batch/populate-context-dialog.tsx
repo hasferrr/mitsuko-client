@@ -12,6 +12,7 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { getContent } from "@/lib/parser/parser"
+import { removeDoneTag } from "@/lib/utils"
 
 interface PopulateContextDialogProps {
   open: boolean
@@ -173,9 +174,7 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
         const translation = translationStore[tId]
         if (!translation) continue
         const bsId = translation.basicSettingsId
-        let context = (extraction?.contextResult ?? "")
-        // Remove trailing <done>
-        context = getContent(context.replace(/<done>\s*$/, "")).trim()
+        const context = removeDoneTag(getContent(extraction?.contextResult ?? "")).trim()
         if (!context) empties += 1
         setBasicSettingsValue(bsId, "contextDocument", context)
         applied += 1

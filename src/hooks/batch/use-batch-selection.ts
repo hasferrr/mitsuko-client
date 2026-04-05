@@ -5,6 +5,7 @@ import { toast } from "sonner"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { BatchFile } from "@/types/batch"
+import { hasDoneTag, removeDoneTag, addDoneTag } from "@/lib/utils"
 
 interface UseBatchSelectionProps {
   batchFiles: BatchFile[]
@@ -70,8 +71,7 @@ export function useBatchSelection({ batchFiles, operationMode }: UseBatchSelecti
       const extraction = extractionData[id]
       if (!extraction) return
       const raw = extraction.contextResult || ''
-      const hasDone = /\s*<done>\s*$/.test(raw)
-      const next = hasDone ? raw.replace(/\s*<done>\s*$/, '') : (raw ? `${raw}\n\n<done>` : '<done>')
+      const next = hasDoneTag(raw) ? removeDoneTag(raw) : addDoneTag(raw)
       setContextResult(id, next)
       await saveExtractionData(id)
     }))

@@ -11,6 +11,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { Extraction } from "@/types/project"
 import { db } from "@/lib/db/db"
 import { getContent } from "@/lib/parser/parser"
+import { removeDoneTag } from "@/lib/utils"
 
 interface Props {
   basicSettingsId: string
@@ -42,7 +43,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId }: Props) => {
 
   const handleContextSelect = (contextResult: string) => {
     setHasChanges(true)
-    setContextDocument(getContent(contextResult).replace(/<done>\s*$/, "").trim())
+    setContextDocument(removeDoneTag(getContent(contextResult)).trim())
     setIsContextDialogOpen(false)
   }
 

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+import { cn, removeDoneTag } from "@/lib/utils"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -227,8 +227,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
   const handleSingleFileDownload = (batchFileId: string) => {
     const extraction = extractionData[batchFileId]
     if (!extraction) return
-    let content = extraction.contextResult || ''
-    content = content.replace(/<done>\s*$/, '')
+    const content = removeDoneTag(extraction.contextResult || '')
     if (!content.trim()) return
     const baseTitle = extraction.title || 'extraction'
     const dotIdx = baseTitle.lastIndexOf('.')
@@ -253,8 +252,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
     for (const batchFile of batchFiles) {
       const extraction = extractionData[batchFile.id]
       if (!extraction) continue
-      let content = extraction.contextResult || ''
-      content = content.replace(/<done>\s*$/, '')
+      const content = removeDoneTag(extraction.contextResult || '')
 
       const baseTitle = extraction.title || 'extraction'
       const dotIdx = baseTitle.lastIndexOf('.')

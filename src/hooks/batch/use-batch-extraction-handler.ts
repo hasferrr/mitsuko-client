@@ -10,6 +10,7 @@ import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
 import { BatchFile } from "@/types/batch"
 import { toast } from "sonner"
 import { getContent } from "@/lib/parser/parser"
+import { hasDoneTag, addDoneTag, removeDoneTag } from "@/lib/utils"
 
 interface UseBatchExtractionHandlerProps {
   basicSettingsId: string
@@ -65,10 +66,8 @@ export default function useBatchExtractionHandler({
       try {
         const raw = getContextResult(currentId)
         const content = getContent(raw).trim()
-        const hasFinished = /\s*<done>\s*$/.test(raw)
-        if (!hasFinished && content.length > 0) {
-          const withMarker = raw ? `${raw}\n\n<done>` : "<done>"
-          setContextResult(currentId, withMarker)
+        if (!hasDoneTag(raw) && content.length > 0) {
+          setContextResult(currentId, addDoneTag(raw))
         }
       } catch (e) {
         console.error("Failed to append finished marker (batch):", e)
@@ -282,7 +281,7 @@ export default function useBatchExtractionHandler({
 
       // Set previousContext from previous file's contextResult
       if (prevId) {
-        const prevContext = getContent(getContextResult(prevId)).replace(/\s*<done>\s*$/, "").trim()
+        const prevContext = removeDoneTag(getContent(getContextResult(prevId))).trim()
         setPreviousContext(currentId, prevContext)
       }
 
@@ -351,7 +350,7 @@ export default function useBatchExtractionHandler({
       // Always set previousContext from the immediate previous file's contextResult when available
       if (currentIndex !== undefined && currentIndex > 0) {
         const prevId = batchFiles[currentIndex - 1].id
-        const prevContext = getContent(getContextResult(prevId)).replace(/\s*<done>\s*$/, "").trim()
+        const prevContext = removeDoneTag(getContent(getContextResult(prevId))).trim()
         setPreviousContext(currentId, prevContext)
       }
 

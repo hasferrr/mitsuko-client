@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { getContent } from "@/lib/parser/parser"
-import { cn } from "@/lib/utils"
+import { cn, removeDoneTag } from "@/lib/utils"
 import { MaxCompletionTokenInput, ModelSelection, SubtitleCleanupSwitch } from "../settings"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { useSessionStore } from "@/stores/ui/use-session-store"
@@ -155,7 +155,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
 
   const handlePreviousContextSelect = (contextResult: string) => {
     setHasChanges(true)
-    setPreviousContext(currentId, getContent(contextResult).replace(/<done>\s*$/, "").trim())
+    setPreviousContext(currentId, removeDoneTag(getContent(contextResult)).trim())
     setIsPreviousContextDialogOpen(false)
     if (previousContextRef.current) {
       previousContextRef.current.style.height = "auto"

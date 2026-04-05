@@ -3,6 +3,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { BatchFile } from "@/types/batch"
+import { hasDoneTag } from "@/lib/utils"
 
 export const useBatchExtractionFiles = (order: string[], queueSet: Set<string>) => {
   const extractionData = useExtractionDataStore((state) => state.data)
@@ -15,7 +16,7 @@ export const useBatchExtractionFiles = (order: string[], queueSet: Set<string>) 
       const extraction = extractionData[id]
 
       const partial = extraction?.contextResult && extraction.contextResult.trim() !== ""
-      const extracted = partial && extraction.contextResult.trim().endsWith("<done>")
+      const extracted = partial && hasDoneTag(extraction.contextResult)
       const progress = extracted ? 100 : 0
 
       let status: BatchFile["status"]
