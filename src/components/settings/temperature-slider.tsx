@@ -4,7 +4,7 @@ import { memo } from "react"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { useLocalSettingsStore } from '@/stores/use-local-settings-store'
+import { useLocalSettingsStore } from '@/stores/settings/use-local-settings-store'
 import { TEMPERATURE_MIN, TEMPERATURE_MAX } from "@/constants/limits"
 
 interface TemperatureSliderProps {

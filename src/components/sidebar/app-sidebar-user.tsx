@@ -39,7 +39,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useSessionStore } from "@/stores/use-session-store"
+import { useSessionStore } from "@/stores/ui/use-session-store"
 import { supabase } from "@/lib/supabase"
 import { useState, useTransition } from "react"
 

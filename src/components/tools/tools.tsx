@@ -3,8 +3,8 @@
 import { useEffect, useRef } from "react"
 import hljs from 'highlight.js/lib/core'
 import ass from 'highlightjs-ass'
-import { useThemeStore } from "@/stores/use-theme-store"
-import { useToolsStore } from "@/stores/use-tools-store"
+import { useThemeStore } from "@/stores/ui/use-theme-store"
+import { useToolsStore } from "@/stores/ui/use-tools-store"
 import { Input } from "@/components/ui/input"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import type { SubtitleEvent, SubtitleType } from "@/types/subtitles"
@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { DownloadSection } from "@/components/download-section"
+import { DownloadSection } from "@/components/shared/download-section"
 import { convertSubtitlesToSubtitleEvents } from "@/lib/subtitles/ass/helper"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { convertSubtitle } from "@/lib/subtitles/utils/convert-subtitle"

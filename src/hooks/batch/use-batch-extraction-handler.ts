@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { useBatchSettingsStore } from "@/stores/use-batch-settings-store"
+import { useBatchSettingsStore } from "@/stores/settings/use-batch-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"

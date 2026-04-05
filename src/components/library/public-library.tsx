@@ -53,7 +53,7 @@ import {
   AlertDialogDescription,
 } from '@/components/ui/alert-dialog'
 import { useCustomInstructionStore } from '@/stores/data/use-custom-instruction-store'
-import { useSessionStore } from '@/stores/use-session-store'
+import { useSessionStore } from '@/stores/ui/use-session-store'
 import { cn } from '@/lib/utils'
 
 export default function PublicLibrary() {

@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { useSessionStore } from "@/stores/use-session-store"
+import { useSessionStore } from "@/stores/ui/use-session-store"
 import { ProductId } from "@/types/product"
 
 export function useLemonSqueezyCache() {

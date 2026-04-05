@@ -1,6 +1,6 @@
 import { memo } from "react"
 import { SubtitleCard } from "./subtitle-card"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import type { SubtitleTranslated } from "@/types/subtitles"
 import { VirtualizedList } from "../ui-custom/virtualized-list"
 

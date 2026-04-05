@@ -210,20 +210,3 @@ export function generateSegmentsTranscription(segments: Segment[]): string {
     })
     .join("\n\n")
 }
-
-// --- Execution ---
-
-// async function main() {
-//   const inputPath = process.argv[2] || "input.json"
-//   const outputPath = process.argv[3] || "output.srt"
-
-//   console.log(`Reading from ${inputPath}...`)
-//   const jsonData: TranscriptData = await Bun.file(inputPath).json()
-
-//   console.log(`Processing with Target CPS: ${CONFIG.TARGET_CPS} (Max: ${CONFIG.MAX_CPS})...`)
-
-//   const srtContent = generateSmartSubtitles(jsonData)
-
-//   await Bun.write(outputPath, srtContent)
-//   console.log(`Saved SRT to ${outputPath}`)
-// }

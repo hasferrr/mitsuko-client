@@ -13,7 +13,7 @@ import { File, Trash2, RefreshCw, Loader2 } from "lucide-react"
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
 import { listUploads, deleteUpload } from "@/lib/api/uploads"
 import { UploadFileMeta } from "@/types/uploads"
-import { useSessionStore } from "@/stores/use-session-store"
+import { useSessionStore } from "@/stores/ui/use-session-store"
 
 import { toast } from "sonner"
 import { DeleteDialogue } from "@/components/ui-custom/delete-dialogue"

@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState, useRef } from 'react'
-import { useUploadStore } from '@/stores/use-upload-store'
+import { useUploadStore } from '@/stores/ui/use-upload-store'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { listUploads, deleteUpload } from '@/lib/api/uploads'
 import { uploadFile } from '@/lib/api/file-upload'
@@ -32,7 +32,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 import { DeleteDialogue } from '@/components/ui-custom/delete-dialogue'
-import { useSessionStore } from '@/stores/use-session-store'
+import { useSessionStore } from '@/stores/ui/use-session-store'
 import { MAX_FILE_SIZE } from "@/constants/transcription"
 
 const getFileIcon = (contentType?: string) => {

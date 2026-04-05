@@ -5,7 +5,7 @@ import { Wand2, RefreshCw } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useWhisperSettingsStore } from "@/stores/use-whisper-settings-store"
+import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
 import { cn } from "@/lib/utils"
 
 interface WhisperSettingsPanelProps {

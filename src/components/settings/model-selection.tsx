@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 import { HelpCircle } from "lucide-react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useLocalSettingsStore } from '@/stores/use-local-settings-store'
-import { ModelSelector } from "@/components/model-selector"
+import { useLocalSettingsStore } from '@/stores/settings/use-local-settings-store'
+import { ModelSelector } from "@/components/settings/model-selector"
 import WhichModels from "@/components/pricing/which-models"
 import { CustomApiConfigManager } from "./custom-api-config-manager"
 interface ModelSelectionProps {

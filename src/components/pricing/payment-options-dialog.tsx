@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useSnapStore } from "@/stores/use-snap-store"
+import { useSnapStore } from "@/stores/ui/use-snap-store"
 import { ProductId } from "@/types/product"
 import { CreditCard, Info, Loader2, Minus, Plus } from "lucide-react"
 import { useSnapPayment } from "@/hooks/use-snap-payment"

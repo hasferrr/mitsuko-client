@@ -1,7 +1,7 @@
 "use client"
 
 import { Moon, Sun } from "lucide-react"
-import { useThemeStore } from "@/stores/use-theme-store"
+import { useThemeStore } from "@/stores/ui/use-theme-store"
 
 export function ThemeToggle() {
   const isDarkMode = useThemeStore(state => state.isDarkMode)

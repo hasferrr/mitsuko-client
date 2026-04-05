@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useLocalSettingsStore, CustomApiConfig } from "@/stores/use-local-settings-store"
+import { useLocalSettingsStore, CustomApiConfig } from "@/stores/settings/use-local-settings-store"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {

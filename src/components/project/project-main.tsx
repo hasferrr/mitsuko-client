@@ -45,9 +45,9 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
-import { SettingsDialogue } from "../settings-dialogue"
-import { TranscriptionSettingsDialogue } from "../transcription-settings-dialogue"
+import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
+import { SettingsDialogue } from "../settings/settings-dialogue"
+import { TranscriptionSettingsDialogue } from "../settings/transcription-settings-dialogue"
 import {
   GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
   GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
@@ -640,7 +640,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         resetFromAdvancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
         settingsParentType="translation"
         isDefaultEnabled={currentProject.isDefaultTranslationEnabled}
-        onDefaultEnabledChange={(enabled) => updateProjectStore(currentProject.id, { isDefaultTranslationEnabled: enabled })}
+        onDefaultEnabledChange={(enabled: boolean) => updateProjectStore(currentProject.id, { isDefaultTranslationEnabled: enabled })}
         onOpenGlobalSettings={() => {
           setIsTranslationSettingsModalOpen(false)
           setIsGlobalTranslationSettingsOpen(true)
@@ -658,7 +658,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         resetFromAdvancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
         settingsParentType="extraction"
         isDefaultEnabled={currentProject.isDefaultExtractionEnabled}
-        onDefaultEnabledChange={(enabled) => updateProjectStore(currentProject.id, { isDefaultExtractionEnabled: enabled })}
+        onDefaultEnabledChange={(enabled: boolean) => updateProjectStore(currentProject.id, { isDefaultExtractionEnabled: enabled })}
         onOpenGlobalSettings={() => {
           setIsExtractionSettingsModalOpen(false)
           setIsGlobalExtractionSettingsOpen(true)
@@ -672,7 +672,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         projectName={currentProject.name}
         defaultTranscriptionId={currentProject.defaultTranscriptionId}
         isDefaultEnabled={currentProject.isDefaultTranscriptionEnabled}
-        onDefaultEnabledChange={(enabled) => updateProjectStore(currentProject.id, { isDefaultTranscriptionEnabled: enabled })}
+        onDefaultEnabledChange={(enabled: boolean) => updateProjectStore(currentProject.id, { isDefaultTranscriptionEnabled: enabled })}
         onOpenGlobalSettings={() => {
           setIsTranscriptionSettingsModalOpen(false)
           setIsGlobalTranscriptionSettingsOpen(true)

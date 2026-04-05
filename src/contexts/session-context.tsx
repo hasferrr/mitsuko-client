@@ -3,7 +3,7 @@
 import * as Sentry from '@sentry/nextjs'
 import posthog from 'posthog-js'
 import { supabase } from '@/lib/supabase'
-import { useSessionStore } from '@/stores/use-session-store'
+import { useSessionStore } from '@/stores/ui/use-session-store'
 import type { Session } from '@supabase/supabase-js'
 import { createContext, PropsWithChildren, useEffect } from 'react'
 

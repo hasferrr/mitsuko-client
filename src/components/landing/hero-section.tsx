@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { useState } from "react"
-import { useSessionStore } from "@/stores/use-session-store"
+import { useSessionStore } from "@/stores/ui/use-session-store"
 import demoPlaceholderImage from "@/static/demo-placeholder.png"
 import { Play } from "lucide-react"
 

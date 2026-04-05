@@ -1,7 +1,7 @@
 "use client"
 
 import { Checkbox } from "@/components/ui/checkbox"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 
 export const SubtitleCleanupSwitch = () => {
   const isSubtitleCleanupEnabled = useLocalSettingsStore((state) => state.isSubtitleCleanupEnabled)

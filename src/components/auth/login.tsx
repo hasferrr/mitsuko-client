@@ -3,7 +3,7 @@
 import { supabase } from "@/lib/supabase"
 import { useEffect, useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
-import { useSessionStore } from "@/stores/use-session-store"
+import { useSessionStore } from "@/stores/ui/use-session-store"
 import { User } from "./user"
 import { UserSettings } from "./user-settings"
 import { LogOutIcon } from "lucide-react"
@@ -17,7 +17,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog"
-import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
+import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { IconBrandGoogleFilled } from "@tabler/icons-react"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"

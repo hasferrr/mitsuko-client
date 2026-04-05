@@ -2,7 +2,7 @@
 
 import React, { createContext, useEffect, PropsWithChildren } from 'react'
 import { indexedDBStorage } from '@/lib/indexed-db-storage'
-import { useClientIdStore } from '@/stores/use-client-id-store'
+import { useClientIdStore } from '@/stores/ui/use-client-id-store'
 import { v4 as uuidv4 } from 'uuid'
 
 const CLIENT_ID_KEY = 'client-id'
