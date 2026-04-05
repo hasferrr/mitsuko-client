@@ -4,7 +4,7 @@ import { useLocalSettingsStore } from "@/stores/use-local-settings-store"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { SettingsDialogue } from "@/components/settings-dialogue"
+import { SettingsDialogue } from "@/components/settings/settings-dialogue"
 import {
   GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
   GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
@@ -12,7 +12,7 @@ import {
   GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
   GLOBAL_TRANSCRIPTION_SETTINGS_ID
 } from "@/constants/global-settings"
-import { TranscriptionSettingsDialogue } from "@/components/transcription-settings-dialogue"
+import { TranscriptionSettingsDialogue } from "@/components/settings/transcription-settings-dialogue"
 import {
   AlertDialog,
   AlertDialogAction,
