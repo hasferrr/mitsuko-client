@@ -21,6 +21,10 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        source: '/og-image-:slug.png',
+        destination: '/og-image.png',
+      },
+      {
         source: '/blog/:slug.md',
         destination: '/api/blog/:slug/raw',
       },
