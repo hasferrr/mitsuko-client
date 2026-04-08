@@ -300,6 +300,19 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "xai",
     models: [
       {
+        name: "Grok 4.20",
+        maxInput: 2_000_000,
+        maxOutput: 2_000_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "high",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "Grok 4.1 Fast",
         maxInput: 2_000_000,
         maxOutput: 30_000,

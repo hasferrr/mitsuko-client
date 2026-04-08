@@ -14,6 +14,11 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2026
 
+### April 8
+
+- 🤖 **Model Updates:**
+  - Added Grok 4.20, xAI's flagship model with a massive 2M token context window and 2M max output.
+
 ### March 16
 
 - ⚙️ **Independent Feature Settings:** You can now enable custom default settings for Translation, Extraction, and Transcription independently from one another within your projects.
