@@ -2,7 +2,7 @@ import { CurrencyData, BasePlanData, CreditPack } from "@/types/pricing"
 
 export const CURRENCIES: { USD: CurrencyData; IDR: CurrencyData } = {
   USD: { symbol: "$", rate: 1 },
-  IDR: { symbol: "Rp", rate: 17000 },
+  IDR: { symbol: "Rp", rate: 17500 },
 }
 
 export const SUBSCRIPTION_PLANS: {
