@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -111,18 +111,16 @@ export function SortableBatchTranscriptionFile({
         </div>
         <div className="flex items-center gap-1 shrink-0">
           {batchFile.hasDurationWarning && (
-            <TooltipProvider delayDuration={50}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center justify-center p-1 text-amber-500">
-                    <AlertTriangle className="size-4" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Exceeds maximum duration for selected model</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip delayDuration={50}>
+              <TooltipTrigger asChild>
+                <div className="flex items-center justify-center p-1 text-amber-500">
+                  <AlertTriangle className="size-4" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Exceeds maximum duration for selected model</p>
+              </TooltipContent>
+            </Tooltip>
           )}
           {batchFile.status === 'pending' && <Badge variant="secondary">Pending</Badge>}
           {batchFile.status === 'partial' && <Badge variant="outline">Partial</Badge>}
@@ -135,16 +133,14 @@ export function SortableBatchTranscriptionFile({
           {batchFile.status === 'queued' && <Badge variant="secondary" className="bg-transparent">Queued</Badge>}
           {batchFile.status === 'done' && (
             <>
-              <TooltipProvider delayDuration={50}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id) }}>
-                      <Download className="size-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Download Transcription</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+               <Tooltip delayDuration={50}>
+                 <TooltipTrigger asChild>
+                   <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id) }}>
+                     <Download className="size-4" />
+                   </Button>
+                 </TooltipTrigger>
+                 <TooltipContent>Download Transcription</TooltipContent>
+               </Tooltip>
               <Badge variant="default">Done</Badge>
             </>
           )}

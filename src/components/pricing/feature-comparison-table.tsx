@@ -4,7 +4,6 @@ import { Info } from "lucide-react"
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
@@ -79,16 +78,14 @@ export function FeatureComparisonTable({
                   <div className="flex items-center gap-1.5">
                     {item.feature}
                     {!showDescription && (
-                      <TooltipProvider delayDuration={50}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="size-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-xs">
-                            <p>{item.description}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <Tooltip delayDuration={50}>
+                        <TooltipTrigger asChild>
+                          <Info className="size-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs">
+                          <p>{item.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     )}
                   </div>
                 </td>

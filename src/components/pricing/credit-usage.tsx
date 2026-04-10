@@ -5,7 +5,6 @@ import { cn, formatTokens } from "@/lib/utils"
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import {
@@ -85,28 +84,24 @@ export default async function CreditUsage() {
                 <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">
                   {model.name}
                   {highQualityModels.has(model.name) && (
-                    <TooltipProvider>
-                      <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                          <span className="cursor-default ml-1 text-[1rem]">⭐</span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>High Quality</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <Tooltip delayDuration={0}>
+                      <TooltipTrigger asChild>
+                        <span className="cursor-default ml-1 text-[1rem]">⭐</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>High Quality</p>
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                   {favoriteModels.has(model.name) && (
-                    <TooltipProvider>
-                      <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                          <span className="cursor-default ml-1 text-[1rem]">💙</span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Favorite Model</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <Tooltip delayDuration={0}>
+                      <TooltipTrigger asChild>
+                        <span className="cursor-default ml-1 text-[1rem]">💙</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Favorite Model</p>
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                 </td>
                 <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">

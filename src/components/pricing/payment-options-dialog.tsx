@@ -22,7 +22,7 @@ import { sleep } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { createPaymentLink } from "@/lib/api/create-snap-payment"
 import LemonSqueezyLogo from "@/static/lemonsqueezy.svg"
 import Image from "next/image"
@@ -314,19 +314,17 @@ export function PaymentOptionsDialog({
                 <Label htmlFor="consent" className="text-xs text-[11px] text-muted-foreground leading-tight cursor-pointer">
                   I expressly request immediate access and acknowledge I lose any statutory right of withdrawal or any cooling-off period once credits are delivered.
                 </Label>
-                <TooltipProvider delayDuration={50}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="size-3.5 text-muted-foreground shrink-0 cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="max-w-xs text-[11px]">
-                      <p>
-                        Digital credits are delivered immediately and cannot be returned once accessed.
-                        By checking this box, you confirm waiver of any refund rights under applicable consumer protection laws, including 14-day cooling-off periods where applicable.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Tooltip delayDuration={50}>
+                  <TooltipTrigger asChild>
+                    <Info className="size-3.5 text-muted-foreground shrink-0 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs text-[11px]">
+                    <p>
+                      Digital credits are delivered immediately and cannot be returned once accessed.
+                      By checking this box, you confirm waiver of any refund rights under applicable consumer protection laws, including 14-day cooling-off periods where applicable.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
           </div>

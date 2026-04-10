@@ -3,7 +3,7 @@
 import { memo } from "react"
 import { Switch } from "@/components/ui/switch"
 import { Sparkles } from "lucide-react"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 export const AdvancedReasoningSwitch = memo(() => {
   return (
@@ -15,18 +15,16 @@ export const AdvancedReasoningSwitch = memo(() => {
             Advanced Reasoning & Planning
           </span>
         </label>
-        <TooltipProvider>
-          <Tooltip delayDuration={10}>
-            <TooltipTrigger asChild>
-              <div>
-                <Switch checked disabled />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>This feature is always enabled for optimal translation quality</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip delayDuration={10}>
+          <TooltipTrigger asChild>
+            <div>
+              <Switch checked disabled />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>This feature is always enabled for optimal translation quality</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
       <p className="text-xs text-muted-foreground">
         Enable the AI follows a more structured & multi-step thinking process.
