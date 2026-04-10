@@ -107,6 +107,7 @@ export function CreateEditInstructionDialog({ children, instruction }: CreateEdi
                       ref={textareaRef}
                       onInput={handleResize}
                       onFocus={handleResize}
+                      style={{ wordBreak: 'break-word' }}
                       className="min-h-[100px] max-h-[300px] overflow-y-auto resize-none"
                       placeholder="Enter your custom instruction here"
                     />

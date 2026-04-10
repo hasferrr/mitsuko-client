@@ -190,7 +190,7 @@ export function DownloadSection({
       <Button
         variant="outline"
         className={cn(
-          "gap-2 w-full",
+          "gap-2",
           !inlineLayout && (!showSelectors || downloadOption !== "combined" || hideTextOptionSelector) && "col-span-2"
         )}
         onClick={handleDownload}

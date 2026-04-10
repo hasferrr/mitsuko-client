@@ -148,7 +148,7 @@ export const SubtitleResultOutput = memo(() => {
           onClick={!isTranslating
             ? (isEditing ? handleParseAndSave : handleEditText)
             : () => setIsShowRaw(prev => !prev)}
-          className="w-full"
+          className="w-1/2"
         >
           {!isTranslating
             ? isEditing ? "Parse & Save" : "Edit Text"
@@ -158,7 +158,7 @@ export const SubtitleResultOutput = memo(() => {
           variant="outline"
           onClick={isEditing ? handleCancelEdit : handleApply}
           disabled={isTranslating}
-          className="w-full"
+          className="w-1/2"
         >
           {isEditing ? "Cancel" : "Apply to Subtitles"}
         </Button>

@@ -392,6 +392,7 @@ export default function PublicLibrary() {
                   value={importContent}
                   onFocus={handleResize}
                   readOnly
+                  style={{ wordBreak: 'break-word' }}
                   placeholder="Enter your custom instruction here"
                   className="min-h-[100px] max-h-[300px] overflow-y-auto resize-none"
                 />
