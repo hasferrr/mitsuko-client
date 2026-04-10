@@ -226,7 +226,7 @@ function ModelItem({ model, modelKey, cost, isSelected, onSelect }: ModelItemPro
         side="left"
         align="start"
         className="w-[260px] text-sm"
-        animate={false}
+        // animate={false}
       >
         <ModelDescription model={model} cost={cost} isSelected={isSelected} />
       </HoverCardContent>

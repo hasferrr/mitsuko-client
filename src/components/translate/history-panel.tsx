@@ -112,7 +112,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
   return (
     <>
       <ResizablePanelGroup
-        direction="horizontal"
+        // direction="horizontal"
         className="h-[1000px] border rounded-lg overflow-hidden mt-4"
       >
         {/* Left Panel: History List */}
@@ -152,7 +152,10 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
 
         {/* Right Panel: Split Vertically into Three */}
         <ResizablePanel defaultSize={70} minSize={10}>
-          <ResizablePanelGroup direction="vertical" className="h-full">
+          <ResizablePanelGroup
+            // direction="vertical"
+            className="h-full"
+          >
 
             {/* Top Panel: Subtitles and Parsed Data */}
             <ResizablePanel minSize={10}>
