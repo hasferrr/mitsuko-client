@@ -138,7 +138,7 @@ export function ModelSelector({
               {modelDetail && (
                 <Badge
                   variant={modelDetail.isPaid ? "default" : "secondary"}
-                  className="text-xs px-2 h-[1.125rem] shrink-0"
+                  className="text-xs px-2 h-4.5 shrink-0"
                 >
                   {modelDetail.isPaid ? "Premium" : "Free"}
                 </Badge>
@@ -164,7 +164,7 @@ export function ModelSelector({
                     {key}
                     <Badge
                       variant={value.models[0]?.isPaid ? "default" : "secondary"}
-                      className={cn("text-xs px-[6px] h-[1rem]", "text-[11px]")}
+                      className={cn("text-xs px-[6px] h-4", "text-[11px]")}
                     >
                       {value.models[0]?.isPaid ? "Premium" : "Free"}
                     </Badge>

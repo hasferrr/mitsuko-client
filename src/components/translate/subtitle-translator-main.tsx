@@ -648,7 +648,7 @@ export default function SubtitleTranslatorMain({
               <TabsTrigger value="result">Result</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
+            <TabsContent value="basic" className="grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className={cn("p-4 space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
                   {isSharedSettings && (
@@ -680,7 +680,7 @@ export default function SubtitleTranslatorMain({
               </Card>
             </TabsContent>
 
-            <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
+            <TabsContent value="advanced" className="grow space-y-4 mt-4">
               <Card className="border border-border bg-card text-card-foreground">
                 <CardContent className={cn("p-4 space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
                   <ModelDetail
@@ -727,7 +727,7 @@ export default function SubtitleTranslatorMain({
               </Card>
             </TabsContent>
 
-            <TabsContent value="result" className="flex-grow space-y-4 mt-4">
+            <TabsContent value="result" className="grow space-y-4 mt-4">
               <SubtitleResultOutput />
             </TabsContent>
           </Tabs>

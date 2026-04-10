@@ -32,7 +32,7 @@ export default async function TranscriptionUsage() {
   ]
 
   return (
-    <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
+    <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-xs">
       <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
         Transcription (Experimental)
       </h3>

@@ -41,7 +41,7 @@ const features = {
 function FeatureItem({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-2">
-      <div className="h-5 w-5 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+      <div className="h-5 w-5 rounded-full bg-green-500/10 flex items-center justify-center shrink-0 mt-0.5">
         <Check className="h-3 w-3 text-green-500" strokeWidth={3} />
       </div>
       <span className="text-sm">{text}</span>

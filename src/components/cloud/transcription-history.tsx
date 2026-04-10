@@ -277,7 +277,7 @@ export default function TranscriptionHistory({ onApplyDirect }: TranscriptionHis
                   <TableRow key={index}>
                     <TableCell className="py-4 min-w-[250px] max-w-[250px] lg:min-w-[300px] lg:max-w-[400px]">
                       <div className="flex items-center gap-3">
-                        <Skeleton className="flex-shrink-0 w-10 h-10 rounded-lg" />
+                        <Skeleton className="shrink-0 w-10 h-10 rounded-lg" />
                         <div className="w-full">
                           <Skeleton className="h-4 w-full mb-2" />
                           <Skeleton className="h-3 w-20" />
@@ -379,7 +379,7 @@ export default function TranscriptionHistory({ onApplyDirect }: TranscriptionHis
                   <TableRow key={item._id} className="group">
                     <TableCell className="py-4 min-w-[250px] max-w-[250px] lg:min-w-[300px] lg:max-w-[400px]">
                       <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <div className="shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                           <FileAudio2 className="h-5 w-5 text-primary" />
                         </div>
                         <div className="w-full line-clamp-3">

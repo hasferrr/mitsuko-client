@@ -40,7 +40,7 @@ const generalFeaturesList = [
 export function GeneralFeaturesSection() {
   return (
     <div
-      className="mt-8 rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto shadow-sm"
+      className="mt-8 rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto shadow-xs"
     >
       <div className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 p-4">
         <h3 className="text-lg font-medium text-gray-900 dark:text-white">
@@ -51,7 +51,7 @@ export function GeneralFeaturesSection() {
         {generalFeaturesList.map((item) => (
           <div key={item.feature} className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-blue-500 flex-shrink-0" />
+              <Check className="w-5 h-5 text-blue-500 shrink-0" />
               <span className="text-base font-medium text-gray-800 dark:text-gray-200">
                 {item.feature}
               </span>

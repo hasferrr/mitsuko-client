@@ -261,14 +261,14 @@ export function PaymentOptionsDialog({
             <button
               onClick={handlePopup}
               disabled={isFetchingPayment || !hasConsented}
-              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isFetchingPayment ? (
-                <Loader2 className="w-6 h-6 mr-4 text-blue-500 flex-shrink-0 mt-1 animate-spin" />
+                <Loader2 className="w-6 h-6 mr-4 text-blue-500 shrink-0 mt-1 animate-spin" />
               ) : (
-                <CreditCard className="w-6 h-6 mr-4 text-blue-500 flex-shrink-0 mt-1" />
+                <CreditCard className="w-6 h-6 mr-4 text-blue-500 shrink-0 mt-1" />
               )}
-              <div className="flex-grow">
+              <div className="grow">
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-medium text-sm">Pay in IDR</span>
                   <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700">RECOMMENDED</Badge>
@@ -282,20 +282,20 @@ export function PaymentOptionsDialog({
             <button
               onClick={handleNewTab}
               disabled={isFetchingPayment || !hasConsented}
-              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isFetchingPayment ? (
-                <Loader2 className="w-6 h-6 mr-4 text-gray-500 flex-shrink-0 mt-1 animate-spin" />
+                <Loader2 className="w-6 h-6 mr-4 text-gray-500 shrink-0 mt-1 animate-spin" />
               ) : (
                 <Image
                   src={LemonSqueezyLogo}
                   alt="Lemon Squeezy"
                   width={24}
                   height={24}
-                  className="w-6 h-6 mr-4 flex-shrink-0 mt-1"
+                  className="w-6 h-6 mr-4 shrink-0 mt-1"
                 />
               )}
-              <div className="flex-grow">
+              <div className="grow">
                 <div className="font-medium text-sm mb-1">Pay with Lemon Squeezy</div>
                 <p className="text-xs text-muted-foreground">
                   {isFetchingPayment ? "Preparing secure payment..." : "Proceed to Lemon Squeezy. A small fee applies."}
@@ -317,7 +317,7 @@ export function PaymentOptionsDialog({
                 <TooltipProvider delayDuration={50}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Info className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0 cursor-help" />
+                      <Info className="h-3.5 w-3.5 text-muted-foreground shrink-0 cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent side="top" className="max-w-xs text-[11px]">
                       <p>

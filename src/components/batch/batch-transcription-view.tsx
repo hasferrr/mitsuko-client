@@ -505,7 +505,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           </TabsList>
 
           {/* Batch Settings */}
-          <div className="space-y-4 w-full p-4 mt-4 rounded-xl border border-input bg-card shadow-sm">
+          <div className="space-y-4 w-full p-4 mt-4 rounded-xl border border-input bg-card shadow-xs">
             <div className="flex items-center justify-between">
               <label htmlFor="shared-settings-switch" className="flex flex-col">
                 <span className="text-sm font-semibold">Settings Mode</span>
@@ -551,7 +551,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             </div>
           </div>
 
-          <TabsContent value="settings" className="flex-grow space-y-4 mt-4">
+          <TabsContent value="settings" className="grow space-y-4 mt-4">
             <Card className="border border-border bg-card text-card-foreground">
               <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
@@ -560,7 +560,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             </Card>
           </TabsContent>
 
-          <TabsContent value="whisper" className="flex-grow mt-4">
+          <TabsContent value="whisper" className="grow mt-4">
             <WhisperSettingsPanel
               showApplyButton
               onApplyClick={() => setIsApplyWhisperDialogOpen(true)}

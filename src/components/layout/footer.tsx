@@ -4,7 +4,7 @@ import { DISCORD_LINK, GITHUB_LINK } from "@/constants/external-links"
 
 export function Footer() {
   return (
-    <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <footer className="border-t bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60">
       <div className="flex flex-col gap-4 p-8 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
           <nav className="flex flex-wrap gap-4 text-sm text-muted-foreground">

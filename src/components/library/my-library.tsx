@@ -238,7 +238,7 @@ export default function MyLibrary() {
                     <CardHeader className="pb-4">
                       <CardTitle>{item.name}</CardTitle>
                     </CardHeader>
-                    <CardContent className="pb-2 flex-grow">
+                    <CardContent className="pb-2 grow">
                       <p className="text-sm text-muted-foreground line-clamp-4">
                         {item.content}
                       </p>

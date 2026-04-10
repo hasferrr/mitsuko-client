@@ -280,7 +280,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             }}
             placeholder="e.g., S01E01"
             className={cn("bg-background dark:bg-muted/30",
-              !isEpisodeNumberValid && "outline outline-red-500"
+              !isEpisodeNumberValid && "ring-2 ring-red-500"
             )}
           />
         </div>
@@ -334,7 +334,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
               onChange={handleSubtitleContentChange}
               className={cn(
                 "min-h-[181px] h-[181px] max-h-[250px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
-                !isSubtitleContentValid && "outline outline-red-500"
+                !isSubtitleContentValid && "ring-2 ring-red-500"
               )}
               placeholder="Paste subtitle content here..."
               onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
@@ -401,7 +401,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             <TabsTrigger value="result">Result</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="settings" className="flex-grow space-y-4 mt-4">
+          <TabsContent value="settings" className="grow space-y-4 mt-4">
             <Card className="border border-border bg-card text-card-foreground">
               <CardContent className={cn("p-4 space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
                 {isSharedSettings && (
@@ -420,7 +420,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             </Card>
           </TabsContent>
 
-          <TabsContent value="result" className="flex-grow space-y-4 mt-4">
+          <TabsContent value="result" className="grow space-y-4 mt-4">
             <div className="space-y-2">
               {isEditingResult ? (
                 <Textarea

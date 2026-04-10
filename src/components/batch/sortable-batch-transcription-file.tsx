@@ -82,9 +82,9 @@ export function SortableBatchTranscriptionFile({
       <CardContent className="p-4 flex-1 flex items-center justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <FileAudio className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <FileAudio className="h-4 w-4 text-muted-foreground shrink-0" />
             <p
-              className={cn("text-sm break-words break-all pr-2 line-clamp-4 flex-1", !selectMode && "hover:underline cursor-pointer")}
+              className={cn("text-sm wrap-break-word break-all pr-2 line-clamp-4 flex-1", !selectMode && "hover:underline cursor-pointer")}
               onClick={handleTitleClick}
               tabIndex={!selectMode ? 0 : undefined}
               role={!selectMode ? "button" : undefined}
@@ -98,7 +98,7 @@ export function SortableBatchTranscriptionFile({
           </div>
           <p
             className={cn(
-              "text-sm break-words break-all pr-2 line-clamp-4 font-light ml-6",
+              "text-sm wrap-break-word break-all pr-2 line-clamp-4 font-light ml-6",
               batchFile.descriptionColor === "green" && "text-green-600",
               batchFile.descriptionColor === "blue" && "text-blue-600",
               batchFile.descriptionColor === "red" && "text-red-600",
@@ -109,7 +109,7 @@ export function SortableBatchTranscriptionFile({
             {batchFile.description}
           </p>
         </div>
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           {batchFile.hasDurationWarning && (
             <TooltipProvider delayDuration={50}>
               <Tooltip>
@@ -150,7 +150,7 @@ export function SortableBatchTranscriptionFile({
           )}
           {batchFile.status === 'error' && (
             <Badge variant="destructive" className="flex items-center gap-1">
-              <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+              <AlertTriangle className="h-3 w-3 shrink-0" />
               Error
             </Badge>
           )}

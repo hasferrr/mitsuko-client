@@ -19,7 +19,7 @@ export default function KeyFeatures() {
         <div
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"
         >
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
             <div className="text-[#3B82F6] mb-6">
               <Languages size={40} />
             </div>
@@ -29,7 +29,7 @@ export default function KeyFeatures() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
             <div className="text-red-500 mb-6">
               <div className="w-10 h-10 rounded-md bg-red-500 flex items-center justify-center">
                 <AudioWaveform size={24} className="text-white" />
@@ -41,7 +41,7 @@ export default function KeyFeatures() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
             <div className="text-purple-500 mb-6">
               <Layers size={40} />
             </div>
@@ -56,7 +56,7 @@ export default function KeyFeatures() {
           className="grid grid-cols-1 lg:grid-cols-3 gap-6 mx-auto"
         >
           {/* Context-aware translation component */}
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
             <div className="flex items-center gap-2 text-[#3B82F6] mb-6">
               <Languages size={20} />
               <span>Subtitle Translation</span>
@@ -68,7 +68,7 @@ export default function KeyFeatures() {
 
             <div className="space-y-2">
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
@@ -76,7 +76,7 @@ export default function KeyFeatures() {
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
@@ -84,7 +84,7 @@ export default function KeyFeatures() {
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
@@ -92,7 +92,7 @@ export default function KeyFeatures() {
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
@@ -103,7 +103,7 @@ export default function KeyFeatures() {
           </div>
 
           {/* Audio Transcription Component */}
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
             <div className="flex items-center gap-2 text-red-500 mb-6">
               <AudioWaveform size={20} />
               <span>Audio Transcription</span>
@@ -115,7 +115,7 @@ export default function KeyFeatures() {
 
             <div className="space-y-2">
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
@@ -123,7 +123,7 @@ export default function KeyFeatures() {
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
@@ -131,7 +131,7 @@ export default function KeyFeatures() {
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
@@ -139,7 +139,7 @@ export default function KeyFeatures() {
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
@@ -150,7 +150,7 @@ export default function KeyFeatures() {
           </div>
 
           {/* Context Extractor Component */}
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-sm">
+          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
             <div className="flex items-center gap-2 text-purple-500 mb-6">
               <Layers size={20} />
               <span>Context Extractor</span>
@@ -162,7 +162,7 @@ export default function KeyFeatures() {
 
             <div className="space-y-2">
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
@@ -170,7 +170,7 @@ export default function KeyFeatures() {
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
@@ -178,7 +178,7 @@ export default function KeyFeatures() {
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
@@ -186,7 +186,7 @@ export default function KeyFeatures() {
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center flex-shrink-0">
+                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">

@@ -17,7 +17,7 @@ export default function PricingDescription() {
         </div>
 
         {/* Description of Credits */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
+        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-xs">
           <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
             What are Credits?
           </h3>
@@ -41,7 +41,7 @@ export default function PricingDescription() {
         </div>
 
         {/* Track Your Credits Section */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
+        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-xs">
           <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
             Where Can I See My Credits?
           </h3>
@@ -61,7 +61,7 @@ export default function PricingDescription() {
         <TranscriptionUsage />
 
         {/* Background Processing */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm">
+        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-xs">
           <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
             Background Processing
           </h3>

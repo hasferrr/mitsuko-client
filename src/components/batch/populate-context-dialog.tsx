@@ -262,12 +262,12 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
                     />
                     <div className="flex-1 min-w-0">
                       <label htmlFor={`checkbox-${t.id}`} className="cursor-pointer">
-                        <p className="text-sm font-medium break-words break-all line-clamp-2">{t.title || "Untitled"}</p>
+                        <p className="text-sm font-medium wrap-break-word break-all line-clamp-2">{t.title || "Untitled"}</p>
                         <p className="text-xs text-muted-foreground">{t.subtitlesCount} lines, status: {t.status}</p>
                       </label>
                     </div>
                     {isChecked && (
-                      <ArrowLeft className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <ArrowLeft className="h-4 w-4 text-muted-foreground shrink-0" />
                     )}
                     <div className="flex items-center gap-2 min-w-[360px]">
                       <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleShift(t.id, -1)} disabled={isLoading || extractionIds.length === 0}>

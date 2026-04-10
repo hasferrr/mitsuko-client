@@ -75,7 +75,7 @@ export default function BatchMain() {
         <div className="flex-1 min-w-40 flex items-center gap-2">
           <Button
             variant="ghost"
-            className="h-10 w-10 flex-shrink-0"
+            className="h-10 w-10 shrink-0"
             onClick={() => setCurrentProject(null)}
             title="Go back to batch selection"
           >

@@ -185,16 +185,16 @@ export const ProjectItemList = ({
             onClick={handleTitleClick}
           >
             <div className="flex items-center gap-2">
-              <h4 className={cn("text-sm font-medium break-words break-all line-clamp-1 min-w-fit group-hover/title:underline cursor-pointer", (!title || title === "Episode X") && "italic pr-1")}>
+              <h4 className={cn("text-sm font-medium wrap-break-word break-all line-clamp-1 min-w-fit group-hover/title:underline cursor-pointer", (!title || title === "Episode X") && "italic pr-1")}>
                 {title || "No title"}
               </h4>
               {subtitle && (
-                <span className="text-xs text-muted-foreground font-extralight break-words break-all line-clamp-1">
+                <span className="text-xs text-muted-foreground font-extralight wrap-break-word break-all line-clamp-1">
                   {subtitle}
                 </span>
               )}
             </div>
-            <p className="text-xs text-muted-foreground line-clamp-2 break-words" style={{ overflowWrap: "anywhere" }}>
+            <p className="text-xs text-muted-foreground line-clamp-2 wrap-break-word" style={{ overflowWrap: "anywhere" }}>
               {description.substring(0, 250)}
             </p>
             <p className="text-xs text-muted-foreground sm:hidden block">{date}</p>

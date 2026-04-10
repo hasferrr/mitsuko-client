@@ -18,7 +18,7 @@ export default function HeroSection() {
   return (
     <div className="flex flex-col justify-between items-center text-center px-4 my-12">
       {/* Main heading */}
-      <h1 className="md:mt-8 w-full md:max-w-[50rem] max-w-lg text-center font-semibold leading-[110%] text-balance md:text-5xl text-4xl tracking-tight">
+      <h1 className="md:mt-8 w-full md:max-w-200 max-w-lg text-center font-semibold leading-[110%] text-balance md:text-5xl text-4xl tracking-tight">
         The Most Accurate AI Subtitle Translator
       </h1>
 
@@ -34,7 +34,7 @@ export default function HeroSection() {
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
           href="/dashboard"
-          className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-[#101828] text-white text-sm font-semibold shadow-sm transition-colors hover:bg-[#15213a] hover:shadow dark:bg-white dark:text-[#101828] dark:hover:bg-[#f4f4f5]"
+          className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-[#101828] text-white text-sm font-semibold shadow-xs transition-colors hover:bg-[#15213a] hover:shadow-sm dark:bg-white dark:text-[#101828] dark:hover:bg-[#f4f4f5]"
         >
           {session ? "Dashboard" : "Try for Free!"}
         </Link>
@@ -48,7 +48,7 @@ export default function HeroSection() {
 
       {/* Video embed */}
       <div className="md:mt-24 mt-16 w-full max-w-5xl mx-auto overflow-hidden">
-        <div className="relative pt-[56.25%] select-none overflow-hidden md:rounded-3xl rounded-lg md:border-[3px] border-[2px] border-background-soft">
+        <div className="relative pt-[56.25%] select-none overflow-hidden md:rounded-3xl rounded-lg md:border-[3px] border-2 border-background-soft">
           {!isPlayClicked && (
             <Image
               width={960}

@@ -182,7 +182,7 @@ export const Project = () => {
               </DropdownMenuContent>
             </DropdownMenu>
             <GripVertical
-              className="h-4 w-4 cursor-grab text-muted-foreground focus:outline-none"
+              className="h-4 w-4 cursor-grab text-muted-foreground focus:outline-hidden"
               {...attributes}
               {...listeners}
               onClick={e => e.stopPropagation()}

@@ -41,10 +41,10 @@ const Subtitle = memo(({ subtitle }: { subtitle: SubtitleNoTimeTranslated }) => 
         </div>
       )}
       {subtitle.content && (
-        <div className="mt-1 text-sm break-words">{subtitle.content}</div>
+        <div className="mt-1 text-sm wrap-break-word">{subtitle.content}</div>
       )}
       {subtitle.translated && (
-        <div className="mt-1 text-sm break-words">{subtitle.translated}</div>
+        <div className="mt-1 text-sm wrap-break-word">{subtitle.translated}</div>
       )}
     </motion.div>
   )

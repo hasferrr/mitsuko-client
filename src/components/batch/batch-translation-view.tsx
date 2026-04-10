@@ -465,7 +465,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
           </TabsList>
 
           {/* Batch Settings */}
-          <div className="space-y-4 w-full p-4 mt-4 rounded-xl border border-input bg-card shadow-sm">
+          <div className="space-y-4 w-full p-4 mt-4 rounded-xl border border-input bg-card shadow-xs">
             <div className="flex items-center justify-between">
               <label htmlFor="shared-settings-switch" className="flex flex-col">
                 <span className="text-sm font-semibold">Settings Mode</span>
@@ -537,7 +537,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
             </div>
           </div>
 
-          <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
+          <TabsContent value="basic" className="grow space-y-4 mt-4">
             <Card className="border border-border bg-card text-card-foreground">
               <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
@@ -554,7 +554,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
             </Card>
           </TabsContent>
 
-          <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
+          <TabsContent value="advanced" className="grow space-y-4 mt-4">
             <Card className="border border-border bg-card text-card-foreground">
               <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>

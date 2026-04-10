@@ -36,7 +36,7 @@ export function SortableBatchCard({ project, onSelect }: SortableBatchCardProps)
         <CardTitle>{project.name}</CardTitle>
         <div className="flex items-center gap-4">
           <GripVertical
-            className="h-4 w-4 cursor-grab text-muted-foreground focus:outline-none"
+            className="h-4 w-4 cursor-grab text-muted-foreground focus:outline-hidden"
             {...attributes}
             {...listeners}
             onClick={e => e.stopPropagation()}

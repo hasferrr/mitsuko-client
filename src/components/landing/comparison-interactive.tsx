@@ -57,7 +57,7 @@ export default function ComparisonInteractive({
   return (
     <div className="grid md:grid-cols-2 gap-8">
       {/* Left Column - Comparison Table (Interactive) */}
-      <div className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm flex flex-col">
+      <div className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg shadow-xs flex flex-col">
         {/* Header */}
         <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-800">
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 mb-2">
@@ -119,7 +119,7 @@ export default function ComparisonInteractive({
       </div>
 
       {/* Right Column - See the Difference (Displays based on state) */}
-      <div className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm flex flex-col">
+      <div className="dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg shadow-xs flex flex-col">
         {/* Header with category badge */}
         <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between">
@@ -238,7 +238,7 @@ export default function ComparisonInteractive({
               <ul className="space-y-2.5">
                 {details.advantage.description.map((item, index) => (
                   <li key={index} className="flex items-start gap-2.5 text-sm">
-                    <ArrowRight className="text-blue-400 mt-0.5 flex-shrink-0" size={14} />
+                    <ArrowRight className="text-blue-400 mt-0.5 shrink-0" size={14} />
                     <p className="text-gray-600 dark:text-gray-400">{item}</p>
                   </li>
                 ))}

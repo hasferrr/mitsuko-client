@@ -18,7 +18,7 @@ export default function Layout({ children }: PropsWithChildren) {
         <div className="flex flex-col min-h-[calc(100vh-3.6rem)]">
           <UploadIndicator />
           <FeaturesPrefetcher />
-          <div className="md:mx-8 flex flex-grow">
+          <div className="md:mx-8 flex grow">
             {children}
           </div>
           <Footer />

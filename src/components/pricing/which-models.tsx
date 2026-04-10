@@ -12,7 +12,7 @@ export default function WhichModels({ className }: WhichModelsProps) {
 
   return (
     <div className={cn(
-      "relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm",
+      "relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-xs",
       className
     )}>
       <div id="which-models" className="absolute -top-24" />

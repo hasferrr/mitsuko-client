@@ -49,7 +49,7 @@ export default function CtaSection() {
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
                 href="/dashboard"
-                className="whitespace-nowrap inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-[#101828] text-white text-sm font-semibold shadow-sm transition-colors hover:bg-[#15213a] hover:shadow dark:bg-white dark:text-[#101828] dark:hover:bg-[#f4f4f5]"
+                className="whitespace-nowrap inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-[#101828] text-white text-sm font-semibold shadow-xs transition-colors hover:bg-[#15213a] hover:shadow-sm dark:bg-white dark:text-[#101828] dark:hover:bg-[#f4f4f5]"
               >
                 {session ? "Go to Dashboard" : "Get started for free"}
               </Link>

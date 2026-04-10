@@ -75,7 +75,7 @@ export default function SubtitleViewer({
                     <div className="p-2">{item.event.start}</div>
                     <div className="p-2">{item.event.end}</div>
                     <div className="p-2">{cps === -1 ? 'Invalid' : cps}</div>
-                    <div className="p-2 break-words">{item.event.style}</div>
+                    <div className="p-2 wrap-break-word">{item.event.style}</div>
                     <div className="p-2">{item.event.name}</div>
                     <div className="p-2">
                       {enableHighlight ? (

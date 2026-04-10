@@ -106,7 +106,7 @@ export function CreditPackPrices({
   }
 
   return (
-    <div className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-sm">
+    <div className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-xs">
       <div id="credit-packs" className="absolute -top-24" />
 
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
@@ -126,7 +126,7 @@ export function CreditPackPrices({
           return (
             <Card
               key={pack.productId}
-              className="relative border-t-4 border-t-blue-500 border-r border-b border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/30 rounded-md shadow-sm hover:border-blue-400 hover:dark:border-blue-600 transition-colors duration-200"
+              className="relative border-t-4 border-t-blue-500 border-r border-b border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/30 rounded-md shadow-xs hover:border-blue-400 dark:hover:border-blue-600 transition-colors duration-200"
             >
               <CardHeader className="pb-0 pt-4">
                 <div className="flex justify-between items-baseline mb-1">
