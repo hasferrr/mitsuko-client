@@ -86,8 +86,8 @@ export function AppSidebarUser() {
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex"
                 >
-                  <div className="h-8 w-8">
-                    <Avatar className="h-8 w-8 rounded-lg">
+                  <div className="size-8">
+                    <Avatar className="size-8 rounded-lg">
                       <AvatarImage className="sentry-block ph-no-capture" src={user.avatar || null} alt={user.name} />
                       <AvatarFallback className="rounded-lg">{name}</AvatarFallback>
                     </Avatar>
@@ -123,7 +123,7 @@ export function AppSidebarUser() {
             >
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="h-8 w-8 rounded-lg">
+                  <Avatar className="size-8 rounded-lg">
                     <AvatarImage src={user.avatar || null} alt={user.name} />
                     <AvatarFallback className="rounded-lg">{name}</AvatarFallback>
                   </Avatar>

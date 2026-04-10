@@ -133,7 +133,7 @@ export default function MyLibrary() {
     <>
       <div className="flex justify-between items-center mb-6 gap-2">
         <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Search instructions by name or content..."
             value={searchQuery}
@@ -185,14 +185,14 @@ export default function MyLibrary() {
         </div>
       ) : customInstructions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
-          <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+          <FileText className="size-12 text-muted-foreground mb-4" />
           <h2 className="text-xl font-medium mb-2 text-center">Your Library is Empty</h2>
           <p className="text-muted-foreground mb-4 text-center text-sm">
             Add reusable custom instructions to improve your translations.
           </p>
           <CreateEditInstructionDialog>
             <Button>
-              <Plus className="h-4 w-4" /> Create Custom Instruction
+              <Plus className="size-4" /> Create Custom Instruction
             </Button>
           </CreateEditInstructionDialog>
         </div>
@@ -200,7 +200,7 @@ export default function MyLibrary() {
         <>
           {filteredInstructions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
-              <Search className="h-12 w-12 text-muted-foreground mb-4" />
+              <Search className="size-12 text-muted-foreground mb-4" />
               <h2 className="text-xl font-medium mb-2 text-center">No Results Found</h2>
               <p className="text-muted-foreground mb-4 text-center text-sm">
                 Try adjusting your search terms
@@ -260,13 +260,13 @@ export default function MyLibrary() {
                         disabled={isSelectionMode || publishingId === item.id}
                       >
                         {publishingId === item.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="size-4 animate-spin" />
                         ) : (
-                          <Globe className="h-4 w-4" />
+                          <Globe className="size-4" />
                         )}
                       </Button>
                       <Button variant="outline" size="sm" disabled={isSelectionMode}>
-                        <Pencil className="h-4 w-4" />
+                        <Pencil className="size-4" />
                         Edit
                       </Button>
                       <Button
@@ -275,7 +275,7 @@ export default function MyLibrary() {
                         onClick={(e) => { e.stopPropagation(); handleDelete(item.id!) }}
                         disabled={isSelectionMode}
                       >
-                        <Trash className="h-4 w-4" />
+                        <Trash className="size-4" />
                         Delete
                       </Button>
                     </CardFooter>

@@ -219,10 +219,10 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={openLinkDialog} className="h-8 px-2">
-                      <LinkIcon className="h-3 w-3" /> Change
+                      <LinkIcon className="size-3" /> Change
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={handleUnlinkTranslation} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                      <XCircle className="h-4 w-4" />
+                    <Button variant="ghost" size="icon" onClick={handleUnlinkTranslation} className="size-8 text-muted-foreground hover:text-destructive">
+                      <XCircle className="size-4" />
                     </Button>
                   </div>
                 </div>
@@ -267,7 +267,7 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
                 onClick={openLinkDialog}
                 className="w-full"
               >
-                <LinkIcon className="h-4 w-4" />
+                <LinkIcon className="size-4" />
                 Link Existing Translation Project
               </Button>
             )}
@@ -304,7 +304,7 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
                       {translation.subtitles?.length || 0} lines
                     </div>
                   </div>
-                  <FileTextIcon className="h-5 w-5 text-muted-foreground" />
+                  <FileTextIcon className="size-5 text-muted-foreground" />
                 </div>
               ))
             )}

@@ -107,7 +107,7 @@ export const Project = () => {
           <Skeleton className="h-5 w-36" />
           <div className="flex items-center gap-4">
             <Skeleton className="h-4 w-8" />
-            <Skeleton className="h-4 w-4" />
+            <Skeleton className="size-4" />
           </div>
         </CardHeader>
         <CardContent className="pb-4 flex flex-col flex-1">
@@ -155,7 +155,7 @@ export const Project = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                 <div className="rounded-md hover:bg-muted cursor-pointer">
-                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                  <MoreHorizontal className="size-4 text-muted-foreground" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -165,7 +165,7 @@ export const Project = () => {
                     handleExportProject(project.id)
                   }}
                 >
-                  <Upload className="h-4 w-4 mr-2" />
+                  <Upload className="size-4 mr-2" />
                   Export
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -176,13 +176,13 @@ export const Project = () => {
                   }}
                   className="text-destructive"
                 >
-                  <Trash className="h-4 w-4 mr-2" />
+                  <Trash className="size-4 mr-2" />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <GripVertical
-              className="h-4 w-4 cursor-grab text-muted-foreground focus:outline-hidden"
+              className="size-4 cursor-grab text-muted-foreground focus:outline-hidden"
               {...attributes}
               {...listeners}
               onClick={e => e.stopPropagation()}
@@ -215,7 +215,7 @@ export const Project = () => {
           <div className="flex gap-2">
             <Button onClick={handleCreateProject} disabled={isCreateDisabled}>
               {isCreateDisabled ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
               ) : (
                 <Plus size={18} />
               )}
@@ -232,7 +232,7 @@ export const Project = () => {
           </div>
         ) : visibleProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
-            <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+            <FileText className="size-12 text-muted-foreground mb-4" />
             <h2 className="text-xl font-medium mb-2 text-center">Translation & Transcription</h2>
             <p className="text-muted-foreground mb-4 text-center text-sm">
               Create a new project to manage your subtitle translations.

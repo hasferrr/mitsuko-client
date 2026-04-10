@@ -45,7 +45,7 @@ export function CustomInstructionsLibraryControls({ onSelectFromLibrary }: Custo
         onClick={openLibraryDialog}
         className="h-8 px-2"
       >
-        <LibraryBig className="h-4 w-4" />
+        <LibraryBig className="size-4" />
         Library
       </Button>
 

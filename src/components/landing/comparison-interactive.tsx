@@ -72,14 +72,14 @@ export default function ComparisonInteractive({
         <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-800">
           <div className="flex justify-center gap-16">
             <div className="flex flex-col items-center">
-              <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mb-2">
+              <div className="size-12 rounded-full bg-blue-500 flex items-center justify-center mb-2">
                 <Target size={24} className="text-white" />
               </div>
               <span className="font-medium">Mitsuko</span>
             </div>
 
             <div className="flex flex-col items-center">
-              <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center mb-2">
+              <div className="size-12 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center mb-2">
                 <Globe size={24} className="text-gray-500 dark:text-gray-400" />
               </div>
               <span className="text-gray-700 dark:text-gray-300 font-medium">
@@ -138,7 +138,7 @@ export default function ComparisonInteractive({
                     key={index}
                     onClick={() => setExampleIndex(index)}
                     className={cn(
-                      "w-2 h-2 rounded-full transition-all",
+                      "size-2 rounded-full transition-all",
                       index === exampleIndex
                         ? "bg-blue-500 w-6"
                         : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400"
@@ -157,7 +157,7 @@ export default function ComparisonInteractive({
           {details.original && (
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-blue-400"></div>
+                <div className="size-2.5 rounded-full bg-blue-400"></div>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {details.original.label}
                 </span>
@@ -177,7 +177,7 @@ export default function ComparisonInteractive({
           {/* Render Mitsuko */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+              <div className="size-2.5 rounded-full bg-emerald-400"></div>
               <div className="flex items-center gap-1.5">
                 <Target size={14} className="text-blue-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -203,7 +203,7 @@ export default function ComparisonInteractive({
           {/* Render Generic */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+              <div className="size-2.5 rounded-full bg-red-400"></div>
               <div className="flex items-center gap-1.5">
                 <Globe size={14} className="text-gray-400" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -227,7 +227,7 @@ export default function ComparisonInteractive({
           {/* Render Advantage */}
           <div className="pt-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+              <div className="size-5 rounded-full bg-blue-500 flex items-center justify-center">
                 <Check size={12} className="text-white" />
               </div>
               <h4 className="font-semibold text-gray-900 dark:text-gray-100">

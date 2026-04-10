@@ -39,7 +39,7 @@ export function CustomInstructionsSaveDialog({ customInstructions }: CustomInstr
         }}
         className="h-8 px-2"
       >
-        <Save className="h-4 w-4" />
+        <Save className="size-4" />
       </Button>
 
       <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>

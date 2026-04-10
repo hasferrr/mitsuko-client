@@ -82,7 +82,7 @@ export function FeatureComparisonTable({
                       <TooltipProvider delayDuration={50}>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Info className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+                            <Info className="size-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
                           </TooltipTrigger>
                           <TooltipContent side="top" className="max-w-xs">
                             <p>{item.description}</p>

@@ -30,7 +30,7 @@ export function Footer() {
             rel="noopener noreferrer"
           >
             <span className="sr-only">GitHub</span>
-            <IconBrandGithub className="h-5 w-5" />
+            <IconBrandGithub className="size-5" />
           </Link>
           <Link
             href={DISCORD_LINK}
@@ -39,7 +39,7 @@ export function Footer() {
             rel="noopener noreferrer"
           >
             <span className="sr-only">Discord</span>
-            <IconBrandDiscord className="h-5 w-5" />
+            <IconBrandDiscord className="size-5" />
           </Link>
         </div>
       </div>

@@ -93,7 +93,7 @@ export function TranscriptionResultPanel({
                       onClick={onClear}
                       disabled={isTranscribing}
                     >
-                      <Trash className="h-3 w-3" /> Clear
+                      <Trash className="size-3" /> Clear
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -119,8 +119,8 @@ export function TranscriptionResultPanel({
                   disabled={isTranscribing}
                 >
                   {isEditing
-                    ? <Save className="h-3 w-3" />
-                    : <Edit className="h-3 w-3" />}
+                    ? <Save className="size-3" />
+                    : <Edit className="size-3" />}
                   {isEditing ? "Done" : "Edit"}
                 </Button>
                 <Button
@@ -129,7 +129,7 @@ export function TranscriptionResultPanel({
                   className="text-xs border-border"
                   onClick={onExport}
                 >
-                  <Download className="h-3 w-3" /> Export SRT
+                  <Download className="size-3" /> Export SRT
                 </Button>
               </div>
             )}
@@ -137,7 +137,7 @@ export function TranscriptionResultPanel({
 
           {!transcriptionText && !isTranscribing && !isEditing ? (
             <div className="border border-border rounded-lg p-8 flex flex-col items-center justify-center">
-              <AudioWaveform className="h-10 w-10 text-muted-foreground mb-3" />
+              <AudioWaveform className="size-10 text-muted-foreground mb-3" />
               <p className="text-muted-foreground text-sm mb-1">
                 Upload an audio file and click &quot;Start Transcription&quot;
               </p>
@@ -187,7 +187,7 @@ export function TranscriptionResultPanel({
                       onClick={onClear}
                       disabled={isTranscribing}
                     >
-                      <Trash className="h-3 w-3" /> Clear
+                      <Trash className="size-3" /> Clear
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -211,7 +211,7 @@ export function TranscriptionResultPanel({
                   className="text-xs border-border"
                   onClick={onParse}
                 >
-                  <ClipboardPaste className="h-3 w-3" /> Parse
+                  <ClipboardPaste className="size-3" /> Parse
                 </Button>
                 <Button
                   size="sm"
@@ -219,7 +219,7 @@ export function TranscriptionResultPanel({
                   className="text-xs border-border"
                   onClick={onExport}
                 >
-                  <Download className="h-3 w-3" /> Export SRT
+                  <Download className="size-3" /> Export SRT
                 </Button>
               </div>
             )}
@@ -227,7 +227,7 @@ export function TranscriptionResultPanel({
 
           {transcriptSubtitles.length === 0 && !isTranscribing ? (
             <div className="border border-border rounded-lg p-8 flex flex-col items-center justify-center">
-              <Clock className="h-10 w-10 text-muted-foreground mb-3" />
+              <Clock className="size-10 text-muted-foreground mb-3" />
               <p className="text-muted-foreground text-sm mb-1">
                 Your subtitles with timestamps will appear here
               </p>
@@ -257,9 +257,9 @@ export function TranscriptionResultPanel({
               {isTranscribing && (
                 <div className="flex items-center justify-center py-4">
                   <div className="animate-pulse flex space-x-1">
-                    <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-                    <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-                    <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                    <div className="size-2 bg-blue-500 rounded-full"></div>
+                    <div className="size-2 bg-blue-500 rounded-full"></div>
+                    <div className="size-2 bg-blue-500 rounded-full"></div>
                   </div>
                 </div>
               )}

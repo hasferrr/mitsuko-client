@@ -33,11 +33,11 @@ export default function Error({
             onClick={() => reset()}
             className="inline-flex items-center gap-2 transition-colors hover:text-primary"
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className="size-4" />
             Try again
           </button>
           <Link href="/" className="inline-flex items-center gap-2 transition-colors hover:text-primary">
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="size-4" />
             Go back home
           </Link>
         </div>

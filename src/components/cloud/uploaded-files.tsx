@@ -217,9 +217,9 @@ export default function UploadedFiles() {
             className="w-fit"
           >
             {isUploading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
             ) : (
-              <Plus className="h-4 w-4" />
+              <Plus className="size-4" />
             )}
             Upload File
           </Button> */}
@@ -230,9 +230,9 @@ export default function UploadedFiles() {
             className="w-fit"
           >
             {isRefetching ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
             ) : (
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className="size-4" />
             )}
             Refresh
           </Button>
@@ -274,7 +274,7 @@ export default function UploadedFiles() {
           className="pl-10"
         />
         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-          <Search className="h-4 w-4 text-muted-foreground" />
+          <Search className="size-4 text-muted-foreground" />
         </div>
       </div>
 
@@ -284,7 +284,7 @@ export default function UploadedFiles() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <Upload className="h-4 w-4 text-primary" />
+                <Upload className="size-4 text-primary" />
                 <div>
                   <div className="text-sm font-medium">
                     File Storage Overview
@@ -299,7 +299,7 @@ export default function UploadedFiles() {
             </div>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
-                <HardDrive className="h-3 w-3" />
+                <HardDrive className="size-3" />
                 {totalSize > 0 ? formatFileSize(totalSize) : '0 Bytes'}
               </div>
             </div>
@@ -326,7 +326,7 @@ export default function UploadedFiles() {
                 <TableRow key={index}>
                   <TableCell className="py-4 min-w-[250px] max-w-[250px] lg:min-w-[300px] lg:max-w-[400px]">
                     <div className="flex items-center gap-3">
-                      <Skeleton className="shrink-0 w-10 h-10 rounded-lg" />
+                      <Skeleton className="shrink-0 size-10 rounded-lg" />
                       <div className="w-full">
                         <Skeleton className="h-4 w-full mb-2" />
                         <Skeleton className="h-3 w-20" />
@@ -344,7 +344,7 @@ export default function UploadedFiles() {
                   </TableCell>
                   <TableCell className="py-4">
                     <div className="flex items-center gap-2">
-                      <Skeleton className="h-4 w-4 rounded-full" />
+                      <Skeleton className="size-4 rounded-full" />
                       <Skeleton className="h-4 w-20" />
                     </div>
                   </TableCell>
@@ -358,7 +358,7 @@ export default function UploadedFiles() {
         </div>
       ) : filteredUploads.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 border border-dashed rounded-lg">
-          <Upload className="h-8 w-8 text-muted-foreground mb-4" />
+          <Upload className="size-8 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium mb-2">
             {searchQuery
               ? 'No matching files found'
@@ -392,8 +392,8 @@ export default function UploadedFiles() {
                   <TableRow key={upload.uploadId} className="group">
                     <TableCell className="py-4 min-w-[250px] max-w-[250px] lg:min-w-[300px] lg:max-w-[400px]">
                       <div className="flex items-center gap-3">
-                        <div className="shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                          <FileIcon className="h-5 w-5 text-primary" />
+                        <div className="shrink-0 size-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <FileIcon className="size-5 text-primary" />
                         </div>
                         <div className="w-full line-clamp-3">
                           <p className="font-medium line-clamp-2">
@@ -407,13 +407,13 @@ export default function UploadedFiles() {
                     </TableCell>
                     <TableCell className="py-4">
                       <div className="flex items-center gap-2 text-sm">
-                        <HardDrive className="h-4 w-4 text-muted-foreground" />
+                        <HardDrive className="size-4 text-muted-foreground" />
                         {upload.size ? formatFileSize(upload.size) : 'N/A'}
                       </div>
                     </TableCell>
                     <TableCell className="py-4">
                       <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <Clock className="size-4 text-muted-foreground" />
                         {upload.duration ? formatDuration(upload.duration) : 'N/A'}
                       </div>
                     </TableCell>
@@ -424,7 +424,7 @@ export default function UploadedFiles() {
                     </TableCell>
                     <TableCell className="py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <Calendar className="size-4 text-muted-foreground" />
                         {formatDate(upload.createdAt)}
                       </div>
                     </TableCell>
@@ -440,9 +440,9 @@ export default function UploadedFiles() {
                         }}
                       >
                         {deletingId === upload.uploadId ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="size-4 animate-spin" />
                         ) : (
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="size-4" />
                         )}
                         Delete
                       </Button>

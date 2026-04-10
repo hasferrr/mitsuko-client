@@ -60,8 +60,8 @@ export function ProjectTranscriptionList({
       projectId={currentProject.id}
       type="transcription"
       icon={isTranscribingSet.has(transcription.id)
-        ? <Loader2 className="h-5 w-5 text-green-500 animate-spin" />
-        : <Headphones className="h-5 w-5 text-green-500" />}
+        ? <Loader2 className="size-5 text-green-500 animate-spin" />
+        : <Headphones className="size-5 text-green-500" />}
       title={transcription.title}
       description={`${transcription.transcriptSubtitles.length} segments`}
       date={transcription.createdAt.toLocaleDateString()}
@@ -96,7 +96,7 @@ export function ProjectTranscriptionList({
             onClick={onOpenSettings}
             title="Transcription settings"
           >
-            <Settings2 className="h-4 w-4" />
+            <Settings2 className="size-4" />
             Settings
           </Button>
           <Button
@@ -116,7 +116,7 @@ export function ProjectTranscriptionList({
               setTranscriptions(prev => [created, ...prev])
             }}
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="size-4" />
             New Transcription
           </Button>
         </div>

@@ -177,7 +177,7 @@ export const ProjectItemList = ({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 sm:gap-3">
           <button {...attributes} {...listeners} className="cursor-grab">
-            <GripVertical className="h-5 w-5 text-muted-foreground" />
+            <GripVertical className="size-5 text-muted-foreground" />
           </button>
           <div className="bg-secondary p-2 rounded-lg">{icon}</div>
           <div
@@ -209,7 +209,7 @@ export const ProjectItemList = ({
             onClick={() => setIsMoveOpen(true)}
             disabled={isProcessing}
           >
-            <SquareArrowOutUpRight className="h-4 w-4" />
+            <SquareArrowOutUpRight className="size-4" />
           </Button>
           <Button
             variant="ghost"
@@ -218,7 +218,7 @@ export const ProjectItemList = ({
             onClick={() => setIsEditOpen(true)}
             disabled={isProcessing}
           >
-            <Edit className="h-4 w-4" />
+            <Edit className="size-4" />
           </Button>
           <Button
             variant="ghost"
@@ -227,7 +227,7 @@ export const ProjectItemList = ({
             onClick={() => setIsDeleteOpen(true)}
             disabled={isProcessing}
           >
-            <Trash className="h-4 w-4" />
+            <Trash className="size-4" />
           </Button>
         </div>
       </div>

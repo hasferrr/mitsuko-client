@@ -10,7 +10,7 @@ export default function NotFound() {
         <h1 className="text-4xl font-semibold">404</h1>
         <p className="text-muted-foreground">This page could not be found.</p>
         <Link href="/" className="inline-flex items-center gap-2 transition-colors">
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="size-4" />
           Go back home
         </Link>
       </div>

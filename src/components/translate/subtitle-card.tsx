@@ -85,7 +85,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-muted-foreground">#{subtitle.index}</span>
               <div className="flex items-center gap-2 text-sm">
-                <Timer className="h-4 w-4 text-muted-foreground" />
+                <Timer className="size-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
                   {timestampToString(subtitle.timestamp.start)} ➝ {timestampToString(subtitle.timestamp.end)}
                 </span>

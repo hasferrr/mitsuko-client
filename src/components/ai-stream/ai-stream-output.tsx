@@ -157,9 +157,9 @@ export const AiStreamOutput = ({
             className="flex items-center font-semibold cursor-pointer"
           >
             {isCollapsed ? (
-              <ChevronRight className="h-4 w-4 mr-1" />
+              <ChevronRight className="size-4 mr-1" />
             ) : (
-              <ChevronDown className="h-4 w-4 mr-1" />
+              <ChevronDown className="size-4 mr-1" />
             )}
             {parsedContent.output || !isProcessing ? "Thought" : (
               <span className="inline-flex">

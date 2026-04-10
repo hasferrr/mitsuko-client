@@ -72,23 +72,23 @@ export default function PricingSection({
     },
     {
       feature: "Subtitle Translation",
-      free: <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />,
-      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
-      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      free: <Check className="size-5 mx-auto text-gray-500 dark:text-gray-400" />,
+      basic: <Check className="size-5 mx-auto text-blue-500" />,
+      pro: <Check className="size-5 mx-auto text-blue-500" />,
       description: "Translate subtitle (SRT & ASS) using any AI models available."
     },
     {
       feature: "Extract Context Feature",
-      free: <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />,
-      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
-      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      free: <Check className="size-5 mx-auto text-gray-500 dark:text-gray-400" />,
+      basic: <Check className="size-5 mx-auto text-blue-500" />,
+      pro: <Check className="size-5 mx-auto text-blue-500" />,
       description: "Analyze content to extract characters, settings, plot, and relationships."
     },
     {
       feature: "Audio Transcription",
       free: "Limited",
-      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
-      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      basic: <Check className="size-5 mx-auto text-blue-500" />,
+      pro: <Check className="size-5 mx-auto text-blue-500" />,
       description: "Convert into subtitle text. Free tier supports up to 100MB (1 file at a time). Basic & Pro tiers up to 1GB file (5 files at a time). Basic & Pro tiers supports background processing."
     },
     {
@@ -100,16 +100,16 @@ export default function PricingSection({
     },
     {
       feature: "Custom Model Integration",
-      free: <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />,
-      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
-      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      free: <Check className="size-5 mx-auto text-gray-500 dark:text-gray-400" />,
+      basic: <Check className="size-5 mx-auto text-blue-500" />,
+      pro: <Check className="size-5 mx-auto text-blue-500" />,
       description: "Use your own LLM API within the Mitsuko platform."
     },
     {
       feature: "Save to Cloud",
-      free: <X className="w-5 h-5 mx-auto text-gray-400 dark:text-gray-500" />,
-      basic: <X className="w-5 h-5 mx-auto text-gray-400 dark:text-gray-500" />,
-      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      free: <X className="size-5 mx-auto text-gray-400 dark:text-gray-500" />,
+      basic: <X className="size-5 mx-auto text-gray-400 dark:text-gray-500" />,
+      pro: <Check className="size-5 mx-auto text-blue-500" />,
       description: "Securely save your projects, translated files, extraction, and audio transcription file to cloud."
     },
     {

@@ -9,11 +9,11 @@ export default function CloudWrapper() {
       <Tabs defaultValue="storage" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="storage" className="flex items-center gap-2 w-48">
-            <Upload className="h-4 w-4" />
+            <Upload className="size-4" />
             Uploaded Files
           </TabsTrigger>
           <TabsTrigger value="history" className="flex items-center gap-2 w-48">
-            <History className="h-4 w-4" />
+            <History className="size-4" />
             Transcription History
           </TabsTrigger>
         </TabsList>

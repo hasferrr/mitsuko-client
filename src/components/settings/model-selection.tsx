@@ -58,7 +58,7 @@ export const ModelSelection = memo(({
             onClick={() => setIsWhichModelsDialogOpen(true)}
             aria-label="Which Models Should I Use?"
           >
-            <HelpCircle className="w-4 h-4 opacity-70" />
+            <HelpCircle className="size-4 opacity-70" />
           </Button>
         </div>
       </div>

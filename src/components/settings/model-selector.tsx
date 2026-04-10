@@ -144,7 +144,7 @@ export function ModelSelector({
                 </Badge>
               )}
             </div>
-            <ChevronsUpDown className="h-4 w-4 opacity-50 absolute right-3 top-1/2 -translate-y-1/2" />
+            <ChevronsUpDown className="size-4 opacity-50 absolute right-3 top-1/2 -translate-y-1/2" />
           </Button>
         </PopoverTrigger>
 

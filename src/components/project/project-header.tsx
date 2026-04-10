@@ -86,7 +86,7 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
         <div className="text-2xl font-medium mb-4 sm:mb-2 flex flex-col sm:flex-row gap-4">
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" onClick={handleBack}>
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="size-5" />
             </Button>
             <h1>{currentProject.name}</h1>
             {currentProject.isBatch && <Badge className="ml-2">Batch Project</Badge>}

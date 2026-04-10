@@ -58,7 +58,7 @@ export function TranscriptionHistoryDialog({ currentId }: TranscriptionHistoryDi
         onClick={() => setOpen(true)}
         title="Transcription History"
       >
-        <History className="h-4 w-4" />
+        <History className="size-4" />
         History
       </Button>
 

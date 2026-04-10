@@ -26,7 +26,7 @@ export function UploadIndicator() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium flex items-center gap-2 truncate">
-                  <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                  <Loader2 className="size-4 animate-spin shrink-0" />
                   <span className="truncate">{upload?.fileName || 'Uploading...'}</span>
                 </span>
                 <span className="text-sm text-muted-foreground shrink-0">

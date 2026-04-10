@@ -11,7 +11,7 @@ export const AdvancedReasoningSwitch = memo(() => {
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium">
           <span className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4" />
+            <Sparkles className="size-4" />
             Advanced Reasoning & Planning
           </span>
         </label>

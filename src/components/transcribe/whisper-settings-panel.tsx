@@ -150,7 +150,7 @@ export function WhisperSettingsPanel({
               onClick={onApplyClick}
               disabled={applyDisabled}
             >
-              <Wand2 className="h-3 w-3" />
+              <Wand2 className="size-3" />
               Apply Whisper subtitles
             </Button>
           )}
@@ -161,7 +161,7 @@ export function WhisperSettingsPanel({
               className="border-border"
               onClick={reset}
             >
-              <RefreshCw className="h-3 w-3" />
+              <RefreshCw className="size-3" />
               Reset
             </Button>
           )}

@@ -425,7 +425,7 @@ export default function SubtitleTranslatorMain({
             size="icon"
             onClick={() => router.push('/project')}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="size-4" />
           </Button>
         )}
         <div className="flex-1 min-w-40">
@@ -451,7 +451,7 @@ export default function SubtitleTranslatorMain({
           onClick={() => setIsInitialUploadDialogOpen(true)}
           disabled={isTranslating}
         >
-          <Upload className="h-5 w-5" />
+          <Upload className="size-5" />
           Upload
         </Button>
         {/* Save Button */}
@@ -462,7 +462,7 @@ export default function SubtitleTranslatorMain({
           onClick={handleSave}
           disabled={isTranslating || isSaving}
         >
-          <SaveIcon className="h-5 w-5" />
+          <SaveIcon className="size-5" />
           Save
         </Button>
         {/* History Button */}
@@ -472,7 +472,7 @@ export default function SubtitleTranslatorMain({
           className="gap-2 px-4"
           onClick={() => setIsHistoryOpen(!isHistoryOpen)}
         >
-          <HistoryIcon className="h-5 w-5" />
+          <HistoryIcon className="size-5" />
         </Button>
       </div>
 
@@ -485,11 +485,11 @@ export default function SubtitleTranslatorMain({
           <div className="flex items-center mb-4 justify-between mr-4 gap-[6px]">
             <div className="flex flex-wrap items-center gap-[6px]">
               <Badge variant="secondary" className="gap-1">
-                <Globe2 className="h-4 w-4" />
+                <Globe2 className="size-4" />
                 {sourceLanguage} → {targetLanguage}
               </Badge>
               <Badge variant="secondary" className="gap-1">
-                <MessageSquare className="h-4 w-4" /> {subtitles.length} Lines
+                <MessageSquare className="size-4" /> {subtitles.length} Lines
               </Badge>
               <Badge variant="secondary" className="gap-1 uppercase">
                 {subName}
@@ -502,7 +502,7 @@ export default function SubtitleTranslatorMain({
                   className="gap-1 cursor-pointer hover:bg-secondary select-none"
                   onClick={() => setSubtitlesHidden(!subtitlesHidden)}
                 >
-                  {subtitlesHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  {subtitlesHidden ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
                   {subtitlesHidden ? "Show" : "Hide"}
                 </Badge>
               )}
@@ -511,7 +511,7 @@ export default function SubtitleTranslatorMain({
                   variant="outline"
                   className="gap-1 cursor-pointer hover:bg-secondary select-none"
                 >
-                  <SquareChartGantt className="h-4 w-4" />
+                  <SquareChartGantt className="size-4" />
                   Progress
                 </Badge>
               </SubtitleProgress>
@@ -520,7 +520,7 @@ export default function SubtitleTranslatorMain({
                   variant="outline"
                   className="gap-1 cursor-pointer hover:bg-secondary select-none"
                 >
-                  <Box className="h-4 w-4" />
+                  <Box className="size-4" />
                   Tools
                 </Badge>
               </SubtitleTools>
@@ -540,7 +540,7 @@ export default function SubtitleTranslatorMain({
                 className="h-full flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
                 onClick={() => document.getElementById("subtitle-upload")?.click()}
               >
-                <Upload className="h-10 w-10 text-muted-foreground" />
+                <Upload className="size-10 text-muted-foreground" />
                 <p className="mt-2 text-sm text-muted-foreground text-center">
                   Drag and drop file here, or click to select a file.
                   <br />
@@ -560,12 +560,12 @@ export default function SubtitleTranslatorMain({
             >
               {isTranslating ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="size-4 animate-spin" />
                   Translating...
                 </>
               ) : (
                 <>
-                  <Play className="h-4 w-4" />
+                  <Play className="size-4" />
                   {session
                     ? (startIndex !== 1 || endIndex < subtitles.length)
                       ? `Start (line ${startIndex} to ${Math.min(endIndex, subtitles.length)})`
@@ -583,7 +583,7 @@ export default function SubtitleTranslatorMain({
               onClick={handleStopTranslation}
               disabled={!isTranslating || !translation.response.response}
             >
-              <Square className="h-4 w-4" />
+              <Square className="size-4" />
               Stop
             </Button>
           </div>
@@ -595,7 +595,7 @@ export default function SubtitleTranslatorMain({
             onClick={handleContinueTranslation}
             disabled={isTranslating || !session || subtitles.length === 0}
           >
-            <FastForward className="h-4 w-4" />
+            <FastForward className="size-4" />
             Continue and Fill Missing Translations
           </Button>
 
@@ -606,7 +606,7 @@ export default function SubtitleTranslatorMain({
                 className="w-full gap-2 mt-2"
                 disabled={isTranslating}
               >
-                <Trash className="h-4 w-4" />
+                <Trash className="size-4" />
                 Clear All Translations
               </Button>
             </AlertDialogTrigger>
@@ -756,7 +756,7 @@ export default function SubtitleTranslatorMain({
               className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
               onClick={() => document.getElementById("subtitle-upload")?.click()}
             >
-              <Upload className="h-10 w-10 text-muted-foreground" />
+              <Upload className="size-10 text-muted-foreground" />
               <p className="mt-2 text-sm text-muted-foreground text-center">
                 Drag and drop file here, or click to select a file.
                 <br />

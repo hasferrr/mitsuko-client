@@ -127,7 +127,7 @@ export function Navbar() {
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
                 <div className="flex items-center gap-2 text-sm text-foreground/80 mr-4 cursor-pointer hover:underline">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="size-4 animate-spin" />
                   <span className="hidden md:block">Processing...</span>
                 </div>
               </PopoverTrigger>
@@ -184,17 +184,17 @@ export function Navbar() {
           >
             {isFetching || isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 <span className="text-muted-foreground">Loading credits...</span>
               </>
             ) : isError ? (
               <>
-                <AlertCircle className="h-4 w-4 text-red-500" />
+                <AlertCircle className="size-4 text-red-500" />
                 <span className="text-red-500">Error</span>
               </>
             ) : user ? (
               <>
-                <CircleDollarSign className="h-4 w-4" />
+                <CircleDollarSign className="size-4" />
                 <span className={cn(user.credit < 0 && "text-red-500")}>
                   {Math.round(user.credit).toLocaleString()} credits
                 </span>
@@ -212,9 +212,9 @@ export function Navbar() {
             aria-label="Toggle dark mode"
           >
             {isDarkMode ? (
-              <Sun className="h-5 w-5" />
+              <Sun className="size-5" />
             ) : (
-              <Moon className="h-5 w-5" />
+              <Moon className="size-5" />
             )}
           </Button>
         </div>

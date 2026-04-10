@@ -204,15 +204,15 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
           {/* Controls */}
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={handleSelectAllToggle} disabled={isLoading || translationIds.length === 0}>
-              <ListChecks className="h-4 w-4" />
+              <ListChecks className="size-4" />
               Select All
             </Button>
             <Button variant="outline" size="sm" onClick={handleDeselectAll} disabled={isLoading || translationIds.length === 0}>
-              <ListX className="h-4 w-4" />
+              <ListX className="size-4" />
               Deselect All
             </Button>
             <Button variant="outline" size="sm" onClick={handleResetMapping} disabled={isLoading}>
-              <ListRestart className="h-4 w-4" />
+              <ListRestart className="size-4" />
               Reset Mapping
             </Button>
 
@@ -221,11 +221,11 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8"
+                className="size-8"
                 onClick={() => handleShiftAll(-1)}
                 disabled={isLoading || extractionIds.length === 0}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="size-4" />
               </Button>
               <div
                 className="h-8 px-4 text-xs cursor-default select-none pointer-events-none border border-input bg-background rounded-md inline-flex items-center justify-center"
@@ -236,11 +236,11 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8"
+                className="size-8"
                 onClick={() => handleShiftAll(+1)}
                 disabled={isLoading || extractionIds.length === 0}
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="size-4" />
               </Button>
             </div>
           </div>
@@ -267,11 +267,11 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
                       </label>
                     </div>
                     {isChecked && (
-                      <ArrowLeft className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <ArrowLeft className="size-4 text-muted-foreground shrink-0" />
                     )}
                     <div className="flex items-center gap-2 min-w-[360px]">
-                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleShift(t.id, -1)} disabled={isLoading || extractionIds.length === 0}>
-                        <ChevronLeft className="h-4 w-4" />
+                      <Button variant="outline" size="icon" className="size-8" onClick={() => handleShift(t.id, -1)} disabled={isLoading || extractionIds.length === 0}>
+                        <ChevronLeft className="size-4" />
                       </Button>
                       <Select value={mappedId ?? undefined} onValueChange={(val) => handleSelectChange(t.id, val)}>
                         <SelectTrigger className="w-[300px] h-10">
@@ -291,8 +291,8 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
                           ))}
                         </SelectContent>
                       </Select>
-                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleShift(t.id, +1)} disabled={isLoading || extractionIds.length === 0}>
-                        <ChevronRight className="h-4 w-4" />
+                      <Button variant="outline" size="icon" className="size-8" onClick={() => handleShift(t.id, +1)} disabled={isLoading || extractionIds.length === 0}>
+                        <ChevronRight className="size-4" />
                       </Button>
                     </div>
                   </div>
@@ -309,7 +309,7 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
           <Button onClick={handleApply} disabled={isApplying || isLoading || translationIds.length === 0}>
             {isApplying ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Applying...
               </>
             ) : (

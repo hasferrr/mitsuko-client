@@ -75,11 +75,11 @@ export default function BatchMain() {
         <div className="flex-1 min-w-40 flex items-center gap-2">
           <Button
             variant="ghost"
-            className="h-10 w-10 shrink-0"
+            className="size-10 shrink-0"
             onClick={() => setCurrentProject(null)}
             title="Go back to batch selection"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="size-5" />
           </Button>
           <Input
             defaultValue={currentProject.name || (operationMode === 'translation' ? "Batch Translation" : "Batch Extraction")}
@@ -94,24 +94,24 @@ export default function BatchMain() {
           <SelectContent>
             <SelectItem value="translation">
               <div className="flex items-center gap-2 pr-1">
-                <div className="h-4 w-4">
-                  <Languages className="h-4 w-4" />
+                <div className="size-4">
+                  <Languages className="size-4" />
                 </div>
                 Translation
               </div>
             </SelectItem>
             <SelectItem value="extraction">
               <div className="flex items-center gap-2 pr-1">
-                <div className="h-4 w-4">
-                  <Layers className="h-4 w-4" />
+                <div className="size-4">
+                  <Layers className="size-4" />
                 </div>
                 Extraction
               </div>
             </SelectItem>
             <SelectItem value="transcription">
               <div className="flex items-center gap-2 pr-1">
-                <div className="h-4 w-4">
-                  <AudioLines className="h-4 w-4" />
+                <div className="size-4">
+                  <AudioLines className="size-4" />
                 </div>
                 Transcription
               </div>
@@ -120,7 +120,7 @@ export default function BatchMain() {
         </Select>
         <Link href="/project">
           <Button variant="outline" className="h-10">
-            <FileText className="h-5 w-5" />
+            <FileText className="size-5" />
             See as Project
           </Button>
         </Link>
@@ -129,7 +129,7 @@ export default function BatchMain() {
           className="h-10"
           onClick={() => setIsDeleteDialogOpen(true)}
         >
-          <Trash className="h-5 w-5" />
+          <Trash className="size-5" />
         </Button>
       </div>
 

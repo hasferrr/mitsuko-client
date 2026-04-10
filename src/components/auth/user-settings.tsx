@@ -123,7 +123,7 @@ export function UserSettings() {
               variant="outline"
               onClick={() => setIsGlobalTranslationSettingsOpen(true)}
             >
-              <Settings2 className="h-4 w-4" />
+              <Settings2 className="size-4" />
               Configure
             </Button>
           </div>
@@ -141,7 +141,7 @@ export function UserSettings() {
               variant="outline"
               onClick={() => setIsGlobalTranscriptionSettingsOpen(true)}
             >
-              <Settings2 className="h-4 w-4" />
+              <Settings2 className="size-4" />
               Configure
             </Button>
           </div>
@@ -159,7 +159,7 @@ export function UserSettings() {
               variant="outline"
               onClick={() => setIsGlobalExtractionSettingsOpen(true)}
             >
-              <Settings2 className="h-4 w-4" />
+              <Settings2 className="size-4" />
               Configure
             </Button>
           </div>

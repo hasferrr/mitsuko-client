@@ -31,7 +31,7 @@ export default function KeyFeatures() {
 
           <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
             <div className="text-red-500 mb-6">
-              <div className="w-10 h-10 rounded-md bg-red-500 flex items-center justify-center">
+              <div className="size-10 rounded-md bg-red-500 flex items-center justify-center">
                 <AudioWaveform size={24} className="text-white" />
               </div>
             </div>
@@ -68,32 +68,32 @@ export default function KeyFeatures() {
 
             <div className="space-y-2">
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></div>
+                <div className="mt-1 size-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Prioritize the meaning over literal translation
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></div>
+                <div className="mt-1 size-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Tonal alignment with character speech patterns
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></div>
+                <div className="mt-1 size-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Adapt the cultural nuance and idiomatic usage
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></div>
+                <div className="mt-1 size-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Guide the translation with custom instructions
@@ -115,32 +115,32 @@ export default function KeyFeatures() {
 
             <div className="space-y-2">
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                <div className="mt-1 size-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-red-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Accurate audio to text transcription
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                <div className="mt-1 size-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-red-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Precise spotting and subtitle timing
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                <div className="mt-1 size-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-red-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Additional custom instructions before transcribing
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                <div className="mt-1 size-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-red-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Intelligent sentence and clause-based segmentation
@@ -162,32 +162,32 @@ export default function KeyFeatures() {
 
             <div className="space-y-2">
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
+                <div className="mt-1 size-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-purple-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Get context from subtitles, audio, or text sources
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
+                <div className="mt-1 size-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-purple-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Inform the AI based on the context provided
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
+                <div className="mt-1 size-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-purple-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Maintain consistency across episodes
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
+                <div className="mt-1 size-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
+                  <div className="size-2.5 rounded-full bg-purple-500"></div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
                   Improve translation quality

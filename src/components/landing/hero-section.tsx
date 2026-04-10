@@ -68,7 +68,7 @@ export default function HeroSection() {
               aria-label="Play video"
               role="button"
             >
-              <Play className="text-white opacity-80 group-hover:opacity-100 transform group-hover:scale-110 transition-all duration-300 z-10 rounded-full border-2 border-white w-16 h-16 p-4" />
+              <Play className="text-white opacity-80 group-hover:opacity-100 transform group-hover:scale-110 transition-all duration-300 z-10 rounded-full border-2 border-white size-16 p-4" />
             </div>
           )}
 

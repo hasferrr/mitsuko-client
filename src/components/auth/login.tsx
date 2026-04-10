@@ -105,7 +105,7 @@ export function Login() {
         process.env.NODE_ENV === "development" && "w-full",
       )}>
         <Button onClick={signUp} className="w-full">
-          <IconBrandGoogleFilled className="h-4 w-4" />
+          <IconBrandGoogleFilled className="size-4" />
           Sign in with Google
         </Button>
         {process.env.NODE_ENV === "development" && (
@@ -167,7 +167,7 @@ export function Login() {
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogTrigger asChild>
           <Button disabled={isPending} className="w-fit" variant="outline">
-            <LogOutIcon className="h-4 w-4 mr-2" />
+            <LogOutIcon className="size-4 mr-2" />
             Sign out
           </Button>
         </DialogTrigger>

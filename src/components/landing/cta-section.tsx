@@ -30,7 +30,7 @@ export default function CtaSection() {
                     className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-white"
                     {...eventHandlers}
                   >
-                    <Mail className="w-4 h-4" />
+                    <Mail className="size-4" />
                     Contact Us
                   </Link>
                   <Link
@@ -39,7 +39,7 @@ export default function CtaSection() {
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-white"
                   >
-                    <IconBrandDiscord className="h-5 w-5" />
+                    <IconBrandDiscord className="size-5" />
                     Join Discord
                   </Link>
                 </div>

@@ -61,11 +61,11 @@ export function ImportSubDialog({
           {/* Controls */}
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => handleSelectAll(true)} disabled={!!isLoading || totalFiles === 0}>
-              <ListChecks className="h-4 w-4" />
+              <ListChecks className="size-4" />
               Select All
             </Button>
             <Button variant="outline" size="sm" onClick={() => handleSelectAll(false)} disabled={!!isLoading || totalFiles === 0}>
-              <ListX className="h-4 w-4" />
+              <ListX className="size-4" />
               Deselect All
             </Button>
             <div className="ml-auto text-xs text-muted-foreground">

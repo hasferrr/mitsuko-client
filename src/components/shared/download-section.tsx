@@ -128,7 +128,7 @@ export function DownloadSection({
         <Dialog>
           <DialogTrigger className="w-full" asChild>
             <Button variant="outline">
-              <AlignCenter className="w-4 h-4" />
+              <AlignCenter className="size-4" />
               Select Format
             </Button>
           </DialogTrigger>
@@ -195,7 +195,7 @@ export function DownloadSection({
         )}
         onClick={handleDownload}
       >
-        <Download className="h-4 w-4" />
+        <Download className="size-4" />
         Download {type === "zip" ? "ZIP" : SUBTITLE_NAME_MAP.get(type)}
       </Button>
     </div>

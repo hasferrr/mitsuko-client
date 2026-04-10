@@ -133,7 +133,7 @@ export function User() {
             >
               <RefreshCw
                 className={cn(
-                  "h-4 w-4",
+                  "size-4",
                   (isUserFetching || isTransactionsFetching || isCreditBatchesFetching) && "animate-spin"
                 )}
               />
@@ -163,7 +163,7 @@ export function User() {
                         size="sm"
                         className="gap-1 py-0 px-2 mr-1 h-6 text-white hover:text-white bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors"
                       >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="size-4" />
                         Buy
                       </Button>
                     </Link>

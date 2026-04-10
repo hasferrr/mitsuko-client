@@ -53,8 +53,8 @@ export function TranscriptionControls({
 
         {isModelDurationLimitExceeded(models, localAudioDuration || 0) && (
           <div className="flex items-center gap-2 text-red-600 text-xs">
-            <div className="h-3 w-3">
-              <Clock className="h-3 w-3" />
+            <div className="size-3">
+              <Clock className="size-3" />
             </div>
             <p>
               {models ? `${models} model has ${(getModel(models)?.maxDuration || 0) / 60} minutes limit.` : ""}
@@ -73,12 +73,12 @@ export function TranscriptionControls({
           >
             {isTranscribing ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Transcribing
               </>
             ) : (
               <>
-                <Wand2 className="h-4 w-4" />
+                <Wand2 className="size-4" />
                 {session ? "Transcribe" : "Sign in to Start"}
               </>
             )}
@@ -90,7 +90,7 @@ export function TranscriptionControls({
             disabled={!isTranscribing}
             onClick={onStop}
           >
-            <Square className="h-4 w-4" />
+            <Square className="size-4" />
             Stop
           </Button>
         </div>

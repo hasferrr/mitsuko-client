@@ -143,7 +143,7 @@ export function ExportImportDialogue({
               disabled={isLoading}
               className="w-full"
             >
-              <Upload className="mr-2 h-4 w-4" />
+              <Upload className="mr-2 size-4" />
               Export Database
             </Button>
             <Button
@@ -152,7 +152,7 @@ export function ExportImportDialogue({
               disabled={isLoading}
               className="w-full"
             >
-              <Download className="mr-2 h-4 w-4" />
+              <Download className="mr-2 size-4" />
               Import Database
             </Button>
           </div>

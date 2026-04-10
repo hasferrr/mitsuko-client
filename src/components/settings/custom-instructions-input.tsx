@@ -54,7 +54,7 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
             onClick={() => setIsPresetsDialogOpen(true)}
             className="h-8 px-2"
           >
-            <List className="h-4 w-4" />
+            <List className="size-4" />
             Presets
           </Button>
           <CustomInstructionsLibraryControls

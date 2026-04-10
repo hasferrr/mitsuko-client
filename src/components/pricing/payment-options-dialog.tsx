@@ -264,9 +264,9 @@ export function PaymentOptionsDialog({
               className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isFetchingPayment ? (
-                <Loader2 className="w-6 h-6 mr-4 text-blue-500 shrink-0 mt-1 animate-spin" />
+                <Loader2 className="size-6 mr-4 text-blue-500 shrink-0 mt-1 animate-spin" />
               ) : (
-                <CreditCard className="w-6 h-6 mr-4 text-blue-500 shrink-0 mt-1" />
+                <CreditCard className="size-6 mr-4 text-blue-500 shrink-0 mt-1" />
               )}
               <div className="grow">
                 <div className="flex items-center justify-between mb-1">
@@ -285,14 +285,14 @@ export function PaymentOptionsDialog({
               className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isFetchingPayment ? (
-                <Loader2 className="w-6 h-6 mr-4 text-gray-500 shrink-0 mt-1 animate-spin" />
+                <Loader2 className="size-6 mr-4 text-gray-500 shrink-0 mt-1 animate-spin" />
               ) : (
                 <Image
                   src={LemonSqueezyLogo}
                   alt="Lemon Squeezy"
                   width={24}
                   height={24}
-                  className="w-6 h-6 mr-4 shrink-0 mt-1"
+                  className="size-6 mr-4 shrink-0 mt-1"
                 />
               )}
               <div className="grow">
@@ -317,7 +317,7 @@ export function PaymentOptionsDialog({
                 <TooltipProvider delayDuration={50}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Info className="h-3.5 w-3.5 text-muted-foreground shrink-0 cursor-help" />
+                      <Info className="size-3.5 text-muted-foreground shrink-0 cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent side="top" className="max-w-xs text-[11px]">
                       <p>
@@ -354,7 +354,7 @@ export function PaymentOptionsDialog({
                   disabled={inputQuantity <= MIN_QUANTITY || isFetchingPayment || isResetting || !!snapData}
                   aria-label="Decrease quantity"
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="size-4" />
                 </Button>
                 <Input
                   id="quantity"
@@ -376,7 +376,7 @@ export function PaymentOptionsDialog({
                   disabled={inputQuantity >= MAX_QUANTITY || isFetchingPayment || isResetting || !!snapData}
                   aria-label="Increase quantity"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="size-4" />
                 </Button>
               </div>
             </div>
@@ -402,7 +402,7 @@ export function PaymentOptionsDialog({
           <Button onClick={handleReset} variant="destructive" size="sm" disabled={isResetting || isFetchingPayment || (!snapData && lemonSqueezyCache.size === 0)}>
             {isResetting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Resetting...
               </>
             ) : (

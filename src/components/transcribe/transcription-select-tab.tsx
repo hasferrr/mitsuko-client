@@ -83,7 +83,7 @@ export function TranscriptionSelectTab({
           onClick={() => onRefetch()}
           disabled={isUploadsRefetching}
         >
-          {isUploadsRefetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          {isUploadsRefetching ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
           Refresh
         </Button>
       </div>
@@ -96,7 +96,7 @@ export function TranscriptionSelectTab({
               className="border rounded-md p-3"
             >
               <div className="flex items-center gap-3">
-                <Skeleton className="h-5 w-5" />
+                <Skeleton className="size-5" />
                 <div className="flex-1 min-w-0">
                   <Skeleton className="h-4 w-3/4 mb-2" />
                   <div className="flex gap-1">
@@ -105,7 +105,7 @@ export function TranscriptionSelectTab({
                     <Skeleton className="h-3 w-12" />
                   </div>
                 </div>
-                <Skeleton className="h-8 w-8" />
+                <Skeleton className="size-8" />
               </div>
             </div>
           ))}
@@ -124,7 +124,7 @@ export function TranscriptionSelectTab({
               )}
             >
               <div className="flex items-center gap-3">
-                <File className="h-5 w-5 text-primary" />
+                <File className="size-5 text-primary" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm truncate font-medium">{upload.fileName}</p>
                   <p className="text-xs text-muted-foreground flex gap-1">
@@ -144,7 +144,7 @@ export function TranscriptionSelectTab({
                   }}
                   disabled={isTranscribing}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="size-4" />
                 </Button>
               </div>
             </div>
@@ -163,7 +163,7 @@ export function TranscriptionSelectTab({
             disabled={isTranscribing}
             className="flex items-center gap-1 p-1 hover:bg-muted rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <X className="h-3 w-3" />
+            <X className="size-3" />
             <span className="text-xs">Deselect</span>
           </button>
         </div>

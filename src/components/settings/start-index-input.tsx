@@ -82,7 +82,7 @@ export const StartIndexInput = memo(({ advancedSettingsId }: Props) => {
                 className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
                 onClick={handleFindEmptyTranslation}
               >
-                <ChevronsRight className="h-4 w-4" />
+                <ChevronsRight className="size-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>

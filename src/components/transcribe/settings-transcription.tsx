@@ -136,7 +136,7 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
               onClick={() => setIsPresetsDialogOpen(true)}
               className="h-8 px-2"
             >
-              <List className="h-3.5 w-3.5" />
+              <List className="size-3.5" />
               <span className="ml-1">Presets</span>
             </Button>
             <CustomInstructionsLibraryControls

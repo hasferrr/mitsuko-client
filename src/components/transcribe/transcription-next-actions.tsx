@@ -27,8 +27,8 @@ export function TranscriptionNextActions({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="flex flex-col justify-between p-4 border border-border rounded-md">
           <div className="flex items-start gap-3 mb-2">
-            <div className="h-5 w-5 mt-0.5 text-blue-500">
-              <Globe className="h-5 w-5" />
+            <div className="size-5 mt-0.5 text-blue-500">
+              <Globe className="size-5" />
             </div>
             <div>
               <h3 className="text-sm font-medium">Translate</h3>
@@ -48,8 +48,8 @@ export function TranscriptionNextActions({
 
         <div className="flex flex-col justify-between p-4 border border-border rounded-md">
           <div className="flex items-start gap-3 mb-2">
-            <div className="h-5 w-5 mt-0.5 text-blue-500">
-              <FileText className="h-5 w-5" />
+            <div className="size-5 mt-0.5 text-blue-500">
+              <FileText className="size-5" />
             </div>
             <div>
               <h3 className="text-sm font-medium">Export</h3>

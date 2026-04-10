@@ -72,7 +72,7 @@ export function SortableBatchFile({
         <div className="flex items-center ml-4">
           <input
             type="checkbox"
-            className="w-4 h-4"
+            className="size-4"
             checked={selected}
             onClick={(e) => e.stopPropagation()}
             onChange={(e) => {
@@ -83,7 +83,7 @@ export function SortableBatchFile({
         </div>
       ) : (
         <div className="flex items-center ml-4 cursor-grab" {...attributes} {...listeners}>
-          <GripVertical className="h-5 w-5 text-muted-foreground" />
+          <GripVertical className="size-5 text-muted-foreground" />
         </div>
       )}
       <CardContent className="p-4 flex-1 flex items-center justify-between">
@@ -118,7 +118,7 @@ export function SortableBatchFile({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id) }}>
-                      <Download className="h-4 w-4" />
+                      <Download className="size-4" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>{optionText}</TooltipContent>
@@ -130,7 +130,7 @@ export function SortableBatchFile({
           {batchFile.status === 'error' && <Badge variant="destructive">Error</Badge>}
           {!selectMode && (
             <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDelete(batchFile.id) }}>
-              <X className="h-4 w-4" />
+              <X className="size-4" />
             </Button>
           )}
         </div>

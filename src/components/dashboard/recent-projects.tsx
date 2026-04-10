@@ -34,13 +34,13 @@ export function RecentProjects() {
         </h3>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setIsHorizontal(!isHorizontal)}>
-            {isHorizontal ? <LayoutGrid className="h-4 w-4" /> : <LayoutList className="h-4 w-4" />}
+            {isHorizontal ? <LayoutGrid className="size-4" /> : <LayoutList className="size-4" />}
             {isHorizontal ? "Grid View" : "List View"}
           </Button>
           <Button variant="outline" size="sm" onClick={() => setShowAllProjects(!showAllProjects)}>
             {showAllProjects ? (
               <>
-                <ChevronUp className="h-4 w-4" />
+                <ChevronUp className="size-4" />
                 Show Less
               </>
             ) : (

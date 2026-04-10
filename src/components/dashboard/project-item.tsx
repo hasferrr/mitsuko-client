@@ -66,12 +66,12 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
           >
             {isHorizontal ? (
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4">
+                <div className="size-4">
                   {project.transcriptions.length > project.translations.length &&
                     project.transcriptions.length > project.extractions.length ? (
-                    <Headphones className="h-4 w-4 text-green-500" />
+                    <Headphones className="size-4 text-green-500" />
                   ) : (
-                    <FileText className="h-4 w-4 text-blue-500" />
+                    <FileText className="size-4 text-blue-500" />
                   )}
                 </div>
                 <span className="text-sm font-medium line-clamp-1">{project.name}</span>
@@ -87,12 +87,12 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
             ) : (
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="h-4 w-4">
+                  <div className="size-4">
                     {project.transcriptions.length > project.translations.length &&
                       project.transcriptions.length > project.extractions.length ? (
-                      <Headphones className="h-4 w-4 text-green-500" />
+                      <Headphones className="size-4 text-green-500" />
                     ) : (
-                      <FileText className="h-4 w-4 text-blue-500" />
+                      <FileText className="size-4 text-blue-500" />
                     )}
                   </div>
                   <span className="text-sm font-medium line-clamp-1">{project.name}</span>
@@ -104,7 +104,7 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
                   </span>
                 </div>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
+                  <Clock className="size-3" />
                   <span>{project.updatedAt.toLocaleDateString()}</span>
                 </div>
               </div>
@@ -115,9 +115,9 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="h-8 w-8 p-0 hover:bg-accent"
+                  className="size-8 p-0 hover:bg-accent"
                 >
-                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                  <MoreHorizontal className="size-4 text-muted-foreground" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -125,7 +125,7 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
                   className="text-destructive focus:text-destructive"
                   onClick={() => setIsDeleteDialogOpen(true)}
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  <Trash2 className="size-4 mr-2" />
                   Delete Project
                 </DropdownMenuItem>
               </DropdownMenuContent>

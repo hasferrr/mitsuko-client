@@ -256,7 +256,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             size="icon"
             onClick={() => router.push('/project')}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="size-4" />
           </Button>
         )}
         <Input
@@ -310,7 +310,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
               onClick={() => document.getElementById("subtitle-content-upload")?.click()}
               disabled={isExtracting}
             >
-              <Upload className="h-4 w-4" />
+              <Upload className="size-4" />
               Upload
             </Button>
             <Button
@@ -323,7 +323,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
               className="h-2 py-3 px-2"
               disabled={isExtracting}
             >
-              <FolderDown className="h-4 w-4" />
+              <FolderDown className="size-4" />
               Import
             </Button>
           </div>
@@ -363,7 +363,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
               onClick={() => document.getElementById("previous-context-upload")?.click()}
               disabled={isExtracting}
             >
-              <Upload className="h-4 w-4" />
+              <Upload className="size-4" />
               Upload
             </Button>
             <Button
@@ -376,7 +376,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
               className="h-2 py-3 px-2"
               disabled={isExtracting}
             >
-              <FolderDown className="h-4 w-4" />
+              <FolderDown className="size-4" />
               Import
             </Button>
           </div>
@@ -459,24 +459,24 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
         >
           {isExtracting ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
               Extracting...
             </>
           ) : (
             <>
-              <Play className="h-4 w-4" />
+              <Play className="size-4" />
               {!!session ? "Start Extraction" : "Sign In to Start"}
             </>
           )}
         </Button>
 
         <Button variant="outline" className="gap-2" onClick={handleStopExtraction} disabled={!isExtracting || !contextResult}>
-          <Square className="h-4 w-4" />
+          <Square className="size-4" />
           Stop
         </Button>
 
         <Button variant="outline" className="gap-2" onClick={handleSaveToFile}>
-          <Save className="h-4 w-4" />
+          <Save className="size-4" />
           Save to File
         </Button>
 
@@ -488,12 +488,12 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
         >
           {isEditingResult ? (
             <>
-              <Check className="h-4 w-4" />
+              <Check className="size-4" />
               Done Editing
             </>
           ) : (
             <>
-              <Edit className="h-4 w-4" />
+              <Edit className="size-4" />
               Edit Result
             </>
           )}

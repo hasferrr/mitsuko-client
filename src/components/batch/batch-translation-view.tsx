@@ -335,7 +335,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
                 onClick={() => setIsDeleteSelectedDialogOpen(true)}
                 disabled={selectedIds.size === 0}
               >
-                <Trash className="h-4 w-4" />
+                <Trash className="size-4" />
                 Delete
               </Button>
               <Button
@@ -345,7 +345,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
                 onClick={handleSelectAllToggle}
                 disabled={batchFiles.length === 0}
               >
-                <ListChecks className="h-4 w-4" />
+                <ListChecks className="size-4" />
                 {selectedIds.size === batchFiles.length ? 'Deselect All' : 'Select All'}
               </Button>
             </>
@@ -358,7 +358,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
               onClick={() => setIsPopulateDialogOpen(true)}
               disabled={isProcessing || batchFiles.length === 0}
             >
-              <FolderInput className="h-4 w-4" />
+              <FolderInput className="size-4" />
               Get Context
             </Button>
           )}
@@ -370,7 +370,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
               onClick={() => document.getElementById(uploadInputId)?.click()}
               disabled={isProcessing}
             >
-              <Upload className="h-4 w-4" />
+              <Upload className="size-4" />
               Upload
             </Button>
           )}
@@ -381,7 +381,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
             onClick={toggleSelectMode}
             disabled={isProcessing || batchFiles.length === 0}
           >
-            <CheckSquare className="h-4 w-4" />
+            <CheckSquare className="size-4" />
             {isSelecting ? 'Cancel' : 'Select'}
           </Button>
         </div>
@@ -410,12 +410,12 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
           >
             {isProcessing ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Translating...
               </>
             ) : (
               <>
-                <Play className="h-4 w-4" />
+                <Play className="size-4" />
                 {session ? `Translate ${batchFiles.length} files` : "Sign In to Start"}
               </>
             )}
@@ -426,7 +426,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
             onClick={handleStopBatchTranslation}
             disabled={!isProcessing}
           >
-            <Square className="h-4 w-4" />
+            <Square className="size-4" />
             Stop All
           </Button>
         </div>
@@ -437,7 +437,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
           onClick={handleOpenContinueBatchDialog}
           disabled={isProcessing || !session || batchFiles.length === 0 || (batchFiles.length - finishedCount <= 0) || isSelecting}
         >
-          <FastForward className="h-4 w-4" />
+          <FastForward className="size-4" />
           Continue Batch Translation ({batchFiles.length - finishedCount} remaining)
         </Button>
 
@@ -493,7 +493,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
+                  className="size-8 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
                   onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, concurrentOperation - 1))}
                   disabled={concurrentOperation <= 1}
                 >
@@ -513,7 +513,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
+                  className="size-8 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
                   onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_BATCH_CONCURRENT_OPERATION, concurrentOperation + 1))}
                   disabled={concurrentOperation >= MAX_BATCH_CONCURRENT_OPERATION}
                 >
@@ -531,7 +531,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
                 onClick={() => setIsCopySharedDialogOpen(true)}
                 disabled={isProcessing || batchFiles.length === 0}
               >
-                <ListChecks className="h-4 w-4" />
+                <ListChecks className="size-4" />
                 Copy Shared Settings...
               </Button>
             </div>
@@ -627,7 +627,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              <AlertTriangle className="size-5 text-amber-500" />
               Already Translated Content
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -649,7 +649,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <Play className="h-5 w-5 text-primary" />
+              <Play className="size-5 text-primary" />
               Start Batch Translation
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -683,7 +683,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
          <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <FastForward className="h-5 w-5 text-primary" />
+              <FastForward className="size-5 text-primary" />
               Continue Batch Translation
             </AlertDialogTitle>
             <AlertDialogDescription>

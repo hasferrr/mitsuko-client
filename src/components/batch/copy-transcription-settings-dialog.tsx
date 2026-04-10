@@ -131,11 +131,11 @@ export function CopyTranscriptionSettingsDialog({
               <p className="text-sm font-semibold">Transcription Settings</p>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={() => setAll(true)} disabled={isLoading}>
-                  <ListChecks className="h-4 w-4" />
+                  <ListChecks className="size-4" />
                   Select All
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setAll(false)} disabled={isLoading}>
-                  <ListX className="h-4 w-4" />
+                  <ListX className="size-4" />
                   Clear
                 </Button>
               </div>
@@ -158,7 +158,7 @@ export function CopyTranscriptionSettingsDialog({
           <Button onClick={handleApply} disabled={isApplying || isLoading || transcriptionIds.length === 0}>
             {isApplying ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Applying...
               </>
             ) : (

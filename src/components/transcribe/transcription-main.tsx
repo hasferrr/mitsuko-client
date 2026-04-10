@@ -377,7 +377,7 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
             size="icon"
             onClick={() => router.push('/project')}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="size-4" />
           </Button>
         )}
         <Input

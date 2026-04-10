@@ -54,31 +54,31 @@ export function PricingCards({
           </Link>
           <div className="space-y-3">
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
+              <Check className="size-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 Subtitle Translation
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
+              <Check className="size-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 Limited Audio Transcription
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
+              <Check className="size-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 Extract Context Feature
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
+              <Check className="size-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 Custom Model Integration
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <X className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
+              <X className="size-5 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {pricingData.free.credits} Monthly Credits
               </span>
@@ -123,31 +123,31 @@ export function PricingCards({
           )}
           <div className="space-y-3">
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+              <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 <strong>{pricingData.basic.credits}</strong> Monthly Credits
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+              <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 Full Audio Transcription
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+              <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 Priority Email Support
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+              <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 Custom Model Integration
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <X className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
+              <X className="size-5 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 Save to Cloud
               </span>
@@ -192,31 +192,31 @@ export function PricingCards({
           )}
           <div className="space-y-3">
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+              <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 <strong>{pricingData.pro.credits}</strong> Monthly Credits
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+              <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 Full Audio Transcription
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+              <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 Priority Email Support
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+              <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 Custom Model Integration
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+              <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
               <span className="text-sm text-gray-600 dark:text-gray-300">
                 Save to Cloud
               </span>
