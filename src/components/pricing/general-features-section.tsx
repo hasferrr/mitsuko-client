@@ -51,11 +51,11 @@ export function GeneralFeaturesSection() {
           <div key={item.feature} className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <Check className="size-5 text-blue-500 shrink-0" />
-              <span className="text-base font-medium text-gray-800 dark:text-gray-200">
+              <span className="text-base font-medium text-card-foreground">
                 {item.feature}
               </span>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 pl-7">
+            <p className="text-sm text-muted-foreground pl-7">
               {item.description}
             </p>
           </div>

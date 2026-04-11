@@ -11,14 +11,14 @@ interface CurrencyTabsProps {
 export function CurrencyTabs({ currentCurrencySymbol, onCurrencyChange }: CurrencyTabsProps) {
   return (
     <div className="flex justify-center items-center mb-8">
-      <span className="text-gray-600 dark:text-gray-400 mr-2">Show currency in</span>
+      <span className="text-muted-foreground mr-2">Show currency in</span>
       <Tabs
         defaultValue={CURRENCIES.USD.symbol}
         value={currentCurrencySymbol}
         onValueChange={onCurrencyChange}
         className="w-auto"
       >
-        <TabsList className="bg-gray-200 dark:bg-muted text-primary">
+        <TabsList className="bg-muted text-primary">
           <TabsTrigger value={CURRENCIES.USD.symbol}>USD</TabsTrigger>
           <TabsTrigger value={CURRENCIES.IDR.symbol}>IDR</TabsTrigger>
         </TabsList>

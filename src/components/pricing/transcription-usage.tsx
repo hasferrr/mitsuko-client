@@ -46,33 +46,33 @@ export default async function TranscriptionUsage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-900/30">
-                <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+              <tr className="bg-muted/50">
+                <th className="px-4 py-2 text-left font-medium text-card-foreground">
                   Model Type
                 </th>
-                <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                <th className="px-4 py-2 text-left font-medium text-card-foreground">
                   Credit per <br /> 1 minute audio
                 </th>
-                <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                <th className="px-4 py-2 text-left font-medium text-card-foreground">
                   Credit per <br /> Output Token
                 </th>
-                <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                <th className="px-4 py-2 text-left font-medium text-card-foreground">
                   Max Duration
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+            <tbody className="divide-y divide-border">
               {modelCosts.map((model) => (
-                <tr key={model.name} className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                  <td className="px-4 py-2 text-left text-gray-700 dark:text-gray-300">{model.name}</td>
-                  <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.input}</td>
-                  <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.output}</td>
-                  <td className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">{model.maxDuration / 60} minutes</td>
+                <tr key={model.name} className="hover:bg-muted/50">
+                  <td className="px-4 py-2 text-left text-card-foreground">{model.name}</td>
+                  <td className="px-4 py-2 text-left text-muted-foreground">{model.input}</td>
+                  <td className="px-4 py-2 text-left text-muted-foreground">{model.output}</td>
+                  <td className="px-4 py-2 text-left text-muted-foreground">{model.maxDuration / 60} minutes</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <p className="text-xs text-gray-500 dark:text-gray-500 mt-4">
+          <p className="text-xs text-muted-foreground mt-4">
             * The costs shown are not including system prompts and custom instructions input costs.
           </p>
         </div>

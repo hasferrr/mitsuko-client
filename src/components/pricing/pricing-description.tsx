@@ -12,7 +12,7 @@ export default function PricingDescription() {
           <h2 className="text-4xl font-semibold mb-4 tracking-tight">
             How Credits Work
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="text-muted-foreground max-w-3xl mx-auto">
             Discover how credits work and how they provide flexible access to our powerful AI tools.
           </p>
         </div>
