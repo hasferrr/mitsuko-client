@@ -50,7 +50,7 @@ export const FullContextMemorySwitch = memo(({ advancedSettingsId }: Props) => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Enable Full Context Memory?</DialogTitle>
-            <DialogDescription className="pt-2">
+            <DialogDescription>
               Warning: This feature uses all previous chunks for context,
               which significantly increases token usage and costs. Are you sure you want to proceed?
             </DialogDescription>

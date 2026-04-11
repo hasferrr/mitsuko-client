@@ -120,7 +120,7 @@ export function CopyTranscriptionSettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md w-full">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Copy Shared Settings to All Files</DialogTitle>
         </DialogHeader>

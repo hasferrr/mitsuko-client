@@ -396,7 +396,7 @@ export function PaymentOptionsDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex flex-row justify-between w-full sm:justify-between pt-4 border-t border-border mt-auto">
+        <DialogFooter className="flex-row justify-between mt-auto">
           <Button onClick={handleReset} variant="destructive" size="sm" disabled={isResetting || isFetchingPayment || (!snapData && lemonSqueezyCache.size === 0)}>
             {isResetting ? (
               <>

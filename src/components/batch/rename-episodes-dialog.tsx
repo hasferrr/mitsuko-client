@@ -152,7 +152,7 @@ export function RenameEpisodesDialog({ open, onOpenChange, batchFiles }: RenameE
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl w-full">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Batch Rename Episode Numbers</DialogTitle>
         </DialogHeader>

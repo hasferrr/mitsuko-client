@@ -180,7 +180,7 @@ export default function LogResultDialog({ log, onOpenChange, onApplyDirect }: Lo
   return (
     <Dialog open={!!log} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl flex flex-col">
-        <DialogHeader className="pb-2">
+        <DialogHeader>
           <div className="space-y-1">
             <DialogTitle className="text-xl font-semibold truncate">
               {log?.metadata.originalname || "Transcription Result"}

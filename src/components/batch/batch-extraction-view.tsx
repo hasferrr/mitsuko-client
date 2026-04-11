@@ -804,7 +804,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
 
       {/* Preview Dialog */}
       <Dialog open={!!previewId} onOpenChange={handlePreviewDialogOpenChange}>
-        <DialogContent className="max-w-6xl w-full">
+        <DialogContent className="max-w-6xl">
           <DialogHeader>
             <DialogTitle>Extraction Preview</DialogTitle>
           </DialogHeader>

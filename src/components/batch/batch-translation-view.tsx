@@ -702,7 +702,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
 
       {/* Preview Dialog */}
       <Dialog open={!!previewId} onOpenChange={handlePreviewDialogOpenChange}>
-        <DialogContent className="max-w-6xl w-full">
+        <DialogContent className="max-w-6xl">
           <DialogHeader>
             <DialogTitle>Translation Preview</DialogTitle>
           </DialogHeader>

@@ -206,7 +206,7 @@ export function CopySharedSettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl w-full">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Copy Shared Settings to All Files</DialogTitle>
         </DialogHeader>

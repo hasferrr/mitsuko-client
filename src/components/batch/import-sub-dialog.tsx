@@ -51,7 +51,7 @@ export function ImportSubDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg w-full">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Import Subtitles</DialogTitle>
         </DialogHeader>

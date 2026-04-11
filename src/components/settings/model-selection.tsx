@@ -72,7 +72,7 @@ export const ModelSelection = memo(({
       )}
       {isUseCustomModel && <CustomApiConfigManager />}
       <Dialog open={isWhichModelsDialogOpen} onOpenChange={setIsWhichModelsDialogOpen}>
-        <DialogContent className="sm:max-w-2xl pt-2">
+        <DialogContent className="sm:max-w-2xl">
           <DialogTitle></DialogTitle>
           <WhichModels className="mt-0 p-2 border-0 shadow-none" />
         </DialogContent>
