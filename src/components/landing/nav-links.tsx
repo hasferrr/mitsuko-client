@@ -9,7 +9,7 @@ interface NavLinksProps {
   onLinkClick?: () => void
 }
 
-const navLinkClass = "block text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors py-2"
+const navLinkClass = "block text-foreground hover:text-muted-foreground transition-colors py-2"
 
 const solutionItems = [
   {
@@ -115,14 +115,14 @@ function MobileSolutionsDropdown({
     <div className="py-2">
       <button
         onClick={onToggle}
-        className="flex items-center justify-between text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors w-full text-left"
+        className="flex items-center justify-between text-foreground hover:text-muted-foreground transition-colors w-full text-left"
       >
         Solutions
         {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </button>
       {isOpen && (
         <div className="mt-3 ml-2 flex flex-col gap-1">
-          <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider px-2">
+          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider px-2">
             Mitsuko for
           </span>
           {solutionItems.map((item) => {
@@ -134,10 +134,10 @@ function MobileSolutionsDropdown({
                 onClick={onLinkClick}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors"
               >
-                <Icon size={18} className="text-gray-500 dark:text-gray-400 shrink-0" />
+                <Icon size={18} className="text-muted-foreground shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">{item.description}</div>
+                  <div className="text-sm font-medium text-foreground">{item.label}</div>
+                  <div className="text-xs text-muted-foreground">{item.description}</div>
                 </div>
               </Link>
             )
@@ -161,7 +161,7 @@ function DesktopSolutionsDropdown({
     <div className="relative">
       <button
         onClick={onToggle}
-        className="flex items-center text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors gap-1 py-2"
+        className="flex items-center text-foreground hover:text-muted-foreground transition-colors gap-1 py-2"
       >
         Solutions
         {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -170,7 +170,7 @@ function DesktopSolutionsDropdown({
         <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 z-50">
           <div className="w-64 rounded-xl bg-background border shadow-lg p-2">
             <div className="px-2 py-1.5">
-              <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
                 Mitsuko for
               </span>
             </div>
@@ -184,10 +184,10 @@ function DesktopSolutionsDropdown({
                     onClick={onLinkClick}
                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors"
                   >
-                    <Icon size={18} className="text-gray-500 dark:text-gray-400 shrink-0" />
+                    <Icon size={18} className="text-muted-foreground shrink-0" />
                     <div className="min-w-0">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">{item.description}</div>
+                      <div className="text-sm font-medium text-foreground">{item.label}</div>
+                      <div className="text-xs text-muted-foreground">{item.description}</div>
                     </div>
                   </Link>
                 )

@@ -26,7 +26,7 @@ export default function Navbar() {
         <div className="px-6 max-w-5xl mx-auto flex h-16 items-center justify-between relative">
           <div className="flex items-center gap-4 md:gap-8">
             <button
-              className="md:hidden text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              className="md:hidden text-muted-foreground hover:text-foreground"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -36,14 +36,14 @@ export default function Navbar() {
             {isRoot ? (
               <a
                 href="#"
-                className="text-xl font-semibold text-gray-900 dark:text-white"
+                className="text-xl font-semibold text-foreground"
               >
                 mitsuko
               </a>
             ) : (
               <Link
                 href="/"
-                className="text-xl font-semibold text-gray-900 dark:text-white"
+                className="text-xl font-semibold text-foreground"
               >
                 mitsuko
               </Link>
@@ -58,7 +58,7 @@ export default function Navbar() {
             <ThemeToggle />
             <Link
               href="/auth/login"
-              className="text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300 transition-colors"
+              className="text-foreground hover:text-muted-foreground transition-colors"
             >
               {session ? (
                 <div className="group relative">
@@ -67,10 +67,10 @@ export default function Navbar() {
                     <AvatarFallback>{session.user?.email?.[0].toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="absolute right-0 mt-2 w-48 p-2 bg-background border rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-69">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate sentry-mask ph-no-capture">
+                    <p className="text-sm font-medium text-foreground truncate sentry-mask ph-no-capture">
                       {session.user?.user_metadata?.full_name}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate sentry-mask ph-no-capture">
+                    <p className="text-sm text-muted-foreground truncate sentry-mask ph-no-capture">
                       {session.user?.email}
                     </p>
                   </div>
@@ -83,7 +83,7 @@ export default function Navbar() {
         </div>
 
         {isMobileMenuOpen && (
-          <div className="md:hidden w-full px-6 pb-4 border-t border-gray-200/30 dark:border-gray-800/30">
+          <div className="md:hidden w-full px-6 pb-4 border-t border-border/30">
             <nav className="flex flex-col space-y-2 mt-2">
               <NavLinks isMobile onLinkClick={() => setIsMobileMenuOpen(false)} />
             </nav>

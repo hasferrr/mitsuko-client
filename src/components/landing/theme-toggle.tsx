@@ -9,7 +9,7 @@ export function ThemeToggle() {
 
   return (
     <button
-      className="text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+      className="text-muted-foreground hover:text-foreground transition-colors"
       onClick={() => setIsDarkMode(!isDarkMode)}
       aria-label="Toggle dark mode"
     >
