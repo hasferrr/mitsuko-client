@@ -147,10 +147,10 @@ export function FeaturesOptions() {
             ))}
           </div>
 
-           <Button className="mt-6 w-full">
-             Start Translation
-             <ArrowRight className="size-4" />
-           </Button>
+          <Button className="mt-6 w-full bg-blue-600/80 dark:bg-blue-600/40 hover:bg-blue-700/80 dark:hover:bg-blue-700/60 text-white">
+            Start Translation
+            <ArrowRight className="size-4" />
+          </Button>
         </div>
       </div>
 
@@ -181,10 +181,10 @@ export function FeaturesOptions() {
             ))}
           </div>
 
-           <Button className="mt-6 w-full">
-             Start Transcription
-             <ArrowRight className="size-4" />
-           </Button>
+          <Button className="mt-6 w-full bg-green-600/80 dark:bg-green-600/40 hover:bg-green-700/80 dark:hover:bg-green-700/60 text-white">
+            Start Transcription
+            <ArrowRight className="size-4" />
+          </Button>
         </div>
       </div>
 
@@ -215,10 +215,10 @@ export function FeaturesOptions() {
             ))}
           </div>
 
-           <Button className="mt-6 w-full">
-             Start Extraction
-             <ArrowRight className="size-4" />
-           </Button>
+          <Button className="mt-6 w-full bg-purple-600/80 dark:bg-purple-600/40 hover:bg-purple-700/80 dark:hover:bg-purple-700/60 text-white">
+            Start Extraction
+            <ArrowRight className="size-4" />
+          </Button>
         </div>
       </div>
     </div>

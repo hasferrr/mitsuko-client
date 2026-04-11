@@ -20,7 +20,6 @@ import {
 import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { IconBrandGoogleFilled } from "@tabler/icons-react"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
 
 export function Login() {
   const session = useSessionStore((state) => state.session)
@@ -100,27 +99,19 @@ export function Login() {
 
   if (!session) {
     return (
-      <div className={cn(
-        "mx-auto flex max-w-sm flex-col items-center justify-center gap-4",
-        process.env.NODE_ENV === "development" && "w-full",
-      )}>
-        <Button onClick={signUp} className="w-full">
+      <div className="mx-auto flex max-w-sm flex-col items-center justify-center gap-4">
+        <Button onClick={signUp}>
           <IconBrandGoogleFilled className="size-4" />
           Sign in with Google
         </Button>
         {process.env.NODE_ENV === "development" && (
           <>
-            <div className="relative w-full">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
+            <div className="flex justify-center text-xs uppercase">
+              <div className="bg-background px-2 text-muted-foreground">
+                Or continue with
               </div>
             </div>
-            <div className="flex w-full flex-col gap-2">
+            <div className="flex flex-col gap-2">
               <Input
                 type="email"
                 placeholder="Email"
@@ -136,17 +127,15 @@ export function Login() {
                 disabled={isPending}
               />
             </div>
-            <div className="flex w-full gap-2">
+            <div className="flex gap-2">
               <Button
                 onClick={signInWithEmailPassword}
-                className="w-full"
                 disabled={isPending}
               >
                 Sign In
               </Button>
               <Button
                 onClick={signUpWithEmailPassword}
-                className="w-full"
                 variant="outline"
                 disabled={isPending}
               >

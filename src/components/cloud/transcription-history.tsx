@@ -354,7 +354,7 @@ export default function TranscriptionHistory({ onApplyDirect }: TranscriptionHis
                         ? 'Checking status...'
                         : bgCount > 0
                           ? `${bgCount} transcription${bgCount > 1 ? 's' : ''} still processing`
-                          : 'No transcriptions running'}
+                          : 'CardHeader'}
                     </div>
                   </div>
                 </div>
