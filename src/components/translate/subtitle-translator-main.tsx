@@ -447,7 +447,6 @@ export default function SubtitleTranslatorMain({
         <Button
           variant="outline"
           size="lg"
-          className="gap-2"
           onClick={() => setIsInitialUploadDialogOpen(true)}
           disabled={isTranslating}
         >
@@ -458,7 +457,6 @@ export default function SubtitleTranslatorMain({
         <Button
           variant="outline"
           size="lg"
-          className="gap-2"
           onClick={handleSave}
           disabled={isTranslating || isSaving}
         >
@@ -553,7 +551,6 @@ export default function SubtitleTranslatorMain({
           <div className="grid grid-cols-2 gap-4">
             {/* Start Translation Button */}
             <Button
-              className="gap-2"
               onClick={() => handleStartTranslation()}
               disabled={isTranslating || !session || subtitles.length === 0}
             >
@@ -578,7 +575,6 @@ export default function SubtitleTranslatorMain({
             {/* Stop Button */}
             <Button
               variant="outline"
-              className="gap-2"
               onClick={handleStopTranslation}
               disabled={!isTranslating || !translation.response.response}
             >
