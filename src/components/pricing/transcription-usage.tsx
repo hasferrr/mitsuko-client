@@ -34,7 +34,7 @@ export default async function TranscriptionUsage() {
 
   return (
     <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
-      <CardContent className="px-8 space-y-4">
+      <CardContent className="space-y-4">
         <h3 className="text-xl font-medium">
           Transcription (Experimental)
         </h3>

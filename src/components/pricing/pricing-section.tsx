@@ -123,7 +123,7 @@ export default function PricingSection({
 
   return (
     <div id="pricing" className="py-16">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-12">
           {useH1Title ? (
             <h1 className="text-4xl font-semibold mb-4 tracking-tight">

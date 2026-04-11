@@ -6,8 +6,8 @@ import { Card, CardContent } from "@/components/ui/card"
 
 export default function PricingDescription() {
   return (
-    <div id="pricing" className="py-4">
-      <div className="max-w-6xl mx-auto px-4">
+    <div className="py-12">
+      <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-semibold mb-4 tracking-tight">
             How Credits Work
@@ -18,8 +18,8 @@ export default function PricingDescription() {
         </div>
 
         {/* Description of Credits */}
-        <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
-          <CardContent className="px-8 space-y-4">
+        <Card className="mt-8 shadow-xs">
+          <CardContent className="space-y-4">
             <h3 className="text-xl font-medium">
               What are Credits?
             </h3>
@@ -29,7 +29,7 @@ export default function PricingDescription() {
               Using these features will deduct credits from your balance. See "Credit Usage" below for details.
             </p>
             <p>
-              You can receive credits by purchasing <a href="#credit-packs" className="text-blue-500 hover:text-blue-600">credit packs</a>{" "}
+              You can receive credits by purchasing <a href="#credit-packs" className="text-primary hover:text-primary/80">credit packs</a>{" "}
               as needed.
             </p>
             {/* <div className="flex flex-col gap-2">
@@ -44,14 +44,14 @@ export default function PricingDescription() {
         </Card>
 
         {/* Track Your Credits Section */}
-        <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
-          <CardContent className="px-8 space-y-4">
+        <Card className="mt-8 shadow-xs">
+          <CardContent className="space-y-4">
             <h3 className="text-xl font-medium">
               Where Can I See My Credits?
             </h3>
           <p>
             You can see your remaining credit balance and usage history in{" "}
-            <Link href="/auth/login" className="text-blue-500 hover:text-blue-600">User Information          </Link> page.
+            <Link href="/auth/login" className="text-primary hover:text-primary/80">User Information</Link> page.
           </p>
           </CardContent>
         </Card>
@@ -66,8 +66,8 @@ export default function PricingDescription() {
         <TranscriptionUsage />
 
         {/* Background Processing */}
-        <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
-          <CardContent className="px-8 space-y-4">
+        <Card className="mt-8 shadow-xs">
+          <CardContent className="space-y-4">
             <h3 className="text-xl font-medium">
               Background Processing
             </h3>

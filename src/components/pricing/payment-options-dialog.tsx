@@ -261,12 +261,12 @@ export function PaymentOptionsDialog({
             <button
               onClick={handlePopup}
               disabled={isFetchingPayment || !hasConsented}
-              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-muted/50 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isFetchingPayment ? (
-                <Loader2 className="size-6 mr-4 text-blue-500 shrink-0 mt-1 animate-spin" />
+                <Loader2 className="size-6 mr-4 text-primary shrink-0 mt-1 animate-spin" />
               ) : (
-                <CreditCard className="size-6 mr-4 text-blue-500 shrink-0 mt-1" />
+                <CreditCard className="size-6 mr-4 text-primary shrink-0 mt-1" />
               )}
               <div className="grow">
                 <div className="flex items-center justify-between mb-1">
@@ -282,10 +282,10 @@ export function PaymentOptionsDialog({
             <button
               onClick={handleNewTab}
               disabled={isFetchingPayment || !hasConsented}
-              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-muted/50 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isFetchingPayment ? (
-                <Loader2 className="size-6 mr-4 text-gray-500 shrink-0 mt-1 animate-spin" />
+                <Loader2 className="size-6 mr-4 text-muted-foreground shrink-0 mt-1 animate-spin" />
               ) : (
                 <Image
                   src={LemonSqueezyLogo}

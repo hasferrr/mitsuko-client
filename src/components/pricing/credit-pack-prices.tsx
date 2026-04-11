@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react"
 import { Button } from "../ui/button"
 import { useRouter } from "next/navigation"
 import { ProductId } from "@/types/product"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { useState, useTransition } from "react"
 import { useSnapStore } from "@/stores/ui/use-snap-store"
 import { PaymentOptionsDialog } from "./payment-options-dialog"
@@ -126,7 +126,7 @@ export function CreditPackPrices({
           return (
             <Card
               key={pack.productId}
-              className="relative border-t-4 border-t-blue-500 rounded-md shadow-xs hover:border-t-blue-400 dark:hover:border-t-blue-600 transition-colors duration-200"
+              className="relative shadow-xs"
             >
               <CardHeader>
                 <div className="flex justify-between items-baseline">
@@ -179,17 +179,18 @@ export function CreditPackPrices({
                   )}
                 </div>
               </CardContent>
-              <CardFooter>
+              <div className="px-4">
                 {redirectToPricingPage ? (
                   <Button
-                    className="w-full bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-blue-500 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    variant="outline"
+                    className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary"
                     onClick={() => router.push("/pricing")}
                   >
                     See Details
                   </Button>
                 ) : pack.baseCredits !== 0 ? (
                   <Button
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                     onClick={() => handlePurchase(pack.productId)}
                     disabled={isPending}
                   >
@@ -204,13 +205,14 @@ export function CreditPackPrices({
                   </Button>
                 ) : (
                   <Button
-                    className="w-full bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-blue-500 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    variant="outline"
+                    className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary"
                     onClick={() => router.push("/dashboard")}
                   >
                     Get Started
                   </Button>
                 )}
-              </CardFooter>
+              </div>
             </Card>
           )
         })}

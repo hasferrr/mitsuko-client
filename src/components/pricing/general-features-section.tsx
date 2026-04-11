@@ -41,16 +41,16 @@ const generalFeaturesList = [
 export function GeneralFeaturesSection() {
   return (
     <Card className="mt-8 max-w-5xl mx-auto shadow-xs">
-      <CardHeader className="bg-muted/50 border-b">
+      <CardHeader className="border-b">
         <h3 className="text-lg font-medium">
           Key Platform Features
         </h3>
       </CardHeader>
-      <CardContent className="px-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {generalFeaturesList.map((item) => (
           <div key={item.feature} className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <Check className="size-5 text-blue-500 shrink-0" />
+              <Check className="size-5 text-primary shrink-0" />
               <span className="text-base font-medium">
                 {item.feature}
               </span>
