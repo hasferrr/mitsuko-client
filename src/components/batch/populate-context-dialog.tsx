@@ -221,7 +221,6 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
               <Button
                 variant="outline"
                 size="icon"
-                className="size-8"
                 onClick={() => handleShiftAll(-1)}
                 disabled={isLoading || extractionIds.length === 0}
               >
@@ -236,7 +235,6 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
               <Button
                 variant="outline"
                 size="icon"
-                className="size-8"
                 onClick={() => handleShiftAll(+1)}
                 disabled={isLoading || extractionIds.length === 0}
               >
@@ -270,7 +268,7 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
                       <ArrowLeft className="size-4 text-muted-foreground shrink-0" />
                     )}
                     <div className="flex items-center gap-2 min-w-[360px]">
-                      <Button variant="outline" size="icon" className="size-8" onClick={() => handleShift(t.id, -1)} disabled={isLoading || extractionIds.length === 0}>
+                      <Button variant="outline" size="icon" onClick={() => handleShift(t.id, -1)} disabled={isLoading || extractionIds.length === 0}>
                         <ChevronLeft className="size-4" />
                       </Button>
                       <Select value={mappedId ?? undefined} onValueChange={(val) => handleSelectChange(t.id, val)}>
@@ -291,7 +289,7 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
                           ))}
                         </SelectContent>
                       </Select>
-                      <Button variant="outline" size="icon" className="size-8" onClick={() => handleShift(t.id, +1)} disabled={isLoading || extractionIds.length === 0}>
+                      <Button variant="outline" size="icon" onClick={() => handleShift(t.id, +1)} disabled={isLoading || extractionIds.length === 0}>
                         <ChevronRight className="size-4" />
                       </Button>
                     </div>

@@ -221,7 +221,7 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
                     <Button variant="outline" onClick={openLinkDialog} className="px-2">
                       <LinkIcon className="size-3" /> Change
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={handleUnlinkTranslation} className="size-8 text-muted-foreground hover:text-destructive">
+                    <Button variant="ghost" size="icon" onClick={handleUnlinkTranslation} className="text-muted-foreground hover:text-destructive">
                       <XCircle className="size-4" />
                     </Button>
                   </div>
