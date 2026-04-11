@@ -27,7 +27,7 @@ export function SortableBatchCard({ project, onSelect }: SortableBatchCardProps)
       ref={setNodeRef}
       style={style}
       className={cn(
-        "cursor-pointer hover:border-primary transition-colors overflow-hidden border border-muted h-full flex flex-col",
+        "cursor-pointer hover:border-primary transition-colors overflow-hidden h-full flex flex-col",
         isDragging && "opacity-50"
       )}
       onClick={() => onSelect(project.id)}

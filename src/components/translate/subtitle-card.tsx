@@ -75,7 +75,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
 
   return (
     <Card className={cn(
-      "border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow",
+      "group relative hover:shadow-md transition-shadow",
       !isSubtitlePerformanceModeEnabled && subtitle.index > 10 && "sentry-block ph-no-capture",
     )}>
       <CardContent className="p-4">

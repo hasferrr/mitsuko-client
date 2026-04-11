@@ -108,7 +108,7 @@ export default function Batch() {
 
   const BatchCardSkeleton = () => {
     return (
-      <Card className="overflow-hidden border border-muted h-full flex flex-col">
+      <Card className="overflow-hidden h-full flex flex-col">
         <CardHeader className="flex-row items-center justify-between gap-2 pb-2">
           <Skeleton className="h-5 w-36" />
           <Skeleton className="size-4" />

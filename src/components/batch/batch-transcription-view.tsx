@@ -552,7 +552,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           </div>
 
           <TabsContent value="settings" className="grow space-y-4 mt-4">
-            <Card className="border border-border bg-card text-card-foreground">
+            <Card>
               <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <SettingsTranscription transcriptionId={defaultTranscriptionId} />

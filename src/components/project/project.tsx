@@ -102,7 +102,7 @@ export const Project = () => {
 
   const ProjectItemSkeleton = () => {
     return (
-      <Card className="overflow-hidden border border-muted h-full flex flex-col">
+      <Card className="overflow-hidden h-full flex flex-col">
         <CardHeader className="flex-row items-center justify-between gap-2 pb-2">
           <Skeleton className="h-5 w-36" />
           <div className="flex items-center gap-4">
@@ -144,7 +144,7 @@ export const Project = () => {
         ref={setNodeRef}
         style={style}
         className={cn(
-          "cursor-pointer hover:border-primary transition-colors overflow-hidden border border-muted h-full flex flex-col",
+          "cursor-pointer hover:border-primary transition-colors overflow-hidden h-full flex flex-col",
           isDragging && "opacity-50"
         )}
         onClick={() => setCurrentProject(project.id)}

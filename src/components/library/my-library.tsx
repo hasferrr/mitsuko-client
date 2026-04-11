@@ -215,7 +215,7 @@ export default function MyLibrary() {
                 <CreateEditInstructionDialog key={item.id} instruction={item}>
                   <Card
                     className={cn(
-                      "overflow-hidden border border-muted h-full flex flex-col transition-colors duration-300 relative",
+                      "overflow-hidden h-full flex flex-col transition-colors duration-300 relative",
                       "cursor-pointer",
                       selectedIds.has(item.id) && "border-primary"
                     )}
