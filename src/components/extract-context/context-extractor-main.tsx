@@ -263,7 +263,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
           value={title}
           onChange={(e) => setTitle(currentId, e.target.value)}
           onBlur={() => saveData(currentId)}
-          className="text-xl font-semibold h-12"
+          className="text-xl font-semibold"
         />
       </div>
 
@@ -306,7 +306,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             <Button
               variant="outline"
               size="sm"
-              className="h-2 py-3 px-2"
+              className="py-3"
               onClick={() => document.getElementById("subtitle-content-upload")?.click()}
               disabled={isExtracting}
             >
@@ -320,7 +320,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                 loadProjectTranslations()
                 setIsSubtitleImportDialogOpen(true)
               }}
-              className="h-2 py-3 px-2"
+              className="py-3"
               disabled={isExtracting}
             >
               <FolderDown className="size-4" />
@@ -359,7 +359,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             <Button
               variant="outline"
               size="sm"
-              className="h-2 py-3 px-2"
+              className="py-3"
               onClick={() => document.getElementById("previous-context-upload")?.click()}
               disabled={isExtracting}
             >
@@ -373,7 +373,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                 loadProjectExtractions()
                 setIsPreviousContextDialogOpen(true)
               }}
-              className="h-2 py-3 px-2"
+              className="py-3"
               disabled={isExtracting}
             >
               <FolderDown className="size-4" />

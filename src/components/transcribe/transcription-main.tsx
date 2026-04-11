@@ -384,7 +384,7 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
           type="text"
           value={title}
           onChange={(e) => setTitle(currentId, e.target.value)}
-          className="text-xl font-semibold h-12"
+          className="text-xl font-semibold"
           placeholder="Enter title..."
         />
         <TranscriptionHistoryDialog currentId={currentId} />

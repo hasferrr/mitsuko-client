@@ -200,7 +200,7 @@ export function User() {
               value={amountFilter}
               onValueChange={(value) => handleAmountFilterChange(value as AmountFilter)}
             >
-              <SelectTrigger className="w-[105px] h-8">
+              <SelectTrigger className="w-[105px]">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent>

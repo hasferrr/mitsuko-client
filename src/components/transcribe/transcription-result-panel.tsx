@@ -153,7 +153,7 @@ export function TranscriptionResultPanel({
                 value={transcriptionText}
                 readOnly={!isEditing || isTranscribing}
                 onChange={onTranscriptionTextChange}
-                className="w-full h-96 p-4 bg-background text-foreground resize-none overflow-y-auto"
+                className="h-96 p-4 bg-background text-foreground resize-none overflow-y-auto"
               />
             ) : (
               <div

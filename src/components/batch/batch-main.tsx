@@ -84,7 +84,7 @@ export default function BatchMain() {
           </Button>
           <Input
             defaultValue={currentProject.name || (operationMode === 'translation' ? "Batch Translation" : "Batch Extraction")}
-            className="text-xl font-semibold h-12"
+            className="text-xl font-semibold"
             onChange={(e) => handleBatchNameChange(e.target.value)}
           />
         </div>
