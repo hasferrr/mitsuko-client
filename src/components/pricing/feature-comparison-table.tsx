@@ -6,6 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 interface Currency {
@@ -40,32 +41,30 @@ export function FeatureComparisonTable({
   showDescription = false,
 }: FeatureComparisonTableProps) {
   return (
-    <div
-      className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto shadow-xs"
-    >
-      <div className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 p-4">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+    <Card className="max-w-5xl mx-auto shadow-xs">
+      <div className="bg-muted/50 border-b border-border p-4">
+        <h3 className="text-lg font-medium text-card-foreground">
           Feature Comparison
         </h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-50 dark:bg-gray-900/30">
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+            <tr className="bg-muted/50">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Feature/Limit
               </th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">
                 Free
               </th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">
                 Basic ({currency.symbol}{pricingData.basic.price}/mo)
               </th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
+              <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">
                 Pro ({currency.symbol}{pricingData.pro.price}/mo)
               </th>
               {showDescription && (
-                <th className="w-72 px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
+                <th className="w-72 px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                   Description
                 </th>
               )}
@@ -74,13 +73,13 @@ export function FeatureComparisonTable({
           <tbody className="divide-y">
             {featuresData.map((item, index) => (
               <tr key={index}>
-                <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 font-medium">
+                <td className="px-4 py-3 text-sm text-muted-foreground font-medium">
                   <div className="flex items-center gap-1.5">
                     {item.feature}
                     {!showDescription && (
                       <Tooltip delayDuration={50}>
                         <TooltipTrigger asChild>
-                          <Info className="size-3.5 text-gray-400 dark:text-gray-500 cursor-help" />
+                          <Info className="size-3.5 text-muted-foreground cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent side="top" className="max-w-xs">
                           <p>{item.description}</p>
@@ -89,17 +88,17 @@ export function FeatureComparisonTable({
                     )}
                   </div>
                 </td>
-                <td className={cn("px-4 py-3 text-sm text-center", typeof item.free !== "string" && "text-gray-600 dark:text-gray-400")}>
+                <td className={cn("px-4 py-3 text-sm text-center", typeof item.free !== "string" && "text-muted-foreground")}>
                   {item.free}
                 </td>
-                <td className={cn("px-4 py-3 text-sm text-center", typeof item.basic !== "string" && "text-gray-600 dark:text-gray-400")}>
+                <td className={cn("px-4 py-3 text-sm text-center", typeof item.basic !== "string" && "text-muted-foreground")}>
                   {item.basic}
                 </td>
-                <td className={cn("px-4 py-3 text-sm text-center", typeof item.pro !== "string" && "text-gray-600 dark:text-gray-400")}>
+                <td className={cn("px-4 py-3 text-sm text-center", typeof item.pro !== "string" && "text-muted-foreground")}>
                   {item.pro}
                 </td>
                 {showDescription && (
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 text-left align-top">
+                  <td className="px-4 py-3 text-sm text-muted-foreground text-left align-top">
                     <p>{item.description}</p>
                   </td>
                 )}
@@ -108,6 +107,6 @@ export function FeatureComparisonTable({
           </tbody>
         </table>
       </div>
-    </div>
+    </Card>
   )
 }

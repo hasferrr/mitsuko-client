@@ -37,14 +37,14 @@ export function PricingCards({
     >
       <div id="pricing-cards" className="absolute -top-24" />
       {/* Free Tier */}
-      <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden shadow-xs hover:shadow-md transition-shadow">
+      <div className="rounded-xl bg-card border border-border overflow-hidden shadow-xs hover:shadow-md transition-shadow">
         <div className="p-6">
-          <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Free</h3>
+          <h3 className="text-xl font-bold mb-2 text-card-foreground">Free</h3>
           <div className="flex items-end gap-1 mb-6">
-            <span className="text-3xl font-bold text-gray-900 dark:text-white">{currency.symbol}{pricingData.free.price}</span>
-            <span className="text-gray-500 dark:text-gray-400 mb-1">/month</span>
+            <span className="text-3xl font-bold text-card-foreground">{currency.symbol}{pricingData.free.price}</span>
+            <span className="text-muted-foreground mb-1">/month</span>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-sm text-muted-foreground mb-6">
             Access to most features with some limitations. Purchase credits as needed.
           </p>
           <Link href="/dashboard">
@@ -54,32 +54,32 @@ export function PricingCards({
           </Link>
           <div className="space-y-3">
             <div className="flex items-start gap-2">
-              <Check className="size-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <Check className="size-5 text-muted-foreground mt-0.5 shrink-0" />
+              <span className="text-sm text-muted-foreground">
                 Subtitle Translation
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="size-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <Check className="size-5 text-muted-foreground mt-0.5 shrink-0" />
+              <span className="text-sm text-muted-foreground">
                 Limited Audio Transcription
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="size-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <Check className="size-5 text-muted-foreground mt-0.5 shrink-0" />
+              <span className="text-sm text-muted-foreground">
                 Extract Context Feature
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <Check className="size-5 text-gray-500 dark:text-gray-400 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <Check className="size-5 text-muted-foreground mt-0.5 shrink-0" />
+              <span className="text-sm text-muted-foreground">
                 Custom Model Integration
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <X className="size-5 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <X className="size-5 text-muted-foreground mt-0.5 shrink-0" />
+              <span className="text-sm text-muted-foreground">
                 {pricingData.free.credits} Monthly Credits
               </span>
             </div>
@@ -88,14 +88,14 @@ export function PricingCards({
       </div>
 
       {/* Basic Tier */}
-      <div className="rounded-xl bg-white dark:bg-gray-900/30 border-2 border-blue-400 dark:border-blue-500 overflow-hidden shadow-xs hover:shadow-md transition-shadow">
+      <div className="rounded-xl bg-card border-2 border-blue-400 dark:border-blue-500 overflow-hidden shadow-xs hover:shadow-md transition-shadow">
         <div className="p-6">
-          <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Basic</h3>
+          <h3 className="text-xl font-bold mb-2 text-card-foreground">Basic</h3>
           <div className="flex items-end gap-1 mb-6">
-            <span className="text-3xl font-bold text-gray-900 dark:text-white">{currency.symbol}{pricingData.basic.price}</span>
-            <span className="text-gray-500 dark:text-gray-400 mb-1">/month</span>
+            <span className="text-3xl font-bold text-card-foreground">{currency.symbol}{pricingData.basic.price}</span>
+            <span className="text-muted-foreground mb-1">/month</span>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-sm text-muted-foreground mb-6">
             Fewer limitations and monthly credit grant. Email support included.
           </p>
           {redirectToPricingPage ? (
@@ -121,31 +121,31 @@ export function PricingCards({
           <div className="space-y-3">
             <div className="flex items-start gap-2">
               <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-muted-foreground">
                 <strong>{pricingData.basic.credits}</strong> Monthly Credits
               </span>
             </div>
             <div className="flex items-start gap-2">
               <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-muted-foreground">
                 Full Audio Transcription
               </span>
             </div>
             <div className="flex items-start gap-2">
               <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-muted-foreground">
                 Priority Email Support
               </span>
             </div>
             <div className="flex items-start gap-2">
               <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-muted-foreground">
                 Custom Model Integration
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <X className="size-5 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <X className="size-5 text-muted-foreground mt-0.5 shrink-0" />
+              <span className="text-sm text-muted-foreground">
                 Save to Cloud
               </span>
             </div>
@@ -154,14 +154,14 @@ export function PricingCards({
       </div>
 
       {/* Pro Tier */}
-      <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden shadow-xs hover:shadow-md transition-shadow">
+      <div className="rounded-xl bg-card border border-border overflow-hidden shadow-xs hover:shadow-md transition-shadow">
         <div className="p-6">
-          <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Pro</h3>
+          <h3 className="text-xl font-bold mb-2 text-card-foreground">Pro</h3>
           <div className="flex items-end gap-1 mb-6">
-            <span className="text-3xl font-bold text-gray-900 dark:text-white">{currency.symbol}{pricingData.pro.price}</span>
-            <span className="text-gray-500 dark:text-gray-400 mb-1">/month</span>
+            <span className="text-3xl font-bold text-card-foreground">{currency.symbol}{pricingData.pro.price}</span>
+            <span className="text-muted-foreground mb-1">/month</span>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-sm text-muted-foreground mb-6">
             Maximum features with priority support and cloud saving.
           </p>
           {redirectToPricingPage ? (
@@ -187,31 +187,31 @@ export function PricingCards({
           <div className="space-y-3">
             <div className="flex items-start gap-2">
               <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-muted-foreground">
                 <strong>{pricingData.pro.credits}</strong> Monthly Credits
               </span>
             </div>
             <div className="flex items-start gap-2">
               <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-muted-foreground">
                 Full Audio Transcription
               </span>
             </div>
             <div className="flex items-start gap-2">
               <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-muted-foreground">
                 Priority Email Support
               </span>
             </div>
             <div className="flex items-start gap-2">
               <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-muted-foreground">
                 Custom Model Integration
               </span>
             </div>
             <div className="flex items-start gap-2">
               <Check className="size-5 text-blue-500 mt-0.5 shrink-0" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-muted-foreground">
                 Save to Cloud
               </span>
             </div>

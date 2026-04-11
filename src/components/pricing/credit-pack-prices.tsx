@@ -106,10 +106,10 @@ export function CreditPackPrices({
   }
 
   return (
-    <div className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-xs">
+    <Card className="relative max-w-5xl mx-auto mt-8 shadow-xs">
       <div id="credit-packs" className="absolute -top-24" />
-
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+      <CardContent className="p-6">
+      <p className="text-sm text-muted-foreground mb-6">
         Need more credits? Purchase additional credit packs starting at just{" "}
         {currency.symbol}
         {((CREDIT_PACKS.find((pack) => pack.baseCredits !== 0)?.basePriceUSD || 0) * currency.rate).toLocaleString()}
@@ -126,11 +126,11 @@ export function CreditPackPrices({
           return (
             <Card
               key={pack.productId}
-              className="relative border-t-4 border-t-blue-500 border-r border-b border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/30 rounded-md shadow-xs hover:border-blue-400 dark:hover:border-blue-600 transition-colors duration-200"
+              className="relative border-t-4 border-t-blue-500 rounded-md shadow-xs hover:border-t-blue-400 dark:hover:border-t-blue-600 transition-colors duration-200"
             >
               <CardHeader>
                 <div className="flex justify-between items-baseline mb-1">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <span className="text-sm font-medium text-muted-foreground">
                     {pack.baseCredits !== 0 ? "Credit Pack" : "Try for Free!"}
                   </span>
                   {savings > 0 && (
@@ -144,11 +144,11 @@ export function CreditPackPrices({
                     </span>
                   )}
                 </div>
-                <div className="text-xl font-medium text-gray-900 dark:text-white">
+                <div className="text-xl font-medium text-card-foreground">
                   {pack.baseCredits !== 0 ? (
                     <>
                       {pack.baseCredits.toLocaleString()}
-                      <span className="text-gray-500 dark:text-gray-400 text-sm"> credits</span>
+                      <span className="text-muted-foreground text-sm"> credits</span>
                     </>
                   ) : (
                     "Free"
@@ -159,7 +159,7 @@ export function CreditPackPrices({
                 <div className="flex items-center gap-2">
                   {savings > 0 ? (
                     <>
-                      <span className="text-gray-500 dark:text-gray-400 line-through text-sm">
+                      <span className="text-muted-foreground line-through text-sm">
                         {currency.symbol}{(() => {
                           const originalPrice = price + savings
                           if (originalPrice > 1000) {
@@ -168,12 +168,12 @@ export function CreditPackPrices({
                           return originalPrice.toLocaleString()
                         })()}
                       </span>
-                      <span className="text-xl font-bold text-gray-900 dark:text-white">
+                      <span className="text-xl font-bold text-card-foreground">
                         {currency.symbol}{price.toLocaleString()}
                       </span>
                     </>
                   ) : (
-                    <span className="text-xl font-bold text-gray-900 dark:text-white">
+                    <span className="text-xl font-bold text-card-foreground">
                       {currency.symbol}{price.toLocaleString()}
                     </span>
                   )}
@@ -229,6 +229,7 @@ export function CreditPackPrices({
           currencyRate={dialogData.currencyRate}
         />
       )}
-    </div>
+      </CardContent>
+    </Card>
   )
 }
