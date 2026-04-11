@@ -145,18 +145,27 @@ Do NOT re-add classes that components already provide. Key defaults:
 - **Input**: `h-8 px-2.5 py-1`. Do NOT add `h-8` explicitly. Title inputs default to h-8 (not h-12).
 - **SelectTrigger**: `h-8` (default), `h-7` (sm). Do NOT add `h-8` or `h-10`.
 - **Textarea**: `w-full min-h-16 px-2.5 py-2 field-sizing-content`. Do NOT add `w-full`.
-- **TabsTrigger**: includes `gap-1.5`. Do NOT add `mr-2` on icons.
+- **TabsTrigger**: includes `inline-flex items-center gap-1.5`. Do NOT add `mr-2` on icons or `flex items-center`.
 - **DropdownMenuItem**: includes `gap-1.5`. Do NOT add `mr-2` on icons.
 
 ### Design Tokens
 
 Use semantic tokens instead of hardcoded colors:
-- `text-muted-foreground` not `text-gray-500 dark:text-gray-400`
-- `bg-muted/50` not `bg-gray-50 dark:bg-gray-900/30`
+- `text-foreground` not `text-gray-900 dark:text-white` or `text-gray-800 dark:text-gray-200`
+- `text-muted-foreground` not `text-gray-500 dark:text-gray-400` or `text-gray-600 dark:text-gray-400` or `text-gray-700 dark:text-gray-300`
+- `text-card-foreground` not `text-gray-900 dark:text-white` (only inside Card component)
+- `hover:text-foreground` not `hover:text-gray-900 dark:hover:text-white`
 - `border-border` not `border-gray-200 dark:border-gray-800`
 - `divide-border` not `divide-gray-200 dark:divide-gray-800`
-- `text-card-foreground` not `text-gray-900 dark:text-white`
-- `bg-card` not `bg-white dark:bg-gray-900/20`
+- `bg-muted/50` not `bg-gray-50 dark:bg-gray-900/30`
+- `text-destructive` not `text-red-500` (for error/error contexts)
+- `bg-primary text-primary-foreground` not `bg-blue-500 text-white` (brand blue = primary)
+- `bg-primary/10 text-primary` not `bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300`
+- `bg-primary/10` not `bg-blue-50 dark:bg-blue-900/20` (brand blue hover states)
+- **Keep original background colors** — only replace borders and text colors with tokens, NOT background colors. This especially applies to landing pages and custom containers:
+  - Landing sections use deliberate bg colors (e.g. `bg-white dark:bg-[#111111]`, `bg-gray-50/70 dark:bg-[#121212]`) that differ from `--card`/`--muted` CSS variables. Replacing them with `bg-card` or `bg-muted` shifts the visual tone (e.g. `bg-card` in dark mode is `oklch(0.205 0 0)` ≈ #222, not #111).
+  - Landing pages have specific visual design with precise dark-mode values — these are intentional, not accidental hardcoding. Treat them as design choices, not tech debt.
+  - Inside Card components, `bg-card` is already provided by the component — do NOT add it manually. But outside Card, keep the author's original bg value.
 
 ### Spacing Conventions
 
