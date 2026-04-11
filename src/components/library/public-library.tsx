@@ -291,7 +291,7 @@ export default function PublicLibrary() {
                 <CardContent>
                   <p className="text-sm text-muted-foreground line-clamp-4">{item.preview}</p>
                 </CardContent>
-                <CardFooter className="pt-2 flex justify-between text-xs text-muted-foreground mt-auto">
+                <CardFooter className="flex justify-between text-xs text-muted-foreground mt-auto">
                   <div className="flex items-center">
                     <User className="size-3 mr-1" />
                     <span>{item.user_id.split('-')[0]}</span>

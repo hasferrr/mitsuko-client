@@ -60,11 +60,11 @@ export default async function CreditUsage() {
   return (
     <Card className="relative max-w-5xl mx-auto mt-8 shadow-xs">
       <div id="credit-usage" className="absolute -top-24" />
-      <CardContent className="p-8">
-      <h3 className="text-xl font-medium mb-4 text-card-foreground">
+      <CardContent className="space-y-4">
+      <h3 className="text-xl font-medium">
         Credit Usage
       </h3>
-      <p className="mb-6">
+      <p>
         Credit costs vary based on the specific AI model used. Costs are typically calculated based on the number of input and output tokens processed.
         More models will be added in the future. See the estimated costs below.
       </p>
@@ -144,10 +144,10 @@ export default async function CreditUsage() {
           </tbody>
         </table>
       </div>
-      <p className="text-xs text-muted-foreground mt-4">
+      <p className="text-xs text-muted-foreground">
         * These are estimated costs and limits, and are subject to change. Input/Output token costs may vary. Refer to the dashboard for precise figures.
       </p>
-      <div className="mt-6 text-sm space-y-2">
+      <div className="text-sm space-y-2">
         <p>Token: A unit of text processed by the LLM. Roughly 4 characters or 0.75 words.</p>
         <p>Context Length: The maximum number of tokens (input + output history) the model can consider at once.</p>
         <p>Max Completion: The maximum number of tokens the model can generate in a single response.</p>

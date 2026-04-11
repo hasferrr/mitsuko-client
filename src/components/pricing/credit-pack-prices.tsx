@@ -108,8 +108,8 @@ export function CreditPackPrices({
   return (
     <Card className="relative max-w-5xl mx-auto mt-8 shadow-xs">
       <div id="credit-packs" className="absolute -top-24" />
-      <CardContent className="p-6">
-      <p className="text-sm text-muted-foreground mb-6">
+      <CardContent className="space-y-4">
+      <p className="text-sm text-muted-foreground">
         Need more credits? Purchase additional credit packs starting at just{" "}
         {currency.symbol}
         {((CREDIT_PACKS.find((pack) => pack.baseCredits !== 0)?.basePriceUSD || 0) * currency.rate).toLocaleString()}
@@ -155,7 +155,7 @@ export function CreditPackPrices({
                   )}
                 </div>
               </CardHeader>
-              <CardContent className="pt-2 pb-4">
+              <CardContent>
                 <div className="flex items-center gap-2">
                   {savings > 0 ? (
                     <>
@@ -179,7 +179,7 @@ export function CreditPackPrices({
                   )}
                 </div>
               </CardContent>
-              <CardFooter className="pt-0">
+              <CardFooter>
                 {redirectToPricingPage ? (
                   <Button
                     className="w-full bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-blue-500 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
