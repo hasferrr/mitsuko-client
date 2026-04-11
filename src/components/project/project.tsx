@@ -144,7 +144,7 @@ export const Project = () => {
         ref={setNodeRef}
         style={style}
         className={cn(
-          "cursor-pointer hover:border-primary transition-colors overflow-hidden h-full flex flex-col",
+          "cursor-pointer hover:ring-primary transition-colors overflow-hidden h-full flex flex-col",
           isDragging && "opacity-50"
         )}
         onClick={() => setCurrentProject(project.id)}

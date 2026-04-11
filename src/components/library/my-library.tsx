@@ -217,7 +217,7 @@ export default function MyLibrary() {
                     className={cn(
                       "overflow-hidden h-full flex flex-col transition-colors duration-300 relative",
                       "cursor-pointer",
-                      selectedIds.has(item.id) && "border-primary"
+                      selectedIds.has(item.id) && "ring-primary"
                     )}
                     onClick={(e) => {
                       if (isSelectionMode) {

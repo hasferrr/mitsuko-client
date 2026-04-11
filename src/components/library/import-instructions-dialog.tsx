@@ -155,8 +155,8 @@ export function ImportInstructionsDialog() {
                 <Card
                   key={item.id}
                   className={cn(
-                    "overflow-hidden border h-full flex flex-col transition-colors duration-300 relative cursor-pointer",
-                    selectedImportIds.has(item.id) ? "border-primary" : "border-muted"
+                    "overflow-hidden h-full flex flex-col transition-colors duration-300 relative cursor-pointer",
+                    selectedImportIds.has(item.id) ? "ring-primary" : "ring-foreground/10"
                   )}
                   onClick={() => handleToggleImportSelection(item.id)}
                 >
