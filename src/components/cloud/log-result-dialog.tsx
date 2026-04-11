@@ -253,13 +253,11 @@ export default function LogResultDialog({ log, onOpenChange, onApplyDirect }: Lo
                   <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
-                      size="sm"
                       onClick={handleOpenApplyDialog}
-                      className="h-8"
                     >
                       <FolderPlus className="size-3" /> {onApplyDirect ? "Apply" : "Apply to project"}
                     </Button>
-                    <Button variant="outline" size="sm" onClick={handleExportSRT} className="h-8">
+                    <Button variant="outline" onClick={handleExportSRT}>
                       <Download className="size-3" /> Export SRT
                     </Button>
                   </div>

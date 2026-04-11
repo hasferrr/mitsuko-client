@@ -485,7 +485,8 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
 
         <div className="flex flex-wrap items-center gap-4 w-full">
           <Button
-            className="h-10 flex-1"
+            size="lg"
+            className="flex-1"
             onClick={handleOpenStartBatchDialog}
             disabled={isProcessing || !session || batchFiles.length === 0 || isSelecting}
           >
@@ -503,7 +504,8 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
           </Button>
           <Button
             variant="outline"
-            className="h-10 flex-1"
+            size="lg"
+            className="flex-1"
             onClick={handleStopBatchExtraction}
             disabled={!isProcessing}
           >
@@ -514,7 +516,8 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
 
         <Button
           variant="outline"
-          className="h-10 w-full border-primary/25 hover:border-primary/50"
+          size="lg"
+          className="w-full border-primary/25 hover:border-primary/50"
           onClick={handleOpenContinueBatchDialog}
           disabled={isProcessing || !session || batchFiles.length === 0 || (batchFiles.length - finishedCount <= 0) || isSelecting}
         >

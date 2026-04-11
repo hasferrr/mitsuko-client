@@ -66,7 +66,7 @@ export function TranscriptionControls({
 
         <div className="flex gap-2">
           <Button
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="w-full"
             disabled={isTranscribing || !session || isGlobalMaxDurationExceeded}
             onClick={() => {
               onSetRightTab("transcript")

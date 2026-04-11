@@ -469,7 +469,6 @@ export default function SubtitleTranslatorMain({
         <Button
           variant={isHistoryOpen ? "default" : "outline"}
           size="lg"
-          className="gap-2 px-4"
           onClick={() => setIsHistoryOpen(!isHistoryOpen)}
         >
           <HistoryIcon className="size-5" />

@@ -165,7 +165,7 @@ export const Project = () => {
                     handleExportProject(project.id)
                   }}
                 >
-                  <Upload className="size-4 mr-2" />
+                  <Upload className="size-4" />
                   Export
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -176,7 +176,7 @@ export const Project = () => {
                   }}
                   className="text-destructive"
                 >
-                  <Trash className="size-4 mr-2" />
+                  <Trash className="size-4" />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>

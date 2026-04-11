@@ -48,7 +48,7 @@ export function PricingCards({
             Access to most features with some limitations. Purchase credits as needed.
           </p>
           <Link href="/dashboard">
-            <Button className="w-full py-2 px-4 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors mb-6">
+            <Button variant="secondary" className="w-full mb-6">
               Get Started
             </Button>
           </Link>
@@ -100,9 +100,7 @@ export function PricingCards({
           </p>
           {redirectToPricingPage ? (
             <Button
-              className={cn(
-                "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6",
-              )}
+              className="w-full mb-6"
               onClick={() => router.push("/pricing")}
             >
               Go to Pricing Page
@@ -112,8 +110,7 @@ export function PricingCards({
               <Button
                 disabled
                 className={cn(
-                  "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors",
-                  "cursor-not-allowed opacity-50 mb-6"
+                  "w-full cursor-not-allowed opacity-50 mb-6"
                 )}
                 onClick={(e) => e.preventDefault()}
               >
@@ -169,9 +166,7 @@ export function PricingCards({
           </p>
           {redirectToPricingPage ? (
             <Button
-              className={cn(
-                "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors mb-6",
-              )}
+              className="w-full mb-6"
               onClick={() => router.push("/pricing")}
             >
               Go to Pricing Page
@@ -181,8 +176,7 @@ export function PricingCards({
               <Button
                 disabled
                 className={cn(
-                  "w-full py-2 px-4 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors",
-                  "cursor-not-allowed opacity-50 mb-6"
+                  "w-full cursor-not-allowed opacity-50 mb-6"
                 )}
                 onClick={(e) => e.preventDefault()}
               >

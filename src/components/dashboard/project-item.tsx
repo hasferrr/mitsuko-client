@@ -125,7 +125,7 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
                   className="text-destructive focus:text-destructive"
                   onClick={() => setIsDeleteDialogOpen(true)}
                 >
-                  <Trash2 className="size-4 mr-2" />
+                  <Trash2 className="size-4" />
                   Delete Project
                 </DropdownMenuItem>
               </DropdownMenuContent>

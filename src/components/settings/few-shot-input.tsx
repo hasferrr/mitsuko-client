@@ -218,7 +218,7 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
                     <p className="text-xs text-muted-foreground">{linkedTranslationLineCount === null ? '...' : linkedTranslationLineCount} Lines</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={openLinkDialog} className="h-8 px-2">
+                    <Button variant="outline" onClick={openLinkDialog} className="px-2">
                       <LinkIcon className="size-3" /> Change
                     </Button>
                     <Button variant="ghost" size="icon" onClick={handleUnlinkTranslation} className="size-8 text-muted-foreground hover:text-destructive">

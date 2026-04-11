@@ -167,7 +167,7 @@ export function Login() {
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogTrigger asChild>
           <Button disabled={isPending} className="w-fit" variant="outline">
-            <LogOutIcon className="size-4 mr-2" />
+            <LogOutIcon className="size-4" />
             Sign out
           </Button>
         </DialogTrigger>

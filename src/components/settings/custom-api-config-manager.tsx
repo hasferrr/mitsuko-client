@@ -83,11 +83,11 @@ export function CustomApiConfigManager() {
             ))}
           </SelectContent>
         </Select>
-        <Button variant="outline" size="sm" className="px-2" onClick={handleAddNew}>
+        <Button variant="outline" size="sm" onClick={handleAddNew}>
           <Plus className="size-4" />
         </Button>
         {selectedApiConfigIndex !== null && (
-          <Button variant="destructive" size="sm" className="px-2" onClick={handleRemove}>
+          <Button variant="destructive" size="sm" onClick={handleRemove}>
             <Trash2 className="size-4" />
           </Button>
         )}

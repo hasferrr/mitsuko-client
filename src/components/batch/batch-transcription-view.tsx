@@ -444,7 +444,8 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
 
         <div className="flex flex-wrap items-center gap-4 w-full">
           <Button
-            className="h-10 flex-1"
+            size="lg"
+            className="flex-1"
             onClick={handleOpenStartBatchDialog}
             disabled={isProcessing || !session || batchFiles.length === 0 || isSelecting}
           >
@@ -462,7 +463,8 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           </Button>
           <Button
             variant="outline"
-            className="h-10 flex-1"
+            size="lg"
+            className="flex-1"
             onClick={handleStopBatchTranscription}
             disabled={!isProcessing}
           >
@@ -473,7 +475,8 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
 
         <Button
           variant="outline"
-          className="h-10 w-full border-primary/25 hover:border-primary/50"
+          size="lg"
+          className="w-full border-primary/25 hover:border-primary/50"
           onClick={() => setIsContinueDialogOpen(true)}
           disabled={isProcessing || !session || batchFiles.length === 0 || (batchFiles.length - finishedCount <= 0) || isSelecting}
         >

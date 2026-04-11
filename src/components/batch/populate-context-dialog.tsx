@@ -274,7 +274,7 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
                         <ChevronLeft className="size-4" />
                       </Button>
                       <Select value={mappedId ?? undefined} onValueChange={(val) => handleSelectChange(t.id, val)}>
-                        <SelectTrigger className="w-[300px] h-10">
+                        <SelectTrigger className="w-[300px]">
                           <SelectValue placeholder="Select extraction" />
                         </SelectTrigger>
                         <SelectContent>

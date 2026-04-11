@@ -75,7 +75,8 @@ export default function BatchMain() {
         <div className="flex-1 min-w-40 flex items-center gap-2">
           <Button
             variant="ghost"
-            className="size-10 shrink-0"
+            size="icon-lg"
+            className="shrink-0"
             onClick={() => setCurrentProject(null)}
             title="Go back to batch selection"
           >
@@ -88,7 +89,7 @@ export default function BatchMain() {
           />
         </div>
         <Select value={operationMode} onValueChange={(value: "translation" | "extraction" | "transcription") => setOperationMode(value)}>
-          <SelectTrigger className="w-fit h-10">
+          <SelectTrigger className="w-fit">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -118,15 +119,15 @@ export default function BatchMain() {
             </SelectItem>
           </SelectContent>
         </Select>
-        <Link href="/project">
-          <Button variant="outline" className="h-10">
+          <Link href="/project">
+          <Button variant="outline" size="lg">
             <FileText className="size-5" />
             See as Project
           </Button>
         </Link>
         <Button
           variant="outline"
-          className="h-10"
+          size="lg"
           onClick={() => setIsDeleteDialogOpen(true)}
         >
           <Trash className="size-5" />

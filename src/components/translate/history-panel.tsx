@@ -224,13 +224,13 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
       {/* History Action Buttons */}
       <div className="flex justify-center gap-4 mt-4 flex-wrap">
         <Button variant="outline" disabled>
-          <FileJson className="size-4 mr-2" /> Export All
+          <FileJson className="size-4" /> Export All
         </Button>
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="default" disabled={selectedHistoryIndex === null}>
-              <CheckCircle className="size-4 mr-2" /> Apply
+              <CheckCircle className="size-4" /> Apply
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -252,7 +252,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" disabled={selectedHistoryIndex === null}>
-              <XCircle className="size-4 mr-2" /> Delete
+              <XCircle className="size-4" /> Delete
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -274,7 +274,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" disabled={history.length === 0}>
-              <Trash className="size-4 mr-2" /> Delete All
+              <Trash className="size-4" /> Delete All
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>

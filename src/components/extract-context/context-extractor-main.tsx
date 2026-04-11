@@ -453,7 +453,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
       {/* Bottom Controls */}
       <div className="lg:col-span-2 flex items-center justify-center gap-4 flex-wrap">
         <Button
-          className="gap-2 w-[152px]"
+          className="gap-2"
           onClick={handleStartExtraction}
           disabled={isExtracting || !session}
         >
