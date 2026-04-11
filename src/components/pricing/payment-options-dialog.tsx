@@ -257,7 +257,7 @@ export function PaymentOptionsDialog({
 
         <div className="flex flex-col sm:flex-row gap-8 py-2 px-1 overflow-y-auto">
           <div className="flex-1 space-y-4">
-            <h3 className="text-lg font-semibold mb-3">Payment Method</h3>
+            <h3 className="text-lg font-semibold">Payment Method</h3>
             <button
               onClick={handlePopup}
               disabled={isFetchingPayment || !hasConsented}
@@ -330,7 +330,7 @@ export function PaymentOptionsDialog({
           </div>
 
           <div className="flex-1 space-y-4 sm:border-l border-border sm:pl-8 px-2">
-            <h3 className="text-lg font-semibold mb-3">Order Summary</h3>
+            <h3 className="text-lg font-semibold">Order Summary</h3>
             <div className="space-y-2">
               <p className="text-sm font-medium">{credits.toLocaleString()} Credit Pack</p>
               <p className="text-xs text-muted-foreground">

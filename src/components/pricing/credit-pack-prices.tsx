@@ -129,7 +129,7 @@ export function CreditPackPrices({
               className="relative border-t-4 border-t-blue-500 rounded-md shadow-xs hover:border-t-blue-400 dark:hover:border-t-blue-600 transition-colors duration-200"
             >
               <CardHeader>
-                <div className="flex justify-between items-baseline mb-1">
+                <div className="flex justify-between items-baseline">
                   <span className="text-sm font-medium text-muted-foreground">
                     {pack.baseCredits !== 0 ? "Credit Pack" : "Try for Free!"}
                   </span>

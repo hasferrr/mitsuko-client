@@ -566,7 +566,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               />
             </div>
 
-            <div className="mt-3 flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <div className="flex flex-col">
                 <span className="text-sm font-semibold">Max Concurrent Extractions</span>
                 <span className="text-xs text-muted-foreground">
@@ -609,7 +609,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <div className="flex flex-col">
                 <span className="text-sm font-semibold">Extraction Mode</span>
                 <span className="text-xs text-muted-foreground">

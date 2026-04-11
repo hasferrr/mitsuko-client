@@ -155,7 +155,7 @@ export function TranscriptionSelectTab({
       )}
 
       {selectedUploadId && (
-        <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>
             Selected: <span className="text-foreground">{uploads.find(u => u.uploadId === selectedUploadId)?.fileName || 'Unknown file'}</span>
           </span>
@@ -172,7 +172,7 @@ export function TranscriptionSelectTab({
       )}
 
       {uploads.length > 0 && (
-        <div className="flex items-center gap-2 mt-4">
+        <div className="flex items-center gap-2">
           <Checkbox
             id="delete-after-transcription"
             checked={deleteAfterTranscription}

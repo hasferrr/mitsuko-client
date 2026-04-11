@@ -57,7 +57,7 @@ export const StartIndexInput = memo(({ advancedSettingsId }: Props) => {
 
   return (
     <div className="space-y-2">
-      <div className="flex justify-between mb-2 items-center">
+      <div className="flex justify-between items-center">
         <label className="text-sm font-medium">Start Index</label>
       </div>
       <div className="relative">

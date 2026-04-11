@@ -21,7 +21,7 @@ export const TemperatureSlider = memo(({ advancedSettingsId }: TemperatureSlider
 
   return (
     <div className="space-y-2">
-      <div className="flex justify-between mb-2 items-center">
+      <div className="flex justify-between items-center">
         <label className="text-sm font-medium">Temperature</label>
         <span className="text-sm text-muted-foreground">
           {temperature}
