@@ -1,5 +1,5 @@
 ---
-name: nextjs-app-router
+name: posthog-nextjs
 description: PostHog integration for Next.js App Router applications
 metadata:
   author: PostHog
