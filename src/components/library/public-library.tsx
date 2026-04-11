@@ -285,10 +285,10 @@ export default function PublicLibrary() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredInstructions.map(item => (
               <Card key={item.id} className="cursor-pointer flex flex-col" onClick={() => setSelectedId(item.id)}>
-                <CardHeader className="pb-4">
+                <CardHeader>
                   <CardTitle>{item.name}</CardTitle>
                 </CardHeader>
-                <CardContent className="pb-2">
+                <CardContent>
                   <p className="text-sm text-muted-foreground line-clamp-4">{item.preview}</p>
                 </CardContent>
                 <CardFooter className="pt-2 flex justify-between text-xs text-muted-foreground mt-auto">

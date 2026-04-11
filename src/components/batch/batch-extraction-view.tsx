@@ -649,7 +649,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
 
           <TabsContent value="basic" className="grow space-y-4 mt-4">
             <Card>
-              <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <ModelSelection basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />
                 <SubtitleCleanupSwitch />
@@ -659,7 +659,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
 
           <TabsContent value="advanced" className="grow space-y-4 mt-4">
             <Card>
-              <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <ModelDetail basicSettingsId={basicSettingsId} />
                 <MaxCompletionTokenInput basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />

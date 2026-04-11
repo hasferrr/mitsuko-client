@@ -247,7 +247,7 @@ export default function TranscriptionHistory({ onApplyDirect }: TranscriptionHis
       {isLoading || !session ? (
         <div className="space-y-6">
           <Card className="border-dashed">
-            <CardHeader className="py-4">
+            <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Skeleton className="size-4 rounded-full" />
@@ -337,7 +337,7 @@ export default function TranscriptionHistory({ onApplyDirect }: TranscriptionHis
       ) : (
         <div className="space-y-6">
           <Card className="border-dashed">
-            <CardHeader className="py-4">
+            <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {(isBgLoading || bgCount > 0) ? (

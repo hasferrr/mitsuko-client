@@ -235,10 +235,10 @@ export default function MyLibrary() {
                         aria-label={`Select ${item.name}`}
                       />
                     )}
-                    <CardHeader className="pb-4">
+                    <CardHeader>
                       <CardTitle>{item.name}</CardTitle>
                     </CardHeader>
-                    <CardContent className="pb-2 grow">
+                    <CardContent className="grow">
                       <p className="text-sm text-muted-foreground line-clamp-4">
                         {item.content}
                       </p>

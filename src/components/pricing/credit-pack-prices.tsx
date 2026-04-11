@@ -128,7 +128,7 @@ export function CreditPackPrices({
               key={pack.productId}
               className="relative border-t-4 border-t-blue-500 border-r border-b border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/30 rounded-md shadow-xs hover:border-blue-400 dark:hover:border-blue-600 transition-colors duration-200"
             >
-              <CardHeader className="pb-0 pt-4">
+              <CardHeader>
                 <div className="flex justify-between items-baseline mb-1">
                   <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     {pack.baseCredits !== 0 ? "Credit Pack" : "Try for Free!"}
@@ -179,7 +179,7 @@ export function CreditPackPrices({
                   )}
                 </div>
               </CardContent>
-              <CardFooter className="pt-0 pb-4">
+              <CardFooter className="pt-0">
                 {redirectToPricingPage ? (
                   <Button
                     className="w-full bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-blue-500 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"

@@ -78,7 +78,7 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
       "group relative hover:shadow-md transition-shadow",
       !isSubtitlePerformanceModeEnabled && subtitle.index > 10 && "sentry-block ph-no-capture",
     )}>
-      <CardContent className="p-4">
+      <CardContent>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             {/* Left side (timestamp and index) */}

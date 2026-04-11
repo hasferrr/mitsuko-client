@@ -79,7 +79,7 @@ export function SortableBatchTranscriptionFile({
           <GripVertical className="size-5 text-muted-foreground" />
         </div>
       )}
-      <CardContent className="p-4 flex-1 flex items-center justify-between">
+      <CardContent className="flex-1 flex items-center justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <FileAudio className="size-4 text-muted-foreground shrink-0" />

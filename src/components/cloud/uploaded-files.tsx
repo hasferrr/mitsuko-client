@@ -251,7 +251,7 @@ export default function UploadedFiles() {
       {/* Upload Progress */}
       {uploadProgress && (
         <Card>
-          <CardHeader className="py-4">
+          <CardHeader>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Uploading file...</span>

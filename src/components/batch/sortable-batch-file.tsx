@@ -86,7 +86,7 @@ export function SortableBatchFile({
           <GripVertical className="size-5 text-muted-foreground" />
         </div>
       )}
-      <CardContent className="p-4 flex-1 flex items-center justify-between">
+      <CardContent className="flex-1 flex items-center justify-between">
         <div>
           <p
             className={cn("text-sm wrap-break-word break-all pr-2 line-clamp-4", !selectMode && "hover:underline cursor-pointer")}

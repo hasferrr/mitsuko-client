@@ -166,7 +166,7 @@ export function ImportInstructionsDialog() {
                     className="absolute top-3 right-3 z-10"
                     aria-label={`Select ${item.name}`}
                   />
-                  <CardHeader className="pb-2">
+                  <CardHeader>
                     <CardTitle className="text-lg">{item.name}</CardTitle>
                   </CardHeader>
                   <CardContent className="grow">

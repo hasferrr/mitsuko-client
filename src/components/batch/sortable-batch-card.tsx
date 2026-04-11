@@ -32,7 +32,7 @@ export function SortableBatchCard({ project, onSelect }: SortableBatchCardProps)
       )}
       onClick={() => onSelect(project.id)}
     >
-      <CardHeader className="flex-row items-center justify-between gap-2 pb-2">
+      <CardHeader className="flex-row items-center justify-between gap-2">
         <CardTitle>{project.name}</CardTitle>
         <div className="flex items-center gap-4">
           <GripVertical
@@ -43,7 +43,7 @@ export function SortableBatchCard({ project, onSelect }: SortableBatchCardProps)
           />
         </div>
       </CardHeader>
-      <CardContent className="pb-4 flex flex-col flex-1">
+      <CardContent className="flex flex-col flex-1">
         <div className="flex-1"></div>
         <div className="flex flex-col gap-1 mt-auto">
           <p className="text-sm text-muted-foreground">

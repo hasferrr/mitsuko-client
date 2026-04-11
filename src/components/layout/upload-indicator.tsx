@@ -22,7 +22,7 @@ export function UploadIndicator() {
     <div className="fixed bottom-4 right-4 w-[300px] z-50 space-y-2">
       {activeUploads.map(({ id, upload }) => (
         <Card key={id}>
-          <CardHeader className="py-3">
+          <CardHeader>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium flex items-center gap-2 truncate">
