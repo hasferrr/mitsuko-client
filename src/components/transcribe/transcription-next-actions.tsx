@@ -40,7 +40,7 @@ export function TranscriptionNextActions({
           <Button
             size="sm"
             variant="outline"
-            className="w-full mt-2 border-border"
+            className="w-full mt-2"
             onClick={onCreateTranslation}
             disabled={!transcriptSubtitles.length || isTranscribing}
           >
@@ -61,7 +61,7 @@ export function TranscriptionNextActions({
           <Button
             size="sm"
             variant="outline"
-            className="w-full mt-2 border-border"
+            className="w-full mt-2"
             onClick={onExport}
             disabled={!transcriptSubtitles.length || isTranscribing}
           >

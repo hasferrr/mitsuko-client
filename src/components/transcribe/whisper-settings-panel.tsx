@@ -147,7 +147,6 @@ export function WhisperSettingsPanel({
             <Button
               size="sm"
               variant="outline"
-              className="border-border"
               onClick={onApplyClick}
               disabled={applyDisabled}
             >
@@ -159,7 +158,6 @@ export function WhisperSettingsPanel({
             <Button
               size="sm"
               variant="outline"
-              className="border-border"
               onClick={reset}
             >
               <RefreshCw className="size-3" />

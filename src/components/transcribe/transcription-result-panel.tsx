@@ -91,7 +91,7 @@ export function TranscriptionResultPanel({
                       <Button
                         size="sm"
                         variant="outline"
-                        className="text-xs border-border"
+                        className="text-xs"
                         onClick={onClear}
                         disabled={isTranscribing}
                       >
@@ -116,7 +116,7 @@ export function TranscriptionResultPanel({
                   <Button
                     size="sm"
                     variant="outline"
-                    className={cn("text-xs border-border", isEditing && "border-primary/50")}
+                    className={cn("text-xs", isEditing && "border-primary/50")}
                     onClick={onIsEditing}
                     disabled={isTranscribing}
                   >
@@ -128,7 +128,7 @@ export function TranscriptionResultPanel({
                   <Button
                     size="sm"
                     variant="outline"
-                    className="text-xs border-border"
+                    className="text-xs"
                     onClick={onExport}
                   >
                     <Download className="size-3" /> Export SRT
@@ -187,7 +187,7 @@ export function TranscriptionResultPanel({
                       <Button
                         size="sm"
                         variant="outline"
-                        className="text-xs border-border"
+                        className="text-xs"
                         onClick={onClear}
                         disabled={isTranscribing}
                       >
@@ -212,7 +212,7 @@ export function TranscriptionResultPanel({
                   <Button
                     size="sm"
                     variant="outline"
-                    className="text-xs border-border"
+                    className="text-xs"
                     onClick={onParse}
                   >
                     <ClipboardPaste className="size-3" /> Parse
@@ -220,7 +220,7 @@ export function TranscriptionResultPanel({
                   <Button
                     size="sm"
                     variant="outline"
-                    className="text-xs border-border"
+                    className="text-xs"
                     onClick={onExport}
                   >
                     <Download className="size-3" /> Export SRT
