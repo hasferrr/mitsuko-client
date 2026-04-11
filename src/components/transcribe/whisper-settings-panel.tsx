@@ -1,12 +1,12 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Wand2, RefreshCw } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
-import { cn } from "@/lib/utils"
 
 interface WhisperSettingsPanelProps {
   showApplyButton?: boolean
@@ -37,7 +37,8 @@ export function WhisperSettingsPanel({
   const reset = useWhisperSettingsStore((state) => state.reset)
 
   return (
-    <div className={cn("bg-card border border-border rounded-lg p-6", className)}>
+    <Card size="sm" className={className}>
+      <CardContent>
       <h2 className="text-lg font-medium mb-4">Whisper transcription settings</h2>
 
       <div className="space-y-4">
@@ -167,6 +168,7 @@ export function WhisperSettingsPanel({
           )}
         </div>
       </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

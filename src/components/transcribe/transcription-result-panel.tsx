@@ -2,6 +2,7 @@
 
 import { type RefObject, type ChangeEvent } from "react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Download,
   Clock,
@@ -78,194 +79,198 @@ export function TranscriptionResultPanel({
       </TabsList>
 
       <TabsContent value="transcript" className="mt-4">
-        <div className="bg-card border border-border rounded-lg p-6">
-          <div className="flex justify-between items-center mb-4 gap-2">
-            <h2 className="text-lg font-medium">Transcription</h2>
+        <Card size="sm">
+          <CardContent>
+            <div className="flex justify-between items-center mb-4 gap-2">
+              <h2 className="text-lg font-medium">Transcription</h2>
 
-            {(transcriptionText || isEditing) && (
-              <div className="flex flex-wrap gap-2 justify-end">
-                <AlertDialog open={isClearDialogOpen} onOpenChange={onSetIsClearDialogOpen}>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-border"
-                      onClick={onClear}
-                      disabled={isTranscribing}
-                    >
-                      <Trash className="size-3" /> Clear
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will permanently clear the transcription and subtitles.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={onConfirmClear}>
-                        Confirm
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className={cn("text-xs border-border", isEditing && "border-primary/50")}
-                  onClick={onIsEditing}
-                  disabled={isTranscribing}
-                >
-                  {isEditing
-                    ? <Save className="size-3" />
-                    : <Edit className="size-3" />}
-                  {isEditing ? "Done" : "Edit"}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-xs border-border"
-                  onClick={onExport}
-                >
-                  <Download className="size-3" /> Export SRT
-                </Button>
+              {(transcriptionText || isEditing) && (
+                <div className="flex flex-wrap gap-2 justify-end">
+                  <AlertDialog open={isClearDialogOpen} onOpenChange={onSetIsClearDialogOpen}>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs border-border"
+                        onClick={onClear}
+                        disabled={isTranscribing}
+                      >
+                        <Trash className="size-3" /> Clear
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently clear the transcription and subtitles.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={onConfirmClear}>
+                          Confirm
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className={cn("text-xs border-border", isEditing && "border-primary/50")}
+                    onClick={onIsEditing}
+                    disabled={isTranscribing}
+                  >
+                    {isEditing
+                      ? <Save className="size-3" />
+                      : <Edit className="size-3" />}
+                    {isEditing ? "Done" : "Edit"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs border-border"
+                    onClick={onExport}
+                  >
+                    <Download className="size-3" /> Export SRT
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {!transcriptionText && !isTranscribing && !isEditing ? (
+              <div className="border border-border rounded-lg p-8 flex flex-col items-center justify-center">
+                <AudioWaveform className="size-10 text-muted-foreground mb-3" />
+                <p className="text-muted-foreground text-sm mb-1">
+                  Upload an audio file and click &quot;Start Transcription&quot;
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  Your transcription will appear here in real-time
+                </p>
+              </div>
+            ) : isEditing ? (
+              <Textarea
+                ref={transcriptionAreaRef}
+                value={transcriptionText}
+                readOnly={!isEditing || isTranscribing}
+                onChange={onTranscriptionTextChange}
+                className="w-full h-96 p-4 bg-background text-foreground resize-none overflow-y-auto"
+              />
+            ) : (
+              <div
+                ref={transcriptionResultRef}
+                className={cn(
+                  "min-h-96 h-96 overflow-y-auto rounded-md border p-3 pr-2",
+                  !transcriptionText && "text-muted-foreground",
+                )}
+              >
+                <AiStreamOutput
+                  content={transcriptionText || "Transcription will appear here..."}
+                  isProcessing={isTranscribing}
+                  defaultCollapsed={!!transcriptionText}
+                />
               </div>
             )}
-          </div>
-
-          {!transcriptionText && !isTranscribing && !isEditing ? (
-            <div className="border border-border rounded-lg p-8 flex flex-col items-center justify-center">
-              <AudioWaveform className="size-10 text-muted-foreground mb-3" />
-              <p className="text-muted-foreground text-sm mb-1">
-                Upload an audio file and click &quot;Start Transcription&quot;
-              </p>
-              <p className="text-muted-foreground text-xs">
-                Your transcription will appear here in real-time
-              </p>
-            </div>
-          ) : isEditing ? (
-            <Textarea
-              ref={transcriptionAreaRef}
-              value={transcriptionText}
-              readOnly={!isEditing || isTranscribing}
-              onChange={onTranscriptionTextChange}
-              className="w-full h-96 p-4 bg-background text-foreground resize-none overflow-y-auto"
-            />
-          ) : (
-            <div
-              ref={transcriptionResultRef}
-              className={cn(
-                "min-h-96 h-96 overflow-y-auto rounded-md border p-3 pr-2",
-                !transcriptionText && "text-muted-foreground",
-              )}
-            >
-              <AiStreamOutput
-                content={transcriptionText || "Transcription will appear here..."}
-                isProcessing={isTranscribing}
-                defaultCollapsed={!!transcriptionText}
-              />
-            </div>
-          )}
-        </div>
+          </CardContent>
+        </Card>
       </TabsContent>
 
       <TabsContent value="subtitles" className="mt-4">
-        <div className="bg-card border border-border rounded-lg p-6">
-          <div className="flex justify-between items-center mb-4 gap-2">
-            <h2 className="text-lg font-medium">Subtitle Result</h2>
+        <Card size="sm">
+          <CardContent>
+            <div className="flex justify-between items-center mb-4 gap-2">
+              <h2 className="text-lg font-medium">Subtitle Result</h2>
 
-            {transcriptSubtitles.length > 0 && (
-              <div className="flex flex-wrap gap-2 justify-end">
-                <AlertDialog open={isClearDialogOpen} onOpenChange={onSetIsClearDialogOpen}>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-border"
-                      onClick={onClear}
-                      disabled={isTranscribing}
-                    >
-                      <Trash className="size-3" /> Clear
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will permanently clear the transcription and subtitles.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={onConfirmClear}>
-                        Confirm
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-xs border-border"
-                  onClick={onParse}
-                >
-                  <ClipboardPaste className="size-3" /> Parse
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-xs border-border"
-                  onClick={onExport}
-                >
-                  <Download className="size-3" /> Export SRT
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {transcriptSubtitles.length === 0 && !isTranscribing ? (
-            <div className="border border-border rounded-lg p-8 flex flex-col items-center justify-center">
-              <Clock className="size-10 text-muted-foreground mb-3" />
-              <p className="text-muted-foreground text-sm mb-1">
-                Your subtitles with timestamps will appear here
-              </p>
-              <p className="text-muted-foreground text-xs">After transcription is complete</p>
-            </div>
-          ) : (
-            <div className="h-96 overflow-y-auto pr-2">
-              {transcriptSubtitles.map((subtitle) => (
-                <div
-                  key={`transcript-subtitle-${subtitle.index}`}
-                  className="mb-4 p-3 border border-border rounded-md hover:border-border/80 transition-colors"
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs font-medium">#{subtitle.index}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {timestampToString(subtitle.timestamp.start)} → {timestampToString(subtitle.timestamp.end)}
-                    </span>
-                  </div>
-                  {subtitle.content.split("\n").map((line: string, index: number) => (
-                    <p key={`transcript-subtitle-${subtitle.index}-${index}`} className="text-sm">
-                      {line}
-                    </p>
-                  ))}
-                </div>
-              ))}
-
-              {isTranscribing && (
-                <div className="flex items-center justify-center py-4">
-                  <div className="animate-pulse flex space-x-1">
-                    <div className="size-2 bg-blue-500 rounded-full"></div>
-                    <div className="size-2 bg-blue-500 rounded-full"></div>
-                    <div className="size-2 bg-blue-500 rounded-full"></div>
-                  </div>
+              {transcriptSubtitles.length > 0 && (
+                <div className="flex flex-wrap gap-2 justify-end">
+                  <AlertDialog open={isClearDialogOpen} onOpenChange={onSetIsClearDialogOpen}>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs border-border"
+                        onClick={onClear}
+                        disabled={isTranscribing}
+                      >
+                        <Trash className="size-3" /> Clear
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently clear the transcription and subtitles.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={onConfirmClear}>
+                          Confirm
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs border-border"
+                    onClick={onParse}
+                  >
+                    <ClipboardPaste className="size-3" /> Parse
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs border-border"
+                    onClick={onExport}
+                  >
+                    <Download className="size-3" /> Export SRT
+                  </Button>
                 </div>
               )}
             </div>
-          )}
-        </div>
+
+            {transcriptSubtitles.length === 0 && !isTranscribing ? (
+              <div className="border border-border rounded-lg p-8 flex flex-col items-center justify-center">
+                <Clock className="size-10 text-muted-foreground mb-3" />
+                <p className="text-muted-foreground text-sm mb-1">
+                  Your subtitles with timestamps will appear here
+                </p>
+                <p className="text-muted-foreground text-xs">After transcription is complete</p>
+              </div>
+            ) : (
+              <div className="h-96 overflow-y-auto pr-2">
+                {transcriptSubtitles.map((subtitle) => (
+                  <div
+                    key={`transcript-subtitle-${subtitle.index}`}
+                    className="mb-4 p-3 border border-border rounded-md hover:border-border/80 transition-colors"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-xs font-medium">#{subtitle.index}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {timestampToString(subtitle.timestamp.start)} → {timestampToString(subtitle.timestamp.end)}
+                      </span>
+                    </div>
+                    {subtitle.content.split("\n").map((line: string, index: number) => (
+                      <p key={`transcript-subtitle-${subtitle.index}-${index}`} className="text-sm">
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                ))}
+
+                {isTranscribing && (
+                  <div className="flex items-center justify-center py-4">
+                    <div className="animate-pulse flex space-x-1">
+                      <div className="size-2 bg-blue-500 rounded-full"></div>
+                      <div className="size-2 bg-blue-500 rounded-full"></div>
+                      <div className="size-2 bg-blue-500 rounded-full"></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </TabsContent>
     </Tabs>
   )

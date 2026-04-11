@@ -2,6 +2,7 @@
 
 import { type RefObject } from "react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   File,
   Loader2,
@@ -40,7 +41,8 @@ export function TranscriptionUploadTab({
   onUploadSelectedFile,
 }: TranscriptionUploadTabProps) {
   return (
-    <div className="bg-card border border-border rounded-lg p-6 space-y-4">
+    <Card size="sm">
+      <CardContent className="space-y-4">
       <h2 className="text-lg font-medium">Upload Audio</h2>
 
       {!file && (
@@ -130,6 +132,7 @@ export function TranscriptionUploadTab({
           </Button>
         </div>
       )}
-    </div>
+      </CardContent>
+    </Card>
   )
 }

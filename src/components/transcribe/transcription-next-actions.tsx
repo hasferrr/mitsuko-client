@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Globe,
   FileText,
@@ -21,8 +22,9 @@ export function TranscriptionNextActions({
   onExport,
 }: TranscriptionNextActionsProps) {
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h2 className="text-lg font-medium mb-4">What&apos;s Next?</h2>
+    <Card size="sm">
+      <CardContent>
+        <h2 className="text-lg font-medium mb-4">What&apos;s Next?</h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="flex flex-col justify-between p-4 border border-border rounded-md">
@@ -67,6 +69,7 @@ export function TranscriptionNextActions({
           </Button>
         </div>
       </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Wand2,
   Clock,
@@ -40,8 +41,9 @@ export function TranscriptionControls({
   onSetRightTab,
 }: TranscriptionControlsProps) {
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h2 className="text-lg font-medium mb-4">Transcription Settings</h2>
+    <Card size="sm">
+      <CardContent>
+        <h2 className="text-lg font-medium mb-4">Transcription Settings</h2>
 
       <div className="space-y-4">
         <div className={cn("space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
@@ -95,6 +97,7 @@ export function TranscriptionControls({
           </Button>
         </div>
       </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

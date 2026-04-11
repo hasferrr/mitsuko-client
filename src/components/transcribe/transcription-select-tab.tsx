@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   File,
   Loader2,
@@ -74,7 +75,8 @@ export function TranscriptionSelectTab({
   }
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
+    <Card size="sm">
+      <CardContent>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-medium">Select Uploaded Audio</h2>
         <Button
@@ -190,6 +192,7 @@ export function TranscriptionSelectTab({
         setIsDeleteModalOpen={onSetIsDeleteDialogOpen}
         isProcessing={isDeleting}
       />
-    </div>
+      </CardContent>
+    </Card>
   )
 }
