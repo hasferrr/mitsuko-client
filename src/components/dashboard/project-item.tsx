@@ -115,7 +115,8 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="size-8 p-0 hover:bg-accent"
+                  size="icon"
+                  className="hover:bg-accent"
                 >
                   <MoreHorizontal className="size-4 text-muted-foreground" />
                 </Button>

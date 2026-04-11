@@ -50,9 +50,7 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            size="sm"
             onClick={() => setIsPresetsDialogOpen(true)}
-            className="h-8 px-2"
           >
             <List className="size-4" />
             Presets

@@ -132,12 +132,10 @@ export function SettingsTranscription({ transcriptionId }: SettingsTranscription
             <Button
               disabled={isAsrModel(selectedModel)}
               variant="outline"
-              size="sm"
               onClick={() => setIsPresetsDialogOpen(true)}
-              className="h-8 px-2"
             >
               <List className="size-3.5" />
-              <span className="ml-1">Presets</span>
+              <span>Presets</span>
             </Button>
             <CustomInstructionsLibraryControls
               customInstructions={customInstructions}

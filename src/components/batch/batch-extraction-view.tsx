@@ -578,8 +578,8 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="size-8 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
+                  size="icon"
+                  className="hover:text-foreground text-lg font-medium select-none"
                   onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, concurrentOperation - 1))}
                   disabled={isSequentialExtraction || concurrentOperation <= 1}
                 >
@@ -599,8 +599,8 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
                 />
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="size-8 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
+                  size="icon"
+                  className="hover:text-foreground text-lg font-medium select-none"
                   onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_BATCH_CONCURRENT_OPERATION, concurrentOperation + 1))}
                   disabled={isSequentialExtraction || concurrentOperation >= MAX_BATCH_CONCURRENT_OPERATION}
                 >
