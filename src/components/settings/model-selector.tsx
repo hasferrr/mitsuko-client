@@ -225,7 +225,7 @@ function ModelItem({ model, modelKey, cost, isSelected, onSelect }: ModelItemPro
       <HoverCardContent
         side="left"
         align="start"
-        className="w-[260px] text-sm"
+        className="w-[260px]"
         // animate={false}
       >
         <ModelDescription model={model} cost={cost} isSelected={isSelected} />
@@ -242,7 +242,7 @@ interface ModelDescriptionProps {
 
 function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
   return model ? (
-    <div className="bg-popover text-popover-foreground text-sm">
+    <div>
       {isSelected && (
         <div className="text-xs text-muted-foreground mb-1">
           Currently Selected Model

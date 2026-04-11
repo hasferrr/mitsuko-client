@@ -126,7 +126,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       />
 
       <Tabs defaultValue="overview" className="mb-6">
-        <TabsList className="bg-card border border-border p-1 rounded-lg w-fit h-fit flex flex-wrap">
+        <TabsList className="bg-card border border-border p-1 h-fit flex flex-wrap">
           <TabsTrigger value="overview" className="data-[state=active]:bg-secondary rounded-md">
             <LayoutDashboard className="size-4" />
             Overview ({translations.length + transcriptions.length + extractions.length})
