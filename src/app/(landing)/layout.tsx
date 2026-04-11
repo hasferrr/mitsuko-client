@@ -4,7 +4,7 @@ import Navbar from "@/components/landing/navbar"
 
 export default function HomeLayout({ children }: PropsWithChildren) {
   return (
-    <div className="min-h-screen text-gray-900 dark:text-white flex flex-col">
+    <div className="min-h-screen text-foreground flex flex-col">
       <Navbar />
       {children}
       <Footer />

@@ -24,7 +24,7 @@ export default function GlobalError({
         <div className="min-h-screen flex flex-col items-center justify-center">
           <div className="flex flex-col gap-4 items-center justify-center px-4">
             <h1 className="text-4xl font-semibold">Something went wrong!</h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-muted-foreground">
               {error.message || 'An unexpected error occurred'}
             </p>
             <button

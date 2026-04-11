@@ -155,20 +155,19 @@ export function User() {
                 {isUserLoading ? (
                   <span className="italic text-muted-foreground">Loading...</span>
                 ) : isUserError ? (
-                  <span className="italic text-red-500">Error</span>
+                  <span className="italic text-destructive">Error</span>
                 ) : (
                   <div className="flex items-center justify-end gap-2">
                     <Link href="/pricing" target="_blank">
                       <Button
-                        variant="outline"
                         size="sm"
-                        className="gap-1 py-0 px-2 mr-1 h-6 text-white hover:text-white bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors"
+                        className="py-0 px-2 h-6"
                       >
                         <Plus className="size-4" />
                         Buy
                       </Button>
                     </Link>
-                    <span className={cn((user?.credit ?? 0) < 0 && "text-red-500")}>
+                    <span className={cn((user?.credit ?? 0) < 0 && "text-destructive")}>
                       {Math.round(user?.credit ?? 0).toLocaleString()}
                     </span>
                   </div>
@@ -181,7 +180,7 @@ export function User() {
                 {isUserLoading ? (
                   <span className="italic text-muted-foreground">Loading...</span>
                 ) : isUserError ? (
-                  <span className="italic text-red-500">Error</span>
+                  <span className="italic text-destructive">Error</span>
                 ) : (
                   // capitalize(user?.tier ?? "unknown")
                   "Basic"
@@ -245,7 +244,7 @@ export function User() {
                 ))
               ) : isTransactionsError ? (
                 <tr>
-                  <td colSpan={4} className="p-4 text-center text-red-500">
+                  <td colSpan={4} className="p-4 text-center text-destructive">
                     Error loading transactions
                   </td>
                 </tr>
@@ -261,7 +260,7 @@ export function User() {
                     <td className="px-4 py-2">
                       {new Date(transaction.created_at).toLocaleString()}
                     </td>
-                    <td className={cn("px-4 py-2", transaction.amount >= 0 ? "text-foreground" : "text-red-500")}>
+                    <td className={cn("px-4 py-2", transaction.amount >= 0 ? "text-foreground" : "text-destructive")}>
                       {transaction.amount > 0 ? "+" : ""}
                       {Math.round(transaction.amount).toLocaleString()}
                     </td>
@@ -385,7 +384,7 @@ export function User() {
                 ))
               ) : isCreditBatchesError ? (
                 <tr>
-                  <td colSpan={4} className="p-4 text-center text-red-500">
+                  <td colSpan={4} className="p-4 text-center text-destructive">
                     Error loading credit grants
                   </td>
                 </tr>
@@ -408,8 +407,8 @@ export function User() {
                           className={cn(
                             "px-2 py-1 rounded-full text-xs font-medium",
                             isExpired
-                              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                              : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                              ? "bg-destructive/10 text-destructive"
+                              : "bg-primary/10 text-primary"
                           )}
                         >
                           {state}
