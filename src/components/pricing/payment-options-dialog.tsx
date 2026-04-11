@@ -251,7 +251,7 @@ export function PaymentOptionsDialog({
           <DialogDescription>
             Customize your purchase and select a payment method.
             <br />
-            {paymentError && <span className="absolute text-red-500 text-sm">{paymentError}</span>}
+            {paymentError && <span className="absolute text-destructive text-sm">{paymentError}</span>}
           </DialogDescription>
         </DialogHeader>
 
@@ -396,7 +396,7 @@ export function PaymentOptionsDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex-row justify-between mt-auto">
+        <DialogFooter className="sm:flex-row justify-between mt-auto">
           <Button onClick={handleReset} variant="destructive" size="sm" disabled={isResetting || isFetchingPayment || (!snapData && lemonSqueezyCache.size === 0)}>
             {isResetting ? (
               <>

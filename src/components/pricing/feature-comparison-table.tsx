@@ -43,7 +43,7 @@ export function FeatureComparisonTable({
   return (
     <Card className="max-w-5xl mx-auto shadow-xs">
       <div className="bg-muted/50 border-b border-border p-4">
-        <h3 className="text-lg font-medium text-card-foreground">
+        <h3 className="text-lg font-medium">
           Feature Comparison
         </h3>
       </div>

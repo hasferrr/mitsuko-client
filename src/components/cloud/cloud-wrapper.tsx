@@ -8,11 +8,11 @@ export default function CloudWrapper() {
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       <Tabs defaultValue="storage" className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="storage" className="flex items-center gap-2 w-48">
+          <TabsTrigger value="storage" className="gap-2 w-48">
             <Upload className="size-4" />
             Uploaded Files
           </TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-2 w-48">
+          <TabsTrigger value="history" className="gap-2 w-48">
             <History className="size-4" />
             Transcription History
           </TabsTrigger>

@@ -19,8 +19,8 @@ export default function PricingDescription() {
 
         {/* Description of Credits */}
         <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
-          <CardContent className="p-8">
-            <h3 className="text-xl font-medium mb-4">
+          <CardContent className="px-8 space-y-4">
+            <h3 className="text-xl font-medium">
               What are Credits?
             </h3>
           <div className="flex flex-col gap-4">
@@ -45,8 +45,8 @@ export default function PricingDescription() {
 
         {/* Track Your Credits Section */}
         <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
-          <CardContent className="p-8">
-            <h3 className="text-xl font-medium mb-4">
+          <CardContent className="px-8 space-y-4">
+            <h3 className="text-xl font-medium">
               Where Can I See My Credits?
             </h3>
           <p>
@@ -67,8 +67,8 @@ export default function PricingDescription() {
 
         {/* Background Processing */}
         <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
-          <CardContent className="p-8">
-            <h3 className="text-xl font-medium mb-4">
+          <CardContent className="px-8 space-y-4">
+            <h3 className="text-xl font-medium">
               Background Processing
             </h3>
             <p>

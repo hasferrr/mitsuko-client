@@ -56,7 +56,7 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
     <>
       <Card
         className={cn(
-          "dark:bg-[#111111] hover:ring-primary/50 hover:bg-card/80 transition-colors",
+          "hover:ring-primary/50 hover:bg-card/80 transition-colors",
         )}
       >
         <CardContent>

@@ -16,9 +16,9 @@ export default function WhichModels({ className }: WhichModelsProps) {
       "max-w-5xl mx-auto mt-8 shadow-xs",
       className
     )}>
-      <CardContent className="p-8">
+      <CardContent className="px-8 space-y-4">
         <div id="which-models" className="absolute -top-24" />
-        <h3 className="text-xl font-medium mb-4">
+        <h3 className="text-xl font-medium">
           Which Models Should I Use?
         </h3>
       <div className="flex flex-col gap-4">

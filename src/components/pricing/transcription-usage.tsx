@@ -34,8 +34,8 @@ export default async function TranscriptionUsage() {
 
   return (
     <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
-      <CardContent className="p-8">
-        <h3 className="text-xl font-medium mb-4">
+      <CardContent className="px-8 space-y-4">
+        <h3 className="text-xl font-medium">
           Transcription (Experimental)
         </h3>
       <div className="flex flex-col gap-4">
@@ -47,16 +47,16 @@ export default async function TranscriptionUsage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-muted/50">
-                <th className="px-4 py-2 text-left font-medium text-card-foreground">
+                <th className="px-4 py-2 text-left font-medium">
                   Model Type
                 </th>
-                <th className="px-4 py-2 text-left font-medium text-card-foreground">
+                <th className="px-4 py-2 text-left font-medium">
                   Credit per <br /> 1 minute audio
                 </th>
-                <th className="px-4 py-2 text-left font-medium text-card-foreground">
+                <th className="px-4 py-2 text-left font-medium">
                   Credit per <br /> Output Token
                 </th>
-                <th className="px-4 py-2 text-left font-medium text-card-foreground">
+                <th className="px-4 py-2 text-left font-medium">
                   Max Duration
                 </th>
               </tr>
@@ -64,7 +64,7 @@ export default async function TranscriptionUsage() {
             <tbody className="divide-y divide-border">
               {modelCosts.map((model) => (
                 <tr key={model.name} className="hover:bg-muted/50">
-                  <td className="px-4 py-2 text-left text-card-foreground">{model.name}</td>
+                  <td className="px-4 py-2 text-left">{model.name}</td>
                   <td className="px-4 py-2 text-left text-muted-foreground">{model.input}</td>
                   <td className="px-4 py-2 text-left text-muted-foreground">{model.output}</td>
                   <td className="px-4 py-2 text-left text-muted-foreground">{model.maxDuration / 60} minutes</td>

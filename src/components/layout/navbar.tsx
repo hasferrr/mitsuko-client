@@ -189,13 +189,13 @@ export function Navbar() {
               </>
             ) : isError ? (
               <>
-                <AlertCircle className="size-4 text-red-500" />
-                <span className="text-red-500">Error</span>
+                <AlertCircle className="size-4 text-destructive" />
+                <span className="text-destructive">Error</span>
               </>
             ) : user ? (
               <>
                 <CircleDollarSign className="size-4" />
-                <span className={cn(user.credit < 0 && "text-red-500")}>
+                <span className={cn(user.credit < 0 && "text-destructive")}>
                   {Math.round(user.credit).toLocaleString()} credits
                 </span>
               </>

@@ -144,7 +144,7 @@ export function CreditPackPrices({
                     </span>
                   )}
                 </div>
-                <div className="text-xl font-medium text-card-foreground">
+                <div className="text-xl font-medium">
                   {pack.baseCredits !== 0 ? (
                     <>
                       {pack.baseCredits.toLocaleString()}
@@ -168,12 +168,12 @@ export function CreditPackPrices({
                           return originalPrice.toLocaleString()
                         })()}
                       </span>
-                      <span className="text-xl font-bold text-card-foreground">
+                      <span className="text-xl font-bold">
                         {currency.symbol}{price.toLocaleString()}
                       </span>
                     </>
                   ) : (
-                    <span className="text-xl font-bold text-card-foreground">
+                    <span className="text-xl font-bold">
                       {currency.symbol}{price.toLocaleString()}
                     </span>
                   )}

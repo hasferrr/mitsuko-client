@@ -39,17 +39,17 @@ export function PricingCards({
       <div id="pricing-cards" className="absolute -top-24" />
       {/* Free Tier */}
       <Card className="overflow-hidden shadow-xs hover:shadow-md transition-shadow">
-        <CardContent className="p-6">
-          <h3 className="text-xl font-bold mb-2">Free</h3>
-          <div className="flex items-end gap-1 mb-6">
+        <CardContent className="px-6 space-y-6">
+          <h3 className="text-xl font-bold">Free</h3>
+          <div className="flex items-end gap-1">
             <span className="text-3xl font-bold">{currency.symbol}{pricingData.free.price}</span>
             <span className="text-muted-foreground mb-1">/month</span>
           </div>
-          <p className="text-sm text-muted-foreground mb-6">
+          <p className="text-sm text-muted-foreground">
             Access to most features with some limitations. Purchase credits as needed.
           </p>
           <Link href="/dashboard">
-            <Button variant="secondary" className="w-full mb-6">
+            <Button variant="secondary" className="w-full">
               Get Started
             </Button>
           </Link>
@@ -156,18 +156,18 @@ export function PricingCards({
 
       {/* Pro Tier */}
       <Card className="overflow-hidden shadow-xs hover:shadow-md transition-shadow">
-        <CardContent className="p-6">
-          <h3 className="text-xl font-bold mb-2">Pro</h3>
-          <div className="flex items-end gap-1 mb-6">
+        <CardContent className="px-6 space-y-6">
+          <h3 className="text-xl font-bold">Pro</h3>
+          <div className="flex items-end gap-1">
             <span className="text-3xl font-bold">{currency.symbol}{pricingData.pro.price}</span>
             <span className="text-muted-foreground mb-1">/month</span>
           </div>
-          <p className="text-sm text-muted-foreground mb-6">
+          <p className="text-sm text-muted-foreground">
             Maximum features with priority support and cloud saving.
           </p>
           {redirectToPricingPage ? (
             <Button
-              className="w-full mb-6"
+              className="w-full"
               onClick={() => router.push("/pricing")}
             >
               Go to Pricing Page
@@ -177,7 +177,7 @@ export function PricingCards({
               <Button
                 disabled
                 className={cn(
-                  "w-full cursor-not-allowed opacity-50 mb-6"
+                  "w-full cursor-not-allowed opacity-50"
                 )}
                 onClick={(e) => e.preventDefault()}
               >
