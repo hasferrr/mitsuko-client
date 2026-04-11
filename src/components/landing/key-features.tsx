@@ -10,7 +10,7 @@ export default function KeyFeatures() {
         <h2 className="md:text-4xl text-3xl font-semibold mb-4 tracking-tight">
           Key Features
         </h2>
-        <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+        <p className="text-muted-foreground max-w-3xl mx-auto">
           Everything you need for high-quality translation and transcription.
         </p>
       </div>
@@ -19,34 +19,34 @@ export default function KeyFeatures() {
         <div
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"
         >
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
+          <div className="bg-white dark:bg-[#111111] border border-border rounded-xl p-8 shadow-xs">
             <div className="text-[#3B82F6] mb-6">
               <Languages size={40} />
             </div>
-            <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Subtitle Translator</h3>
-            <p className="text-gray-600 dark:text-gray-400 -tracking-[0.02em]">
+            <h3 className="text-xl font-semibold mb-3 text-foreground">Subtitle Translator</h3>
+            <p className="text-muted-foreground -tracking-[0.02em]">
               Translate subtitles with frontier AI models like Gemini, Claude, Grok, and OpenAI.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
+          <div className="bg-white dark:bg-[#111111] border border-border rounded-xl p-8 shadow-xs">
             <div className="text-red-500 mb-6">
               <div className="size-10 rounded-md bg-red-500 flex items-center justify-center">
                 <AudioWaveform size={24} className="text-white" />
               </div>
             </div>
-            <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Audio Transcriber</h3>
-            <p className="text-gray-600 dark:text-gray-400 -tracking-[0.02em]">
+            <h3 className="text-xl font-semibold mb-3 text-foreground">Audio Transcriber</h3>
+            <p className="text-muted-foreground -tracking-[0.02em]">
               Generate perfectly timed subtitles from audio files with custom instructions for precise results.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
+          <div className="bg-white dark:bg-[#111111] border border-border rounded-xl p-8 shadow-xs">
             <div className="text-purple-500 mb-6">
               <Layers size={40} />
             </div>
-            <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Context Extractor</h3>
-            <p className="text-gray-600 dark:text-gray-400 -tracking-[0.02em]">
+            <h3 className="text-xl font-semibold mb-3 text-foreground">Context Extractor</h3>
+            <p className="text-muted-foreground -tracking-[0.02em]">
               Maintain context across episodes and scenes for consistent, accurate, and high-quality translations.
             </p>
           </div>
@@ -56,13 +56,13 @@ export default function KeyFeatures() {
           className="grid grid-cols-1 lg:grid-cols-3 gap-6 mx-auto"
         >
           {/* Context-aware translation component */}
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
+          <div className="bg-white dark:bg-[#111111] border border-border rounded-xl p-8 shadow-xs">
             <div className="flex items-center gap-2 text-[#3B82F6] mb-6">
               <Languages size={20} />
               <span>Subtitle Translation</span>
             </div>
 
-            <h3 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">
+            <h3 className="text-xl font-semibold mb-6 text-foreground">
               Context-aware
             </h3>
 
@@ -71,7 +71,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Prioritize the meaning over literal translation
                 </p>
               </div>
@@ -79,7 +79,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Tonal alignment with character speech patterns
                 </p>
               </div>
@@ -87,7 +87,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Adapt the cultural nuance and idiomatic usage
                 </p>
               </div>
@@ -95,7 +95,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-[#3B82F6] flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-[#3B82F6]"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Guide the translation with custom instructions
                 </p>
               </div>
@@ -103,13 +103,13 @@ export default function KeyFeatures() {
           </div>
 
           {/* Audio Transcription Component */}
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
+          <div className="bg-white dark:bg-[#111111] border border-border rounded-xl p-8 shadow-xs">
             <div className="flex items-center gap-2 text-red-500 mb-6">
               <AudioWaveform size={20} />
               <span>Audio Transcription</span>
             </div>
 
-            <h3 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">
+            <h3 className="text-xl font-semibold mb-6 text-foreground">
               Subtitle Timing
             </h3>
 
@@ -118,7 +118,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-red-500"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Accurate audio to text transcription
                 </p>
               </div>
@@ -126,7 +126,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-red-500"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Precise spotting and subtitle timing
                 </p>
               </div>
@@ -134,7 +134,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-red-500"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Additional custom instructions before transcribing
                 </p>
               </div>
@@ -142,7 +142,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-red-500 flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-red-500"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Intelligent sentence and clause-based segmentation
                 </p>
               </div>
@@ -150,13 +150,13 @@ export default function KeyFeatures() {
           </div>
 
           {/* Context Extractor Component */}
-          <div className="bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#222222] rounded-xl p-8 shadow-xs">
+          <div className="bg-white dark:bg-[#111111] border border-border rounded-xl p-8 shadow-xs">
             <div className="flex items-center gap-2 text-purple-500 mb-6">
               <Layers size={20} />
               <span>Context Extractor</span>
             </div>
 
-            <h3 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">
+            <h3 className="text-xl font-semibold mb-6 text-foreground">
               Context Generation
             </h3>
 
@@ -165,7 +165,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-purple-500"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Get context from subtitles, audio, or text sources
                 </p>
               </div>
@@ -173,7 +173,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-purple-500"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Inform the AI based on the context provided
                 </p>
               </div>
@@ -181,7 +181,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-purple-500"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Maintain consistency across episodes
                 </p>
               </div>
@@ -189,7 +189,7 @@ export default function KeyFeatures() {
                 <div className="mt-1 size-5 rounded-full border border-purple-500 flex items-center justify-center shrink-0">
                   <div className="size-2.5 rounded-full bg-purple-500"></div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 -tracking-[0.02em]">
+                <p className="text-muted-foreground -tracking-[0.02em]">
                   Improve translation quality
                 </p>
               </div>
