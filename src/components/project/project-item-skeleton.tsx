@@ -1,7 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton"
+import { Card } from "@/components/ui/card"
 
 export const ProjectItemSkeleton = () => (
-  <div className="border border-border rounded-lg p-3 bg-background">
+  <Card size="sm" className="p-3">
     <div className="flex items-center justify-between gap-2">
       <div className="flex items-center gap-3">
         <Skeleton className="size-5 rounded" />
@@ -20,5 +21,5 @@ export const ProjectItemSkeleton = () => (
         <Skeleton className="size-4 sm:mx-1 rounded" />
       </div>
     </div>
-  </div>
+  </Card>
 )

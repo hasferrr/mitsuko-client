@@ -4,6 +4,7 @@ import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-stor
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { SettingsDialogue } from "@/components/settings/settings-dialogue"
 import {
   GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
@@ -57,11 +58,11 @@ export function UserSettings() {
 
   return (
     <>
-      <div className="rounded-md overflow-hidden border">
-        <div className="px-4 py-2 border-b">
+      <Card className="overflow-hidden">
+        <CardHeader className="border-b">
           <h2 className="font-medium">User Settings</h2>
-        </div>
-        <div className="p-4 space-y-4">
+        </CardHeader>
+        <CardContent className="space-y-4">
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-col gap-2">
               <Label>
@@ -163,8 +164,8 @@ export function UserSettings() {
               Configure
             </Button>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
       <SettingsDialogue
         mode="global"
         isOpen={isGlobalTranslationSettingsOpen}

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { capitalize, cn } from "@/lib/utils"
+import { Card, CardHeader } from "@/components/ui/card"
 import { RefreshCw, Plus } from "lucide-react"
 import { Button } from "../ui/button"
 import { Skeleton } from "../ui/skeleton"
@@ -118,8 +119,8 @@ export function User() {
 
   return (
     <div className="w-[min(42rem,90vw)] mx-auto">
-      <div className="rounded-md overflow-hidden border mb-6">
-        <div className="px-4 py-2 border-b">
+      <Card className="mb-6">
+        <CardHeader className="border-b">
           <div className="flex justify-between items-center">
             <h2 className="font-medium">User Information</h2>
             <Button
@@ -140,7 +141,7 @@ export function User() {
               <span className="text-sm">Refresh</span>
             </Button>
           </div>
-        </div>
+        </CardHeader>
 
         <table className="w-full">
           <tbody>
@@ -189,10 +190,10 @@ export function User() {
             </tr>
           </tbody>
         </table>
-      </div>
+      </Card>
 
-      <div className="rounded-md overflow-hidden border">
-        <div className="px-4 py-2 border-b flex justify-between items-center gap-4">
+      <Card>
+        <CardHeader className="border-b flex justify-between items-center gap-4">
           <h2 className="font-medium">Transaction History</h2>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Amount:</span>
@@ -212,7 +213,7 @@ export function User() {
               </SelectContent>
             </Select>
           </div>
-        </div>
+        </CardHeader>
 
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -348,12 +349,12 @@ export function User() {
             </Pagination>
           </div>
         )}
-      </div>
+      </Card>
 
-      <div className="rounded-md overflow-hidden border mt-6">
-        <div className="px-4 py-2 border-b">
+      <Card className="mt-6">
+        <CardHeader className="border-b">
           <h2 className="font-medium">Credit Grants</h2>
-        </div>
+        </CardHeader>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -501,7 +502,7 @@ export function User() {
             </Pagination>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

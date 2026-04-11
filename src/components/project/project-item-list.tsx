@@ -15,6 +15,7 @@ import { db } from "@/lib/db/db"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
+import { Card } from "@/components/ui/card"
 
 interface ProjectItemListProps {
   id: string
@@ -169,10 +170,11 @@ export const ProjectItemList = ({
   }
 
   return (
-    <div
+    <Card
+      size="sm"
       ref={setNodeRef}
       style={style}
-      className="border border-border rounded-lg p-3 bg-background touch-none"
+      className="p-3 touch-none"
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 sm:gap-3">
@@ -262,6 +264,6 @@ export const ProjectItemList = ({
         onMove={handleMove}
         isProcessing={isProcessing}
       />
-    </div>
+    </Card>
   )
 }

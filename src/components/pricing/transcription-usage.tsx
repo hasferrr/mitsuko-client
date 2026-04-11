@@ -1,5 +1,6 @@
 import { getModel } from '@/constants/transcription'
 import { getModelCostData } from '@/lib/api/get-model-cost-data'
+import { Card, CardContent } from '@/components/ui/card'
 
 export default async function TranscriptionUsage() {
   const creditCostsMap = await getModelCostData()
@@ -32,10 +33,11 @@ export default async function TranscriptionUsage() {
   ]
 
   return (
-    <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-xs">
-      <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-        Transcription (Experimental)
-      </h3>
+    <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
+      <CardContent className="p-8">
+        <h3 className="text-xl font-medium mb-4">
+          Transcription (Experimental)
+        </h3>
       <div className="flex flex-col gap-4">
         <p>
           Audio transcription tasks consume credits based on the duration of the audio and the number of output tokens generated.
@@ -75,6 +77,7 @@ export default async function TranscriptionUsage() {
           </p>
         </div>
       </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent } from "@/components/ui/card"
 import { File, Trash2, RefreshCw, Loader2 } from "lucide-react"
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
 import { listUploads, deleteUpload } from "@/lib/api/uploads"
@@ -115,7 +116,8 @@ export function ManageUploadsDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="bg-card border border-border rounded-lg p-4">
+        <Card size="sm">
+          <CardContent>
           {isUploadsLoading ? (
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {[...Array(2)].map((_, index) => (
@@ -180,7 +182,8 @@ export function ManageUploadsDialog({
               Selected: <span className="text-foreground">{uploads.find(u => u.uploadId === selectedUploadId)?.fileName || 'Unknown file'}</span>
             </p>
           )}
-        </div>
+          </CardContent>
+        </Card>
 
         <DeleteDialogue
           handleDelete={() => {

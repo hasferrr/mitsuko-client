@@ -10,6 +10,7 @@ import {
   MoreHorizontal
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,13 +54,13 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
 
   return (
     <>
-      <div
+      <Card
         className={cn(
-          "dark:bg-[#111111]",
-          "border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-card/80 transition-colors",
+          "dark:bg-[#111111] hover:ring-primary/50 hover:bg-card/80 transition-colors",
         )}
       >
-        <div className="flex items-center justify-between gap-2">
+        <CardContent>
+          <div className="flex items-center justify-between gap-2">
           <div
             className="flex-1 cursor-pointer"
             onClick={handleProjectClick}
@@ -133,7 +134,8 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
             </DropdownMenu>
           </div>
         </div>
-      </div>
+        </CardContent>
+      </Card>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>

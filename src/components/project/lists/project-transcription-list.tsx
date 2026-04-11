@@ -16,6 +16,7 @@ import {
 } from "@dnd-kit/sortable"
 import { Headphones, Loader2, Settings2, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { ProjectItemList } from "../project-item-list"
 import { Transcription, Project } from "@/types/project"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
@@ -86,8 +87,9 @@ export function ProjectTranscriptionList({
   ))
 
   return (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <div className="flex items-center justify-between mb-4">
+    <Card size="sm">
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium">{title}</h3>
         <div className="flex items-center gap-2">
           <Button
@@ -137,6 +139,7 @@ export function ProjectTranscriptionList({
           </div>
         </SortableContext>
       </DndContext>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { Check } from "lucide-react"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
 
 const generalFeaturesList = [
   {
@@ -39,15 +40,13 @@ const generalFeaturesList = [
 
 export function GeneralFeaturesSection() {
   return (
-    <div
-      className="mt-8 rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto shadow-xs"
-    >
-      <div className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 p-4">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+    <Card className="mt-8 max-w-5xl mx-auto shadow-xs">
+      <CardHeader className="bg-muted/50 border-b">
+        <h3 className="text-lg font-medium">
           Key Platform Features
         </h3>
-      </div>
-      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      </CardHeader>
+      <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         {generalFeaturesList.map((item) => (
           <div key={item.feature} className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
@@ -61,7 +60,7 @@ export function GeneralFeaturesSection() {
             </p>
           </div>
         ))}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

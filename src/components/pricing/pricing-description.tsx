@@ -2,6 +2,7 @@ import Link from "next/link"
 import CreditUsage from "./credit-usage"
 import TranscriptionUsage from "./transcription-usage"
 import WhichModels from "./which-models"
+import { Card, CardContent } from "@/components/ui/card"
 
 export default function PricingDescription() {
   return (
@@ -17,10 +18,11 @@ export default function PricingDescription() {
         </div>
 
         {/* Description of Credits */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-xs">
-          <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-            What are Credits?
-          </h3>
+        <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
+          <CardContent className="p-8">
+            <h3 className="text-xl font-medium mb-4">
+              What are Credits?
+            </h3>
           <div className="flex flex-col gap-4">
             <p>
               Credits used for features like Translation, Transcription, and Context Extraction.
@@ -38,18 +40,21 @@ export default function PricingDescription() {
               </ul>
             </div> */}
           </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Track Your Credits Section */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-xs">
-          <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-            Where Can I See My Credits?
-          </h3>
+        <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
+          <CardContent className="p-8">
+            <h3 className="text-xl font-medium mb-4">
+              Where Can I See My Credits?
+            </h3>
           <p>
             You can see your remaining credit balance and usage history in{" "}
-            <Link href="/auth/login" className="text-blue-500 hover:text-blue-600">User Information</Link> page.
+            <Link href="/auth/login" className="text-blue-500 hover:text-blue-600">User Information          </Link> page.
           </p>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Which Models Should I Use? */}
         <WhichModels />
@@ -61,15 +66,17 @@ export default function PricingDescription() {
         <TranscriptionUsage />
 
         {/* Background Processing */}
-        <div className="rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-xs">
-          <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-            Background Processing
-          </h3>
-          <p>
-            Background processing allows audio transcriptions to run on our server even if you close the browser tab.
-            This means you don't have to wait for the process to finish.
-          </p>
-        </div>
+        <Card className="max-w-5xl mx-auto mt-8 shadow-xs">
+          <CardContent className="p-8">
+            <h3 className="text-xl font-medium mb-4">
+              Background Processing
+            </h3>
+            <p>
+              Background processing allows audio transcriptions to run on our server even if you close the browser tab.
+              This means you don&apos;t have to wait for the process to finish.
+            </p>
+          </CardContent>
+        </Card>
 
       </div>
     </div>

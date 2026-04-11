@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Check, X } from "lucide-react"
 import { Button } from "../ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { ComingSoonTooltipWrapper } from "@/components/ui-custom/coming-soon-tooltip-wrapper"
 import { useRouter } from "next/navigation"
@@ -37,11 +38,11 @@ export function PricingCards({
     >
       <div id="pricing-cards" className="absolute -top-24" />
       {/* Free Tier */}
-      <div className="rounded-xl bg-card border border-border overflow-hidden shadow-xs hover:shadow-md transition-shadow">
-        <div className="p-6">
-          <h3 className="text-xl font-bold mb-2 text-card-foreground">Free</h3>
+      <Card className="overflow-hidden shadow-xs hover:shadow-md transition-shadow">
+        <CardContent className="p-6">
+          <h3 className="text-xl font-bold mb-2">Free</h3>
           <div className="flex items-end gap-1 mb-6">
-            <span className="text-3xl font-bold text-card-foreground">{currency.symbol}{pricingData.free.price}</span>
+            <span className="text-3xl font-bold">{currency.symbol}{pricingData.free.price}</span>
             <span className="text-muted-foreground mb-1">/month</span>
           </div>
           <p className="text-sm text-muted-foreground mb-6">
@@ -84,8 +85,8 @@ export function PricingCards({
               </span>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Basic Tier */}
       <div className="rounded-xl bg-card border-2 border-blue-400 dark:border-blue-500 overflow-hidden shadow-xs hover:shadow-md transition-shadow">
@@ -154,11 +155,11 @@ export function PricingCards({
       </div>
 
       {/* Pro Tier */}
-      <div className="rounded-xl bg-card border border-border overflow-hidden shadow-xs hover:shadow-md transition-shadow">
-        <div className="p-6">
-          <h3 className="text-xl font-bold mb-2 text-card-foreground">Pro</h3>
+      <Card className="overflow-hidden shadow-xs hover:shadow-md transition-shadow">
+        <CardContent className="p-6">
+          <h3 className="text-xl font-bold mb-2">Pro</h3>
           <div className="flex items-end gap-1 mb-6">
-            <span className="text-3xl font-bold text-card-foreground">{currency.symbol}{pricingData.pro.price}</span>
+            <span className="text-3xl font-bold">{currency.symbol}{pricingData.pro.price}</span>
             <span className="text-muted-foreground mb-1">/month</span>
           </div>
           <p className="text-sm text-muted-foreground mb-6">
@@ -216,8 +217,8 @@ export function PricingCards({
               </span>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
