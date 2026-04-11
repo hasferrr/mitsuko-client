@@ -23,8 +23,8 @@ export function TranscriptionNextActions({
 }: TranscriptionNextActionsProps) {
   return (
     <Card size="sm">
-      <CardContent>
-        <h2 className="text-lg font-medium mb-4">What&apos;s Next?</h2>
+      <CardContent className="space-y-4">
+        <h2 className="text-lg font-medium">What&apos;s Next?</h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="flex flex-col justify-between p-4 border border-border rounded-md">

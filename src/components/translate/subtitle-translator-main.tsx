@@ -416,9 +416,9 @@ export default function SubtitleTranslatorMain({
   }
 
   return (
-    <div translate="no" className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
+    <div translate="no" className="flex flex-col gap-4 max-w-5xl mx-auto container py-6 px-4">
       {/* Header */}
-      <div className="flex flex-wrap items-center gap-2 mb-2">
+      <div className="flex flex-wrap items-center gap-2">
         {!hideBackButton && (
           <Button
             variant="ghost"
@@ -481,8 +481,8 @@ export default function SubtitleTranslatorMain({
       >
         {/* Left Column - Subtitles */}
         <div className="space-y-4">
-          <div className="flex items-center mb-4 justify-between mr-4 gap-[6px]">
-            <div className="flex flex-wrap items-center gap-[6px]">
+          <div className="flex items-center justify-between mr-4 gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               <Badge variant="secondary" className="gap-1">
                 <Globe2 className="size-4" />
                 {sourceLanguage} → {targetLanguage}
@@ -494,7 +494,7 @@ export default function SubtitleTranslatorMain({
                 {subName}
               </Badge>
             </div>
-            <div className="flex flex-wrap items-center gap-[6px] justify-end">
+            <div className="flex flex-wrap items-center gap-1.5 justify-end">
               {subtitles.length >= maxSubtitles && (
                 <Badge
                   variant="outline"
@@ -550,7 +550,7 @@ export default function SubtitleTranslatorMain({
           </DragAndDrop>
 
           {/* Grid for Start and Stop buttons */}
-          <div className="grid grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-2 gap-4">
             {/* Start Translation Button */}
             <Button
               className="gap-2"
@@ -590,7 +590,7 @@ export default function SubtitleTranslatorMain({
           {/* Continue Translation Button - Moved here, full width */}
           <Button
             variant="outline"
-            className="gap-2 w-full mt-2 border-primary/25 hover:border-primary/50"
+            className="gap-2 w-full border-primary/25 hover:border-primary/50"
             onClick={handleContinueTranslation}
             disabled={isTranslating || !session || subtitles.length === 0}
           >
@@ -602,7 +602,7 @@ export default function SubtitleTranslatorMain({
             <AlertDialogTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full gap-2 mt-2"
+                 className="w-full gap-2"
                 disabled={isTranslating}
               >
                 <Trash className="size-4" />

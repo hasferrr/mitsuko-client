@@ -76,8 +76,8 @@ export function TranscriptionSelectTab({
 
   return (
     <Card size="sm">
-      <CardContent>
-      <div className="flex items-center justify-between mb-4">
+      <CardContent className="space-y-4">
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-medium">Select Uploaded Audio</h2>
         <Button
           variant="outline"

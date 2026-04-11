@@ -38,12 +38,12 @@ export function WhisperSettingsPanel({
 
   return (
     <Card size="sm" className={className}>
-      <CardContent>
-      <h2 className="text-lg font-medium mb-4">Whisper transcription settings</h2>
+      <CardContent className="space-y-4">
+      <h2 className="text-lg font-medium">Whisper transcription settings</h2>
 
       <div className="space-y-4">
         <div>
-          <p className="text-sm font-medium mb-2">Subtitle level</p>
+          <p className="text-sm font-medium">Subtitle level</p>
           <RadioGroup
             value={subtitleLevel}
             onValueChange={(value) => setSubtitleLevel(value as "words" | "segments")}

@@ -42,8 +42,8 @@ export function TranscriptionControls({
 }: TranscriptionControlsProps) {
   return (
     <Card size="sm">
-      <CardContent>
-        <h2 className="text-lg font-medium mb-4">Transcription Settings</h2>
+      <CardContent className="space-y-4">
+        <h2 className="text-lg font-medium">Transcription Settings</h2>
 
       <div className="space-y-4">
         <div className={cn("space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>

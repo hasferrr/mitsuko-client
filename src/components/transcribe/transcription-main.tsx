@@ -369,8 +369,8 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
   }
 
   return (
-    <div translate="no" className="mx-auto pt-4 pb-8 px-4 max-w-5xl">
-      <div className="mb-4 flex items-center gap-2">
+    <div translate="no" className="max-w-5xl mx-auto py-6 px-4 space-y-6">
+      <div className="flex items-center gap-2">
         {!hideBackButton && (
           <Button
             variant="ghost"
