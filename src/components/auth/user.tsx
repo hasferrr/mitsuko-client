@@ -118,8 +118,8 @@ export function User() {
   }
 
   return (
-    <div className="w-[min(42rem,90vw)] mx-auto">
-      <Card className="mb-6">
+    <div className="w-[min(42rem,90vw)] mx-auto space-y-6">
+      <Card>
         <CardHeader className="border-b">
           <div className="flex justify-between items-center">
             <h2 className="font-medium">User Information</h2>
@@ -160,8 +160,8 @@ export function User() {
                   <div className="flex items-center justify-end gap-2">
                     <Link href="/pricing" target="_blank">
                       <Button
-                        size="sm"
-                        className="py-0 px-2 h-6"
+                         size="xs"
+                         className="py-0"
                       >
                         <Plus className="size-4" />
                         Buy
@@ -350,7 +350,7 @@ export function User() {
         )}
       </Card>
 
-      <Card className="mt-6">
+      <Card>
         <CardHeader className="border-b">
           <h2 className="font-medium">Credit Grants</h2>
         </CardHeader>

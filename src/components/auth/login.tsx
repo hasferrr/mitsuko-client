@@ -150,7 +150,7 @@ export function Login() {
   }
 
   return (
-    <div className="max-w-6xl flex flex-col gap-4 p-4 m-auto">
+    <div className="max-w-6xl flex flex-col gap-6 p-4 m-auto">
       <User />
       <UserSettings />
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
