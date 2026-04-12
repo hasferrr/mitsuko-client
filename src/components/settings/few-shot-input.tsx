@@ -239,21 +239,21 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
                       onChange={handleStartIndexChange}
                       min={1}
                       max={linkedTranslationLineCount || 1}
-                      className="bg-background dark:bg-muted/30 h-8 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={linkedTranslationLineCount === null}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="fewshot-end-index" className="text-xs">End Line</Label>
-                    <Input
-                      id="fewshot-end-index"
-                      type="number"
-                      value={fewShotEndIndex === undefined ? '' : fewShotEndIndex}
-                      onBlur={handleEndIndexChange}
-                      onChange={handleEndIndexChange}
-                      min={fewShotStartIndex || 1}
-                      max={linkedTranslationLineCount || 1}
-                      className="bg-background dark:bg-muted/30 h-8 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+className="bg-background dark:bg-muted/30 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                       disabled={linkedTranslationLineCount === null}
+                     />
+                   </div>
+                   <div>
+                     <Label htmlFor="fewshot-end-index" className="text-xs">End Line</Label>
+                     <Input
+                       id="fewshot-end-index"
+                       type="number"
+                       value={fewShotEndIndex === undefined ? '' : fewShotEndIndex}
+                       onBlur={handleEndIndexChange}
+                       onChange={handleEndIndexChange}
+                       min={fewShotStartIndex || 1}
+                       max={linkedTranslationLineCount || 1}
+                       className="bg-background dark:bg-muted/30 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={linkedTranslationLineCount === null}
                     />
                   </div>
