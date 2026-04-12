@@ -423,22 +423,25 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                   value={contextResult}
                   onChange={handleResultChange}
                   readOnly={!isEditingResult}
-                  className="min-h-[412px] h-[412px] max-h-[412px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                  className="min-h-[412px] h-[412px] max-h-[412px] bg-background dark:bg-muted/30 resize-none overflow-y-auto rounded-xl"
                   placeholder="Extracted context will appear here..."
                 />
               ) : (
-                <div
+                <Card
                   ref={contextResultRef}
+                  size="sm"
                   className={cn(
-                    "min-h-[412px] h-[412px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2",
+                    "min-h-[412px] h-[412px] bg-background dark:bg-muted/30 overflow-y-auto",
                     !contextResult && "text-muted-foreground",
                   )}
                 >
-                  <AiStreamOutput
-                    content={contextResult || "Extracted context will appear here..."}
-                    isProcessing={isExtracting}
-                  />
-                </div>
+                  <CardContent className="pr-2">
+                    <AiStreamOutput
+                      content={contextResult || "Extracted context will appear here..."}
+                      isProcessing={isExtracting}
+                    />
+                  </CardContent>
+                </Card>
               )}
             </div>
           </TabsContent>

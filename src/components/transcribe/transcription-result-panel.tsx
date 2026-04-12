@@ -153,22 +153,25 @@ export function TranscriptionResultPanel({
                 value={transcriptionText}
                 readOnly={!isEditing || isTranscribing}
                 onChange={onTranscriptionTextChange}
-                className="h-96 p-4 bg-background text-foreground resize-none overflow-y-auto"
+                className="h-96 p-4 bg-background text-foreground resize-none overflow-y-auto rounded-xl"
               />
             ) : (
-              <div
+              <Card
                 ref={transcriptionResultRef}
+                size="sm"
                 className={cn(
-                  "min-h-96 h-96 overflow-y-auto rounded-md border p-3 pr-2",
+                  "min-h-96 h-96 overflow-y-auto",
                   !transcriptionText && "text-muted-foreground",
                 )}
               >
-                <AiStreamOutput
-                  content={transcriptionText || "Transcription will appear here..."}
-                  isProcessing={isTranscribing}
-                  defaultCollapsed={!!transcriptionText}
-                />
-              </div>
+                <CardContent className="pr-2">
+                  <AiStreamOutput
+                    content={transcriptionText || "Transcription will appear here..."}
+                    isProcessing={isTranscribing}
+                    defaultCollapsed={!!transcriptionText}
+                  />
+                </CardContent>
+              </Card>
             )}
           </CardContent>
         </Card>
@@ -242,7 +245,7 @@ export function TranscriptionResultPanel({
                 {transcriptSubtitles.map((subtitle) => (
                   <div
                     key={`transcript-subtitle-${subtitle.index}`}
-                    className="mb-4 p-3 border border-border rounded-md hover:border-border/80 transition-colors"
+                    className="mb-4 p-3 border border-border rounded-xl hover:border-border/80 transition-colors"
                   >
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-xs font-medium">#{subtitle.index}</span>

@@ -95,7 +95,7 @@ export function TranscriptionSelectTab({
           {[...Array(2)].map((_, index) => (
             <div
               key={index}
-              className="border rounded-md p-3"
+              className="border rounded-xl p-3"
             >
               <div className="flex items-center gap-3">
                 <Skeleton className="size-5" />
@@ -121,7 +121,7 @@ export function TranscriptionSelectTab({
               key={upload.uploadId}
               onClick={() => onSelectUpload(upload)}
               className={cn(
-                "border rounded-md p-3 cursor-pointer",
+                "border rounded-xl p-3 cursor-pointer",
                 selectedUploadId === upload.uploadId ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
               )}
             >
