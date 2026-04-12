@@ -166,7 +166,7 @@ export function ManageUploadsDialog({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-red-500"
+                      className="text-destructive"
                       onClick={(e) => handleDeleteClick(e, upload.uploadId)}
                     >
                       <Trash2 className="size-4" />
