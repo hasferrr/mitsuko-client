@@ -331,7 +331,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
               <Button
                 variant="destructive"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsDeleteSelectedDialogOpen(true)}
                 disabled={selectedIds.size === 0}
               >
@@ -341,7 +341,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={handleSelectAllToggle}
                 disabled={batchFiles.length === 0}
               >
@@ -354,7 +354,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 rounded-lg"
+              className="rounded-lg"
               onClick={() => setIsPopulateDialogOpen(true)}
               disabled={isProcessing || batchFiles.length === 0}
             >
@@ -366,7 +366,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 rounded-lg"
+              className="rounded-lg"
               onClick={() => document.getElementById(uploadInputId)?.click()}
               disabled={isProcessing}
             >
@@ -377,7 +377,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 rounded-lg"
+            className="rounded-lg"
             onClick={toggleSelectMode}
             disabled={isProcessing || batchFiles.length === 0}
           >
@@ -530,7 +530,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsCopySharedDialogOpen(true)}
                 disabled={isProcessing || batchFiles.length === 0}
               >

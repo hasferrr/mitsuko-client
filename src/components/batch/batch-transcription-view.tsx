@@ -372,7 +372,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               <Button
                 variant="destructive"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsDeleteSelectedDialogOpen(true)}
                 disabled={selectedIds.size === 0}
               >
@@ -382,7 +382,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={handleSelectAllToggle}
                 disabled={batchFiles.length === 0}
               >
@@ -395,7 +395,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 rounded-lg"
+              className="rounded-lg"
               onClick={() => setIsManageFilesDialogOpen(true)}
               disabled={isProcessing}
             >
@@ -407,7 +407,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 rounded-lg"
+              className="rounded-lg"
               onClick={() => document.getElementById(uploadInputId)?.click()}
               disabled={isProcessing}
             >
@@ -418,7 +418,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 rounded-lg"
+            className="rounded-lg"
             onClick={toggleSelectMode}
             disabled={isProcessing || batchFiles.length === 0}
           >
@@ -544,7 +544,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsCopySettingsDialogOpen(true)}
                 disabled={isProcessing || batchFiles.length === 0}
               >

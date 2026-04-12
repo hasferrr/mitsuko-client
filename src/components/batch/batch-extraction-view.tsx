@@ -390,7 +390,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               <Button
                 variant="destructive"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsDeleteSelectedDialogOpen(true)}
                 disabled={selectedIds.size === 0}
               >
@@ -400,7 +400,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
                <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2 rounded-lg bg-green-500 hover:bg-green-600 text-white border-0"
+                    className="rounded-lg bg-green-500 hover:bg-green-600 text-white border-0"
                     onClick={handleToggleMarkSelected}
                     disabled={isProcessing || batchFiles.length === 0 || selectedIds.size === 0}
                   >
@@ -410,7 +410,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={handleSelectAllToggle}
                 disabled={batchFiles.length === 0}
               >
@@ -423,7 +423,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
              <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsRenameDialogOpen(true)}
                 disabled={isProcessing || batchFiles.length === 0}
               >
@@ -435,7 +435,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
              <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsImportSubDialogOpen(true)}
                 disabled={isProcessing || translationBatchFiles.length === 0}
               >
@@ -447,7 +447,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 rounded-lg"
+              className="rounded-lg"
               onClick={() => document.getElementById(uploadInputId)?.click()}
               disabled={isProcessing}
             >
@@ -458,7 +458,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 rounded-lg"
+            className="rounded-lg"
             onClick={toggleSelectMode}
             disabled={isProcessing || batchFiles.length === 0}
           >
@@ -640,7 +640,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsCopySharedDialogOpen(true)}
                 disabled={isProcessing || batchFiles.length === 0}
               >
