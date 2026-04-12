@@ -468,7 +468,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
           </TabsList>
 
           {/* Batch Settings */}
-          <div className="space-y-4 w-full p-4 mt-4 rounded-xl border border-input bg-card shadow-xs">
+          <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <label htmlFor="shared-settings-switch" className="flex flex-col">
                 <span className="text-sm font-semibold">Settings Mode</span>
@@ -538,7 +538,8 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
                 Copy Shared Settings...
               </Button>
             </div>
-          </div>
+          </CardContent>
+          </Card>
 
           <TabsContent value="basic" className="grow space-y-4 mt-4">
             <Card>
