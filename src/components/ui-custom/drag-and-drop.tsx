@@ -56,7 +56,7 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({
       {children}
       {isDragOver && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/80 pointer-events-none">
-          <p className="text-lg font-semibold text-primary text-center px-4">Drop files here</p>
+          <p className="text-lg font-semibold text-sidebar-primary text-center px-4">Drop files here</p>
         </div>
       )}
     </div>

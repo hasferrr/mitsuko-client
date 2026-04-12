@@ -160,8 +160,9 @@ Use semantic tokens instead of hardcoded colors:
 - `bg-muted/50` not `bg-gray-50 dark:bg-gray-900/30`
 - `text-destructive` not `text-red-500` (for error/error contexts)
 - `bg-primary text-primary-foreground` not `bg-blue-500 text-white` (brand blue = primary)
-- `bg-primary/10 text-primary` not `bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300`
+- `bg-primary/10 text-sidebar-primary` not `bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300`
 - `bg-primary/10` not `bg-blue-50 dark:bg-blue-900/20` (brand blue hover states)
+- `text-sidebar-primary` for standalone brand-colored text/icons (not `text-primary` — too dark in dark mode)
 - **Keep original background colors** — only replace borders and text colors with tokens, NOT background colors. This especially applies to landing pages and custom containers:
   - Landing sections use deliberate bg colors (e.g. `bg-white dark:bg-[#111111]`, `bg-gray-50/70 dark:bg-[#121212]`) that differ from `--card`/`--muted` CSS variables. Replacing them with `bg-card` or `bg-muted` shifts the visual tone (e.g. `bg-card` in dark mode is `oklch(0.205 0 0)` ≈ #222, not #111).
   - Landing pages have specific visual design with precise dark-mode values — these are intentional, not accidental hardcoding. Treat them as design choices, not tech debt.

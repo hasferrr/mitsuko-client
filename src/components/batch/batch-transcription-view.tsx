@@ -622,7 +622,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-primary" />
+              <AlertTriangle className="size-5 text-sidebar-primary" />
               Start Batch Transcription
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
@@ -679,7 +679,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <FastForward className="size-5 text-primary" />
+              <FastForward className="size-5 text-sidebar-primary" />
               Continue Batch Transcription
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -698,7 +698,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-primary" />
+              <AlertTriangle className="size-5 text-sidebar-primary" />
               Apply Whisper Subtitles
             </AlertDialogTitle>
             <AlertDialogDescription>

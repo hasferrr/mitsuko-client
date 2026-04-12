@@ -184,17 +184,17 @@ See Token Mappings section below.
 | Hardcoded | Token |
 |---|---|
 | `bg-blue-500 text-white` / `bg-blue-500 hover:bg-blue-600 text-white` | `bg-primary text-primary-foreground` |
-| `bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300` | `bg-primary/10 text-primary` |
+| `bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300` | `bg-primary/10 text-sidebar-primary` |
 | `bg-blue-50 dark:bg-blue-900/20` | `bg-primary/10` |
 | `bg-blue-50/50 dark:bg-blue-950/30 border-blue-*` | `bg-primary/5 border border-primary/20` |
-| `text-blue-500` (brand context) | `text-primary` |
+| `text-blue-500` (brand context) | `text-sidebar-primary` |
 | `bg-blue-500 hover:bg-blue-600` on Button with variant | Use `variant="default"` without hardcoded colors |
 
 ### Status badge colors
 
 | Hardcoded | Token |
 |---|---|
-| `bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300` | `bg-primary/10 text-primary` |
+| `bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300` | `bg-primary/10 text-sidebar-primary` |
 | `bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300` | `bg-destructive/10 text-destructive` |
 
 ### Background colors (table/section)

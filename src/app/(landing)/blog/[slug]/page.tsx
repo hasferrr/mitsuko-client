@@ -137,7 +137,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               ul: props => <ul className="my-4 list-disc pl-6 space-y-2" {...props} />,
               ol: props => <ol className="my-4 list-decimal pl-6 space-y-2" {...props} />,
               li: props => <li className="leading-7" {...props} />,
-              a: props => <Link href={props.href || "#"} className="text-primary underline underline-offset-4" {...props} />,
+              a: props => <Link href={props.href || "#"} className="text-sidebar-primary underline underline-offset-4" {...props} />,
               pre: props => <pre className="my-4 overflow-x-auto rounded bg-muted p-4" {...props} />,
               code: ({ className, children, ...props }) => (
                 <code className={"rounded bg-muted px-1.5 py-0.5 " + (className || "")} {...props}>{children}</code>

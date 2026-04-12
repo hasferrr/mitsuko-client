@@ -31,12 +31,12 @@ export default function Error({
         <div className="flex gap-6 mt-4">
           <button
             onClick={() => reset()}
-            className="inline-flex items-center gap-2 transition-colors hover:text-primary"
+            className="inline-flex items-center gap-2 transition-colors hover:text-sidebar-primary"
           >
             <RefreshCw className="size-4" />
             Try again
           </button>
-          <Link href="/" className="inline-flex items-center gap-2 transition-colors hover:text-primary">
+          <Link href="/" className="inline-flex items-center gap-2 transition-colors hover:text-sidebar-primary">
             <ArrowLeft className="size-4" />
             Go back home
           </Link>

@@ -79,7 +79,7 @@ export function TranscriptionUploadTab({
           <Card size="sm">
             <CardContent className="space-y-3">
             <div className="flex items-center mb-3">
-              <File className="size-6 text-primary mr-2" />
+              <File className="size-6 text-sidebar-primary mr-2" />
               <div className="flex-1 line-clamp-3 text-sm">{file.name}</div>
               <Button
                 variant="ghost"

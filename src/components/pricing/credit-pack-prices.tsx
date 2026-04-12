@@ -183,7 +183,7 @@ export function CreditPackPrices({
                 {redirectToPricingPage ? (
                   <Button
                     variant="outline"
-                    className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary"
+                    className="w-full border-primary text-sidebar-primary hover:bg-primary/10 hover:text-sidebar-primary"
                     onClick={() => router.push("/pricing")}
                   >
                     See Details
@@ -206,7 +206,7 @@ export function CreditPackPrices({
                 ) : (
                   <Button
                     variant="outline"
-                    className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary"
+                    className="w-full border-primary text-sidebar-primary hover:bg-primary/10 hover:text-sidebar-primary"
                     onClick={() => router.push("/dashboard")}
                   >
                     Get Started

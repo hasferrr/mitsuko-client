@@ -50,7 +50,7 @@ export function GeneralFeaturesSection() {
         {generalFeaturesList.map((item) => (
           <div key={item.feature} className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <Check className="size-5 text-primary shrink-0" />
+              <Check className="size-5 text-sidebar-primary shrink-0" />
               <span className="text-base font-medium">
                 {item.feature}
               </span>

@@ -18,7 +18,7 @@ export function CurrencyTabs({ currentCurrencySymbol, onCurrencyChange }: Curren
         onValueChange={onCurrencyChange}
         className="w-auto"
       >
-        <TabsList className="bg-muted text-primary">
+        <TabsList className="bg-muted text-sidebar-primary">
           <TabsTrigger value={CURRENCIES.USD.symbol}>USD</TabsTrigger>
           <TabsTrigger value={CURRENCIES.IDR.symbol}>IDR</TabsTrigger>
         </TabsList>

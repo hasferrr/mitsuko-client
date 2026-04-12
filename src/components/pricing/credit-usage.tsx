@@ -111,7 +111,7 @@ export default async function CreditUsage() {
                     {model.creditPerInputToken === -1 ? "N/A" : (model.creditPerInputToken / (1 - model.discount)).toLocaleString()}
                   </span>
                   {model.discount > 0 && (
-                    <span className="ml-2 text-primary font-medium">
+                    <span className="ml-2 text-sidebar-primary font-medium">
                       {model.creditPerInputToken === -1 ? "N/A" : model.creditPerInputToken}
                       <span className="ml-1 text-xs text-green-500">
                         ({model.discount * 100}% off)
@@ -124,7 +124,7 @@ export default async function CreditUsage() {
                     {model.creditPerOutputToken === -1 ? "N/A" : (model.creditPerOutputToken / (1 - model.discount)).toLocaleString()}
                   </span>
                   {model.discount > 0 && (
-                    <span className="ml-2 text-primary font-medium">
+                    <span className="ml-2 text-sidebar-primary font-medium">
                       {model.creditPerOutputToken === -1 ? "N/A" : model.creditPerOutputToken}
                       <span className="ml-1 text-xs text-green-500">
                         ({model.discount * 100}% off)

@@ -87,7 +87,7 @@ export default async function BlogIndexPage() {
                 </div>
                 <p className="mt-3 text-muted-foreground">{post.description}</p>
                 <div className="mt-3">
-                  <Link href={`/blog/${post.slug}`} className="text-primary hover:underline">Read more</Link>
+                  <Link href={`/blog/${post.slug}`} className="text-sidebar-primary hover:underline">Read more</Link>
                 </div>
               </article>
             ))}

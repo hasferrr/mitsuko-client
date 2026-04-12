@@ -284,7 +284,7 @@ export default function UploadedFiles() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <Upload className="size-4 text-primary" />
+                <Upload className="size-4 text-sidebar-primary" />
                 <div>
                   <div className="text-sm font-medium">
                     File Storage Overview
@@ -393,7 +393,7 @@ export default function UploadedFiles() {
                     <TableCell className="py-4 min-w-[250px] max-w-[250px] lg:min-w-[300px] lg:max-w-[400px]">
                       <div className="flex items-center gap-3">
                         <div className="shrink-0 size-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                          <FileIcon className="size-5 text-primary" />
+                          <FileIcon className="size-5 text-sidebar-primary" />
                         </div>
                         <div className="w-full line-clamp-3">
                           <p className="font-medium line-clamp-2">

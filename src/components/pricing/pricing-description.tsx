@@ -29,7 +29,7 @@ export default function PricingDescription() {
               Using these features will deduct credits from your balance. See "Credit Usage" below for details.
             </p>
             <p>
-              You can receive credits by purchasing <a href="#credit-packs" className="text-primary hover:text-primary/80">credit packs</a>{" "}
+              You can receive credits by purchasing <a href="#credit-packs" className="text-sidebar-primary hover:text-sidebar-primary/80">credit packs</a>{" "}
               as needed.
             </p>
             {/* <div className="flex flex-col gap-2">
@@ -51,7 +51,7 @@ export default function PricingDescription() {
             </h3>
           <p>
             You can see your remaining credit balance and usage history in{" "}
-            <Link href="/auth/login" className="text-primary hover:text-primary/80">User Information</Link> page.
+            <Link href="/auth/login" className="text-sidebar-primary hover:text-sidebar-primary/80">User Information</Link> page.
           </p>
           </CardContent>
         </Card>

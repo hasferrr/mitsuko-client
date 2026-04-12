@@ -754,7 +754,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <Play className="size-5 text-primary" />
+              <Play className="size-5 text-sidebar-primary" />
               Start Batch Extraction
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -789,7 +789,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
         <AlertDialogContent>
           <AlertDialogHeader>
              <AlertDialogTitle className="flex items-center gap-2">
-              <FastForward className="size-5 text-primary" />
+              <FastForward className="size-5 text-sidebar-primary" />
               Continue Batch Extraction
             </AlertDialogTitle>
             <AlertDialogDescription>

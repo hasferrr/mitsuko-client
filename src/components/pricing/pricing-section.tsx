@@ -172,7 +172,7 @@ export default function PricingSection({
         {/* More Information */}
         {showLink && (
           <div className="text-center text-sm text-muted-foreground mt-8">
-            <Link href="/pricing" className="hover:underline hover:text-primary">
+            <Link href="/pricing" className="hover:underline hover:text-sidebar-primary">
               Click here to learn more about credits and pricing.
             </Link>
           </div>

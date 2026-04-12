@@ -181,7 +181,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
                     <span className="font-medium">Email: </span>
                     <a
                       href={`mailto:${emailAddress}`}
-                      className="text-primary hover:underline"
+                      className="text-sidebar-primary hover:underline"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {emailAddress}
@@ -201,7 +201,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
                       href={DISCORD_LINK}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline"
+                      className="text-sidebar-primary hover:underline"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {DISCORD_LINK.replace("https://", "")}

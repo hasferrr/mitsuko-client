@@ -30,7 +30,7 @@ export function TranscriptionNextActions({
           <Card size="sm" className="flex flex-col justify-between">
             <CardContent>
               <div className="flex items-start gap-3 mb-2">
-                <div className="size-5 mt-0.5 text-primary">
+                <div className="size-5 mt-0.5 text-sidebar-primary">
                   <Globe className="size-5" />
                 </div>
                 <div>
@@ -53,7 +53,7 @@ export function TranscriptionNextActions({
           <Card size="sm" className="flex flex-col justify-between">
             <CardContent>
               <div className="flex items-start gap-3 mb-2">
-                <div className="size-5 mt-0.5 text-primary">
+                <div className="size-5 mt-0.5 text-sidebar-primary">
                   <FileText className="size-5" />
                 </div>
                 <div>

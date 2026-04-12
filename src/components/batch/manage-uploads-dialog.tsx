@@ -154,7 +154,7 @@ export function ManageUploadsDialog({
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <File className="size-5 text-primary" />
+                    <File className="size-5 text-sidebar-primary" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm truncate font-medium">{upload.fileName}</p>
                       <p className="text-xs text-muted-foreground flex gap-1">

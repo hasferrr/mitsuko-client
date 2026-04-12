@@ -341,7 +341,7 @@ export default function TranscriptionHistory({ onApplyDirect }: TranscriptionHis
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {(isBgLoading || bgCount > 0) ? (
-                    <Loader2 className="size-4 animate-spin text-primary" />
+                    <Loader2 className="size-4 animate-spin text-sidebar-primary" />
                   ) : (
                     <CheckCircle className="size-4 text-sidebar-primary" />
                   )}
@@ -380,7 +380,7 @@ export default function TranscriptionHistory({ onApplyDirect }: TranscriptionHis
                     <TableCell className="py-4 min-w-[250px] max-w-[250px] lg:min-w-[300px] lg:max-w-[400px]">
                       <div className="flex items-center gap-3">
                         <div className="shrink-0 size-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                          <FileAudio2 className="size-5 text-primary" />
+                          <FileAudio2 className="size-5 text-sidebar-primary" />
                         </div>
                         <div className="w-full line-clamp-3">
                           <p className="font-medium line-clamp-2">
