@@ -103,7 +103,7 @@ export const Project = () => {
   const ProjectItemSkeleton = () => {
     return (
       <Card className="overflow-hidden h-full flex flex-col">
-        <CardHeader className="flex-row items-center justify-between gap-2">
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
           <Skeleton className="h-5 w-36" />
           <div className="flex items-center gap-4">
             <Skeleton className="h-4 w-8" />
@@ -149,7 +149,7 @@ export const Project = () => {
         )}
         onClick={() => setCurrentProject(project.id)}
       >
-        <CardHeader className="flex-row items-center justify-between gap-2">
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
           <CardTitle>{project.name}</CardTitle>
           <div className="flex items-center gap-4">
             <DropdownMenu>

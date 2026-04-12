@@ -55,7 +55,7 @@ export function SortableBatchTranscriptionFile({
       ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>}
       style={style}
       className={cn(
-        "flex",
+        "flex flex-row items-center",
         selectMode && "select-none",
         selected && "bg-primary/5 dark:bg-primary/10"
       )}

@@ -32,7 +32,7 @@ export function SortableBatchCard({ project, onSelect }: SortableBatchCardProps)
       )}
       onClick={() => onSelect(project.id)}
     >
-      <CardHeader className="flex-row items-center justify-between gap-2">
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
         <CardTitle>{project.name}</CardTitle>
         <div className="flex items-center gap-4">
           <GripVertical
