@@ -53,8 +53,7 @@ export const ModelSelection = memo(({
           </div>
           <Button
             variant="outline"
-            size="default"
-            className="w-10 flex items-center justify-center"
+            size="icon"
             onClick={() => setIsWhichModelsDialogOpen(true)}
             aria-label="Which Models Should I Use?"
           >
