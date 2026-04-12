@@ -112,8 +112,8 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
   return (
     <>
       <ResizablePanelGroup
-        // direction="horizontal"
-        className="h-[1000px] border rounded-lg overflow-hidden mt-4"
+        orientation="horizontal"
+        className="max-w-4xl h-[1000px] border rounded-lg"
       >
         {/* Left Panel: History List */}
         <ResizablePanel defaultSize={30} minSize={20}>
@@ -148,12 +148,12 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
           </ScrollArea>
         </ResizablePanel>
 
-        <ResizableHandle className="border" />
+        <ResizableHandle />
 
         {/* Right Panel: Split Vertically into Three */}
         <ResizablePanel defaultSize={70} minSize={10}>
           <ResizablePanelGroup
-            // direction="vertical"
+            orientation="vertical"
             className="h-full"
           >
 
@@ -171,7 +171,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
               </ScrollArea>
             </ResizablePanel>
 
-            <ResizableHandle className="border" />
+            <ResizableHandle />
 
             {/* Middle Panel: Raw Responses */}
             <ResizablePanel minSize={10}>
@@ -197,7 +197,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
               </ScrollArea>
             </ResizablePanel>
 
-            <ResizableHandle className="border" />
+            <ResizableHandle />
 
             {/* Bottom Panel: JSON  */}
             <ResizablePanel minSize={10}>
