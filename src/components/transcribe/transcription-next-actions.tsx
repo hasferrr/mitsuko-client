@@ -30,7 +30,7 @@ export function TranscriptionNextActions({
           <Card size="sm" className="flex flex-col justify-between">
             <CardContent>
               <div className="flex items-start gap-3 mb-2">
-                <div className="size-5 mt-0.5 text-blue-500">
+                <div className="size-5 mt-0.5 text-primary">
                   <Globe className="size-5" />
                 </div>
                 <div>
@@ -41,7 +41,7 @@ export function TranscriptionNextActions({
               <Button
                 size="sm"
                 variant="outline"
-                className="w-full mt-2"
+                className="w-full"
                 onClick={onCreateTranslation}
                 disabled={!transcriptSubtitles.length || isTranscribing}
               >
@@ -53,7 +53,7 @@ export function TranscriptionNextActions({
           <Card size="sm" className="flex flex-col justify-between">
             <CardContent>
               <div className="flex items-start gap-3 mb-2">
-                <div className="size-5 mt-0.5 text-blue-500">
+                <div className="size-5 mt-0.5 text-primary">
                   <FileText className="size-5" />
                 </div>
                 <div>
@@ -64,7 +64,7 @@ export function TranscriptionNextActions({
               <Button
                 size="sm"
                 variant="outline"
-                className="w-full mt-2"
+                className="w-full"
                 onClick={onExport}
                 disabled={!transcriptSubtitles.length || isTranscribing}
               >

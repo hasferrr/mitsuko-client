@@ -76,9 +76,10 @@ export function TranscriptionUploadTab({
 
       {file && (
         <div className="space-y-3">
-          <div className="border border-border rounded-lg p-4">
+          <Card size="sm">
+            <CardContent className="space-y-3">
             <div className="flex items-center mb-3">
-              <File className="size-6 text-blue-500 mr-2" />
+              <File className="size-6 text-primary mr-2" />
               <div className="flex-1 line-clamp-3 text-sm">{file.name}</div>
               <Button
                 variant="ghost"
@@ -98,11 +99,12 @@ export function TranscriptionUploadTab({
                 {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
               </p>
               {file.size > MAX_FILE_SIZE &&
-                <p className="text-red-500">File size exceeds {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB</p>}
+                <p className="text-destructive">File size exceeds {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB</p>}
             </div>
-          </div>
+            </CardContent>
+          </Card>
           {isGlobalMaxDurationExceeded ? (
-            <div className="flex items-center gap-2 text-red-600 text-xs">
+            <div className="flex items-center gap-2 text-destructive text-xs">
               <div className="size-3">
                 <Clock className="size-3" />
               </div>

@@ -138,7 +138,7 @@ export function TranscriptionSelectTab({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-red-500"
+                  className="text-destructive"
                   onClick={(e) => {
                     e.stopPropagation()
                     onSetPendingDeleteId(upload.uploadId)

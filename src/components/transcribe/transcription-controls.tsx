@@ -54,7 +54,7 @@ export function TranscriptionControls({
         </div>
 
         {isModelDurationLimitExceeded(models, localAudioDuration || 0) && (
-          <div className="flex items-center gap-2 text-red-600 text-xs">
+          <div className="flex items-center gap-2 text-destructive text-xs">
             <div className="size-3">
               <Clock className="size-3" />
             </div>

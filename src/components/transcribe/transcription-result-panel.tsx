@@ -261,9 +261,9 @@ export function TranscriptionResultPanel({
                 {isTranscribing && (
                   <div className="flex items-center justify-center py-4">
                     <div className="animate-pulse flex space-x-1">
-                      <div className="size-2 bg-blue-500 rounded-full"></div>
-                      <div className="size-2 bg-blue-500 rounded-full"></div>
-                      <div className="size-2 bg-blue-500 rounded-full"></div>
+                      <div className="size-2 bg-primary rounded-full"></div>
+                      <div className="size-2 bg-primary rounded-full"></div>
+                      <div className="size-2 bg-primary rounded-full"></div>
                     </div>
                   </div>
                 )}

@@ -586,7 +586,7 @@ export default function SubtitleTranslatorMain({
           {/* Continue Translation Button - Moved here, full width */}
           <Button
             variant="outline"
-            className="gap-2 w-full border-primary/25 hover:border-primary/50"
+            className="w-full border-primary/25 hover:border-primary/50"
             onClick={handleContinueTranslation}
             disabled={isTranslating || !session || subtitles.length === 0}
           >
@@ -598,7 +598,7 @@ export default function SubtitleTranslatorMain({
             <AlertDialogTrigger asChild>
               <Button
                 variant="outline"
-                 className="w-full gap-2"
+                 className="w-full"
                 disabled={isTranslating}
               >
                 <Trash className="size-4" />
@@ -693,9 +693,11 @@ export default function SubtitleTranslatorMain({
                   <EndIndexInput
                     advancedSettingsId={advancedSettingsId}
                   />
-                  <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
-                    <AdvancedReasoningSwitch />
-                  </div>
+                  <Card size="sm" className="ring-muted-foreground/20">
+                    <CardContent className="space-y-4">
+                      <AdvancedReasoningSwitch />
+                    </CardContent>
+                  </Card>
                   <p className="text-sm font-semibold">Technical Options</p>
                   <SplitSizeInput
                     advancedSettingsId={advancedSettingsId}

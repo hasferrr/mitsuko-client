@@ -280,7 +280,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             }}
             placeholder="e.g., S01E01"
             className={cn("bg-background dark:bg-muted/30",
-              !isEpisodeNumberValid && "ring-2 ring-red-500"
+              !isEpisodeNumberValid && "ring-2 ring-destructive"
             )}
           />
         </div>
@@ -306,7 +306,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             <Button
               variant="outline"
               size="sm"
-              className="py-3"
               onClick={() => document.getElementById("subtitle-content-upload")?.click()}
               disabled={isExtracting}
             >
@@ -320,7 +319,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                 loadProjectTranslations()
                 setIsSubtitleImportDialogOpen(true)
               }}
-              className="py-3"
               disabled={isExtracting}
             >
               <FolderDown className="size-4" />
@@ -334,7 +332,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
               onChange={handleSubtitleContentChange}
               className={cn(
                 "min-h-[181px] h-[181px] max-h-[250px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
-                !isSubtitleContentValid && "ring-2 ring-red-500"
+                !isSubtitleContentValid && "ring-2 ring-destructive"
               )}
               placeholder="Paste subtitle content here..."
               onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
@@ -359,7 +357,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             <Button
               variant="outline"
               size="sm"
-              className="py-3"
               onClick={() => document.getElementById("previous-context-upload")?.click()}
               disabled={isExtracting}
             >
@@ -373,7 +370,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                 loadProjectExtractions()
                 setIsPreviousContextDialogOpen(true)
               }}
-              className="py-3"
               disabled={isExtracting}
             >
               <FolderDown className="size-4" />
@@ -453,7 +449,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
       {/* Bottom Controls */}
       <div className="lg:col-span-2 flex items-center justify-center gap-4 flex-wrap">
         <Button
-          className="gap-2"
           onClick={handleStartExtraction}
           disabled={isExtracting || !session}
         >
@@ -470,19 +465,18 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
           )}
         </Button>
 
-        <Button variant="outline" className="gap-2" onClick={handleStopExtraction} disabled={!isExtracting || !contextResult}>
+        <Button variant="outline" onClick={handleStopExtraction} disabled={!isExtracting || !contextResult}>
           <Square className="size-4" />
           Stop
         </Button>
 
-        <Button variant="outline" className="gap-2" onClick={handleSaveToFile}>
+        <Button variant="outline" onClick={handleSaveToFile}>
           <Save className="size-4" />
           Save to File
         </Button>
 
         <Button
           variant={isEditingResult ? "default" : "outline"}
-          className="gap-2"
           onClick={handleToggleEditMode}
           disabled={isExtracting}
         >
