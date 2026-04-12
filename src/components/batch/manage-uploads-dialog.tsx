@@ -100,7 +100,7 @@ export function ManageUploadsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Manage Uploaded Files</span>

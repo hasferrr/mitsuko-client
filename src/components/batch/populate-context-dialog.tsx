@@ -195,7 +195,7 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>Populate Context Document from Extractions</DialogTitle>
         </DialogHeader>
