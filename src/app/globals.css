@@ -194,8 +194,8 @@
   }
 
   ::selection {
-    background-color: var(--foreground);
-    color: var(--background);
+    background-color: oklch(from var(--primary) l c h / 0.85);
+    color: var(--primary-foreground);
   }
 }
 
