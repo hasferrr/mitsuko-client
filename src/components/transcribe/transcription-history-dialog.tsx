@@ -54,7 +54,6 @@ export function TranscriptionHistoryDialog({ currentId }: TranscriptionHistoryDi
     <>
       <Button
         variant="outline"
-        size="lg"
         onClick={() => setOpen(true)}
         title="Transcription History"
       >

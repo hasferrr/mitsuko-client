@@ -75,12 +75,11 @@ export default function BatchMain() {
         <div className="flex-1 min-w-40 flex items-center gap-2">
           <Button
             variant="ghost"
-            size="icon-lg"
             className="shrink-0"
             onClick={() => setCurrentProject(null)}
             title="Go back to batch selection"
           >
-            <ArrowLeft className="size-5" />
+            <ArrowLeft className="size-4" />
           </Button>
           <Input
             defaultValue={currentProject.name || (operationMode === 'translation' ? "Batch Translation" : "Batch Extraction")}
@@ -120,17 +119,16 @@ export default function BatchMain() {
           </SelectContent>
         </Select>
           <Link href="/project">
-          <Button variant="outline" size="lg">
-            <FileText className="size-5" />
+          <Button variant="outline">
+            <FileText className="size-4" />
             See as Project
           </Button>
         </Link>
         <Button
           variant="outline"
-          size="lg"
           onClick={() => setIsDeleteDialogOpen(true)}
         >
-          <Trash className="size-5" />
+          <Trash className="size-4" />
         </Button>
       </div>
 

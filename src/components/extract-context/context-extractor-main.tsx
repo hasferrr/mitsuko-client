@@ -253,7 +253,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
         {!hideBackButton && (
           <Button
             variant="ghost"
-            size="icon"
             onClick={() => router.push('/project')}
           >
             <ArrowLeft className="size-4" />

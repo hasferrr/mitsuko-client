@@ -374,7 +374,6 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
         {!hideBackButton && (
           <Button
             variant="ghost"
-            size="icon"
             onClick={() => router.push('/project')}
           >
             <ArrowLeft className="size-4" />

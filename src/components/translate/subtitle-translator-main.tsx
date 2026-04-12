@@ -422,7 +422,6 @@ export default function SubtitleTranslatorMain({
         {!hideBackButton && (
           <Button
             variant="ghost"
-            size="icon"
             onClick={() => router.push('/project')}
           >
             <ArrowLeft className="size-4" />
@@ -446,30 +445,27 @@ export default function SubtitleTranslatorMain({
         {/* Upload Button */}
         <Button
           variant="outline"
-          size="lg"
           onClick={() => setIsInitialUploadDialogOpen(true)}
           disabled={isTranslating}
         >
-          <Upload className="size-5" />
+          <Upload className="size-4" />
           Upload
         </Button>
         {/* Save Button */}
         <Button
           variant="outline"
-          size="lg"
           onClick={handleSave}
           disabled={isTranslating || isSaving}
         >
-          <SaveIcon className="size-5" />
+          <SaveIcon className="size-4" />
           Save
         </Button>
         {/* History Button */}
         <Button
           variant={isHistoryOpen ? "default" : "outline"}
-          size="lg"
           onClick={() => setIsHistoryOpen(!isHistoryOpen)}
         >
-          <HistoryIcon className="size-5" />
+          <HistoryIcon className="size-4" />
         </Button>
       </div>
 
