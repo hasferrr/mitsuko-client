@@ -299,10 +299,11 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
           ensureProjectDefaultSettings(project)
         })
 
-        // Upadate current project order
+        // Update current project order
+        const importedOrder = convertedData.projectOrders.at(0)?.order ?? convertedData.projects.map(project => project.id)
         let currentProjectOrder = await db.projectOrders.get(convertedData.projectOrders.at(0)?.id ?? "")
         if (currentProjectOrder) {
-          currentProjectOrder.order = [...convertedData.projects.map(project => project.id), ...currentProjectOrder.order]
+          currentProjectOrder.order = [...importedOrder, ...currentProjectOrder.order]
         } else {
           currentProjectOrder = dataWithNewIds.projectOrders.at(0)
         }

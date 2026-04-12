@@ -45,6 +45,7 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
   const translationsMap: Map<string, Translation> = new Map()
   const transcriptionsMap: Map<string, Transcription> = new Map()
   const extractionsMap: Map<string, Extraction> = new Map()
+  const projectIdMap: Map<string, string> = new Map()
 
   for (const basicSetting of data.basicSettings) {
     basicSettingsMap.set(basicSetting.id, { ...basicSetting, id: uuidv4() })
@@ -97,6 +98,7 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
   // Create new projects with new IDs
   const newProjects = data.projects.map(project => {
     const newId = uuidv4()
+    projectIdMap.set(project.id, newId)
 
     const newTranslationsId = project.translations.map(translationId => {
       const newTranslation = translationsMap.get(translationId)
@@ -168,7 +170,9 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
 
   const newProjectOrders = data.projectOrders.at(0)
   if (newProjectOrders) {
-    newProjectOrders.order = newProjects.map(project => project.id)
+    newProjectOrders.order = newProjectOrders.order
+      .map(oldId => projectIdMap.get(oldId))
+      .filter((id): id is string => !!id)
   }
 
   return {
