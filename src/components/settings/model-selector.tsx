@@ -296,14 +296,14 @@ function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
         <Link
           href="/pricing#credit-usage"
           target="_blank"
-          className="block hover:underline text-blue-500/80"
+          className="block hover:underline text-primary/80"
         >
           See full comparison
         </Link>
         <Link
           href="/pricing#which-models"
           target="_blank"
-          className="block hover:underline text-blue-500/80"
+          className="block hover:underline text-primary/80"
         >
           Which Models Should I Use?
         </Link>
