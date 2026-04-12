@@ -206,8 +206,7 @@ export const ProjectItemList = ({
           <p className="text-xs text-muted-foreground sm:block hidden">{date}</p>
           <Button
             variant="ghost"
-            size="sm"
-            className="h-6 min-w-4 md:min-w-6 p-0"
+            size="icon-xs"
             onClick={() => setIsMoveOpen(true)}
             disabled={isProcessing}
           >
@@ -215,8 +214,7 @@ export const ProjectItemList = ({
           </Button>
           <Button
             variant="ghost"
-            size="sm"
-            className="h-6 min-w-4 md:min-w-6 p-0"
+            size="icon-xs"
             onClick={() => setIsEditOpen(true)}
             disabled={isProcessing}
           >
@@ -224,8 +222,7 @@ export const ProjectItemList = ({
           </Button>
           <Button
             variant="ghost"
-            size="sm"
-            className="h-6 min-w-4 md:min-w-6 p-0"
+            size="icon-xs"
             onClick={() => setIsDeleteOpen(true)}
             disabled={isProcessing}
           >
