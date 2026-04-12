@@ -208,7 +208,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                     Context & Instruction Settings
                   </AccordionTrigger>
                   <AccordionContent className="pt-4 pb-2">
-                    <Card size="sm">
+                    <Card size="sm" className="ring-0 border">
                       <CardContent className="space-y-6">
                         <ContextDocumentInput
                           basicSettingsId={basicSettingsId}
@@ -228,7 +228,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                     Advanced Settings
                   </AccordionTrigger>
                   <AccordionContent className="pt-4 pb-2">
-                    <Card size="sm">
+                    <Card size="sm" className="ring-0 border">
                       <CardContent className="space-y-6">
                         <TemperatureSlider
                           advancedSettingsId={advancedSettingsId}

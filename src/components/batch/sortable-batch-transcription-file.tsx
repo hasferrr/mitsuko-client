@@ -55,6 +55,7 @@ export function SortableBatchTranscriptionFile({
       ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>}
       style={style}
       className={cn(
+        "ring-0 border",
         selectMode && "select-none",
         selected && "bg-primary/5 dark:bg-primary/10"
       )}
