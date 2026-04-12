@@ -25,7 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useState } from "react"
-import { Settings2 } from "lucide-react"
+import { Settings2, RotateCcw } from "lucide-react"
 
 export function UserSettings() {
   const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
@@ -34,10 +34,13 @@ export function UserSettings() {
   const setIsSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.setIsSubtitlePerformanceModeEnabled)
   const isAutoEnableProjectSettings = useLocalSettingsStore((state) => state.isAutoEnableProjectSettings)
   const setIsAutoEnableProjectSettings = useLocalSettingsStore((state) => state.setIsAutoEnableProjectSettings)
+  const dismissedDialogs = useLocalSettingsStore((state) => state.dismissedDialogs)
+  const resetAllDismissedDialogs = useLocalSettingsStore((state) => state.resetAllDismissedDialogs)
   const [isThirdPartyDialogOpen, setIsThirdPartyDialogOpen] = useState(false)
   const [isGlobalTranslationSettingsOpen, setIsGlobalTranslationSettingsOpen] = useState(false)
   const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
   const [isGlobalTranscriptionSettingsOpen, setIsGlobalTranscriptionSettingsOpen] = useState(false)
+  const [isResetDismissalsDialogOpen, setIsResetDismissalsDialogOpen] = useState(false)
 
   const handleCheckedChange = (checked: boolean) => {
     if (checked) {
@@ -164,6 +167,25 @@ export function UserSettings() {
               Configure
             </Button>
           </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Reset Dismissed Popups
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Restore any popups you've dismissed with "Don't show again".
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              disabled={Object.keys(dismissedDialogs).length === 0}
+              onClick={() => setIsResetDismissalsDialogOpen(true)}
+            >
+              <RotateCcw className="size-4" />
+              Reset
+            </Button>
+          </div>
         </CardContent>
       </Card>
       <SettingsDialogue
@@ -199,6 +221,22 @@ export function UserSettings() {
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirm}>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={isResetDismissalsDialogOpen} onOpenChange={setIsResetDismissalsDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset Dismissed Popups?</AlertDialogTitle>
+            <AlertDialogDescription>
+              All previously dismissed popups will be shown again.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { resetAllDismissedDialogs(); setIsResetDismissalsDialogOpen(false) }}>
+              Reset
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

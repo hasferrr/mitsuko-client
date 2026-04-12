@@ -16,6 +16,7 @@ interface LocalSettingsStore {
   isDeleteAfterTranscription: boolean
   isSubtitlePerformanceModeEnabled: boolean
   isAutoEnableProjectSettings: boolean
+  dismissedDialogs: Record<string, boolean>
 
   addApiConfig: (config: CustomApiConfig) => void
   updateApiConfig: (index: number, updates: Partial<CustomApiConfig>) => Promise<void>
@@ -28,6 +29,8 @@ interface LocalSettingsStore {
   setIsDeleteAfterTranscription: (enabled: boolean) => void
   setIsSubtitlePerformanceModeEnabled: (enabled: boolean) => void
   setIsAutoEnableProjectSettings: (enabled: boolean) => void
+  dismissDialog: (id: string) => void
+  resetAllDismissedDialogs: () => void
 }
 
 export const useLocalSettingsStore = create<LocalSettingsStore>()(
@@ -41,6 +44,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       isDeleteAfterTranscription: true,
       isSubtitlePerformanceModeEnabled: true,
       isAutoEnableProjectSettings: false,
+      dismissedDialogs: {},
 
       addApiConfig: (config) =>
         set((state) => ({
@@ -82,10 +86,12 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       setIsDeleteAfterTranscription: (enabled) => set({ isDeleteAfterTranscription: enabled }),
       setIsSubtitlePerformanceModeEnabled: (enabled) => set({ isSubtitlePerformanceModeEnabled: enabled }),
       setIsAutoEnableProjectSettings: (enabled) => set({ isAutoEnableProjectSettings: enabled }),
+      dismissDialog: (id) => set((state) => ({ dismissedDialogs: { ...state.dismissedDialogs, [id]: true } })),
+      resetAllDismissedDialogs: () => set({ dismissedDialogs: {} }),
     }),
     {
       name: "api-settings-storage",
-      version: 2,
+      version: 3,
       migrate: (persistedState, version) => {
         if (version === 0) {
           const oldState = persistedState as {
@@ -123,6 +129,13 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
           ) {
             state.isDeleteAfterTranscription = state.deleteAfterTranscription
             delete state.deleteAfterTranscription
+          }
+        }
+
+        if (version < 3) {
+          const state = persistedState as { dismissedDialogs?: Record<string, boolean> }
+          if (!state.dismissedDialogs) {
+            state.dismissedDialogs = {}
           }
         }
 

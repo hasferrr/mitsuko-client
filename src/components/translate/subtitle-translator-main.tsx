@@ -147,6 +147,8 @@ export default function SubtitleTranslatorMain({
   // Other Store
   const session = useSessionStore((state) => state.session)
   const isSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.isSubtitlePerformanceModeEnabled)
+  const isASSGuidanceDismissed = useLocalSettingsStore((state) => state.dismissedDialogs["ass-guidance"] ?? false)
+  const dismissDialog = useLocalSettingsStore((state) => state.dismissDialog)
 
   // Other State
   const [activeTab, setActiveTab] = useState(isTranslating ? "result" : "basic")
@@ -158,6 +160,7 @@ export default function SubtitleTranslatorMain({
   const [progressOpen, setProgressOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isASSGuidanceDialogOpen, setIsASSGuidanceDialogOpen] = useState(false)
+  const [isASSGuidanceDontShowAgain, setIsASSGuidanceDontShowAgain] = useState(false)
   const [subtitlesHidden, setSubtitlesHidden] = useState(true)
   const [isInitialUploadDialogOpen, setIsInitialUploadDialogOpen] = useState(false)
   const [uploadMode, setUploadMode] = useState<"normal" | "as-translated">("normal")
@@ -318,7 +321,7 @@ export default function SubtitleTranslatorMain({
 
         setParsed(currentId, data.parsed)
         setToType(data.parsed.type)
-        if (data.parsed.type === "ass") {
+        if (data.parsed.type === "ass" && !isASSGuidanceDismissed) {
           setIsASSGuidanceDialogOpen(true)
         }
         if (parsedSubtitles.length >= maxSubtitles) {
@@ -816,7 +819,7 @@ export default function SubtitleTranslatorMain({
       </AlertDialog>
 
       {/* ASS Subtitle Guidance Dialog */}
-      <AlertDialog open={isASSGuidanceDialogOpen} onOpenChange={setIsASSGuidanceDialogOpen}>
+      <AlertDialog open={isASSGuidanceDialogOpen} onOpenChange={(open) => { setIsASSGuidanceDialogOpen(open); if (!open) setIsASSGuidanceDontShowAgain(false) }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>ASS Subtitle Guidelines</AlertDialogTitle>
@@ -841,8 +844,18 @@ export default function SubtitleTranslatorMain({
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction>
+          <AlertDialogFooter className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:items-center">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="ass-guidance-dont-show"
+                checked={isASSGuidanceDontShowAgain}
+                onCheckedChange={(checked) => setIsASSGuidanceDontShowAgain(checked === true)}
+              />
+              <Label htmlFor="ass-guidance-dont-show" className="text-sm text-muted-foreground cursor-pointer">
+                Don't show again
+              </Label>
+            </div>
+            <AlertDialogAction onClick={() => { if (isASSGuidanceDontShowAgain) dismissDialog("ass-guidance") }}>
               I understand
             </AlertDialogAction>
           </AlertDialogFooter>
