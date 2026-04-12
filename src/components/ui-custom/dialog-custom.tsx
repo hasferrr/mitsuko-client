@@ -9,7 +9,6 @@ interface DialogCustomProps extends PropsWithChildren {
   onOpenChange: (isOpen: boolean) => void
   modal?: boolean
   overlayClassName?: string
-  fadeDuration?: number
 }
 
 export const DialogCustom: React.FC<DialogCustomProps> = ({
@@ -18,7 +17,6 @@ export const DialogCustom: React.FC<DialogCustomProps> = ({
   modal = true,
   children,
   overlayClassName,
-  fadeDuration = 50,
 }) => {
   const [isOverlayMounted, setIsOverlayMounted] = useState(false)
   const [isOverlayFadedIn, setIsOverlayFadedIn] = useState(false)
@@ -34,13 +32,13 @@ export const DialogCustom: React.FC<DialogCustomProps> = ({
       setIsOverlayFadedIn(false)
       const timer = setTimeout(() => {
         setIsOverlayMounted(false)
-      }, fadeDuration)
+      }, 100)
       return () => clearTimeout(timer)
     } else if (modal !== false) {
       setIsOverlayMounted(false)
       setIsOverlayFadedIn(false)
     }
-  }, [isOpen, modal, fadeDuration])
+  }, [isOpen, modal])
 
   // Prevent outer (body) scroll when dialog is open
   const originalBodyStylesRef = useRef<{ overflow: string; paddingRight: string } | null>(null)
@@ -82,11 +80,10 @@ export const DialogCustom: React.FC<DialogCustomProps> = ({
       {modal === false && isOverlayMounted && (
         <div
           className={cn(
-            "fixed inset-0 bg-black/80 z-50 transition-opacity ease-in-out",
+            "fixed inset-0 isolate z-50 bg-black/10 supports-backdrop-filter:backdrop-blur-xs transition-opacity duration-100",
             isOverlayFadedIn ? "opacity-100" : "opacity-0",
             overlayClassName
           )}
-          style={{ transitionDuration: `${fadeDuration}ms` }}
           aria-hidden="true"
         />
       )}
