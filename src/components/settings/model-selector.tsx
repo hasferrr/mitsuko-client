@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { PopoverProps } from "@radix-ui/react-popover"
+import { Popover as RadixPopover } from "radix-ui"
+type PopoverProps = RadixPopover.PopoverProps
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
