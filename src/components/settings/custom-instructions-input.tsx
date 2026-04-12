@@ -112,7 +112,7 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
           <DialogHeader>
             <DialogTitle>Tips for Custom Instructions</DialogTitle>
           </DialogHeader>
-          <div className="pt-2 text-base text-foreground space-y-2">
+          <div className="text-base text-foreground space-y-2">
             <p>Custom instructions help guide the model to follow specific patterns, maintain consistent terminology, or adopt particular styles.</p>
             <p>Be concise, direct, and specific to avoid confusing the model. Focus on clear examples and explicit rules.</p>
           </div>

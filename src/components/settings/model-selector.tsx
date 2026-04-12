@@ -164,7 +164,7 @@ export function ModelSelector({
                     {key}
                     <Badge
                       variant={value.models[0]?.isPaid ? "default" : "secondary"}
-                      className={cn("text-xs px-[6px] h-4", "text-[11px]")}
+                      className={cn("text-xs px-1.5 h-4", "text-[11px]")}
                     >
                       {value.models[0]?.isPaid ? "Premium" : "Free"}
                     </Badge>
