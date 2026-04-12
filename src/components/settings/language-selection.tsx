@@ -18,7 +18,7 @@ export const LanguageSelection = memo(({ basicSettingsId }: LanguageSelectionPro
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Source Language</label>
         <ComboBox
           data={LANGUAGES}
@@ -27,7 +27,7 @@ export const LanguageSelection = memo(({ basicSettingsId }: LanguageSelectionPro
           name="language"
         />
       </div>
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Target Language</label>
         <ComboBox
           data={LANGUAGES}
