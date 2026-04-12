@@ -62,7 +62,7 @@ export function TranscriptionHistoryDialog({ currentId }: TranscriptionHistoryDi
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-5xl max-h-[85vh] overflow-y-auto">
           <DialogTitle className="sr-only">Transcription History</DialogTitle>
           <TranscriptionHistory onApplyDirect={handleApplyDirect} />
         </DialogContent>
