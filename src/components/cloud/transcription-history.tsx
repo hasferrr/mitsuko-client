@@ -343,7 +343,7 @@ export default function TranscriptionHistory({ onApplyDirect }: TranscriptionHis
                   {(isBgLoading || bgCount > 0) ? (
                     <Loader2 className="size-4 animate-spin text-primary" />
                   ) : (
-                    <CheckCircle className="size-4 " />
+                    <CheckCircle className="size-4 text-sidebar-primary" />
                   )}
                   <div>
                     <div className="text-sm font-medium">
@@ -354,7 +354,7 @@ export default function TranscriptionHistory({ onApplyDirect }: TranscriptionHis
                         ? 'Checking status...'
                         : bgCount > 0
                           ? `${bgCount} transcription${bgCount > 1 ? 's' : ''} still processing`
-                          : 'CardHeader'}
+                          : 'No transcriptions running'}
                     </div>
                   </div>
                 </div>
