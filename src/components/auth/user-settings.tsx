@@ -34,6 +34,8 @@ export function UserSettings() {
   const setIsSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.setIsSubtitlePerformanceModeEnabled)
   const isAutoEnableProjectSettings = useLocalSettingsStore((state) => state.isAutoEnableProjectSettings)
   const setIsAutoEnableProjectSettings = useLocalSettingsStore((state) => state.setIsAutoEnableProjectSettings)
+  const isLegacyCreateBehavior = useLocalSettingsStore((state) => state.isLegacyCreateBehavior)
+  const setIsLegacyCreateBehavior = useLocalSettingsStore((state) => state.setIsLegacyCreateBehavior)
   const dismissedDialogs = useLocalSettingsStore((state) => state.dismissedDialogs)
   const resetAllDismissedDialogs = useLocalSettingsStore((state) => state.resetAllDismissedDialogs)
   const [isThirdPartyDialogOpen, setIsThirdPartyDialogOpen] = useState(false)
@@ -95,6 +97,22 @@ export function UserSettings() {
               id="subtitle-performance-mode-switch"
               checked={!isSubtitlePerformanceModeEnabled}
               onCheckedChange={(checked) => setIsSubtitlePerformanceModeEnabled(!checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Don't auto-open new items
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Enable this to create new translation, transcription, or extraction items without opening them.
+              </p>
+            </div>
+            <Switch
+              id="legacy-create-behavior-switch"
+              checked={isLegacyCreateBehavior}
+              onCheckedChange={setIsLegacyCreateBehavior}
             />
           </div>
 

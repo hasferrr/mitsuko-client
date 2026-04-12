@@ -15,6 +15,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { Headphones, Loader2, Settings2, Plus } from "lucide-react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ProjectItemList } from "../project-item-list"
@@ -22,6 +23,8 @@ import { Transcription, Project } from "@/types/project"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
+import { useRouter } from "next/navigation"
 import { ProjectItemSkeleton } from "../project-item-skeleton"
 
 interface ProjectTranscriptionListProps {
@@ -50,9 +53,13 @@ export function ProjectTranscriptionList({
 
   const isTranscribingSet = useTranscriptionStore(state => state.isTranscribingSet)
   const createTranscriptionDb = useTranscriptionDataStore((state) => state.createTranscriptionDb)
+  const setCurrentId = useTranscriptionDataStore((state) => state.setCurrentId)
   const updateTranscriptionDb = useTranscriptionDataStore((state) => state.updateTranscriptionDb)
   const deleteTranscriptionDb = useTranscriptionDataStore((state) => state.deleteTranscriptionDb)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
+  const isLegacyCreateBehavior = useLocalSettingsStore((state) => state.isLegacyCreateBehavior)
+  const router = useRouter()
+  const [isCreating, setIsCreating] = useState(false)
 
   const transcriptionComponentList = transcriptions.map((transcription) => (
     <ProjectItemList
@@ -104,21 +111,32 @@ export function ProjectTranscriptionList({
           <Button
             size="sm"
             variant="outline"
+            disabled={isCreating}
             onClick={async () => {
-              const created = await createTranscriptionDb(currentProject.id, {
-                title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
-                transcriptionText: "",
-                transcriptSubtitles: [],
-              })
-              {
+              setIsCreating(true)
+              try {
+                const created = await createTranscriptionDb(currentProject.id, {
+                  title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
+                  transcriptionText: "",
+                  transcriptSubtitles: [],
+                })
                 const storeProject = useProjectStore.getState().currentProject
                 const base = storeProject && storeProject.id === currentProject.id ? storeProject.transcriptions : currentProject.transcriptions
-                await updateProjectItems(currentProject.id, [...base, created.id], 'transcription')
+                if (!isLegacyCreateBehavior) {
+                  setCurrentId(created.id)
+                  router.push("/transcribe")
+                  updateProjectItems(currentProject.id, [...base, created.id], 'transcription')
+                } else {
+                  await updateProjectItems(currentProject.id, [...base, created.id], 'transcription')
+                  setTranscriptions(prev => [created, ...prev])
+                  setIsCreating(false)
+                }
+              } catch {
+                setIsCreating(false)
               }
-              setTranscriptions(prev => [created, ...prev])
             }}
           >
-            <Plus className="size-4" />
+            {isCreating ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
             New Transcription
           </Button>
         </div>

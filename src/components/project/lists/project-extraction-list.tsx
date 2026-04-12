@@ -15,6 +15,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { FileText, Loader2, Settings2, Plus } from "lucide-react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ProjectItemList } from "../project-item-list"
@@ -22,6 +23,8 @@ import { Extraction, Project } from "@/types/project"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
+import { useRouter } from "next/navigation"
 import { ProjectItemSkeleton } from "../project-item-skeleton"
 
 interface ProjectExtractionListProps {
@@ -50,9 +53,13 @@ export function ProjectExtractionList({
 
   const isExtractingSet = useExtractionStore(state => state.isExtractingSet)
   const createExtractionDb = useExtractionDataStore((state) => state.createExtractionDb)
+  const setCurrentId = useExtractionDataStore((state) => state.setCurrentId)
   const updateExtractionDb = useExtractionDataStore((state) => state.updateExtractionDb)
   const deleteExtractionDb = useExtractionDataStore((state) => state.deleteExtractionDb)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
+  const isLegacyCreateBehavior = useLocalSettingsStore((state) => state.isLegacyCreateBehavior)
+  const router = useRouter()
+  const [isCreating, setIsCreating] = useState(false)
 
   const extractionComponentList = extractions.map((extraction) => (
     <ProjectItemList
@@ -105,28 +112,39 @@ export function ProjectExtractionList({
           <Button
             size="sm"
             variant="outline"
+            disabled={isCreating}
             onClick={async () => {
-              const created = await createExtractionDb(
-                currentProject.id,
-                {
-                  title: "",
-                  episodeNumber: "",
-                  subtitleContent: "",
-                  previousContext: "",
-                  contextResult: ""
-                },
-                undefined,
-                undefined,
-              )
-              {
+              setIsCreating(true)
+              try {
+                const created = await createExtractionDb(
+                  currentProject.id,
+                  {
+                    title: "",
+                    episodeNumber: "",
+                    subtitleContent: "",
+                    previousContext: "",
+                    contextResult: ""
+                  },
+                  undefined,
+                  undefined,
+                )
                 const storeProject = useProjectStore.getState().currentProject
                 const base = storeProject && storeProject.id === currentProject.id ? storeProject.extractions : currentProject.extractions
-                await updateProjectItems(currentProject.id, [...base, created.id], 'extraction')
+                if (!isLegacyCreateBehavior) {
+                  setCurrentId(created.id)
+                  router.push("/extract-context")
+                  updateProjectItems(currentProject.id, [...base, created.id], 'extraction')
+                } else {
+                  await updateProjectItems(currentProject.id, [...base, created.id], 'extraction')
+                  setExtractions(prev => [created, ...prev])
+                  setIsCreating(false)
+                }
+              } catch {
+                setIsCreating(false)
               }
-              setExtractions(prev => [created, ...prev])
             }}
           >
-            <Plus className="size-4" />
+            {isCreating ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
             New Extraction
           </Button>
         </div>
