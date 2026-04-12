@@ -43,14 +43,14 @@ export default function SubtitleViewer({
 
   return (
     <div>
-      <div className="flex items-center space-x-4 my-4">
-        <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 mb-4">
           <Checkbox id="enableHighlight" checked={enableHighlight} onCheckedChange={(checked) => setEnableHighlight(Boolean(checked))} />
           <Label htmlFor="enableHighlight">Syntax Highlight</Label>
         </div>
       </div>
       {subtitleEvents.length > 0 && (
-        <div className="border rounded-md sentry-mask ph-no-capture">
+        <div className="border rounded-xl sentry-mask ph-no-capture">
           <div className="grid grid-cols-[48px_96px_96px_60px_120px_120px_1fr] h-10 border-b text-sm text-muted-foreground font-medium pl-2">
             <div className="h-full flex items-center px-2">#</div>
             <div className="h-full flex items-center px-2">Start</div>
