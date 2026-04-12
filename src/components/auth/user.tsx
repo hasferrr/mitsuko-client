@@ -408,7 +408,7 @@ export function User() {
                             "px-2 py-1 rounded-full text-xs font-medium",
                             isExpired
                               ? "bg-destructive/10 text-destructive"
-                              : "bg-primary/10 text-primary"
+                              : "bg-green-500/10 text-green-600 dark:text-green-400"
                           )}
                         >
                           {state}
