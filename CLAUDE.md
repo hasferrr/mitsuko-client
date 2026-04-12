@@ -173,6 +173,11 @@ Use semantic tokens instead of hardcoded colors:
 - Use `space-y-4` on CardContent instead of `mb-*` on individual children
 - When parent has `gap-*`, child `mb-*`/`mt-*` is redundant — remove it
 - `gap-1.5` is the standard small gap (not `gap-[6px]`)
+- Use `flex`/`grid` with `gap-*` instead of `space-x-*`/`space-y-*` (Tailwind v4 changed the selector, breaking inline children):
+  ```diff
+  - <div class="space-y-4 p-4">
+  + <div class="flex flex-col gap-4 p-4">
+  ```
 
 ## Settings Access Pattern
 
