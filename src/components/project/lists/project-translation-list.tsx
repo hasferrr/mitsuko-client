@@ -119,7 +119,7 @@ export function ProjectTranslationList({
 
   return (
     <Card size="sm">
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium">{title}</h3>
         <div className="flex items-center gap-2">
