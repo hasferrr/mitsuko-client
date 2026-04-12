@@ -548,12 +548,8 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
                 <LanguageSelection basicSettingsId={basicSettingsId} />
                 <ModelSelection basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />
                 <ContextDocumentInput basicSettingsId={basicSettingsId} />
-                <div className="m-[2px]">
-                  <CustomInstructionsInput basicSettingsId={basicSettingsId} />
-                </div>
-                <div className="m-[2px]">
-                  <FewShotInput basicSettingsId={basicSettingsId} />
-                </div>
+                <CustomInstructionsInput basicSettingsId={basicSettingsId} />
+                <FewShotInput basicSettingsId={basicSettingsId} />
               </CardContent>
             </Card>
           </TabsContent>

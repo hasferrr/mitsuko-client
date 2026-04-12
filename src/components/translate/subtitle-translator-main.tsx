@@ -661,16 +661,12 @@ export default function SubtitleTranslatorMain({
                       basicSettingsId={basicSettingsId}
                     />
                   </DragAndDrop>
-                  <div className="m-[2px]">
                     <CustomInstructionsInput
                       basicSettingsId={basicSettingsId}
                     />
-                  </div>
-                  <div className="m-[2px]">
                     <FewShotInput
                       basicSettingsId={basicSettingsId}
                     />
-                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
