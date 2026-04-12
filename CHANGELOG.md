@@ -14,10 +14,13 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 ## 2026
 
+### April 12
+
+- 🎨 **UI Update:** Fresh, cleaner, and more consistent interface across all views.
+
 ### April 8
 
-- 🤖 **Model Updates:**
-  - Added Grok 4.20, xAI's flagship model with a massive 2M token context window and 2M max output.
+- 🤖 **Model Updates:** Added Grok 4.20, xAI's flagship model with a massive 2M token context window and 2M max output.
 
 ### March 16
 
