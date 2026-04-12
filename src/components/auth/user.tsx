@@ -118,8 +118,8 @@ export function User() {
   }
 
   return (
-    <div className="w-[min(42rem,90vw)] mx-auto space-y-6">
-      <Card>
+    <div className="w-[min(42rem,90vw)] mx-auto flex flex-col gap-6">
+      <Card size="sm">
         <CardHeader className="border-b">
           <div className="flex justify-between items-center">
             <h2 className="font-medium">User Information</h2>
@@ -191,7 +191,7 @@ export function User() {
         </table>
       </Card>
 
-      <Card>
+      <Card size="sm">
         <CardHeader className="border-b flex justify-between items-center gap-4">
           <h2 className="font-medium">Transaction History</h2>
           <div className="flex items-center gap-2">
@@ -350,7 +350,7 @@ export function User() {
         )}
       </Card>
 
-      <Card>
+      <Card size="sm">
         <CardHeader className="border-b">
           <h2 className="font-medium">Credit Grants</h2>
         </CardHeader>

@@ -62,7 +62,7 @@ export function UserSettings() {
         <CardHeader className="border-b">
           <h2 className="font-medium">User Settings</h2>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-col gap-2">
               <Label>
