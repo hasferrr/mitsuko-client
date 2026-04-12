@@ -32,14 +32,12 @@ export function CustomInstructionsSaveDialog({ customInstructions }: CustomInstr
     <>
       <Button
         variant="outline"
-        size="sm"
         onClick={() => {
           setNewInstructionName("")
           setIsSaveDialogOpen(true)
         }}
-        className="h-8 px-2"
       >
-        <Save className="h-4 w-4" />
+        <Save className="size-4" />
       </Button>
 
       <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>

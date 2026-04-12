@@ -102,15 +102,15 @@ export const Project = () => {
 
   const ProjectItemSkeleton = () => {
     return (
-      <Card className="overflow-hidden border border-muted h-full flex flex-col">
-        <CardHeader className="flex-row items-center justify-between gap-2 pb-2">
+      <Card className="overflow-hidden h-full flex flex-col">
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
           <Skeleton className="h-5 w-36" />
           <div className="flex items-center gap-4">
             <Skeleton className="h-4 w-8" />
-            <Skeleton className="h-4 w-4" />
+            <Skeleton className="size-4" />
           </div>
         </CardHeader>
-        <CardContent className="pb-4 flex flex-col flex-1">
+        <CardContent className="flex flex-col flex-1">
           <div className="flex-1" />
           <div className="flex flex-col gap-1 mt-auto">
             <Skeleton className="h-4 w-24" />
@@ -144,18 +144,18 @@ export const Project = () => {
         ref={setNodeRef}
         style={style}
         className={cn(
-          "cursor-pointer hover:border-primary transition-colors overflow-hidden border border-muted h-full flex flex-col",
+          "cursor-pointer hover:ring-primary transition-colors overflow-hidden h-full flex flex-col",
           isDragging && "opacity-50"
         )}
         onClick={() => setCurrentProject(project.id)}
       >
-        <CardHeader className="flex-row items-center justify-between gap-2 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
           <CardTitle>{project.name}</CardTitle>
           <div className="flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                 <div className="rounded-md hover:bg-muted cursor-pointer">
-                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                  <MoreHorizontal className="size-4 text-muted-foreground" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -165,7 +165,7 @@ export const Project = () => {
                     handleExportProject(project.id)
                   }}
                 >
-                  <Upload className="h-4 w-4 mr-2" />
+                  <Upload className="size-4" />
                   Export
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -176,20 +176,20 @@ export const Project = () => {
                   }}
                   className="text-destructive"
                 >
-                  <Trash className="h-4 w-4 mr-2" />
+                  <Trash className="size-4" />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <GripVertical
-              className="h-4 w-4 cursor-grab text-muted-foreground focus:outline-none"
+              className="size-4 cursor-grab text-muted-foreground focus:outline-hidden"
               {...attributes}
               {...listeners}
               onClick={e => e.stopPropagation()}
             />
           </div>
         </CardHeader>
-        <CardContent className="pb-4 flex flex-col flex-1">
+        <CardContent className="flex flex-col flex-1">
           <div className="flex-1" />
           <div className="flex flex-col gap-1 mt-auto">
             <p className="text-sm text-muted-foreground">
@@ -215,7 +215,7 @@ export const Project = () => {
           <div className="flex gap-2">
             <Button onClick={handleCreateProject} disabled={isCreateDisabled}>
               {isCreateDisabled ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
               ) : (
                 <Plus size={18} />
               )}
@@ -232,7 +232,7 @@ export const Project = () => {
           </div>
         ) : visibleProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
-            <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+            <FileText className="size-12 text-muted-foreground mb-4" />
             <h2 className="text-xl font-medium mb-2 text-center">Translation & Transcription</h2>
             <p className="text-muted-foreground mb-4 text-center text-sm">
               Create a new project to manage your subtitle translations.

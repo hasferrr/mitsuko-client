@@ -126,21 +126,21 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
       />
 
       <Tabs defaultValue="overview" className="mb-6">
-        <TabsList className="bg-card border border-border p-1 rounded-lg w-fit h-fit flex flex-wrap">
+        <TabsList className="bg-card border border-border h-fit flex-wrap">
           <TabsTrigger value="overview" className="data-[state=active]:bg-secondary rounded-md">
-            <LayoutDashboard className="h-4 w-4 mr-2" />
+            <LayoutDashboard className="size-4" />
             Overview ({translations.length + transcriptions.length + extractions.length})
           </TabsTrigger>
           <TabsTrigger value="translations" className="data-[state=active]:bg-secondary rounded-md">
-            <Globe className="h-4 w-4 mr-2" />
+            <Globe className="size-4" />
             Translations ({translations.length})
           </TabsTrigger>
           <TabsTrigger value="transcriptions" className="data-[state=active]:bg-secondary rounded-md">
-            <Headphones className="h-4 w-4 mr-2" />
+            <Headphones className="size-4" />
             Transcriptions ({transcriptions.length})
           </TabsTrigger>
           <TabsTrigger value="context-extractor" className="data-[state=active]:bg-secondary rounded-md">
-            <FileText className="h-4 w-4 mr-2" />
+            <FileText className="size-4" />
             Extractions ({extractions.length})
           </TabsTrigger>
         </TabsList>

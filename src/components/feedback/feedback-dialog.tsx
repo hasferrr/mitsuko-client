@@ -147,7 +147,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
                   onClick={() => setSendMethod("app")}
                   className="flex items-center gap-2"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="size-4" />
                   In App
                 </Button>
                 <Button
@@ -157,7 +157,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
                   onClick={() => setSendMethod("email")}
                   className="flex items-center gap-2"
                 >
-                  <Mail className="h-4 w-4" />
+                  <Mail className="size-4" />
                   Email
                 </Button>
                 <Button
@@ -167,7 +167,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
                   onClick={() => setSendMethod("discord")}
                   className="flex items-center gap-2"
                 >
-                  <MessageSquare className="h-4 w-4" />
+                  <MessageSquare className="size-4" />
                   Discord
                 </Button>
               </div>

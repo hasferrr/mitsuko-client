@@ -94,7 +94,6 @@ export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialog
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       modal={false}
-      fadeDuration={50}
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -107,7 +106,7 @@ export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialog
         </DialogHeader>
 
         {!isGlobal && isDefaultEnabled !== undefined && onDefaultEnabledChange && (
-          <div className="flex items-center justify-between gap-2 p-4 border rounded-md mb-4 bg-muted/20">
+          <div className="flex items-center justify-between gap-2 p-4 border rounded-md bg-muted/20">
             <div className="flex flex-col gap-1">
               <Label htmlFor="enable-default-transcription">
                 Enable Settings
@@ -134,7 +133,7 @@ export const TranscriptionSettingsDialogue: React.FC<TranscriptionSettingsDialog
         <DialogFooter>
           {!isGlobal && onOpenGlobalSettings && (
             <Button variant="outline" className="mr-auto" onClick={onOpenGlobalSettings}>
-              <Settings2 className="h-4 w-4" />
+              <Settings2 className="size-4" />
               Global Settings
             </Button>
           )}

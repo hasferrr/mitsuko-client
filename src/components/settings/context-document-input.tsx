@@ -53,14 +53,12 @@ export const ContextDocumentInput = memo(({ basicSettingsId }: Props) => {
         <label className="text-sm font-medium">Context Document</label>
         <Button
           variant="outline"
-          size="sm"
           onClick={() => {
             loadProjectExtractions()
             setIsContextDialogOpen(true)
           }}
-          className="h-8 px-2"
         >
-          <FolderDown className="h-4 w-4" />
+          <FolderDown className="size-4" />
           Import
         </Button>
       </div>

@@ -372,21 +372,21 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               <Button
                 variant="destructive"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsDeleteSelectedDialogOpen(true)}
                 disabled={selectedIds.size === 0}
               >
-                <Trash className="h-4 w-4" />
+                <Trash className="size-4" />
                 Delete
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={handleSelectAllToggle}
                 disabled={batchFiles.length === 0}
               >
-                <ListChecks className="h-4 w-4" />
+                <ListChecks className="size-4" />
                 {selectedIds.size === batchFiles.length ? 'Deselect All' : 'Select All'}
               </Button>
             </>
@@ -395,11 +395,11 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 rounded-lg"
+              className="rounded-lg"
               onClick={() => setIsManageFilesDialogOpen(true)}
               disabled={isProcessing}
             >
-              <FolderOpen className="h-4 w-4" />
+              <FolderOpen className="size-4" />
               Manage Files
             </Button>
           )}
@@ -407,22 +407,22 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 rounded-lg"
+              className="rounded-lg"
               onClick={() => document.getElementById(uploadInputId)?.click()}
               disabled={isProcessing}
             >
-              <Upload className="h-4 w-4" />
+              <Upload className="size-4" />
               Upload
             </Button>
           )}
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 rounded-lg"
+            className="rounded-lg"
             onClick={toggleSelectMode}
             disabled={isProcessing || batchFiles.length === 0}
           >
-            <CheckSquare className="h-4 w-4" />
+            <CheckSquare className="size-4" />
             {isSelecting ? 'Cancel' : 'Select'}
           </Button>
         </div>
@@ -444,40 +444,43 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
 
         <div className="flex flex-wrap items-center gap-4 w-full">
           <Button
-            className="h-10 flex-1"
+            size="lg"
+            className="flex-1"
             onClick={handleOpenStartBatchDialog}
             disabled={isProcessing || !session || batchFiles.length === 0 || isSelecting}
           >
             {isProcessing ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Transcribing...
               </>
             ) : (
               <>
-                <AudioLines className="h-4 w-4" />
+                <AudioLines className="size-4" />
                 {session ? `Transcribe ${batchFiles.length} files` : "Sign In to Start"}
               </>
             )}
           </Button>
           <Button
             variant="outline"
-            className="h-10 flex-1"
+            size="lg"
+            className="flex-1"
             onClick={handleStopBatchTranscription}
             disabled={!isProcessing}
           >
-            <Square className="h-4 w-4" />
+            <Square className="size-4" />
             Stop All
           </Button>
         </div>
 
         <Button
           variant="outline"
-          className="h-10 w-full border-primary/25 hover:border-primary/50"
+          size="lg"
+          className="w-full border-primary/25 hover:border-primary/50"
           onClick={() => setIsContinueDialogOpen(true)}
           disabled={isProcessing || !session || batchFiles.length === 0 || (batchFiles.length - finishedCount <= 0) || isSelecting}
         >
-          <FastForward className="h-4 w-4" />
+          <FastForward className="size-4" />
           Continue Batch Transcription ({batchFiles.length - finishedCount} remaining)
         </Button>
 
@@ -505,7 +508,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           </TabsList>
 
           {/* Batch Settings */}
-          <div className="space-y-4 w-full p-4 mt-4 rounded-xl border border-input bg-card shadow-sm">
+          <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <label htmlFor="shared-settings-switch" className="flex flex-col">
                 <span className="text-sm font-semibold">Settings Mode</span>
@@ -541,26 +544,27 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsCopySettingsDialogOpen(true)}
                 disabled={isProcessing || batchFiles.length === 0}
               >
-                <ListChecks className="h-4 w-4" />
+                <ListChecks className="size-4" />
                 Copy Shared Settings...
               </Button>
             </div>
-          </div>
+          </CardContent>
+          </Card>
 
-          <TabsContent value="settings" className="flex-grow space-y-4 mt-4">
-            <Card className="border border-border bg-card text-card-foreground">
-              <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+          <TabsContent value="settings" className="grow space-y-4 mt-4">
+            <Card>
+              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <SettingsTranscription transcriptionId={defaultTranscriptionId} />
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="whisper" className="flex-grow mt-4">
+          <TabsContent value="whisper" className="grow mt-4">
             <WhisperSettingsPanel
               showApplyButton
               onApplyClick={() => setIsApplyWhisperDialogOpen(true)}
@@ -618,7 +622,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-primary" />
+              <AlertTriangle className="size-5 text-primary" />
               Start Batch Transcription
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
@@ -653,7 +657,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              <AlertTriangle className="size-5 text-amber-500" />
               Already Transcribed Content
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -675,7 +679,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <FastForward className="h-5 w-5 text-primary" />
+              <FastForward className="size-5 text-primary" />
               Continue Batch Transcription
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -694,7 +698,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-primary" />
+              <AlertTriangle className="size-5 text-primary" />
               Apply Whisper Subtitles
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -710,7 +714,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
 
       {/* Preview Dialog */}
       <Dialog open={!!previewId} onOpenChange={handlePreviewDialogOpenChange}>
-        <DialogContent className="max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Transcription Preview</DialogTitle>
           </DialogHeader>

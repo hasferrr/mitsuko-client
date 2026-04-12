@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronsRight } from "lucide-react"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface Props {
   advancedSettingsId: string
@@ -57,7 +57,7 @@ export const StartIndexInput = memo(({ advancedSettingsId }: Props) => {
 
   return (
     <div className="space-y-2">
-      <div className="flex justify-between mb-2 items-center">
+      <div className="flex justify-between items-center">
         <label className="text-sm font-medium">Start Index</label>
       </div>
       <div className="relative">
@@ -72,25 +72,23 @@ export const StartIndexInput = memo(({ advancedSettingsId }: Props) => {
           className="bg-background dark:bg-muted/30 pr-10"
           inputMode="numeric"
         />
-        <TooltipProvider>
-          <Tooltip delayDuration={10}>
-            <TooltipTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
-                onClick={handleFindEmptyTranslation}
-              >
-                <ChevronsRight className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="font-medium text-center">Find the first subtitle with empty</p>
-              <p className="font-medium text-center">translation and set it as the start index</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip delayDuration={10}>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
+              onClick={handleFindEmptyTranslation}
+            >
+              <ChevronsRight className="size-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="font-medium text-center">Find the first subtitle with empty</p>
+            <p className="font-medium text-center">translation and set it as the start index</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
       <p className="text-xs text-muted-foreground">
         Start translation from this subtitle index. Useful for resuming translations. (1-{subtitles.length})

@@ -132,7 +132,7 @@ export function ExportImportDialogue({
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Export/Import Database</DialogTitle>
-            <DialogDescription className="pt-1">
+            <DialogDescription>
               Backup all your projects and batches to a JSON file or restore from a previously exported backup.
             </DialogDescription>
           </DialogHeader>
@@ -143,7 +143,7 @@ export function ExportImportDialogue({
               disabled={isLoading}
               className="w-full"
             >
-              <Upload className="mr-2 h-4 w-4" />
+              <Upload className="size-4" />
               Export Database
             </Button>
             <Button
@@ -152,7 +152,7 @@ export function ExportImportDialogue({
               disabled={isLoading}
               className="w-full"
             >
-              <Download className="mr-2 h-4 w-4" />
+              <Download className="size-4" />
               Import Database
             </Button>
           </div>

@@ -157,9 +157,9 @@ export const AiStreamOutput = ({
             className="flex items-center font-semibold cursor-pointer"
           >
             {isCollapsed ? (
-              <ChevronRight className="h-4 w-4 mr-1" />
+              <ChevronRight className="size-4 mr-1" />
             ) : (
-              <ChevronDown className="h-4 w-4 mr-1" />
+              <ChevronDown className="size-4 mr-1" />
             )}
             {parsedContent.output || !isProcessing ? "Thought" : (
               <span className="inline-flex">
@@ -169,7 +169,7 @@ export const AiStreamOutput = ({
                     className="animate-[thinking_2s_ease-in-out_infinite]"
                     style={{
                       animationDelay: `${index * 100}ms`,
-                      color: "hsl(var(--primary))",
+                      color: "var(--primary)",
                     }}
                   >
                     {char}
@@ -238,7 +238,7 @@ export const AiStreamOutput = ({
         />
       )}
       {parsedContent.output && translatedSubtitles.length === 0 && (
-        <div className="whitespace-pre-wrap break-words text-sm p-1">
+        <div className="whitespace-pre-wrap wrap-break-word text-sm p-1">
           {parsedContent.output}
         </div>
       )}

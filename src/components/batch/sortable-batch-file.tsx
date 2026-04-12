@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -62,17 +62,17 @@ export function SortableBatchFile({
       ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>}
       style={style}
       className={cn(
-        "flex",
+        "ring-0 border",
         selectMode && "select-none",
         selected && "bg-primary/5 dark:bg-primary/10"
       )}
       onClick={handleCardClick}
     >
-      {selectMode ? (
-        <div className="flex items-center ml-4">
+      <CardContent className="flex items-center justify-between gap-4">
+        {selectMode ? (
           <input
             type="checkbox"
-            className="w-4 h-4"
+            className="size-4 shrink-0"
             checked={selected}
             onClick={(e) => e.stopPropagation()}
             onChange={(e) => {
@@ -80,16 +80,14 @@ export function SortableBatchFile({
               onSelectToggle?.(batchFile.id)
             }}
           />
-        </div>
-      ) : (
-        <div className="flex items-center ml-4 cursor-grab" {...attributes} {...listeners}>
-          <GripVertical className="h-5 w-5 text-muted-foreground" />
-        </div>
-      )}
-      <CardContent className="p-4 flex-1 flex items-center justify-between">
-        <div>
+        ) : (
+          <button {...attributes} {...listeners} className="cursor-grab shrink-0">
+            <GripVertical className="size-5 text-muted-foreground" />
+          </button>
+        )}
+        <div className="flex-1 min-w-0">
           <p
-            className={cn("text-sm break-words break-all pr-2 line-clamp-4", !selectMode && "hover:underline cursor-pointer")}
+            className={cn("text-sm wrap-break-word break-all pr-2 line-clamp-4", !selectMode && "hover:underline cursor-pointer")}
             onClick={handleTitleClick}
           >
             {!!batchFile.title ? (
@@ -101,36 +99,34 @@ export function SortableBatchFile({
               <span className="italic">No title</span>
             )}
           </p>
-          <p className="text-sm break-words break-all pr-2 line-clamp-4 text-muted-foreground font-light">
+          <p className="text-sm wrap-break-word break-all pr-2 line-clamp-4 text-muted-foreground font-light">
             {batchFile.description ? batchFile.description : batchFile.translatedCount === batchFile.subtitlesCount
               ? `${batchFile.subtitlesCount} lines`
               : `${batchFile.translatedCount}/${batchFile.subtitlesCount} lines`}
           </p>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           {batchFile.status === 'pending' && <Badge variant="secondary">Pending</Badge>}
           {batchFile.status === 'partial' && <Badge variant="outline">Partial</Badge>}
           {batchFile.status === 'processing' && <Badge variant="outline">Processing ({batchFile.progress.toFixed(0)}%)</Badge>}
           {batchFile.status === 'queued' && <Badge variant="secondary" className="bg-transparent">Queued</Badge>}
           {batchFile.status === 'done' && (
             <>
-              <TooltipProvider delayDuration={50}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id) }}>
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{optionText}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Tooltip delayDuration={50}>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id) }}>
+                    <Download className="size-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{optionText}</TooltipContent>
+              </Tooltip>
               <Badge variant="default">Done</Badge>
             </>
           )}
           {batchFile.status === 'error' && <Badge variant="destructive">Error</Badge>}
           {!selectMode && (
             <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDelete(batchFile.id) }}>
-              <X className="h-4 w-4" />
+              <X className="size-4" />
             </Button>
           )}
         </div>

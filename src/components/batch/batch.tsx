@@ -108,12 +108,12 @@ export default function Batch() {
 
   const BatchCardSkeleton = () => {
     return (
-      <Card className="overflow-hidden border border-muted h-full flex flex-col">
-        <CardHeader className="flex-row items-center justify-between gap-2 pb-2">
+      <Card className="overflow-hidden h-full flex flex-col">
+        <CardHeader className="flex-row items-center justify-between gap-2">
           <Skeleton className="h-5 w-36" />
-          <Skeleton className="h-4 w-4" />
+          <Skeleton className="size-4" />
         </CardHeader>
-        <CardContent className="pb-4 flex flex-col flex-1">
+        <CardContent className="flex flex-col flex-1">
           <div className="flex-1" />
           <div className="flex flex-col gap-1 mt-auto">
             <Skeleton className="h-4 w-24" />
@@ -134,7 +134,7 @@ export default function Batch() {
           <h2 className="text-xl font-medium">Select a Batch</h2>
           <Button onClick={handleCreateBatch} disabled={isCreateDisabled}>
             {isCreateDisabled ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
             ) : (
               <Plus size={18} />
             )}
@@ -150,7 +150,7 @@ export default function Batch() {
           </div>
         ) : batchProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
-            <Files className="h-12 w-12 text-muted-foreground mb-4" />
+            <Files className="size-12 text-muted-foreground mb-4" />
             <h2 className="text-xl font-medium mb-2 text-center">Batch Projects</h2>
             <p className="text-muted-foreground mb-4 text-center text-sm">
               Create a new batch to translate, transcribe, or extract multiple files at once.

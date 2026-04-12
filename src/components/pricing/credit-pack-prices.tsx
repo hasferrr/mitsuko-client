@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react"
 import { Button } from "../ui/button"
 import { useRouter } from "next/navigation"
 import { ProductId } from "@/types/product"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { useState, useTransition } from "react"
 import { useSnapStore } from "@/stores/ui/use-snap-store"
 import { PaymentOptionsDialog } from "./payment-options-dialog"
@@ -106,10 +106,10 @@ export function CreditPackPrices({
   }
 
   return (
-    <div className="relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-6 shadow-sm">
+    <Card className="relative max-w-5xl mx-auto mt-8 shadow-xs">
       <div id="credit-packs" className="absolute -top-24" />
-
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+      <CardContent className="space-y-4">
+      <p className="text-sm text-muted-foreground">
         Need more credits? Purchase additional credit packs starting at just{" "}
         {currency.symbol}
         {((CREDIT_PACKS.find((pack) => pack.baseCredits !== 0)?.basePriceUSD || 0) * currency.rate).toLocaleString()}
@@ -126,11 +126,11 @@ export function CreditPackPrices({
           return (
             <Card
               key={pack.productId}
-              className="relative border-t-4 border-t-blue-500 border-r border-b border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/30 rounded-md shadow-sm hover:border-blue-400 hover:dark:border-blue-600 transition-colors duration-200"
+              className="relative shadow-xs"
             >
-              <CardHeader className="pb-0 pt-4">
-                <div className="flex justify-between items-baseline mb-1">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              <CardHeader>
+                <div className="flex justify-between items-baseline">
+                  <span className="text-sm font-medium text-muted-foreground">
                     {pack.baseCredits !== 0 ? "Credit Pack" : "Try for Free!"}
                   </span>
                   {savings > 0 && (
@@ -144,22 +144,22 @@ export function CreditPackPrices({
                     </span>
                   )}
                 </div>
-                <div className="text-xl font-medium text-gray-900 dark:text-white">
+                <div className="text-xl font-medium">
                   {pack.baseCredits !== 0 ? (
                     <>
                       {pack.baseCredits.toLocaleString()}
-                      <span className="text-gray-500 dark:text-gray-400 text-sm"> credits</span>
+                      <span className="text-muted-foreground text-sm"> credits</span>
                     </>
                   ) : (
                     "Free"
                   )}
                 </div>
               </CardHeader>
-              <CardContent className="pt-2 pb-4">
+              <CardContent>
                 <div className="flex items-center gap-2">
                   {savings > 0 ? (
                     <>
-                      <span className="text-gray-500 dark:text-gray-400 line-through text-sm">
+                      <span className="text-muted-foreground line-through text-sm">
                         {currency.symbol}{(() => {
                           const originalPrice = price + savings
                           if (originalPrice > 1000) {
@@ -168,34 +168,35 @@ export function CreditPackPrices({
                           return originalPrice.toLocaleString()
                         })()}
                       </span>
-                      <span className="text-xl font-bold text-gray-900 dark:text-white">
+                      <span className="text-xl font-bold">
                         {currency.symbol}{price.toLocaleString()}
                       </span>
                     </>
                   ) : (
-                    <span className="text-xl font-bold text-gray-900 dark:text-white">
+                    <span className="text-xl font-bold">
                       {currency.symbol}{price.toLocaleString()}
                     </span>
                   )}
                 </div>
               </CardContent>
-              <CardFooter className="pt-0 pb-4">
+              <div className="px-4">
                 {redirectToPricingPage ? (
                   <Button
-                    className="w-full bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-blue-500 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    variant="outline"
+                    className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary"
                     onClick={() => router.push("/pricing")}
                   >
                     See Details
                   </Button>
                 ) : pack.baseCredits !== 0 ? (
                   <Button
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                     onClick={() => handlePurchase(pack.productId)}
                     disabled={isPending}
                   >
                     {isCurrentCardLoading ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className="size-4 animate-spin" />
                         Purchasing...
                       </>
                     ) : (
@@ -204,13 +205,14 @@ export function CreditPackPrices({
                   </Button>
                 ) : (
                   <Button
-                    className="w-full bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-blue-500 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    variant="outline"
+                    className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary"
                     onClick={() => router.push("/dashboard")}
                   >
                     Get Started
                   </Button>
                 )}
-              </CardFooter>
+              </div>
             </Card>
           )
         })}
@@ -229,6 +231,7 @@ export function CreditPackPrices({
           currencyRate={dialogData.currencyRate}
         />
       )}
-    </div>
+      </CardContent>
+    </Card>
   )
 }

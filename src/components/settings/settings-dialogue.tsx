@@ -43,6 +43,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Card, CardContent } from "@/components/ui/card"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SettingsParentType } from "@/types/project"
@@ -142,7 +143,6 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       modal={false}
-      fadeDuration={50}
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -151,7 +151,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
         </DialogHeader>
 
         {!isGlobal && settingsParentType !== 'project' && isDefaultEnabled !== undefined && onDefaultEnabledChange && (
-          <div className="flex items-center justify-between gap-2 p-4 border rounded-md mb-4 bg-muted/20">
+          <div className="flex items-center justify-between gap-2 p-4 border rounded-md bg-muted/20">
             <div className="flex flex-col gap-1">
               <Label htmlFor={`enable-default-${settingsParentType}`}>
                 Enable Settings
@@ -181,12 +181,14 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                     Advanced Settings
                   </AccordionTrigger>
                   <AccordionContent className="pt-4 pb-2">
-                    <div className="border border-muted-foreground/20 rounded-md p-4 space-y-6">
-                      <MaxCompletionTokenInput
-                        basicSettingsId={basicSettingsId}
-                        advancedSettingsId={advancedSettingsId}
-                      />
-                    </div>
+                    <Card size="sm" className="ring-0 border">
+                      <CardContent className="space-y-6">
+                        <MaxCompletionTokenInput
+                          basicSettingsId={basicSettingsId}
+                          advancedSettingsId={advancedSettingsId}
+                        />
+                      </CardContent>
+                    </Card>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -206,17 +208,19 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                     Context & Instruction Settings
                   </AccordionTrigger>
                   <AccordionContent className="pt-4 pb-2">
-                    <div className="border border-muted-foreground/20 rounded-md p-4 space-y-6">
-                      <ContextDocumentInput
-                        basicSettingsId={basicSettingsId}
-                      />
-                      <CustomInstructionsInput
-                        basicSettingsId={basicSettingsId}
-                      />
-                      <FewShotInput
-                        basicSettingsId={basicSettingsId}
-                      />
-                    </div>
+                    <Card size="sm" className="ring-0 border">
+                      <CardContent className="space-y-6">
+                        <ContextDocumentInput
+                          basicSettingsId={basicSettingsId}
+                        />
+                        <CustomInstructionsInput
+                          basicSettingsId={basicSettingsId}
+                        />
+                        <FewShotInput
+                          basicSettingsId={basicSettingsId}
+                        />
+                      </CardContent>
+                    </Card>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="advanced-settings" className="border-none">
@@ -224,33 +228,35 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                     Advanced Settings
                   </AccordionTrigger>
                   <AccordionContent className="pt-4 pb-2">
-                    <div className="border border-muted-foreground/20 rounded-md p-4 space-y-6">
-                      <TemperatureSlider
-                        advancedSettingsId={advancedSettingsId}
-                      />
-                      <p className="text-sm font-semibold">Technical Options</p>
-                      <SplitSizeInput
-                        advancedSettingsId={advancedSettingsId}
-                      />
-                      <MaxCompletionTokenInput
-                        basicSettingsId={basicSettingsId}
-                        advancedSettingsId={advancedSettingsId}
-                      />
-                      <StructuredOutputSwitch
-                        basicSettingsId={basicSettingsId}
-                        advancedSettingsId={advancedSettingsId}
-                      />
-                      <FullContextMemorySwitch
-                        advancedSettingsId={advancedSettingsId}
-                      />
-                      <BetterContextCachingSwitch
-                        advancedSettingsId={advancedSettingsId}
-                      />
-                      <AdvancedSettingsResetButton
-                        basicSettingsId={basicSettingsId}
-                        advancedSettingsId={advancedSettingsId}
-                      />
-                    </div>
+                    <Card size="sm" className="ring-0 border">
+                      <CardContent className="space-y-6">
+                        <TemperatureSlider
+                          advancedSettingsId={advancedSettingsId}
+                        />
+                        <p className="text-sm font-semibold">Technical Options</p>
+                        <SplitSizeInput
+                          advancedSettingsId={advancedSettingsId}
+                        />
+                        <MaxCompletionTokenInput
+                          basicSettingsId={basicSettingsId}
+                          advancedSettingsId={advancedSettingsId}
+                        />
+                        <StructuredOutputSwitch
+                          basicSettingsId={basicSettingsId}
+                          advancedSettingsId={advancedSettingsId}
+                        />
+                        <FullContextMemorySwitch
+                          advancedSettingsId={advancedSettingsId}
+                        />
+                        <BetterContextCachingSwitch
+                          advancedSettingsId={advancedSettingsId}
+                        />
+                        <AdvancedSettingsResetButton
+                          basicSettingsId={basicSettingsId}
+                          advancedSettingsId={advancedSettingsId}
+                        />
+                      </CardContent>
+                    </Card>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -260,7 +266,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
         <DialogFooter>
           {!isGlobal && settingsParentType !== 'project' && onOpenGlobalSettings && (
             <Button variant="outline" className="mr-auto" onClick={onOpenGlobalSettings}>
-              <Settings2 className="h-4 w-4" />
+              <Settings2 className="size-4" />
               Global Settings
             </Button>
           )}

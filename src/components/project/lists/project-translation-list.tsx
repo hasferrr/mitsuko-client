@@ -16,6 +16,7 @@ import {
 } from "@dnd-kit/sortable"
 import { Globe, Loader2, Settings2, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { ProjectItemList } from "../project-item-list"
 import { Translation, Project } from "@/types/project"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
@@ -90,8 +91,8 @@ export function ProjectTranslationList({
         projectId={currentProject.id}
         type="translation"
         icon={isTranslatingSet.has(translation.id)
-          ? <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
-          : <Globe className="h-5 w-5 text-blue-500" />}
+          ? <Loader2 className="size-5 text-blue-500 animate-spin" />
+          : <Globe className="size-5 text-blue-500" />}
         title={translation.title}
         description={description}
         date={translation.updatedAt.toLocaleDateString()}
@@ -117,8 +118,9 @@ export function ProjectTranslationList({
   })
 
   return (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <div className="flex items-center justify-between mb-4">
+    <Card size="sm">
+      <CardContent className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium">{title}</h3>
         <div className="flex items-center gap-2">
           <Button
@@ -127,7 +129,7 @@ export function ProjectTranslationList({
             onClick={onOpenSettings}
             title="Translation settings"
           >
-            <Settings2 className="h-4 w-4" />
+            <Settings2 className="size-4" />
             Settings
           </Button>
           <Button
@@ -155,7 +157,7 @@ export function ProjectTranslationList({
               setTranslations(prev => [created, ...prev])
             }}
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="size-4" />
             New Translation
           </Button>
         </div>
@@ -176,6 +178,7 @@ export function ProjectTranslationList({
           </div>
         </SortableContext>
       </DndContext>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

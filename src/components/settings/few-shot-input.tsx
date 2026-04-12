@@ -15,6 +15,7 @@ import { Translation } from "@/types/project"
 import { db } from "@/lib/db/db"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
+import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 interface Props {
@@ -211,18 +212,19 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
         {fewShotType === 'linked' && (
           <div className="space-y-3">
             {fewShotLinkedId && linkedTranslationTitle ? (
-              <div className={cn("p-3 border rounded-md space-y-3")}>
+              <Card size="sm">
+                <CardContent className="space-y-3">
                 <div className="flex flex-row items-center justify-between">
                   <div className="space-y-1">
                     <span className="text-sm font-medium">Linked: {linkedTranslationTitle}</span>
                     <p className="text-xs text-muted-foreground">{linkedTranslationLineCount === null ? '...' : linkedTranslationLineCount} Lines</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={openLinkDialog} className="h-8 px-2">
-                      <LinkIcon className="h-3 w-3" /> Change
+                    <Button variant="outline" onClick={openLinkDialog} className="px-2">
+                      <LinkIcon className="size-3" /> Change
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={handleUnlinkTranslation} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                      <XCircle className="h-4 w-4" />
+                    <Button variant="ghost" size="icon" onClick={handleUnlinkTranslation} className="text-muted-foreground hover:text-destructive">
+                      <XCircle className="size-4" />
                     </Button>
                   </div>
                 </div>
@@ -237,29 +239,30 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
                       onChange={handleStartIndexChange}
                       min={1}
                       max={linkedTranslationLineCount || 1}
-                      className="bg-background dark:bg-muted/30 h-8 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      disabled={linkedTranslationLineCount === null}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="fewshot-end-index" className="text-xs">End Line</Label>
-                    <Input
-                      id="fewshot-end-index"
-                      type="number"
-                      value={fewShotEndIndex === undefined ? '' : fewShotEndIndex}
-                      onBlur={handleEndIndexChange}
-                      onChange={handleEndIndexChange}
-                      min={fewShotStartIndex || 1}
-                      max={linkedTranslationLineCount || 1}
-                      className="bg-background dark:bg-muted/30 h-8 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+className="bg-background dark:bg-muted/30 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                       disabled={linkedTranslationLineCount === null}
+                     />
+                   </div>
+                   <div>
+                     <Label htmlFor="fewshot-end-index" className="text-xs">End Line</Label>
+                     <Input
+                       id="fewshot-end-index"
+                       type="number"
+                       value={fewShotEndIndex === undefined ? '' : fewShotEndIndex}
+                       onBlur={handleEndIndexChange}
+                       onChange={handleEndIndexChange}
+                       min={fewShotStartIndex || 1}
+                       max={linkedTranslationLineCount || 1}
+                       className="bg-background dark:bg-muted/30 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       disabled={linkedTranslationLineCount === null}
                     />
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground pt-2">
+                <p className="text-xs text-muted-foreground">
                   Note: Using a large number of lines will significantly increase token and credit usage.
                 </p>
-              </div>
+                </CardContent>
+              </Card>
             ) : (
               <Button
                 disabled={!isFewShotEnabled}
@@ -267,7 +270,7 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
                 onClick={openLinkDialog}
                 className="w-full"
               >
-                <LinkIcon className="h-4 w-4" />
+                <LinkIcon className="size-4" />
                 Link Existing Translation Project
               </Button>
             )}
@@ -304,7 +307,7 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
                       {translation.subtitles?.length || 0} lines
                     </div>
                   </div>
-                  <FileTextIcon className="h-5 w-5 text-muted-foreground" />
+                  <FileTextIcon className="size-5 text-muted-foreground" />
                 </div>
               ))
             )}

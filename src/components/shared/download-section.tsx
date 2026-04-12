@@ -128,7 +128,7 @@ export function DownloadSection({
         <Dialog>
           <DialogTrigger className="w-full" asChild>
             <Button variant="outline">
-              <AlignCenter className="w-4 h-4" />
+              <AlignCenter className="size-4" />
               Select Format
             </Button>
           </DialogTrigger>
@@ -143,28 +143,28 @@ export function DownloadSection({
               <Button
                 variant={combinedFormat === "(o)-t" ? "default" : "outline"}
                 onClick={() => setCombinedFormat("(o)-t")}
-                className="py-8 flex justify-center w-56"
+                className="py-8 flex w-56"
               >
                 (Original Text) Translated Text
               </Button>
               <Button
                 variant={combinedFormat === "(t)-o" ? "default" : "outline"}
                 onClick={() => setCombinedFormat("(t)-o")}
-                className="py-8 flex justify-center w-56"
+                className="py-8 flex w-56"
               >
                 (Translated Text) Original Text
               </Button>
               <Button
                 variant={combinedFormat === "o-n-t" ? "default" : "outline"}
                 onClick={() => setCombinedFormat("o-n-t")}
-                className="py-8 flex justify-center w-56"
+                className="py-8 flex w-56"
               >
                 Original Text<br />Translated Text
               </Button>
               <Button
                 variant={combinedFormat === "t-n-o" ? "default" : "outline"}
                 onClick={() => setCombinedFormat("t-n-o")}
-                className="py-8 flex justify-center w-56"
+                className="py-8 flex w-56"
               >
                 Translated Text<br />Original Text
               </Button>
@@ -175,7 +175,7 @@ export function DownloadSection({
               <Button
                 variant={combinedFormat === "{o}-t" ? "default" : "outline"}
                 onClick={() => setCombinedFormat("{o}-t")}
-                className="py-8 flex justify-center w-full"
+                className="py-8 flex w-full"
               >
                 {"{Commented Original}"}Translated Text
               </Button>
@@ -190,12 +190,12 @@ export function DownloadSection({
       <Button
         variant="outline"
         className={cn(
-          "gap-2 w-full",
+          "gap-2",
           !inlineLayout && (!showSelectors || downloadOption !== "combined" || hideTextOptionSelector) && "col-span-2"
         )}
         onClick={handleDownload}
       >
-        <Download className="h-4 w-4" />
+        <Download className="size-4" />
         Download {type === "zip" ? "ZIP" : SUBTITLE_NAME_MAP.get(type)}
       </Button>
     </div>

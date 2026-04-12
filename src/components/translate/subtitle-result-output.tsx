@@ -8,6 +8,7 @@ import { parseTranslationJson } from "@/lib/parser/parser"
 import { cn } from "@/lib/utils"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
+import { Card, CardContent } from "@/components/ui/card"
 import { AiStreamOutput } from "@/components/ai-stream/ai-stream-output"
 
 export const SubtitleResultOutput = memo(() => {
@@ -112,24 +113,27 @@ export const SubtitleResultOutput = memo(() => {
           value={response.trim() || "Translation output will appear here..."}
           readOnly
           className={cn(
-            "h-[439px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2 resize-none",
+            "h-[439px] bg-background dark:bg-muted/30 overflow-y-auto rounded-xl p-3 pr-2 resize-none",
             !response && "text-muted-foreground"
           )}
         />
       ) : (
-        <div
+        <Card
           ref={topContainerRef}
+          size="sm"
           className={cn(
-            "h-[439px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2",
+            "h-[439px] bg-background dark:bg-muted/30 overflow-y-auto",
             !response && "text-muted-foreground"
           )}
         >
-          <AiStreamOutput
-            content={response.trim() || "Translation output will appear here..."}
-            subtitles={subtitles}
-            isProcessing={isTranslating}
-          />
-        </div>
+          <CardContent className="pr-2">
+            <AiStreamOutput
+              content={response.trim() || "Translation output will appear here..."}
+              subtitles={subtitles}
+              isProcessing={isTranslating}
+            />
+          </CardContent>
+        </Card>
       )}
       <Textarea
         ref={bottomTextareaRef}
@@ -137,8 +141,8 @@ export const SubtitleResultOutput = memo(() => {
         readOnly={!isEditing || isTranslating}
         onChange={handleChangeJSONInput}
         className={cn(
-          "h-[200px] bg-background dark:bg-muted/30 resize-none overflow-y-auto font-mono text-sm",
-          isParseError && "focus-visible:ring-red-600",
+          "h-[200px] bg-background dark:bg-muted/30 resize-none overflow-y-auto rounded-xl font-mono text-sm",
+          isParseError && "focus-visible:ring-destructive",
         )}
         placeholder="Accumulated result will appear here..."
       />
@@ -148,7 +152,7 @@ export const SubtitleResultOutput = memo(() => {
           onClick={!isTranslating
             ? (isEditing ? handleParseAndSave : handleEditText)
             : () => setIsShowRaw(prev => !prev)}
-          className="w-full"
+          className="w-1/2"
         >
           {!isTranslating
             ? isEditing ? "Parse & Save" : "Edit Text"
@@ -158,7 +162,7 @@ export const SubtitleResultOutput = memo(() => {
           variant="outline"
           onClick={isEditing ? handleCancelEdit : handleApply}
           disabled={isTranslating}
-          className="w-full"
+          className="w-1/2"
         >
           {isEditing ? "Cancel" : "Apply to Subtitles"}
         </Button>

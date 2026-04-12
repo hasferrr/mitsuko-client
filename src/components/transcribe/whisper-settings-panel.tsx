@@ -1,12 +1,12 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Wand2, RefreshCw } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
-import { cn } from "@/lib/utils"
 
 interface WhisperSettingsPanelProps {
   showApplyButton?: boolean
@@ -37,12 +37,13 @@ export function WhisperSettingsPanel({
   const reset = useWhisperSettingsStore((state) => state.reset)
 
   return (
-    <div className={cn("bg-card border border-border rounded-lg p-6", className)}>
-      <h2 className="text-lg font-medium mb-4">Whisper transcription settings</h2>
+    <Card size="sm" className={className}>
+      <CardContent className="space-y-4">
+      <h2 className="text-lg font-medium">Whisper transcription settings</h2>
 
       <div className="space-y-4">
         <div>
-          <p className="text-sm font-medium mb-2">Subtitle level</p>
+          <p className="text-sm font-medium">Subtitle level</p>
           <RadioGroup
             value={subtitleLevel}
             onValueChange={(value) => setSubtitleLevel(value as "words" | "segments")}
@@ -146,11 +147,10 @@ export function WhisperSettingsPanel({
             <Button
               size="sm"
               variant="outline"
-              className="border-border"
               onClick={onApplyClick}
               disabled={applyDisabled}
             >
-              <Wand2 className="h-3 w-3" />
+              <Wand2 className="size-3" />
               Apply Whisper subtitles
             </Button>
           )}
@@ -158,15 +158,15 @@ export function WhisperSettingsPanel({
             <Button
               size="sm"
               variant="outline"
-              className="border-border"
               onClick={reset}
             >
-              <RefreshCw className="h-3 w-3" />
+              <RefreshCw className="size-3" />
               Reset
             </Button>
           )}
         </div>
       </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

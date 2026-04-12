@@ -75,7 +75,7 @@ export function CreateEditInstructionDialog({ children, instruction }: CreateEdi
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-xl">{instruction ? 'Edit' : 'Create'} Custom Instruction</AlertDialogTitle>
+          <AlertDialogTitle>{instruction ? 'Edit' : 'Create'} Custom Instruction</AlertDialogTitle>
           <AlertDialogDescription>
             {instruction ? 'Update your custom instruction details below.' : 'Create a new custom instruction to use in your translations.'}
           </AlertDialogDescription>
@@ -107,6 +107,7 @@ export function CreateEditInstructionDialog({ children, instruction }: CreateEdi
                       ref={textareaRef}
                       onInput={handleResize}
                       onFocus={handleResize}
+                      style={{ wordBreak: 'break-word' }}
                       className="min-h-[100px] max-h-[300px] overflow-y-auto resize-none"
                       placeholder="Enter your custom instruction here"
                     />
@@ -115,7 +116,7 @@ export function CreateEditInstructionDialog({ children, instruction }: CreateEdi
                 </FormItem>
               )}
             />
-            <AlertDialogFooter className="gap-2 sm:gap-0">
+            <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction type="submit" disabled={loading || !form.formState.isValid}>Save</AlertDialogAction>
             </AlertDialogFooter>

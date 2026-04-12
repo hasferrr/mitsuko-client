@@ -138,13 +138,13 @@ export function ModelSelector({
               {modelDetail && (
                 <Badge
                   variant={modelDetail.isPaid ? "default" : "secondary"}
-                  className="text-xs px-2 h-[1.125rem] shrink-0"
+                  className="text-xs px-2 h-4.5 shrink-0"
                 >
                   {modelDetail.isPaid ? "Premium" : "Free"}
                 </Badge>
               )}
             </div>
-            <ChevronsUpDown className="h-4 w-4 opacity-50 absolute right-3 top-1/2 -translate-y-1/2" />
+            <ChevronsUpDown className="size-4 opacity-50 absolute right-3 top-1/2 -translate-y-1/2" />
           </Button>
         </PopoverTrigger>
 
@@ -164,7 +164,7 @@ export function ModelSelector({
                     {key}
                     <Badge
                       variant={value.models[0]?.isPaid ? "default" : "secondary"}
-                      className={cn("text-xs px-[6px] h-[1rem]", "text-[11px]")}
+                      className={cn("text-xs px-1.5 h-4", "text-[11px]")}
                     >
                       {value.models[0]?.isPaid ? "Premium" : "Free"}
                     </Badge>
@@ -225,8 +225,8 @@ function ModelItem({ model, modelKey, cost, isSelected, onSelect }: ModelItemPro
       <HoverCardContent
         side="left"
         align="start"
-        className="w-[260px] text-sm"
-        animate={false}
+        className="w-[260px]"
+        // animate={false}
       >
         <ModelDescription model={model} cost={cost} isSelected={isSelected} />
       </HoverCardContent>
@@ -242,7 +242,7 @@ interface ModelDescriptionProps {
 
 function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
   return model ? (
-    <div className="bg-popover text-popover-foreground text-sm">
+    <div>
       {isSelected && (
         <div className="text-xs text-muted-foreground mb-1">
           Currently Selected Model
@@ -296,14 +296,14 @@ function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
         <Link
           href="/pricing#credit-usage"
           target="_blank"
-          className="block hover:underline text-blue-500/80"
+          className="block hover:underline text-primary/80"
         >
           See full comparison
         </Link>
         <Link
           href="/pricing#which-models"
           target="_blank"
-          className="block hover:underline text-blue-500/80"
+          className="block hover:underline text-primary/80"
         >
           Which Models Should I Use?
         </Link>

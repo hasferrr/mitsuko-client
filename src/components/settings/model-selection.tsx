@@ -40,10 +40,10 @@ export const ModelSelection = memo(({
 
   return (
     <>
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Model</label>
         <div className="flex items-center gap-2">
-          <div className="flex-grow">
+          <div className="grow">
             <ModelSelector
               basicSettingsId={basicSettingsId}
               advancedSettingsId={advancedSettingsId}
@@ -53,12 +53,11 @@ export const ModelSelection = memo(({
           </div>
           <Button
             variant="outline"
-            size="default"
-            className="w-10 flex items-center justify-center"
+            size="icon"
             onClick={() => setIsWhichModelsDialogOpen(true)}
             aria-label="Which Models Should I Use?"
           >
-            <HelpCircle className="w-4 h-4 opacity-70" />
+            <HelpCircle className="size-4 opacity-70" />
           </Button>
         </div>
       </div>
@@ -72,7 +71,7 @@ export const ModelSelection = memo(({
       )}
       {isUseCustomModel && <CustomApiConfigManager />}
       <Dialog open={isWhichModelsDialogOpen} onOpenChange={setIsWhichModelsDialogOpen}>
-        <DialogContent className="sm:max-w-2xl pt-2">
+        <DialogContent className="sm:max-w-2xl">
           <DialogTitle></DialogTitle>
           <WhichModels className="mt-0 p-2 border-0 shadow-none" />
         </DialogContent>

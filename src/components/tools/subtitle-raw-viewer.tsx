@@ -51,7 +51,7 @@ export default function SubtitleRawViewer({ content, fileName, enableHighlight, 
               const displayLine = item.line.length === 0 ? "\u00A0" : item.line
 
               return (
-                <div className="text-[0.875rem] whitespace-pre-wrap break-words">
+                <div className="text-[0.875rem] whitespace-pre-wrap wrap-break-word">
                   {enableHighlight ? (
                     <pre
                       className="hljs m-0"

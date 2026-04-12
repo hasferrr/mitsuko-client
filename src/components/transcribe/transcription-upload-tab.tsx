@@ -2,6 +2,7 @@
 
 import { type RefObject } from "react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   File,
   Loader2,
@@ -40,7 +41,8 @@ export function TranscriptionUploadTab({
   onUploadSelectedFile,
 }: TranscriptionUploadTabProps) {
   return (
-    <div className="bg-card border border-border rounded-lg p-6 space-y-4">
+    <Card size="sm">
+      <CardContent className="space-y-4">
       <h2 className="text-lg font-medium">Upload Audio</h2>
 
       {!file && (
@@ -53,7 +55,7 @@ export function TranscriptionUploadTab({
             onClick={onDragAndDropClick}
             className="border-2 border-dashed border-border rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
           >
-            <Upload className="h-10 w-10 text-muted-foreground mb-3" />
+            <Upload className="size-10 text-muted-foreground mb-3" />
             <p className="text-muted-foreground text-sm mb-1">Click to upload or drag and drop</p>
             <p className="text-muted-foreground text-xs">AAC, FLAC, MP3, and more (max {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB)</p>
           </div>
@@ -74,18 +76,19 @@ export function TranscriptionUploadTab({
 
       {file && (
         <div className="space-y-3">
-          <div className="border border-border rounded-lg p-4">
+          <Card size="sm">
+            <CardContent className="space-y-3">
             <div className="flex items-center mb-3">
-              <File className="h-6 w-6 text-blue-500 mr-2" />
+              <File className="size-6 text-primary mr-2" />
               <div className="flex-1 line-clamp-3 text-sm">{file.name}</div>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0"
+                className="size-6 p-0"
                 onClick={onRemoveFile}
                 disabled={isUploading}
               >
-                <X className="h-4 w-4" />
+                <X className="size-4" />
               </Button>
             </div>
 
@@ -96,13 +99,14 @@ export function TranscriptionUploadTab({
                 {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
               </p>
               {file.size > MAX_FILE_SIZE &&
-                <p className="text-red-500">File size exceeds {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB</p>}
+                <p className="text-destructive">File size exceeds {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB</p>}
             </div>
-          </div>
+            </CardContent>
+          </Card>
           {isGlobalMaxDurationExceeded ? (
-            <div className="flex items-center gap-2 text-red-600 text-xs">
-              <div className="h-3 w-3">
-                <Clock className="h-3 w-3" />
+            <div className="flex items-center gap-2 text-destructive text-xs">
+              <div className="size-3">
+                <Clock className="size-3" />
               </div>
               <p>
                 Audio duration exceeds {(GLOBAL_MAX_DURATION_SECONDS / 60)} minutes limit.
@@ -111,8 +115,8 @@ export function TranscriptionUploadTab({
             </div>
           ) : (
             <div className="flex items-center gap-2 text-xs">
-              <div className="h-3 w-3">
-                <Clock className="h-3 w-3" />
+              <div className="size-3">
+                <Clock className="size-3" />
               </div>
               <p>
                 Please check maximum duration limit for selected model.
@@ -125,11 +129,12 @@ export function TranscriptionUploadTab({
             disabled={isUploading || !session || (isGlobalMaxDurationExceeded)}
             className="w-full border-primary/25 hover:border-primary/50"
           >
-            {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            {isUploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
             Upload Selected File {uploadProgress && `(${uploadProgress.percentage}%)`}
           </Button>
         </div>
       )}
-    </div>
+      </CardContent>
+    </Card>
   )
 }

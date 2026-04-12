@@ -247,23 +247,22 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   }, [currentProject])
 
   return (
-    <div translate="no" className="grid md:grid-cols-2 gap-6 gap-y-4 container mx-auto py-2 px-4 mt-2 mb-6 max-w-5xl">
+    <div translate="no" className="grid md:grid-cols-2 gap-6 gap-y-4 container mx-auto py-6 px-4 max-w-5xl">
       {/* Header */}
       <div className="md:col-span-2 flex items-center gap-2">
         {!hideBackButton && (
           <Button
             variant="ghost"
-            size="icon"
             onClick={() => router.push('/project')}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="size-4" />
           </Button>
         )}
         <Input
           value={title}
           onChange={(e) => setTitle(currentId, e.target.value)}
           onBlur={() => saveData(currentId)}
-          className="text-xl font-semibold h-12"
+          className="text-xl font-semibold"
         />
       </div>
 
@@ -280,7 +279,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             }}
             placeholder="e.g., S01E01"
             className={cn("bg-background dark:bg-muted/30",
-              !isEpisodeNumberValid && "outline outline-red-500"
+              !isEpisodeNumberValid && "ring-2 ring-destructive"
             )}
           />
         </div>
@@ -306,11 +305,10 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             <Button
               variant="outline"
               size="sm"
-              className="h-2 py-3 px-2"
               onClick={() => document.getElementById("subtitle-content-upload")?.click()}
               disabled={isExtracting}
             >
-              <Upload className="h-4 w-4" />
+              <Upload className="size-4" />
               Upload
             </Button>
             <Button
@@ -320,10 +318,9 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                 loadProjectTranslations()
                 setIsSubtitleImportDialogOpen(true)
               }}
-              className="h-2 py-3 px-2"
               disabled={isExtracting}
             >
-              <FolderDown className="h-4 w-4" />
+              <FolderDown className="size-4" />
               Import
             </Button>
           </div>
@@ -334,7 +331,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
               onChange={handleSubtitleContentChange}
               className={cn(
                 "min-h-[181px] h-[181px] max-h-[250px] bg-background dark:bg-muted/30 resize-none overflow-y-auto",
-                !isSubtitleContentValid && "outline outline-red-500"
+                !isSubtitleContentValid && "ring-2 ring-destructive"
               )}
               placeholder="Paste subtitle content here..."
               onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 900)}px`)}
@@ -359,11 +356,10 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             <Button
               variant="outline"
               size="sm"
-              className="h-2 py-3 px-2"
               onClick={() => document.getElementById("previous-context-upload")?.click()}
               disabled={isExtracting}
             >
-              <Upload className="h-4 w-4" />
+              <Upload className="size-4" />
               Upload
             </Button>
             <Button
@@ -373,10 +369,9 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                 loadProjectExtractions()
                 setIsPreviousContextDialogOpen(true)
               }}
-              className="h-2 py-3 px-2"
               disabled={isExtracting}
             >
-              <FolderDown className="h-4 w-4" />
+              <FolderDown className="size-4" />
               Import
             </Button>
           </div>
@@ -401,9 +396,9 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             <TabsTrigger value="result">Result</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="settings" className="flex-grow space-y-4 mt-4">
-            <Card className="border border-border bg-card text-card-foreground">
-              <CardContent className={cn("p-4 space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
+          <TabsContent value="settings" className="grow space-y-4 mt-4">
+            <Card>
+              <CardContent className={cn("space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
                 {isSharedSettings && (
                   <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 )}
@@ -420,7 +415,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
             </Card>
           </TabsContent>
 
-          <TabsContent value="result" className="flex-grow space-y-4 mt-4">
+          <TabsContent value="result" className="grow space-y-4 mt-4">
             <div className="space-y-2">
               {isEditingResult ? (
                 <Textarea
@@ -428,22 +423,25 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                   value={contextResult}
                   onChange={handleResultChange}
                   readOnly={!isEditingResult}
-                  className="min-h-[412px] h-[412px] max-h-[412px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
+                  className="min-h-[412px] h-[412px] max-h-[412px] bg-background dark:bg-muted/30 resize-none overflow-y-auto rounded-xl"
                   placeholder="Extracted context will appear here..."
                 />
               ) : (
-                <div
+                <Card
                   ref={contextResultRef}
+                  size="sm"
                   className={cn(
-                    "min-h-[412px] h-[412px] bg-background dark:bg-muted/30 overflow-y-auto rounded-md border p-3 pr-2",
+                    "min-h-[412px] h-[412px] bg-background dark:bg-muted/30 overflow-y-auto",
                     !contextResult && "text-muted-foreground",
                   )}
                 >
-                  <AiStreamOutput
-                    content={contextResult || "Extracted context will appear here..."}
-                    isProcessing={isExtracting}
-                  />
-                </div>
+                  <CardContent className="pr-2">
+                    <AiStreamOutput
+                      content={contextResult || "Extracted context will appear here..."}
+                      isProcessing={isExtracting}
+                    />
+                  </CardContent>
+                </Card>
               )}
             </div>
           </TabsContent>
@@ -453,47 +451,45 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
       {/* Bottom Controls */}
       <div className="lg:col-span-2 flex items-center justify-center gap-4 flex-wrap">
         <Button
-          className="gap-2 w-[152px]"
           onClick={handleStartExtraction}
           disabled={isExtracting || !session}
         >
           {isExtracting ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
               Extracting...
             </>
           ) : (
             <>
-              <Play className="h-4 w-4" />
+              <Play className="size-4" />
               {!!session ? "Start Extraction" : "Sign In to Start"}
             </>
           )}
         </Button>
 
-        <Button variant="outline" className="gap-2" onClick={handleStopExtraction} disabled={!isExtracting || !contextResult}>
-          <Square className="h-4 w-4" />
+        <Button variant="outline" onClick={handleStopExtraction} disabled={!isExtracting || !contextResult}>
+          <Square className="size-4" />
           Stop
         </Button>
 
-        <Button variant="outline" className="gap-2" onClick={handleSaveToFile}>
-          <Save className="h-4 w-4" />
+        <Button variant="outline" onClick={handleSaveToFile}>
+          <Save className="size-4" />
           Save to File
         </Button>
 
         <Button
           variant={isEditingResult ? "default" : "outline"}
-          className="gap-2"
           onClick={handleToggleEditMode}
           disabled={isExtracting}
         >
           {isEditingResult ? (
             <>
-              <Check className="h-4 w-4" />
+              <Check className="size-4" />
               Done Editing
             </>
           ) : (
             <>
-              <Edit className="h-4 w-4" />
+              <Edit className="size-4" />
               Edit Result
             </>
           )}

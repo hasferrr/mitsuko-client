@@ -238,7 +238,7 @@ export default function PublicLibrary() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Search public instructions..."
             value={searchQuery}
@@ -253,7 +253,7 @@ export default function PublicLibrary() {
             disabled={isRefetching || isLoadingInstructions}
           >
             <RefreshCw
-              className={cn('h-4 w-4', isRefetching && 'animate-spin')}
+              className={cn('size-4', isRefetching && 'animate-spin')}
             />
             Refresh
           </Button>
@@ -271,7 +271,7 @@ export default function PublicLibrary() {
         </div>
       ) : filteredInstructions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
-          <Search className="h-12 w-12 text-muted-foreground mb-4" />
+          <Search className="size-12 text-muted-foreground mb-4" />
           <h2 className="text-xl font-medium mb-2 text-center">No Results Found</h2>
           <p className="text-muted-foreground mb-4 text-center text-sm">
             Try adjusting your search terms
@@ -285,26 +285,26 @@ export default function PublicLibrary() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredInstructions.map(item => (
               <Card key={item.id} className="cursor-pointer flex flex-col" onClick={() => setSelectedId(item.id)}>
-                <CardHeader className="pb-4">
+                <CardHeader>
                   <CardTitle>{item.name}</CardTitle>
                 </CardHeader>
-                <CardContent className="pb-2">
+                <CardContent>
                   <p className="text-sm text-muted-foreground line-clamp-4">{item.preview}</p>
                 </CardContent>
-                <CardFooter className="pt-2 flex justify-between text-xs text-muted-foreground mt-auto">
+                <CardFooter className="flex justify-between text-xs text-muted-foreground mt-auto">
                   <div className="flex items-center">
-                    <User className="h-3 w-3 mr-1" />
+                    <User className="size-3 mr-1" />
                     <span>{item.user_id.split('-')[0]}</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center">
-                      <Calendar className="h-3 w-3 mr-1" />
+                      <Calendar className="size-3 mr-1" />
                       <span>{formatDate(item.created_at)}</span>
                     </div>
                     {session?.user.id === item.user_id && (
                       <Button
                         variant="link"
-                        className="text-muted-foreground hover:text-foreground p-0 h-3 w-3 [&_svg]:h-3 [&_svg]:w-3"
+                        className="text-muted-foreground hover:text-foreground p-0 size-3 [&_svg]:h-3 [&_svg]:w-3"
                         onClick={e => {
                           e.stopPropagation()
                           if (item.id) handleDeleteClick(item.id)
@@ -392,6 +392,7 @@ export default function PublicLibrary() {
                   value={importContent}
                   onFocus={handleResize}
                   readOnly
+                  style={{ wordBreak: 'break-word' }}
                   placeholder="Enter your custom instruction here"
                   className="min-h-[100px] max-h-[300px] overflow-y-auto resize-none"
                 />
@@ -399,11 +400,11 @@ export default function PublicLibrary() {
               {selectedInstruction && (
                 <div className="flex justify-between text-xs text-muted-foreground pt-2">
                   <div className="flex items-center">
-                    <User className="h-3 w-3 mr-1" />
+                    <User className="size-3 mr-1" />
                     <span>Created by: {selectedInstruction.user_id.split('-')[0]}</span>
                   </div>
                   <div className="flex items-center">
-                    <Calendar className="h-3 w-3 mr-1" />
+                    <Calendar className="size-3 mr-1" />
                     <span>{formatDate(selectedInstruction.created_at)}</span>
                   </div>
                 </div>
@@ -415,7 +416,7 @@ export default function PublicLibrary() {
               Cancel
             </Button>
             <Button onClick={handleImportInstruction}>
-              <Download className="h-4 w-4" />
+              <Download className="size-4" />
               Import to My Library
             </Button>
           </div>

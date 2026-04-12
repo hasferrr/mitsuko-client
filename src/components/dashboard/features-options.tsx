@@ -41,8 +41,8 @@ const features = {
 function FeatureItem({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-2">
-      <div className="h-5 w-5 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <Check className="h-3 w-3 text-green-500" strokeWidth={3} />
+      <div className="size-5 rounded-full bg-green-500/10 flex items-center justify-center shrink-0 mt-0.5">
+        <Check className="size-3 text-green-500" strokeWidth={3} />
       </div>
       <span className="text-sm">{text}</span>
     </div>
@@ -131,8 +131,8 @@ export function FeaturesOptions() {
       >
         <div className="flex flex-col h-full">
           <div className="mb-4">
-            <div className="h-14 w-14 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
-              <Globe className="h-7 w-7 text-blue-500" />
+            <div className="size-14 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
+              <Globe className="size-7 text-blue-500" />
             </div>
             <h3 className="text-xl font-medium mb-2">Translation</h3>
             <p className="text-muted-foreground text-sm mb-6">
@@ -147,9 +147,9 @@ export function FeaturesOptions() {
             ))}
           </div>
 
-          <Button className="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white">
+          <Button className="mt-6 w-full bg-blue-600/80 dark:bg-blue-600/40 hover:bg-blue-700/80 dark:hover:bg-blue-700/60 text-white">
             Start Translation
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="size-4" />
           </Button>
         </div>
       </div>
@@ -166,8 +166,8 @@ export function FeaturesOptions() {
       >
         <div className="flex flex-col h-full">
           <div className="mb-4">
-            <div className="h-14 w-14 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center mb-4">
-              <Headphones className="h-7 w-7 text-green-500" />
+            <div className="size-14 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center mb-4">
+              <Headphones className="size-7 text-green-500" />
             </div>
             <h3 className="text-xl font-medium mb-2">Transcription</h3>
             <p className="text-muted-foreground text-sm mb-6">
@@ -181,9 +181,9 @@ export function FeaturesOptions() {
             ))}
           </div>
 
-          <Button className="mt-6 w-full bg-green-500 hover:bg-green-600 text-white">
+          <Button className="mt-6 w-full bg-green-600/80 dark:bg-green-600/40 hover:bg-green-700/80 dark:hover:bg-green-700/60 text-white">
             Start Transcription
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="size-4" />
           </Button>
         </div>
       </div>
@@ -200,8 +200,8 @@ export function FeaturesOptions() {
       >
         <div className="flex flex-col h-full">
           <div className="mb-4">
-            <div className="h-14 w-14 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4">
-              <Layers className="h-7 w-7 text-purple-500" />
+            <div className="size-14 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4">
+              <Layers className="size-7 text-purple-500" />
             </div>
             <h3 className="text-xl font-medium mb-2">Context Extraction</h3>
             <p className="text-muted-foreground text-sm mb-6">
@@ -215,9 +215,9 @@ export function FeaturesOptions() {
             ))}
           </div>
 
-          <Button className="mt-6 w-full bg-purple-500 hover:bg-purple-600 text-white">
+          <Button className="mt-6 w-full bg-purple-600/80 dark:bg-purple-600/40 hover:bg-purple-700/80 dark:hover:bg-purple-700/60 text-white">
             Start Extraction
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="size-4" />
           </Button>
         </div>
       </div>

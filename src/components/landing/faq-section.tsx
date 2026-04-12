@@ -60,7 +60,7 @@ export default function FAQSection() {
             <h2 className="text-4xl font-semibold tracking-tighter">
               Frequently Asked Questions
             </h2>
-            <p className="max-w-[900px] text-gray-600 dark:text-gray-400 md:text-base/relaxed lg:text-base/relaxed xl:text-base/relaxed">
+            <p className="max-w-[900px] text-muted-foreground md:text-base/relaxed lg:text-base/relaxed xl:text-base/relaxed">
               Find answers to common questions about Mitsuko and its features.
             </p>
           </div>
@@ -70,8 +70,8 @@ export default function FAQSection() {
         >
           <Accordion type="single" collapsible className="w-full">
             {faqData.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 dark:border-gray-800">
-                <AccordionTrigger className="text-left text-base md:text-lg font-medium hover:text-gray-900 dark:hover:text-white py-4">
+              <AccordionItem key={index} value={`item-${index}`} className="border-b border-border">
+                <AccordionTrigger className="text-left text-base md:text-lg font-medium hover:text-foreground py-4">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="pb-4 pt-1" >

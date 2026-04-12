@@ -69,67 +69,66 @@ export default function BatchMain() {
   }
 
   return (
-    <div translate="no" className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
+    <div translate="no" className="flex flex-col gap-4 max-w-5xl mx-auto container py-6 px-4">
       {/* Header */}
-      <div className="flex flex-wrap items-center gap-4 mb-2">
+      <div className="flex flex-wrap items-center gap-4">
         <div className="flex-1 min-w-40 flex items-center gap-2">
           <Button
             variant="ghost"
-            className="h-10 w-10 flex-shrink-0"
+            className="shrink-0"
             onClick={() => setCurrentProject(null)}
             title="Go back to batch selection"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="size-4" />
           </Button>
           <Input
             defaultValue={currentProject.name || (operationMode === 'translation' ? "Batch Translation" : "Batch Extraction")}
-            className="text-xl font-semibold h-12"
+            className="text-xl font-semibold"
             onChange={(e) => handleBatchNameChange(e.target.value)}
           />
         </div>
         <Select value={operationMode} onValueChange={(value: "translation" | "extraction" | "transcription") => setOperationMode(value)}>
-          <SelectTrigger className="w-fit h-10">
+          <SelectTrigger className="w-fit">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="translation">
               <div className="flex items-center gap-2 pr-1">
-                <div className="h-4 w-4">
-                  <Languages className="h-4 w-4" />
+                <div className="size-4">
+                  <Languages className="size-4" />
                 </div>
                 Translation
               </div>
             </SelectItem>
             <SelectItem value="extraction">
               <div className="flex items-center gap-2 pr-1">
-                <div className="h-4 w-4">
-                  <Layers className="h-4 w-4" />
+                <div className="size-4">
+                  <Layers className="size-4" />
                 </div>
                 Extraction
               </div>
             </SelectItem>
             <SelectItem value="transcription">
               <div className="flex items-center gap-2 pr-1">
-                <div className="h-4 w-4">
-                  <AudioLines className="h-4 w-4" />
+                <div className="size-4">
+                  <AudioLines className="size-4" />
                 </div>
                 Transcription
               </div>
             </SelectItem>
           </SelectContent>
         </Select>
-        <Link href="/project">
-          <Button variant="outline" className="h-10">
-            <FileText className="h-5 w-5" />
+          <Link href="/project">
+          <Button variant="outline">
+            <FileText className="size-4" />
             See as Project
           </Button>
         </Link>
         <Button
           variant="outline"
-          className="h-10"
           onClick={() => setIsDeleteDialogOpen(true)}
         >
-          <Trash className="h-5 w-5" />
+          <Trash className="size-4" />
         </Button>
       </div>
 

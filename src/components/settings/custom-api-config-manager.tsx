@@ -83,12 +83,12 @@ export function CustomApiConfigManager() {
             ))}
           </SelectContent>
         </Select>
-        <Button variant="outline" size="sm" className="px-2" onClick={handleAddNew}>
-          <Plus className="h-4 w-4" />
+        <Button variant="outline" size="sm" onClick={handleAddNew}>
+          <Plus className="size-4" />
         </Button>
         {selectedApiConfigIndex !== null && (
-          <Button variant="destructive" size="sm" className="px-2" onClick={handleRemove}>
-            <Trash2 className="h-4 w-4" />
+          <Button variant="destructive" size="sm" onClick={handleRemove}>
+            <Trash2 className="size-4" />
           </Button>
         )}
       </div>
@@ -126,7 +126,7 @@ export function CustomApiConfigManager() {
           className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
           onClick={() => setShowApiKey(!showApiKey)}
         >
-          {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          {showApiKey ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
         </Button>
       </div>
     </div>

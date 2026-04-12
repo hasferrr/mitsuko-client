@@ -50,11 +50,9 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            size="sm"
             onClick={() => setIsPresetsDialogOpen(true)}
-            className="h-8 px-2"
           >
-            <List className="h-4 w-4" />
+            <List className="size-4" />
             Presets
           </Button>
           <CustomInstructionsLibraryControls
@@ -114,7 +112,7 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
           <DialogHeader>
             <DialogTitle>Tips for Custom Instructions</DialogTitle>
           </DialogHeader>
-          <div className="pt-2 text-base text-foreground space-y-2">
+          <div className="text-base text-foreground space-y-2">
             <p>Custom instructions help guide the model to follow specific patterns, maintain consistent terminology, or adopt particular styles.</p>
             <p>Be concise, direct, and specific to avoid confusing the model. Focus on clear examples and explicit rules.</p>
           </div>

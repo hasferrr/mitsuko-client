@@ -6,6 +6,7 @@ import { useState } from "react"
 import { useSessionStore } from "@/stores/ui/use-session-store"
 import demoPlaceholderImage from "@/static/demo-placeholder.png"
 import { Play } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function HeroSection() {
   const session = useSessionStore((state) => state.session)
@@ -18,12 +19,12 @@ export default function HeroSection() {
   return (
     <div className="flex flex-col justify-between items-center text-center px-4 my-12">
       {/* Main heading */}
-      <h1 className="md:mt-8 w-full md:max-w-[50rem] max-w-lg text-center font-semibold leading-[110%] text-balance md:text-5xl text-4xl tracking-tight">
+      <h1 className="md:mt-8 w-full md:max-w-200 max-w-lg text-center font-semibold leading-[110%] text-balance md:text-5xl text-4xl tracking-tight">
         The Most Accurate AI Subtitle Translator
       </h1>
 
       {/* Subheading */}
-      <div className="text-text-main md:text-lg/[150%] text-base/[150%] mt-6 text-center md:max-w-xl max-w-lg">
+      <div className="text-foreground md:text-lg/[150%] text-base/[150%] mt-6 text-center md:max-w-xl max-w-lg">
         <p>
           Translate subtitles with high-quality and context-aware result.
           Accelerate your subtitling workflow with Mitsuko!
@@ -32,23 +33,21 @@ export default function HeroSection() {
 
       {/* CTA Buttons */}
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-[#101828] text-white text-sm font-semibold shadow-sm transition-colors hover:bg-[#15213a] hover:shadow dark:bg-white dark:text-[#101828] dark:hover:bg-[#f4f4f5]"
-        >
-          {session ? "Dashboard" : "Try for Free!"}
-        </Link>
-        <Link
-          href="/auth/login"
-          className="inline-flex items-center justify-center px-5 py-2.5 rounded-full border border-gray-300 text-sm font-semibold text-gray-900 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-gray-800 dark:text-gray-100 dark:hover:bg-[#1d1d1d]"
-        >
-          {session ? "My Account" : "Sign In"}
-        </Link>
+        <Button asChild size="lg" className="rounded-full shadow-xs px-5 py-2.5">
+          <Link href="/dashboard">
+            {session ? "Dashboard" : "Try for Free!"}
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="lg" className="rounded-full px-5 py-2.5">
+          <Link href="/auth/login">
+            {session ? "My Account" : "Sign In"}
+          </Link>
+        </Button>
       </div>
 
       {/* Video embed */}
       <div className="md:mt-24 mt-16 w-full max-w-5xl mx-auto overflow-hidden">
-        <div className="relative pt-[56.25%] select-none overflow-hidden md:rounded-3xl rounded-lg md:border-[3px] border-[2px] border-background-soft">
+        <div className="relative pt-[56.25%] select-none overflow-hidden md:rounded-3xl rounded-lg md:border-[3px] border-2 border-border">
           {!isPlayClicked && (
             <Image
               width={960}
@@ -68,7 +67,7 @@ export default function HeroSection() {
               aria-label="Play video"
               role="button"
             >
-              <Play className="text-white opacity-80 group-hover:opacity-100 transform group-hover:scale-110 transition-all duration-300 z-10 rounded-full border-2 border-white w-16 h-16 p-4" />
+              <Play className="text-white opacity-80 group-hover:opacity-100 transform group-hover:scale-110 transition-all duration-300 z-10 rounded-full border-2 border-white size-16 p-4" />
             </div>
           )}
 

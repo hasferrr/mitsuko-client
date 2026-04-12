@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent } from "@/components/ui/card"
 import { File, Trash2, RefreshCw, Loader2 } from "lucide-react"
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
 import { listUploads, deleteUpload } from "@/lib/api/uploads"
@@ -99,7 +100,7 @@ export function ManageUploadsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Manage Uploaded Files</span>
@@ -109,13 +110,14 @@ export function ManageUploadsDialog({
               onClick={() => refetchUploads()}
               disabled={isUploadsRefetching}
             >
-              {isUploadsRefetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              {isUploadsRefetching ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
               Refresh
             </Button>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="bg-card border border-border rounded-lg p-4">
+        <Card size="sm">
+          <CardContent>
           {isUploadsLoading ? (
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {[...Array(2)].map((_, index) => (
@@ -124,7 +126,7 @@ export function ManageUploadsDialog({
                   className="border rounded-md p-3"
                 >
                   <div className="flex items-center gap-3">
-                    <Skeleton className="h-5 w-5" />
+                    <Skeleton className="size-5" />
                     <div className="flex-1 min-w-0">
                       <Skeleton className="h-4 w-3/4 mb-2" />
                       <div className="flex gap-1">
@@ -133,7 +135,7 @@ export function ManageUploadsDialog({
                         <Skeleton className="h-3 w-12" />
                       </div>
                     </div>
-                    <Skeleton className="h-8 w-8" />
+                    <Skeleton className="size-8" />
                   </div>
                 </div>
               ))}
@@ -152,7 +154,7 @@ export function ManageUploadsDialog({
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <File className="h-5 w-5 text-primary" />
+                    <File className="size-5 text-primary" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm truncate font-medium">{upload.fileName}</p>
                       <p className="text-xs text-muted-foreground flex gap-1">
@@ -164,10 +166,10 @@ export function ManageUploadsDialog({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-red-500"
+                      className="text-destructive"
                       onClick={(e) => handleDeleteClick(e, upload.uploadId)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="size-4" />
                     </Button>
                   </div>
                 </div>
@@ -180,7 +182,8 @@ export function ManageUploadsDialog({
               Selected: <span className="text-foreground">{uploads.find(u => u.uploadId === selectedUploadId)?.fileName || 'Unknown file'}</span>
             </p>
           )}
-        </div>
+          </CardContent>
+        </Card>
 
         <DeleteDialogue
           handleDelete={() => {

@@ -369,22 +369,21 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
   }
 
   return (
-    <div translate="no" className="mx-auto pt-4 pb-8 px-4 max-w-5xl">
-      <div className="mb-4 flex items-center gap-2">
+    <div translate="no" className="max-w-5xl mx-auto py-6 px-4 space-y-6">
+      <div className="flex items-center gap-2">
         {!hideBackButton && (
           <Button
             variant="ghost"
-            size="icon"
             onClick={() => router.push('/project')}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="size-4" />
           </Button>
         )}
         <Input
           type="text"
           value={title}
           onChange={(e) => setTitle(currentId, e.target.value)}
-          className="text-xl font-semibold h-12"
+          className="text-xl font-semibold"
           placeholder="Enter title..."
         />
         <TranscriptionHistoryDialog currentId={currentId} />

@@ -72,23 +72,23 @@ export default function PricingSection({
     },
     {
       feature: "Subtitle Translation",
-      free: <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />,
-      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
-      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      free: <Check className="size-5 mx-auto text-muted-foreground" />,
+      basic: <Check className="size-5 mx-auto text-blue-500" />,
+      pro: <Check className="size-5 mx-auto text-blue-500" />,
       description: "Translate subtitle (SRT & ASS) using any AI models available."
     },
     {
       feature: "Extract Context Feature",
-      free: <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />,
-      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
-      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      free: <Check className="size-5 mx-auto text-muted-foreground" />,
+      basic: <Check className="size-5 mx-auto text-blue-500" />,
+      pro: <Check className="size-5 mx-auto text-blue-500" />,
       description: "Analyze content to extract characters, settings, plot, and relationships."
     },
     {
       feature: "Audio Transcription",
       free: "Limited",
-      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
-      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      basic: <Check className="size-5 mx-auto text-blue-500" />,
+      pro: <Check className="size-5 mx-auto text-blue-500" />,
       description: "Convert into subtitle text. Free tier supports up to 100MB (1 file at a time). Basic & Pro tiers up to 1GB file (5 files at a time). Basic & Pro tiers supports background processing."
     },
     {
@@ -100,16 +100,16 @@ export default function PricingSection({
     },
     {
       feature: "Custom Model Integration",
-      free: <Check className="w-5 h-5 mx-auto text-gray-500 dark:text-gray-400" />,
-      basic: <Check className="w-5 h-5 mx-auto text-blue-500" />,
-      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      free: <Check className="size-5 mx-auto text-muted-foreground" />,
+      basic: <Check className="size-5 mx-auto text-blue-500" />,
+      pro: <Check className="size-5 mx-auto text-blue-500" />,
       description: "Use your own LLM API within the Mitsuko platform."
     },
     {
       feature: "Save to Cloud",
-      free: <X className="w-5 h-5 mx-auto text-gray-400 dark:text-gray-500" />,
-      basic: <X className="w-5 h-5 mx-auto text-gray-400 dark:text-gray-500" />,
-      pro: <Check className="w-5 h-5 mx-auto text-blue-500" />,
+      free: <X className="size-5 mx-auto text-muted-foreground" />,
+      basic: <X className="size-5 mx-auto text-muted-foreground" />,
+      pro: <Check className="size-5 mx-auto text-blue-500" />,
       description: "Securely save your projects, translated files, extraction, and audio transcription file to cloud."
     },
     {
@@ -123,7 +123,7 @@ export default function PricingSection({
 
   return (
     <div id="pricing" className="py-16">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-12">
           {useH1Title ? (
             <h1 className="text-4xl font-semibold mb-4 tracking-tight">
@@ -134,7 +134,7 @@ export default function PricingSection({
               Simple, Transparent Pricing
             </h2>
           )}
-          <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="text-muted-foreground max-w-3xl mx-auto">
             Get exactly what you need with one-time credits. Zero subscriptions, zero hassle.
           </p>
         </div>
@@ -171,7 +171,7 @@ export default function PricingSection({
 
         {/* More Information */}
         {showLink && (
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-8">
+          <div className="text-center text-sm text-muted-foreground mt-8">
             <Link href="/pricing" className="hover:underline hover:text-primary">
               Click here to learn more about credits and pricing.
             </Link>

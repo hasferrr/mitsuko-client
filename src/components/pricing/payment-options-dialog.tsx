@@ -22,7 +22,7 @@ import { sleep } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { createPaymentLink } from "@/lib/api/create-snap-payment"
 import LemonSqueezyLogo from "@/static/lemonsqueezy.svg"
 import Image from "next/image"
@@ -251,24 +251,24 @@ export function PaymentOptionsDialog({
           <DialogDescription>
             Customize your purchase and select a payment method.
             <br />
-            {paymentError && <span className="absolute text-red-500 text-sm">{paymentError}</span>}
+            {paymentError && <span className="absolute text-destructive text-sm">{paymentError}</span>}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col sm:flex-row gap-8 py-2 px-1 overflow-y-auto">
           <div className="flex-1 space-y-4">
-            <h3 className="text-lg font-semibold mb-3">Payment Method</h3>
+            <h3 className="text-lg font-semibold">Payment Method</h3>
             <button
               onClick={handlePopup}
               disabled={isFetchingPayment || !hasConsented}
-              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-muted/50 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isFetchingPayment ? (
-                <Loader2 className="w-6 h-6 mr-4 text-blue-500 flex-shrink-0 mt-1 animate-spin" />
+                <Loader2 className="size-6 mr-4 text-primary shrink-0 mt-1 animate-spin" />
               ) : (
-                <CreditCard className="w-6 h-6 mr-4 text-blue-500 flex-shrink-0 mt-1" />
+                <CreditCard className="size-6 mr-4 text-primary shrink-0 mt-1" />
               )}
-              <div className="flex-grow">
+              <div className="grow">
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-medium text-sm">Pay in IDR</span>
                   <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700">RECOMMENDED</Badge>
@@ -282,20 +282,20 @@ export function PaymentOptionsDialog({
             <button
               onClick={handleNewTab}
               disabled={isFetchingPayment || !hasConsented}
-              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-muted/50 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isFetchingPayment ? (
-                <Loader2 className="w-6 h-6 mr-4 text-gray-500 flex-shrink-0 mt-1 animate-spin" />
+                <Loader2 className="size-6 mr-4 text-muted-foreground shrink-0 mt-1 animate-spin" />
               ) : (
                 <Image
                   src={LemonSqueezyLogo}
                   alt="Lemon Squeezy"
                   width={24}
                   height={24}
-                  className="w-6 h-6 mr-4 flex-shrink-0 mt-1"
+                  className="size-6 mr-4 shrink-0 mt-1"
                 />
               )}
-              <div className="flex-grow">
+              <div className="grow">
                 <div className="font-medium text-sm mb-1">Pay with Lemon Squeezy</div>
                 <p className="text-xs text-muted-foreground">
                   {isFetchingPayment ? "Preparing secure payment..." : "Proceed to Lemon Squeezy. A small fee applies."}
@@ -314,25 +314,23 @@ export function PaymentOptionsDialog({
                 <Label htmlFor="consent" className="text-xs text-[11px] text-muted-foreground leading-tight cursor-pointer">
                   I expressly request immediate access and acknowledge I lose any statutory right of withdrawal or any cooling-off period once credits are delivered.
                 </Label>
-                <TooltipProvider delayDuration={50}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0 cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="max-w-xs text-[11px]">
-                      <p>
-                        Digital credits are delivered immediately and cannot be returned once accessed.
-                        By checking this box, you confirm waiver of any refund rights under applicable consumer protection laws, including 14-day cooling-off periods where applicable.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Tooltip delayDuration={50}>
+                  <TooltipTrigger asChild>
+                    <Info className="size-3.5 text-muted-foreground shrink-0 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs text-[11px]">
+                    <p>
+                      Digital credits are delivered immediately and cannot be returned once accessed.
+                      By checking this box, you confirm waiver of any refund rights under applicable consumer protection laws, including 14-day cooling-off periods where applicable.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
           </div>
 
           <div className="flex-1 space-y-4 sm:border-l border-border sm:pl-8 px-2">
-            <h3 className="text-lg font-semibold mb-3">Order Summary</h3>
+            <h3 className="text-lg font-semibold">Order Summary</h3>
             <div className="space-y-2">
               <p className="text-sm font-medium">{credits.toLocaleString()} Credit Pack</p>
               <p className="text-xs text-muted-foreground">
@@ -354,7 +352,7 @@ export function PaymentOptionsDialog({
                   disabled={inputQuantity <= MIN_QUANTITY || isFetchingPayment || isResetting || !!snapData}
                   aria-label="Decrease quantity"
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="size-4" />
                 </Button>
                 <Input
                   id="quantity"
@@ -376,7 +374,7 @@ export function PaymentOptionsDialog({
                   disabled={inputQuantity >= MAX_QUANTITY || isFetchingPayment || isResetting || !!snapData}
                   aria-label="Increase quantity"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="size-4" />
                 </Button>
               </div>
             </div>
@@ -398,11 +396,11 @@ export function PaymentOptionsDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex flex-row justify-between w-full sm:justify-between pt-4 border-t border-border mt-auto">
+        <DialogFooter className="sm:flex-row justify-between mt-auto">
           <Button onClick={handleReset} variant="destructive" size="sm" disabled={isResetting || isFetchingPayment || (!snapData && lemonSqueezyCache.size === 0)}>
             {isResetting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Resetting...
               </>
             ) : (

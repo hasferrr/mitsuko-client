@@ -147,7 +147,7 @@ export default function ComparisonSection() {
           <h2 className="md:text-4xl text-3xl font-semibold text-center mb-4 tracking-tight">
             Why Choose Mitsuko
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-center max-w-3xl mx-auto mb-12">
+          <p className="text-muted-foreground text-center max-w-3xl mx-auto mb-12">
             See how Mitsuko outperforms machine translator and is comparable to human translation
           </p>
         </div>

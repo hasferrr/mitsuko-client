@@ -75,17 +75,17 @@ export const SubtitleCard = memo(({ subtitle }: SubtitleCardProps) => {
 
   return (
     <Card className={cn(
-      "border border-border bg-card text-card-foreground group relative hover:shadow-md transition-shadow",
+      "ring-0 border group relative hover:shadow-md transition-shadow",
       !isSubtitlePerformanceModeEnabled && subtitle.index > 10 && "sentry-block ph-no-capture",
     )}>
-      <CardContent className="p-4">
+      <CardContent>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             {/* Left side (timestamp and index) */}
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-muted-foreground">#{subtitle.index}</span>
               <div className="flex items-center gap-2 text-sm">
-                <Timer className="h-4 w-4 text-muted-foreground" />
+                <Timer className="size-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
                   {timestampToString(subtitle.timestamp.start)} ➝ {timestampToString(subtitle.timestamp.end)}
                 </span>

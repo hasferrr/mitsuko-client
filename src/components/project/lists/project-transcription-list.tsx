@@ -16,6 +16,7 @@ import {
 } from "@dnd-kit/sortable"
 import { Headphones, Loader2, Settings2, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { ProjectItemList } from "../project-item-list"
 import { Transcription, Project } from "@/types/project"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
@@ -60,8 +61,8 @@ export function ProjectTranscriptionList({
       projectId={currentProject.id}
       type="transcription"
       icon={isTranscribingSet.has(transcription.id)
-        ? <Loader2 className="h-5 w-5 text-green-500 animate-spin" />
-        : <Headphones className="h-5 w-5 text-green-500" />}
+        ? <Loader2 className="size-5 text-green-500 animate-spin" />
+        : <Headphones className="size-5 text-green-500" />}
       title={transcription.title}
       description={`${transcription.transcriptSubtitles.length} segments`}
       date={transcription.createdAt.toLocaleDateString()}
@@ -86,8 +87,9 @@ export function ProjectTranscriptionList({
   ))
 
   return (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <div className="flex items-center justify-between mb-4">
+    <Card size="sm">
+      <CardContent className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium">{title}</h3>
         <div className="flex items-center gap-2">
           <Button
@@ -96,7 +98,7 @@ export function ProjectTranscriptionList({
             onClick={onOpenSettings}
             title="Transcription settings"
           >
-            <Settings2 className="h-4 w-4" />
+            <Settings2 className="size-4" />
             Settings
           </Button>
           <Button
@@ -116,7 +118,7 @@ export function ProjectTranscriptionList({
               setTranscriptions(prev => [created, ...prev])
             }}
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="size-4" />
             New Transcription
           </Button>
         </div>
@@ -137,6 +139,7 @@ export function ProjectTranscriptionList({
           </div>
         </SortableContext>
       </DndContext>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

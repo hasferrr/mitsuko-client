@@ -4,7 +4,7 @@ import { DISCORD_LINK, GITHUB_LINK } from "@/constants/external-links"
 
 export function Footer() {
   return (
-    <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <footer className="border-t bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60">
       <div className="flex flex-col gap-4 p-8 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
           <nav className="flex flex-wrap gap-4 text-sm text-muted-foreground">
@@ -30,7 +30,7 @@ export function Footer() {
             rel="noopener noreferrer"
           >
             <span className="sr-only">GitHub</span>
-            <IconBrandGithub className="h-5 w-5" />
+            <IconBrandGithub className="size-5" />
           </Link>
           <Link
             href={DISCORD_LINK}
@@ -39,7 +39,7 @@ export function Footer() {
             rel="noopener noreferrer"
           >
             <span className="sr-only">Discord</span>
-            <IconBrandDiscord className="h-5 w-5" />
+            <IconBrandDiscord className="size-5" />
           </Link>
         </div>
       </div>

@@ -1,12 +1,13 @@
 import { Skeleton } from "@/components/ui/skeleton"
+import { Card } from "@/components/ui/card"
 
 export const ProjectItemSkeleton = () => (
-  <div className="border border-border rounded-lg p-3 bg-background">
+  <Card size="sm" className="p-3">
     <div className="flex items-center justify-between gap-2">
       <div className="flex items-center gap-3">
-        <Skeleton className="h-5 w-5 rounded" />
+        <Skeleton className="size-5 rounded" />
         <Skeleton className="bg-secondary p-2 rounded-lg">
-          <div className="h-5 w-5 rounded" />
+          <div className="size-5 rounded" />
         </Skeleton>
         <div className="space-y-1">
           <Skeleton className="h-[14px] w-32" />
@@ -15,10 +16,10 @@ export const ProjectItemSkeleton = () => (
       </div>
       <div className="flex items-center gap-3">
         <Skeleton className="hidden sm:block h-3 w-16" />
-        <Skeleton className="h-4 w-4 sm:mx-1 rounded" />
-        <Skeleton className="h-4 w-4 sm:mx-1 rounded" />
-        <Skeleton className="h-4 w-4 sm:mx-1 rounded" />
+        <Skeleton className="size-4 sm:mx-1 rounded" />
+        <Skeleton className="size-4 sm:mx-1 rounded" />
+        <Skeleton className="size-4 sm:mx-1 rounded" />
       </div>
     </div>
-  </div>
+  </Card>
 )

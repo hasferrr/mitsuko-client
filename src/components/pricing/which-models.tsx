@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface WhichModelsProps {
   className?: string
@@ -11,14 +12,15 @@ export default function WhichModels({ className }: WhichModelsProps) {
   ]
 
   return (
-    <div className={cn(
-      "relative rounded-xl bg-white dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto mt-8 p-8 shadow-sm",
+    <Card className={cn(
+      "max-w-5xl mx-auto mt-8 shadow-xs",
       className
     )}>
-      <div id="which-models" className="absolute -top-24" />
-      <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-        Which Models Should I Use?
-      </h3>
+      <CardContent className="space-y-4">
+        <div id="which-models" className="absolute -top-24" />
+        <h3 className="text-xl font-medium">
+          Which Models Should I Use?
+        </h3>
       <div className="flex flex-col gap-4">
         <p>Different LLMs (Large Language Models) have varying performance when it comes to different languages and tasks.</p>
         <p>
@@ -42,6 +44,7 @@ export default function WhichModels({ className }: WhichModelsProps) {
           <p>Generally, <span className="font-semibold">Gemini Pro</span>, <span className="font-semibold">GPT-5</span>, and <span className="font-semibold">Claude Sonnet</span> provide excellent results for most use cases and languages.</p>
         </div>
       </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

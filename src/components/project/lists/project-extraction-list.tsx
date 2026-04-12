@@ -16,6 +16,7 @@ import {
 } from "@dnd-kit/sortable"
 import { FileText, Loader2, Settings2, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { ProjectItemList } from "../project-item-list"
 import { Extraction, Project } from "@/types/project"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
@@ -60,8 +61,8 @@ export function ProjectExtractionList({
       projectId={currentProject.id}
       type="extraction"
       icon={isExtractingSet.has(extraction.id)
-        ? <Loader2 className="h-5 w-5 text-purple-500 animate-spin" />
-        : <FileText className="h-5 w-5 text-purple-500" />}
+        ? <Loader2 className="size-5 text-purple-500 animate-spin" />
+        : <FileText className="size-5 text-purple-500" />}
       title={`Episode ${extraction.episodeNumber || "X"}`}
       subtitle={extraction.title}
       description={extraction.contextResult}
@@ -87,8 +88,9 @@ export function ProjectExtractionList({
   ))
 
   return (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <div className="flex items-center justify-between mb-4">
+    <Card size="sm">
+      <CardContent className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium">{title}</h3>
         <div className="flex items-center gap-2">
           <Button
@@ -97,7 +99,7 @@ export function ProjectExtractionList({
             onClick={onOpenSettings}
             title="Extraction settings"
           >
-            <Settings2 className="h-4 w-4" />
+            <Settings2 className="size-4" />
             Settings
           </Button>
           <Button
@@ -124,7 +126,7 @@ export function ProjectExtractionList({
               setExtractions(prev => [created, ...prev])
             }}
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="size-4" />
             New Extraction
           </Button>
         </div>
@@ -145,6 +147,7 @@ export function ProjectExtractionList({
           </div>
         </SortableContext>
       </DndContext>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

@@ -15,6 +15,7 @@ import { db } from "@/lib/db/db"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
+import { Card } from "@/components/ui/card"
 
 interface ProjectItemListProps {
   id: string
@@ -169,15 +170,16 @@ export const ProjectItemList = ({
   }
 
   return (
-    <div
+    <Card
+      size="sm"
       ref={setNodeRef}
       style={style}
-      className="border border-border rounded-lg p-3 bg-background touch-none"
+      className="p-3 touch-none"
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 sm:gap-3">
           <button {...attributes} {...listeners} className="cursor-grab">
-            <GripVertical className="h-5 w-5 text-muted-foreground" />
+            <GripVertical className="size-5 text-muted-foreground" />
           </button>
           <div className="bg-secondary p-2 rounded-lg">{icon}</div>
           <div
@@ -185,16 +187,16 @@ export const ProjectItemList = ({
             onClick={handleTitleClick}
           >
             <div className="flex items-center gap-2">
-              <h4 className={cn("text-sm font-medium break-words break-all line-clamp-1 min-w-fit group-hover/title:underline cursor-pointer", (!title || title === "Episode X") && "italic pr-1")}>
+              <h4 className={cn("text-sm font-medium wrap-break-word break-all line-clamp-1 min-w-fit group-hover/title:underline cursor-pointer", (!title || title === "Episode X") && "italic pr-1")}>
                 {title || "No title"}
               </h4>
               {subtitle && (
-                <span className="text-xs text-muted-foreground font-extralight break-words break-all line-clamp-1">
+                <span className="text-xs text-muted-foreground font-extralight wrap-break-word break-all line-clamp-1">
                   {subtitle}
                 </span>
               )}
             </div>
-            <p className="text-xs text-muted-foreground line-clamp-2 break-words" style={{ overflowWrap: "anywhere" }}>
+            <p className="text-xs text-muted-foreground line-clamp-2 wrap-break-word" style={{ overflowWrap: "anywhere" }}>
               {description.substring(0, 250)}
             </p>
             <p className="text-xs text-muted-foreground sm:hidden block">{date}</p>
@@ -204,30 +206,27 @@ export const ProjectItemList = ({
           <p className="text-xs text-muted-foreground sm:block hidden">{date}</p>
           <Button
             variant="ghost"
-            size="sm"
-            className="h-6 min-w-4 md:min-w-6 p-0"
+            size="icon-xs"
             onClick={() => setIsMoveOpen(true)}
             disabled={isProcessing}
           >
-            <SquareArrowOutUpRight className="h-4 w-4" />
+            <SquareArrowOutUpRight className="size-4" />
           </Button>
           <Button
             variant="ghost"
-            size="sm"
-            className="h-6 min-w-4 md:min-w-6 p-0"
+            size="icon-xs"
             onClick={() => setIsEditOpen(true)}
             disabled={isProcessing}
           >
-            <Edit className="h-4 w-4" />
+            <Edit className="size-4" />
           </Button>
           <Button
             variant="ghost"
-            size="sm"
-            className="h-6 min-w-4 md:min-w-6 p-0"
+            size="icon-xs"
             onClick={() => setIsDeleteOpen(true)}
             disabled={isProcessing}
           >
-            <Trash className="h-4 w-4" />
+            <Trash className="size-4" />
           </Button>
         </div>
       </div>
@@ -262,6 +261,6 @@ export const ProjectItemList = ({
         onMove={handleMove}
         isProcessing={isProcessing}
       />
-    </div>
+    </Card>
   )
 }

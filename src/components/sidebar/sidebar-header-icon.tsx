@@ -23,7 +23,7 @@ export function SidebarHeaderIcon() {
               height={4 * 7}
               src={ImageLogo}
               alt="Mitsuko Logo"
-              className="w-7 h-7 object-cover rounded-lg"
+              className="size-7 object-cover rounded-lg"
             />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">

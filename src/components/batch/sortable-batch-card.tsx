@@ -27,23 +27,23 @@ export function SortableBatchCard({ project, onSelect }: SortableBatchCardProps)
       ref={setNodeRef}
       style={style}
       className={cn(
-        "cursor-pointer hover:border-primary transition-colors overflow-hidden border border-muted h-full flex flex-col",
+        "ring-0 border cursor-pointer hover:ring-primary transition-colors overflow-hidden h-full flex flex-col",
         isDragging && "opacity-50"
       )}
       onClick={() => onSelect(project.id)}
     >
-      <CardHeader className="flex-row items-center justify-between gap-2 pb-2">
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
         <CardTitle>{project.name}</CardTitle>
         <div className="flex items-center gap-4">
           <GripVertical
-            className="h-4 w-4 cursor-grab text-muted-foreground focus:outline-none"
+            className="size-4 cursor-grab text-muted-foreground focus:outline-hidden"
             {...attributes}
             {...listeners}
             onClick={e => e.stopPropagation()}
           />
         </div>
       </CardHeader>
-      <CardContent className="pb-4 flex flex-col flex-1">
+      <CardContent className="flex flex-col flex-1">
         <div className="flex-1"></div>
         <div className="flex flex-col gap-1 mt-auto">
           <p className="text-sm text-muted-foreground">

@@ -390,31 +390,31 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               <Button
                 variant="destructive"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsDeleteSelectedDialogOpen(true)}
                 disabled={selectedIds.size === 0}
               >
-                <Trash className="h-4 w-4" />
+                <Trash className="size-4" />
                 Delete
               </Button>
                <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2 rounded-lg bg-green-500 hover:bg-green-600 text-white border-0"
+                    className="rounded-lg bg-green-500 hover:bg-green-600 text-white border-0"
                     onClick={handleToggleMarkSelected}
                     disabled={isProcessing || batchFiles.length === 0 || selectedIds.size === 0}
                   >
-                    <SquareCheckBig className="h-4 w-4" />
+                    <SquareCheckBig className="size-4" />
                     Mark
                </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={handleSelectAllToggle}
                 disabled={batchFiles.length === 0}
               >
-                <ListChecks className="h-4 w-4" />
+                <ListChecks className="size-4" />
                 {selectedIds.size === batchFiles.length ? 'Deselect All' : 'Select All'}
               </Button>
             </>
@@ -423,11 +423,11 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
              <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsRenameDialogOpen(true)}
                 disabled={isProcessing || batchFiles.length === 0}
               >
-                <SquarePen className="h-4 w-4" />
+                <SquarePen className="size-4" />
                 Rename
              </Button>
           )}
@@ -435,11 +435,11 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
              <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsImportSubDialogOpen(true)}
                 disabled={isProcessing || translationBatchFiles.length === 0}
               >
-                <FolderInput className="h-4 w-4" />
+                <FolderInput className="size-4" />
                 Import
               </Button>
           )}
@@ -447,22 +447,22 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 rounded-lg"
+              className="rounded-lg"
               onClick={() => document.getElementById(uploadInputId)?.click()}
               disabled={isProcessing}
             >
-              <Upload className="h-4 w-4" />
+              <Upload className="size-4" />
               Upload
             </Button>
           )}
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 rounded-lg"
+            className="rounded-lg"
             onClick={toggleSelectMode}
             disabled={isProcessing || batchFiles.length === 0}
           >
-            <CheckSquare className="h-4 w-4" />
+            <CheckSquare className="size-4" />
             {isSelecting ? 'Cancel' : 'Select'}
           </Button>
         </div>
@@ -485,40 +485,43 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
 
         <div className="flex flex-wrap items-center gap-4 w-full">
           <Button
-            className="h-10 flex-1"
+            size="lg"
+            className="flex-1"
             onClick={handleOpenStartBatchDialog}
             disabled={isProcessing || !session || batchFiles.length === 0 || isSelecting}
           >
             {isProcessing ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Extracting...
               </>
             ) : (
               <>
-                <Play className="h-4 w-4" />
+                <Play className="size-4" />
                 {session ? `Extract ${batchFiles.length} files` : "Sign In to Start"}
               </>
             )}
           </Button>
           <Button
             variant="outline"
-            className="h-10 flex-1"
+            size="lg"
+            className="flex-1"
             onClick={handleStopBatchExtraction}
             disabled={!isProcessing}
           >
-            <Square className="h-4 w-4" />
+            <Square className="size-4" />
             Stop All
           </Button>
         </div>
 
         <Button
           variant="outline"
-          className="h-10 w-full border-primary/25 hover:border-primary/50"
+          size="lg"
+          className="w-full border-primary/25 hover:border-primary/50"
           onClick={handleOpenContinueBatchDialog}
           disabled={isProcessing || !session || batchFiles.length === 0 || (batchFiles.length - finishedCount <= 0) || isSelecting}
         >
-          <FastForward className="h-4 w-4" />
+          <FastForward className="size-4" />
           Continue Batch Extraction ({batchFiles.length - finishedCount} remaining)
         </Button>
 
@@ -546,7 +549,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
           </TabsList>
 
           {/* Batch Settings */}
-          <div className="space-y-4 w-full p-4 mt-4 rounded-xl border border-input bg-card shadow-sm">
+          <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <label htmlFor="shared-settings-switch" className="flex flex-col">
                 <span className="text-sm font-semibold">Settings Mode</span>
@@ -563,7 +566,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               />
             </div>
 
-            <div className="mt-3 flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <div className="flex flex-col">
                 <span className="text-sm font-semibold">Max Concurrent Extractions</span>
                 <span className="text-xs text-muted-foreground">
@@ -575,8 +578,8 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
+                  size="icon"
+                  className="hover:text-foreground text-lg font-medium select-none"
                   onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, concurrentOperation - 1))}
                   disabled={isSequentialExtraction || concurrentOperation <= 1}
                 >
@@ -596,8 +599,8 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
                 />
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 flex items-center justify-center p-0 hover:text-foreground text-lg font-medium select-none"
+                  size="icon"
+                  className="hover:text-foreground text-lg font-medium select-none"
                   onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_BATCH_CONCURRENT_OPERATION, concurrentOperation + 1))}
                   disabled={isSequentialExtraction || concurrentOperation >= MAX_BATCH_CONCURRENT_OPERATION}
                 >
@@ -606,7 +609,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <div className="flex flex-col">
                 <span className="text-sm font-semibold">Extraction Mode</span>
                 <span className="text-xs text-muted-foreground">
@@ -637,19 +640,20 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-lg"
+                className="rounded-lg"
                 onClick={() => setIsCopySharedDialogOpen(true)}
                 disabled={isProcessing || batchFiles.length === 0}
               >
-                <ListChecks className="h-4 w-4" />
+                <ListChecks className="size-4" />
                 Copy Shared Settings...
               </Button>
             </div>
-          </div>
+          </CardContent>
+          </Card>
 
-          <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
-            <Card className="border border-border bg-card text-card-foreground">
-              <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+          <TabsContent value="basic" className="grow space-y-4 mt-4">
+            <Card>
+              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <ModelSelection basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />
                 <SubtitleCleanupSwitch />
@@ -657,9 +661,9 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
             </Card>
           </TabsContent>
 
-          <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
-            <Card className="border border-border bg-card text-card-foreground">
-              <CardContent className={cn("p-4 space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+          <TabsContent value="advanced" className="grow space-y-4 mt-4">
+            <Card>
+              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <ModelDetail basicSettingsId={basicSettingsId} />
                 <MaxCompletionTokenInput basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />
@@ -728,7 +732,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              <AlertTriangle className="size-5 text-amber-500" />
               Already Extracted Content
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -750,7 +754,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <Play className="h-5 w-5 text-primary" />
+              <Play className="size-5 text-primary" />
               Start Batch Extraction
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -785,7 +789,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
         <AlertDialogContent>
           <AlertDialogHeader>
              <AlertDialogTitle className="flex items-center gap-2">
-              <FastForward className="h-5 w-5 text-primary" />
+              <FastForward className="size-5 text-primary" />
               Continue Batch Extraction
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -801,7 +805,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
 
       {/* Preview Dialog */}
       <Dialog open={!!previewId} onOpenChange={handlePreviewDialogOpenChange}>
-        <DialogContent className="max-w-6xl w-full">
+        <DialogContent className="sm:max-w-5xl">
           <DialogHeader>
             <DialogTitle>Extraction Preview</DialogTitle>
           </DialogHeader>

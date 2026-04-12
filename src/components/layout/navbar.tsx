@@ -85,11 +85,11 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pr-8">
+    <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60 pr-8">
       <div className="flex h-14 shrink-0 items-center gap-2">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="h-4" />
+          <Separator orientation="vertical" className="h-4 data-vertical:self-center" />
         </div>
         <Breadcrumb>
           <BreadcrumbList>
@@ -127,7 +127,7 @@ export function Navbar() {
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
                 <div className="flex items-center gap-2 text-sm text-foreground/80 mr-4 cursor-pointer hover:underline">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="size-4 animate-spin" />
                   <span className="hidden md:block">Processing...</span>
                 </div>
               </PopoverTrigger>
@@ -184,18 +184,18 @@ export function Navbar() {
           >
             {isFetching || isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 <span className="text-muted-foreground">Loading credits...</span>
               </>
             ) : isError ? (
               <>
-                <AlertCircle className="h-4 w-4 text-red-500" />
-                <span className="text-red-500">Error</span>
+                <AlertCircle className="size-4 text-destructive" />
+                <span className="text-destructive">Error</span>
               </>
             ) : user ? (
               <>
-                <CircleDollarSign className="h-4 w-4" />
-                <span className={cn(user.credit < 0 && "text-red-500")}>
+                <CircleDollarSign className="size-4" />
+                <span className={cn(user.credit < 0 && "text-destructive")}>
                   {Math.round(user.credit).toLocaleString()} credits
                 </span>
               </>
@@ -212,9 +212,9 @@ export function Navbar() {
             aria-label="Toggle dark mode"
           >
             {isDarkMode ? (
-              <Sun className="h-5 w-5" />
+              <Sun className="size-5" />
             ) : (
-              <Moon className="h-5 w-5" />
+              <Moon className="size-5" />
             )}
           </Button>
         </div>

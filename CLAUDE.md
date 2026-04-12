@@ -128,6 +128,56 @@ Dexie database is at version 24. When modifying data models in `src/types/`:
 - Use path alias `@/*` for imports from `src/`
 - Use `cn()` from `@/lib/utils` for conditional Tailwind classes (or directly from `@/lib/utils/cn`)
 - Use `toast.error()`/`toast.success()` from `sonner` for user feedback
+- **Tailwind v4** with CSS-based config in `src/app/globals.css` (no `tailwind.config.*`)
+
+### Shadcn/ui Component Defaults
+
+Do NOT re-add classes that components already provide. Key defaults:
+
+- **Card**: `bg-card ring-1 ring-foreground/10 rounded-xl py-4 gap-4`. Has `size="sm"` (py-3, gap-3, CardContent px-3). Do NOT add `border`, `bg-card`, `rounded-lg` on Card.
+- **CardHeader**: `px-4`. Card's `py-4` + `gap-4` handles vertical spacing — do NOT add `pb-*`/`py-*`.
+- **CardContent**: `px-4` (group-data-[size=sm]/card:px-3). Do NOT add `p-4` (doubles padding). Use `space-y-4` on CardContent instead of `mb-*` on children.
+- **CardFooter**: `p-4 border-t`. Do NOT add `pb-4` or `border-t`.
+- **Button**: sizes — default(h-8), xs(h-6), sm(h-7), lg(h-9), icon(size-8), icon-lg(size-9). All sizes include `gap`. Do NOT add `mr-2` on icons inside Button; do NOT add manual `h-*`/`px-*` that override the size variant.
+- **DialogContent**: `w-full max-w-[calc(100%-2rem)] p-4 gap-4 rounded-xl`. Do NOT add `w-full` or `pt-*`.
+- **DialogHeader**: `gap-2`. Do NOT add `pb-*`.
+- **DialogFooter**: `flex flex-col-reverse gap-2 border-t bg-muted/50 p-4 -mx-4 -mb-4 rounded-b-xl sm:flex-row sm:justify-end`. Do NOT add `flex`, `border-t`, `pt-4`, `sm:justify-between`.
+- **Input**: `h-8 px-2.5 py-1`. Do NOT add `h-8` explicitly. Title inputs default to h-8 (not h-12).
+- **SelectTrigger**: `h-8` (default), `h-7` (sm). Do NOT add `h-8` or `h-10`.
+- **Textarea**: `w-full min-h-16 px-2.5 py-2 field-sizing-content`. Do NOT add `w-full`.
+- **TabsTrigger**: includes `inline-flex items-center gap-1.5`. Do NOT add `mr-2` on icons or `flex items-center`.
+- **DropdownMenuItem**: includes `gap-1.5`. Do NOT add `mr-2` on icons.
+
+### Design Tokens
+
+Use semantic tokens instead of hardcoded colors:
+- `text-foreground` not `text-gray-900 dark:text-white` or `text-gray-800 dark:text-gray-200`
+- `text-muted-foreground` not `text-gray-500 dark:text-gray-400` or `text-gray-600 dark:text-gray-400` or `text-gray-700 dark:text-gray-300`
+- `text-card-foreground` not `text-gray-900 dark:text-white` (only inside Card component)
+- `hover:text-foreground` not `hover:text-gray-900 dark:hover:text-white`
+- `border-border` not `border-gray-200 dark:border-gray-800`
+- `divide-border` not `divide-gray-200 dark:divide-gray-800`
+- `bg-muted/50` not `bg-gray-50 dark:bg-gray-900/30`
+- `text-destructive` not `text-red-500` (for error/error contexts)
+- `bg-primary text-primary-foreground` not `bg-blue-500 text-white` (brand blue = primary)
+- `bg-primary/10 text-primary` not `bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300`
+- `bg-primary/10` not `bg-blue-50 dark:bg-blue-900/20` (brand blue hover states)
+- **Keep original background colors** — only replace borders and text colors with tokens, NOT background colors. This especially applies to landing pages and custom containers:
+  - Landing sections use deliberate bg colors (e.g. `bg-white dark:bg-[#111111]`, `bg-gray-50/70 dark:bg-[#121212]`) that differ from `--card`/`--muted` CSS variables. Replacing them with `bg-card` or `bg-muted` shifts the visual tone (e.g. `bg-card` in dark mode is `oklch(0.205 0 0)` ≈ #222, not #111).
+  - Landing pages have specific visual design with precise dark-mode values — these are intentional, not accidental hardcoding. Treat them as design choices, not tech debt.
+  - Inside Card components, `bg-card` is already provided by the component — do NOT add it manually. But outside Card, keep the author's original bg value.
+
+### Spacing Conventions
+
+- Page wrappers: `py-6 px-4 max-w-5xl mx-auto`
+- Use `space-y-4` on CardContent instead of `mb-*` on individual children
+- When parent has `gap-*`, child `mb-*`/`mt-*` is redundant — remove it
+- `gap-1.5` is the standard small gap (not `gap-[6px]`)
+- Use `flex`/`grid` with `gap-*` instead of `space-x-*`/`space-y-*` (Tailwind v4 changed the selector, breaking inline children):
+  ```diff
+  - <div class="space-y-4 p-4">
+  + <div class="flex flex-col gap-4 p-4">
+  ```
 
 ## Settings Access Pattern
 

@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Geist_Mono } from 'next/font/google'
+import { Inter, Geist_Mono, Figtree } from 'next/font/google'
 import './globals.css'
 import { META_DESCRIPTION, META_KEYWORDS, META_TITLE_LONG } from '@/constants/metadata'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { cn } from '@/lib/utils'
 import Providers from '@/contexts/providers'
+
+const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
 
 const schema = {
   "@context": "https://schema.org",
@@ -66,7 +68,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={cn(inter.variable, geistMono.variable, "dark scroll-smooth")}>
+    <html lang="en" data-scroll-behavior="smooth" className={cn(inter.variable, geistMono.variable, "dark scroll-smooth", "font-sans", figtree.variable)}>
       <link rel="icon" href="/favicon.ico" sizes="any" />
       <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />

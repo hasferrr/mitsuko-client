@@ -10,6 +10,7 @@ import {
   MoreHorizontal
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,25 +54,25 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
 
   return (
     <>
-      <div
+      <Card
         className={cn(
-          "dark:bg-[#111111]",
-          "border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-card/80 transition-colors",
+          "hover:ring-primary/50 hover:bg-card/80 transition-colors",
         )}
       >
-        <div className="flex items-center justify-between gap-2">
+        <CardContent>
+          <div className="flex items-center justify-between gap-2">
           <div
             className="flex-1 cursor-pointer"
             onClick={handleProjectClick}
           >
             {isHorizontal ? (
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4">
+                <div className="size-4">
                   {project.transcriptions.length > project.translations.length &&
                     project.transcriptions.length > project.extractions.length ? (
-                    <Headphones className="h-4 w-4 text-green-500" />
+                    <Headphones className="size-4 text-green-500" />
                   ) : (
-                    <FileText className="h-4 w-4 text-blue-500" />
+                    <FileText className="size-4 text-blue-500" />
                   )}
                 </div>
                 <span className="text-sm font-medium line-clamp-1">{project.name}</span>
@@ -87,12 +88,12 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
             ) : (
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="h-4 w-4">
+                  <div className="size-4">
                     {project.transcriptions.length > project.translations.length &&
                       project.transcriptions.length > project.extractions.length ? (
-                      <Headphones className="h-4 w-4 text-green-500" />
+                      <Headphones className="size-4 text-green-500" />
                     ) : (
-                      <FileText className="h-4 w-4 text-blue-500" />
+                      <FileText className="size-4 text-blue-500" />
                     )}
                   </div>
                   <span className="text-sm font-medium line-clamp-1">{project.name}</span>
@@ -104,7 +105,7 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
                   </span>
                 </div>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
+                  <Clock className="size-3" />
                   <span>{project.updatedAt.toLocaleDateString()}</span>
                 </div>
               </div>
@@ -115,9 +116,10 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="h-8 w-8 p-0 hover:bg-accent"
+                  size="icon"
+                  className="hover:bg-accent"
                 >
-                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                  <MoreHorizontal className="size-4 text-muted-foreground" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -125,14 +127,15 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
                   className="text-destructive focus:text-destructive"
                   onClick={() => setIsDeleteDialogOpen(true)}
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  <Trash2 className="size-4" />
                   Delete Project
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
-      </div>
+        </CardContent>
+      </Card>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>

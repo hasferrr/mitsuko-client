@@ -206,7 +206,7 @@ export function CopySharedSettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl w-full">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Copy Shared Settings to All Files</DialogTitle>
         </DialogHeader>
@@ -220,11 +220,11 @@ export function CopySharedSettingsDialog({
                   <p className="text-sm font-semibold">Translation — Basic Settings</p>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => setAll(setTBasicSel, BASIC_KEYS.map(k => k.key) as readonly BasicKey[], true)} disabled={isLoading}>
-                      <ListChecks className="h-4 w-4" />
+                      <ListChecks className="size-4" />
                       Select All
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setAll(setTBasicSel, [], false)} disabled={isLoading}>
-                      <ListX className="h-4 w-4" />
+                      <ListX className="size-4" />
                       Clear
                     </Button>
                   </div>
@@ -245,11 +245,11 @@ export function CopySharedSettingsDialog({
                   <p className="text-sm font-semibold">Translation — Advanced Settings</p>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => setAll(setTAdvSel, ADVANCED_KEYS.map(k => k.key) as readonly AdvancedKey[], true)} disabled={isLoading}>
-                      <ListChecks className="h-4 w-4" />
+                      <ListChecks className="size-4" />
                       Select All
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setAll(setTAdvSel, [], false)} disabled={isLoading}>
-                      <ListX className="h-4 w-4" />
+                      <ListX className="size-4" />
                       Clear
                     </Button>
                   </div>
@@ -274,11 +274,11 @@ export function CopySharedSettingsDialog({
                   <p className="text-sm font-semibold">Extraction — Basic Settings</p>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => setAll(setEBasicSel, BASIC_KEYS.map(k => k.key) as readonly BasicKey[], true)} disabled={isLoading}>
-                      <ListChecks className="h-4 w-4" />
+                      <ListChecks className="size-4" />
                       Select All
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setAll(setEBasicSel, [], false)} disabled={isLoading}>
-                      <ListX className="h-4 w-4" />
+                      <ListX className="size-4" />
                       Clear
                     </Button>
                   </div>
@@ -299,11 +299,11 @@ export function CopySharedSettingsDialog({
                   <p className="text-sm font-semibold">Extraction — Advanced Settings</p>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => setAll(setEAdvSel, ADVANCED_KEYS.map(k => k.key) as readonly AdvancedKey[], true)} disabled={isLoading}>
-                      <ListChecks className="h-4 w-4" />
+                      <ListChecks className="size-4" />
                       Select All
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setAll(setEAdvSel, [], false)} disabled={isLoading}>
-                      <ListX className="h-4 w-4" />
+                      <ListX className="size-4" />
                       Clear
                     </Button>
                   </div>
@@ -328,7 +328,7 @@ export function CopySharedSettingsDialog({
           <Button onClick={handleApply} disabled={isApplying || isLoading || (operationMode === 'translation' ? translationIds.length === 0 : extractionIds.length === 0)}>
             {isApplying ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Applying...
               </>
             ) : (

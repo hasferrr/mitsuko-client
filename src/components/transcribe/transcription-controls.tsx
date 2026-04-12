@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Wand2,
   Clock,
@@ -40,8 +41,9 @@ export function TranscriptionControls({
   onSetRightTab,
 }: TranscriptionControlsProps) {
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
-      <h2 className="text-lg font-medium mb-4">Transcription Settings</h2>
+    <Card size="sm">
+      <CardContent className="space-y-4">
+        <h2 className="text-lg font-medium">Transcription Settings</h2>
 
       <div className="space-y-4">
         <div className={cn("space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
@@ -52,9 +54,9 @@ export function TranscriptionControls({
         </div>
 
         {isModelDurationLimitExceeded(models, localAudioDuration || 0) && (
-          <div className="flex items-center gap-2 text-red-600 text-xs">
-            <div className="h-3 w-3">
-              <Clock className="h-3 w-3" />
+          <div className="flex items-center gap-2 text-destructive text-xs">
+            <div className="size-3">
+              <Clock className="size-3" />
             </div>
             <p>
               {models ? `${models} model has ${(getModel(models)?.maxDuration || 0) / 60} minutes limit.` : ""}
@@ -64,7 +66,7 @@ export function TranscriptionControls({
 
         <div className="flex gap-2">
           <Button
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="w-full"
             disabled={isTranscribing || !session || isGlobalMaxDurationExceeded}
             onClick={() => {
               onSetRightTab("transcript")
@@ -73,12 +75,12 @@ export function TranscriptionControls({
           >
             {isTranscribing ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 Transcribing
               </>
             ) : (
               <>
-                <Wand2 className="h-4 w-4" />
+                <Wand2 className="size-4" />
                 {session ? "Transcribe" : "Sign in to Start"}
               </>
             )}
@@ -90,11 +92,12 @@ export function TranscriptionControls({
             disabled={!isTranscribing}
             onClick={onStop}
           >
-            <Square className="h-4 w-4" />
+            <Square className="size-4" />
             Stop
           </Button>
         </div>
       </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

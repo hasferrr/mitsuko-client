@@ -416,16 +416,15 @@ export default function SubtitleTranslatorMain({
   }
 
   return (
-    <div translate="no" className="flex flex-col gap-4 max-w-5xl mx-auto container py-4 px-4 mb-6">
+    <div translate="no" className="flex flex-col gap-4 max-w-5xl mx-auto container py-6 px-4">
       {/* Header */}
-      <div className="flex flex-wrap items-center gap-2 mb-2">
+      <div className="flex flex-wrap items-center gap-2">
         {!hideBackButton && (
           <Button
             variant="ghost"
-            size="icon"
             onClick={() => router.push('/project')}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="size-4" />
           </Button>
         )}
         <div className="flex-1 min-w-40">
@@ -433,7 +432,7 @@ export default function SubtitleTranslatorMain({
             value={title}
             onChange={(e) => setTitle(currentId, e.target.value)}
             onBlur={() => saveData(currentId)}
-            className="text-xl font-semibold h-12"
+            className="text-xl font-semibold"
           />
         </div>
         <input
@@ -446,33 +445,27 @@ export default function SubtitleTranslatorMain({
         {/* Upload Button */}
         <Button
           variant="outline"
-          size="lg"
-          className="gap-2"
           onClick={() => setIsInitialUploadDialogOpen(true)}
           disabled={isTranslating}
         >
-          <Upload className="h-5 w-5" />
+          <Upload className="size-4" />
           Upload
         </Button>
         {/* Save Button */}
         <Button
           variant="outline"
-          size="lg"
-          className="gap-2"
           onClick={handleSave}
           disabled={isTranslating || isSaving}
         >
-          <SaveIcon className="h-5 w-5" />
+          <SaveIcon className="size-4" />
           Save
         </Button>
         {/* History Button */}
         <Button
           variant={isHistoryOpen ? "default" : "outline"}
-          size="lg"
-          className="gap-2 px-4"
           onClick={() => setIsHistoryOpen(!isHistoryOpen)}
         >
-          <HistoryIcon className="h-5 w-5" />
+          <HistoryIcon className="size-4" />
         </Button>
       </div>
 
@@ -482,27 +475,27 @@ export default function SubtitleTranslatorMain({
       >
         {/* Left Column - Subtitles */}
         <div className="space-y-4">
-          <div className="flex items-center mb-4 justify-between mr-4 gap-[6px]">
-            <div className="flex flex-wrap items-center gap-[6px]">
+          <div className="flex items-center justify-between mr-4 gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               <Badge variant="secondary" className="gap-1">
-                <Globe2 className="h-4 w-4" />
+                <Globe2 className="size-4" />
                 {sourceLanguage} → {targetLanguage}
               </Badge>
               <Badge variant="secondary" className="gap-1">
-                <MessageSquare className="h-4 w-4" /> {subtitles.length} Lines
+                <MessageSquare className="size-4" /> {subtitles.length} Lines
               </Badge>
               <Badge variant="secondary" className="gap-1 uppercase">
                 {subName}
               </Badge>
             </div>
-            <div className="flex flex-wrap items-center gap-[6px] justify-end">
+            <div className="flex flex-wrap items-center gap-1.5 justify-end">
               {subtitles.length >= maxSubtitles && (
                 <Badge
                   variant="outline"
                   className="gap-1 cursor-pointer hover:bg-secondary select-none"
                   onClick={() => setSubtitlesHidden(!subtitlesHidden)}
                 >
-                  {subtitlesHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  {subtitlesHidden ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
                   {subtitlesHidden ? "Show" : "Hide"}
                 </Badge>
               )}
@@ -511,7 +504,7 @@ export default function SubtitleTranslatorMain({
                   variant="outline"
                   className="gap-1 cursor-pointer hover:bg-secondary select-none"
                 >
-                  <SquareChartGantt className="h-4 w-4" />
+                  <SquareChartGantt className="size-4" />
                   Progress
                 </Badge>
               </SubtitleProgress>
@@ -520,7 +513,7 @@ export default function SubtitleTranslatorMain({
                   variant="outline"
                   className="gap-1 cursor-pointer hover:bg-secondary select-none"
                 >
-                  <Box className="h-4 w-4" />
+                  <Box className="size-4" />
                   Tools
                 </Badge>
               </SubtitleTools>
@@ -540,7 +533,7 @@ export default function SubtitleTranslatorMain({
                 className="h-full flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
                 onClick={() => document.getElementById("subtitle-upload")?.click()}
               >
-                <Upload className="h-10 w-10 text-muted-foreground" />
+                <Upload className="size-10 text-muted-foreground" />
                 <p className="mt-2 text-sm text-muted-foreground text-center">
                   Drag and drop file here, or click to select a file.
                   <br />
@@ -551,21 +544,20 @@ export default function SubtitleTranslatorMain({
           </DragAndDrop>
 
           {/* Grid for Start and Stop buttons */}
-          <div className="grid grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-2 gap-4">
             {/* Start Translation Button */}
             <Button
-              className="gap-2"
               onClick={() => handleStartTranslation()}
               disabled={isTranslating || !session || subtitles.length === 0}
             >
               {isTranslating ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="size-4 animate-spin" />
                   Translating...
                 </>
               ) : (
                 <>
-                  <Play className="h-4 w-4" />
+                  <Play className="size-4" />
                   {session
                     ? (startIndex !== 1 || endIndex < subtitles.length)
                       ? `Start (line ${startIndex} to ${Math.min(endIndex, subtitles.length)})`
@@ -579,11 +571,10 @@ export default function SubtitleTranslatorMain({
             {/* Stop Button */}
             <Button
               variant="outline"
-              className="gap-2"
               onClick={handleStopTranslation}
               disabled={!isTranslating || !translation.response.response}
             >
-              <Square className="h-4 w-4" />
+              <Square className="size-4" />
               Stop
             </Button>
           </div>
@@ -591,11 +582,11 @@ export default function SubtitleTranslatorMain({
           {/* Continue Translation Button - Moved here, full width */}
           <Button
             variant="outline"
-            className="gap-2 w-full mt-2 border-primary/25 hover:border-primary/50"
+            className="w-full border-primary/25 hover:border-primary/50"
             onClick={handleContinueTranslation}
             disabled={isTranslating || !session || subtitles.length === 0}
           >
-            <FastForward className="h-4 w-4" />
+            <FastForward className="size-4" />
             Continue and Fill Missing Translations
           </Button>
 
@@ -603,10 +594,10 @@ export default function SubtitleTranslatorMain({
             <AlertDialogTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full gap-2 mt-2"
+                 className="w-full"
                 disabled={isTranslating}
               >
-                <Trash className="h-4 w-4" />
+                <Trash className="size-4" />
                 Clear All Translations
               </Button>
             </AlertDialogTrigger>
@@ -648,13 +639,13 @@ export default function SubtitleTranslatorMain({
               <TabsTrigger value="result">Result</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="basic" className="flex-grow space-y-4 mt-4">
-              <Card className="border border-border bg-card text-card-foreground">
-                <CardContent className={cn("p-4 space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
-                  {isSharedSettings && (
-                    <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
-                  )}
-                  <LanguageSelection
+            <TabsContent value="basic" className="grow space-y-4 mt-4">
+            <Card>
+              <CardContent className={cn("space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
+                {isSharedSettings && (
+                  <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
+                )}
+                <LanguageSelection
                     basicSettingsId={basicSettingsId}
                   />
                   <ModelSelection
@@ -666,24 +657,20 @@ export default function SubtitleTranslatorMain({
                       basicSettingsId={basicSettingsId}
                     />
                   </DragAndDrop>
-                  <div className="m-[2px]">
                     <CustomInstructionsInput
                       basicSettingsId={basicSettingsId}
                     />
-                  </div>
-                  <div className="m-[2px]">
                     <FewShotInput
                       basicSettingsId={basicSettingsId}
                     />
-                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="advanced" className="flex-grow space-y-4 mt-4">
-              <Card className="border border-border bg-card text-card-foreground">
-                <CardContent className={cn("p-4 space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
-                  <ModelDetail
+            <TabsContent value="advanced" className="grow space-y-4 mt-4">
+            <Card>
+              <CardContent className={cn("space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
+                <ModelDetail
                     basicSettingsId={basicSettingsId}
                   />
                   {isSharedSettings && (
@@ -698,9 +685,11 @@ export default function SubtitleTranslatorMain({
                   <EndIndexInput
                     advancedSettingsId={advancedSettingsId}
                   />
-                  <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
-                    <AdvancedReasoningSwitch />
-                  </div>
+                  <Card size="sm" className="ring-muted-foreground/20">
+                    <CardContent className="space-y-4">
+                      <AdvancedReasoningSwitch />
+                    </CardContent>
+                  </Card>
                   <p className="text-sm font-semibold">Technical Options</p>
                   <SplitSizeInput
                     advancedSettingsId={advancedSettingsId}
@@ -727,7 +716,7 @@ export default function SubtitleTranslatorMain({
               </Card>
             </TabsContent>
 
-            <TabsContent value="result" className="flex-grow space-y-4 mt-4">
+            <TabsContent value="result" className="grow space-y-4 mt-4">
               <SubtitleResultOutput />
             </TabsContent>
           </Tabs>
@@ -756,7 +745,7 @@ export default function SubtitleTranslatorMain({
               className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
               onClick={() => document.getElementById("subtitle-upload")?.click()}
             >
-              <Upload className="h-10 w-10 text-muted-foreground" />
+              <Upload className="size-10 text-muted-foreground" />
               <p className="mt-2 text-sm text-muted-foreground text-center">
                 Drag and drop file here, or click to select a file.
                 <br />

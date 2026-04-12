@@ -51,7 +51,7 @@ export function ImportSubDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg w-full">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Import Subtitles</DialogTitle>
         </DialogHeader>
@@ -61,11 +61,11 @@ export function ImportSubDialog({
           {/* Controls */}
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => handleSelectAll(true)} disabled={!!isLoading || totalFiles === 0}>
-              <ListChecks className="h-4 w-4" />
+              <ListChecks className="size-4" />
               Select All
             </Button>
             <Button variant="outline" size="sm" onClick={() => handleSelectAll(false)} disabled={!!isLoading || totalFiles === 0}>
-              <ListX className="h-4 w-4" />
+              <ListX className="size-4" />
               Deselect All
             </Button>
             <div className="ml-auto text-xs text-muted-foreground">
@@ -87,7 +87,7 @@ export function ImportSubDialog({
                     disabled={!!isLoading}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium break-words break-all line-clamp-2">{t.title || "Untitled"}</p>
+                    <p className="text-sm font-medium wrap-break-word break-all line-clamp-2">{t.title || "Untitled"}</p>
                     <p className="text-xs text-muted-foreground">{t.subtitlesCount} lines, status: {t.status}</p>
                   </div>
                 </label>

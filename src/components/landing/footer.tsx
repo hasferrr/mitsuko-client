@@ -46,13 +46,13 @@ export default async function Footer() {
   const posts = await getAllPostsMeta()
   const latest = posts.slice(0, 4)
   return (
-    <footer className="border-t border-gray-200 dark:border-gray-800 py-12 px-4 mt-4">
+    <footer className="border-t border-border py-12 px-4 mt-4">
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-11 gap-8">
         <div className="flex flex-col gap-4 lg:col-span-3 lg:mr-8">
           <div className="flex items-center">
-            <span className="text-base font-medium text-gray-900 dark:text-white">About</span>
+            <span className="text-base font-medium mb-4 text-foreground">About</span>
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+          <div className="text-sm text-muted-foreground space-y-2">
             <p>Mitsuko breaks down language barriers to make all content accessible.</p>
             <p>Made with ❤️ by{" "}
               <Link
@@ -68,25 +68,25 @@ export default async function Footer() {
         </div>
 
         <div className="lg:col-span-2">
-          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Resources</h3>
+          <h3 className="text-base font-medium mb-4 text-foreground">Resources</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="/blog" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Blog
               </Link>
             </li>
             <li>
-              <Link href="/pricing" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Pricing
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Documentation
               </Link>
             </li>
             <li>
-              <Link href="/changelog" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <Link href="/changelog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Changelog
               </Link>
             </li>
@@ -94,15 +94,15 @@ export default async function Footer() {
         </div>
 
         <div className="lg:col-span-2">
-          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Legal</h3>
+          <h3 className="text-base font-medium mb-4 text-foreground">Legal</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="/terms" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Terms of Service
               </Link>
             </li>
             <li>
-              <Link href="/privacy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Privacy Policy
               </Link>
             </li>
@@ -110,14 +110,14 @@ export default async function Footer() {
         </div>
 
         <div className="lg:col-span-2">
-          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Community</h3>
+          <h3 className="text-base font-medium mb-4 text-foreground">Community</h3>
           <ul className="space-y-2">
             <li>
               <Link
                 href={DISCORD_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Discord
               </Link>
@@ -127,7 +127,7 @@ export default async function Footer() {
                 href={GITHUB_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 GitHub
               </Link>
@@ -136,10 +136,10 @@ export default async function Footer() {
         </div>
 
         <div className="lg:col-span-2">
-          <h3 className="text-base font-medium mb-4 text-gray-900 dark:text-white">Articles</h3>
+          <h3 className="text-base font-medium mb-4 text-foreground">Articles</h3>
           <ul className="flex flex-col gap-2">
             {latest.map(p => (
-              <li key={p.slug} className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <li key={p.slug} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <Link href={`/blog/${p.slug}`} className="line-clamp-2">{p.title.split(":")[0] || p.title}</Link>
               </li>
             ))}
@@ -149,9 +149,9 @@ export default async function Footer() {
 
       <FooterBadges badges={badges} />
 
-      <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
+      <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-border">
 
-        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">© {new Date().getFullYear()} Mitsuko. All rights reserved.</p>
+        <p className="text-sm text-muted-foreground text-center">© {new Date().getFullYear()} Mitsuko. All rights reserved.</p>
       </div>
     </footer>
   )

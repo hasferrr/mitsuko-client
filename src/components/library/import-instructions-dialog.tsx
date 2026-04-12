@@ -155,8 +155,8 @@ export function ImportInstructionsDialog() {
                 <Card
                   key={item.id}
                   className={cn(
-                    "overflow-hidden border h-full flex flex-col transition-colors duration-300 relative cursor-pointer",
-                    selectedImportIds.has(item.id) ? "border-primary" : "border-muted"
+                    "overflow-hidden h-full flex flex-col transition-colors duration-300 relative cursor-pointer",
+                    selectedImportIds.has(item.id) ? "ring-primary" : "ring-foreground/10"
                   )}
                   onClick={() => handleToggleImportSelection(item.id)}
                 >
@@ -166,10 +166,10 @@ export function ImportInstructionsDialog() {
                     className="absolute top-3 right-3 z-10"
                     aria-label={`Select ${item.name}`}
                   />
-                  <CardHeader className="pb-2">
+                  <CardHeader>
                     <CardTitle className="text-lg">{item.name}</CardTitle>
                   </CardHeader>
-                  <CardContent className="flex-grow">
+                  <CardContent className="grow">
                     <p className="text-sm text-muted-foreground line-clamp-4">{item.content}</p>
                   </CardContent>
                 </Card>

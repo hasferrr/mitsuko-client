@@ -180,7 +180,7 @@ export default function LogResultDialog({ log, onOpenChange, onApplyDirect }: Lo
   return (
     <Dialog open={!!log} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl flex flex-col">
-        <DialogHeader className="pb-2">
+        <DialogHeader>
           <div className="space-y-1">
             <DialogTitle className="text-xl font-semibold truncate">
               {log?.metadata.originalname || "Transcription Result"}
@@ -188,14 +188,14 @@ export default function LogResultDialog({ log, onOpenChange, onApplyDirect }: Lo
             {log && (
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <div className="inline-flex items-center gap-1">
-                  <div className="h-3 w-3">
-                    <Calendar className="h-3 w-3" />
+                  <div className="size-3">
+                    <Calendar className="size-3" />
                   </div>
                   {formatDate(log.createdAt)}
                 </div>
                 <div className="inline-flex items-center gap-1">
-                  <div className="h-3 w-3">
-                    <CircleDollarSign className="h-3 w-3" />
+                  <div className="size-3">
+                    <CircleDollarSign className="size-3" />
                   </div>
                   {log.creditsConsumed !== undefined
                     ? log.creditsConsumed.toLocaleString()
@@ -204,8 +204,8 @@ export default function LogResultDialog({ log, onOpenChange, onApplyDirect }: Lo
                   credits
                 </div>
                 <div className="inline-flex items-center gap-1">
-                  <div className="h-3 w-3">
-                    <FileAudio2 className="h-3 w-3" />
+                  <div className="size-3">
+                    <FileAudio2 className="size-3" />
                   </div>
                   {log.metadata.mimetype}
                 </div>
@@ -237,8 +237,8 @@ export default function LogResultDialog({ log, onOpenChange, onApplyDirect }: Lo
             </>
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <div className="w-12 h-12 mb-4 bg-destructive/10 rounded-full flex items-center justify-center">
-                <FileAudio2 className="h-6 w-6 text-destructive" />
+              <div className="size-12 mb-4 bg-destructive/10 rounded-full flex items-center justify-center">
+                <FileAudio2 className="size-6 text-destructive" />
               </div>
               <h3 className="font-medium mb-2 text-destructive">Failed to load result</h3>
               <p className="text-sm text-muted-foreground text-center max-w-md">
@@ -253,14 +253,12 @@ export default function LogResultDialog({ log, onOpenChange, onApplyDirect }: Lo
                   <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
-                      size="sm"
                       onClick={handleOpenApplyDialog}
-                      className="h-8"
                     >
-                      <FolderPlus className="h-3 w-3" /> {onApplyDirect ? "Apply" : "Apply to project"}
+                      <FolderPlus className="size-3" /> {onApplyDirect ? "Apply" : "Apply to project"}
                     </Button>
-                    <Button variant="outline" size="sm" onClick={handleExportSRT} className="h-8">
-                      <Download className="h-3 w-3" /> Export SRT
+                    <Button variant="outline" onClick={handleExportSRT}>
+                      <Download className="size-3" /> Export SRT
                     </Button>
                   </div>
                 )}

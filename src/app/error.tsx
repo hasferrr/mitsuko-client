@@ -21,7 +21,7 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen text-gray-900 dark:text-white flex flex-col items-center">
+    <div className="min-h-screen text-foreground flex flex-col items-center">
       <Navbar />
       <div className="flex-1 flex flex-col gap-4 items-center justify-center px-4 pb-12">
         <h1 className="text-4xl font-semibold">Something went wrong!</h1>
@@ -33,11 +33,11 @@ export default function Error({
             onClick={() => reset()}
             className="inline-flex items-center gap-2 transition-colors hover:text-primary"
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className="size-4" />
             Try again
           </button>
           <Link href="/" className="inline-flex items-center gap-2 transition-colors hover:text-primary">
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="size-4" />
             Go back home
           </Link>
         </div>

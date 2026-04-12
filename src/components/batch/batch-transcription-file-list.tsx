@@ -91,7 +91,7 @@ export function BatchTranscriptionFileList({
             className="h-full flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
             onClick={() => document.getElementById(inputId)?.click()}
           >
-            <FileAudio className="h-10 w-10 text-muted-foreground" />
+            <FileAudio className="size-10 text-muted-foreground" />
             <p className="mt-2 text-sm text-muted-foreground text-center">
               Drag and drop audio files here, or click to select files.
               <br />

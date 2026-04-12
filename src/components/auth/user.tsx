@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { capitalize, cn } from "@/lib/utils"
+import { Card, CardHeader } from "@/components/ui/card"
 import { RefreshCw, Plus } from "lucide-react"
 import { Button } from "../ui/button"
 import { Skeleton } from "../ui/skeleton"
@@ -117,9 +118,9 @@ export function User() {
   }
 
   return (
-    <div className="w-[min(42rem,90vw)] mx-auto">
-      <div className="rounded-md overflow-hidden border mb-6">
-        <div className="px-4 py-2 border-b">
+    <div className="w-[min(42rem,90vw)] mx-auto space-y-6">
+      <Card>
+        <CardHeader className="border-b">
           <div className="flex justify-between items-center">
             <h2 className="font-medium">User Information</h2>
             <Button
@@ -133,14 +134,14 @@ export function User() {
             >
               <RefreshCw
                 className={cn(
-                  "h-4 w-4",
+                  "size-4",
                   (isUserFetching || isTransactionsFetching || isCreditBatchesFetching) && "animate-spin"
                 )}
               />
               <span className="text-sm">Refresh</span>
             </Button>
           </div>
-        </div>
+        </CardHeader>
 
         <table className="w-full">
           <tbody>
@@ -154,20 +155,19 @@ export function User() {
                 {isUserLoading ? (
                   <span className="italic text-muted-foreground">Loading...</span>
                 ) : isUserError ? (
-                  <span className="italic text-red-500">Error</span>
+                  <span className="italic text-destructive">Error</span>
                 ) : (
                   <div className="flex items-center justify-end gap-2">
                     <Link href="/pricing" target="_blank">
                       <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1 py-0 px-2 mr-1 h-6 text-white hover:text-white bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors"
+                         size="xs"
+                         className="py-0"
                       >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="size-4" />
                         Buy
                       </Button>
                     </Link>
-                    <span className={cn((user?.credit ?? 0) < 0 && "text-red-500")}>
+                    <span className={cn((user?.credit ?? 0) < 0 && "text-destructive")}>
                       {Math.round(user?.credit ?? 0).toLocaleString()}
                     </span>
                   </div>
@@ -180,7 +180,7 @@ export function User() {
                 {isUserLoading ? (
                   <span className="italic text-muted-foreground">Loading...</span>
                 ) : isUserError ? (
-                  <span className="italic text-red-500">Error</span>
+                  <span className="italic text-destructive">Error</span>
                 ) : (
                   // capitalize(user?.tier ?? "unknown")
                   "Basic"
@@ -189,10 +189,10 @@ export function User() {
             </tr>
           </tbody>
         </table>
-      </div>
+      </Card>
 
-      <div className="rounded-md overflow-hidden border">
-        <div className="px-4 py-2 border-b flex justify-between items-center gap-4">
+      <Card>
+        <CardHeader className="border-b flex justify-between items-center gap-4">
           <h2 className="font-medium">Transaction History</h2>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Amount:</span>
@@ -200,7 +200,7 @@ export function User() {
               value={amountFilter}
               onValueChange={(value) => handleAmountFilterChange(value as AmountFilter)}
             >
-              <SelectTrigger className="w-[105px] h-8">
+              <SelectTrigger className="w-[105px]">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent>
@@ -212,7 +212,7 @@ export function User() {
               </SelectContent>
             </Select>
           </div>
-        </div>
+        </CardHeader>
 
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -244,7 +244,7 @@ export function User() {
                 ))
               ) : isTransactionsError ? (
                 <tr>
-                  <td colSpan={4} className="p-4 text-center text-red-500">
+                  <td colSpan={4} className="p-4 text-center text-destructive">
                     Error loading transactions
                   </td>
                 </tr>
@@ -260,7 +260,7 @@ export function User() {
                     <td className="px-4 py-2">
                       {new Date(transaction.created_at).toLocaleString()}
                     </td>
-                    <td className={cn("px-4 py-2", transaction.amount >= 0 ? "text-foreground" : "text-red-500")}>
+                    <td className={cn("px-4 py-2", transaction.amount >= 0 ? "text-foreground" : "text-destructive")}>
                       {transaction.amount > 0 ? "+" : ""}
                       {Math.round(transaction.amount).toLocaleString()}
                     </td>
@@ -348,12 +348,12 @@ export function User() {
             </Pagination>
           </div>
         )}
-      </div>
+      </Card>
 
-      <div className="rounded-md overflow-hidden border mt-6">
-        <div className="px-4 py-2 border-b">
+      <Card>
+        <CardHeader className="border-b">
           <h2 className="font-medium">Credit Grants</h2>
-        </div>
+        </CardHeader>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -384,7 +384,7 @@ export function User() {
                 ))
               ) : isCreditBatchesError ? (
                 <tr>
-                  <td colSpan={4} className="p-4 text-center text-red-500">
+                  <td colSpan={4} className="p-4 text-center text-destructive">
                     Error loading credit grants
                   </td>
                 </tr>
@@ -407,8 +407,8 @@ export function User() {
                           className={cn(
                             "px-2 py-1 rounded-full text-xs font-medium",
                             isExpired
-                              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                              : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                              ? "bg-destructive/10 text-destructive"
+                              : "bg-green-500/10 text-green-600 dark:text-green-400"
                           )}
                         >
                           {state}
@@ -501,7 +501,7 @@ export function User() {
             </Pagination>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

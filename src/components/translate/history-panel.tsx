@@ -112,8 +112,8 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
   return (
     <>
       <ResizablePanelGroup
-        direction="horizontal"
-        className="h-[1000px] border rounded-lg overflow-hidden mt-4"
+        orientation="horizontal"
+        className="max-w-4xl h-[1000px] border rounded-lg"
       >
         {/* Left Panel: History List */}
         <ResizablePanel defaultSize={30} minSize={20}>
@@ -148,11 +148,14 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
           </ScrollArea>
         </ResizablePanel>
 
-        <ResizableHandle className="border" />
+        <ResizableHandle />
 
         {/* Right Panel: Split Vertically into Three */}
         <ResizablePanel defaultSize={70} minSize={10}>
-          <ResizablePanelGroup direction="vertical" className="h-full">
+          <ResizablePanelGroup
+            orientation="vertical"
+            className="h-full"
+          >
 
             {/* Top Panel: Subtitles and Parsed Data */}
             <ResizablePanel minSize={10}>
@@ -168,7 +171,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
               </ScrollArea>
             </ResizablePanel>
 
-            <ResizableHandle className="border" />
+            <ResizableHandle />
 
             {/* Middle Panel: Raw Responses */}
             <ResizablePanel minSize={10}>
@@ -194,7 +197,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
               </ScrollArea>
             </ResizablePanel>
 
-            <ResizableHandle className="border" />
+            <ResizableHandle />
 
             {/* Bottom Panel: JSON  */}
             <ResizablePanel minSize={10}>
@@ -221,13 +224,13 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
       {/* History Action Buttons */}
       <div className="flex justify-center gap-4 mt-4 flex-wrap">
         <Button variant="outline" disabled>
-          <FileJson className="h-4 w-4 mr-2" /> Export All
+          <FileJson className="size-4" /> Export All
         </Button>
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="default" disabled={selectedHistoryIndex === null}>
-              <CheckCircle className="h-4 w-4 mr-2" /> Apply
+              <CheckCircle className="size-4" /> Apply
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -249,7 +252,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" disabled={selectedHistoryIndex === null}>
-              <XCircle className="h-4 w-4 mr-2" /> Delete
+              <XCircle className="size-4" /> Delete
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -271,7 +274,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" disabled={history.length === 0}>
-              <Trash className="h-4 w-4 mr-2" /> Delete All
+              <Trash className="size-4" /> Delete All
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
