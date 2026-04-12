@@ -15,6 +15,7 @@ import { Translation } from "@/types/project"
 import { db } from "@/lib/db/db"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
+import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 interface Props {
@@ -211,7 +212,8 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
         {fewShotType === 'linked' && (
           <div className="space-y-3">
             {fewShotLinkedId && linkedTranslationTitle ? (
-              <div className={cn("p-3 border rounded-md space-y-3")}>
+              <Card size="sm">
+                <CardContent className="space-y-3">
                 <div className="flex flex-row items-center justify-between">
                   <div className="space-y-1">
                     <span className="text-sm font-medium">Linked: {linkedTranslationTitle}</span>
@@ -256,10 +258,11 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
                     />
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground pt-2">
+                <p className="text-xs text-muted-foreground">
                   Note: Using a large number of lines will significantly increase token and credit usage.
                 </p>
-              </div>
+                </CardContent>
+              </Card>
             ) : (
               <Button
                 disabled={!isFewShotEnabled}
