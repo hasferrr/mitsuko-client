@@ -55,17 +55,16 @@ export function SortableBatchTranscriptionFile({
       ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>}
       style={style}
       className={cn(
-        "flex flex-row items-center",
         selectMode && "select-none",
         selected && "bg-primary/5 dark:bg-primary/10"
       )}
       onClick={handleCardClick}
     >
-      {selectMode ? (
-        <div className="flex items-center ml-4">
+      <CardContent className="flex items-center justify-between gap-4">
+        {selectMode ? (
           <input
             type="checkbox"
-            className="size-4"
+            className="size-4 shrink-0"
             checked={selected}
             onClick={(e) => e.stopPropagation()}
             onChange={(e) => {
@@ -73,13 +72,11 @@ export function SortableBatchTranscriptionFile({
               onSelectToggle?.(batchFile.id)
             }}
           />
-        </div>
-      ) : (
-        <div className="flex items-center ml-4 cursor-grab" {...attributes} {...listeners}>
-          <GripVertical className="size-5 text-muted-foreground" />
-        </div>
-      )}
-      <CardContent className="flex-1 flex items-center justify-between">
+        ) : (
+          <button {...attributes} {...listeners} className="cursor-grab shrink-0">
+            <GripVertical className="size-5 text-muted-foreground" />
+          </button>
+        )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <FileAudio className="size-4 text-muted-foreground shrink-0" />
