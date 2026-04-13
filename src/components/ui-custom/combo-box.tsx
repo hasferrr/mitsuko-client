@@ -45,11 +45,11 @@ export function ComboBox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between relative pr-6"
+          className="flex grow justify-between"
           disabled={disabled}
         >
           <span className="truncate">{value}</span>
-          <ChevronsUpDown className="opacity-50 absolute right-3 top-1/2 -translate-y-1/2" />
+          <ChevronsUpDown className="size-4 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
@@ -66,16 +66,9 @@ export function ComboBox({
                     setValue(currentValue)
                     setOpen(false)
                   }}
+                  data-checked={(valueForCheckmark ? valueForCheckmark : value) === label || undefined}
                 >
                   {label}
-                  <Check
-                    className={cn(
-                      "ml-auto",
-                      (valueForCheckmark ? valueForCheckmark : value) === label
-                        ? "opacity-100"
-                        : "opacity-0"
-                    )}
-                  />
                 </CommandItem>
               ))}
             </CommandGroup>

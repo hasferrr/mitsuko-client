@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Popover as RadixPopover } from "radix-ui"
 type PopoverProps = RadixPopover.PopoverProps
-import { Check, ChevronsUpDown } from "lucide-react"
+import { ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -64,7 +64,6 @@ export function ModelSelector({
   basicSettingsId,
   advancedSettingsId,
   disabled,
-  className,
   ...props
 }: ModelSelectorProps) {
   const models = MODEL_COLLECTION
@@ -121,78 +120,76 @@ export function ModelSelector({
   }
 
   return (
-    <div className={cn("flex flex-col gap-2", className)}>
-      <Popover open={open} onOpenChange={setOpen} {...props}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            aria-label="Select a model"
-            className="w-full justify-between relative pr-8"
-            disabled={disabled}
-          >
-            <div className="flex items-center gap-2 w-0 flex-1 min-w-0">
-              <span className="truncate" title={modelDetail ? modelDetail.name : undefined}>
-                {modelDetail ? modelDetail.name : "Select a model..."}
-              </span>
-              {modelDetail && (
-                <Badge
-                  variant={modelDetail.isPaid ? "default" : "secondary"}
-                  className="text-xs px-2 h-4.5 shrink-0"
-                >
-                  {modelDetail.isPaid ? "Premium" : "Free"}
-                </Badge>
-              )}
-            </div>
-            <ChevronsUpDown className="size-4 opacity-50 absolute right-3 top-1/2 -translate-y-1/2" />
-          </Button>
-        </PopoverTrigger>
-
-        <PopoverContent
-          align="start"
-          side="bottom"
-          className="w-full p-0 overflow-y-auto"
+    <Popover open={open} onOpenChange={setOpen} {...props}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          aria-label="Select a model"
+          className="flex grow justify-between"
+          disabled={disabled}
         >
-          <Command className="min-w-[320px]" loop defaultValue={`${modelDetail?.name}-${modelDetail?.isPaid ? "paid" : "free"}`}>
-            <CommandInput placeholder="Search Models..." />
-            <CommandList>
-              <CommandEmpty>No Models found.</CommandEmpty>
-              {Object.entries(models).map(([key, value]) => (
-                <CommandGroup key={key} heading={(
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    <ModelProviderIcon provider={value.provider} />
-                    {key}
-                    <Badge
-                      variant={value.models[0]?.isPaid ? "default" : "secondary"}
-                      className={cn("text-xs px-1.5 h-4", "text-[11px]")}
-                    >
-                      {value.models[0]?.isPaid ? "Premium" : "Free"}
-                    </Badge>
-                  </div>
-                )}>
-                  {value.models.map((model) => (
-                    <ModelItem
-                      key={`${model.name}-${value.provider}-${model.isPaid ? "paid" : "free"}`}
-                      model={model}
-                      modelKey={key}
-                      cost={model.isPaid ? modelCostsMap.get(model.name) : undefined}
-                      isSelected={
-                        modelDetail?.name === model.name &&
-                        modelDetail.isPaid === model.isPaid
-                      }
-                      onSelect={() => {
-                        handleSelect(model)
-                      }}
-                    />
-                  ))}
-                </CommandGroup>
-              ))}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
+          <div className="flex gap-2">
+            <span className="truncate" title={modelDetail ? modelDetail.name : undefined}>
+              {modelDetail ? modelDetail.name : "Select a model..."}
+            </span>
+            {modelDetail && (
+              <Badge
+                variant={modelDetail.isPaid ? "default" : "secondary"}
+                className="text-xs px-2 h-4.5 shrink-0"
+              >
+                {modelDetail.isPaid ? "Premium" : "Free"}
+              </Badge>
+            )}
+          </div>
+          <ChevronsUpDown className="size-4 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+
+      <PopoverContent
+        align="start"
+        side="bottom"
+        className="w-full p-0 overflow-y-auto"
+      >
+        <Command className="min-w-[320px]" loop defaultValue={`${modelDetail?.name}-${modelDetail?.isPaid ? "paid" : "free"}`}>
+          <CommandInput placeholder="Search Models..." />
+          <CommandList>
+            <CommandEmpty>No Models found.</CommandEmpty>
+            {Object.entries(models).map(([key, value]) => (
+              <CommandGroup key={key} heading={(
+                <div className="flex items-center gap-2 text-sm font-semibold">
+                  <ModelProviderIcon provider={value.provider} />
+                  {key}
+                  <Badge
+                    variant={value.models[0]?.isPaid ? "default" : "secondary"}
+                    className={cn("text-xs px-1.5 h-4", "text-[11px]")}
+                  >
+                    {value.models[0]?.isPaid ? "Premium" : "Free"}
+                  </Badge>
+                </div>
+              )}>
+                {value.models.map((model) => (
+                  <ModelItem
+                    key={`${model.name}-${value.provider}-${model.isPaid ? "paid" : "free"}`}
+                    model={model}
+                    modelKey={key}
+                    cost={model.isPaid ? modelCostsMap.get(model.name) : undefined}
+                    isSelected={
+                      modelDetail?.name === model.name &&
+                      modelDetail.isPaid === model.isPaid
+                    }
+                    onSelect={() => {
+                      handleSelect(model)
+                    }}
+                  />
+                ))}
+              </CommandGroup>
+            ))}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -211,23 +208,22 @@ function ModelItem({ model, modelKey, cost, isSelected, onSelect }: ModelItemPro
         <CommandItem
           onSelect={onSelect}
           value={`${model.name}-${modelKey}-${model.isPaid ? "premium" : "free"}`}
+          data-checked={isSelected || undefined}
         >
-          {model.name}
-          {cost && cost.discount > 0 && (
-            <span className="text-green-500">
-              ({cost.discount * 100}% off)
-            </span>
-          )}
-          <Check
-            className={cn("ml-auto", isSelected ? "opacity-100" : "opacity-0")}
-          />
+          <span>
+            {model.name}
+            {cost && cost.discount > 0 && (
+              <span className="text-green-500">
+                ({cost.discount * 100}% off)
+              </span>
+            )}
+          </span>
         </CommandItem>
       </HoverCardTrigger>
       <HoverCardContent
         side="left"
         align="start"
-        className="w-[260px]"
-        // animate={false}
+        className="w-65"
       >
         <ModelDescription model={model} cost={cost} isSelected={isSelected} />
       </HoverCardContent>

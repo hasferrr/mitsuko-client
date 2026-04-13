@@ -43,14 +43,11 @@ export const ModelSelection = memo(({
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Model</label>
         <div className="flex items-center gap-2">
-          <div className="grow">
-            <ModelSelector
-              basicSettingsId={basicSettingsId}
-              advancedSettingsId={advancedSettingsId}
-              disabled={isUseCustomModel}
-              className="w-full"
-            />
-          </div>
+          <ModelSelector
+            basicSettingsId={basicSettingsId}
+            advancedSettingsId={advancedSettingsId}
+            disabled={isUseCustomModel}
+          />
           <Button
             variant="outline"
             size="icon"
