@@ -184,11 +184,11 @@ export const AiStreamOutput = ({
             )}
           >
             <div className="overflow-hidden">
-              <div className="text-sm pt-3 prose prose-sm dark:prose-invert max-w-none">
+              <div className="flex flex-col gap-3 text-sm pt-3 max-w-none">
                 <ReactMarkdown
                   components={{
-                    p: props => <p className="mb-3 whitespace-pre-line" {...props} />,
-                    ul: props => <ul className="mb-3 list-disc pl-5 space-y-1" {...props} />,
+                    p: props => <p className="whitespace-pre-line" {...props} />,
+                    ul: props => <ul className="list-disc pl-5 flex flex-col gap-1" {...props} />,
                     ol: props => {
                       const listItemCount = Children.toArray(props.children).filter(isValidElement).length
                       const maxListNumber = (props.start ?? 1) + listItemCount - 1
@@ -197,7 +197,7 @@ export const AiStreamOutput = ({
                       return (
                         <ol
                           className={cn(
-                            "mb-3 list-decimal pl-5 space-y-1 [&>li]:ml-(--li-ml)",
+                            "list-decimal pl-5 flex flex-col gap-1 [&>li]:ml-(--li-ml)",
                             props.className,
                           )}
                           style={{ "--li-ml": `${listItemMargin}rem` }}
@@ -211,13 +211,13 @@ export const AiStreamOutput = ({
                         {children}
                       </code>
                     ),
-                    pre: props => <pre className="mb-3 overflow-x-auto rounded bg-muted/50 p-2 text-xs" {...props} />,
+                    pre: props => <pre className="overflow-x-auto rounded bg-muted/50 p-2 text-xs" {...props} />,
                     strong: props => <strong className="font-semibold" {...props} />,
                     em: props => <em className="italic" {...props} />,
-                    h1: props => <h1 className="text-base font-semibold mt-3 mb-2" {...props} />,
-                    h2: props => <h2 className="text-sm font-semibold mt-2 mb-1" {...props} />,
-                    h3: props => <h3 className="text-sm font-semibold mt-2 mb-1" {...props} />,
-                    blockquote: props => <blockquote className="mb-3 border-l-2 border-border pl-3 text-muted-foreground italic" {...props} />,
+                    h1: props => <h1 className="text-base font-semibold" {...props} />,
+                    h2: props => <h2 className="text-sm font-semibold" {...props} />,
+                    h3: props => <h3 className="text-sm font-semibold" {...props} />,
+                    blockquote: props => <blockquote className="border-l-2 border-border pl-3 text-muted-foreground italic" {...props} />,
                   }}
                 >
                   {parsedContent.think}
