@@ -169,7 +169,6 @@ export const AiStreamOutput = ({
                     className="animate-[thinking_2s_ease-in-out_infinite]"
                     style={{
                       animationDelay: `${index * 100}ms`,
-                      color: "var(--primary)",
                     }}
                   >
                     {char}
