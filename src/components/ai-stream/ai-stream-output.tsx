@@ -191,19 +191,16 @@ export const AiStreamOutput = ({
                     ul: props => <ul className="mb-3 list-disc pl-5 space-y-1" {...props} />,
                     ol: props => {
                       const listItemCount = Children.toArray(props.children).filter(isValidElement).length
-                      const listItemMarginClass =
-                        listItemCount >= 100
-                          ? "[&>li]:ml-4"
-                          : listItemCount >= 10
-                            ? "[&>li]:ml-1.5"
-                            : "[&>li]:ml-0"
+                      const maxListNumber = (props.start ?? 1) + listItemCount - 1
+                      const digitCount = String(maxListNumber).length
+                      const listItemMargin = Math.max(0, (digitCount - 1) * 0.5)
                       return (
                         <ol
                           className={cn(
-                            "mb-3 list-decimal pl-5 space-y-1",
-                            listItemMarginClass,
+                            "mb-3 list-decimal pl-5 space-y-1 [&>li]:ml-(--li-ml)",
                             props.className,
                           )}
+                          style={{ "--li-ml": `${listItemMargin}rem` }}
                           {...props}
                         />
                       )
