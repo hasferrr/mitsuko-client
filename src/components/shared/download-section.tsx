@@ -132,50 +132,50 @@ export function DownloadSection({
               Select Format
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-118">
             <DialogHeader>
               <DialogTitle>Select Format</DialogTitle>
               <DialogDescription>
                 Choose how the original and translated text should be combined:
               </DialogDescription>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
               <Button
                 variant={combinedFormat === "(o)-t" ? "default" : "outline"}
                 onClick={() => setCombinedFormat("(o)-t")}
-                className="py-8 flex w-56"
+                className="py-8 w-full"
               >
                 (Original Text) Translated Text
               </Button>
               <Button
                 variant={combinedFormat === "(t)-o" ? "default" : "outline"}
                 onClick={() => setCombinedFormat("(t)-o")}
-                className="py-8 flex w-56"
+                className="py-8 w-full"
               >
                 (Translated Text) Original Text
               </Button>
               <Button
                 variant={combinedFormat === "o-n-t" ? "default" : "outline"}
                 onClick={() => setCombinedFormat("o-n-t")}
-                className="py-8 flex w-56"
+                className="py-8 w-full"
               >
                 Original Text<br />Translated Text
               </Button>
               <Button
                 variant={combinedFormat === "t-n-o" ? "default" : "outline"}
                 onClick={() => setCombinedFormat("t-n-o")}
-                className="py-8 flex w-56"
+                className="py-8 w-full"
               >
                 Translated Text<br />Original Text
               </Button>
             </div>
 
-            <div className="pt-4 border-t">
+            <div className="">
               <h3 className="text-sm font-medium mb-2">Comment Original</h3>
               <Button
                 variant={combinedFormat === "{o}-t" ? "default" : "outline"}
                 onClick={() => setCombinedFormat("{o}-t")}
-                className="py-8 flex w-full"
+                className="py-8 w-full"
               >
                 {"{Commented Original}"}Translated Text
               </Button>
