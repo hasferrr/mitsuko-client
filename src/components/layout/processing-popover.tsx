@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
@@ -104,10 +105,10 @@ export function ProcessingPopover() {
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
       <PopoverTrigger asChild>
-        <div className="flex items-center gap-2 text-sm text-foreground/80 mr-4 cursor-pointer hover:underline">
+        <Button variant="ghost" size="sm" className="flex gap-2 text-sm">
           <Loader2 className="size-4 animate-spin" />
           <span className="hidden md:block">Processing...</span>
-        </div>
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="grid gap-2">

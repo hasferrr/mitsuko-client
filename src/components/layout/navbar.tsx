@@ -71,42 +71,40 @@ export function Navbar() {
 
         <div className="flex items-center gap-2 ml-auto">
           <FeedbackWrapper>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7 mr-4"
-            >
+            <Button variant="outline" size="sm">
               Feedback
             </Button>
           </FeedbackWrapper>
 
           <ProcessingPopover />
 
-          <Link
-            href="/auth/login"
-            className="flex items-center gap-2 text-sm mr-2 cursor-pointer hover:underline"
-          >
-            {isFetching || isLoading ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                <span className="text-muted-foreground">Loading credits...</span>
-              </>
-            ) : isError ? (
-              <>
-                <AlertCircle className="size-4 text-destructive" />
-                <span className="text-destructive">Error</span>
-              </>
-            ) : user ? (
-              <>
-                <CircleDollarSign className="size-4" />
-                <span className={cn(user.credit < 0 && "text-destructive")}>
-                  {Math.round(user.credit).toLocaleString()} credits
-                </span>
-              </>
-            ) : (
-              "Sign In"
-            )}
-          </Link>
+          <Button variant="ghost" size="sm" className="text-sm" asChild>
+            <Link
+              href="/auth/login"
+              className="flex gap-2"
+            >
+              {isFetching || isLoading ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  <span className="text-muted-foreground">Loading credits...</span>
+                </>
+              ) : isError ? (
+                <>
+                  <AlertCircle className="size-4 text-destructive" />
+                  <span className="text-destructive">Error</span>
+                </>
+              ) : user ? (
+                <>
+                  <CircleDollarSign className="size-4" />
+                  <span className={cn(user.credit < 0 && "text-destructive")}>
+                    {Math.round(user.credit).toLocaleString()} credits
+                  </span>
+                </>
+              ) : (
+                "Sign In"
+              )}
+            </Link>
+          </Button>
 
           <Button
             variant="ghost"
@@ -116,9 +114,9 @@ export function Navbar() {
             aria-label="Toggle dark mode"
           >
             {isDarkMode ? (
-              <Sun className="size-5" />
+              <Sun className="size-4" />
             ) : (
-              <Moon className="size-5" />
+              <Moon className="size-4" />
             )}
           </Button>
         </div>
