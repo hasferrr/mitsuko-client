@@ -2,17 +2,9 @@ import { getModelCostData } from '@/lib/api/get-model-cost-data'
 import { ModelCost } from '@/types/model-cost'
 import { PAID_MODELS } from "@/constants/model-collection"
 import { cn, formatTokens } from "@/lib/utils"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  favoriteModels,
-  highQualityModels,
-  priorityModels,
-} from '@/constants/model-preferences'
+import { priorityModels } from '@/constants/model-preferences'
+import ModelNameWithBadges from './model-name-with-badges'
 
 export default async function CreditUsage() {
   const fetchedCreditCostsMap = await getModelCostData()
@@ -84,27 +76,7 @@ export default async function CreditUsage() {
             {modelCosts.map((model) => (
               <tr key={model.name} className="hover:bg-muted/50">
                 <td className="px-4 py-2 text-left text-muted-foreground">
-                  {model.name}
-                  {highQualityModels.has(model.name) && (
-                    <Tooltip delayDuration={0}>
-                      <TooltipTrigger asChild>
-                        <span className="cursor-default ml-1 text-[1rem]">⭐</span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>High Quality</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-                  {favoriteModels.has(model.name) && (
-                    <Tooltip delayDuration={0}>
-                      <TooltipTrigger asChild>
-                        <span className="cursor-default ml-1 text-[1rem]">💙</span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Favorite Model</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
+                  <ModelNameWithBadges name={model.name} />
                 </td>
                 <td className="px-4 py-2 text-left text-muted-foreground">
                   <span className={cn(model.discount > 0 && "line-through")}>
