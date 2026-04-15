@@ -205,6 +205,7 @@ Each store keeps backward-compatible aliases (e.g., `setIsTranslating` → `setA
 - `src/lib/db/db.ts` - Database schema and migrations (version 24+)
 - `src/lib/db/global-settings.ts` - Global settings management
 - `src/lib/db/db-io.ts` - Database import/export functionality
+- `src/lib/db/db-schema.ts` - Zod schemas for import validation (`databaseExportSchema` validates between `JSON.parse` and `databaseExportConstructor`)
 - `src/lib/api/stream.ts` - SSE streaming for AI responses
 - `src/constants/model-collection.ts` - Available AI models (free and paid model definitions)
 - `src/constants/default.ts` - Default settings values

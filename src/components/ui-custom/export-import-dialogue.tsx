@@ -21,6 +21,7 @@ import { Download, Upload } from "lucide-react"
 import { exportDatabase, importDatabase } from "@/lib/db/db-io"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { ZodError } from "zod"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useRouter } from "next/navigation"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
@@ -113,7 +114,13 @@ export function ExportImportDialogue({
           setIsOpen(false)
         } catch (error) {
           console.error('Error importing database:', error)
-          toast.error("Failed to import database")
+          if (error instanceof ZodError) {
+            toast.error("Invalid project file format", {
+              description: error.issues[0]?.message,
+            })
+          } else {
+            toast.error("Failed to import database")
+          }
         } finally {
           setIsLoading(false)
         }

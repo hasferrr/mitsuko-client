@@ -1,5 +1,6 @@
 import { db } from './db'
 import { DatabaseExport, databaseExportConstructor, generateNewIds } from './db-constructor'
+import { databaseExportSchema } from './db-schema'
 import { Project, BasicSettings, AdvancedSettings, Transcription } from '@/types/project'
 import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
 import {
@@ -136,7 +137,8 @@ export async function exportProject(
 export async function importDatabase(jsonString: string, clearExisting: boolean): Promise<void> {
   try {
     const importData = JSON.parse(jsonString)
-    const convertedData = databaseExportConstructor(importData)
+    const validated = databaseExportSchema.parse(importData) as unknown as Partial<DatabaseExport>
+    const convertedData = databaseExportConstructor(validated)
 
     const ensureProjectDefaultSettings = (project: Project) => {
       const now = new Date()
