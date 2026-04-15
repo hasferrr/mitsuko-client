@@ -15,7 +15,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
-import { useEffect, useState, Fragment } from "react"
+import { useEffect, useState } from "react"
 import { useSessionStore } from "@/stores/ui/use-session-store"
 import { useQuery } from "@tanstack/react-query"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
@@ -29,7 +29,6 @@ interface Breadcrumb {
 }
 
 export function Navbar() {
-  const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[]>([])
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
 
   // User data
@@ -62,17 +61,10 @@ export function Navbar() {
   const tsData = useTranscriptionDataStore(state => state.data)
   const exData = useExtractionDataStore(state => state.data)
 
-  useEffect(() => {
-    const newBreadcrumbs: Breadcrumb[] = [{
-      name: "Dashboard",
-      link: "/dashboard",
-    }]
-
-    if (currentProject) {
-      newBreadcrumbs.push({ name: currentProject.name, link: currentProject.isBatch ? "/batch" : "/project" })
-    }
-    setBreadcrumbs(newBreadcrumbs)
-  }, [currentProject])
+  const breadcrumbs: Breadcrumb[] = [
+    { name: "Dashboard", link: "/dashboard" },
+    ...(currentProject ? [{ name: currentProject.name, link: currentProject.isBatch ? "/batch" : "/project" }] : []),
+  ]
 
   useEffect(() => {
     if (!isProcessing) {
@@ -93,22 +85,16 @@ export function Navbar() {
         </div>
         <Breadcrumb>
           <BreadcrumbList>
-            {breadcrumbs.map((breadcrumb, index) => (
-              <Fragment key={index}>
-                {index > 0 && <BreadcrumbSeparator />}
-                <BreadcrumbItem>
-                  {breadcrumb.link ? (
-                    <Link href={breadcrumb.link}>
-                      <BreadcrumbPage className="line-clamp-1 hover:underline">
-                        {breadcrumb.name}
-                      </BreadcrumbPage>
-                    </Link>
-                  ) : (
-                    <BreadcrumbPage className="line-clamp-1 hover:underline">{breadcrumb.name}</BreadcrumbPage>
-                  )}
-                </BreadcrumbItem>
-              </Fragment>
-            ))}
+            {breadcrumbs.flatMap((breadcrumb, index) => [
+              index > 0 && <BreadcrumbSeparator key={`sep-${index}`} />,
+              <BreadcrumbItem key={index}>
+                <Link href={breadcrumb.link}>
+                  <BreadcrumbPage className="line-clamp-1 hover:underline">
+                    {breadcrumb.name}
+                  </BreadcrumbPage>
+                </Link>
+              </BreadcrumbItem>,
+            ])}
           </BreadcrumbList>
         </Breadcrumb>
 
