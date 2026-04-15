@@ -6,8 +6,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useHistoryStore } from "@/stores/ui/use-history-store"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { HistoryItemDetails } from "./history-item-details"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -22,9 +21,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { CheckCircle, FileJson, Trash, XCircle } from "lucide-react"
+import { CheckCircle, FileJson, FileUp, Trash, XCircle } from "lucide-react"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { useHistoryStore, type HistoryItem } from "@/stores/ui/use-history-store"
+import { toast } from "sonner"
+import { HISTORY_MAX_ITEMS } from "@/constants/limits"
 
 interface HistoryPanelProps {
   isHistoryOpen: boolean
@@ -99,7 +101,9 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
     if (selectedHistoryIndex === null) return
     const updatedHistory = history.filter((_, index) => index !== selectedHistoryIndex)
     useHistoryStore.setState({ history: updatedHistory })
-    setSelectedHistoryIndex(null)
+    setSelectedHistoryIndex(
+      updatedHistory.length > 0 ? Math.max(0, selectedHistoryIndex - 1) : null
+    )
   }
 
   const handleDeleteAll = () => {
@@ -107,13 +111,94 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
     setSelectedHistoryIndex(null)
   }
 
+  function isValidHistoryItem(item: unknown): item is HistoryItem {
+    if (typeof item !== "object" || item === null) return false
+    const obj = item as Record<string, unknown>
+    return (
+      typeof obj.title === "string" &&
+      Array.isArray(obj.content) &&
+      Array.isArray(obj.json) &&
+      Array.isArray(obj.subtitles) &&
+      typeof obj.parsed === "object" && obj.parsed !== null &&
+      typeof obj.timestamp === "string"
+    )
+  }
+
+  const addHistoryItems = useHistoryStore((state) => state.addHistoryItems)
+
+  const handleExportAll = () => {
+    try {
+      const blob = new Blob([JSON.stringify(history)], { type: "application/json" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `mitsuko-history-${new Date().toISOString().split("T")[0]}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      toast.success("History exported successfully")
+    } catch (error) {
+      console.error("Error exporting history:", error)
+      toast.error("Failed to export history")
+    }
+  }
+
+  const handleImport = () => {
+    try {
+      const input = document.createElement("input")
+      input.type = "file"
+      input.accept = ".json"
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0]
+        if (!file) return
+        setSelectedFile(file)
+        setShowImportConfirm(true)
+      }
+      input.click()
+    } catch (error) {
+      console.error("Error importing history:", error)
+      toast.error("Failed to import history")
+    }
+  }
+
+  const handleConfirmImport = () => {
+    if (!selectedFile) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string
+        const data = JSON.parse(content)
+        if (!Array.isArray(data)) {
+          toast.error("Invalid file format: expected an array")
+          return
+        }
+        const validItems = data.filter(isValidHistoryItem)
+        if (validItems.length === 0) {
+          toast.error("No valid history items found in file")
+          return
+        }
+        addHistoryItems(validItems)
+        toast.success(`Imported ${validItems.length} history item${validItems.length > 1 ? "s" : ""}`)
+      } catch (error) {
+        console.error("Error importing history:", error)
+        toast.error("Failed to parse import file")
+      }
+    }
+    reader.readAsText(selectedFile)
+  }
+
+  const [showImportConfirm, setShowImportConfirm] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
   if (!isHistoryOpen) return null
 
   return (
     <>
       <ResizablePanelGroup
         orientation="horizontal"
-        className="max-w-4xl h-[1000px] border rounded-lg"
+        className="max-w-4xl mx-auto h-[1000px] border rounded-lg"
       >
         {/* Left Panel: History List */}
         <ResizablePanel defaultSize={30} minSize={20}>
@@ -168,6 +253,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
                     />
                   )}
                 </div>
+                <ScrollBar orientation="horizontal" />
               </ScrollArea>
             </ResizablePanel>
 
@@ -223,9 +309,30 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
 
       {/* History Action Buttons */}
       <div className="flex justify-center gap-4 mt-4 flex-wrap">
-        <Button variant="outline" disabled>
+        <Button variant="outline" disabled={history.length === 0} onClick={handleExportAll}>
           <FileJson className="size-4" /> Export All
         </Button>
+
+        <Button variant="outline" onClick={handleImport}>
+          <FileUp className="size-4" /> Import
+        </Button>
+
+        <AlertDialog open={showImportConfirm} onOpenChange={setShowImportConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Import History</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will append imported items to your existing history. History is limited to {HISTORY_MAX_ITEMS} items, so older entries may be removed. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleConfirmImport}>
+                Import
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         <AlertDialog>
           <AlertDialogTrigger asChild>

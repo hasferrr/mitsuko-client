@@ -2,8 +2,9 @@ import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/subtitles"
 import { indexedDBStorage } from "@/lib/indexed-db-storage"
+import { HISTORY_MAX_ITEMS } from "@/constants/limits"
 
-interface HistoryItem {
+export interface HistoryItem {
   title: string
   content: string[]
   json: SubOnlyTranslated[]
@@ -21,6 +22,7 @@ interface HistoryStore {
     subtitles: SubtitleTranslated[],
     parsed: Parsed
   ) => void
+  addHistoryItems: (items: HistoryItem[]) => void
   clearHistory: () => void
 }
 
@@ -34,7 +36,12 @@ export const useHistoryStore = create<HistoryStore>()(
           history: [
             ...state.history,
             { title, content, json, subtitles, parsed, timestamp },
-          ].slice(-50),
+].slice(-HISTORY_MAX_ITEMS),
+        }))
+      },
+      addHistoryItems: (items) => {
+        set((state) => ({
+          history: [...state.history, ...items].slice(-HISTORY_MAX_ITEMS),
         }))
       },
       clearHistory: () => set({ history: [] }),
