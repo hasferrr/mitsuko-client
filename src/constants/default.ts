@@ -27,7 +27,7 @@ const createBasicSettings = (modelName: string): Omit<BasicSettings, "id" | "cre
 })
 
 export const DEFAULT_BASIC_SETTINGS = createBasicSettings("Gemini 3 Flash")
-export const DEFAULT_EXTRACTION_BASIC_SETTINGS = createBasicSettings("DeepSeek V3.2 (Thinking)")
+export const DEFAULT_EXTRACTION_BASIC_SETTINGS = createBasicSettings("GLM 5.1")
 
 export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {
   temperature: 0.6,

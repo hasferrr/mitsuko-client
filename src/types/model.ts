@@ -6,6 +6,7 @@ export type ModelProvider =
   | "openai"
   | "deepseek"
   | "xai"
+  | "zai"
   | "unknown"
 
 export type UsageLevel =

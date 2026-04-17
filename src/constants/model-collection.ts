@@ -160,6 +160,19 @@ const RAW_FREE_MODELS: FreeModelCollection = {
           isUseStructuredOutput: false
         }
       },
+      {
+        name: "GLM 5.1",
+        maxInput: 202_800,
+        maxOutput: 65_536,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
     ]
   },
 }
@@ -608,6 +621,24 @@ const RAW_PAID_MODELS: PaidModelCollection = {
           isUseStructuredOutput: false
         }
       },
+    ]
+  },
+  "Z.ai": {
+    provider: "zai",
+    models: [
+      {
+        name: "GLM 5.1",
+        maxInput: 202_800,
+        maxOutput: 65_536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "medium",
+        default: {
+          temperature: 0.6,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      }
     ]
   },
 }

@@ -37,6 +37,7 @@ import {
   Grok,
   OpenAI,
   OpenRouter,
+  ZAI,
 } from "@lobehub/icons"
 
 const providerIconMap: Record<ModelProvider, React.ElementType> = {
@@ -45,6 +46,7 @@ const providerIconMap: Record<ModelProvider, React.ElementType> = {
   openai: OpenAI,
   deepseek: DeepSeek,
   xai: Grok,
+  zai: ZAI,
   unknown: OpenRouter,
 }
 
