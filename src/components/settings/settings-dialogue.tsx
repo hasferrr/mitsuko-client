@@ -176,6 +176,18 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                 advancedSettingsId={advancedSettingsId}
               />
               <Accordion type="multiple" className="border-none space-y-4">
+                <AccordionItem value="instruction-settings" className="border-none">
+                  <AccordionTrigger className="text-sm font-medium py-0">
+                    Instruction Settings
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-4 pb-2">
+                    <Card size="sm" className="ring-0 border">
+                      <CardContent className="space-y-6">
+                        <CustomInstructionsInput basicSettingsId={basicSettingsId} hidePresets />
+                      </CardContent>
+                    </Card>
+                  </AccordionContent>
+                </AccordionItem>
                 <AccordionItem value="advanced-settings" className="border-none">
                   <AccordionTrigger className="text-sm font-medium py-0">
                     Advanced Settings

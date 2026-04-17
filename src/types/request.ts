@@ -32,6 +32,7 @@ export interface ExtractionRequestBody {
   }
   baseURL: string
   model: string
+  customInstructions: string
   maxCompletionTokens?: number
   isBatch: boolean
   clientId?: string

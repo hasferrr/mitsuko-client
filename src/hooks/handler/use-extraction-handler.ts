@@ -76,6 +76,7 @@ export const useExtractionHandler = ({
     // Settings Store
     const modelDetail = useSettingsStore.getState().getModelDetail(basicSettingsId)
     const isUseCustomModel = useSettingsStore.getState().getIsUseCustomModel(basicSettingsId)
+    const customInstructions = useSettingsStore.getState().getCustomInstructions(basicSettingsId)
 
     // Advanced Settings Store
     const maxCompletionTokens = useAdvancedSettingsStore.getState().getMaxCompletionTokens(advancedSettingsId)
@@ -155,6 +156,7 @@ export const useExtractionHandler = ({
         },
         baseURL: isUseCustomModel ? customBaseUrl : "http://localhost:6969",
         model: isUseCustomModel ? customModel : modelDetail?.name || "",
+        customInstructions,
         maxCompletionTokens: isMaxCompletionTokensAuto ? undefined : minMax(
           maxCompletionTokens,
           MAX_COMPLETION_TOKENS_MIN,

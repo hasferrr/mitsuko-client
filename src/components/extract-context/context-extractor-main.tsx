@@ -23,7 +23,7 @@ import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { getContent } from "@/lib/parser/parser"
 import { cn, removeDoneTag } from "@/lib/utils"
-import { MaxCompletionTokenInput, ModelSelection, SubtitleCleanupSwitch } from "../settings"
+import { MaxCompletionTokenInput, ModelSelection, SubtitleCleanupSwitch, CustomInstructionsInput } from "../settings"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { useSessionStore } from "@/stores/ui/use-session-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
@@ -406,6 +406,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                   basicSettingsId={basicSettingsId}
                   advancedSettingsId={advancedSettingsId}
                 />
+                <CustomInstructionsInput basicSettingsId={basicSettingsId} hidePresets />
                 <MaxCompletionTokenInput
                   basicSettingsId={basicSettingsId}
                   advancedSettingsId={advancedSettingsId}

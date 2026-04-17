@@ -13,9 +13,10 @@ import { CustomInstructionsSaveDialog } from "@/components/settings/custom-instr
 
 interface Props {
   basicSettingsId: string
+  hidePresets?: boolean
 }
 
-export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
+export const CustomInstructionsInput = memo(({ basicSettingsId, hidePresets }: Props) => {
   const customInstructions = useSettingsStore((state) => state.getCustomInstructions(basicSettingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
   const setCustomInstructions = (instructions: string) => setBasicSettingsValue(basicSettingsId, "customInstructions", instructions)
@@ -47,13 +48,15 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium">Custom Instructions</label>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setIsPresetsDialogOpen(true)}
-          >
-            <List className="size-4" />
-            Presets
-          </Button>
+          {!hidePresets && (
+            <Button
+              variant="outline"
+              onClick={() => setIsPresetsDialogOpen(true)}
+            >
+              <List className="size-4" />
+              Presets
+            </Button>
+          )}
           <CustomInstructionsLibraryControls
             customInstructions={customInstructions}
             onSelectFromLibrary={handleLibrarySelect}
@@ -65,39 +68,41 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
         value={customInstructions}
         onChange={handleCustomInstructionsChange}
         className="min-h-[120px] h-[120px] max-h-[300px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
-        placeholder="Provide specific instructions to guide the translation model..."
+        placeholder="Provide specific instructions to guide the model..."
         onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`)}
       />
       <p className="text-xs text-muted-foreground">
-        Guide the model's translation style, tone, or specific terminology usage.
+        Guide the model's style, tone, or specific terminology usage.
       </p>
 
-      <Dialog open={isPresetsDialogOpen} onOpenChange={setIsPresetsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Select Custom Instruction Preset</DialogTitle>
-            <DialogDescription>
-              Choose a preset to guide the translation model.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="max-h-[400px] overflow-y-auto">
-            <div className="space-y-2 mr-1">
-              {customInstructionPresets.map((preset) => (
-                <div
-                  key={preset.title}
-                  className="p-3 border rounded-md cursor-pointer hover:bg-muted"
-                  onClick={() => handlePresetSelect(preset.instruction)}
-                >
-                  <div className="font-medium">{preset.title}</div>
-                  <div className="text-sm text-muted-foreground line-clamp-2">
-                    {preset.instruction}
+      {!hidePresets && (
+        <Dialog open={isPresetsDialogOpen} onOpenChange={setIsPresetsDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Select Custom Instruction Preset</DialogTitle>
+              <DialogDescription>
+                Choose a preset to guide the translation model.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="max-h-[400px] overflow-y-auto">
+              <div className="space-y-2 mr-1">
+                {customInstructionPresets.map((preset) => (
+                  <div
+                    key={preset.title}
+                    className="p-3 border rounded-md cursor-pointer hover:bg-muted"
+                    onClick={() => handlePresetSelect(preset.instruction)}
+                  >
+                    <div className="font-medium">{preset.title}</div>
+                    <div className="text-sm text-muted-foreground line-clamp-2">
+                      {preset.instruction}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      )}
 
     </div>
   )
