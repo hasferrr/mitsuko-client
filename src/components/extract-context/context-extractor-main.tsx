@@ -220,6 +220,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
     setIsEditingResult(newEditingState)
 
     if (newEditingState) {
+      setActiveTab("result")
       setTimeout(() => {
         contextResultEditRef.current?.focus()
         window.scrollTo({
@@ -277,7 +278,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
               setEpisodeNumber(currentId, e.target.value)
               setIsEpisodeNumberValid(true)
             }}
-            placeholder="e.g., S01E01"
+            placeholder={'e.g., "S01E01" or "1"'}
             className={cn("bg-background dark:bg-muted/30",
               !isEpisodeNumberValid && "ring-2 ring-destructive"
             )}
