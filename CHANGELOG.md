@@ -3,7 +3,7 @@
 <!--
 All notable changes to this project will be documented in this file.
 
-If you want to update the changelog, please use the same style. The intent is for users to get rid of the technical details and focus on the features.
+Use the same style. The intent is for users to get rid of the technical details and focus on the features.
 -->
 
 🚀 **We're just getting started!** 🌟
@@ -13,6 +13,16 @@ If you want to update the changelog, please use the same style. The intent is fo
 ---
 
 ## 2026
+
+### April 17
+
+- 🤖 **Model Updates:** Added GLM 5.1, Z.ai's latest model with strong multilingual capabilities.
+- 🎯 **Custom Instructions for Extraction:** You can now provide custom instructions when extracting context, giving you more control over how the AI analyzes your subtitles.
+- ✨ **Improved Navigation & UX:**
+  - Click on items in the processing popover to jump directly to the corresponding feature.
+  - Creating a new translation, transcription, or extraction now automatically navigates you to it. Toggle this off in User Settings if you prefer the old behavior.
+  - The ASS guidelines dialog now has a "Don't show again" option, with a reset button available in User Settings.
+- 🐛 **Import Fix:** Project order is now preserved consistently when importing a database backup.
 
 ### April 12
 
@@ -26,8 +36,7 @@ If you want to update the changelog, please use the same style. The intent is fo
 
 - ⚙️ **Independent Feature Settings:** You can now enable custom default settings for Translation, Extraction, and Transcription independently from one another within your projects.
 - 🎛️ **Better Global Settings:** The User Settings panel has been reorganized with dedicated buttons to easily configure your global defaults for each tool individually.
-- 🤖 **Model Updates:**
-  - Added GPT-5.4, GPT-5.4 mini, and GPT-5.4 nano from OpenAI's latest model family.
+- 🤖 **Model Updates:** Added GPT-5.4, GPT-5.4 mini, and GPT-5.4 nano from OpenAI's latest model family.
 
 ### March 6
 
