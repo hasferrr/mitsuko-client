@@ -77,16 +77,15 @@ export const StartIndexInput = memo(({ advancedSettingsId }: Props) => {
             <Button
               type="button"
               variant="ghost"
-              size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
+              size="icon-sm"
+              className="absolute right-2 top-0 bottom-0 my-auto hover:bg-transparent"
               onClick={handleFindEmptyTranslation}
             >
               <ChevronsRight className="size-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="font-medium text-center">Find the first subtitle with empty</p>
-            <p className="font-medium text-center">translation and set it as the start index</p>
+            <p className="font-medium text-center">Find the first subtitle with empty translation and set it as the start index</p>
           </TooltipContent>
         </Tooltip>
       </div>

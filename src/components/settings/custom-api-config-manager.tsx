@@ -122,8 +122,8 @@ export function CustomApiConfigManager() {
         <Button
           type="button"
           variant="ghost"
-          size="icon"
-          className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
+          size="icon-sm"
+          className="absolute right-2 top-0 bottom-0 my-auto hover:bg-transparent"
           onClick={() => setShowApiKey(!showApiKey)}
         >
           {showApiKey ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
