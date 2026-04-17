@@ -58,7 +58,7 @@ export default async function CreditUsage() {
       </h3>
       <p>
         Credit costs vary based on the specific AI model used. Costs are typically calculated based on the number of input and output tokens processed.
-        More models will be added in the future. See the estimated costs below.
+        More models will be added in the future. Prices are aligned to original API prices with a 0.2 service fee. See the estimated costs below.
       </p>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">

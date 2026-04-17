@@ -26,8 +26,7 @@ const faqData = [
     question: "How does the context extraction feature work?",
     answer: [
       "It analyzes subtitles to track characters, settings, and relationships, creating reusable context documents. You can use this context document to inform the translation.",
-      "To use this feature, you need to extract context from the first episode. Then, you can use this context document to inform the translation of the second episode.",
-      "You can also use this feature by extracting context to inform the translation of the same episode.",
+      "Use the extracted context to inform the translation, and build context from a previous episode for the next episode, keeping terminology and character names consistent.",
     ],
   },
   {

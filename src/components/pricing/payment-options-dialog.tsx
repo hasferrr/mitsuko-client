@@ -320,7 +320,6 @@ export function PaymentOptionsDialog({
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-xs text-[11px]">
                     <p>
-                      Digital credits are delivered immediately and cannot be returned once accessed.
                       By checking this box, you confirm waiver of any refund rights under applicable consumer protection laws, including 14-day cooling-off periods where applicable.
                     </p>
                   </TooltipContent>
