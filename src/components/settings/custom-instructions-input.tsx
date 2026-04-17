@@ -21,7 +21,6 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
   const setCustomInstructions = (instructions: string) => setBasicSettingsValue(basicSettingsId, "customInstructions", instructions)
 
   const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
-  const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false)
 
   const { setHasChanges } = useUnsavedChanges()
 
@@ -71,13 +70,6 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
       />
       <p className="text-xs text-muted-foreground">
         Guide the model's translation style, tone, or specific terminology usage.
-        {" "}
-        <span
-          className="hover:underline cursor-pointer"
-          onClick={() => setIsHelpDialogOpen(true)}
-        >
-          (Info)
-        </span>
       </p>
 
       <Dialog open={isPresetsDialogOpen} onOpenChange={setIsPresetsDialogOpen}>
@@ -107,17 +99,6 @@ export const CustomInstructionsInput = memo(({ basicSettingsId }: Props) => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isHelpDialogOpen} onOpenChange={setIsHelpDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Tips for Custom Instructions</DialogTitle>
-          </DialogHeader>
-          <div className="text-base text-foreground space-y-2">
-            <p>Custom instructions help guide the model to follow specific patterns, maintain consistent terminology, or adopt particular styles.</p>
-            <p>Be concise, direct, and specific to avoid confusing the model. Focus on clear examples and explicit rules.</p>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 })
