@@ -289,7 +289,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         isPaid: true,
         usage: "very high",
         default: {
-          temperature: 0.6,
+          temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -302,7 +302,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         isPaid: true,
         usage: "medium",
         default: {
-          temperature: 0.6,
+          temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -320,7 +320,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         isPaid: true,
         usage: "high",
         default: {
-          temperature: 0.6,
+          temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -333,7 +333,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         isPaid: true,
         usage: "low",
         default: {
-          temperature: 0.6,
+          temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -346,7 +346,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         isPaid: true,
         usage: "high",
         default: {
-          temperature: 0.6,
+          temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -359,7 +359,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         isPaid: true,
         usage: "low",
         default: {
-          temperature: 0.6,
+          temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }

@@ -30,7 +30,7 @@ export const DEFAULT_BASIC_SETTINGS = createBasicSettings("Gemini 3 Flash")
 export const DEFAULT_EXTRACTION_BASIC_SETTINGS = createBasicSettings("GLM 5.1")
 
 export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {
-  temperature: 0.6,
+  temperature: 1,
   startIndex: 1,
   endIndex: 100000,
   splitSize: 100,
