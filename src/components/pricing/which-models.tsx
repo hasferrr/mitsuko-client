@@ -41,7 +41,7 @@ export default function WhichModels({ className }: WhichModelsProps) {
             <li>If the results meet your needs, you can continue using them.</li>
             <li>If you need higher quality results, you can gradually switch to more expensive models.</li>
           </ul>
-          <p>Generally, <span className="font-semibold">Gemini Pro</span>, <span className="font-semibold">GPT-5</span>, and <span className="font-semibold">Claude Sonnet</span> provide excellent results for most use cases and languages.</p>
+          <p>Generally, <span className="font-semibold">Gemini Pro</span> and <span className="font-semibold">GPT-5</span> provide excellent results for most use cases and languages.</p>
         </div>
       </div>
       </CardContent>
