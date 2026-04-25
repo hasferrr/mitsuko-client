@@ -119,8 +119,8 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "DeepSeek V3.2 (Thinking)",
-        subName: "deepseek-v3.2 / deepseek-reasoner",
+        name: "DeepSeek V3.2",
+        subName: "deepseek-v3.2 (thinking)",
         maxInput: 131072,
         maxOutput: 65536,
         structuredOutput: true,
@@ -130,20 +130,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false
-        }
-      },
-      {
-        name: "DeepSeek V3.2",
-        subName: "deepseek-v3.2 / deepseek-chat",
-        maxInput: 131072,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
         }
       },
       {
@@ -580,8 +566,36 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "deepseek",
     models: [
       {
-        name: "DeepSeek V3.2 (Thinking)",
-        subName: "deepseek-v3.2 / deepseek-reasoner",
+        name: "DeepSeek V4 Pro",
+        subName: "deepseek-v4-pro",
+        maxInput: 1_048_576,
+        maxOutput: 65_536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "medium",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "DeepSeek V4 Flash",
+        subName: "deepseek-v4-flash",
+        maxInput: 1_048_576,
+        maxOutput: 65_536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "low",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "DeepSeek V3.2",
+        subName: "deepseek-v3.2 (thinking)",
         maxInput: 131072,
         maxOutput: 65536,
         structuredOutput: true,
@@ -591,20 +605,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
           temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false
-        }
-      },
-      {
-        name: "DeepSeek V3.2",
-        subName: "deepseek-v3.2 / deepseek-chat",
-        maxInput: 131072,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "low",
-        default: {
-          temperature: 0.6,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
         }
       },
       {
