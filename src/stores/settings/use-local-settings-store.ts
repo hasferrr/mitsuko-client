@@ -95,7 +95,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
     }),
     {
       name: "api-settings-storage",
-      version: 4,
+      version: 5,
       migrate: (persistedState, version) => {
         if (version === 0) {
           const oldState = persistedState as {
@@ -147,6 +147,13 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
           const state = persistedState as { isLegacyCreateBehavior?: boolean }
           if (typeof state.isLegacyCreateBehavior !== "boolean") {
             state.isLegacyCreateBehavior = false
+          }
+        }
+
+        if (version < 5) {
+          const state = persistedState as { isAutoTemperatureEnabled?: boolean }
+          if (state.isAutoTemperatureEnabled === false) {
+            state.isAutoTemperatureEnabled = true
           }
         }
 
