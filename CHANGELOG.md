@@ -14,6 +14,10 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### April 26
+
+- 🤖 **Model Updates:** Added DeepSeek V4 Pro and DeepSeek V4 Flash, featuring 1M token context windows with hybrid attention for efficient long-context processing. Removed the non-thinking DeepSeek V3.2 variant.
+
 ### April 17
 
 - 🤖 **Model Updates:** Added GLM 5.1, Z.ai's latest model with strong multilingual capabilities.
