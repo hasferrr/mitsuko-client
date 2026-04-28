@@ -24,7 +24,7 @@ Sentry.init({
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
 
 posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-  api_host: '/api/occurrunces',
+  api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || '/api/occurrunces',
   ui_host: 'https://us.posthog.com',
   defaults: '2025-11-30',
   capture_exceptions: true,
