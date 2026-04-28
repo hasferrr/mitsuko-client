@@ -5,6 +5,8 @@ import { supabase } from "./lib/supabase"
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  tunnel: process.env.NEXT_PUBLIC_SENTRY_TUNNEL,
+  debug: process.env.NODE_ENV === 'development',
   integrations: [
     Sentry.replayIntegration({
       maskAllText: false,
@@ -14,7 +16,7 @@ Sentry.init({
       supabaseClient: supabase,
     }),
   ],
-  tracesSampleRate: 1,
+  tracesSampleRate: 0.2,
   enableLogs: true,
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 1.0,
