@@ -16,7 +16,7 @@ Sentry.init({
       supabaseClient: supabase,
     }),
   ],
-  tracesSampleRate: 0.2,
+  tracesSampleRate: 1,
   enableLogs: true,
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 1.0,
