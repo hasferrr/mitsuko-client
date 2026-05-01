@@ -119,6 +119,20 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
+        name: "DeepSeek V4 Pro",
+        subName: "deepseek-v4-pro",
+        maxInput: 1_048_576,
+        maxOutput: 384_000,
+        structuredOutput: false,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: false
+        }
+      },
+      {
         name: "DeepSeek V3.2",
         subName: "deepseek-v3.2 (thinking)",
         maxInput: 131072,
@@ -299,12 +313,12 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "xai",
     models: [
       {
-        name: "Grok 4.20",
-        maxInput: 2_000_000,
-        maxOutput: 2_000_000,
+        name: "Grok 4.3",
+        maxInput: 1_000_000,
+        maxOutput: 1_000_000,
         structuredOutput: true,
         isPaid: true,
-        usage: "high",
+        usage: "medium",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -569,28 +583,28 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         name: "DeepSeek V4 Pro",
         subName: "deepseek-v4-pro",
         maxInput: 1_048_576,
-        maxOutput: 65_536,
-        structuredOutput: true,
+        maxOutput: 384_000,
+        structuredOutput: false,
         isPaid: true,
         usage: "medium",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
+          isUseStructuredOutput: false
         }
       },
       {
         name: "DeepSeek V4 Flash",
         subName: "deepseek-v4-flash",
         maxInput: 1_048_576,
-        maxOutput: 65_536,
-        structuredOutput: true,
+        maxOutput: 384_000,
+        structuredOutput: false,
         isPaid: true,
         usage: "low",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
+          isUseStructuredOutput: false
         }
       },
       {
