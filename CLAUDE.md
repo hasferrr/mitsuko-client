@@ -25,6 +25,9 @@ bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.
 - **Persistence**: Dexie.js (IndexedDB) for offline-first project data
 - **UI**: Radix UI primitives + Tailwind CSS
 - **Auth**: Supabase Auth
+- **Analytics**: Sentry (error tracking), PostHog (product analytics)
+- **Payment**: Midtrans/Snap
+- **Drag & Drop**: @dnd-kit
 - **Backend**: External API at `NEXT_PUBLIC_API_URL` (chizuru-translator)
 
 ## Architecture
@@ -50,6 +53,7 @@ bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.
 - `src/lib/translation/` - Translation utilities: context memory strategies (full, minimal, split) for AI completion requests
 - `src/components/` - Feature components organized by domain (translate, batch, transcribe)
 - `src/components/ui/` - Shadcn/Radix UI primitives (auto-generated, avoid editing)
+- `src/components/ui-custom/` - Shared composed components (combo-box, virtualized-list, drag-and-drop, various dialogs)
 - `src/components/transcribe/` - Transcription UI split into sub-components (upload-tab, select-tab, controls, result-panel, next-actions) composed by `transcription-main.tsx`
 - `src/types/` - TypeScript interfaces for Project, Translation, Transcription, etc.
 - `src/constants/` - App constants and defaults
@@ -109,6 +113,7 @@ All AI processing happens in the backend (chizuru-translator). The frontend:
 1. Sends requests via SSE streaming (`src/lib/api/stream.ts`)
 2. Uses Supabase Auth tokens for authentication
 3. Handles credit management and reservations via the API
+4. Transcription can use a separate backend via `NEXT_PUBLIC_TRANSCRIPTION_API_URL` (falls back to main URL)
 
 ### Database Migrations
 
@@ -136,7 +141,7 @@ Do NOT re-add classes that components already provide. Key defaults:
 
 - **Card**: `bg-card ring-1 ring-foreground/10 rounded-xl py-4 gap-4`. Has `size="sm"` (py-3, gap-3, CardContent px-3). Do NOT add `border`, `bg-card`, `rounded-lg` on Card.
 - **CardHeader**: `px-4`. Card's `py-4` + `gap-4` handles vertical spacing — do NOT add `pb-*`/`py-*`.
-- **CardContent**: `px-4` (group-data-[size=sm]/card:px-3). Do NOT add `p-4` (doubles padding). Use `space-y-4` on CardContent instead of `mb-*` on children.
+- **CardContent**: `px-4` (group-data-[size=sm]/card:px-3). Do NOT add `p-4` (doubles padding). Use `flex flex-col gap-4` on CardContent instead of `mb-*` on children.
 - **CardFooter**: `p-4 border-t`. Do NOT add `pb-4` or `border-t`.
 - **Button**: sizes — default(h-8), xs(h-6), sm(h-7), lg(h-9), icon(size-8), icon-lg(size-9). All sizes include `gap`. Do NOT add `mr-2` on icons inside Button; do NOT add manual `h-*`/`px-*` that override the size variant.
 - **DialogContent**: `w-full max-w-[calc(100%-2rem)] p-4 gap-4 rounded-xl`. Do NOT add `w-full` or `pt-*`.
@@ -171,7 +176,7 @@ Use semantic tokens instead of hardcoded colors:
 ### Spacing Conventions
 
 - Page wrappers: `py-6 px-4 max-w-5xl mx-auto`
-- Use `space-y-4` on CardContent instead of `mb-*` on individual children
+- Use `flex flex-col gap-4` on CardContent instead of `mb-*` on individual children
 - When parent has `gap-*`, child `mb-*`/`mt-*` is redundant — remove it
 - `gap-1.5` is the standard small gap (not `gap-[6px]`)
 - Use `flex`/`grid` with `gap-*` instead of `space-x-*`/`space-y-*` (Tailwind v4 changed the selector, breaking inline children):
