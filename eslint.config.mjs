@@ -12,6 +12,7 @@ const eslintConfig = defineConfig([...nextTypescript, ...nextVitals, {
   },
 }, globalIgnores([
   '.next/**',
+  '.netlify/**',
   'out/**',
   'build/**',
   'next-env.d.ts',
