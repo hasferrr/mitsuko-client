@@ -159,6 +159,7 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       isDefaultTranslationEnabled: typeof project.isDefaultTranslationEnabled === 'boolean' ? project.isDefaultTranslationEnabled : false,
       isDefaultExtractionEnabled: typeof project.isDefaultExtractionEnabled === 'boolean' ? project.isDefaultExtractionEnabled : false,
       isDefaultTranscriptionEnabled: typeof project.isDefaultTranscriptionEnabled === 'boolean' ? project.isDefaultTranscriptionEnabled : false,
+      isArchived: project.isArchived ?? false,
     }
   })
 
@@ -214,6 +215,7 @@ function projectConstructor(project: Partial<Project>): Project {
     isDefaultTranslationEnabled: typeof project.isDefaultTranslationEnabled === 'boolean' ? project.isDefaultTranslationEnabled : false,
     isDefaultExtractionEnabled: typeof project.isDefaultExtractionEnabled === 'boolean' ? project.isDefaultExtractionEnabled : false,
     isDefaultTranscriptionEnabled: typeof project.isDefaultTranscriptionEnabled === 'boolean' ? project.isDefaultTranscriptionEnabled : false,
+    isArchived: project.isArchived ?? false,
   }
 }
 

@@ -78,8 +78,9 @@ const data = {
 
 export function AppSidebar({ className, ...props }: React.ComponentProps<typeof Sidebar>) {
   const projects = useProjectStore((state) => state.projects)
-  const visibleProjects = projects.filter(p => !p.isBatch)
-  const batchProjects = projects.filter(p => p.isBatch)
+  const currentProject = useProjectStore((state) => state.currentProject)
+  const visibleProjects = projects.filter(p => !p.isBatch && (!p.isArchived || currentProject?.id === p.id))
+  const batchProjects = projects.filter(p => p.isBatch && (!p.isArchived || currentProject?.id === p.id))
   const createProject = useProjectStore((state) => state.createProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const router = useRouter()

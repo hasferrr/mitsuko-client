@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -8,13 +8,19 @@ import {
   Files,
   Plus,
   Loader2,
+  Archive,
+  ChevronDown,
 } from "lucide-react"
+import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
+import { hasActiveOperations } from "@/stores/utils/active-operations"
 import BatchMain from "./batch-main"
 import { SortableBatchCard } from "./sortable-batch-card"
+import { ArchivedBatchCard } from "./archived-batch-card"
 import {
   DndContext,
   closestCenter,
@@ -32,6 +38,7 @@ import {
 } from "@dnd-kit/sortable"
 
 export default function Batch() {
+  const [archivedCollapsed, setArchivedCollapsed] = useState(true)
   const batch = useProjectStore((state) => state.currentProject)
   const projects = useProjectStore((state) => state.projects)
   const loading = useProjectStore(state => state.loading)
@@ -39,7 +46,10 @@ export default function Batch() {
   const createProject = useProjectStore((state) => state.createProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const reorderProjects = useProjectStore(state => state.reorderProjects)
+  const updateProject = useProjectStore(state => state.updateProject)
   const batchProjects = projects.filter(p => p.isBatch)
+  const activeBatchProjects = batchProjects.filter(p => !p.isArchived)
+  const archivedBatchProjects = batchProjects.filter(p => p.isArchived)
 
   // Load data for selected batch
   const translationData = useTranslationDataStore((state) => state.data)
@@ -64,6 +74,25 @@ export default function Batch() {
       const newIndex = projects.findIndex(p => p.id === over.id)
       const newOrder = arrayMove(projects.map(p => p.id), oldIndex, newIndex)
       await reorderProjects(newOrder)
+    }
+  }
+
+  const checkActiveOperations = (projectId: string) => {
+    const project = projects.find(p => p.id === projectId)
+    if (!project) return false
+    return hasActiveOperations(project)
+  }
+
+  const handleToggleArchive = async (projectId: string, archive: boolean) => {
+    if (archive && checkActiveOperations(projectId)) {
+      toast.error("Cannot archive — finish or cancel active operations first")
+      return
+    }
+    const updated = await updateProject(projectId, { isArchived: archive })
+    if (updated) {
+      toast.success(archive ? "Project archived" : "Project unarchived")
+    } else {
+      toast.error(`Failed to ${archive ? "archive" : "unarchive"} project`)
     }
   }
 
@@ -125,7 +154,7 @@ export default function Batch() {
   }
 
   if (!batch || !batch.isBatch) {
-    const skeletonCount = batchProjects.length > 0 ? batchProjects.length : 3
+    const skeletonCount = activeBatchProjects.length > 0 ? activeBatchProjects.length : 3
     const showSkeletons = !hasLoaded
     const isCreateDisabled = !hasLoaded || loading
     return (
@@ -148,7 +177,7 @@ export default function Batch() {
               <BatchCardSkeleton key={`batch-skeleton-${index}`} />
             ))}
           </div>
-        ) : batchProjects.length === 0 ? (
+        ) : activeBatchProjects.length === 0 && archivedBatchProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
             <Files className="size-12 text-muted-foreground mb-4" />
             <h2 className="text-xl font-medium mb-2 text-center">Batch Projects</h2>
@@ -165,16 +194,38 @@ export default function Batch() {
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={batchProjects.map(p => p.id)}
+              items={activeBatchProjects.map(p => p.id)}
               strategy={rectSortingStrategy}
             >
               <div translate="no" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {batchProjects.map((b) => (
-                  <SortableBatchCard key={b.id} project={b} onSelect={(id) => setCurrentProject(id)} />
+                {activeBatchProjects.map((b) => (
+                  <SortableBatchCard key={b.id} project={b} onSelect={(id) => setCurrentProject(id)} onToggleArchive={handleToggleArchive} />
                 ))}
               </div>
             </SortableContext>
           </DndContext>
+        )}
+
+        {archivedBatchProjects.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <button
+              type="button"
+              onClick={() => setArchivedCollapsed(v => !v)}
+              className="flex items-center gap-2 w-full text-left"
+            >
+              <ChevronDown className={cn("size-4 text-muted-foreground transition-transform", archivedCollapsed && "-rotate-90")} />
+              <Archive className="size-4 text-muted-foreground" />
+              <h3 className="text-sm font-medium text-muted-foreground">Archived</h3>
+              <span className="text-xs text-muted-foreground">({archivedBatchProjects.length})</span>
+            </button>
+            {!archivedCollapsed && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {archivedBatchProjects.map(b => (
+                  <ArchivedBatchCard key={b.id} project={b} onSelect={(id) => setCurrentProject(id)} onToggleArchive={handleToggleArchive} />
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
     )

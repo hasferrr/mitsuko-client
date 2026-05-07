@@ -145,6 +145,10 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   updateProject: async (id, update) => {
     set({ loading: true })
     try {
+      const project = get().projects.find(p => p.id === id)
+      const wasArchived = project?.isArchived ?? false
+      const isArchiving = !wasArchived && update.isArchived === true
+      const isUnarchiving = wasArchived && update.isArchived === false
       const updatedProject = await updateProjectDB(id, update)
       set((state) => ({
         projects: state.projects.map(p =>
@@ -155,6 +159,15 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
           : state.currentProject,
         loading: false
       }))
+      if (isArchiving || isUnarchiving) {
+        const projects = get().projects
+        const activeIds = projects.filter(p => p.id !== id && !p.isArchived).map(p => p.id)
+        const archivedIds = projects.filter(p => p.id !== id && p.isArchived).map(p => p.id)
+        const newOrder = isUnarchiving
+          ? [id, ...activeIds, ...archivedIds]
+          : [...activeIds, id, ...archivedIds]
+        await get().reorderProjects(newOrder)
+      }
       return updatedProject
     } catch (error) {
       console.error('Failed to update project', error)

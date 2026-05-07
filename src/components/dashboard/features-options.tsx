@@ -71,7 +71,7 @@ export function FeaturesOptions() {
   const handleOptionClick = async (option: string) => {
     setSelectedOption(option)
 
-    let defaultProject = projects.find(p => p.name === "Default" && !p.isBatch)
+    let defaultProject = projects.find(p => p.name === "Default" && !p.isBatch && !p.isArchived)
     if (!defaultProject) {
       defaultProject = await createProject("Default")
     }

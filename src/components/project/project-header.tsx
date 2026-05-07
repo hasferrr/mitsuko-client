@@ -1,14 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Edit, Upload, ArrowLeftRight, Trash } from "lucide-react"
+import { ArrowLeft, Edit, Upload, ArrowLeftRight, Trash, Archive, ArchiveRestore } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { EditDialogue } from "@/components/ui-custom/edit-dialogue"
 import { DeleteDialogue } from "@/components/ui-custom/delete-dialogue"
+import { ArchiveDialog } from "@/components/ui-custom/archive-dialog"
 import { Project } from "@/types/project"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { hasActiveOperations } from "@/stores/utils/active-operations"
 import { exportProject } from "@/lib/db/db-io"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -22,6 +24,8 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isConvertModalOpen, setIsConvertModalOpen] = useState(false)
   const [isProcessingConvert, setIsProcessingConvert] = useState(false)
+  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false)
+  const [isProcessingArchive, setIsProcessingArchive] = useState(false)
 
   const router = useRouter()
   const renameProject = useProjectStore((state) => state.renameProject)
@@ -33,6 +37,8 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
     if (currentProject.isBatch) router.push("/batch")
     else setCurrentProject(null)
   }
+
+  const checkActiveOperations = () => hasActiveOperations(currentProject)
 
   const handleSave = async (newName: string) => {
     await renameProject(currentProject.id, newName.trim())
@@ -65,6 +71,37 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
     }
   }
 
+  const handleToggleArchive = async (archive: boolean) => {
+    const updated = await updateProjectStore(currentProject.id, { isArchived: archive })
+    if (updated) {
+      toast.success(archive ? "Project archived" : "Project unarchived")
+    } else {
+      toast.error(`Failed to ${archive ? "archive" : "unarchive"} project`)
+    }
+  }
+
+  const handleOpenArchiveDialog = () => {
+    if (checkActiveOperations()) {
+      toast.error("Cannot archive — finish or cancel active operations first")
+      return
+    }
+    setIsArchiveDialogOpen(true)
+  }
+
+  const handleConfirmArchive = async () => {
+    setIsProcessingArchive(true)
+    const updated = await updateProjectStore(currentProject.id, { isArchived: true })
+    setIsProcessingArchive(false)
+    if (updated) {
+      toast.success("Project archived")
+      setCurrentProject(null)
+      if (currentProject.isBatch) router.push("/batch")
+    } else {
+      toast.error("Failed to archive project")
+    }
+    setIsArchiveDialogOpen(false)
+  }
+
   const handleToggleBatch = async (): Promise<boolean> => {
     try {
       const updated = await updateProjectStore(currentProject.id, { isBatch: !currentProject.isBatch })
@@ -90,6 +127,7 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
             </Button>
             <h1>{currentProject.name}</h1>
             {currentProject.isBatch && <Badge className="ml-2">Batch Project</Badge>}
+            {currentProject.isArchived && <Badge variant="secondary" className="ml-2">Archived</Badge>}
           </div>
           <div className="flex flex-wrap gap-4 text-sm">
             <button
@@ -113,6 +151,23 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
               <ArrowLeftRight size={20} />
               Convert
             </button>
+            {currentProject.isArchived ? (
+              <button
+                onClick={() => handleToggleArchive(false)}
+                className="flex items-center gap-2 hover:underline"
+              >
+                <ArchiveRestore size={20} />
+                Unarchive
+              </button>
+            ) : (
+              <button
+                onClick={handleOpenArchiveDialog}
+                className="flex items-center gap-2 hover:underline"
+              >
+                <Archive size={20} />
+                Archive
+              </button>
+            )}
             <button
               onClick={() => setIsDeleteModalOpen(true)}
               className="flex items-center gap-2 hover:underline"
@@ -138,6 +193,13 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
         handleDelete={handleDelete}
         isDeleteModalOpen={isDeleteModalOpen}
         setIsDeleteModalOpen={setIsDeleteModalOpen}
+      />
+
+      <ArchiveDialog
+        isOpen={isArchiveDialogOpen}
+        onOpenChange={setIsArchiveDialogOpen}
+        onConfirm={handleConfirmArchive}
+        isProcessing={isProcessingArchive}
       />
 
       <Dialog open={isConvertModalOpen} onOpenChange={setIsConvertModalOpen}>

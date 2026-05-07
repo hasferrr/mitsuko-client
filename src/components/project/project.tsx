@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, FileText, GripVertical, MoreHorizontal, Trash, Upload, Loader2 } from "lucide-react"
+import { Plus, FileText, GripVertical, MoreHorizontal, Trash, Upload, Loader2, Archive, ArchiveRestore, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -34,10 +34,13 @@ import { toast } from "sonner"
 import { exportProject } from "@/lib/db/db-io"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { useState } from "react"
+import { hasActiveOperations } from "@/stores/utils/active-operations"
 
 export const Project = () => {
   const projects = useProjectStore(state => state.projects)
-  const visibleProjects = projects.filter(p => !p.isBatch)
+  const nonBatchProjects = projects.filter(p => !p.isBatch)
+  const activeProjects = nonBatchProjects.filter(p => !p.isArchived)
+  const archivedProjects = nonBatchProjects.filter(p => p.isArchived)
   const currentProject = useProjectStore(state => state.currentProject)
   const loading = useProjectStore(state => state.loading)
   const hasLoaded = useProjectStore(state => state.hasLoaded)
@@ -45,9 +48,11 @@ export const Project = () => {
   const setCurrentProject = useProjectStore(state => state.setCurrentProject)
   const reorderProjects = useProjectStore(state => state.reorderProjects)
   const deleteProject = useProjectStore(state => state.deleteProject)
+  const updateProject = useProjectStore(state => state.updateProject)
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
+  const [archivedCollapsed, setArchivedCollapsed] = useState(true)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -97,6 +102,25 @@ export const Project = () => {
       await deleteProject(projectToDelete)
       setIsDeleteModalOpen(false)
       setProjectToDelete(null)
+    }
+  }
+
+  const checkActiveOperations = (projectId: string) => {
+    const project = projects.find(p => p.id === projectId)
+    if (!project) return false
+    return hasActiveOperations(project)
+  }
+
+  const handleToggleArchive = async (projectId: string, archive: boolean) => {
+    if (archive && checkActiveOperations(projectId)) {
+      toast.error("Cannot archive — finish or cancel active operations first")
+      return
+    }
+    const updated = await updateProject(projectId, { isArchived: archive })
+    if (updated) {
+      toast.success(archive ? "Project archived" : "Project unarchived")
+    } else {
+      toast.error(`Failed to ${archive ? "archive" : "unarchive"} project`)
     }
   }
 
@@ -171,6 +195,15 @@ export const Project = () => {
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation()
+                    handleToggleArchive(project.id, true)
+                  }}
+                >
+                  <Archive className="size-4" />
+                  Archive
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
                     setProjectToDelete(project.id)
                     setIsDeleteModalOpen(true)
                   }}
@@ -204,8 +237,74 @@ export const Project = () => {
     )
   }
 
+  const ArchivedProjectCard = ({ project }: { project: typeof projects[number] }) => {
+    const totalItems = project.translations.length + project.transcriptions.length + project.extractions.length
+
+    return (
+      <Card
+        className="cursor-pointer hover:ring-primary transition-colors overflow-hidden h-full flex flex-col opacity-60"
+        onClick={() => setCurrentProject(project.id)}
+      >
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
+          <CardTitle>{project.name}</CardTitle>
+          <div className="flex items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <div className="rounded-md hover:bg-muted cursor-pointer">
+                  <MoreHorizontal className="size-4 text-muted-foreground" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleExportProject(project.id)
+                  }}
+                >
+                  <Upload className="size-4" />
+                  Export
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleToggleArchive(project.id, false)
+                  }}
+                >
+                  <ArchiveRestore className="size-4" />
+                  Unarchive
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setProjectToDelete(project.id)
+                    setIsDeleteModalOpen(true)
+                  }}
+                  className="text-destructive"
+                >
+                  <Trash className="size-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-col flex-1">
+          <div className="flex-1" />
+          <div className="flex flex-col gap-1 mt-auto">
+            <p className="text-sm text-muted-foreground">
+              {totalItems} {totalItems === 1 ? "item" : "items"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Updated: {new Date(project.updatedAt).toLocaleDateString()}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   if (!currentProject) {
-    const skeletonCount = visibleProjects.length > 0 ? visibleProjects.length : 3
+    const skeletonCount = activeProjects.length > 0 ? activeProjects.length : 3
     const showSkeletons = !hasLoaded
     const isCreateDisabled = !hasLoaded || loading
     return (
@@ -230,7 +329,7 @@ export const Project = () => {
               <ProjectItemSkeleton key={`project-skeleton-${index}`} />
             ))}
           </div>
-        ) : visibleProjects.length === 0 ? (
+        ) : activeProjects.length === 0 && archivedProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
             <FileText className="size-12 text-muted-foreground mb-4" />
             <h2 className="text-xl font-medium mb-2 text-center">Translation & Transcription</h2>
@@ -247,16 +346,38 @@ export const Project = () => {
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={visibleProjects.map(p => p.id)}
+              items={activeProjects.map(p => p.id)}
               strategy={rectSortingStrategy}
             >
               <div translate="no" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {visibleProjects.map(p => (
+                {activeProjects.map(p => (
                   <SortableProjectCard key={p.id} project={p} />
                 ))}
               </div>
             </SortableContext>
           </DndContext>
+        )}
+
+        {archivedProjects.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <button
+              type="button"
+              onClick={() => setArchivedCollapsed(v => !v)}
+              className="flex items-center gap-2 w-full text-left"
+            >
+              <ChevronDown className={cn("size-4 text-muted-foreground transition-transform", archivedCollapsed && "-rotate-90")} />
+              <Archive className="size-4 text-muted-foreground" />
+              <h3 className="text-sm font-medium text-muted-foreground">Archived</h3>
+              <span className="text-xs text-muted-foreground">({archivedProjects.length})</span>
+            </button>
+            {!archivedCollapsed && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {archivedProjects.map(p => (
+                  <ArchivedProjectCard key={p.id} project={p} />
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
         <DeleteDialogue

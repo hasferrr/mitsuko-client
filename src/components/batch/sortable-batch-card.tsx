@@ -2,7 +2,13 @@
 
 import type { CSSProperties } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { GripVertical } from "lucide-react"
+import { Archive, GripVertical, MoreHorizontal } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
@@ -11,9 +17,10 @@ import type { Project } from "@/types/project"
 interface SortableBatchCardProps {
   project: Project
   onSelect: (id: string) => void
+  onToggleArchive: (id: string, archive: boolean) => void
 }
 
-export function SortableBatchCard({ project, onSelect }: SortableBatchCardProps) {
+export function SortableBatchCard({ project, onSelect, onToggleArchive }: SortableBatchCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: project.id })
 
   const style = {
@@ -35,6 +42,24 @@ export function SortableBatchCard({ project, onSelect }: SortableBatchCardProps)
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <CardTitle>{project.name}</CardTitle>
         <div className="flex items-center gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <div className="rounded-md hover:bg-muted cursor-pointer">
+                <MoreHorizontal className="size-4 text-muted-foreground" />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onToggleArchive(project.id, true)
+                }}
+              >
+                <Archive className="size-4" />
+                Archive
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <GripVertical
             className="size-4 cursor-grab text-muted-foreground focus:outline-hidden"
             {...attributes}

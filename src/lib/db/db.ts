@@ -321,6 +321,13 @@ class MyDatabase extends Dexie {
         }
       })
     })
+    this.version(25).stores({}).upgrade(async tx => {
+      await tx.table('projects').toCollection().modify(project => {
+        if (typeof project.isArchived === 'undefined') {
+          project.isArchived = false
+        }
+      })
+    })
   }
 }
 

@@ -15,9 +15,11 @@ export function RecentProjects() {
   const deleteProject = useProjectStore((state) => state.deleteProject)
 
   const sortedProjects = useMemo(() => {
-    return [...projects].sort((a, b) => {
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    })
+    return [...projects]
+      .filter(p => !p.isArchived)
+      .sort((a, b) => {
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      })
   }, [projects])
 
   const displayedProjects = showAllProjects ? sortedProjects : sortedProjects.slice(0, 6)

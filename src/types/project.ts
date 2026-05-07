@@ -31,6 +31,7 @@ export interface Project {
   isDefaultTranslationEnabled: boolean
   isDefaultExtractionEnabled: boolean
   isDefaultTranscriptionEnabled: boolean
+  isArchived: boolean
 }
 
 export interface Translation {
