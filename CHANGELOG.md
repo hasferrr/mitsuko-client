@@ -14,6 +14,11 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### May 8
+
+- 📦 **Project Archiving:** Archive projects to tidy up your workspace. Archived items live in a separate section and can be unarchived anytime.
+- ✅ **Multi-Select & Bulk Actions:** Select multiple projects or batch items and bulk delete, archive, unarchive, or export from the selection bar.
+
 ### April 26
 
 - 🤖 **Model Updates:** Added DeepSeek V4 Pro and DeepSeek V4 Flash, featuring 1M token context windows with hybrid attention for efficient long-context processing. Removed the non-thinking DeepSeek V3.2 variant.

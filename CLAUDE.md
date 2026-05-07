@@ -54,6 +54,7 @@ bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.
 - `src/components/` - Feature components organized by domain (translate, batch, transcribe)
 - `src/components/ui/` - Shadcn/Radix UI primitives (auto-generated, avoid editing)
 - `src/components/ui-custom/` - Shared composed components (combo-box, virtualized-list, drag-and-drop, various dialogs)
+- `src/components/shared/` - Cross-feature shared components (card-grid-selection-bar, confirm-dialogue)
 - `src/components/transcribe/` - Transcription UI split into sub-components (upload-tab, select-tab, controls, result-panel, next-actions) composed by `transcription-main.tsx`
 - `src/types/` - TypeScript interfaces for Project, Translation, Transcription, etc.
 - `src/constants/` - App constants and defaults
