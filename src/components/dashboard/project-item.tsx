@@ -27,7 +27,7 @@ export interface ProjectItemProps {
   project: Project
   isHorizontal: boolean
   onExport: (projectId: string) => void
-  onArchive: (projectId: string) => void
+  onArchive: (projectId: string, archive: boolean) => void
   onDelete: (projectId: string) => void
 }
 
@@ -115,12 +115,12 @@ export const ProjectItem = ({ project, isHorizontal, onExport, onArchive, onDele
                   Export
                 </DropdownMenuItem>
                 {project.isArchived ? (
-                  <DropdownMenuItem onClick={() => onArchive(project.id)}>
+                  <DropdownMenuItem onClick={() => onArchive(project.id, false)}>
                     <ArchiveRestore className="size-4" />
                     Unarchive
                   </DropdownMenuItem>
                 ) : (
-                  <DropdownMenuItem onClick={() => onArchive(project.id)}>
+                  <DropdownMenuItem onClick={() => onArchive(project.id, true)}>
                     <Archive className="size-4" />
                     Archive
                   </DropdownMenuItem>

@@ -31,8 +31,12 @@ export function RecentProjects() {
   const [isProcessingArchive, setIsProcessingArchive] = useState(false)
   const [archiveTargetId, setArchiveTargetId] = useState<string | null>(null)
 
-  const handleOpenArchiveDialog = (projectId: string) => {
-    if (checkActiveOperations(projectId)) {
+  const handleOpenArchiveDialog = (projectId: string, archive: boolean) => {
+    if (archive && checkActiveOperations(projectId)) {
+      return
+    }
+    if (!archive) {
+      handleArchive(projectId, false)
       return
     }
     setArchiveTargetId(projectId)
