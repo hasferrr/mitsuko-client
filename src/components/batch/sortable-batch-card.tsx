@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,9 +21,12 @@ interface SortableBatchCardProps {
   onToggleArchive: (id: string, archive: boolean) => void
   onExport: (id: string) => void
   onDelete: (id: string) => void
+  selectMode?: boolean
+  selected?: boolean
+  onSelectToggle?: (id: string) => void
 }
 
-export function SortableBatchCard({ project, onSelect, onToggleArchive, onExport, onDelete }: SortableBatchCardProps) {
+export function SortableBatchCard({ project, onSelect, onToggleArchive, onExport, onDelete, selectMode = false, selected = false, onSelectToggle }: SortableBatchCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: project.id })
 
   const style = {
@@ -31,63 +35,85 @@ export function SortableBatchCard({ project, onSelect, onToggleArchive, onExport
     zIndex: isDragging ? 1 : 0,
   } as CSSProperties
 
+  const handleClick = () => {
+    if (selectMode) {
+      onSelectToggle?.(project.id)
+    } else {
+      onSelect(project.id)
+    }
+  }
+
   return (
     <Card
       ref={setNodeRef}
       style={style}
       className={cn(
-        "ring-0 border cursor-pointer hover:ring-primary transition-colors overflow-hidden h-full flex flex-col",
-        isDragging && "opacity-50"
+        "cursor-pointer hover:ring-primary transition-colors overflow-hidden h-full flex flex-col",
+        isDragging && "opacity-50",
+        selectMode && "select-none",
+        selected && "ring-primary bg-primary/5 dark:bg-primary/10"
       )}
-      onClick={() => onSelect(project.id)}
+      onClick={handleClick}
     >
       <CardHeader className="flex flex-row items-center justify-between gap-2">
-        <CardTitle>{project.name}</CardTitle>
-        <div className="flex items-center gap-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <div className="rounded-md hover:bg-muted cursor-pointer">
-                <MoreHorizontal className="size-4 text-muted-foreground" />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onExport(project.id)
-                }}
-              >
-                <Upload className="size-4" />
-                Export
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onToggleArchive(project.id, true)
-                }}
-              >
-                <Archive className="size-4" />
-                Archive
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDelete(project.id)
-                }}
-                className="text-destructive"
-              >
-                <Trash className="size-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <GripVertical
-            className="size-4 cursor-grab text-muted-foreground focus:outline-hidden"
-            {...attributes}
-            {...listeners}
-            onClick={e => e.stopPropagation()}
-          />
+        <div className="flex items-center gap-2 min-w-0">
+          {selectMode && (
+            <Checkbox
+              checked={selected}
+              onClick={(e) => e.stopPropagation()}
+              onCheckedChange={() => onSelectToggle?.(project.id)}
+              className="shrink-0"
+            />
+          )}
+          <CardTitle className="truncate">{project.name}</CardTitle>
         </div>
+        {!selectMode && (
+          <div className="flex items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <div className="rounded-md hover:bg-muted cursor-pointer">
+                  <MoreHorizontal className="size-4 text-muted-foreground" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onExport(project.id)
+                  }}
+                >
+                  <Upload className="size-4" />
+                  Export
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onToggleArchive(project.id, true)
+                  }}
+                >
+                  <Archive className="size-4" />
+                  Archive
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onDelete(project.id)
+                  }}
+                  className="text-destructive"
+                >
+                  <Trash className="size-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <GripVertical
+              className="size-4 cursor-grab text-muted-foreground focus:outline-hidden"
+              {...attributes}
+              {...listeners}
+              onClick={e => e.stopPropagation()}
+            />
+          </div>
+        )}
       </CardHeader>
       <CardContent className="flex flex-col flex-1">
         <div className="flex-1"></div>

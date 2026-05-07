@@ -1,7 +1,7 @@
 import { db } from './db'
 import { DatabaseExport, databaseExportConstructor, generateNewIds } from './db-constructor'
 import { databaseExportSchema } from './db-schema'
-import { Project, BasicSettings, AdvancedSettings, Transcription } from '@/types/project'
+import { Project, Translation, Extraction, BasicSettings, AdvancedSettings, Transcription } from '@/types/project'
 import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
 import {
   GLOBAL_ADVANCED_SETTINGS_ID,
@@ -132,6 +132,93 @@ export async function exportProject(
     name: project.name,
     content,
   }
+}
+
+export async function exportProjects(
+  projectIds: string[]
+): Promise<{ content: string } | null> {
+  if (projectIds.length === 0) return null
+
+  const allProjects: Project[] = []
+  const allTranslations: Translation[] = []
+  const allTranscriptions: Transcription[] = []
+  const allExtractions: Extraction[] = []
+  const allBasicSettings: BasicSettings[] = []
+  const allAdvancedSettings: AdvancedSettings[] = []
+  const seenBasicIds = new Set<string>()
+  const seenAdvancedIds = new Set<string>()
+
+  for (const projectId of projectIds) {
+    const project = await db.projects.get(projectId)
+    if (!project) continue
+
+    allProjects.push(project)
+
+    const [translations, transcriptions, extractions] = await Promise.all([
+      db.translations.where("projectId").equals(projectId).toArray(),
+      db.transcriptions.where("projectId").equals(projectId).toArray(),
+      db.extractions.where("projectId").equals(projectId).toArray(),
+    ])
+    allTranslations.push(...translations)
+    allTranscriptions.push(...transcriptions)
+    allExtractions.push(...extractions)
+
+    const basicSettingsIds = new Set<string>()
+    const advancedSettingsIds = new Set<string>()
+
+    if (project.defaultBasicSettingsId) basicSettingsIds.add(project.defaultBasicSettingsId)
+    if (project.defaultAdvancedSettingsId) advancedSettingsIds.add(project.defaultAdvancedSettingsId)
+    if (project.defaultTranslationBasicSettingsId) basicSettingsIds.add(project.defaultTranslationBasicSettingsId)
+    if (project.defaultTranslationAdvancedSettingsId) advancedSettingsIds.add(project.defaultTranslationAdvancedSettingsId)
+    if (project.defaultExtractionBasicSettingsId) basicSettingsIds.add(project.defaultExtractionBasicSettingsId)
+    if (project.defaultExtractionAdvancedSettingsId) advancedSettingsIds.add(project.defaultExtractionAdvancedSettingsId)
+
+    translations.forEach(t => {
+      basicSettingsIds.add(t.basicSettingsId)
+      advancedSettingsIds.add(t.advancedSettingsId)
+    })
+    extractions.forEach(e => {
+      basicSettingsIds.add(e.basicSettingsId)
+      advancedSettingsIds.add(e.advancedSettingsId)
+    })
+
+    const newBasicSettings = (
+      await db.basicSettings.bulkGet(Array.from(basicSettingsIds))
+    ).filter((s): s is BasicSettings => s !== undefined && !GLOBAL_BASIC_IDS.includes(s.id) && !seenBasicIds.has(s.id))
+    newBasicSettings.forEach(s => seenBasicIds.add(s.id))
+    allBasicSettings.push(...newBasicSettings)
+
+    const newAdvancedSettings = (
+      await db.advancedSettings.bulkGet(Array.from(advancedSettingsIds))
+    ).filter((s): s is AdvancedSettings => s !== undefined && !GLOBAL_ADVANCED_IDS.includes(s.id) && !seenAdvancedIds.has(s.id))
+    newAdvancedSettings.forEach(s => seenAdvancedIds.add(s.id))
+    allAdvancedSettings.push(...newAdvancedSettings)
+  }
+
+  if (allProjects.length === 0) return null
+
+  const projectOrders = await db.projectOrders.limit(1).toArray()
+  const projectOrder =
+    projectOrders.length > 0
+      ? projectOrders[0]
+      : { id: crypto.randomUUID(), order: [], createdAt: new Date(), updatedAt: new Date() }
+
+  const exportData: DatabaseExport = {
+    projects: allProjects,
+    translations: allTranslations,
+    transcriptions: allTranscriptions.filter(t => t.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID),
+    extractions: allExtractions,
+    projectOrders: [{ ...projectOrder, order: allProjects.map(p => p.id) }],
+    basicSettings: allBasicSettings,
+    advancedSettings: allAdvancedSettings,
+  }
+
+  const content =
+    process.env.NODE_ENV === "development"
+      ? JSON.stringify(databaseExportConstructor(exportData), null, 2)
+      : JSON.stringify(databaseExportConstructor(exportData))
+
+  return { content }
 }
 
 export async function importDatabase(jsonString: string, clearExisting: boolean): Promise<void> {

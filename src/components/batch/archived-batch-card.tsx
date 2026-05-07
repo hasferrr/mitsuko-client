@@ -1,6 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ArchiveRestore, MoreHorizontal, Trash, Upload } from "lucide-react"
+import { cn } from "@/lib/utils"
 import type { Project } from "@/types/project"
 
 interface ArchivedBatchCardProps {
@@ -16,22 +18,48 @@ interface ArchivedBatchCardProps {
   onToggleArchive: (id: string, archive: boolean) => void
   onExport: (id: string) => void
   onDelete: (id: string) => void
+  selectMode?: boolean
+  selected?: boolean
+  onSelectToggle?: (id: string) => void
 }
 
-export function ArchivedBatchCard({ project, onSelect, onToggleArchive, onExport, onDelete }: ArchivedBatchCardProps) {
+export function ArchivedBatchCard({ project, onSelect, onToggleArchive, onExport, onDelete, selectMode = false, selected = false, onSelectToggle }: ArchivedBatchCardProps) {
+  const handleClick = () => {
+    if (selectMode) {
+      onSelectToggle?.(project.id)
+    } else {
+      onSelect(project.id)
+    }
+  }
+
   return (
     <Card
-      className="cursor-pointer hover:ring-primary transition-colors overflow-hidden h-full flex flex-col opacity-60"
-      onClick={() => onSelect(project.id)}
+      className={cn(
+        "cursor-pointer hover:ring-primary transition-colors overflow-hidden h-full flex flex-col opacity-60",
+        selectMode && "select-none",
+        selectMode && selected && "ring-primary bg-primary/5 dark:bg-primary/10 opacity-100"
+      )}
+      onClick={handleClick}
     >
       <CardHeader className="flex flex-row items-center justify-between gap-2">
-        <CardTitle>{project.name}</CardTitle>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-            <div className="rounded-md hover:bg-muted cursor-pointer">
-              <MoreHorizontal className="size-4 text-muted-foreground" />
-            </div>
-          </DropdownMenuTrigger>
+        <div className="flex items-center gap-2 min-w-0">
+          {selectMode && (
+            <Checkbox
+              checked={selected}
+              onClick={(e) => e.stopPropagation()}
+              onCheckedChange={() => onSelectToggle?.(project.id)}
+              className="shrink-0"
+            />
+          )}
+          <CardTitle className="truncate">{project.name}</CardTitle>
+        </div>
+        {!selectMode && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <div className="rounded-md hover:bg-muted cursor-pointer">
+                <MoreHorizontal className="size-4 text-muted-foreground" />
+              </div>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 onClick={(e) => {
@@ -62,7 +90,8 @@ export function ArchivedBatchCard({ project, onSelect, onToggleArchive, onExport
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
-        </DropdownMenu>
+          </DropdownMenu>
+        )}
       </CardHeader>
       <CardContent className="flex flex-col flex-1">
         <div className="flex-1"></div>
