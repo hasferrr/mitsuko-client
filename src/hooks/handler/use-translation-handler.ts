@@ -251,7 +251,6 @@ export const useTranslationHandler = ({
     logSubtitle(
       title,
       generateSubtitleContent(currentId, "original", "o-n-t", parsed.type),
-      currentId,
       isBatch,
       projectName,
     )

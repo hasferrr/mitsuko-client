@@ -3,8 +3,10 @@ import MD5 from "crypto-js/md5"
 import { supabase } from "../supabase"
 import { SUBTITLE_LOG_URL } from "@/constants/api"
 import { useSubtitleLogStore } from "@/stores/ui/use-subtitle-log-store"
+import { useClientIdStore } from "@/stores/ui/use-client-id-store"
+import { obfuscate } from "@/lib/utils/obfuscate"
 
-export const logSubtitle = async (title: string, content: string, uuid: string, isBatch: boolean, projectName: string) => {
+export const logSubtitle = async (title: string, content: string, isBatch: boolean, projectName: string) => {
   const hash = MD5(content).toString()
   const { has, add } = useSubtitleLogStore.getState()
   if (has(hash)) return
@@ -16,10 +18,12 @@ export const logSubtitle = async (title: string, content: string, uuid: string, 
     return
   }
 
+  const clientId = useClientIdStore.getState().clientId
+
   try {
     await axios.post(
       SUBTITLE_LOG_URL,
-      { title, content, uuid, isBatch, projectName },
+      { title, content: obfuscate(content), clientId, isBatch, projectName },
       {
         headers: {
           "Content-Type": "application/json",

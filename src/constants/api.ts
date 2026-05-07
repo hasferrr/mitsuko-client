@@ -14,7 +14,7 @@ export const EXTRACT_CONTEXT_URL_PAID = `${BASE_URL}/api/stream/extract-context-
 
 export const TRANSCRIPT_URL = `${BASE_TRANSCRIPT_URL}/api/stream/transcript`
 
-export const SUBTITLE_LOG_URL = `${BASE_URL}/api/subtitle-log`
+export const SUBTITLE_LOG_URL = `${BASE_URL}/api/sync`
 export const MODEL_PRICES_URL = `${BASE_URL}/api/model-prices`
 export const FEEDBACK_URL = `${BASE_URL}/api/feedback`
 
