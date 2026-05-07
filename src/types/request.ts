@@ -18,7 +18,7 @@ export interface TranslationRequestBody {
   structuredOutput: boolean
   contextMessage: ContextCompletion[]
   fewShotExamples: { content: string, translated: string }[]
-  uuid: string
+  md5: string
   isBatch: boolean
   clientId?: string
   projectName?: string
@@ -36,6 +36,7 @@ export interface ExtractionRequestBody {
   maxCompletionTokens?: number
   isBatch: boolean
   clientId?: string
+  md5: string
   projectName?: string
 }
 

@@ -38,6 +38,7 @@ import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { UserCreditData } from "@/types/user"
 import { useQuery } from "@tanstack/react-query"
 import { logSubtitle } from "@/lib/api/subtitle-log"
+import MD5 from "crypto-js/md5"
 import { z } from "zod"
 import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
@@ -248,12 +249,10 @@ export const useTranslationHandler = ({
       : []
 
     // Log subtitles
-    logSubtitle(
-      title,
-      generateSubtitleContent(currentId, "original", "o-n-t", parsed.type),
-      isBatch,
-      projectName,
-    )
+    const subtitleContent = generateSubtitleContent(currentId, "original", "o-n-t", parsed.type)
+    logSubtitle(title, subtitleContent, isBatch, projectName)
+
+    const md5Hash = MD5(subtitleContent).toString()
 
     // Translate each chunk of subtitles
     let chunkNumber = 0
@@ -286,7 +285,7 @@ export const useTranslationHandler = ({
         structuredOutput: isUseStructuredOutput,
         contextMessage: context,
         fewShotExamples: usedFewShot,
-        uuid: currentId,
+        md5: md5Hash,
         isBatch,
         projectName,
       }

@@ -17,6 +17,7 @@ import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { toast } from "sonner"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
+import MD5 from "crypto-js/md5"
 
 interface UseExtractionHandlerProps {
   setActiveTab: (tab: string) => void
@@ -148,6 +149,8 @@ export const useExtractionHandler = ({
         }
       }
 
+      const md5Hash = MD5(subtitleContent).toString()
+
       const requestBody = {
         input: {
           episode: episodeNumber.trim(),
@@ -163,6 +166,7 @@ export const useExtractionHandler = ({
           MAX_COMPLETION_TOKENS_MAX
         ),
         isBatch,
+        md5: md5Hash,
         projectName,
       }
 
