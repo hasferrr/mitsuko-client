@@ -71,55 +71,7 @@ export function UserSettings() {
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-col gap-2">
               <Label>
-                Enable Third-Party Model
-              </Label>
-              <p className="text-xs text-muted-foreground max-w-lg">
-                Allow Mitsuko to access additional custom models from third-party providers using your own API keys. A small fee may apply.
-              </p>
-            </div>
-            <Switch
-              id="third-party-model-switch"
-              checked={isThirdPartyModelEnabled}
-              onCheckedChange={handleCheckedChange}
-            />
-          </div>
-
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex flex-col gap-2">
-              <Label>
-                Disable performance mode
-              </Label>
-              <p className="text-xs text-muted-foreground max-w-lg">
-                Turn off performance optimizations for subtitle operations. This can improve quality on some devices but may feel laggy.
-              </p>
-            </div>
-            <Switch
-              id="subtitle-performance-mode-switch"
-              checked={!isSubtitlePerformanceModeEnabled}
-              onCheckedChange={(checked) => setIsSubtitlePerformanceModeEnabled(!checked)}
-            />
-          </div>
-
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex flex-col gap-2">
-              <Label>
-                Don't auto-open new items
-              </Label>
-              <p className="text-xs text-muted-foreground max-w-lg">
-                Enable this to create new translation, transcription, or extraction items without opening them.
-              </p>
-            </div>
-            <Switch
-              id="legacy-create-behavior-switch"
-              checked={isLegacyCreateBehavior}
-              onCheckedChange={setIsLegacyCreateBehavior}
-            />
-          </div>
-
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex flex-col gap-2">
-              <Label>
-                Auto-enable custom default settings for new projects
+                Auto-enable project default settings
               </Label>
               <p className="text-xs text-muted-foreground max-w-lg">
                 When enabled, the "Enable Settings" option for translation, extraction, and transcription will be automatically turned on for new projects. New batch projects are always turned on.
@@ -204,6 +156,55 @@ export function UserSettings() {
               Reset
             </Button>
           </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Disable performance mode
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Turn off performance optimizations for subtitle operations. This can improve quality on some devices but may feel laggy.
+              </p>
+            </div>
+            <Switch
+              id="subtitle-performance-mode-switch"
+              checked={!isSubtitlePerformanceModeEnabled}
+              onCheckedChange={(checked) => setIsSubtitlePerformanceModeEnabled(!checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Don't auto-open new items
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Enable this to create new translation, transcription, or extraction items without opening them.
+              </p>
+            </div>
+            <Switch
+              id="legacy-create-behavior-switch"
+              checked={isLegacyCreateBehavior}
+              onCheckedChange={setIsLegacyCreateBehavior}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Enable Third-Party Model
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Allow Mitsuko to access additional custom models from third-party providers using your own API keys. A small fee may apply.
+              </p>
+            </div>
+            <Switch
+              id="third-party-model-switch"
+              checked={isThirdPartyModelEnabled}
+              onCheckedChange={handleCheckedChange}
+            />
+          </div>
+
         </CardContent>
       </Card>
       <SettingsDialogue
