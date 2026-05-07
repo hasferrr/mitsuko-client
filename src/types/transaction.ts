@@ -10,7 +10,6 @@ export type TransactionEvent =
 
 export interface Transaction {
   id: string
-  user_id: string
   amount: number
   event: TransactionEvent
   description: string | null

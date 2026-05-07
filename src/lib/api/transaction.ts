@@ -25,7 +25,7 @@ export async function fetchTransactions(
   // Start building the query
   let query = supabase
     .from('transactions')
-    .select('*', { count: 'exact' })
+    .select('id, amount, event, description, created_at', { count: 'exact' })
     .eq('user_id', session.user.id)
 
   if (amountFilter === "positive") {
