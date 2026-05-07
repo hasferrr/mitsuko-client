@@ -1,9 +1,11 @@
 "use client"
 
 import {
+  Archive,
+  ArchiveRestore,
   MoreHorizontal,
   PlusCircle,
-  Trash2,
+  Trash,
   Upload,
 } from "lucide-react"
 
@@ -24,12 +26,12 @@ import {
 } from "@/components/ui/sidebar"
 import { Project } from "@/types/project"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { useProjectActions } from "@/hooks/project/use-project-actions"
 import { redirect, usePathname } from "next/navigation"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
+import { ArchiveDialog } from "../ui-custom/archive-dialog"
 import { ExportImportDialogue } from "../ui-custom/export-import-dialogue"
 import { useState } from "react"
-import { exportProject } from "@/lib/db/db-io"
-import { toast } from "sonner"
 
 interface AppSidebarProjectsProps {
   projects: Project[],
@@ -52,36 +54,38 @@ export function AppSidebarProjects({
   const pathname = usePathname()
   const currentProject = useProjectStore((state) => state.currentProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
-  const deleteProject = useProjectStore((state) => state.deleteProject)
 
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const {
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    isDeleting,
+    promptDelete,
+    handleConfirmDelete,
+    handleExport,
+    handleArchive,
+    checkActiveOperations,
+  } = useProjectActions()
+
   const [isExportImportModalOpen, setIsExportImportModalOpen] = useState(false)
-  const [idToDelete, setIdToDelete] = useState("")
+  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false)
+  const [isProcessingArchive, setIsProcessingArchive] = useState(false)
+  const [archiveTargetId, setArchiveTargetId] = useState<string | null>(null)
 
-  const handleExportProject = async (projectId: string) => {
-    try {
-      const result = await exportProject(projectId)
-      if (result) {
-        const blob = new Blob([result.content], { type: "application/json" })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = `mitsuko-project-${result.name.replace(/\s+/g, "_")}-${new Date().toISOString().split("T")[0]}.json`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-        toast.success("Project exported successfully")
-      }
-    } catch (error) {
-      console.error("Error exporting project:", error)
-      toast.error("Failed to export project")
+  const handleOpenArchiveDialog = (projectId: string) => {
+    if (checkActiveOperations(projectId)) {
+      return
     }
+    setArchiveTargetId(projectId)
+    setIsArchiveDialogOpen(true)
   }
 
-  const handleDeleteProject = async () => {
-    setIsDeleteModalOpen(false)
-    await deleteProject(idToDelete)
+  const handleConfirmArchive = async () => {
+    if (!archiveTargetId) return
+    setIsProcessingArchive(true)
+    await handleArchive(archiveTargetId, true)
+    setIsProcessingArchive(false)
+    setIsArchiveDialogOpen(false)
+    setArchiveTargetId(null)
   }
 
   return (
@@ -116,22 +120,30 @@ export function AppSidebarProjects({
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-48 rounded-lg"
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem onClick={() => handleExportProject(project.id)}>
-                  <Upload className="text-muted-foreground" />
-                  <span>Export Project</span>
+                <DropdownMenuItem onClick={() => handleExport(project.id)}>
+                  <Upload className="size-4" />
+                  Export
                 </DropdownMenuItem>
+                {project.isArchived ? (
+                  <DropdownMenuItem onClick={() => handleArchive(project.id, false)}>
+                    <ArchiveRestore className="size-4" />
+                    Unarchive
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onClick={() => handleOpenArchiveDialog(project.id)}>
+                    <Archive className="size-4" />
+                    Archive
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
-                  onClick={() => {
-                    setIdToDelete(project.id)
-                    setIsDeleteModalOpen(true)
-                  }}
+                  onClick={() => promptDelete(project.id)}
+                  className="text-destructive"
                 >
-                  <Trash2 className="text-muted-foreground" />
-                  <span>Delete Project</span>
+                  <Trash className="size-4" />
+                  Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -160,9 +172,16 @@ export function AppSidebarProjects({
           </SidebarMenuItem>
         )}
         <DeleteDialogue
-          handleDelete={handleDeleteProject}
+          handleDelete={handleConfirmDelete}
           isDeleteModalOpen={isDeleteModalOpen}
           setIsDeleteModalOpen={setIsDeleteModalOpen}
+          isProcessing={isDeleting}
+        />
+        <ArchiveDialog
+          isOpen={isArchiveDialogOpen}
+          onOpenChange={setIsArchiveDialogOpen}
+          onConfirm={handleConfirmArchive}
+          isProcessing={isProcessingArchive}
         />
         <ExportImportDialogue
           isOpen={isExportImportModalOpen}

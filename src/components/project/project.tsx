@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { useProjectActions } from "@/hooks/project/use-project-actions"
 import { ProjectMain } from "./project-main"
 import {
   DndContext,
@@ -30,11 +31,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { toast } from "sonner"
-import { exportProject } from "@/lib/db/db-io"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { useState } from "react"
-import { hasActiveOperations } from "@/stores/utils/active-operations"
 
 export const Project = () => {
   const projects = useProjectStore(state => state.projects)
@@ -47,11 +45,17 @@ export const Project = () => {
   const createProject = useProjectStore(state => state.createProject)
   const setCurrentProject = useProjectStore(state => state.setCurrentProject)
   const reorderProjects = useProjectStore(state => state.reorderProjects)
-  const deleteProject = useProjectStore(state => state.deleteProject)
-  const updateProject = useProjectStore(state => state.updateProject)
 
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
+  const {
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    isDeleting,
+    promptDelete,
+    handleConfirmDelete,
+    handleExport,
+    handleArchive,
+  } = useProjectActions()
+
   const [archivedCollapsed, setArchivedCollapsed] = useState(true)
 
   const sensors = useSensors(
@@ -73,54 +77,6 @@ export const Project = () => {
       const newIndex = projects.findIndex(p => p.id === over.id)
       const newOrder = arrayMove(projects.map(p => p.id), oldIndex, newIndex)
       await reorderProjects(newOrder)
-    }
-  }
-
-  const handleExportProject = async (projectId: string) => {
-    try {
-      const result = await exportProject(projectId)
-      if (result) {
-        const blob = new Blob([result.content], { type: "application/json" })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = `mitsuko-project-${result.name.replace(/\s+/g, "_")}-${new Date().toISOString().split("T")[0]}.json`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-        toast.success("Project exported successfully")
-      }
-    } catch (error) {
-      console.error("Error exporting project:", error)
-      toast.error("Failed to export project")
-    }
-  }
-
-  const handleDelete = async () => {
-    if (projectToDelete) {
-      await deleteProject(projectToDelete)
-      setIsDeleteModalOpen(false)
-      setProjectToDelete(null)
-    }
-  }
-
-  const checkActiveOperations = (projectId: string) => {
-    const project = projects.find(p => p.id === projectId)
-    if (!project) return false
-    return hasActiveOperations(project)
-  }
-
-  const handleToggleArchive = async (projectId: string, archive: boolean) => {
-    if (archive && checkActiveOperations(projectId)) {
-      toast.error("Cannot archive — finish or cancel active operations first")
-      return
-    }
-    const updated = await updateProject(projectId, { isArchived: archive })
-    if (updated) {
-      toast.success(archive ? "Project archived" : "Project unarchived")
-    } else {
-      toast.error(`Failed to ${archive ? "archive" : "unarchive"} project`)
     }
   }
 
@@ -186,7 +142,7 @@ export const Project = () => {
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation()
-                    handleExportProject(project.id)
+                    handleExport(project.id)
                   }}
                 >
                   <Upload className="size-4" />
@@ -195,7 +151,7 @@ export const Project = () => {
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation()
-                    handleToggleArchive(project.id, true)
+                    handleArchive(project.id, true)
                   }}
                 >
                   <Archive className="size-4" />
@@ -204,8 +160,7 @@ export const Project = () => {
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation()
-                    setProjectToDelete(project.id)
-                    setIsDeleteModalOpen(true)
+                    promptDelete(project.id)
                   }}
                   className="text-destructive"
                 >
@@ -258,7 +213,7 @@ export const Project = () => {
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation()
-                    handleExportProject(project.id)
+                    handleExport(project.id)
                   }}
                 >
                   <Upload className="size-4" />
@@ -267,7 +222,7 @@ export const Project = () => {
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation()
-                    handleToggleArchive(project.id, false)
+                    handleArchive(project.id, false)
                   }}
                 >
                   <ArchiveRestore className="size-4" />
@@ -276,8 +231,7 @@ export const Project = () => {
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation()
-                    setProjectToDelete(project.id)
-                    setIsDeleteModalOpen(true)
+                    promptDelete(project.id)
                   }}
                   className="text-destructive"
                 >
@@ -381,9 +335,10 @@ export const Project = () => {
         )}
 
         <DeleteDialogue
-          handleDelete={handleDelete}
+          handleDelete={handleConfirmDelete}
           isDeleteModalOpen={isDeleteModalOpen}
           setIsDeleteModalOpen={setIsDeleteModalOpen}
+          isProcessing={isDeleting}
         />
       </div>
     )

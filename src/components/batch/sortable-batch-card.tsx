@@ -2,13 +2,13 @@
 
 import type { CSSProperties } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Archive, GripVertical, MoreHorizontal } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Archive, GripVertical, MoreHorizontal, Trash, Upload } from "lucide-react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
@@ -18,9 +18,11 @@ interface SortableBatchCardProps {
   project: Project
   onSelect: (id: string) => void
   onToggleArchive: (id: string, archive: boolean) => void
+  onExport: (id: string) => void
+  onDelete: (id: string) => void
 }
 
-export function SortableBatchCard({ project, onSelect, onToggleArchive }: SortableBatchCardProps) {
+export function SortableBatchCard({ project, onSelect, onToggleArchive, onExport, onDelete }: SortableBatchCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: project.id })
 
   const style = {
@@ -52,11 +54,30 @@ export function SortableBatchCard({ project, onSelect, onToggleArchive }: Sortab
               <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation()
+                  onExport(project.id)
+                }}
+              >
+                <Upload className="size-4" />
+                Export
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
                   onToggleArchive(project.id, true)
                 }}
               >
                 <Archive className="size-4" />
                 Archive
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete(project.id)
+                }}
+                className="text-destructive"
+              >
+                <Trash className="size-4" />
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

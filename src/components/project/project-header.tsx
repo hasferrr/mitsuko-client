@@ -10,8 +10,7 @@ import { DeleteDialogue } from "@/components/ui-custom/delete-dialogue"
 import { ArchiveDialog } from "@/components/ui-custom/archive-dialog"
 import { Project } from "@/types/project"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { hasActiveOperations } from "@/stores/utils/active-operations"
-import { exportProject } from "@/lib/db/db-io"
+import { useProjectActions } from "@/hooks/project/use-project-actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
@@ -21,7 +20,6 @@ interface ProjectHeaderProps {
 
 export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isConvertModalOpen, setIsConvertModalOpen] = useState(false)
   const [isProcessingConvert, setIsProcessingConvert] = useState(false)
   const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false)
@@ -29,60 +27,36 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
 
   const router = useRouter()
   const renameProject = useProjectStore((state) => state.renameProject)
-  const deleteProject = useProjectStore((state) => state.deleteProject)
   const updateProjectStore = useProjectStore(state => state.updateProject)
   const setCurrentProject = useProjectStore(state => state.setCurrentProject)
+
+  const {
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    isDeleting,
+    promptDelete,
+    handleConfirmDelete,
+    handleExport,
+    handleArchive,
+    checkActiveOperations,
+  } = useProjectActions()
 
   const handleBack = () => {
     if (currentProject.isBatch) router.push("/batch")
     else setCurrentProject(null)
   }
 
-  const checkActiveOperations = () => hasActiveOperations(currentProject)
-
   const handleSave = async (newName: string) => {
     await renameProject(currentProject.id, newName.trim())
     setIsEditModalOpen(false)
   }
 
-  const handleDelete = async () => {
-    setIsDeleteModalOpen(false)
-    await deleteProject(currentProject.id)
-  }
-
-  const handleExportProject = async () => {
-    try {
-      const result = await exportProject(currentProject.id)
-      if (result) {
-        const blob = new Blob([result.content], { type: "application/json" })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = `mitsuko-project-${result.name.replace(/\s+/g, "_")}-${new Date().toISOString().split("T")[0]}.json`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-        toast.success("Project exported successfully")
-      }
-    } catch (error) {
-      console.error("Error exporting project:", error)
-      toast.error("Failed to export project")
-    }
-  }
-
   const handleToggleArchive = async (archive: boolean) => {
-    const updated = await updateProjectStore(currentProject.id, { isArchived: archive })
-    if (updated) {
-      toast.success(archive ? "Project archived" : "Project unarchived")
-    } else {
-      toast.error(`Failed to ${archive ? "archive" : "unarchive"} project`)
-    }
+    await handleArchive(currentProject.id, archive)
   }
 
   const handleOpenArchiveDialog = () => {
-    if (checkActiveOperations()) {
-      toast.error("Cannot archive — finish or cancel active operations first")
+    if (checkActiveOperations(currentProject.id)) {
       return
     }
     setIsArchiveDialogOpen(true)
@@ -90,14 +64,11 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
 
   const handleConfirmArchive = async () => {
     setIsProcessingArchive(true)
-    const updated = await updateProjectStore(currentProject.id, { isArchived: true })
+    const updated = await handleArchive(currentProject.id, true)
     setIsProcessingArchive(false)
     if (updated) {
-      toast.success("Project archived")
       setCurrentProject(null)
       if (currentProject.isBatch) router.push("/batch")
-    } else {
-      toast.error("Failed to archive project")
     }
     setIsArchiveDialogOpen(false)
   }
@@ -138,7 +109,7 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
               Rename
             </button>
             <button
-              onClick={handleExportProject}
+              onClick={() => handleExport(currentProject.id)}
               className="flex items-center gap-2 hover:underline"
             >
               <Upload size={20} />
@@ -169,7 +140,7 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
               </button>
             )}
             <button
-              onClick={() => setIsDeleteModalOpen(true)}
+              onClick={() => promptDelete(currentProject.id)}
               className="flex items-center gap-2 hover:underline"
             >
               <Trash size={20} />
@@ -190,9 +161,10 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
       />
 
       <DeleteDialogue
-        handleDelete={handleDelete}
+        handleDelete={handleConfirmDelete}
         isDeleteModalOpen={isDeleteModalOpen}
         setIsDeleteModalOpen={setIsDeleteModalOpen}
+        isProcessing={isDeleting}
       />
 
       <ArchiveDialog

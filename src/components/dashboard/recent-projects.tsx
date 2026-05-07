@@ -6,13 +6,47 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ProjectItem } from "./project-item"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { useProjectActions } from "@/hooks/project/use-project-actions"
+import { DeleteDialogue } from "@/components/ui-custom/delete-dialogue"
+import { ArchiveDialog } from "@/components/ui-custom/archive-dialog"
 
 export function RecentProjects() {
   const [showAllProjects, setShowAllProjects] = useState(false)
   const [isHorizontal, setIsHorizontal] = useState(false)
 
   const projects = useProjectStore((state) => state.projects)
-  const deleteProject = useProjectStore((state) => state.deleteProject)
+
+  const {
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    isDeleting,
+    promptDelete,
+    handleConfirmDelete,
+    handleExport,
+    handleArchive,
+    checkActiveOperations,
+  } = useProjectActions()
+
+  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false)
+  const [isProcessingArchive, setIsProcessingArchive] = useState(false)
+  const [archiveTargetId, setArchiveTargetId] = useState<string | null>(null)
+
+  const handleOpenArchiveDialog = (projectId: string) => {
+    if (checkActiveOperations(projectId)) {
+      return
+    }
+    setArchiveTargetId(projectId)
+    setIsArchiveDialogOpen(true)
+  }
+
+  const handleConfirmArchive = async () => {
+    if (!archiveTargetId) return
+    setIsProcessingArchive(true)
+    await handleArchive(archiveTargetId, true)
+    setIsProcessingArchive(false)
+    setIsArchiveDialogOpen(false)
+    setArchiveTargetId(null)
+  }
 
   const sortedProjects = useMemo(() => {
     return [...projects]
@@ -59,7 +93,7 @@ export function RecentProjects() {
         )}
       >
         {displayedProjects.map((project) => (
-          <ProjectItem key={project.id} project={project} isHorizontal={isHorizontal} onDelete={deleteProject} />
+          <ProjectItem key={project.id} project={project} isHorizontal={isHorizontal} onExport={handleExport} onArchive={handleOpenArchiveDialog} onDelete={promptDelete} />
         ))}
       </div>
 
@@ -70,6 +104,19 @@ export function RecentProjects() {
           </Button>
         </div>
       )}
+
+      <DeleteDialogue
+        handleDelete={handleConfirmDelete}
+        isDeleteModalOpen={isDeleteModalOpen}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        isProcessing={isDeleting}
+      />
+      <ArchiveDialog
+        isOpen={isArchiveDialogOpen}
+        onOpenChange={setIsArchiveDialogOpen}
+        onConfirm={handleConfirmArchive}
+        isProcessing={isProcessingArchive}
+      />
     </div>
   )
 }

@@ -1,22 +1,24 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArchiveRestore, MoreHorizontal } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { ArchiveRestore, MoreHorizontal, Trash, Upload } from "lucide-react"
 import type { Project } from "@/types/project"
 
 interface ArchivedBatchCardProps {
   project: Project
   onSelect: (id: string) => void
   onToggleArchive: (id: string, archive: boolean) => void
+  onExport: (id: string) => void
+  onDelete: (id: string) => void
 }
 
-export function ArchivedBatchCard({ project, onSelect, onToggleArchive }: ArchivedBatchCardProps) {
+export function ArchivedBatchCard({ project, onSelect, onToggleArchive, onExport, onDelete }: ArchivedBatchCardProps) {
   return (
     <Card
       className="cursor-pointer hover:ring-primary transition-colors overflow-hidden h-full flex flex-col opacity-60"
@@ -30,17 +32,36 @@ export function ArchivedBatchCard({ project, onSelect, onToggleArchive }: Archiv
               <MoreHorizontal className="size-4 text-muted-foreground" />
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation()
-                onToggleArchive(project.id, false)
-              }}
-            >
-              <ArchiveRestore className="size-4" />
-              Unarchive
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onExport(project.id)
+                }}
+              >
+                <Upload className="size-4" />
+                Export
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onToggleArchive(project.id, false)
+                }}
+              >
+                <ArchiveRestore className="size-4" />
+                Unarchive
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete(project.id)
+                }}
+                className="text-destructive"
+              >
+                <Trash className="size-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
       <CardContent className="flex flex-col flex-1">

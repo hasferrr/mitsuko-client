@@ -1,26 +1,18 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import {
+  Archive,
+  ArchiveRestore,
   FileText,
   Headphones,
   Clock,
-  Trash2,
+  Trash,
+  Upload,
   MoreHorizontal
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,18 +26,14 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 export interface ProjectItemProps {
   project: Project
   isHorizontal: boolean
-  onDelete: (projectId: string) => Promise<void>
+  onExport: (projectId: string) => void
+  onArchive: (projectId: string) => void
+  onDelete: (projectId: string) => void
 }
 
-export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProps) => {
+export const ProjectItem = ({ project, isHorizontal, onExport, onArchive, onDelete }: ProjectItemProps) => {
   const router = useRouter()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const setCurrentProject = useProjectStore(state => state.setCurrentProject)
-
-  const handleDelete = async () => {
-    await onDelete(project.id)
-    setIsDeleteDialogOpen(false)
-  }
 
   const handleProjectClick = () => {
     setCurrentProject(project)
@@ -53,14 +41,13 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
   }
 
   return (
-    <>
-      <Card
-        className={cn(
-          "hover:ring-primary/50 hover:bg-card/80 transition-colors",
-        )}
-      >
-        <CardContent>
-          <div className="flex items-center justify-between gap-2">
+    <Card
+      className={cn(
+        "hover:ring-primary/50 hover:bg-card/80 transition-colors",
+      )}
+    >
+      <CardContent>
+        <div className="flex items-center justify-between gap-2">
           <div
             className="flex-1 cursor-pointer"
             onClick={handleProjectClick}
@@ -123,39 +110,33 @@ export const ProjectItem = ({ project, isHorizontal, onDelete }: ProjectItemProp
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onExport(project.id)}>
+                  <Upload className="size-4" />
+                  Export
+                </DropdownMenuItem>
+                {project.isArchived ? (
+                  <DropdownMenuItem onClick={() => onArchive(project.id)}>
+                    <ArchiveRestore className="size-4" />
+                    Unarchive
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onClick={() => onArchive(project.id)}>
+                    <Archive className="size-4" />
+                    Archive
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
-                  className="text-destructive focus:text-destructive"
-                  onClick={() => setIsDeleteDialogOpen(true)}
+                  onClick={() => onDelete(project.id)}
+                  className="text-destructive"
                 >
-                  <Trash2 className="size-4" />
-                  Delete Project
+                  <Trash className="size-4" />
+                  Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
-        </CardContent>
-      </Card>
-
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Project</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete "{project.name}"? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+      </CardContent>
+    </Card>
   )
 }
