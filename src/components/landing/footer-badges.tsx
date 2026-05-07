@@ -18,7 +18,7 @@ export default function FooterBadges({ badges }: { badges: Badge[] }) {
               alt={badge.alt}
               width="auto"
               height="auto"
-              className={cn("h-[35px] md:h-[38px] object-contain", badge.className)}
+              className={cn("h-[35px] md:h-[38px] object-contain grayscale opacity-70", badge.className)}
             />
           </a>
         </li>

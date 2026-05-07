@@ -25,12 +25,6 @@ const badges = [
     alt: "Fazier badge",
   },
   {
-    href: "https://similarlabs.com/?ref=embed",
-    imgSrc: "https://similarlabs.com/similarlabs-embed-badge-light.svg",
-    alt: "SimilarLabs Embed Badge",
-    className: "bg-white rounded-sm",
-  },
-  {
     href: "https://twelve.tools",
     imgSrc: "https://twelve.tools/badge0-white.svg",
     alt: "Featured on Twelve Tools",
@@ -48,10 +42,8 @@ export default async function Footer() {
   return (
     <footer className="border-t border-border py-12 px-4 mt-4">
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-11 gap-8">
-        <div className="flex flex-col gap-4 lg:col-span-3 lg:mr-8">
-          <div className="flex items-center">
-            <span className="text-base font-medium mb-4 text-foreground">About</span>
-          </div>
+        <div className="lg:col-span-3 lg:mr-8">
+          <h3 className="text-base font-medium mb-4 text-foreground">About</h3>
           <div className="text-sm text-muted-foreground space-y-2">
             <p>Mitsuko breaks down language barriers to make all content accessible.</p>
             <p>Made with ❤️ by{" "}
@@ -150,7 +142,6 @@ export default async function Footer() {
       <FooterBadges badges={badges} />
 
       <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-border">
-
         <p className="text-sm text-muted-foreground text-center">© {new Date().getFullYear()} Mitsuko. All rights reserved.</p>
       </div>
     </footer>
