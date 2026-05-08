@@ -62,6 +62,28 @@ export const updateExtraction = async (
   return updated
 }
 
+export const moveExtraction = async (
+  sourceProjectId: string,
+  targetProjectId: string,
+  extractionId: string,
+): Promise<void> => {
+  return db.transaction('rw', db.projects, db.extractions, async () => {
+    await db.extractions.update(extractionId, { projectId: targetProjectId, updatedAt: new Date() })
+
+    await db.projects.update(sourceProjectId, project => {
+      if (!project) return
+      project.extractions = project.extractions.filter(id => id !== extractionId)
+      project.updatedAt = new Date()
+    })
+
+    await db.projects.update(targetProjectId, project => {
+      if (!project) return
+      project.extractions.push(extractionId)
+      project.updatedAt = new Date()
+    })
+  })
+}
+
 export const deleteExtraction = async (projectId: string, extractionId: string): Promise<void> => {
   return db.transaction('rw', db.projects, db.extractions, db.basicSettings, db.advancedSettings, async () => {
     const extraction = await db.extractions.get(extractionId)

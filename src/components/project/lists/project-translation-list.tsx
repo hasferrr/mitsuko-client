@@ -14,7 +14,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
-import { Globe, Loader2, Settings2, Plus } from "lucide-react"
+import { Globe, Loader2, Settings2, Plus, ListChecks } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -26,6 +26,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { useRouter } from "next/navigation"
 import { ProjectItemSkeleton } from "../project-item-skeleton"
+import { ItemType } from "@/hooks/project/use-project-item-selection"
 
 const countTranslatedLines = (subtitles: Translation['subtitles']): { count: number, hasError: boolean } => {
   if (!subtitles || subtitles.length === 0) {
@@ -55,6 +56,11 @@ interface ProjectTranslationListProps {
   onDragEnd: (event: DragEndEvent, type: 'translation' | 'transcription' | 'extraction') => void
   onOpenSettings: () => void
   title?: string
+  selectMode?: boolean
+  selectedIds: Map<string, ItemType>
+  onSelectToggle: (id: string, type: ItemType) => void
+  onToggleSelectMode: () => void
+  isSelecting?: boolean
 }
 
 export function ProjectTranslationList({
@@ -64,7 +70,12 @@ export function ProjectTranslationList({
   isLoadingData,
   onDragEnd,
   onOpenSettings,
-  title = "Translations"
+  title = "Translations",
+  selectMode = false,
+  selectedIds,
+  onSelectToggle,
+  onToggleSelectMode,
+  isSelecting = false,
 }: ProjectTranslationListProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -120,9 +131,16 @@ export function ProjectTranslationList({
           }
           setTranslations(prev => prev.filter(t => t.id !== translation.id))
         }}
+        selectMode={selectMode}
+        selected={selectedIds.has(translation.id)}
+        onSelectToggle={() => onSelectToggle(translation.id, "translation")}
       />
     )
   })
+
+  const itemsList = isLoadingData
+    ? Array.from({ length: 3 }).map((_, i) => <ProjectItemSkeleton key={`translation-skeleton-${i}`} />)
+    : translationComponentList
 
   return (
     <Card size="sm">
@@ -130,6 +148,15 @@ export function ProjectTranslationList({
         <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium">{title}</h3>
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant={isSelecting ? "secondary" : "outline"}
+            onClick={onToggleSelectMode}
+            title="Select mode"
+          >
+            <ListChecks className="size-4" />
+            {isSelecting ? "Cancel" : "Select"}
+          </Button>
           <Button
             size="sm"
             variant="outline"
@@ -180,6 +207,11 @@ export function ProjectTranslationList({
           </Button>
         </div>
       </div>
+      {selectMode ? (
+        <div className="space-y-3">
+          {itemsList}
+        </div>
+      ) : (
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -190,12 +222,11 @@ export function ProjectTranslationList({
           strategy={verticalListSortingStrategy}
         >
           <div className="space-y-3">
-            {isLoadingData
-              ? Array.from({ length: 3 }).map((_, i) => <ProjectItemSkeleton key={`translation-skeleton-${i}`} />)
-              : translationComponentList}
+            {itemsList}
           </div>
         </SortableContext>
       </DndContext>
+      )}
       </CardContent>
     </Card>
   )

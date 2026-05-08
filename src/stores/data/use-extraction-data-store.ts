@@ -5,6 +5,7 @@ import {
   createExtraction as createDB,
   getExtraction as getDB,
   deleteExtraction as deleteDB,
+  moveExtraction as moveDB,
 } from "@/lib/db/extraction"
 import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
@@ -27,6 +28,7 @@ export interface ExtractionDataStore {
   getExtractionsDb: (extractionIds: string[]) => Promise<Extraction[]>
   updateExtractionDb: (extractionId: string, changes: Partial<Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext">>) => Promise<Extraction>
   deleteExtractionDb: (projectId: string, extractionId: string) => Promise<void>
+  moveExtractionDb: (sourceProjectId: string, targetProjectId: string, extractionId: string) => Promise<void>
   // getters
   getTitle: (id: string) => string
   getEpisodeNumber: (id: string) => string
@@ -138,6 +140,15 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
     })
     if (get().currentId === extractionId) {
       set({ currentId: null })
+    }
+  },
+  moveExtractionDb: async (sourceProjectId, targetProjectId, extractionId) => {
+    await moveDB(sourceProjectId, targetProjectId, extractionId)
+    const data = get().data[extractionId]
+    if (data) {
+      set(state => ({
+        data: { ...state.data, [extractionId]: { ...data, projectId: targetProjectId, updatedAt: new Date() } }
+      }))
     }
   },
   // getters implementation

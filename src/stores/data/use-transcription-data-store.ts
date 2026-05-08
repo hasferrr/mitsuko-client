@@ -5,6 +5,7 @@ import {
   createTranscription as createDB,
   getTranscription as getDB,
   deleteTranscription as deleteDB,
+  moveTranscription as moveDB,
 } from "@/lib/db/transcription"
 import { db } from "@/lib/db/db"
 import { Subtitle } from "@/types/subtitles"
@@ -24,6 +25,7 @@ interface TranscriptionDataStore {
   getTranscriptionsDb: (transcriptionIds: string[]) => Promise<Transcription[]>
   updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language" | "selectedUploadId">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
+  moveTranscriptionDb: (sourceProjectId: string, targetProjectId: string, transcriptionId: string) => Promise<void>
   // settings copy method
   copyTranscriptionSettingsKeys: (sourceId: string, targetId: string, keys: TranscriptionSettingKey[]) => Promise<void>
   // getters
@@ -139,6 +141,15 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
     })
     if (get().currentId === transcriptionId) {
       set({ currentId: null })
+    }
+  },
+  moveTranscriptionDb: async (sourceProjectId, targetProjectId, transcriptionId) => {
+    await moveDB(sourceProjectId, targetProjectId, transcriptionId)
+    const data = get().data[transcriptionId]
+    if (data) {
+      set(state => ({
+        data: { ...state.data, [transcriptionId]: { ...data, projectId: targetProjectId, updatedAt: new Date() } }
+      }))
     }
   },
   // getters implementation

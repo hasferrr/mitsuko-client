@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "../ui/button"
+import { Checkbox } from "../ui/checkbox"
 import { Edit, Trash, SquareArrowOutUpRight, GripVertical } from "lucide-react"
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { EditDialogue } from "../ui-custom/edit-dialogue"
@@ -28,6 +29,9 @@ interface ProjectItemListProps {
   date: string
   handleEdit: (newName: string) => Promise<void>
   handleDelete: () => Promise<void>
+  selectMode?: boolean
+  selected?: boolean
+  onSelectToggle?: () => void
 }
 
 export const ProjectItemList = ({
@@ -41,6 +45,9 @@ export const ProjectItemList = ({
   date,
   handleEdit,
   handleDelete,
+  selectMode = false,
+  selected = false,
+  onSelectToggle,
 }: ProjectItemListProps) => {
   const router = useRouter()
   const projects = useProjectStore((state) => state.projects)
@@ -69,7 +76,7 @@ export const ProjectItemList = ({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: id })
+  } = useSortable({ id: id, disabled: selectMode })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -83,6 +90,7 @@ export const ProjectItemList = ({
   const [isProcessing, setIsProcessing] = useState(false)
 
   const handleTitleClick = async () => {
+    if (selectMode) return
     switch (type) {
       case "translation":
         if (!(id in translationData)) {
@@ -174,13 +182,26 @@ export const ProjectItemList = ({
       size="sm"
       ref={setNodeRef}
       style={style}
-      className="p-3 touch-none"
+      className={cn(
+        "p-3 touch-none",
+        selectMode && "select-none",
+        selected && "ring-primary bg-primary/5 dark:bg-primary/10"
+      )}
+      onClick={selectMode ? (e) => { e.stopPropagation(); onSelectToggle?.() } : undefined}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 sm:gap-3">
-          <button {...attributes} {...listeners} className="cursor-grab">
-            <GripVertical className="size-5 text-muted-foreground" />
-          </button>
+          {selectMode ? (
+            <Checkbox
+              checked={selected}
+              onCheckedChange={onSelectToggle}
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <button {...attributes} {...listeners} className="cursor-grab">
+              <GripVertical className="size-5 text-muted-foreground" />
+            </button>
+          )}
           <div className="bg-secondary p-2 rounded-lg">{icon}</div>
           <div
             className="cursor-pointer hover:bg-muted/50 rounded-lg py-1 -my-1 px-2 -mx-1 group/title"
@@ -204,6 +225,8 @@ export const ProjectItemList = ({
         </div>
         <div className="flex items-center gap-3">
           <p className="text-xs text-muted-foreground sm:block hidden">{date}</p>
+          {!selectMode && (
+          <>
           <Button
             variant="ghost"
             size="icon-xs"
@@ -228,6 +251,8 @@ export const ProjectItemList = ({
           >
             <Trash className="size-4" />
           </Button>
+          </>
+          )}
         </div>
       </div>
 

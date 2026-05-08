@@ -6,13 +6,15 @@ interface DeleteDialogueProps {
   isDeleteModalOpen: boolean
   setIsDeleteModalOpen: (open: boolean) => void
   isProcessing?: boolean
+  message?: string
 }
 
 export const DeleteDialogue = ({
   handleDelete,
   isDeleteModalOpen,
   setIsDeleteModalOpen,
-  isProcessing = false
+  isProcessing = false,
+  message,
 }: DeleteDialogueProps) => (
   <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
     <DialogContent>
@@ -21,7 +23,7 @@ export const DeleteDialogue = ({
       </DialogHeader>
       <DialogDescription className="hidden" />
       <p className="text-sm">
-        Are you sure you want to delete this item?
+        {message ?? "Are you sure you want to delete this item?"}
       </p>
       <DialogFooter>
         <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>

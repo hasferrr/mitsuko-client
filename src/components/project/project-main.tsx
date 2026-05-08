@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Globe, Headphones, LayoutDashboard, FileText } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Project } from "@/types/project"
@@ -15,10 +15,14 @@ import {
 } from "@/constants/global-settings"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useProjectData } from "@/hooks/project/use-project-data"
+import { useProjectItemSelection } from "@/hooks/project/use-project-item-selection"
 import { ProjectHeader } from "./project-header"
 import { ProjectTranslationList } from "./lists/project-translation-list"
 import { ProjectTranscriptionList } from "./lists/project-transcription-list"
 import { ProjectExtractionList } from "./lists/project-extraction-list"
+import { ProjectItemSelectionBar } from "../shared/project-item-selection-bar"
+import { BulkMoveDialogue } from "../ui-custom/bulk-move-dialogue"
+import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 
 interface ProjectMainProps {
   currentProject: Project
@@ -31,6 +35,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   const [isGlobalTranslationSettingsOpen, setIsGlobalTranslationSettingsOpen] = useState(false)
   const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
   const [isGlobalTranscriptionSettingsOpen, setIsGlobalTranscriptionSettingsOpen] = useState(false)
+  const [currentTab, setCurrentTab] = useState("overview")
 
   const updateProjectStore = useProjectStore(state => state.updateProject)
 
@@ -44,6 +49,49 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
     isLoadingData,
     handleDragEnd,
   } = useProjectData(currentProject)
+
+  const selection = useProjectItemSelection({
+    translations,
+    transcriptions,
+    extractions,
+    currentProjectId: currentProject.id,
+    currentTab,
+    setTranslations,
+    setTranscriptions,
+    setExtractions,
+  })
+
+  const isSelecting = selection.isSelecting
+  const exitSelectMode = selection.exitSelectMode
+
+  useEffect(() => {
+    exitSelectMode()
+  }, [currentProject.id, exitSelectMode])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isSelecting) {
+        exitSelectMode()
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [isSelecting, exitSelectMode])
+
+  const handleTabChange = (value: string) => {
+    setCurrentTab(value)
+    if (selection.isSelecting) {
+      selection.exitSelectMode()
+    }
+  }
+
+  const selectModeProps = {
+    selectMode: selection.isSelecting,
+    selectedIds: selection.selectedIds,
+    onSelectToggle: selection.handleSelectToggle,
+    onToggleSelectMode: selection.toggleSelectMode,
+    isSelecting: selection.isSelecting,
+  }
 
   return (
     <div translate="no" className="flex-1 p-6 max-w-5xl mx-auto">
@@ -99,7 +147,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         }}
       />
 
-      {/* Global Settings Dialogues */}
       <SettingsDialogue
         mode="global"
         isOpen={isGlobalTranslationSettingsOpen}
@@ -125,7 +172,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         defaultTranscriptionId={GLOBAL_TRANSCRIPTION_SETTINGS_ID}
       />
 
-      <Tabs defaultValue="overview" className="mb-6">
+      <Tabs value={currentTab} onValueChange={handleTabChange} className="mb-6">
         <TabsList className="bg-card border border-border h-fit flex-wrap">
           <TabsTrigger value="overview" className="data-[state=active]:bg-secondary rounded-md">
             <LayoutDashboard className="size-4" />
@@ -145,7 +192,6 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
           </TabsTrigger>
         </TabsList>
 
-        {/* Overview Tab */}
         <TabsContent value="overview" className="mt-4">
           <div className="space-y-6">
             <ProjectTranslationList
@@ -156,6 +202,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
               isLoadingData={isLoadingData}
               onDragEnd={handleDragEnd}
               onOpenSettings={() => setIsTranslationSettingsModalOpen(true)}
+              {...selectModeProps}
             />
             <ProjectTranscriptionList
               title="Transcriptions"
@@ -165,6 +212,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
               isLoadingData={isLoadingData}
               onDragEnd={handleDragEnd}
               onOpenSettings={() => setIsTranscriptionSettingsModalOpen(true)}
+              {...selectModeProps}
             />
             <ProjectExtractionList
               title="Extractions"
@@ -174,11 +222,11 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
               isLoadingData={isLoadingData}
               onDragEnd={handleDragEnd}
               onOpenSettings={() => setIsExtractionSettingsModalOpen(true)}
+              {...selectModeProps}
             />
           </div>
         </TabsContent>
 
-        {/* Translations Tab */}
         <TabsContent value="translations" className="mt-4">
           <ProjectTranslationList
             title="All Translations"
@@ -188,10 +236,10 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
             isLoadingData={isLoadingData}
             onDragEnd={handleDragEnd}
             onOpenSettings={() => setIsTranslationSettingsModalOpen(true)}
+            {...selectModeProps}
           />
         </TabsContent>
 
-        {/* Transcriptions Tab */}
         <TabsContent value="transcriptions" className="mt-4">
           <ProjectTranscriptionList
             title="All Transcriptions"
@@ -201,10 +249,10 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
             isLoadingData={isLoadingData}
             onDragEnd={handleDragEnd}
             onOpenSettings={() => setIsTranscriptionSettingsModalOpen(true)}
+            {...selectModeProps}
           />
         </TabsContent>
 
-        {/* Extractions Tab */}
         <TabsContent value="context-extractor" className="mt-4">
           <ProjectExtractionList
             title="All Extractions"
@@ -214,9 +262,45 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
             isLoadingData={isLoadingData}
             onDragEnd={handleDragEnd}
             onOpenSettings={() => setIsExtractionSettingsModalOpen(true)}
+            {...selectModeProps}
           />
         </TabsContent>
       </Tabs>
+
+      <ProjectItemSelectionBar
+        open={selection.isSelecting}
+        selectedCount={selection.selectedCount}
+        isProcessing={selection.isProcessing}
+        allSelected={selection.allSelected}
+        hasActiveOperations={selection.hasActiveOperations}
+        currentTab={currentTab}
+        hasTranslations={selection.hasTranslations}
+        hasTranscriptions={selection.hasTranscriptions}
+        hasExtractions={selection.hasExtractions}
+        onDelete={() => selection.setIsDeleteDialogOpen(true)}
+        onMove={() => selection.setIsMoveDialogOpen(true)}
+        onSelectAllToggle={selection.handleSelectAllToggle}
+        onSelectTypeOnly={selection.handleSelectTypeOnly}
+        onCancel={selection.exitSelectMode}
+      />
+
+      <DeleteDialogue
+        handleDelete={selection.handleDeleteSelected}
+        isDeleteModalOpen={selection.isDeleteDialogOpen}
+        setIsDeleteModalOpen={selection.setIsDeleteDialogOpen}
+        isProcessing={selection.isProcessing}
+        message={selection.deleteMessage}
+      />
+
+      <BulkMoveDialogue
+        isOpen={selection.isMoveDialogOpen}
+        onOpenChange={selection.setIsMoveDialogOpen}
+        projects={selection.projects}
+        currentProjectId={currentProject.id}
+        selectedCounts={selection.selectedCounts}
+        onMove={selection.handleMoveSelected}
+        isProcessing={selection.isProcessing}
+      />
     </div>
   )
 }

@@ -66,6 +66,28 @@ export const updateTranscription = async (
   return updated
 }
 
+export const moveTranscription = async (
+  sourceProjectId: string,
+  targetProjectId: string,
+  transcriptionId: string,
+): Promise<void> => {
+  return db.transaction('rw', db.projects, db.transcriptions, async () => {
+    await db.transcriptions.update(transcriptionId, { projectId: targetProjectId, updatedAt: new Date() })
+
+    await db.projects.update(sourceProjectId, project => {
+      if (!project) return
+      project.transcriptions = project.transcriptions.filter(id => id !== transcriptionId)
+      project.updatedAt = new Date()
+    })
+
+    await db.projects.update(targetProjectId, project => {
+      if (!project) return
+      project.transcriptions.push(transcriptionId)
+      project.updatedAt = new Date()
+    })
+  })
+}
+
 export const deleteTranscription = async (projectId: string, transcriptionId: string): Promise<void> => {
   return db.transaction('rw', db.projects, db.transcriptions, async () => {
     await db.transcriptions.delete(transcriptionId)

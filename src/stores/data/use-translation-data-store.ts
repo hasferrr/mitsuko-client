@@ -6,6 +6,7 @@ import {
   createTranslation as createDB,
   getTranslation as getDB,
   deleteTranslation as deleteDB,
+  moveTranslation as moveDB,
 } from "@/lib/db/translation"
 import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
@@ -28,6 +29,7 @@ export interface TranslationDataStore {
   getTranslationsDb: (translationIds: string[]) => Promise<Translation[]>
   updateTranslationDb: (translationId: string, changes: Partial<Pick<Translation, "title" | "subtitles" | "parsed">>) => Promise<Translation>
   deleteTranslationDb: (projectId: string, translationId: string) => Promise<void>
+  moveTranslationDb: (sourceProjectId: string, targetProjectId: string, translationId: string) => Promise<void>
   // setters
   setCurrentId: (id: string | null) => void
   setTitle: (id: string, title: string) => void
@@ -136,6 +138,15 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     })
     if (get().currentId === translationId) {
       set({ currentId: null })
+    }
+  },
+  moveTranslationDb: async (sourceProjectId, targetProjectId, translationId) => {
+    await moveDB(sourceProjectId, targetProjectId, translationId)
+    const data = get().data[translationId]
+    if (data) {
+      set(state => ({
+        data: { ...state.data, [translationId]: { ...data, projectId: targetProjectId, updatedAt: new Date() } }
+      }))
     }
   },
 

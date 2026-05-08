@@ -68,6 +68,28 @@ export const updateTranslation = async (
   return updated
 }
 
+export const moveTranslation = async (
+  sourceProjectId: string,
+  targetProjectId: string,
+  translationId: string,
+): Promise<void> => {
+  return db.transaction('rw', db.projects, db.translations, async () => {
+    await db.translations.update(translationId, { projectId: targetProjectId, updatedAt: new Date() })
+
+    await db.projects.update(sourceProjectId, project => {
+      if (!project) return
+      project.translations = project.translations.filter(id => id !== translationId)
+      project.updatedAt = new Date()
+    })
+
+    await db.projects.update(targetProjectId, project => {
+      if (!project) return
+      project.translations.push(translationId)
+      project.updatedAt = new Date()
+    })
+  })
+}
+
 export const deleteTranslation = async (projectId: string, translationId: string): Promise<void> => {
   return db.transaction('rw', db.projects, db.translations, db.basicSettings, db.advancedSettings, async () => {
     const translation = await db.translations.get(translationId)
