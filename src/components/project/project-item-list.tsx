@@ -12,7 +12,6 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { db } from "@/lib/db/db"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
@@ -55,15 +54,15 @@ export const ProjectItemList = ({
 
   const translationData = useTranslationDataStore((state) => state.data)
   const setCurrentTranslationId = useTranslationDataStore((state) => state.setCurrentId)
-  const upsertTranslationData = useTranslationDataStore((state) => state.upsertData)
+  const moveTranslationDb = useTranslationDataStore((state) => state.moveTranslationDb)
 
   const transcriptionData = useTranscriptionDataStore((state) => state.data)
   const setCurrentTranscriptionId = useTranscriptionDataStore((state) => state.setCurrentId)
-  const upsertTranscriptionData = useTranscriptionDataStore((state) => state.upsertData)
+  const moveTranscriptionDb = useTranscriptionDataStore((state) => state.moveTranscriptionDb)
 
   const extractionData = useExtractionDataStore((state) => state.data)
   const setCurrentExtractionId = useExtractionDataStore((state) => state.setCurrentId)
-  const upsertExtractionData = useExtractionDataStore((state) => state.upsertData)
+  const moveExtractionDb = useExtractionDataStore((state) => state.moveExtractionDb)
 
   const getTranslationDb = useTranslationDataStore((state) => state.getTranslationDb)
   const getExtractionDb = useExtractionDataStore((state) => state.getExtractionDb)
@@ -125,53 +124,13 @@ export const ProjectItemList = ({
 
   const handleMove = async (targetProjectId: string) => {
     setIsProcessing(true)
-    await db.transaction('rw', [db.projects, db.translations, db.transcriptions, db.extractions], async () => {
-      // Remove from current project
-      await db.projects.update(projectId, project => {
-        if (!project) return
-        project[`${type}s`] = project[`${type}s`].filter(itemId => itemId !== id)
-        project.updatedAt = new Date()
-      })
-
-      // Add to target project
-      await db.projects.update(targetProjectId, project => {
-        if (!project) return
-        project[`${type}s`].push(id)
-        project.updatedAt = new Date()
-      })
-
-      // Update item's projectId
-      switch (type) {
-        case "translation":
-          await db.translations.update(id, { projectId: targetProjectId, updatedAt: new Date() })
-          break
-        case "transcription":
-          await db.transcriptions.update(id, { projectId: targetProjectId, updatedAt: new Date() })
-          break
-        case "extraction":
-          await db.extractions.update(id, { projectId: targetProjectId, updatedAt: new Date() })
-          break
-      }
-    })
-
-    // Update data in the store based on item type
     if (type === "translation") {
-      if (translationData[id]) {
-        const updatedData = { ...translationData[id], projectId: targetProjectId }
-        upsertTranslationData(id, updatedData)
-      }
+      await moveTranslationDb(projectId, targetProjectId, id)
     } else if (type === "transcription") {
-      if (transcriptionData[id]) {
-        const updatedData = { ...transcriptionData[id], projectId: targetProjectId }
-        upsertTranscriptionData(id, updatedData)
-      }
-    } else if (type === "extraction") {
-      if (extractionData[id]) {
-        const updatedData = { ...extractionData[id], projectId: targetProjectId }
-        upsertExtractionData(id, updatedData)
-      }
+      await moveTranscriptionDb(projectId, targetProjectId, id)
+    } else {
+      await moveExtractionDb(projectId, targetProjectId, id)
     }
-
     await loadProjects()
     setIsMoveOpen(false)
     setIsProcessing(false)
