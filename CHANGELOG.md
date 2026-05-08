@@ -18,6 +18,7 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 - 📦 **Project Archiving:** Archive projects to tidy up your workspace. Archived items live in a separate section and can be unarchived anytime.
 - ✅ **Multi-Select & Bulk Actions:** Select multiple projects or batch items and bulk delete, archive, unarchive, or export from the selection bar.
+- ✅ **Multi-Select for Project Items:** Select multiple translations, transcriptions, or extractions within a project and bulk delete or move them to another project.
 
 ### April 26
 

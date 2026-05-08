@@ -44,7 +44,7 @@ bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.
   - `utils/` - Shared store utilities (e.g., `copySettingsKeys` for settings copy/reset)
   - `data/` - Project data caches
   - `ui/` - UI state stores (history, tools, theme, session, upload, etc.)
-- `src/lib/db/` - Dexie database schema, migrations, and CRUD operations
+- `src/lib/db/` - Dexie database schema, migrations, and CRUD operations (only layer that defines `db` transaction/CRUD functions; components and hooks must NOT import `db` directly — use store methods instead)
 - `src/lib/subtitles/` - SRT/ASS/VTT parsers and generators
 - `src/lib/parser/` - AI response parsing and cleaning
 - `src/lib/api/` - Backend API integration (streaming, credit management)
@@ -128,7 +128,7 @@ Dexie database is at version 24. When modifying data models in `src/types/`:
 ## Code Style
 
 - **No semicolons** at line endings
-- **No comments** in code (unless explaining non-obvious logic)
+- **No comments** in new code (unless explaining non-obvious logic); do not remove existing comments
 - **No `any` type** — use specific types, `unknown` with type guards, or proper type definitions
 - Use named imports from React (e.g., `import { useEffect, useState } from "react"`)
 - Use path alias `@/*` for imports from `src/`
