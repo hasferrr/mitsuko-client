@@ -6,6 +6,7 @@ import { AppSidebarWrapper } from "@/components/sidebar/app-sidebar-wrapper"
 import { Metadata } from "next"
 import { META_TITLE } from "@/constants/metadata"
 import { FeaturesPrefetcher } from "@/components/layout/features-prefetcher"
+import { MaintenanceBanner } from "@/components/layout/maintenance-banner"
 
 export const metadata: Metadata = {
   title: META_TITLE,
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 export default function Layout({ children }: PropsWithChildren) {
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <AppSidebarWrapper header={<Navbar />}>
+      <AppSidebarWrapper header={<><MaintenanceBanner /><Navbar /></>}>
         <div className="flex flex-col min-h-[calc(100vh-3.6rem)]">
           <UploadIndicator />
           <FeaturesPrefetcher />
