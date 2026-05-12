@@ -1,8 +1,14 @@
 import { CurrencyData, BasePlanData, CreditPack } from "@/types/pricing"
 
+const USD_TO_IDR_FALLBACK = 17500
+
+const USD_TO_IDR = process.env.NEXT_PUBLIC_USD_TO_IDR
+  ? Number(process.env.NEXT_PUBLIC_USD_TO_IDR)
+  : USD_TO_IDR_FALLBACK
+
 export const CURRENCIES: { USD: CurrencyData; IDR: CurrencyData } = {
   USD: { symbol: "$", rate: 1 },
-  IDR: { symbol: "Rp", rate: 17500 },
+  IDR: { symbol: "Rp", rate: USD_TO_IDR },
 }
 
 export const SUBSCRIPTION_PLANS: {
