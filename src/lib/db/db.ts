@@ -328,6 +328,19 @@ class MyDatabase extends Dexie {
         }
       })
     })
+    this.version(26).stores({}).upgrade(async tx => {
+      await tx.table('translations').toCollection().modify(translation => {
+        if (typeof translation.autoContextMode === 'undefined') {
+          translation.autoContextMode = 'disabled'
+        }
+        if (typeof translation.autoContextExtractionId === 'undefined') {
+          translation.autoContextExtractionId = null
+        }
+        if (typeof translation.autoContextPreviousExtractionId === 'undefined') {
+          translation.autoContextPreviousExtractionId = null
+        }
+      })
+    })
   }
 }
 
