@@ -148,6 +148,7 @@ export default function SubtitleTranslatorMain({
   const session = useSessionStore((state) => state.session)
   const isSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.isSubtitlePerformanceModeEnabled)
   const isASSGuidanceDismissed = useLocalSettingsStore((state) => state.dismissedDialogs["ass-guidance"] ?? false)
+  const isRetranslateConfirmationDismissed = useLocalSettingsStore((state) => state.dismissedDialogs["retranslate-confirmation"] ?? false)
   const dismissDialog = useLocalSettingsStore((state) => state.dismissDialog)
 
   // Other State
@@ -165,6 +166,8 @@ export default function SubtitleTranslatorMain({
   const [isInitialUploadDialogOpen, setIsInitialUploadDialogOpen] = useState(false)
   const [uploadMode, setUploadMode] = useState<"normal" | "as-translated">("normal")
   const [isMismatchDialogOpen, setIsMismatchDialogOpen] = useState(false)
+  const [isRetranslateDialogOpen, setIsRetranslateDialogOpen] = useState(false)
+  const [isRetranslateDontShowAgain, setIsRetranslateDontShowAgain] = useState(false)
   const [pendingNewSubtitles, setPendingNewSubtitles] = useState<SubtitleNoTime[]>([])
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
@@ -550,7 +553,14 @@ export default function SubtitleTranslatorMain({
           <div className="grid grid-cols-2 gap-4">
             {/* Start Translation Button */}
             <Button
-              onClick={() => handleStartTranslation()}
+              onClick={() => {
+                const hasTranslated = subtitles.some(s => s.translated.trim() !== "")
+                if (hasTranslated && !isRetranslateConfirmationDismissed) {
+                  setIsRetranslateDialogOpen(true)
+                } else {
+                  handleStartTranslation()
+                }
+              }}
               disabled={isTranslating || !session || subtitles.length === 0}
             >
               {isTranslating ? (
@@ -858,6 +868,39 @@ export default function SubtitleTranslatorMain({
             <AlertDialogAction onClick={() => { if (isASSGuidanceDontShowAgain) dismissDialog("ass-guidance") }}>
               I understand
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Retranslate Confirmation Dialog */}
+      <AlertDialog open={isRetranslateDialogOpen} onOpenChange={(open) => { setIsRetranslateDialogOpen(open); if (!open) setIsRetranslateDontShowAgain(false) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Restart Translation</AlertDialogTitle>
+            <AlertDialogDescription>
+              Start translating from the beginning? Use the "Continue" button to finish the translation instead.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:items-center">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="retranslate-dont-show"
+                checked={isRetranslateDontShowAgain}
+                onCheckedChange={(checked) => setIsRetranslateDontShowAgain(checked === true)}
+              />
+              <Label htmlFor="retranslate-dont-show" className="text-sm text-muted-foreground cursor-pointer">
+                Don't show again
+              </Label>
+            </div>
+            <div className="flex gap-2">
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => {
+                if (isRetranslateDontShowAgain) dismissDialog("retranslate-confirmation")
+                handleStartTranslation()
+              }}>
+                Restart
+              </AlertDialogAction>
+            </div>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
