@@ -749,7 +749,7 @@ export default function SubtitleTranslatorMain({
           <DialogHeader>
             <DialogTitle>Upload Subtitle File</DialogTitle>
             <DialogDescription>
-              Upload a SRT or ASS file. Check the box below to upload as a translation only.
+              Select a subtitle file. Check the box below to upload as a translation only.
             </DialogDescription>
           </DialogHeader>
 

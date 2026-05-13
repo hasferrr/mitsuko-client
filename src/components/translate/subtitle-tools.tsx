@@ -113,7 +113,7 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-xl">Subtitle Tools</DialogTitle>
         </DialogHeader>

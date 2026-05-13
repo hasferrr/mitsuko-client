@@ -82,14 +82,14 @@ export const SubtitleProgress = ({ isOpen, setIsOpen, children }: SubtitleCountP
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-xl">Translation Progress</DialogTitle>
+          <DialogTitle>Translation Progress</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <DialogDescription>
-            Here is the progress of subtitle translation and missing original text.
+            Progress of translation and missing original text.
           </DialogDescription>
           {translatedCount !== null && (
             <div className="text-sm font-medium">

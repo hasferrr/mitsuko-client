@@ -131,7 +131,7 @@ export function ImportInstructionsDialog() {
       </Button>
 
       <AlertDialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-        <AlertDialogContent className="max-w-4xl">
+        <AlertDialogContent className="data-[size=default]:sm:max-w-3xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Import Custom Instructions</AlertDialogTitle>
             <AlertDialogDescription>
@@ -150,7 +150,7 @@ export function ImportInstructionsDialog() {
             </label>
           </div>
           <ScrollArea className="h-[50vh] pr-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-1">
               {instructionsToImport.map(item => (
                 <Card
                   key={item.id}
