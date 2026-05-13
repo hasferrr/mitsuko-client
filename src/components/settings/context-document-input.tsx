@@ -110,7 +110,10 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
 
   const selectedExtraction = translation?.autoContextExtractionId ? extractionData[translation.autoContextExtractionId] : null
   const previousExtraction = translation?.autoContextPreviousExtractionId ? extractionData[translation.autoContextPreviousExtractionId] : null
-  const selectedProblem = translation && translation.autoContextExtractionId
+  const isSelectedExtractionRunning = translation?.autoContextExtractionId
+    ? isExtractingSet.has(translation.autoContextExtractionId)
+    : false
+  const selectedProblem = translation && translation.autoContextExtractionId && !isSelectedExtractionRunning
     ? getExtractionProblem(selectedExtraction ?? undefined, translation.projectId, isExtractingSet)
     : null
 
@@ -246,7 +249,11 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                  {selectedProblem && (
+                  {isSelectedExtractionRunning ? (
+                    <p className="text-xs text-muted-foreground">
+                      Translation will wait until this extraction finishes.
+                    </p>
+                  ) : selectedProblem && (
                     <p className="text-xs text-destructive">{selectedProblem}</p>
                   )}
                   {selectedExtraction && (

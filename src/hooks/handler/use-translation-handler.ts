@@ -114,6 +114,24 @@ export const useTranslationHandler = ({
     isBatch: false,
   })
 
+  const waitForExtractionToFinish = async (extractionId: string) => {
+    if (!useExtractionStore.getState().isExtractingSet.has(extractionId)) return
+
+    await new Promise<void>((resolve) => {
+      const unsubscribe = useExtractionStore.subscribe((state) => {
+        if (!state.isExtractingSet.has(extractionId)) {
+          unsubscribe()
+          resolve()
+        }
+      })
+
+      if (!useExtractionStore.getState().isExtractingSet.has(extractionId)) {
+        unsubscribe()
+        resolve()
+      }
+    })
+  }
+
   // Lazy user data query
   const { refetch: refetchUserData } = useQuery<UserCreditData>({
     queryKey: ["user", session?.user?.id],
@@ -476,8 +494,34 @@ export const useTranslationHandler = ({
         return null
       }
 
-      const extraction = extractionDataStore.data[extractionId] ?? await extractionDataStore.getExtractionDb(extractionId)
-      const problem = getExtractionProblem(extraction, translation.projectId, runningIds)
+      let extraction = extractionDataStore.data[extractionId] ?? await extractionDataStore.getExtractionDb(extractionId)
+      if (!extraction) {
+        toast.error("Selected context extraction was not found.")
+        return null
+      }
+      if (extraction.projectId !== translation.projectId) {
+        toast.error("Selected context extraction is not in this project.", {
+          action: {
+            label: "Open",
+            onClick: () => extractionDataStore.setCurrentId(extraction.id),
+          },
+        })
+        return null
+      }
+
+      if (useExtractionStore.getState().isExtractingSet.has(extraction.id)) {
+        toast.info("Waiting for selected context extraction to finish before translation.")
+        await waitForExtractionToFinish(extraction.id)
+        if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) return null
+        const updatedExtraction = await extractionDataStore.getExtractionDb(extraction.id)
+        if (!updatedExtraction) {
+          toast.error("Selected context extraction was not found.")
+          return null
+        }
+        extraction = updatedExtraction
+      }
+
+      const problem = getExtractionProblem(extraction, translation.projectId, useExtractionStore.getState().isExtractingSet)
       if (problem) {
         toast.error(problem, {
           action: extraction ? {
