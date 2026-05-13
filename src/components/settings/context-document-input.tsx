@@ -109,10 +109,6 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
   const selectedProblem = translation && translation.autoContextExtractionId
     ? getExtractionProblem(selectedExtraction ?? undefined, translation.projectId, isExtractingSet)
     : null
-  const latestUsableExtraction = translation
-    ? findLatestUsableExtraction(projectExtractions, translation.projectId, isExtractingSet)
-    : null
-  const effectivePreviousExtraction = previousExtraction ?? latestUsableExtraction
 
   return (
     <div className="flex flex-col gap-2">
@@ -266,13 +262,14 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
                       variant="ghost"
                       size="sm"
                       onClick={() => setAutoContextValue("autoContextPreviousExtractionId", null)}
+                      disabled={!translation.autoContextPreviousExtractionId}
                     >
                       <X />
-                      Use latest
+                      Deselect
                     </Button>
                   </div>
                   <Select
-                    value={translation.autoContextPreviousExtractionId ?? effectivePreviousExtraction?.id ?? ""}
+                    value={translation.autoContextPreviousExtractionId ?? ""}
                     onValueChange={(value) => setAutoContextValue("autoContextPreviousExtractionId", value)}
                   >
                     <SelectTrigger className="w-full">
@@ -288,13 +285,13 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                  {effectivePreviousExtraction ? (
-                    <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(effectivePreviousExtraction.id)}>
+                  {previousExtraction ? (
+                    <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(previousExtraction.id)}>
                       <ExternalLink />
                       Open Previous Context
                     </Button>
                   ) : (
-                    <p className="text-xs text-muted-foreground">No usable previous extraction found.</p>
+                    <p className="text-xs text-muted-foreground">No previous context will be sent.</p>
                   )}
                 </div>
               )}

@@ -52,7 +52,6 @@ import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import {
   cleanExtractionResult,
   combineAutoContext,
-  findLatestUsableExtraction,
   getEpisodeNumberFromTranslationTitle,
   getExtractionProblem,
   getTranslationSubtitleContent,
@@ -502,9 +501,7 @@ export const useTranslationHandler = ({
     const selectedPrevious = translation.autoContextPreviousExtractionId
       ? projectExtractions.find(extraction => extraction.id === translation.autoContextPreviousExtractionId) ?? await extractionDataStore.getExtractionDb(translation.autoContextPreviousExtractionId)
       : null
-    const previousExtraction = selectedPrevious && getExtractionProblem(selectedPrevious, translation.projectId, runningIds) === null
-      ? selectedPrevious
-      : findLatestUsableExtraction(projectExtractions, translation.projectId, runningIds)
+    const previousExtraction = selectedPrevious && getExtractionProblem(selectedPrevious, translation.projectId, runningIds) === null ? selectedPrevious : null
     const previousContext = previousExtraction ? cleanExtractionResult(previousExtraction.contextResult) : ""
 
     const created = await extractionDataStore.createExtractionDb(project.id, {
