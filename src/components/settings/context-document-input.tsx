@@ -35,6 +35,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
   const extractionData = useExtractionDataStore((state) => state.data)
   const getExtractionsDb = useExtractionDataStore((state) => state.getExtractionsDb)
   const getExtractionDb = useExtractionDataStore((state) => state.getExtractionDb)
+  const setCurrentExtractionId = useExtractionDataStore((state) => state.setCurrentId)
   const isExtractingSet = useExtractionStore((state) => state.isExtractingSet)
 
   const [isContextDialogOpen, setIsContextDialogOpen] = useState(false)
@@ -100,7 +101,10 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
 
   const handleOpenExtraction = async (extractionId: string | null) => {
     if (!extractionId) return
-    await getExtractionDb(extractionId)
+    const extraction = await getExtractionDb(extractionId)
+    if (!extraction) return
+    setCurrentExtractionId(extraction.id)
+    setIsAutoContextDialogOpen(false)
     setPreviewExtractionId(extractionId)
   }
 
