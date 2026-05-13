@@ -99,11 +99,11 @@ export const useExtractionHandler = ({
 
     if (episodeNumber.trim() === "") {
       setIsEpisodeNumberValid?.(false)
-      return
+      return false
     }
     if (subtitleContent.trim() === "") {
       setIsSubtitleContentValid?.(false)
-      return
+      return false
     }
 
     setIsExtracting(currentId, true)
@@ -182,10 +182,12 @@ export const useExtractionHandler = ({
       )
 
       onSuccessTranslation?.({ currentId })
+      return true
     } catch (error) {
       onErrorTranslation?.({ currentId })
 
       console.error(error)
+      return false
     } finally {
       setIsExtracting(currentId, false)
 

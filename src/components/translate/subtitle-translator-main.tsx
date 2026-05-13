@@ -585,7 +585,7 @@ export default function SubtitleTranslatorMain({
             <Button
               variant="outline"
               onClick={handleStopTranslation}
-              disabled={!isTranslating || !translation.response.response}
+              disabled={!isTranslating}
             >
               <Square className="size-4" />
               Stop
@@ -668,6 +668,7 @@ export default function SubtitleTranslatorMain({
                   <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
                     <ContextDocumentInput
                       basicSettingsId={basicSettingsId}
+                      translationId={currentId}
                     />
                   </DragAndDrop>
                     <CustomInstructionsInput

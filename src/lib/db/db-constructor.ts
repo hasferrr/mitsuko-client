@@ -60,6 +60,8 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       id: uuidv4(),
       basicSettingsId: basicSettingsMap.get(translation.basicSettingsId)?.id ?? translation.basicSettingsId,
       advancedSettingsId: advancedSettingsMap.get(translation.advancedSettingsId)?.id ?? translation.advancedSettingsId,
+      autoContextExtractionId: translation.autoContextExtractionId ?? null,
+      autoContextPreviousExtractionId: translation.autoContextPreviousExtractionId ?? null,
       projectId: "",
     })
   }
@@ -85,6 +87,17 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       advancedSettingsId: advancedSettingsMap.get(extraction.advancedSettingsId)?.id ?? extraction.advancedSettingsId,
       projectId: "",
     })
+  }
+
+  for (const translation of data.translations) {
+    const newTranslation = translationsMap.get(translation.id)
+    if (!newTranslation) continue
+    newTranslation.autoContextExtractionId = translation.autoContextExtractionId
+      ? extractionsMap.get(translation.autoContextExtractionId)?.id ?? translation.autoContextExtractionId
+      : null
+    newTranslation.autoContextPreviousExtractionId = translation.autoContextPreviousExtractionId
+      ? extractionsMap.get(translation.autoContextPreviousExtractionId)?.id ?? translation.autoContextPreviousExtractionId
+      : null
   }
 
   for (const transcription of data.transcriptions) {
@@ -230,6 +243,9 @@ function translationConstructor(translation: Partial<Translation>): Translation 
     projectId: translation.projectId ?? "",
     basicSettingsId: translation.basicSettingsId ?? "",
     advancedSettingsId: translation.advancedSettingsId ?? "",
+    autoContextMode: translation.autoContextMode ?? "disabled",
+    autoContextExtractionId: translation.autoContextExtractionId ?? null,
+    autoContextPreviousExtractionId: translation.autoContextPreviousExtractionId ?? null,
     response: translation.response ?? { response: "", jsonResponse: [] },
   }
 }

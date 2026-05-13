@@ -9,7 +9,7 @@ import { createBasicSettings, createAdvancedSettings } from "./settings"
 // Translation CRUD
 export const createTranslation = async (
   projectId: string,
-  data: Pick<Translation, "title" | "subtitles" | "parsed"> & Partial<Pick<Translation, "response">>,
+  data: Pick<Translation, "title" | "subtitles" | "parsed"> & Partial<Pick<Translation, "response" | "autoContextMode" | "autoContextExtractionId" | "autoContextPreviousExtractionId">>,
   basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
   advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
 ): Promise<Translation> => {
@@ -31,6 +31,9 @@ export const createTranslation = async (
       ...data,
       basicSettingsId: basicSettings.id,
       advancedSettingsId: advancedSettings.id,
+      autoContextMode: data.autoContextMode ?? "disabled",
+      autoContextExtractionId: data.autoContextExtractionId ?? null,
+      autoContextPreviousExtractionId: data.autoContextPreviousExtractionId ?? null,
       response: data.response ?? {
         response: "",
         jsonResponse: [],
@@ -56,7 +59,7 @@ export const getTranslation = async (translationId: string): Promise<Translation
 
 export const updateTranslation = async (
   translationId: string,
-  changes: Partial<Pick<Translation, "title" | "subtitles" | "parsed">>
+  changes: Partial<Translation>
 ): Promise<Translation> => {
   await db.translations.update(translationId, {
     ...changes,
