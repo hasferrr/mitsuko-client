@@ -35,6 +35,8 @@ Translation starts normally and uses only the current Context Document textarea.
 
 Before translation starts, the app creates a new extraction in the same project, runs extraction, validates the result, then uses the new extraction result for translation.
 
+As soon as the extraction is created, the app changes the translation's auto context mode to `use-existing` and writes the new extraction id to `autoContextExtractionId`. This keeps the newly created extraction selected and linked even while extraction is still running.
+
 The created extraction uses:
 
 - project default extraction settings if project extraction defaults are enabled
@@ -43,7 +45,7 @@ The created extraction uses:
 - `Auto Context - {translation title}` as title
 - translation title without subtitle extension as episode number
 
-`create-new` stays `create-new` after the run. It does not silently become `use-existing`.
+`create-new` becomes `use-existing` as soon as the linked extraction is created.
 
 ### Use Existing
 

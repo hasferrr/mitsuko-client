@@ -628,6 +628,7 @@ export const useTranslationHandler = ({
     })
 
     autoCreatedExtractionByTranslationRef.current.set(currentId, created.id)
+    translationStore.mutateData(currentId, "autoContextMode", "use-existing")
     translationStore.mutateData(currentId, "autoContextExtractionId", created.id)
     translationStore.mutateData(currentId, "autoContextPreviousExtractionId", previousExtraction?.id ?? null)
     await translationStore.saveData(currentId)
@@ -646,6 +647,7 @@ export const useTranslationHandler = ({
     }
 
     translationStore.mutateData(currentId, "autoContextExtractionId", created.id)
+    translationStore.mutateData(currentId, "autoContextMode", "use-existing")
     await translationStore.saveData(currentId)
 
     if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) {
