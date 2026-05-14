@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef } from "react"
 import {
   Subtitle,
   SubOnlyTranslated,
@@ -52,6 +53,7 @@ import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import {
   cleanExtractionResult,
   combineAutoContext,
+  findLatestUsableExtraction,
   getEpisodeNumberFromTranslationTitle,
   getExtractionProblem,
   getTranslationSubtitleContent,
@@ -66,6 +68,7 @@ interface UseTranslationHandlerProps {
     isBatch: boolean
     onSuccessTranslation?: () => void
     onErrorTranslation?: (args: { currentId: string, isContinuation: boolean }) => void
+    onOpenExtraction?: (extractionId: string) => void
   }
 }
 
@@ -78,6 +81,7 @@ export const useTranslationHandler = ({
     isBatch,
     onSuccessTranslation,
     onErrorTranslation,
+    onOpenExtraction,
   },
 }: UseTranslationHandlerProps) => {
   // Translation Data Store
@@ -108,10 +112,16 @@ export const useTranslationHandler = ({
   // Custom Hooks
   const { setHasChanges } = useUnsavedChanges()
   const scrollToTop = useScrollToTop()
+  const autoCreatedExtractionByTranslationRef = useRef<Map<string, string>>(new Map())
   const { handleStart: handleStartExtraction } = useExtractionHandler({
     setActiveTab: () => {},
     isBatch: false,
   })
+
+  const openExtraction = (extractionId: string) => {
+    useExtractionDataStore.getState().setCurrentId(extractionId)
+    onOpenExtraction?.(extractionId)
+  }
 
   const waitForExtractionToFinish = async (extractionId: string) => {
     if (!useExtractionStore.getState().isExtractingSet.has(extractionId)) return
@@ -470,7 +480,6 @@ export const useTranslationHandler = ({
     const translationStore = useTranslationDataStore.getState()
     const extractionDataStore = useExtractionDataStore.getState()
     const projectStore = useProjectStore.getState()
-    const extractionStore = useExtractionStore.getState()
     const translation = translationStore.data[currentId]
     const mode = translation.autoContextMode ?? "disabled"
 
@@ -483,7 +492,6 @@ export const useTranslationHandler = ({
     }
 
     const projectExtractions = (await extractionDataStore.getExtractionsDb(project.extractions)).toReversed()
-    const runningIds = extractionStore.isExtractingSet
 
     const resolveExisting = async (extractionId: string | null) => {
       if (!extractionId) {
@@ -500,7 +508,7 @@ export const useTranslationHandler = ({
         toast.error("Selected context extraction is not in this project.", {
           action: {
             label: "Open",
-            onClick: () => extractionDataStore.setCurrentId(extraction.id),
+            onClick: () => openExtraction(extraction.id),
           },
         })
         return null
@@ -523,7 +531,7 @@ export const useTranslationHandler = ({
         toast.error(problem, {
           action: extraction ? {
             label: "Open",
-            onClick: () => extractionDataStore.setCurrentId(extraction.id),
+            onClick: () => openExtraction(extraction.id),
           } : undefined,
         })
         return null
@@ -539,10 +547,40 @@ export const useTranslationHandler = ({
       return resolveExisting(translation.autoContextExtractionId)
     }
 
-    const selectedPrevious = translation.autoContextPreviousExtractionId
-      ? projectExtractions.find(extraction => extraction.id === translation.autoContextPreviousExtractionId) ?? await extractionDataStore.getExtractionDb(translation.autoContextPreviousExtractionId)
-      : null
-    const previousExtraction = selectedPrevious && getExtractionProblem(selectedPrevious, translation.projectId, runningIds) === null ? selectedPrevious : null
+    const getProjectExtraction = async (extractionId: string) => {
+      return projectExtractions.find(extraction => extraction.id === extractionId)
+        ?? await extractionDataStore.getExtractionDb(extractionId)
+    }
+
+    const previousMode = translation.autoContextPreviousMode ?? "latest"
+    let previousExtraction = null as Awaited<ReturnType<typeof getProjectExtraction>> | null
+
+    if (previousMode === "selected") {
+      if (!translation.autoContextPreviousExtractionId) {
+        toast.error("Auto context is set to use a selected previous extraction, but none is selected.")
+        return null
+      }
+
+      const selectedPrevious = await getProjectExtraction(translation.autoContextPreviousExtractionId)
+      const problem = getExtractionProblem(selectedPrevious, translation.projectId, useExtractionStore.getState().isExtractingSet)
+      if (problem) {
+        toast.error(problem, {
+          action: selectedPrevious ? {
+            label: "Open",
+            onClick: () => openExtraction(selectedPrevious.id),
+          } : undefined,
+        })
+        return null
+      }
+      previousExtraction = selectedPrevious
+    } else if (previousMode === "latest") {
+      previousExtraction = findLatestUsableExtraction(
+        projectExtractions,
+        translation.projectId,
+        useExtractionStore.getState().isExtractingSet,
+      )
+    }
+
     const previousContext = previousExtraction ? cleanExtractionResult(previousExtraction.contextResult) : ""
 
     const created = await extractionDataStore.createExtractionDb(project.id, {
@@ -553,14 +591,24 @@ export const useTranslationHandler = ({
       contextResult: "",
     })
 
-    translationStore.mutateData(currentId, "autoContextMode", "use-existing")
+    autoCreatedExtractionByTranslationRef.current.set(currentId, created.id)
     translationStore.mutateData(currentId, "autoContextExtractionId", created.id)
     translationStore.mutateData(currentId, "autoContextPreviousExtractionId", previousExtraction?.id ?? null)
     await translationStore.saveData(currentId)
     await projectStore.loadProjects()
 
-    const success = await handleStartExtraction(created.id, created.basicSettingsId, created.advancedSettingsId)
-    translationStore.mutateData(currentId, "autoContextMode", "use-existing")
+    if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) {
+      autoCreatedExtractionByTranslationRef.current.delete(currentId)
+      return null
+    }
+
+    let success = false
+    try {
+      success = await handleStartExtraction(created.id, created.basicSettingsId, created.advancedSettingsId)
+    } finally {
+      autoCreatedExtractionByTranslationRef.current.delete(currentId)
+    }
+
     translationStore.mutateData(currentId, "autoContextExtractionId", created.id)
     await translationStore.saveData(currentId)
 
@@ -583,7 +631,7 @@ export const useTranslationHandler = ({
       toast.error(problem, {
         action: {
           label: "Open",
-          onClick: () => extractionDataStore.setCurrentId(created.id),
+          onClick: () => openExtraction(created.id),
         },
       })
       return null
@@ -613,9 +661,9 @@ export const useTranslationHandler = ({
   }
 
   const handleStop = (currentId: string) => {
-    const translation = useTranslationDataStore.getState().data[currentId]
-    if (translation?.autoContextExtractionId) {
-      stopExtraction(translation.autoContextExtractionId)
+    const ownedExtractionId = autoCreatedExtractionByTranslationRef.current.get(currentId)
+    if (ownedExtractionId) {
+      stopExtraction(ownedExtractionId)
     }
     stopTranslation(currentId)
     setIsTranslating(currentId, false)

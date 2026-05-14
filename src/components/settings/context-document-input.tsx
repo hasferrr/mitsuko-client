@@ -8,7 +8,7 @@ import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { ExternalLink, FolderDown, WandSparkles, X } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { AutoContextMode, Extraction } from "@/types/project"
+import { AutoContextMode, AutoContextPreviousMode, Extraction } from "@/types/project"
 import { db } from "@/lib/db/db"
 import { getContent } from "@/lib/parser/parser"
 import { removeDoneTag } from "@/lib/utils"
@@ -17,14 +17,14 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { getExtractionProblem, findLatestUsableExtraction } from "@/lib/translation/auto-context"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ContextExtractorMain } from "@/components/extract-context/context-extractor-main"
 
 interface Props {
   basicSettingsId: string
   translationId?: string
+  onOpenExtraction?: (extractionId: string) => void
 }
 
-export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Props) => {
+export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOpenExtraction }: Props) => {
   const currentProject = useProjectStore((state) => state.currentProject)
   const contextDocument = useSettingsStore((state) => state.getContextDocument(basicSettingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
@@ -40,7 +40,6 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
 
   const [isContextDialogOpen, setIsContextDialogOpen] = useState(false)
   const [isAutoContextDialogOpen, setIsAutoContextDialogOpen] = useState(false)
-  const [previewExtractionId, setPreviewExtractionId] = useState<string | null>(null)
   const [projectExtractions, setProjectExtractions] = useState<Extraction[]>([])
 
   const { setHasChanges } = useUnsavedChanges()
@@ -63,10 +62,14 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
     if (translation.autoContextExtractionId && !extractionData[translation.autoContextExtractionId]) {
       getExtractionDb(translation.autoContextExtractionId)
     }
+    if (translation.autoContextPreviousMode === "latest") {
+      const latest = findLatestUsableExtraction(projectExtractions, translation.projectId, isExtractingSet)
+      if (latest && !extractionData[latest.id]) getExtractionDb(latest.id)
+    }
     if (translation.autoContextPreviousExtractionId && !extractionData[translation.autoContextPreviousExtractionId]) {
       getExtractionDb(translation.autoContextPreviousExtractionId)
     }
-  }, [extractionData, getExtractionDb, isAutoContextDialogOpen, translation])
+  }, [extractionData, getExtractionDb, isAutoContextDialogOpen, isExtractingSet, projectExtractions, translation])
 
   const handleContextDocumentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
@@ -81,7 +84,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
     setIsContextDialogOpen(false)
   }
 
-  const setAutoContextValue = async <T extends "autoContextMode" | "autoContextExtractionId" | "autoContextPreviousExtractionId">(
+  const setAutoContextValue = async <T extends "autoContextMode" | "autoContextExtractionId" | "autoContextPreviousMode" | "autoContextPreviousExtractionId">(
     key: T,
     value: NonNullable<typeof translation>[T],
   ) => {
@@ -93,9 +96,12 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
 
   const handleAutoModeChange = async (mode: AutoContextMode) => {
     await setAutoContextValue("autoContextMode", mode)
-    if (mode === "create-new" && translation && !translation.autoContextPreviousExtractionId) {
-      const latest = findLatestUsableExtraction(projectExtractions, translation.projectId, isExtractingSet)
-      if (latest) await setAutoContextValue("autoContextPreviousExtractionId", latest.id)
+  }
+
+  const handlePreviousModeChange = async (mode: AutoContextPreviousMode) => {
+    await setAutoContextValue("autoContextPreviousMode", mode)
+    if (mode === "none") {
+      await setAutoContextValue("autoContextPreviousExtractionId", null)
     }
   }
 
@@ -105,14 +111,23 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
     if (!extraction) return
     setCurrentExtractionId(extraction.id)
     setIsAutoContextDialogOpen(false)
-    setPreviewExtractionId(extractionId)
+    onOpenExtraction?.(extraction.id)
   }
 
   const selectedExtraction = translation?.autoContextExtractionId ? extractionData[translation.autoContextExtractionId] : null
-  const previousExtraction = translation?.autoContextPreviousExtractionId ? extractionData[translation.autoContextPreviousExtractionId] : null
+  const previousMode = translation?.autoContextPreviousMode ?? "latest"
+  const latestUsableExtraction = translation
+    ? findLatestUsableExtraction(projectExtractions, translation.projectId, isExtractingSet)
+    : null
+  const previousExtraction = previousMode === "selected" && translation?.autoContextPreviousExtractionId
+    ? extractionData[translation.autoContextPreviousExtractionId]
+    : null
   const isSelectedExtractionRunning = translation?.autoContextExtractionId
     ? isExtractingSet.has(translation.autoContextExtractionId)
     : false
+  const previousProblem = translation && previousMode === "selected"
+    ? getExtractionProblem(previousExtraction ?? undefined, translation.projectId, isExtractingSet)
+    : null
   const selectedProblem = translation && translation.autoContextExtractionId && !isSelectedExtractionRunning
     ? getExtractionProblem(selectedExtraction ?? undefined, translation.projectId, isExtractingSet)
     : null
@@ -266,66 +281,92 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId }: Pr
               )}
 
               {translation.autoContextMode === "create-new" && (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between gap-2">
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium">Previous Context</label>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setAutoContextValue("autoContextPreviousExtractionId", null)}
-                      disabled={!translation.autoContextPreviousExtractionId}
-                    >
-                      <X />
-                      Deselect
-                    </Button>
+                    <Select value={previousMode} onValueChange={(value) => handlePreviousModeChange(value as AutoContextPreviousMode)}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="latest">Latest usable extraction</SelectItem>
+                          <SelectItem value="selected">Selected extraction</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Select
-                    value={translation.autoContextPreviousExtractionId ?? ""}
-                    onValueChange={(value) => setAutoContextValue("autoContextPreviousExtractionId", value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="No previous context" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {projectExtractions.map((extraction) => (
-                          <SelectItem key={extraction.id} value={extraction.id}>
-                            {extraction.title || `Episode ${extraction.episodeNumber || "X"}`}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  {previousExtraction ? (
-                    <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(previousExtraction.id)}>
-                      <ExternalLink />
-                      Open Previous Context
-                    </Button>
-                  ) : (
+
+                  {previousMode === "latest" && (
+                    <div className="flex flex-col gap-2">
+                      {latestUsableExtraction ? (
+                        <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(latestUsableExtraction.id)}>
+                          <ExternalLink />
+                          Open Latest Previous Context
+                        </Button>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">No usable previous context will be sent.</p>
+                      )}
+                    </div>
+                  )}
+
+                  {previousMode === "selected" && (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <label className="text-sm font-medium">Selected Previous Extraction</label>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={async () => {
+                            await setAutoContextValue("autoContextPreviousMode", "none")
+                            await setAutoContextValue("autoContextPreviousExtractionId", null)
+                          }}
+                          disabled={!translation.autoContextPreviousExtractionId}
+                        >
+                          <X />
+                          Deselect
+                        </Button>
+                      </div>
+                      <Select
+                        value={translation.autoContextPreviousExtractionId ?? ""}
+                        onValueChange={async (value) => {
+                          await setAutoContextValue("autoContextPreviousExtractionId", value)
+                          await setAutoContextValue("autoContextPreviousMode", "selected")
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Choose an extraction" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {projectExtractions.map((extraction) => (
+                              <SelectItem key={extraction.id} value={extraction.id}>
+                                {extraction.title || `Episode ${extraction.episodeNumber || "X"}`}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      {previousProblem && (
+                        <p className="text-xs text-destructive">{previousProblem}</p>
+                      )}
+                      {previousExtraction && (
+                        <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(previousExtraction.id)}>
+                          <ExternalLink />
+                          Open Previous Context
+                        </Button>
+                      )}
+                    </div>
+                  )}
+
+                  {previousMode === "none" && (
                     <p className="text-xs text-muted-foreground">No previous context will be sent.</p>
                   )}
+
                 </div>
               )}
             </div>
-          </DialogContent>
-        </Dialog>
-      )}
-
-      {previewExtractionId && extractionData[previewExtractionId] && (
-        <Dialog open={!!previewExtractionId} onOpenChange={(open) => !open && setPreviewExtractionId(null)}>
-          <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-[min(1100px,calc(100%-2rem))]">
-            <DialogHeader>
-              <DialogTitle>{extractionData[previewExtractionId].title || "Context Extraction"}</DialogTitle>
-              <DialogDescription>
-                Review, edit, or re-run this extraction.
-              </DialogDescription>
-            </DialogHeader>
-            <ContextExtractorMain
-              currentId={previewExtractionId}
-              basicSettingsId={extractionData[previewExtractionId].basicSettingsId}
-              advancedSettingsId={extractionData[previewExtractionId].advancedSettingsId}
-              hideBackButton
-            />
           </DialogContent>
         </Dialog>
       )}
