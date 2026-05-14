@@ -60,16 +60,18 @@ export default function useBatchExtractionHandler({
   } = useExtractionHandler({
     setActiveTab,
     isBatch: true,
-    onErrorTranslation: () => {
+    onErrorTranslation: ({ currentId }) => {
       // On first error: empty the queue and halt scheduling.
-      // Do NOT stop currently running extractions.
+      // In sequential mode, keep the failed item failed while stopping any other active extraction.
       if (!queueAbortRef.current) {
         queueAbortRef.current = true
         setQueueSet(new Set())
         if (extractionMode === "sequential") {
           const running = Array.from(useExtractionStore.getState().isExtractingSet)
-          running.forEach(id => baseStopExtraction(id))
-          toast.error("Encountered an error. Stopped all extractions")
+          running
+            .filter(id => id !== currentId)
+            .forEach(id => baseStopExtraction(id))
+          toast.error("Encountered an error. Stopped remaining extractions")
         } else {
           toast.error("Encountered an error. Halting queue; running extractions will finish")
         }

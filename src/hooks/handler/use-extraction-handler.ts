@@ -197,11 +197,12 @@ export const useExtractionHandler = ({
       onSuccessTranslation?.({ currentId })
       return true
     } catch (error) {
-      onErrorTranslation?.({ currentId })
-
       const nextStatus = error instanceof Error && error.name === "AbortError" ? "stopped" : "failed"
       useExtractionDataStore.getState().mutateData(currentId, "status", nextStatus)
       useExtractionDataStore.getState().mutateData(currentId, "completedAt", null)
+      await saveData(currentId)
+
+      onErrorTranslation?.({ currentId })
       console.error(error)
       return false
     } finally {
