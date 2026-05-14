@@ -23,6 +23,8 @@ Each `Translation` stores:
 
 `autoContextExtractionId` is intentionally kept even for `create-new` so imports/exports preserve the relationship and failed auto-created extractions remain inspectable.
 
+Changing `autoContextMode` keeps `autoContextExtractionId` and `autoContextPreviousExtractionId` so linked extraction history and previous selections can be restored. It resets `autoContextPreviousMode` to `latest`.
+
 ## Modes
 
 ### Disabled
