@@ -260,7 +260,10 @@ export const useTranslationHandler = ({
       return subtitleChunks
     }
 
-    if (!subtitles.length) return
+    if (!subtitles.length) {
+      setIsTranslating(currentId, false)
+      return
+    }
     setIsTranslating(currentId, true)
     setHasChanges(true)
 
