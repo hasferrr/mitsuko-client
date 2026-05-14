@@ -42,7 +42,7 @@ The created extraction uses:
 - project default extraction settings if project extraction defaults are enabled
 - global extraction defaults if project extraction defaults are disabled
 - current translation subtitles as `subtitleContent`
-- `Auto Context - {translation title}` as title
+- `[Auto Context] {translation title}` as title
 - translation title without subtitle extension as episode number
 
 `create-new` becomes `use-existing` as soon as the linked extraction is created.

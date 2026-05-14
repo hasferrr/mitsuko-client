@@ -620,7 +620,7 @@ export const useTranslationHandler = ({
     const previousContext = previousExtraction ? cleanExtractionResult(previousExtraction.contextResult) : ""
 
     const created = await extractionDataStore.createExtractionDb(project.id, {
-      title: `Auto Context - ${translation.title}`,
+      title: `[Auto Context] ${translation.title}`,
       episodeNumber: getEpisodeNumberFromTranslationTitle(translation.title),
       subtitleContent: getTranslationSubtitleContent(translation),
       previousContext,

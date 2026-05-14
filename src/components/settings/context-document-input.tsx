@@ -218,7 +218,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
 
       {translation && (
         <Dialog open={isAutoContextDialogOpen} onOpenChange={setIsAutoContextDialogOpen}>
-          <DialogContent className="sm:max-w-[560px]">
+          <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Auto Context</DialogTitle>
               <DialogDescription>
@@ -244,36 +244,39 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
               </div>
 
               {translation.autoContextMode === "use-existing" && (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <label className="text-sm font-medium">Selected Extraction</label>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setAutoContextValue("autoContextExtractionId", null)}
-                      disabled={!translation.autoContextExtractionId}
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="text-sm font-medium">Selected Extraction</label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setAutoContextValue("autoContextExtractionId", null)}
+                        disabled={!translation.autoContextExtractionId}
+                      >
+                        <X />
+                        Deselect
+                      </Button>
+                    </div>
+                    <Select
+                      value={translation.autoContextExtractionId ?? ""}
+                      onValueChange={(value) => setAutoContextValue("autoContextExtractionId", value)}
                     >
-                      <X />
-                      Deselect
-                    </Button>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Choose an extraction" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {projectExtractions.map((extraction) => (
+                            <SelectItem key={extraction.id} value={extraction.id}>
+                              {extraction.title || `Episode ${extraction.episodeNumber || "X"}`}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Select
-                    value={translation.autoContextExtractionId ?? ""}
-                    onValueChange={(value) => setAutoContextValue("autoContextExtractionId", value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Choose an extraction" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {projectExtractions.map((extraction) => (
-                          <SelectItem key={extraction.id} value={extraction.id}>
-                            {extraction.title || `Episode ${extraction.episodeNumber || "X"}`}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+
                   {isSelectedExtractionRunning ? (
                     <p className="text-xs text-muted-foreground">
                       Translation will wait until this extraction finishes.
@@ -331,42 +334,45 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
                   )}
 
                   {previousMode === "selected" && (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <label className="text-sm font-medium">Selected Previous Extraction</label>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={async () => {
-                            await setAutoContextValue("autoContextPreviousMode", "none")
-                            await setAutoContextValue("autoContextPreviousExtractionId", null)
+                    <div className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <label className="text-sm font-medium">Selected Previous Extraction</label>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={async () => {
+                              await setAutoContextValue("autoContextPreviousMode", "none")
+                              await setAutoContextValue("autoContextPreviousExtractionId", null)
+                            }}
+                            disabled={!translation.autoContextPreviousExtractionId}
+                          >
+                            <X />
+                            Deselect
+                          </Button>
+                        </div>
+                        <Select
+                          value={translation.autoContextPreviousExtractionId ?? ""}
+                          onValueChange={async (value) => {
+                            await setAutoContextValue("autoContextPreviousExtractionId", value)
+                            await setAutoContextValue("autoContextPreviousMode", "selected")
                           }}
-                          disabled={!translation.autoContextPreviousExtractionId}
                         >
-                          <X />
-                          Deselect
-                        </Button>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Choose an extraction" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {projectExtractions.map((extraction) => (
+                                <SelectItem key={extraction.id} value={extraction.id}>
+                                  {extraction.title || `Episode ${extraction.episodeNumber || "X"}`}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
                       </div>
-                      <Select
-                        value={translation.autoContextPreviousExtractionId ?? ""}
-                        onValueChange={async (value) => {
-                          await setAutoContextValue("autoContextPreviousExtractionId", value)
-                          await setAutoContextValue("autoContextPreviousMode", "selected")
-                        }}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Choose an extraction" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {projectExtractions.map((extraction) => (
-                              <SelectItem key={extraction.id} value={extraction.id}>
-                                {extraction.title || `Episode ${extraction.episodeNumber || "X"}`}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+
                       {previousProblem && (
                         <p className="text-xs text-destructive">{previousProblem}</p>
                       )}
