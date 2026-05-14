@@ -8,17 +8,22 @@ export function cleanExtractionResult(contextResult: string): string {
   return removeDoneTag(getContent(contextResult)).trim()
 }
 
-export function getExtractionProblem(extraction: Extraction | undefined, projectId: string, runningIds: Set<string>): string | null {
-  if (!extraction) return "Selected context extraction was not found."
-  if (extraction.projectId !== projectId) return "Selected context extraction is not in this project."
-  if (runningIds.has(extraction.id)) return "Selected context extraction is still running."
-  if (extraction.contextResult.includes("<error>")) return "Selected context extraction contains an error."
-  if (!cleanExtractionResult(extraction.contextResult)) return "Selected context extraction is empty."
+export function getExtractionProblem(
+  extraction: Extraction | undefined,
+  projectId: string,
+  runningIds: Set<string>,
+  subject = "Selected context extraction",
+): string | null {
+  if (!extraction) return `${subject} was not found.`
+  if (extraction.projectId !== projectId) return `${subject} is not in this project.`
+  if (runningIds.has(extraction.id)) return `${subject} is still running.`
+  if (extraction.contextResult.includes("<error>")) return `${subject} contains an error.`
+  if (!cleanExtractionResult(extraction.contextResult)) return `${subject} is empty.`
   return null
 }
 
-export function findLatestUsableExtraction(extractions: Extraction[], projectId: string, runningIds: Set<string>): Extraction | null {
-  return extractions.find(extraction => getExtractionProblem(extraction, projectId, runningIds) === null) ?? null
+export function findLatestExtraction(extractions: Extraction[]): Extraction | null {
+  return extractions[0] ?? null
 }
 
 export function combineAutoContext(cleanedExtractionResult: string, contextDocument: string): string {

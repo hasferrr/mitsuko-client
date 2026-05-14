@@ -15,7 +15,7 @@ import { removeDoneTag } from "@/lib/utils"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
-import { getExtractionProblem, findLatestUsableExtraction } from "@/lib/translation/auto-context"
+import { getExtractionProblem, findLatestExtraction } from "@/lib/translation/auto-context"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface Props {
@@ -63,7 +63,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
       getExtractionDb(translation.autoContextExtractionId)
     }
     if (translation.autoContextPreviousMode === "latest") {
-      const latest = findLatestUsableExtraction(projectExtractions, translation.projectId, isExtractingSet)
+      const latest = findLatestExtraction(projectExtractions)
       if (latest && !extractionData[latest.id]) getExtractionDb(latest.id)
     }
     if (translation.autoContextPreviousExtractionId && !extractionData[translation.autoContextPreviousExtractionId]) {
@@ -116,8 +116,14 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
 
   const selectedExtraction = translation?.autoContextExtractionId ? extractionData[translation.autoContextExtractionId] : null
   const previousMode = translation?.autoContextPreviousMode ?? "latest"
-  const latestUsableExtraction = translation
-    ? findLatestUsableExtraction(projectExtractions, translation.projectId, isExtractingSet)
+  const latestPreviousExtraction = translation
+    ? findLatestExtraction(projectExtractions)
+    : null
+  const isLatestPreviousRunning = latestPreviousExtraction
+    ? isExtractingSet.has(latestPreviousExtraction.id)
+    : false
+  const latestPreviousProblem = translation && latestPreviousExtraction && !isLatestPreviousRunning
+    ? getExtractionProblem(latestPreviousExtraction, translation.projectId, isExtractingSet, "Latest previous context")
     : null
   const previousExtraction = previousMode === "selected" && translation?.autoContextPreviousExtractionId
     ? extractionData[translation.autoContextPreviousExtractionId]
@@ -126,7 +132,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
     ? isExtractingSet.has(translation.autoContextExtractionId)
     : false
   const previousProblem = translation && previousMode === "selected"
-    ? getExtractionProblem(previousExtraction ?? undefined, translation.projectId, isExtractingSet)
+    ? getExtractionProblem(previousExtraction ?? undefined, translation.projectId, isExtractingSet, "Selected previous context")
     : null
   const selectedProblem = translation && translation.autoContextExtractionId && !isSelectedExtractionRunning
     ? getExtractionProblem(selectedExtraction ?? undefined, translation.projectId, isExtractingSet)
@@ -290,7 +296,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          <SelectItem value="latest">Latest usable extraction</SelectItem>
+                          <SelectItem value="latest">Latest previous context</SelectItem>
                           <SelectItem value="selected">Selected extraction</SelectItem>
                           <SelectItem value="none">None</SelectItem>
                         </SelectGroup>
@@ -300,13 +306,22 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
 
                   {previousMode === "latest" && (
                     <div className="flex flex-col gap-2">
-                      {latestUsableExtraction ? (
-                        <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(latestUsableExtraction.id)}>
-                          <ExternalLink />
-                          Open Latest Previous Context
-                        </Button>
+                      {latestPreviousExtraction ? (
+                        <>
+                          {isLatestPreviousRunning ? (
+                            <p className="text-xs text-muted-foreground">
+                              Translation will wait until this latest previous extraction finishes.
+                            </p>
+                          ) : latestPreviousProblem && (
+                            <p className="text-xs text-destructive">{latestPreviousProblem}</p>
+                          )}
+                          <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(latestPreviousExtraction.id)}>
+                            <ExternalLink />
+                            Open Latest Previous Context
+                          </Button>
+                        </>
                       ) : (
-                        <p className="text-xs text-muted-foreground">No usable previous context will be sent.</p>
+                        <p className="text-xs text-muted-foreground">No previous context will be sent.</p>
                       )}
                     </div>
                   )}
