@@ -61,6 +61,7 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       basicSettingsId: basicSettingsMap.get(translation.basicSettingsId)?.id ?? translation.basicSettingsId,
       advancedSettingsId: advancedSettingsMap.get(translation.advancedSettingsId)?.id ?? translation.advancedSettingsId,
       autoContextExtractionId: translation.autoContextExtractionId ?? null,
+      autoContextPreviousMode: translation.autoContextPreviousMode ?? "latest",
       autoContextPreviousExtractionId: translation.autoContextPreviousExtractionId ?? null,
       projectId: "",
     })
@@ -245,6 +246,7 @@ function translationConstructor(translation: Partial<Translation>): Translation 
     advancedSettingsId: translation.advancedSettingsId ?? "",
     autoContextMode: translation.autoContextMode ?? "disabled",
     autoContextExtractionId: translation.autoContextExtractionId ?? null,
+    autoContextPreviousMode: translation.autoContextPreviousMode ?? "latest",
     autoContextPreviousExtractionId: translation.autoContextPreviousExtractionId ?? null,
     response: translation.response ?? { response: "", jsonResponse: [] },
   }

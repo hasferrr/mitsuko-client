@@ -13,6 +13,7 @@ describe("databaseExportConstructor", () => {
 
     expect(data.translations[0].autoContextMode).toBe("disabled")
     expect(data.translations[0].autoContextExtractionId).toBeNull()
+    expect(data.translations[0].autoContextPreviousMode).toBe("latest")
     expect(data.translations[0].autoContextPreviousExtractionId).toBeNull()
   })
 })

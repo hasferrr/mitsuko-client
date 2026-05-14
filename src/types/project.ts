@@ -5,6 +5,7 @@ export type ProjectType = 'translation' | 'transcription' | 'extraction'
 export type SettingsParentType = 'project' | 'translation' | 'extraction'
 export type TranscriptionModel = 'mitsuko-premium' | 'mitsuko-free' | 'whisper-large-v3' | 'whisper-large-v3-turbo'
 export type AutoContextMode = 'disabled' | 'create-new' | 'use-existing'
+export type AutoContextPreviousMode = 'latest' | 'selected' | 'none'
 
 export interface ProjectOrder {
   id: string
@@ -47,6 +48,7 @@ export interface Translation {
   advancedSettingsId: string
   autoContextMode: AutoContextMode
   autoContextExtractionId: string | null
+  autoContextPreviousMode: AutoContextPreviousMode
   autoContextPreviousExtractionId: string | null
   response: ResponseTranslation
 }
