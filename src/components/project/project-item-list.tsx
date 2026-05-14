@@ -28,6 +28,7 @@ interface ProjectItemListProps {
   date: string
   handleEdit: (newName: string) => Promise<void>
   handleDelete: () => Promise<void>
+  badges?: React.ReactNode
   selectMode?: boolean
   selected?: boolean
   onSelectToggle?: () => void
@@ -44,6 +45,7 @@ export const ProjectItemList = ({
   date,
   handleEdit,
   handleDelete,
+  badges,
   selectMode = false,
   selected = false,
   onSelectToggle,
@@ -175,6 +177,7 @@ export const ProjectItemList = ({
                   {subtitle}
                 </span>
               )}
+              {badges}
             </div>
             <p className="text-xs text-muted-foreground line-clamp-2 wrap-break-word" style={{ overflowWrap: "anywhere" }}>
               {description.substring(0, 250)}

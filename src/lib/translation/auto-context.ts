@@ -1,11 +1,10 @@
-import { getContent } from "@/lib/parser/parser"
-import { removeDoneTag } from "@/lib/utils"
 import { Extraction, Translation } from "@/types/project"
 import { Subtitle } from "@/types/subtitles"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
+import { cleanExtractionContent, getExtractionValidationProblem } from "@/lib/extraction/status"
 
 export function cleanExtractionResult(contextResult: string): string {
-  return removeDoneTag(getContent(contextResult)).trim()
+  return cleanExtractionContent(contextResult)
 }
 
 export function getExtractionProblem(
@@ -14,16 +13,20 @@ export function getExtractionProblem(
   runningIds: Set<string>,
   subject = "Selected context extraction",
 ): string | null {
-  if (!extraction) return `${subject} was not found.`
-  if (extraction.projectId !== projectId) return `${subject} is not in this project.`
-  if (runningIds.has(extraction.id)) return `${subject} is still running.`
-  if (extraction.contextResult.includes("<error>")) return `${subject} contains an error.`
-  if (!cleanExtractionResult(extraction.contextResult)) return `${subject} is empty.`
-  return null
+  return getExtractionValidationProblem(extraction, projectId, runningIds, subject)
 }
 
-export function findLatestExtraction(extractions: Extraction[]): Extraction | null {
-  return extractions[0] ?? null
+export function findLatestExtraction(
+  extractions: Extraction[],
+  projectId?: string,
+  runningIds: Set<string> = new Set(),
+  excludedIds: Set<string> = new Set(),
+): Extraction | null {
+  if (!projectId) return extractions[0] ?? null
+  return extractions.find(extraction => {
+    if (excludedIds.has(extraction.id)) return false
+    return getExtractionProblem(extraction, projectId, runningIds, "Latest previous context") === null
+  }) ?? null
 }
 
 export function combineAutoContext(cleanedExtractionResult: string, contextDocument: string): string {

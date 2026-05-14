@@ -1,6 +1,7 @@
 import { create } from "zustand"
 import { Extraction, BasicSettings, AdvancedSettings } from "@/types/project"
 import {
+  ExtractionCreateInput,
   updateExtraction as updateDB,
   createExtraction as createDB,
   getExtraction as getDB,
@@ -20,13 +21,13 @@ export interface ExtractionDataStore {
   // CRUD methods
   createExtractionDb: (
     projectId: string,
-    data: Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">,
+    data: ExtractionCreateInput,
     basicSettingsData?: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
     advancedSettingsData?: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Extraction>
   getExtractionDb: (extractionId: string, skipStoreUpdate?: boolean) => Promise<Extraction | undefined>
   getExtractionsDb: (extractionIds: string[]) => Promise<Extraction[]>
-  updateExtractionDb: (extractionId: string, changes: Partial<Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext">>) => Promise<Extraction>
+  updateExtractionDb: (extractionId: string, changes: Partial<Extraction>) => Promise<Extraction>
   deleteExtractionDb: (projectId: string, extractionId: string) => Promise<void>
   moveExtractionDb: (sourceProjectId: string, targetProjectId: string, extractionId: string) => Promise<void>
   // getters
