@@ -53,13 +53,17 @@ If the selected extraction is currently running, translation waits for it to fin
 
 Create-new can seed the new extraction's `previous_context` in three ways:
 
-- `latest`: use the latest usable extraction in the current project
+- `latest`: use the latest previous extraction in the current project
 - `selected`: use the selected previous extraction
 - `none`: send empty previous context
 
 If `selected` is used and the selected previous extraction is missing, outside the project, running, empty, or contains `<error>`, the flow aborts and translation does not start.
 
-If `latest` finds no usable extraction, create-new still runs with empty previous context.
+If `latest` finds a running latest previous extraction, translation waits for it to finish, then reloads and validates the result.
+
+If `latest` finds an empty latest previous extraction, one that contains `<error>`, or one that is otherwise invalid, the flow aborts and translation does not start. It does not silently fall back to an older extraction.
+
+If `latest` finds no extraction in the project, create-new still runs with empty previous context.
 
 ## Validation
 
@@ -101,7 +105,7 @@ The Auto dialog lets the user:
 - enable or disable auto context
 - choose create-new or use-existing mode
 - select or deselect an existing extraction for use-existing
-- choose latest, selected, or no previous context for create-new
+- choose latest previous context, selected previous context, or no previous context for create-new
 - open selected extraction records in the full `ContextExtractorMain` dialog
 
 Use-existing hides previous-context controls because it directly reuses an existing extraction result.
@@ -114,6 +118,7 @@ The whole flow stops with no translation if:
 - a selected extraction is missing or outside the project
 - a selected extraction result is empty or contains `<error>`
 - a selected previous extraction for create-new is invalid
+- the latest previous extraction for create-new is invalid after any required wait
 - auto-created extraction fails because of network/API/parsing/validation error
 - the user presses Stop before translation starts
 

@@ -53,7 +53,7 @@ import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import {
   cleanExtractionResult,
   combineAutoContext,
-  findLatestUsableExtraction,
+  findLatestExtraction,
   getEpisodeNumberFromTranslationTitle,
   getExtractionProblem,
   getTranslationSubtitleContent,
@@ -562,7 +562,12 @@ export const useTranslationHandler = ({
       }
 
       const selectedPrevious = await getProjectExtraction(translation.autoContextPreviousExtractionId)
-      const problem = getExtractionProblem(selectedPrevious, translation.projectId, useExtractionStore.getState().isExtractingSet)
+      const problem = getExtractionProblem(
+        selectedPrevious,
+        translation.projectId,
+        useExtractionStore.getState().isExtractingSet,
+        "Selected previous context",
+      )
       if (problem) {
         toast.error(problem, {
           action: selectedPrevious ? {
@@ -574,11 +579,42 @@ export const useTranslationHandler = ({
       }
       previousExtraction = selectedPrevious
     } else if (previousMode === "latest") {
-      previousExtraction = findLatestUsableExtraction(
-        projectExtractions,
-        translation.projectId,
-        useExtractionStore.getState().isExtractingSet,
-      )
+      const latestPreviousExtraction = findLatestExtraction(projectExtractions)
+      if (latestPreviousExtraction) {
+        previousExtraction = latestPreviousExtraction
+
+        if (useExtractionStore.getState().isExtractingSet.has(previousExtraction.id)) {
+          toast.info("Latest previous context is still running. Translation will start after it finishes.")
+          await waitForExtractionToFinish(previousExtraction.id)
+          if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) return null
+
+          const updatedExtraction = await extractionDataStore.getExtractionDb(previousExtraction.id)
+          if (!updatedExtraction) {
+            toast.error("Latest previous context was not found.")
+            return null
+          }
+          previousExtraction = updatedExtraction
+        }
+
+        const resolvedLatestPreviousExtraction = previousExtraction
+        if (!resolvedLatestPreviousExtraction) return null
+
+        const problem = getExtractionProblem(
+          resolvedLatestPreviousExtraction,
+          translation.projectId,
+          useExtractionStore.getState().isExtractingSet,
+          "Latest previous context",
+        )
+        if (problem) {
+          toast.error(problem, {
+            action: {
+              label: "Open",
+              onClick: () => openExtraction(resolvedLatestPreviousExtraction.id),
+            },
+          })
+          return null
+        }
+      }
     }
 
     const previousContext = previousExtraction ? cleanExtractionResult(previousExtraction.contextResult) : ""
