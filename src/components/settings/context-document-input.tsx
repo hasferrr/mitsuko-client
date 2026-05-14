@@ -16,7 +16,9 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { getExtractionProblem, findLatestExtraction } from "@/lib/translation/auto-context"
+import { isAutoContextOwnedBy } from "@/lib/extraction/status"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ExtractionBadges } from "@/components/extract-context/extraction-badges"
 
 interface Props {
   basicSettingsId: string
@@ -63,7 +65,9 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
       getExtractionDb(translation.autoContextExtractionId)
     }
     if (translation.autoContextPreviousMode === "latest") {
-      const latest = findLatestExtraction(projectExtractions)
+      const excludedIds = new Set<string>()
+      if (translation.autoContextExtractionId) excludedIds.add(translation.autoContextExtractionId)
+      const latest = findLatestExtraction(projectExtractions, translation.projectId, isExtractingSet, excludedIds)
       if (latest && !extractionData[latest.id]) getExtractionDb(latest.id)
     }
     if (translation.autoContextPreviousExtractionId && !extractionData[translation.autoContextPreviousExtractionId]) {
@@ -120,8 +124,10 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
 
   const selectedExtraction = translation?.autoContextExtractionId ? extractionData[translation.autoContextExtractionId] : null
   const previousMode = translation?.autoContextPreviousMode ?? "latest"
+  const latestPreviousExcludedIds = new Set<string>()
+  if (translation?.autoContextExtractionId) latestPreviousExcludedIds.add(translation.autoContextExtractionId)
   const latestPreviousExtraction = translation
-    ? findLatestExtraction(projectExtractions)
+    ? findLatestExtraction(projectExtractions, translation.projectId, isExtractingSet, latestPreviousExcludedIds)
     : null
   const isLatestPreviousRunning = latestPreviousExtraction
     ? isExtractingSet.has(latestPreviousExtraction.id)
@@ -141,6 +147,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
   const selectedProblem = translation && translation.autoContextExtractionId && !isSelectedExtractionRunning
     ? getExtractionProblem(selectedExtraction ?? undefined, translation.projectId, isExtractingSet)
     : null
+  const isSelectedAutoOwned = !!(translation && selectedExtraction && isAutoContextOwnedBy(selectedExtraction, translation.id))
 
   return (
     <div className="flex flex-col gap-2">
@@ -269,7 +276,10 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
                         <SelectGroup>
                           {projectExtractions.map((extraction) => (
                             <SelectItem key={extraction.id} value={extraction.id}>
-                              {extraction.title || `Episode ${extraction.episodeNumber || "X"}`}
+                              <div className="flex min-w-0 items-center gap-2">
+                                <span className="truncate">{extraction.title || `Episode ${extraction.episodeNumber || "X"}`}</span>
+                                <ExtractionBadges extraction={extraction} runningIds={isExtractingSet} size="compact" />
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -282,7 +292,11 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
                       Translation will wait until this extraction finishes.
                     </p>
                   ) : selectedProblem && (
-                    <p className="text-xs text-destructive">{selectedProblem}</p>
+                    <p className={isSelectedAutoOwned ? "text-xs text-muted-foreground" : "text-xs text-destructive"}>
+                      {isSelectedAutoOwned
+                        ? "This linked auto-context extraction will rerun when translation starts."
+                        : selectedProblem}
+                    </p>
                   )}
                   {selectedExtraction && (
                     <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(selectedExtraction.id)}>
@@ -322,6 +336,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
                           ) : latestPreviousProblem && (
                             <p className="text-xs text-destructive">{latestPreviousProblem}</p>
                           )}
+                          <ExtractionBadges extraction={latestPreviousExtraction} runningIds={isExtractingSet} size="compact" />
                           <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(latestPreviousExtraction.id)}>
                             <ExternalLink />
                             Open Latest Previous Context
@@ -365,7 +380,10 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
                             <SelectGroup>
                               {projectExtractions.map((extraction) => (
                                 <SelectItem key={extraction.id} value={extraction.id}>
-                                  {extraction.title || `Episode ${extraction.episodeNumber || "X"}`}
+                                  <div className="flex min-w-0 items-center gap-2">
+                                    <span className="truncate">{extraction.title || `Episode ${extraction.episodeNumber || "X"}`}</span>
+                                    <ExtractionBadges extraction={extraction} runningIds={isExtractingSet} size="compact" />
+                                  </div>
                                 </SelectItem>
                               ))}
                             </SelectGroup>

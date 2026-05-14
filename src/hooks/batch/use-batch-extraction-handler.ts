@@ -9,9 +9,8 @@ import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
 import { BatchFile } from "@/types/batch"
 import { toast } from "sonner"
-import { getContent } from "@/lib/parser/parser"
-import { hasDoneTag, addDoneTag, removeDoneTag } from "@/lib/utils"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
+import { cleanExtractionContent, isExtractionUsable } from "@/lib/extraction/status"
 
 interface UseBatchExtractionHandlerProps {
   basicSettingsId: string
@@ -32,7 +31,6 @@ export default function useBatchExtractionHandler({
   state: { setActiveTab, setQueueSet },
 }: UseBatchExtractionHandlerProps) {
   const queueAbortRef = useRef(false)
-  const stopRequestedIdsRef = useRef<Set<string>>(new Set())
 
   // Project Store
   const currentProject = useProjectStore((state) => state.currentProject)
@@ -43,7 +41,6 @@ export default function useBatchExtractionHandler({
   const extractionMode = useBatchSettingsStore(state => state.getExtractionMode(currentProject?.id))
   const getContextResult = useExtractionDataStore(state => state.getContextResult)
   const setPreviousContext = useExtractionDataStore(state => state.setPreviousContext)
-  const setContextResult = useExtractionDataStore(state => state.setContextResult)
 
   // Extraction Data Store
   const extractionData = useExtractionDataStore((state) => state.data)
@@ -63,26 +60,12 @@ export default function useBatchExtractionHandler({
   } = useExtractionHandler({
     setActiveTab,
     isBatch: true,
-    onSuccessTranslation: ({ currentId }) => {
-      if (stopRequestedIdsRef.current.has(currentId)) return
-      try {
-        const raw = getContextResult(currentId)
-        const content = getContent(raw).trim()
-        if (!hasDoneTag(raw) && content.length > 0) {
-          setContextResult(currentId, addDoneTag(raw))
-        }
-      } catch (e) {
-        console.error("Failed to append finished marker (batch):", e)
-      }
-    },
     onErrorTranslation: () => {
       // On first error: empty the queue and halt scheduling.
       // Do NOT stop currently running extractions.
       if (!queueAbortRef.current) {
         queueAbortRef.current = true
         setQueueSet(new Set())
-        const runningNow = Array.from(useExtractionStore.getState().isExtractingSet)
-        runningNow.forEach(id => stopRequestedIdsRef.current.add(id))
         if (extractionMode === "sequential") {
           const running = Array.from(useExtractionStore.getState().isExtractingSet)
           running.forEach(id => baseStopExtraction(id))
@@ -93,6 +76,15 @@ export default function useBatchExtractionHandler({
       }
     },
   })
+
+  const getUsablePreviousContext = (extractionId: string) => {
+    if (!currentProject) return ""
+    const extraction = useExtractionDataStore.getState().data[extractionId]
+    if (!isExtractionUsable(extraction, currentProject.id, useExtractionStore.getState().isExtractingSet)) {
+      return ""
+    }
+    return cleanExtractionContent(getContextResult(extractionId))
+  }
 
   const handleStartBatchExtraction = () => {
     if (extractionMode === "sequential") {
@@ -120,7 +112,6 @@ export default function useBatchExtractionHandler({
     scrollToTop()
 
     queueAbortRef.current = false
-    stopRequestedIdsRef.current.clear()
     setHasChanges(true)
 
     const ids = batchFiles
@@ -184,7 +175,6 @@ export default function useBatchExtractionHandler({
     scrollToTop()
 
     queueAbortRef.current = false
-    stopRequestedIdsRef.current.clear()
     setHasChanges(true)
 
     const ids = batchFiles
@@ -250,7 +240,6 @@ export default function useBatchExtractionHandler({
     scrollToTop()
 
     queueAbortRef.current = false
-    stopRequestedIdsRef.current.clear()
     setHasChanges(true)
 
     const ids = batchFiles
@@ -277,7 +266,7 @@ export default function useBatchExtractionHandler({
 
       // Set previousContext from previous file's contextResult
       if (prevId) {
-        const prevContext = removeDoneTag(getContent(getContextResult(prevId))).trim()
+        const prevContext = getUsablePreviousContext(prevId)
         setPreviousContext(currentId, prevContext)
       }
 
@@ -313,7 +302,6 @@ export default function useBatchExtractionHandler({
     scrollToTop()
 
     queueAbortRef.current = false
-    stopRequestedIdsRef.current.clear()
     setHasChanges(true)
 
     const firstIdx = batchFiles.findIndex(f => f.status !== "done")
@@ -344,7 +332,7 @@ export default function useBatchExtractionHandler({
       // Always set previousContext from the immediate previous file's contextResult when available
       if (currentIndex !== undefined && currentIndex > 0) {
         const prevId = batchFiles[currentIndex - 1].id
-        const prevContext = removeDoneTag(getContent(getContextResult(prevId))).trim()
+        const prevContext = getUsablePreviousContext(prevId)
         setPreviousContext(currentId, prevContext)
       }
 
@@ -369,8 +357,6 @@ export default function useBatchExtractionHandler({
   const handleStopBatchExtraction = () => {
     queueAbortRef.current = true
     setQueueSet(new Set())
-    const runningIds = Array.from(isExtractingSet)
-    runningIds.forEach(id => stopRequestedIdsRef.current.add(id))
     batchFiles.forEach(f => baseStopExtraction(f.id))
   }
 

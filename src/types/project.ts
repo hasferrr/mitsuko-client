@@ -6,6 +6,8 @@ export type SettingsParentType = 'project' | 'translation' | 'extraction'
 export type TranscriptionModel = 'mitsuko-premium' | 'mitsuko-free' | 'whisper-large-v3' | 'whisper-large-v3-turbo'
 export type AutoContextMode = 'disabled' | 'create-new' | 'use-existing'
 export type AutoContextPreviousMode = 'latest' | 'selected' | 'none'
+export type ExtractionStatus = 'idle' | 'running' | 'completed' | 'failed' | 'stopped'
+export type ExtractionOrigin = 'manual' | 'batch' | 'auto-context'
 
 export interface ProjectOrder {
   id: string
@@ -89,6 +91,10 @@ export interface Extraction {
   subtitleContent: string
   previousContext: string
   contextResult: string
+  status: ExtractionStatus
+  origin: ExtractionOrigin
+  ownerTranslationId: string | null
+  completedAt: Date | null
   createdAt: Date
   updatedAt: Date
   projectId: string

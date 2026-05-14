@@ -26,6 +26,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useRouter } from "next/navigation"
 import { ProjectItemSkeleton } from "../project-item-skeleton"
 import { ItemType } from "@/hooks/project/use-project-item-selection"
+import { ExtractionBadges } from "@/components/extract-context/extraction-badges"
 
 interface ProjectExtractionListProps {
   currentProject: Project
@@ -82,6 +83,7 @@ export function ProjectExtractionList({
       title={`Episode ${extraction.episodeNumber || "X"}`}
       subtitle={extraction.title}
       description={extraction.contextResult}
+      badges={<ExtractionBadges extraction={extraction} runningIds={isExtractingSet} size="compact" className="shrink-0" />}
       date={extraction.updatedAt.toLocaleDateString()}
       handleEdit={async (newName) => {
         const updated = await updateExtractionDb(extraction.id, { episodeNumber: newName })

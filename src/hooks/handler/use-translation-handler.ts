@@ -51,6 +51,10 @@ import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import {
+  AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX,
+  isAutoContextOwnedBy,
+} from "@/lib/extraction/status"
+import {
   cleanExtractionResult,
   combineAutoContext,
   findLatestExtraction,
@@ -496,6 +500,24 @@ export const useTranslationHandler = ({
 
     const projectExtractions = (await extractionDataStore.getExtractionsDb(project.extractions)).toReversed()
 
+    const runOwnedAutoExtraction = async (extractionId: string) => {
+      const extraction = useExtractionDataStore.getState().data[extractionId]
+        ?? await useExtractionDataStore.getState().getExtractionDb(extractionId)
+      if (!extraction) return false
+
+      useExtractionDataStore.getState().mutateData(extractionId, "title", `${AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX} ${translation.title}`)
+      useExtractionDataStore.getState().mutateData(extractionId, "episodeNumber", getEpisodeNumberFromTranslationTitle(translation.title))
+      useExtractionDataStore.getState().mutateData(extractionId, "subtitleContent", getTranslationSubtitleContent(translation))
+      await useExtractionDataStore.getState().saveData(extractionId)
+
+      autoCreatedExtractionByTranslationRef.current.set(currentId, extractionId)
+      try {
+        return await handleStartExtraction(extractionId, extraction.basicSettingsId, extraction.advancedSettingsId)
+      } finally {
+        autoCreatedExtractionByTranslationRef.current.delete(currentId)
+      }
+    }
+
     const resolveExisting = async (extractionId: string | null) => {
       if (!extractionId) {
         toast.error("Auto context is set to use an existing extraction, but none is selected.")
@@ -531,6 +553,36 @@ export const useTranslationHandler = ({
 
       const problem = getExtractionProblem(extraction, translation.projectId, useExtractionStore.getState().isExtractingSet)
       if (problem) {
+        if (isAutoContextOwnedBy(extraction, currentId)) {
+          const success = await runOwnedAutoExtraction(extraction.id)
+          if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) return null
+          if (!success) {
+            toast.error("Auto context extraction failed. Translation was not started.")
+            return null
+          }
+
+          const updatedExtraction = await extractionDataStore.getExtractionDb(extraction.id)
+          const updatedProblem = getExtractionProblem(
+            updatedExtraction,
+            translation.projectId,
+            useExtractionStore.getState().isExtractingSet,
+          )
+          if (updatedProblem || !updatedExtraction) {
+            toast.error(updatedProblem ?? "Auto context extraction was not found after rerun.", {
+              action: updatedExtraction ? {
+                label: "Open",
+                onClick: () => openExtraction(updatedExtraction.id),
+              } : undefined,
+            })
+            return null
+          }
+
+          return combineAutoContext(
+            cleanExtractionResult(updatedExtraction.contextResult),
+            useSettingsStore.getState().getContextDocument(basicSettingsId),
+          )
+        }
+
         toast.error(problem, {
           action: extraction ? {
             label: "Open",
@@ -582,52 +634,31 @@ export const useTranslationHandler = ({
       }
       previousExtraction = selectedPrevious
     } else if (previousMode === "latest") {
-      const latestPreviousExtraction = findLatestExtraction(projectExtractions)
+      const excludedIds = new Set<string>()
+      if (translation.autoContextExtractionId) excludedIds.add(translation.autoContextExtractionId)
+      const latestPreviousExtraction = findLatestExtraction(
+        projectExtractions,
+        translation.projectId,
+        useExtractionStore.getState().isExtractingSet,
+        excludedIds,
+      )
       if (latestPreviousExtraction) {
         previousExtraction = latestPreviousExtraction
-
-        if (useExtractionStore.getState().isExtractingSet.has(previousExtraction.id)) {
-          toast.info("Latest previous context is still running. Translation will start after it finishes.")
-          await waitForExtractionToFinish(previousExtraction.id)
-          if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) return null
-
-          const updatedExtraction = await extractionDataStore.getExtractionDb(previousExtraction.id)
-          if (!updatedExtraction) {
-            toast.error("Latest previous context was not found.")
-            return null
-          }
-          previousExtraction = updatedExtraction
-        }
-
-        const resolvedLatestPreviousExtraction = previousExtraction
-        if (!resolvedLatestPreviousExtraction) return null
-
-        const problem = getExtractionProblem(
-          resolvedLatestPreviousExtraction,
-          translation.projectId,
-          useExtractionStore.getState().isExtractingSet,
-          "Latest previous context",
-        )
-        if (problem) {
-          toast.error(problem, {
-            action: {
-              label: "Open",
-              onClick: () => openExtraction(resolvedLatestPreviousExtraction.id),
-            },
-          })
-          return null
-        }
       }
     }
 
     const previousContext = previousExtraction ? cleanExtractionResult(previousExtraction.contextResult) : ""
 
     const created = await extractionDataStore.createExtractionDb(project.id, {
-      title: `[Auto Context] ${translation.title}`,
+      title: `${AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX} ${translation.title}`,
       episodeNumber: getEpisodeNumberFromTranslationTitle(translation.title),
       subtitleContent: getTranslationSubtitleContent(translation),
       previousContext,
       contextResult: "",
+      status: "idle",
+      origin: "auto-context",
+      ownerTranslationId: currentId,
+      completedAt: null,
     })
 
     autoCreatedExtractionByTranslationRef.current.set(currentId, created.id)

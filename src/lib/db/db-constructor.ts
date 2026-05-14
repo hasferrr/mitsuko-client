@@ -8,6 +8,12 @@ import {
   BasicSettings,
   AdvancedSettings,
 } from '@/types/project'
+import {
+  AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX,
+  normalizeExtractionOrigin,
+  normalizeExtractionStatus,
+  stripExtractionDoneTag,
+} from '@/lib/extraction/status'
 
 const uuidv4 = () => crypto.randomUUID()
 
@@ -27,11 +33,26 @@ export interface DatabaseExport {
 // by implementing this approach, we can make sure it is scalable and easy to maintain
 
 export function databaseExportConstructor(data: Partial<DatabaseExport>): DatabaseExport {
+  const projects = convertDates(data.projects?.map(projectConstructor) ?? [])
+  const translations = convertDates(data.translations?.map(translationConstructor) ?? [])
+  const projectIsBatchMap = new Map(projects.map(project => [project.id, project.isBatch]))
+  const linkedOwnerMap = new Map<string, string>()
+
+  translations.forEach(translation => {
+    if (translation.autoContextExtractionId && !linkedOwnerMap.has(translation.autoContextExtractionId)) {
+      linkedOwnerMap.set(translation.autoContextExtractionId, translation.id)
+    }
+  })
+
   return {
-    projects: convertDates(data.projects?.map(projectConstructor) ?? []),
-    translations: convertDates(data.translations?.map(translationConstructor) ?? []),
+    projects,
+    translations,
     transcriptions: convertDates(data.transcriptions?.map(transcriptionConstructor) ?? []),
-    extractions: convertDates(data.extractions?.map(extractionConstructor) ?? []),
+    extractions: convertDates(data.extractions?.map(extraction => extractionConstructor(
+      extraction,
+      projectIsBatchMap.get(extraction.projectId ?? "") ?? false,
+      linkedOwnerMap.get(extraction.id ?? ""),
+    )) ?? []),
     projectOrders: convertDates(data.projectOrders?.map(projectOrderConstructor) ?? []),
     basicSettings: convertDates(data.basicSettings?.map(basicSettingsConstructor) ?? []),
     advancedSettings: convertDates(data.advancedSettings?.map(advancedSettingsConstructor) ?? []),
@@ -86,6 +107,9 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       id: uuidv4(),
       basicSettingsId: basicSettingsMap.get(extraction.basicSettingsId)?.id ?? extraction.basicSettingsId,
       advancedSettingsId: advancedSettingsMap.get(extraction.advancedSettingsId)?.id ?? extraction.advancedSettingsId,
+      ownerTranslationId: extraction.ownerTranslationId
+        ? translationsMap.get(extraction.ownerTranslationId)?.id ?? extraction.ownerTranslationId
+        : null,
       projectId: "",
     })
   }
@@ -292,14 +316,33 @@ function migrateModelName(model: string | null | undefined): Transcription['mode
   return model as Transcription['models'] | null | undefined
 }
 
-function extractionConstructor(extraction: Partial<Extraction>): Extraction {
+function extractionConstructor(
+  extraction: Partial<Extraction>,
+  projectIsBatch = false,
+  linkedOwnerId?: string,
+): Extraction {
+  const contextResult = extraction.contextResult ?? ""
+  const looksAutoCreated = !!linkedOwnerId
+    && typeof extraction.title === "string"
+    && extraction.title.startsWith(AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX)
+  const fallbackOrigin = looksAutoCreated ? "auto-context" : projectIsBatch ? "batch" : "manual"
+  const status = normalizeExtractionStatus(extraction.status, contextResult, projectIsBatch)
+  const origin = normalizeExtractionOrigin(extraction.origin, fallbackOrigin)
+  const completedAt = extraction.completedAt instanceof Date
+    ? extraction.completedAt
+    : extraction.completedAt ? new Date(extraction.completedAt) : null
+
   return {
     id: extraction.id ?? uuidv4(),
     title: extraction.title ?? "",
     episodeNumber: extraction.episodeNumber ?? "",
     subtitleContent: extraction.subtitleContent ?? "",
     previousContext: extraction.previousContext ?? "",
-    contextResult: extraction.contextResult ?? "",
+    contextResult: stripExtractionDoneTag(contextResult),
+    status,
+    origin,
+    ownerTranslationId: origin === "auto-context" ? extraction.ownerTranslationId ?? linkedOwnerId ?? null : null,
+    completedAt: status === "completed" ? completedAt ?? new Date() : null,
     createdAt: extraction.createdAt ?? new Date(),
     updatedAt: extraction.updatedAt ?? new Date(),
     projectId: extraction.projectId ?? "",
