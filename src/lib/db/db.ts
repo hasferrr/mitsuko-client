@@ -336,15 +336,11 @@ class MyDatabase extends Dexie {
         if (typeof translation.autoContextExtractionId === 'undefined') {
           translation.autoContextExtractionId = null
         }
-        if (typeof translation.autoContextPreviousExtractionId === 'undefined') {
-          translation.autoContextPreviousExtractionId = null
-        }
-      })
-    })
-    this.version(27).stores({}).upgrade(async tx => {
-      await tx.table('translations').toCollection().modify(translation => {
         if (typeof translation.autoContextPreviousMode === 'undefined') {
           translation.autoContextPreviousMode = 'latest'
+        }
+        if (typeof translation.autoContextPreviousExtractionId === 'undefined') {
+          translation.autoContextPreviousExtractionId = null
         }
       })
     })
