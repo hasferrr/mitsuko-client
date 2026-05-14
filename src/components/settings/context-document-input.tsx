@@ -95,7 +95,11 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
   }
 
   const handleAutoModeChange = async (mode: AutoContextMode) => {
-    await setAutoContextValue("autoContextMode", mode)
+    if (!translationId) return
+    setHasChanges(true)
+    mutateTranslation(translationId, "autoContextMode", mode)
+    mutateTranslation(translationId, "autoContextPreviousMode", "latest")
+    await saveTranslation(translationId)
   }
 
   const handlePreviousModeChange = async (mode: AutoContextPreviousMode) => {
