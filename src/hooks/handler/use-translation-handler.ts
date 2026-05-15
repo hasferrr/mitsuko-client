@@ -58,8 +58,10 @@ import {
   cleanExtractionResult,
   combineAutoContext,
   findLatestExtraction,
+  getAutoContextCreatedTranslationPatch,
   getEpisodeNumberFromTranslationTitle,
   getExtractionProblem,
+  getStoppedAutoContextExtractionPatch,
   getTranslationSubtitleContent,
 } from "@/lib/translation/auto-context"
 
@@ -725,18 +727,25 @@ export const useTranslationHandler = ({
     })
 
     setAutoCreatedExtractionRun(currentId, created.id, runToken)
-    if (!isAutoContextRunActive(currentId, runToken)) {
-      clearAutoCreatedExtractionRun(currentId, created.id, runToken)
-      return null
+    const createdTranslationPatch = getAutoContextCreatedTranslationPatch(created.id, previousExtraction?.id)
+    const persistCreatedTranslationLink = async () => {
+      translationStore.mutateData(currentId, "autoContextMode", createdTranslationPatch.autoContextMode)
+      translationStore.mutateData(currentId, "autoContextExtractionId", createdTranslationPatch.autoContextExtractionId)
+      translationStore.mutateData(currentId, "autoContextPreviousExtractionId", createdTranslationPatch.autoContextPreviousExtractionId)
+      await translationStore.saveData(currentId)
+    }
+    const markCreatedExtractionStopped = async () => {
+      const stoppedPatch = getStoppedAutoContextExtractionPatch()
+      extractionDataStore.mutateData(created.id, "status", stoppedPatch.status)
+      extractionDataStore.mutateData(created.id, "completedAt", stoppedPatch.completedAt)
+      await extractionDataStore.saveData(created.id)
     }
 
-    translationStore.mutateData(currentId, "autoContextMode", "use-existing")
-    translationStore.mutateData(currentId, "autoContextExtractionId", created.id)
-    translationStore.mutateData(currentId, "autoContextPreviousExtractionId", previousExtraction?.id ?? null)
-    await translationStore.saveData(currentId)
+    await persistCreatedTranslationLink()
     await projectStore.loadProjects()
 
     if (!isAutoContextRunActive(currentId, runToken)) {
+      await markCreatedExtractionStopped()
       clearAutoCreatedExtractionRun(currentId, created.id, runToken)
       return null
     }
@@ -748,9 +757,7 @@ export const useTranslationHandler = ({
       clearAutoCreatedExtractionRun(currentId, created.id, runToken)
     }
 
-    translationStore.mutateData(currentId, "autoContextExtractionId", created.id)
-    translationStore.mutateData(currentId, "autoContextMode", "use-existing")
-    await translationStore.saveData(currentId)
+    await persistCreatedTranslationLink()
 
     if (!isAutoContextRunActive(currentId, runToken)) {
       return null

@@ -1,5 +1,10 @@
 import { describe, expect, test } from "bun:test"
-import { findLatestExtraction, getExtractionProblem } from "@/lib/translation/auto-context"
+import {
+  findLatestExtraction,
+  getAutoContextCreatedTranslationPatch,
+  getExtractionProblem,
+  getStoppedAutoContextExtractionPatch,
+} from "@/lib/translation/auto-context"
 import { Extraction } from "@/types/project"
 import { isAutoContextOwnedBy } from "@/lib/extraction/status"
 
@@ -83,5 +88,30 @@ describe("getExtractionProblem", () => {
       }),
       "translation-1",
     )).toBe(true)
+  })
+})
+
+describe("auto context creation patches", () => {
+  test("links a created extraction as the selected existing extraction", () => {
+    expect(getAutoContextCreatedTranslationPatch("extraction-1", "previous-1")).toEqual({
+      autoContextMode: "use-existing",
+      autoContextExtractionId: "extraction-1",
+      autoContextPreviousExtractionId: "previous-1",
+    })
+  })
+
+  test("normalizes missing previous extraction links to null", () => {
+    expect(getAutoContextCreatedTranslationPatch("extraction-1", undefined)).toEqual({
+      autoContextMode: "use-existing",
+      autoContextExtractionId: "extraction-1",
+      autoContextPreviousExtractionId: null,
+    })
+  })
+
+  test("marks a created extraction stopped when cancellation happens before start", () => {
+    expect(getStoppedAutoContextExtractionPatch()).toEqual({
+      status: "stopped",
+      completedAt: null,
+    })
   })
 })

@@ -35,6 +35,24 @@ export function combineAutoContext(cleanedExtractionResult: string, contextDocum
     .join("\n\n")
 }
 
+export function getAutoContextCreatedTranslationPatch(
+  extractionId: string,
+  previousExtractionId: string | null | undefined,
+): Pick<Translation, "autoContextMode" | "autoContextExtractionId" | "autoContextPreviousExtractionId"> {
+  return {
+    autoContextMode: "use-existing",
+    autoContextExtractionId: extractionId,
+    autoContextPreviousExtractionId: previousExtractionId ?? null,
+  }
+}
+
+export function getStoppedAutoContextExtractionPatch(): Pick<Extraction, "status" | "completedAt"> {
+  return {
+    status: "stopped",
+    completedAt: null,
+  }
+}
+
 export function getTranslationSubtitleContent(translation: Translation): string {
   const subtitles: Subtitle[] = translation.subtitles.map(subtitle => ({
     index: subtitle.index,
