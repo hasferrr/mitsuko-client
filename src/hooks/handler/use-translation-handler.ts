@@ -128,7 +128,7 @@ export const useTranslationHandler = ({
   const autoCreatedExtractionByTranslationRef = useRef<Map<string, AutoCreatedExtractionRun>>(new Map())
   const autoContextRunTokenRef = useRef<Map<string, AutoContextRunToken>>(new Map())
   const { handleStart: handleStartExtraction } = useExtractionHandler({
-    setActiveTab: () => {},
+    setActiveTab: () => { },
     isBatch: false,
   })
 
@@ -345,9 +345,9 @@ export const useTranslationHandler = ({
     // Prepare context for the first chunk
     let context = sIndexToUse > 1
       ? buildInitialContext(subtitles, adjustedStartIndex, {
-          strategy: contextStrategy,
-          splitSize: size,
-        })
+        strategy: contextStrategy,
+        splitSize: size,
+      })
       : []
 
     // Log subtitles
@@ -797,19 +797,11 @@ export const useTranslationHandler = ({
     const runToken = createAutoContextRunToken(params.currentId)
     try {
       setIsTranslating(params.currentId, true)
-      let contextDocumentOverride: string | null
-      try {
-        contextDocumentOverride = await resolveAutoContextDocument(
-          params.currentId,
-          params.basicSettingsId,
-          runToken,
-        )
-      } catch (error) {
-        if (isAutoContextRunCurrent(params.currentId, runToken)) {
-          setIsTranslating(params.currentId, false)
-        }
-        throw error
-      }
+      const contextDocumentOverride = await resolveAutoContextDocument(
+        params.currentId,
+        params.basicSettingsId,
+        runToken,
+      )
       if (contextDocumentOverride === null) {
         if (isAutoContextRunCurrent(params.currentId, runToken)) {
           setIsTranslating(params.currentId, false)
@@ -819,7 +811,14 @@ export const useTranslationHandler = ({
 
       if (!isAutoContextRunActive(params.currentId, runToken)) return
       await handleStart({ ...params, contextDocumentOverride })
+    } catch {
+      if (isAutoContextRunCurrent(params.currentId, runToken)) {
+        toast.error("Failed to prepare auto-context. Translation was not started.")
+      }
     } finally {
+      if (isAutoContextRunCurrent(params.currentId, runToken)) {
+        setIsTranslating(params.currentId, false)
+      }
       clearAutoContextRunToken(params.currentId, runToken)
     }
   }
