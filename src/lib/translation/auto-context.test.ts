@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import {
+  cleanExtractionResult,
+  combineAutoContext,
   findLatestExtraction,
   getAutoContextCreatedTranslationPatch,
   getExtractionProblem,
@@ -60,6 +62,14 @@ describe("getExtractionProblem", () => {
     )).toBe("Selected context extraction was stopped.")
   })
 
+  test("rejects completed extraction that contains an error", () => {
+    expect(getExtractionProblem(
+      extraction("episode-1", "usable context\n\n<error>failed</error>"),
+      "project-1",
+      new Set(),
+    )).toBe("Selected context extraction contains an error.")
+  })
+
   test("uses the provided subject in validation messages", () => {
     const runningIds = new Set(["episode-3"])
 
@@ -88,6 +98,15 @@ describe("getExtractionProblem", () => {
       }),
       "translation-1",
     )).toBe(true)
+  })
+})
+
+describe("combineAutoContext", () => {
+  test("prepends cleaned auto-context to the manual context document", () => {
+    const autoContext = cleanExtractionResult("  Generated context\n\n<done>  ")
+    const manualContext = "Manual context"
+
+    expect(combineAutoContext(autoContext, manualContext)).toBe("Generated context\n\nManual context")
   })
 })
 
