@@ -2,7 +2,7 @@ import { db } from './db'
 import { DatabaseExport, databaseExportConstructor, generateNewIds } from './db-constructor'
 import { databaseExportSchema } from './db-schema'
 import { Project, Translation, Extraction, BasicSettings, AdvancedSettings, Transcription } from '@/types/project'
-import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
+import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
 import {
   GLOBAL_ADVANCED_SETTINGS_ID,
   GLOBAL_BASIC_SETTINGS_ID,
@@ -287,7 +287,7 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
       if (!project.defaultExtractionBasicSettingsId || !getBasicSettingsById(project.defaultExtractionBasicSettingsId)) {
         const basicSettingsId = crypto.randomUUID()
         const newBasicSettings: BasicSettings = {
-          ...(baseBasicSettings ? { ...baseBasicSettings } : { ...DEFAULT_BASIC_SETTINGS }),
+          ...DEFAULT_EXTRACTION_BASIC_SETTINGS,
           id: basicSettingsId,
           createdAt: now,
           updatedAt: now,
@@ -299,7 +299,7 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
       if (!project.defaultExtractionAdvancedSettingsId || !getAdvancedSettingsById(project.defaultExtractionAdvancedSettingsId)) {
         const advancedSettingsId = crypto.randomUUID()
         const newAdvancedSettings: AdvancedSettings = {
-          ...(baseAdvancedSettings ? { ...baseAdvancedSettings } : { ...DEFAULT_ADVANCED_SETTINGS }),
+          ...DEFAULT_ADVANCED_SETTINGS,
           id: advancedSettingsId,
           createdAt: now,
           updatedAt: now,

@@ -1,4 +1,4 @@
-import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
+import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
 import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
 import { CustomInstruction } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'
@@ -227,7 +227,7 @@ class MyDatabase extends Dexie {
           if (!project.defaultExtractionBasicSettingsId) {
             const basicSettingsId = crypto.randomUUID()
             const newBasicSettings: BasicSettings = {
-              ...baseBasicSettings,
+              ...DEFAULT_EXTRACTION_BASIC_SETTINGS,
               id: basicSettingsId,
               createdAt: new Date(),
               updatedAt: new Date(),
@@ -239,7 +239,7 @@ class MyDatabase extends Dexie {
           if (!project.defaultExtractionAdvancedSettingsId) {
             const advancedSettingsId = crypto.randomUUID()
             const newAdvancedSettings: AdvancedSettings = {
-              ...baseAdvancedSettings,
+              ...DEFAULT_ADVANCED_SETTINGS,
               id: advancedSettingsId,
               createdAt: new Date(),
               updatedAt: new Date(),
