@@ -10,7 +10,11 @@ import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
 import { BatchFile } from "@/types/batch"
 import { toast } from "sonner"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
-import { getRunningBatchExtractionIds } from "@/lib/extraction/batch-stop"
+import {
+  getContinueBatchExtractionIds,
+  getRestartBatchExtractionIds,
+  getRunningBatchExtractionIds,
+} from "@/lib/extraction/batch-ids"
 import { cleanExtractionContent, isExtractionUsable } from "@/lib/extraction/status"
 
 interface UseBatchExtractionHandlerProps {
@@ -117,10 +121,7 @@ export default function useBatchExtractionHandler({
     queueAbortRef.current = false
     setHasChanges(true)
 
-    const ids = batchFiles
-      .filter(f => f.status !== "done")
-      .map(f => f.id)
-      .filter(id => !isExtractingSet.has(id))
+    const ids = getRestartBatchExtractionIds(batchFiles, isExtractingSet)
 
     if (ids.length === 0) return
 
@@ -180,10 +181,7 @@ export default function useBatchExtractionHandler({
     queueAbortRef.current = false
     setHasChanges(true)
 
-    const ids = batchFiles
-      .filter(f => f.status !== "done")
-      .map(f => f.id)
-      .filter(id => !isExtractingSet.has(id))
+    const ids = getContinueBatchExtractionIds(batchFiles, isExtractingSet)
 
     if (ids.length === 0) return
 
@@ -245,10 +243,7 @@ export default function useBatchExtractionHandler({
     queueAbortRef.current = false
     setHasChanges(true)
 
-    const ids = batchFiles
-      .filter((f) => f.status !== "done")
-      .map((f) => f.id)
-      .filter((id) => !isExtractingSet.has(id))
+    const ids = getRestartBatchExtractionIds(batchFiles, isExtractingSet)
 
     if (ids.length === 0) return
 
@@ -310,11 +305,7 @@ export default function useBatchExtractionHandler({
     const firstIdx = batchFiles.findIndex(f => f.status !== "done")
     if (firstIdx === -1) return
 
-    const continueIds = batchFiles
-      .slice(firstIdx)
-      .filter(f => f.status !== "done")
-      .map(f => f.id)
-      .filter(id => !isExtractingSet.has(id))
+    const continueIds = getContinueBatchExtractionIds(batchFiles.slice(firstIdx), isExtractingSet)
 
     if (continueIds.length === 0) return
 
