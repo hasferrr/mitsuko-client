@@ -10,6 +10,7 @@ import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
 import { BatchFile } from "@/types/batch"
 import { toast } from "sonner"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
+import { getRunningBatchExtractionIds } from "@/lib/extraction/batch-stop"
 import { cleanExtractionContent, isExtractionUsable } from "@/lib/extraction/status"
 
 interface UseBatchExtractionHandlerProps {
@@ -359,7 +360,10 @@ export default function useBatchExtractionHandler({
   const handleStopBatchExtraction = () => {
     queueAbortRef.current = true
     setQueueSet(new Set())
-    batchFiles.forEach(f => baseStopExtraction(f.id))
+    getRunningBatchExtractionIds(
+      batchFiles,
+      useExtractionStore.getState().isExtractingSet,
+    ).forEach(id => baseStopExtraction(id))
   }
 
   const handleStartExtraction = async (
