@@ -293,7 +293,7 @@ export const useTranslationHandler = ({
       if (fewShot.type === "manual") {
         try {
           usedFewShot = fewShotSchema.array().parse(JSON.parse(fewShot.value.trim() || "[]"))
-        } catch {
+        } catch (error) {
           toast.error("Few shot format is invalid! Please follow this format:", {
             description: "[" + JSON.stringify({ content: "string", translated: "string" }, null, 2) + "]",
             className: "select-none",
@@ -410,7 +410,7 @@ export const useTranslationHandler = ({
         rawResponse = result.raw
 
         onSuccessTranslation?.()
-      } catch {
+      } catch (error) {
         onErrorTranslation?.({ currentId, isContinuation: !!isContinuation })
 
         setIsTranslating(currentId, false)
@@ -797,11 +797,19 @@ export const useTranslationHandler = ({
     const runToken = createAutoContextRunToken(params.currentId)
     try {
       setIsTranslating(params.currentId, true)
-      const contextDocumentOverride = await resolveAutoContextDocument(
-        params.currentId,
-        params.basicSettingsId,
-        runToken,
-      )
+      let contextDocumentOverride: string | null
+      try {
+        contextDocumentOverride = await resolveAutoContextDocument(
+          params.currentId,
+          params.basicSettingsId,
+          runToken,
+        )
+      } catch (error) {
+        if (isAutoContextRunCurrent(params.currentId, runToken)) {
+          setIsTranslating(params.currentId, false)
+        }
+        throw error
+      }
       if (contextDocumentOverride === null) {
         if (isAutoContextRunCurrent(params.currentId, runToken)) {
           setIsTranslating(params.currentId, false)
