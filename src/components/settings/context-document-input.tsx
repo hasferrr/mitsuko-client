@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
-import { ExternalLink, FolderDown, WandSparkles, X } from "lucide-react"
+import { FileText, ExternalLink, FolderDown, WandSparkles, X } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { AutoContextMode, AutoContextPreviousMode, Extraction } from "@/types/project"
@@ -15,7 +15,7 @@ import { removeDoneTag } from "@/lib/utils"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
-import { getExtractionProblem, findLatestExtraction } from "@/lib/translation/auto-context"
+import { cleanExtractionResult, combineAutoContext, getExtractionProblem, findLatestExtraction } from "@/lib/translation/auto-context"
 import { isAutoContextOwnedBy } from "@/lib/extraction/status"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ExtractionBadges } from "@/components/extract-context/extraction-badges"
@@ -42,6 +42,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
 
   const [isContextDialogOpen, setIsContextDialogOpen] = useState(false)
   const [isAutoContextDialogOpen, setIsAutoContextDialogOpen] = useState(false)
+  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false)
   const [projectExtractions, setProjectExtractions] = useState<Extraction[]>([])
 
   const { setHasChanges } = useUnsavedChanges()
@@ -148,6 +149,35 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
     ? getExtractionProblem(selectedExtraction ?? undefined, translation.projectId, isExtractingSet)
     : null
   const isSelectedAutoOwned = !!(translation && selectedExtraction && isAutoContextOwnedBy(selectedExtraction, translation.id))
+
+  const previewCleanedExtraction = (() => {
+    if (!translation || !selectedExtraction || translation.autoContextMode === "disabled") return ""
+    if (isSelectedExtractionRunning) return ""
+    if (selectedProblem && !isSelectedAutoOwned) return ""
+    if (translation.autoContextMode === "create-new") return ""
+    return cleanExtractionResult(selectedExtraction.contextResult)
+  })()
+
+  const previewCombinedContext = previewCleanedExtraction
+    ? combineAutoContext(previewCleanedExtraction, contextDocument)
+    : contextDocument
+
+  const previewDisplayValue = (() => {
+    if (!translation || translation.autoContextMode === "disabled") {
+      return previewCombinedContext || ""
+    }
+    const extractionPlaceholder = isSelectedExtractionRunning
+      ? "[Extraction is still running]"
+      : selectedProblem && !isSelectedAutoOwned
+        ? `[${selectedProblem}]`
+        : translation.autoContextMode === "create-new"
+          ? "[Extraction has not run yet — it will be created when translation starts]"
+          : ""
+    if (!extractionPlaceholder) return previewCombinedContext || ""
+    return contextDocument
+      ? `${extractionPlaceholder}\n\n${contextDocument}`
+      : extractionPlaceholder
+  })()
 
   return (
     <div className="flex flex-col gap-2">
@@ -410,9 +440,38 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
                 </div>
               )}
             </div>
+
+            {translation.autoContextMode !== "disabled" && (
+              <div className="border-t pt-4">
+                <Button variant="outline" size="sm" className="w-full" onClick={() => setIsPreviewDialogOpen(true)}>
+                  <FileText />
+                  Preview Final Context
+                </Button>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       )}
+
+      <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
+        <DialogContent className="sm:max-w-[560px]">
+          <DialogHeader>
+            <DialogTitle>Final Context Preview</DialogTitle>
+            <DialogDescription>
+              Combined context (auto + manual) sent with the translation request
+            </DialogDescription>
+          </DialogHeader>
+          {previewDisplayValue ? (
+            <Textarea
+              readOnly
+              value={previewDisplayValue}
+              className="font-mono text-xs min-h-[120px] max-h-[400px] resize-none overflow-y-auto bg-muted/30"
+            />
+          ) : (
+            <p className="text-sm text-muted-foreground py-4 text-center">No context will be sent.</p>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 })

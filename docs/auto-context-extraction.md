@@ -110,6 +110,7 @@ The Auto dialog lets the user:
 - select or deselect an existing extraction for use-existing
 - choose latest previous context, selected previous context, or no previous context for create-new
 - open selected extraction records in the full `ContextExtractorMain` dialog
+- preview the combined context (auto extraction + manual) that will be sent with the translation request
 
 Use-existing hides previous-context controls because it directly reuses the selected extraction result or reruns the owned linked extraction.
 
