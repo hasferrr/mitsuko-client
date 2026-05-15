@@ -789,12 +789,13 @@ export const useTranslationHandler = ({
   }
 
   const handleStartWithAutoContext = async (params: HandleStartParams) => {
-    if (isBatch || params.isContinuation) {
+    if (isBatch) {
       await handleStart(params)
       return
     }
 
     const runToken = createAutoContextRunToken(params.currentId)
+    let shouldClearActive = true
     try {
       setIsTranslating(params.currentId, true)
       const contextDocumentOverride = await resolveAutoContextDocument(
@@ -811,12 +812,13 @@ export const useTranslationHandler = ({
 
       if (!isAutoContextRunActive(params.currentId, runToken)) return
       await handleStart({ ...params, contextDocumentOverride })
+      shouldClearActive = !params.isContinuation
     } catch {
       if (isAutoContextRunCurrent(params.currentId, runToken)) {
         toast.error("Failed to prepare auto-context. Translation was not started.")
       }
     } finally {
-      if (isAutoContextRunCurrent(params.currentId, runToken)) {
+      if (shouldClearActive && isAutoContextRunCurrent(params.currentId, runToken)) {
         setIsTranslating(params.currentId, false)
       }
       clearAutoContextRunToken(params.currentId, runToken)

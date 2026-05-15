@@ -10,7 +10,7 @@ When enabled, translation uses:
 cleanedExtractionResult + "\n\n" + currentContextDocumentTextarea
 ```
 
-The saved Context Document textarea is not overwritten. Batch translation is excluded. Continue and Fill Missing Translations do not run auto context.
+The saved Context Document textarea is not overwritten. Batch translation is excluded. Continue and Fill Missing Translations also resolve auto context before starting.
 
 ## Translation Fields
 
