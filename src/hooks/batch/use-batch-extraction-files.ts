@@ -24,10 +24,10 @@ export const useBatchExtractionFiles = (order: string[], queueSet: Set<string>) 
 
       if (isExtractingSet.has(id)) {
         status = "processing"
-      } else if (extracted) {
-        status = "done"
       } else if (queueSet.has(id)) {
         status = "queued"
+      } else if (extracted) {
+        status = "done"
       } else if (effectiveStatus === "failed" || effectiveStatus === "stopped") {
         status = "error"
       } else if (partial) {
