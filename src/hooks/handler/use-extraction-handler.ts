@@ -118,11 +118,6 @@ export const useExtractionHandler = ({
     }
 
     try {
-      setContextResult(currentId, "")
-      useExtractionDataStore.getState().mutateData(currentId, "status", "running")
-      useExtractionDataStore.getState().mutateData(currentId, "completedAt", null)
-      await saveData(currentId)
-
       let data
 
       try {
@@ -175,6 +170,11 @@ export const useExtractionHandler = ({
         md5: md5Hash,
         projectName,
       }
+
+      setContextResult(currentId, "")
+      useExtractionDataStore.getState().mutateData(currentId, "status", "running")
+      useExtractionDataStore.getState().mutateData(currentId, "completedAt", null)
+      await saveData(currentId)
 
       await extractContext(
         requestBody,
