@@ -64,7 +64,7 @@ Create-new can seed the new extraction's `previous_context` in three ways:
 - `selected`: use the selected previous extraction
 - `none`: send empty previous context
 
-`latest` skips running, empty, failed, stopped, idle, errored, and otherwise unusable extractions. It also excludes the current auto-owned linked extraction when rerunning.
+`latest` skips running, empty, failed, stopped, idle, errored, and otherwise unusable extractions. It uses the current auto-owned linked extraction when that extraction is the latest usable completed extraction.
 
 If `latest` finds no usable completed extraction in the project, create-new still runs with empty previous context.
 

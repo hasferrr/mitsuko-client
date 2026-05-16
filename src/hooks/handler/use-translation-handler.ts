@@ -719,13 +719,10 @@ export const useTranslationHandler = ({
       }
       previousExtraction = selectedPrevious
     } else if (previousMode === "latest") {
-      const excludedIds = new Set<string>()
-      if (translation.autoContextExtractionId) excludedIds.add(translation.autoContextExtractionId)
       const latestPreviousExtraction = findLatestExtraction(
         projectExtractions,
         translation.projectId,
         useExtractionStore.getState().isExtractingSet,
-        excludedIds,
       )
       if (latestPreviousExtraction) {
         previousExtraction = latestPreviousExtraction
