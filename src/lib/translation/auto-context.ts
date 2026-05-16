@@ -20,11 +20,9 @@ export function findLatestExtraction(
   extractions: Extraction[],
   projectId?: string,
   runningIds: Set<string> = new Set(),
-  excludedIds: Set<string> = new Set(),
 ): Extraction | null {
   if (!projectId) return extractions[0] ?? null
   return extractions.find(extraction => {
-    if (excludedIds.has(extraction.id)) return false
     return getExtractionProblem(extraction, projectId, runningIds, "Latest previous context") === null
   }) ?? null
 }

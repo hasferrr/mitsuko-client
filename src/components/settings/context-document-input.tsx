@@ -66,9 +66,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
       getExtractionDb(translation.autoContextExtractionId)
     }
     if (translation.autoContextPreviousMode === "latest") {
-      const excludedIds = new Set<string>()
-      if (translation.autoContextExtractionId) excludedIds.add(translation.autoContextExtractionId)
-      const latest = findLatestExtraction(projectExtractions, translation.projectId, isExtractingSet, excludedIds)
+      const latest = findLatestExtraction(projectExtractions, translation.projectId, isExtractingSet)
       if (latest && !extractionData[latest.id]) getExtractionDb(latest.id)
     }
     if (translation.autoContextPreviousExtractionId && !extractionData[translation.autoContextPreviousExtractionId]) {
@@ -125,10 +123,8 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
 
   const selectedExtraction = translation?.autoContextExtractionId ? extractionData[translation.autoContextExtractionId] : null
   const previousMode = translation?.autoContextPreviousMode ?? "latest"
-  const latestPreviousExcludedIds = new Set<string>()
-  if (translation?.autoContextExtractionId) latestPreviousExcludedIds.add(translation.autoContextExtractionId)
   const latestPreviousExtraction = translation
-    ? findLatestExtraction(projectExtractions, translation.projectId, isExtractingSet, latestPreviousExcludedIds)
+    ? findLatestExtraction(projectExtractions, translation.projectId, isExtractingSet)
     : null
   const isLatestPreviousRunning = latestPreviousExtraction
     ? isExtractingSet.has(latestPreviousExtraction.id)

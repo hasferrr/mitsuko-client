@@ -37,11 +37,14 @@ describe("findLatestExtraction", () => {
     expect(findLatestExtraction([latest, previous], "project-1")).toBe(previous)
   })
 
-  test("excludes the provided extraction ids", () => {
-    const latest = extraction("episode-3", "latest context")
+  test("includes a linked auto-context extraction when it is latest and usable", () => {
+    const latest = extraction("episode-3", "latest context", {
+      origin: "auto-context",
+      ownerTranslationId: "translation-1",
+    })
     const previous = extraction("episode-2", "previous context")
 
-    expect(findLatestExtraction([latest, previous], "project-1", new Set(), new Set(["episode-3"]))).toBe(previous)
+    expect(findLatestExtraction([latest, previous], "project-1")).toBe(latest)
   })
 })
 
