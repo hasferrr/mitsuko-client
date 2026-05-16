@@ -11,11 +11,10 @@ This applies to manual extraction, batch extraction, and auto-context extraction
 Each `Extraction` stores:
 
 - `status`: `"idle" | "running" | "completed" | "failed" | "stopped"`
-- `origin`: `"manual" | "batch" | "auto-context"`
 - `ownerTranslationId`: translation that auto-created the extraction, or `null`
 - `completedAt`: completion timestamp, or `null`
 
-`ownerTranslationId` is only meaningful for `origin: "auto-context"`. It lets the owning translation rerun its own invalid linked extraction without allowing other translations to rerun manually selected dependencies.
+`ownerTranslationId` is the auto-context ownership marker. It lets the owning translation rerun its own invalid linked extraction without allowing other translations to rerun manually selected dependencies.
 
 ## Status Rules
 

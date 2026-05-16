@@ -10,7 +10,6 @@ import {
 } from '@/types/project'
 import {
   AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX,
-  normalizeExtractionOrigin,
   normalizeExtractionStatus,
   stripExtractionDoneTag,
 } from '@/lib/extraction/status'
@@ -325,9 +324,7 @@ function extractionConstructor(
   const looksAutoCreated = !!linkedOwnerId
     && typeof extraction.title === "string"
     && extraction.title.startsWith(AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX)
-  const fallbackOrigin = looksAutoCreated ? "auto-context" : projectIsBatch ? "batch" : "manual"
   const status = normalizeExtractionStatus(extraction.status, contextResult, projectIsBatch)
-  const origin = normalizeExtractionOrigin(extraction.origin, fallbackOrigin)
   const completedAt = extraction.completedAt instanceof Date
     ? extraction.completedAt
     : extraction.completedAt ? new Date(extraction.completedAt) : null
@@ -340,8 +337,7 @@ function extractionConstructor(
     previousContext: extraction.previousContext ?? "",
     contextResult: stripExtractionDoneTag(contextResult),
     status,
-    origin,
-    ownerTranslationId: origin === "auto-context" ? extraction.ownerTranslationId ?? linkedOwnerId ?? null : null,
+    ownerTranslationId: extraction.ownerTranslationId ?? (looksAutoCreated ? linkedOwnerId ?? null : null),
     completedAt: status === "completed" ? completedAt ?? new Date() : null,
     createdAt: extraction.createdAt ?? new Date(),
     updatedAt: extraction.updatedAt ?? new Date(),

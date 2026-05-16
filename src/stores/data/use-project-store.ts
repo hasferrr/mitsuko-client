@@ -332,7 +332,6 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
           subtitleContent: content,
           previousContext: '',
           contextResult: '',
-          origin: 'batch',
         }
       )
 

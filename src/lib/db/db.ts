@@ -4,7 +4,6 @@ import { CustomInstruction } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'
 import {
   AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX,
-  normalizeExtractionOrigin,
   normalizeExtractionStatus,
   stripExtractionDoneTag,
 } from '@/lib/extraction/status'
@@ -369,19 +368,16 @@ class MyDatabase extends Dexie {
         const looksAutoCreated = !!linkedOwnerId
           && typeof extraction.title === 'string'
           && extraction.title.startsWith(AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX)
-        const fallbackOrigin = looksAutoCreated ? 'auto-context' : projectIsBatch ? 'batch' : 'manual'
         const status = normalizeExtractionStatus(extraction.status, contextResult, projectIsBatch)
-        const origin = normalizeExtractionOrigin(extraction.origin, fallbackOrigin)
         const completedAt = extraction.completedAt instanceof Date
           ? extraction.completedAt
           : extraction.completedAt ? new Date(extraction.completedAt) : null
 
         extraction.contextResult = stripExtractionDoneTag(contextResult)
         extraction.status = status
-        extraction.origin = origin
-        extraction.ownerTranslationId = origin === 'auto-context'
-          ? (typeof extraction.ownerTranslationId === 'string' ? extraction.ownerTranslationId : linkedOwnerId ?? null)
-          : null
+        extraction.ownerTranslationId = typeof extraction.ownerTranslationId === 'string'
+          ? extraction.ownerTranslationId
+          : looksAutoCreated ? linkedOwnerId ?? null : null
         extraction.completedAt = status === 'completed' ? completedAt ?? new Date() : null
       })
     })

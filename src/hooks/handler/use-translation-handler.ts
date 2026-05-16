@@ -736,7 +736,6 @@ export const useTranslationHandler = ({
       previousContext,
       contextResult: "",
       status: "idle",
-      origin: "auto-context",
       ownerTranslationId: currentId,
       completedAt: null,
     })

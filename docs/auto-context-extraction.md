@@ -44,7 +44,7 @@ The created extraction uses:
 - current translation subtitles as `subtitleContent`
 - `[Auto Context] {translation title}` as title
 - translation title as episode number
-- `origin: "auto-context"` and `ownerTranslationId` set to the translation id
+- `ownerTranslationId` set to the translation id
 
 ### Use Existing
 
@@ -52,7 +52,7 @@ Translation uses the selected extraction result when it is usable.
 
 If the selected extraction is currently running, translation waits for it to finish, then reloads and validates the result.
 
-If the selected extraction is auto-owned by the same translation (`origin: "auto-context"` and matching `ownerTranslationId`) and is not usable, translation reruns that same extraction entity in place. The rerun updates title, episode number, subtitle content, and result status, while preserving the existing extraction settings and previous context.
+If the selected extraction is auto-owned by the same translation (matching `ownerTranslationId`) and is not usable, translation reruns that same extraction entity in place. The rerun updates title, episode number, subtitle content, and result status, while preserving the existing extraction settings and previous context.
 
 If the selected extraction is not owned by the current translation, invalid results abort the flow. The app does not rerun manually selected extraction dependencies.
 

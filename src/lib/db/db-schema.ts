@@ -19,7 +19,6 @@ const childEntitySchema = z.object({
 
 const extractionSchema = childEntitySchema.extend({
   status: z.enum(["idle", "running", "completed", "failed", "stopped"]).optional(),
-  origin: z.enum(["manual", "batch", "auto-context"]).optional(),
   ownerTranslationId: z.string().nullable().optional(),
   completedAt: z.union([z.string(), z.date()]).nullable().optional(),
 }).loose()

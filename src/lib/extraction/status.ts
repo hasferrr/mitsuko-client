@@ -1,17 +1,12 @@
 import { getContent } from "@/lib/parser/parser"
 import { hasDoneTag, removeDoneTag } from "@/lib/utils"
-import { Extraction, ExtractionOrigin, ExtractionStatus } from "@/types/project"
+import { Extraction, ExtractionStatus } from "@/types/project"
 
 const EXTRACTION_STATUSES: ExtractionStatus[] = ["idle", "running", "completed", "failed", "stopped"]
-const EXTRACTION_ORIGINS: ExtractionOrigin[] = ["manual", "batch", "auto-context"]
 export const AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX = "[Auto Context]"
 
 export function isExtractionStatus(value: unknown): value is ExtractionStatus {
   return typeof value === "string" && EXTRACTION_STATUSES.includes(value as ExtractionStatus)
-}
-
-export function isExtractionOrigin(value: unknown): value is ExtractionOrigin {
-  return typeof value === "string" && EXTRACTION_ORIGINS.includes(value as ExtractionOrigin)
 }
 
 export function stripExtractionDoneTag(contextResult: string): string {
@@ -48,14 +43,6 @@ export function normalizeExtractionStatus(
 ): ExtractionStatus {
   if (isExtractionStatus(status)) return status
   return inferLegacyExtractionStatus(contextResult, isBatch)
-}
-
-export function normalizeExtractionOrigin(
-  origin: unknown,
-  fallback: ExtractionOrigin,
-): ExtractionOrigin {
-  if (isExtractionOrigin(origin)) return origin
-  return fallback
 }
 
 export function getEffectiveExtractionStatus(
@@ -96,5 +83,5 @@ export function isExtractionUsable(
 }
 
 export function isAutoContextOwnedBy(extraction: Extraction, translationId: string): boolean {
-  return extraction.origin === "auto-context" && extraction.ownerTranslationId === translationId
+  return extraction.ownerTranslationId === translationId
 }
