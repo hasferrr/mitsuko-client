@@ -66,7 +66,3 @@ export function getTranslationSubtitleContent(translation: Translation): string 
     parsed: translation.parsed,
   })
 }
-
-export function getEpisodeNumberFromTranslationTitle(title: string): string {
-  return title.replace(/\.[^/.]+$/, "")
-}
