@@ -18,7 +18,6 @@ const extraction = (id: string, contextResult: string, overrides: Partial<Extrac
   previousContext: "",
   contextResult,
   status: "completed",
-  origin: "manual",
   ownerTranslationId: null,
   completedAt: new Date(),
   createdAt: new Date(),
@@ -39,7 +38,6 @@ describe("findLatestExtraction", () => {
 
   test("includes a linked auto-context extraction when it is latest and usable", () => {
     const latest = extraction("episode-3", "latest context", {
-      origin: "auto-context",
       ownerTranslationId: "translation-1",
     })
     const previous = extraction("episode-2", "previous context")
@@ -96,7 +94,6 @@ describe("getExtractionProblem", () => {
   test("identifies auto-context owner", () => {
     expect(isAutoContextOwnedBy(
       extraction("episode-1", "context", {
-        origin: "auto-context",
         ownerTranslationId: "translation-1",
       }),
       "translation-1",

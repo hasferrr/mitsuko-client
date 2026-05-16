@@ -5,7 +5,7 @@ import { createBasicSettings, createAdvancedSettings } from "./settings"
 import { inferLegacyExtractionStatus, stripExtractionDoneTag } from "@/lib/extraction/status"
 
 export type ExtractionCreateInput = Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">
-  & Partial<Pick<Extraction, "status" | "origin" | "ownerTranslationId" | "completedAt">>
+  & Partial<Pick<Extraction, "status" | "ownerTranslationId" | "completedAt">>
 
 // Extraction CRUD functions
 export const createExtraction = async (
@@ -27,14 +27,13 @@ export const createExtraction = async (
     })
 
     const contextResult = stripExtractionDoneTag(data.contextResult)
-    const status = data.status ?? inferLegacyExtractionStatus(data.contextResult, data.origin === "batch")
+    const status = data.status ?? inferLegacyExtractionStatus(data.contextResult)
     const extraction: Extraction = {
       id,
       projectId,
       ...data,
       contextResult,
       status,
-      origin: data.origin ?? "manual",
       ownerTranslationId: data.ownerTranslationId ?? null,
       completedAt: data.completedAt ?? (status === "completed" ? new Date() : null),
       basicSettingsId: basicSettings.id,

@@ -83,7 +83,6 @@ describe("databaseExportConstructor", () => {
       } as Partial<Extraction> as Extraction],
     })
 
-    expect(data.extractions[0].origin).toBe("auto-context")
     expect(data.extractions[0].ownerTranslationId).toBe("translation-1")
   })
 })
