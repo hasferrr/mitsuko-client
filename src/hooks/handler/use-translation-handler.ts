@@ -59,7 +59,6 @@ import {
   combineAutoContext,
   findLatestExtraction,
   getAutoContextCreatedTranslationPatch,
-  getEpisodeNumberFromTranslationTitle,
   getExtractionProblem,
   getStoppedAutoContextExtractionPatch,
   getTranslationSubtitleContent,
@@ -581,7 +580,7 @@ export const useTranslationHandler = ({
       if (!extraction) return false
 
       useExtractionDataStore.getState().mutateData(extractionId, "title", `${AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX} ${translation.title}`)
-      useExtractionDataStore.getState().mutateData(extractionId, "episodeNumber", getEpisodeNumberFromTranslationTitle(translation.title))
+      useExtractionDataStore.getState().mutateData(extractionId, "episodeNumber", translation.title)
       useExtractionDataStore.getState().mutateData(extractionId, "subtitleContent", getTranslationSubtitleContent(translation))
       await useExtractionDataStore.getState().saveData(extractionId)
 
@@ -735,7 +734,7 @@ export const useTranslationHandler = ({
 
     const created = await extractionDataStore.createExtractionDb(project.id, {
       title: `${AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX} ${translation.title}`,
-      episodeNumber: getEpisodeNumberFromTranslationTitle(translation.title),
+      episodeNumber: translation.title,
       subtitleContent: getTranslationSubtitleContent(translation),
       previousContext,
       contextResult: "",

@@ -43,7 +43,7 @@ The created extraction uses:
 - global extraction defaults if project extraction defaults are disabled
 - current translation subtitles as `subtitleContent`
 - `[Auto Context] {translation title}` as title
-- translation title without subtitle extension as episode number
+- translation title as episode number
 - `origin: "auto-context"` and `ownerTranslationId` set to the translation id
 
 ### Use Existing
