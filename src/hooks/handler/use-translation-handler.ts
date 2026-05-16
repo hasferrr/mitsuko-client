@@ -178,20 +178,42 @@ export const useTranslationHandler = ({
     onOpenExtraction?.(extractionId)
   }
 
-  const waitForExtractionToFinish = async (extractionId: string) => {
+  const waitForExtractionToFinish = async (
+    extractionId: string,
+    shouldCancel?: () => boolean,
+  ) => {
     if (!useExtractionStore.getState().isExtractingSet.has(extractionId)) return
 
     await new Promise<void>((resolve) => {
+      const cleanupCallbacks: Array<() => void> = []
+      const resolveAndCleanup = () => {
+        cleanupCallbacks.forEach((cleanup) => cleanup())
+        resolve()
+      }
+
       const unsubscribe = useExtractionStore.subscribe((state) => {
         if (!state.isExtractingSet.has(extractionId)) {
-          unsubscribe()
-          resolve()
+          resolveAndCleanup()
         }
       })
+      cleanupCallbacks.push(unsubscribe)
+
+      if (shouldCancel) {
+        const unsubscribeTranslation = useTranslationStore.subscribe(() => {
+          if (shouldCancel()) {
+            resolveAndCleanup()
+          }
+        })
+        cleanupCallbacks.push(unsubscribeTranslation)
+      }
 
       if (!useExtractionStore.getState().isExtractingSet.has(extractionId)) {
-        unsubscribe()
-        resolve()
+        resolveAndCleanup()
+        return
+      }
+
+      if (shouldCancel?.()) {
+        resolveAndCleanup()
       }
     })
   }
@@ -602,7 +624,7 @@ export const useTranslationHandler = ({
 
       if (useExtractionStore.getState().isExtractingSet.has(extraction.id)) {
         toast.info("Waiting for selected context extraction to finish before translation.")
-        await waitForExtractionToFinish(extraction.id)
+        await waitForExtractionToFinish(extraction.id, () => !isAutoContextRunActive(currentId, runToken))
         if (!isAutoContextRunActive(currentId, runToken)) return null
         const updatedExtraction = await extractionDataStore.getExtractionDb(extraction.id)
         if (!isAutoContextRunActive(currentId, runToken)) return null
