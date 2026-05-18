@@ -9,6 +9,7 @@ export default function Pricing() {
         showLink={false}
         showDescription
         useH1Title
+        fetchIdrRateImmediately
       />
       <PricingDescription />
       <CtaSection />

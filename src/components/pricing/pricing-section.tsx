@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Check, X } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { PricingCards } from "./pricing-cards"
 import { FeatureComparisonTable } from "./feature-comparison-table"
 import { CreditPackPrices } from "./credit-pack-prices"
@@ -10,6 +10,7 @@ import { GeneralFeaturesSection } from "./general-features-section"
 import { CURRENCIES, SUBSCRIPTION_PLANS } from "@/constants/pricing"
 import { CurrencyData } from "@/types/pricing"
 import { CurrencyTabs } from "./currency-tabs"
+import { fetchExchangeRate } from "@/lib/api/exchange-rate"
 
 interface Feature {
   feature: string
@@ -24,6 +25,7 @@ interface PricingSectionProps {
   redirectToPricingPage?: boolean
   showDescription?: boolean
   showLink?: boolean
+  fetchIdrRateImmediately?: boolean
 }
 
 export default function PricingSection({
@@ -31,11 +33,39 @@ export default function PricingSection({
   redirectToPricingPage,
   showDescription,
   showLink,
+  fetchIdrRateImmediately = false,
 }: PricingSectionProps) {
   const [currency, setCurrency] = useState<CurrencyData>(CURRENCIES.USD)
+  const [idrRate, setIdrRate] = useState<number>(CURRENCIES.IDR.rate)
+  const [isIdrRateLoading, setIsIdrRateLoading] = useState(false)
+  const [shouldFetchIdrRate, setShouldFetchIdrRate] = useState(fetchIdrRateImmediately)
+
+  useEffect(() => {
+    if (!fetchIdrRateImmediately && !shouldFetchIdrRate) return
+    let cancelled = false
+    setIsIdrRateLoading(true)
+    fetchExchangeRate().then((rate) => {
+      if (!cancelled) {
+        setIdrRate(rate)
+        setCurrency((prev) =>
+          prev.symbol === CURRENCIES.IDR.symbol
+            ? { ...prev, rate }
+            : prev
+        )
+      }
+    }).finally(() => {
+      if (!cancelled) setIsIdrRateLoading(false)
+    })
+    return () => { cancelled = true }
+  }, [shouldFetchIdrRate, fetchIdrRateImmediately])
 
   const handleCurrencyChange = (value: string) => {
-    setCurrency(value === "$" ? CURRENCIES.USD : CURRENCIES.IDR)
+    if (value === "$") {
+      setCurrency(CURRENCIES.USD)
+    } else {
+      setShouldFetchIdrRate(true)
+      setCurrency({ symbol: CURRENCIES.IDR.symbol, rate: idrRate })
+    }
   }
 
   const pricingData = {
@@ -139,20 +169,17 @@ export default function PricingSection({
           </p>
         </div>
 
-        {/* Currency Tabs */}
         <CurrencyTabs
           currentCurrencySymbol={currency.symbol}
           onCurrencyChange={handleCurrencyChange}
         />
 
-        {/* Pricing Cards */}
         {false && <PricingCards
           currency={currency}
           pricingData={pricingData}
           redirectToPricingPage={redirectToPricingPage}
         />}
 
-        {/* Feature Comparison Table */}
         {false && <FeatureComparisonTable
           currency={currency}
           pricingData={pricingData}
@@ -160,16 +187,14 @@ export default function PricingSection({
           showDescription={showDescription}
         />}
 
-        {/* Credit Pack Prices */}
         <CreditPackPrices
           currency={currency}
+          isIdrRateLoading={isIdrRateLoading}
           redirectToPricingPage={redirectToPricingPage}
         />
 
-        {/* Use the new GeneralFeaturesSection component */}
         <GeneralFeaturesSection />
 
-        {/* More Information */}
         {showLink && (
           <div className="text-center text-sm text-muted-foreground mt-8">
             <Link href="/pricing" className="hover:underline hover:text-sidebar-primary">
@@ -182,4 +207,3 @@ export default function PricingSection({
     </div>
   )
 }
-

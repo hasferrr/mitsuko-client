@@ -5,21 +5,24 @@ import { Button } from "../ui/button"
 import { useRouter } from "next/navigation"
 import { ProductId } from "@/types/product"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useState, useTransition } from "react"
 import { useSnapStore } from "@/stores/ui/use-snap-store"
 import { PaymentOptionsDialog } from "./payment-options-dialog"
 import { toast } from "sonner"
 import { useSessionStore } from "@/stores/ui/use-session-store"
-import { CREDIT_PACKS } from "@/constants/pricing"
+import { CREDIT_PACKS, CURRENCIES } from "@/constants/pricing"
 import { CurrencyData } from "@/types/pricing"
 
 interface CreditPackPricesProps {
   currency: CurrencyData
+  isIdrRateLoading: boolean
   redirectToPricingPage?: boolean
 }
 
 export function CreditPackPrices({
   currency,
+  isIdrRateLoading,
   redirectToPricingPage = false,
 }: CreditPackPricesProps) {
   const router = useRouter()
@@ -38,8 +41,12 @@ export function CreditPackPrices({
   } | null>(null)
 
   const session = useSessionStore((state) => state.session)
+  const isIdr = currency.symbol === CURRENCIES.IDR.symbol
+  const isRateLoading = isIdr && isIdrRateLoading
 
   const handlePurchase = async (productId: ProductId) => {
+    if (isRateLoading) return
+
     const getSnapData = useSnapStore.getState().getSnapData
     const removeSnapData = useSnapStore.getState().removeSnapData
     const clearSnapData = useSnapStore.getState().clearSnapData
@@ -105,17 +112,30 @@ export function CreditPackPrices({
     })
   }
 
+  const formatPrice = (value: number) => {
+    if (value > 1000) {
+      return (value / 1000) + 'k'
+    }
+    return value.toLocaleString()
+  }
+
   return (
     <Card className="relative max-w-5xl mx-auto mt-8 shadow-xs">
       <div id="credit-packs" className="absolute -top-24" />
       <CardContent className="space-y-4">
-      <p className="text-sm text-muted-foreground">
+      <div className="text-sm text-muted-foreground">
         Need more credits? Purchase additional credit packs starting at just{" "}
-        {currency.symbol}
-        {((CREDIT_PACKS.find((pack) => pack.baseCredits !== 0)?.basePriceUSD || 0) * currency.rate).toLocaleString()}
+        {isRateLoading ? (
+          <Skeleton className="inline-block w-16 h-[1em] align-middle" />
+        ) : (
+          <>
+            {currency.symbol}
+            {((CREDIT_PACKS.find((pack) => pack.baseCredits !== 0)?.basePriceUSD || 0) * currency.rate).toLocaleString()}
+          </>
+        )}
         . These credit packs provide flexibility for your
         usage needs. Credits valid for a whole year from purchase!
-      </p>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {CREDIT_PACKS.map((pack) => {
@@ -133,14 +153,9 @@ export function CreditPackPrices({
                   <span className="text-sm font-medium text-muted-foreground">
                     {pack.baseCredits !== 0 ? "Credit Pack" : "Try for Free!"}
                   </span>
-                  {savings > 0 && (
+                  {savings > 0 && !isRateLoading && (
                     <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 rounded">
-                      Save {currency.symbol}{(() => {
-                        if (savings > 1000) {
-                          return (savings / 1000) + 'k'
-                        }
-                        return savings.toLocaleString()
-                      })()}
+                      Save {currency.symbol}{formatPrice(savings)}
                     </span>
                   )}
                 </div>
@@ -157,16 +172,21 @@ export function CreditPackPrices({
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-2">
-                  {savings > 0 ? (
+                  {isRateLoading ? (
+                    <>
+                      {savings > 0 ? (
+                        <>
+                          <Skeleton className="h-[1.25rem] w-14" />
+                          <Skeleton className="h-[1.75rem] w-20" />
+                        </>
+                      ) : (
+                        <Skeleton className="h-[1.75rem] w-20" />
+                      )}
+                    </>
+                  ) : savings > 0 ? (
                     <>
                       <span className="text-muted-foreground line-through text-sm">
-                        {currency.symbol}{(() => {
-                          const originalPrice = price + savings
-                          if (originalPrice > 1000) {
-                            return (originalPrice / 1000) + 'k'
-                          }
-                          return originalPrice.toLocaleString()
-                        })()}
+                        {currency.symbol}{formatPrice(price + savings)}
                       </span>
                       <span className="text-xl font-bold">
                         {currency.symbol}{price.toLocaleString()}
@@ -192,7 +212,7 @@ export function CreditPackPrices({
                   <Button
                     className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                     onClick={() => handlePurchase(pack.productId)}
-                    disabled={isPending}
+                    disabled={isPending || isRateLoading}
                   >
                     {isCurrentCardLoading ? (
                       <>
@@ -218,7 +238,6 @@ export function CreditPackPrices({
         })}
       </div>
 
-      {/* Render the Dialog */}
       {dialogData && (
         <PaymentOptionsDialog
           isOpen={isDialogOpen}

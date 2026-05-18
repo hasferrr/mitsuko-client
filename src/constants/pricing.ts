@@ -1,14 +1,19 @@
 import { CurrencyData, BasePlanData, CreditPack } from "@/types/pricing"
 
-const USD_TO_IDR_FALLBACK = 17500
+export const USD_TO_IDR_FALLBACK = 17500
 
-const USD_TO_IDR = process.env.NEXT_PUBLIC_USD_TO_IDR
-  ? Number(process.env.NEXT_PUBLIC_USD_TO_IDR)
-  : USD_TO_IDR_FALLBACK
+export function getFallbackUsdToIdrRate(): number {
+  const env = process.env.NEXT_PUBLIC_USD_TO_IDR
+  if (env) {
+    const parsed = Number(env)
+    if (Number.isFinite(parsed) && parsed > 0) return parsed
+  }
+  return USD_TO_IDR_FALLBACK
+}
 
 export const CURRENCIES: { USD: CurrencyData; IDR: CurrencyData } = {
   USD: { symbol: "$", rate: 1 },
-  IDR: { symbol: "Rp", rate: USD_TO_IDR },
+  IDR: { symbol: "Rp", rate: getFallbackUsdToIdrRate() },
 }
 
 export const SUBSCRIPTION_PLANS: {
@@ -49,13 +54,13 @@ export const CREDIT_PACKS: CreditPack[] = [
   {
     productId: "credit_pack_20m",
     baseCredits: 20_000_000,
-    basePriceUSD: 19, // Discounted price
+    basePriceUSD: 19,
     discountUSD: 1,
   },
   {
     productId: "credit_pack_65m",
     baseCredits: 65_000_000,
-    basePriceUSD: 59, // Discounted price
+    basePriceUSD: 59,
     discountUSD: 6,
   },
 ]

@@ -17,3 +17,10 @@ export interface CreditPack {
   basePriceUSD: number
   discountUSD: number
 }
+
+export interface ExchangeRateResponse {
+  rate: number
+  adjustedRate: number
+  source: "live" | "env" | "fallback"
+  expiresAt: string | null
+}
