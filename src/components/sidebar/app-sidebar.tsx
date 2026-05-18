@@ -72,6 +72,7 @@ const data = {
       url: "/changelog",
       icon: HistoryIcon,
       newTab: false,
+      prefetch: false,
     },
   ],
 }

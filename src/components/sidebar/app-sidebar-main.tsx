@@ -21,6 +21,7 @@ interface Item {
   icon?: LucideIcon | TablerIcon
   newTab?: boolean
   onClick?: () => void
+  prefetch?: boolean
 }
 
 interface AppSidebarMainProps {
@@ -44,6 +45,7 @@ export function AppSidebarMain({
           <SidebarMenuItem key={item.title}>
             <Link
               href={item.url}
+              prefetch={item.prefetch}
               target={cn(item.newTab && "_blank")}
               rel={cn(item.newTab && "noopener noreferrer")}
               onClick={item.onClick}

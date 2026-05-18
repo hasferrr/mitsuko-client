@@ -73,12 +73,12 @@ export default async function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="#" prefetch={false} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Documentation
               </Link>
             </li>
             <li>
-              <Link href="/changelog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/changelog" prefetch={false} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Changelog
               </Link>
             </li>
@@ -89,12 +89,12 @@ export default async function Footer() {
           <h3 className="text-base font-medium mb-4 text-foreground">Legal</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/terms" prefetch={false} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Terms of Service
               </Link>
             </li>
             <li>
-              <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/privacy" prefetch={false} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Privacy Policy
               </Link>
             </li>
@@ -132,7 +132,7 @@ export default async function Footer() {
           <ul className="flex flex-col gap-2">
             {latest.map(p => (
               <li key={p.slug} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                <Link href={`/blog/${p.slug}`} className="line-clamp-2">{p.title.split(":")[0] || p.title}</Link>
+                <Link href={`/blog/${p.slug}`} prefetch={false} className="line-clamp-2">{p.title.split(":")[0] || p.title}</Link>
               </li>
             ))}
           </ul>
