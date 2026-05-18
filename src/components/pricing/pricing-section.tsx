@@ -10,7 +10,7 @@ import { GeneralFeaturesSection } from "./general-features-section"
 import { CURRENCIES, SUBSCRIPTION_PLANS } from "@/constants/pricing"
 import { CurrencyData } from "@/types/pricing"
 import { CurrencyTabs } from "./currency-tabs"
-import { fetchExchangeRate } from "@/lib/api/exchange-rate"
+import { useExchangeRateStore } from "@/stores/ui/use-exchange-rate-store"
 
 interface Feature {
   feature: string
@@ -25,7 +25,6 @@ interface PricingSectionProps {
   redirectToPricingPage?: boolean
   showDescription?: boolean
   showLink?: boolean
-  fetchIdrRateImmediately?: boolean
 }
 
 export default function PricingSection({
@@ -33,37 +32,25 @@ export default function PricingSection({
   redirectToPricingPage,
   showDescription,
   showLink,
-  fetchIdrRateImmediately = false,
 }: PricingSectionProps) {
+  const idrRate = useExchangeRateStore((state) => state.idrRate)
+  const isIdrRateLoading = useExchangeRateStore((state) => state.isIdrRateLoading)
+  const fetchIdrRate = useExchangeRateStore((state) => state.fetchIdrRate)
   const [currency, setCurrency] = useState<CurrencyData>(CURRENCIES.USD)
-  const [idrRate, setIdrRate] = useState<number>(CURRENCIES.IDR.rate)
-  const [isIdrRateLoading, setIsIdrRateLoading] = useState(false)
-  const [shouldFetchIdrRate, setShouldFetchIdrRate] = useState(fetchIdrRateImmediately)
 
   useEffect(() => {
-    if (!fetchIdrRateImmediately && !shouldFetchIdrRate) return
-    let cancelled = false
-    setIsIdrRateLoading(true)
-    fetchExchangeRate().then((rate) => {
-      if (!cancelled) {
-        setIdrRate(rate)
-        setCurrency((prev) =>
-          prev.symbol === CURRENCIES.IDR.symbol
-            ? { ...prev, rate }
-            : prev
-        )
-      }
-    }).finally(() => {
-      if (!cancelled) setIsIdrRateLoading(false)
-    })
-    return () => { cancelled = true }
-  }, [shouldFetchIdrRate, fetchIdrRateImmediately])
+    setCurrency((prev) =>
+      prev.symbol === CURRENCIES.IDR.symbol
+        ? { ...prev, rate: idrRate }
+        : prev
+    )
+  }, [idrRate])
 
   const handleCurrencyChange = (value: string) => {
     if (value === "$") {
       setCurrency(CURRENCIES.USD)
     } else {
-      setShouldFetchIdrRate(true)
+      void fetchIdrRate()
       setCurrency({ symbol: CURRENCIES.IDR.symbol, rate: idrRate })
     }
   }

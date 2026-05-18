@@ -20,7 +20,4 @@ export interface CreditPack {
 
 export interface ExchangeRateResponse {
   rate: number
-  adjustedRate: number
-  source: "live" | "env" | "fallback"
-  expiresAt: string | null
 }

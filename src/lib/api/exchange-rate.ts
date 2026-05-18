@@ -7,8 +7,7 @@ export async function fetchExchangeRate(): Promise<number> {
     if (!res.ok) return getFallbackUsdToIdrRate()
 
     const data: ExchangeRateResponse = await res.json()
-    const effectiveRate = data.adjustedRate > 0 ? data.adjustedRate : data.rate
-    return effectiveRate > 0 ? effectiveRate : getFallbackUsdToIdrRate()
+    return data.rate > 0 ? data.rate : getFallbackUsdToIdrRate()
   } catch {
     return getFallbackUsdToIdrRate()
   }

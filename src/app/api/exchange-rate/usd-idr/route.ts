@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import { getFallbackUsdToIdrRate } from "@/constants/pricing"
-import { ExchangeRateResponse } from "@/types/pricing"
 import { revalidateTag } from "next/cache"
 import { z } from "zod"
 
@@ -12,15 +11,16 @@ const exchangeRateSchema = z.object({
   expiresAt: z.string().nullable(),
 })
 
-function fallback(): ExchangeRateResponse {
-  const adjustedRate = getFallbackUsdToIdrRate()
-  return { rate: adjustedRate, adjustedRate, source: "env", expiresAt: null }
+type UpstreamExchangeRateResponse = z.infer<typeof exchangeRateSchema>
+
+function fallback() {
+  return { rate: getFallbackUsdToIdrRate() }
 }
 
-function parseExchangeRate(data: unknown): ExchangeRateResponse {
+function parseExchangeRate(data: unknown): UpstreamExchangeRateResponse {
   const parsed = exchangeRateSchema.safeParse(data)
   if (!parsed.success) throw new Error("upstream response shape invalid")
-  return { ...parsed.data, source: "live" }
+  return parsed.data
 }
 
 function hasExpired(expiresAt: string | null): boolean {
@@ -59,7 +59,7 @@ export async function GET() {
       revalidateTag(CACHE_TAG, { expire: 0 })
       response = await fetchUpstreamExchangeRate(upstreamUrl, apiSecret)
     }
-    return NextResponse.json(response)
+    return NextResponse.json({ rate: response.adjustedRate })
   } catch {
     revalidateTag(CACHE_TAG, { expire: 0 })
     return NextResponse.json(fallback())

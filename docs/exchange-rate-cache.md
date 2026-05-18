@@ -24,10 +24,9 @@ The route validates the upstream payload with Zod. Invalid payloads fall back to
 
 The frontend receives:
 
-- `rate`
-- `adjustedRate`
-- `source`: `"live"` or `"env"`
-- `expiresAt`
+- `rate`: effective USD to IDR rate used by the UI
+
+For live upstream responses, the route returns `adjustedRate` as `rate`. For fallback responses, the route returns the configured environment rate as `rate`.
 
 ## Cache Storage
 
@@ -52,7 +51,7 @@ On each route request:
 2. Check the returned payload `expiresAt`.
 3. If `expiresAt` is missing, invalid, or in the past, expire the cache tag.
 4. Read through Next.js Data Cache again so the stale entry is replaced by a fresh upstream response.
-5. Return the fresh live response, or fall back to the environment rate if refresh fails.
+5. Return the effective rate from the fresh live response, or fall back to the environment rate if refresh fails.
 
 This is why the route can call the cached fetch helper twice. The first read may be a stale cached value. The second read happens only after the tag is expired.
 
@@ -70,6 +69,8 @@ Fallback responses are not used as the upstream cache value.
 
 ## Client Behavior
 
-The pricing UI starts with the configured fallback IDR rate.
+The pricing UI starts with the configured fallback IDR rate and does not fetch the live rate on page load.
 
-When IDR pricing is requested, the client calls `/api/exchange-rate/usd-idr`. The server route handles caching and expiry. The client does not cache the exchange rate beyond its component state.
+When IDR pricing is requested, the client calls `/api/exchange-rate/usd-idr`. The server route handles caching and expiry. The client stores the fetched IDR rate in a shared Zustand store for the current browser session.
+
+The client only consumes the response `rate` field.
