@@ -35,6 +35,8 @@ import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
 import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
+import { inferEditedExtractionStatus } from "@/lib/extraction/status"
+import { ExtractionBadges } from "./extraction-badges"
 
 interface ContextExtractorMainProps {
   currentId: string
@@ -56,6 +58,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
 
   // Extraction Data Store
   const title = useExtractionDataStore((state) => state.getTitle(currentId))
+  const extraction = useExtractionDataStore((state) => state.data[currentId])
   const episodeNumber = useExtractionDataStore((state) => state.getEpisodeNumber(currentId))
   const subtitleContent = useExtractionDataStore((state) => state.getSubtitleContent(currentId))
   const previousContext = useExtractionDataStore((state) => state.getPreviousContext(currentId))
@@ -65,6 +68,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   const setSubtitleContent = useExtractionDataStore((state) => state.setSubtitleContent)
   const setPreviousContext = useExtractionDataStore((state) => state.setPreviousContext)
   const setContextResult = useExtractionDataStore((state) => state.setContextResult)
+  const mutateExtraction = useExtractionDataStore((state) => state.mutateData)
   const saveData = useExtractionDataStore((state) => state.saveData)
 
   // Extraction Store
@@ -229,6 +233,9 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
         })
       }, 0)
     } else {
+      const status = inferEditedExtractionStatus(contextResult)
+      mutateExtraction(currentId, "status", status)
+      mutateExtraction(currentId, "completedAt", status === "completed" ? new Date() : null)
       await saveData(currentId)
     }
   }
@@ -263,8 +270,11 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
           value={title}
           onChange={(e) => setTitle(currentId, e.target.value)}
           onBlur={() => saveData(currentId)}
-          className="text-xl font-semibold"
+          className="min-w-0 text-xl font-semibold"
         />
+        {extraction && (
+          <ExtractionBadges extraction={extraction} runningIds={isExtractingSet} className="shrink-0" />
+        )}
       </div>
 
       {/* Left Pane */}

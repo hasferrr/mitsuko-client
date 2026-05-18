@@ -18,6 +18,7 @@ import { toast } from "sonner"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
 import MD5 from "crypto-js/md5"
+import { inferEditedExtractionStatus } from "@/lib/extraction/status"
 
 interface UseExtractionHandlerProps {
   setActiveTab: (tab: string) => void
@@ -99,11 +100,11 @@ export const useExtractionHandler = ({
 
     if (episodeNumber.trim() === "") {
       setIsEpisodeNumberValid?.(false)
-      return
+      return false
     }
     if (subtitleContent.trim() === "") {
       setIsSubtitleContentValid?.(false)
-      return
+      return false
     }
 
     setIsExtracting(currentId, true)
@@ -170,6 +171,11 @@ export const useExtractionHandler = ({
         projectName,
       }
 
+      setContextResult(currentId, "")
+      useExtractionDataStore.getState().mutateData(currentId, "status", "running")
+      useExtractionDataStore.getState().mutateData(currentId, "completedAt", null)
+      await saveData(currentId)
+
       await extractContext(
         requestBody,
         isUseCustomModel ? apiKey : "",
@@ -181,11 +187,24 @@ export const useExtractionHandler = ({
         modelDetail?.isFormatReasoning,
       )
 
-      onSuccessTranslation?.({ currentId })
-    } catch (error) {
-      onErrorTranslation?.({ currentId })
+      const resultStatus = inferEditedExtractionStatus(useExtractionDataStore.getState().getContextResult(currentId))
+      if (resultStatus !== "completed") {
+        throw new Error("Extraction result is not usable")
+      }
 
+      useExtractionDataStore.getState().mutateData(currentId, "status", "completed")
+      useExtractionDataStore.getState().mutateData(currentId, "completedAt", new Date())
+      onSuccessTranslation?.({ currentId })
+      return true
+    } catch (error) {
+      const nextStatus = error instanceof Error && error.name === "AbortError" ? "stopped" : "failed"
+      useExtractionDataStore.getState().mutateData(currentId, "status", nextStatus)
+      useExtractionDataStore.getState().mutateData(currentId, "completedAt", null)
+      await saveData(currentId)
+
+      onErrorTranslation?.({ currentId })
       console.error(error)
+      return false
     } finally {
       setIsExtracting(currentId, false)
 
@@ -199,6 +218,8 @@ export const useExtractionHandler = ({
   const handleStop = async (currentId: string) => {
     stopExtraction(currentId)
     setIsExtracting(currentId, false)
+    useExtractionDataStore.getState().mutateData(currentId, "status", "stopped")
+    useExtractionDataStore.getState().mutateData(currentId, "completedAt", null)
     await saveData(currentId)
   }
 

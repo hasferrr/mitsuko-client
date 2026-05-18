@@ -17,6 +17,12 @@ const childEntitySchema = z.object({
   projectId: z.string().optional(),
 }).loose()
 
+const extractionSchema = childEntitySchema.extend({
+  status: z.enum(["idle", "running", "completed", "failed", "stopped"]).optional(),
+  ownerTranslationId: z.string().nullable().optional(),
+  completedAt: z.union([z.string(), z.date()]).nullable().optional(),
+}).loose()
+
 const settingsSchema = z.object({
   id: z.string(),
 }).loose()
@@ -30,7 +36,7 @@ export const databaseExportSchema = z.object({
   projects: z.array(projectSchema).optional().default([]),
   translations: z.array(childEntitySchema).optional().default([]),
   transcriptions: z.array(childEntitySchema).optional().default([]),
-  extractions: z.array(childEntitySchema).optional().default([]),
+  extractions: z.array(extractionSchema).optional().default([]),
   projectOrders: z.array(projectOrderSchema).optional().default([]),
   basicSettings: z.array(settingsSchema).optional().default([]),
   advancedSettings: z.array(settingsSchema).optional().default([]),

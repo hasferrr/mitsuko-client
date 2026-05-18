@@ -5,7 +5,7 @@ import { toast } from "sonner"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { BatchFile } from "@/types/batch"
-import { hasDoneTag, removeDoneTag, addDoneTag } from "@/lib/utils"
+import { cleanExtractionContent, getEffectiveExtractionStatus, hasExtractionError } from "@/lib/extraction/status"
 
 interface UseBatchSelectionProps {
   batchFiles: BatchFile[]
@@ -23,7 +23,7 @@ export function useBatchSelection({ batchFiles, operationMode }: UseBatchSelecti
   const removeTranscriptionFromBatch = useProjectStore((state) => state.removeTranscriptionFromBatch)
 
   const extractionData = useExtractionDataStore((state) => state.data)
-  const setContextResult = useExtractionDataStore((state) => state.setContextResult)
+  const mutateExtraction = useExtractionDataStore((state) => state.mutateData)
   const saveExtractionData = useExtractionDataStore((state) => state.saveData)
 
   const toggleSelectMode = () => {
@@ -70,9 +70,17 @@ export function useBatchSelection({ batchFiles, operationMode }: UseBatchSelecti
     await Promise.all(ids.map(async (id) => {
       const extraction = extractionData[id]
       if (!extraction) return
-      const raw = extraction.contextResult || ''
-      const next = hasDoneTag(raw) ? removeDoneTag(raw) : addDoneTag(raw)
-      setContextResult(id, next)
+      const status = getEffectiveExtractionStatus(extraction, new Set())
+      if (status === "completed") {
+        mutateExtraction(id, "status", "idle")
+        mutateExtraction(id, "completedAt", null)
+      } else if (!cleanExtractionContent(extraction.contextResult) || hasExtractionError(extraction.contextResult)) {
+        toast.error("Only clean non-empty extraction results can be marked done")
+        return
+      } else {
+        mutateExtraction(id, "status", "completed")
+        mutateExtraction(id, "completedAt", new Date())
+      }
       await saveExtractionData(id)
     }))
   }

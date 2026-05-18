@@ -4,6 +4,9 @@ import { Model } from "./model"
 export type ProjectType = 'translation' | 'transcription' | 'extraction'
 export type SettingsParentType = 'project' | 'translation' | 'extraction'
 export type TranscriptionModel = 'mitsuko-premium' | 'mitsuko-free' | 'whisper-large-v3' | 'whisper-large-v3-turbo'
+export type AutoContextMode = 'disabled' | 'create-new' | 'use-existing'
+export type AutoContextPreviousMode = 'latest' | 'selected' | 'none'
+export type ExtractionStatus = 'idle' | 'running' | 'completed' | 'failed' | 'stopped'
 
 export interface ProjectOrder {
   id: string
@@ -44,6 +47,10 @@ export interface Translation {
   projectId: string
   basicSettingsId: string
   advancedSettingsId: string
+  autoContextMode: AutoContextMode
+  autoContextExtractionId: string | null
+  autoContextPreviousMode: AutoContextPreviousMode
+  autoContextPreviousExtractionId: string | null
   response: ResponseTranslation
 }
 
@@ -83,6 +90,9 @@ export interface Extraction {
   subtitleContent: string
   previousContext: string
   contextResult: string
+  status: ExtractionStatus
+  ownerTranslationId: string | null
+  completedAt: Date | null
   createdAt: Date
   updatedAt: Date
   projectId: string
