@@ -14,6 +14,10 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### May 20
+
+- 🤖 **Model Updates:** Added Gemini 3.5 Flash in both free and paid tiers. It delivers near-Pro level reasoning at Flash-tier speed and cost, with a 1M token context window.
+
 ### May 8
 
 - 📦 **Project Archiving:** Archive projects to tidy up your workspace. Archived items live in a separate section and can be unarchived anytime.
