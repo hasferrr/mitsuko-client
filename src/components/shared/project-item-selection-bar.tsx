@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useEffectEvent, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -64,11 +64,8 @@ export function ProjectItemSelectionBar({
   const visibleTypeCount = [hasTranslations, hasTranscriptions, hasExtractions].filter(Boolean).length
   const hasMultipleTypes = currentTab === "overview" && visibleTypeCount > 1
 
-  useEffect(() => {
-    if (open) {
-      setExiting(false)
-      setMounted(true)
-    } else if (mounted) {
+  const startCloseTransition = useEffectEvent(() => {
+    if (mounted) {
       setExiting(true)
       const timer = setTimeout(() => {
         setMounted(false)
@@ -76,6 +73,16 @@ export function ProjectItemSelectionBar({
       }, 200)
       return () => clearTimeout(timer)
     }
+  })
+
+  useEffect(() => {
+    if (open) {
+      setExiting(false)
+      setMounted(true)
+      return
+    }
+
+    return startCloseTransition()
   }, [open])
 
   const renderSelectAllButton = () => {
