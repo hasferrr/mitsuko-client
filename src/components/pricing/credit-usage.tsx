@@ -58,24 +58,24 @@ export default async function CreditUsage() {
       </h3>
       <p>
         Credit costs vary based on the specific AI model used. Costs are typically calculated based on the number of input and output tokens processed.
-        More models will be added in the future. Prices are aligned to original API prices with a 0.2 service fee. See the estimated costs below.
+        More models will be added in the future. Prices are aligned to original API prices with a 0.2 multiplier as a service fee. See the original costs below.
       </p>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-muted/50">
-              <th className="px-4 py-2 text-left font-medium text-muted-foreground">Model</th>
-              <th className="px-4 py-2 text-left font-medium text-muted-foreground">Credit per <br /> Input Token</th>
-              <th className="px-4 py-2 text-left font-medium text-muted-foreground">Credit per <br /> Output Token</th>
-              <th className="px-4 py-2 text-left font-medium text-muted-foreground">Credit Usage</th>
-              <th className="px-4 py-2 text-left font-medium text-muted-foreground">Context Length</th>
-              <th className="px-4 py-2 text-left font-medium text-muted-foreground">Max Completion</th>
+              <th className="px-4 py-2 text-left font-medium">Model</th>
+              <th className="px-4 py-2 text-left font-medium">Credit per <br /> Input Token</th>
+              <th className="px-4 py-2 text-left font-medium">Credit per <br /> Output Token</th>
+              <th className="px-4 py-2 text-left font-medium">Credit Usage</th>
+              <th className="px-4 py-2 text-left font-medium">Context Length</th>
+              <th className="px-4 py-2 text-left font-medium">Max Completion</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {modelCosts.map((model) => (
               <tr key={model.name} className="hover:bg-muted/50">
-                <td className="px-4 py-2 text-left text-muted-foreground">
+                <td className="px-4 py-2 text-left">
                   <ModelNameWithBadges name={model.name} />
                 </td>
                 <td className="px-4 py-2 text-left text-muted-foreground">

@@ -41,7 +41,7 @@ export default async function TranscriptionUsage() {
       <div className="flex flex-col gap-4">
         <p>
           Audio transcription tasks consume credits based on the duration of the audio and the number of output tokens generated.
-          More models will be added in the future.
+          More models will be added in the future. See the estimated costs below.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

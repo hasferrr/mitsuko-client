@@ -39,7 +39,7 @@ export default function WhichModels({ className }: WhichModelsProps) {
               ))}).
             </li>
             <li>If the results meet your needs, you can continue using them.</li>
-            <li>If you need higher quality results, you can gradually switch to more expensive models.</li>
+            <li>If you need higher quality results, you can gradually switch to more bigger models.</li>
           </ul>
           <p>Generally, <span className="font-semibold">Gemini Pro</span> and <span className="font-semibold">GPT-5</span> provide excellent results for most use cases and languages.</p>
         </div>
