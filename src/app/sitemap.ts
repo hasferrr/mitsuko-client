@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
+import { SEO_LANDING_PAGE_SLUGS } from '@/constants/seo-pages'
 import { getAllPostsMeta } from '@/lib/blog'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -9,6 +10,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 1,
+    },
+    {
+      url: `${DEPLOYMENT_URL}/anime-subtitle-translator`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${DEPLOYMENT_URL}/ass-subtitle-translator`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${DEPLOYMENT_URL}/subtitle-localization-agencies`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
+    {
+      url: `${DEPLOYMENT_URL}/youtube-subtitle-translator`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.85,
     },
     {
       url: `${DEPLOYMENT_URL}/dashboard`,
@@ -61,6 +86,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   const posts = await getAllPostsMeta()
+  const baseUrls = new Set(base.map(entry => entry.url))
+  const seoEntries: MetadataRoute.Sitemap = SEO_LANDING_PAGE_SLUGS
+    .map(slug => `${DEPLOYMENT_URL}/${slug}`)
+    .filter(url => !baseUrls.has(url))
+    .map(url => ({
+      url,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    }))
   const postEntries: MetadataRoute.Sitemap = posts.map(p => ({
     url: `${DEPLOYMENT_URL}/blog/${p.slug}`,
     lastModified: new Date(p.updated || p.date),
@@ -68,5 +103,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }))
 
-  return [...base, ...postEntries]
+  return [...base, ...seoEntries, ...postEntries]
 }

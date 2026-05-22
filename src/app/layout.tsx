@@ -11,10 +11,27 @@ const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
 
 const schema = {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Mitsuko",
-  "url": DEPLOYMENT_URL,
-  "logo": `${DEPLOYMENT_URL}/android-chrome-512x512.png`,
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "Mitsuko",
+      "url": DEPLOYMENT_URL,
+      "logo": `${DEPLOYMENT_URL}/android-chrome-512x512.png`,
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Mitsuko",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "url": DEPLOYMENT_URL,
+      "description": META_DESCRIPTION,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+      },
+    },
+  ],
 }
 
 export const metadata: Metadata = {

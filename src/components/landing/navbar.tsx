@@ -51,7 +51,7 @@ export default function Navbar() {
             )}
           </div>
 
-          <nav className="hidden md:flex items-center space-x-8 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <nav className="hidden md:flex items-center gap-8 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <NavLinks />
           </nav>
 
@@ -95,4 +95,3 @@ export default function Navbar() {
     </header>
   )
 }
-
