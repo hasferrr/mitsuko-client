@@ -5,6 +5,7 @@ import { META_DESCRIPTION, META_KEYWORDS, META_TITLE_LONG } from '@/constants/me
 import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { cn } from '@/lib/utils'
 import Providers from '@/contexts/providers'
+import Script from 'next/script'
 
 const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
 
@@ -78,6 +79,13 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
+        {process.env.NODE_ENV === "development" && (
+          <Script
+            src="//unpkg.com/react-grab/dist/index.global.js"
+            crossOrigin="anonymous"
+            strategy="beforeInteractive"
+          />
+        )}
       </head>
       <body suppressHydrationWarning>
         <Providers>
