@@ -222,7 +222,10 @@ export default function SubtitleTranslatorMain({
     const untranslated = mergeIntervalsWithGap(initialUntranslated, 5)
     console.log(JSON.stringify(untranslated))
 
-    if (untranslated.length === 0) return
+    if (untranslated.length === 0) {
+      toast.info("All translations are already finished")
+      return
+    }
 
     setIsTranslating(currentId, true)
     setHasChanges(true)
