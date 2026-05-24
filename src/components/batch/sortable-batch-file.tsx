@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -36,7 +37,7 @@ export function SortableBatchFile({
   onSelectToggle,
   downloadOption,
 }: SortableBatchFileProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id })
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id, disabled: selectMode })
   const style = { transform: CSS.Transform.toString(transform), transition }
 
   const handleTitleClick = () => {
@@ -64,21 +65,17 @@ export function SortableBatchFile({
       className={cn(
         "ring-0 border",
         selectMode && "select-none",
-        selected && "bg-primary/5 dark:bg-primary/10"
+        selected && "border-primary bg-primary/5 dark:bg-primary/10"
       )}
       onClick={handleCardClick}
     >
       <CardContent className="flex items-center justify-between gap-4">
         {selectMode ? (
-          <input
-            type="checkbox"
-            className="size-4 shrink-0"
+          <Checkbox
             checked={selected}
             onClick={(e) => e.stopPropagation()}
-            onChange={(e) => {
-              e.stopPropagation()
-              onSelectToggle?.(batchFile.id)
-            }}
+            onCheckedChange={() => onSelectToggle?.(batchFile.id)}
+            className="shrink-0"
           />
         ) : (
           <button {...attributes} {...listeners} className="cursor-grab shrink-0">
