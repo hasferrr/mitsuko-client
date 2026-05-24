@@ -149,6 +149,8 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       const wasArchived = project?.isArchived ?? false
       const isArchiving = !wasArchived && update.isArchived === true
       const isUnarchiving = wasArchived && update.isArchived === false
+      const wasBatch = project?.isBatch ?? false
+      const isBatchToggling = typeof update.isBatch === 'boolean' && update.isBatch !== wasBatch
       const updatedProject = await updateProjectDB(id, update)
       set((state) => ({
         projects: state.projects.map(p =>
@@ -166,6 +168,12 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
         const newOrder = isUnarchiving
           ? [id, ...activeIds, ...archivedIds]
           : [...activeIds, id, ...archivedIds]
+        await get().reorderProjects(newOrder)
+      }
+      if (isBatchToggling) {
+        const projects = get().projects
+        const otherIds = projects.filter(p => p.id !== id).map(p => p.id)
+        const newOrder = [id, ...otherIds]
         await get().reorderProjects(newOrder)
       }
       return updatedProject
