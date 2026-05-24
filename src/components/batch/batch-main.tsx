@@ -35,7 +35,7 @@ import { BatchExtractionView } from "./batch-extraction-view"
 import { BatchTranscriptionView } from "./batch-transcription-view"
 
 export default function BatchMain() {
-  const [operationMode, setOperationMode] = useState<"translation" | "extraction" | "transcription">("translation")
+  const [operationMode, setOperationMode] = useState<"translation" | "transcription" | "extraction">("translation")
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   // Project Store
@@ -87,7 +87,7 @@ export default function BatchMain() {
             onChange={(e) => handleBatchNameChange(e.target.value)}
           />
         </div>
-        <Select value={operationMode} onValueChange={(value: "translation" | "extraction" | "transcription") => setOperationMode(value)}>
+        <Select value={operationMode} onValueChange={(value: "translation" | "transcription" | "extraction") => setOperationMode(value)}>
           <SelectTrigger className="w-fit">
             <SelectValue />
           </SelectTrigger>
@@ -100,20 +100,20 @@ export default function BatchMain() {
                 Translation
               </div>
             </SelectItem>
-            <SelectItem value="extraction">
-              <div className="flex items-center gap-2 pr-1">
-                <div className="size-4">
-                  <Layers className="size-4" />
-                </div>
-                Extraction
-              </div>
-            </SelectItem>
             <SelectItem value="transcription">
               <div className="flex items-center gap-2 pr-1">
                 <div className="size-4">
                   <AudioLines className="size-4" />
                 </div>
                 Transcription
+              </div>
+            </SelectItem>
+            <SelectItem value="extraction">
+              <div className="flex items-center gap-2 pr-1">
+                <div className="size-4">
+                  <Layers className="size-4" />
+                </div>
+                Extraction
               </div>
             </SelectItem>
           </SelectContent>
