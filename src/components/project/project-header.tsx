@@ -73,13 +73,13 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
     setIsArchiveDialogOpen(false)
   }
 
-  const handleToggleBatch = async (): Promise<boolean> => {
+  const handleToggleBatch = async (): Promise<"project" | "batch" | false> => {
     try {
       const updated = await updateProjectStore(currentProject.id, { isBatch: !currentProject.isBatch })
       if (updated) {
         setCurrentProject(updated)
         toast.success(`Converted to ${updated.isBatch ? 'Batch' : 'Normal'} project`)
-        return true
+        return updated.isBatch ? "batch" : "project"
       }
     } catch (error) {
       console.error('Failed to toggle batch mode', error)
@@ -193,6 +193,7 @@ export function ProjectHeader({ currentProject }: ProjectHeaderProps) {
                 const ok = await handleToggleBatch()
                 setIsProcessingConvert(false)
                 if (ok) setIsConvertModalOpen(false)
+                if (ok === "batch") router.push("/batch")
               }}
               disabled={isProcessingConvert}
             >
