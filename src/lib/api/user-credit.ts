@@ -9,7 +9,7 @@ export async function fetchUserCreditData(): Promise<UserCreditData> {
 
   const { data, error } = await supabase
     .from('users')
-    .select('credit')
+    .select('credit, tier')
     .eq('id', session.user.id)
     .single<UserCreditData>()
 

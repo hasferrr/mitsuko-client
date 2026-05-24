@@ -6,6 +6,7 @@ import { Card, CardHeader } from "@/components/ui/card"
 import { RefreshCw, Plus } from "lucide-react"
 import { Button } from "../ui/button"
 import { Skeleton } from "../ui/skeleton"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { UserCreditData } from "@/types/user"
 import { useSessionStore } from "@/stores/ui/use-session-store"
 import { useQuery } from "@tanstack/react-query"
@@ -181,9 +182,17 @@ export function User() {
                   <span className="italic text-muted-foreground">Loading...</span>
                 ) : isUserError ? (
                   <span className="italic text-destructive">Error</span>
+                ) : user?.tier === "basic+" ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="cursor-help">{capitalize(user.tier)}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                          <p className="max-w-xs text-center">Higher request limit and simultaneous requests</p>
+                    </TooltipContent>
+                  </Tooltip>
                 ) : (
-                  // capitalize(user?.tier ?? "unknown")
-                  "Basic"
+                  capitalize(user?.tier ?? "unknown")
                 )}
               </td>
             </tr>
