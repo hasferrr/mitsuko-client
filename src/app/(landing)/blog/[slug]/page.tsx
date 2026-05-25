@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
+import Link from "@/components/link"
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import { DEPLOYMENT_URL } from '@/constants/external-links'

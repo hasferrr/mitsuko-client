@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from "@/components/link"
 import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { getAllPostsMeta } from '@/lib/blog'
 

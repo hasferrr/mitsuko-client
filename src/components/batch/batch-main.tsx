@@ -29,7 +29,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import Link from "next/link"
+import Link from "@/components/link"
 import { BatchTranslationView } from "./batch-translation-view"
 import { BatchExtractionView } from "./batch-extraction-view"
 import { BatchTranscriptionView } from "./batch-transcription-view"

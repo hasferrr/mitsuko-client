@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import Link from "@/components/link"
 import { capitalize, cn } from "@/lib/utils"
 import { Card, CardHeader } from "@/components/ui/card"
 import { RefreshCw, Plus } from "lucide-react"

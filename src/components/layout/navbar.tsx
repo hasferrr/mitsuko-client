@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import Link from "@/components/link"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun, Loader2, CircleDollarSign, AlertCircle } from "lucide-react"
 import { useThemeStore } from "@/stores/ui/use-theme-store"

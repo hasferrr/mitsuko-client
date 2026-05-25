@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/link"
 import CreditUsage from "./credit-usage"
 import TranscriptionUsage from "./transcription-usage"
 import WhichModels from "./which-models"

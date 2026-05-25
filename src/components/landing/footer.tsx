@@ -1,5 +1,5 @@
 import { DISCORD_LINK, GITHUB_LINK, ABOUT_LINK } from "@/constants/external-links"
-import Link from "next/link"
+import Link from "@/components/link"
 import { getAllPostsMeta } from "@/lib/blog"
 import FooterBadges from "@/components/landing/footer-badges"
 

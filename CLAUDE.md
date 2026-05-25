@@ -134,6 +134,7 @@ Dexie database is at version 24. When modifying data models in `src/types/`:
 - Use path alias `@/*` for imports from `src/`
 - Use `cn()` from `@/lib/utils` for conditional Tailwind classes (or directly from `@/lib/utils/cn`)
 - Use `toast.error()`/`toast.success()` from `sonner` for user feedback
+- **Use `@/components/link`** instead of `next/link` — it wraps Next.js `Link` with route-level prefetch policy (`src/lib/route-prefetch-policy.ts`). ESLint enforces this via `no-restricted-imports`.
 - **Tailwind v4** with CSS-based config in `src/app/globals.css` (no `tailwind.config.*`)
 
 ### Shadcn/ui Component Defaults

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
+import Link from "@/components/link"
 import { Menu, X } from "lucide-react"
 import { ThemeToggle } from "@/components/landing/theme-toggle"
 import { useSessionStore } from "@/stores/ui/use-session-store"

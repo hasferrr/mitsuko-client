@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/link"
 import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react"
 import { DISCORD_LINK, GITHUB_LINK } from "@/constants/external-links"
 

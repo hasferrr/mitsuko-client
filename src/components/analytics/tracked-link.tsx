@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import Link from "@/components/link"
 import posthog from "posthog-js"
 import { forwardRef } from "react"
 import type { ComponentPropsWithoutRef } from "react"

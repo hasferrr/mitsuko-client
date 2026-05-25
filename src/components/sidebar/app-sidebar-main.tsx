@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import Link from "next/link"
+import Link from "@/components/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useProjectStore } from "@/stores/data/use-project-store"

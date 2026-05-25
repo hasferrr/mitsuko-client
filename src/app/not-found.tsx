@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from "@/components/link"
 import { ArrowLeft } from 'lucide-react'
 import Navbar from '@/components/landing/navbar'
 

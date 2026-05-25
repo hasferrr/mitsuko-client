@@ -1,16 +1,22 @@
 "use client"
 
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { isRoutePrefetchDisabled } from "@/lib/route-prefetch-policy"
 
 export const FeaturesPrefetcher = () => {
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
+    if (isRoutePrefetchDisabled(pathname)) {
+      return
+    }
+
     router.prefetch('/translate')
     router.prefetch('/transcribe')
     router.prefetch('/extract-context')
-  }, [router])
+  }, [pathname, router])
 
   return null
 }

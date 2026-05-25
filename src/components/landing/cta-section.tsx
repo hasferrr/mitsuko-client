@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import Link from "@/components/link"
 import { DISCORD_LINK } from "@/constants/external-links"
 import { useEmailLink } from "@/hooks/use-email-link"
 import { useSessionStore } from "@/stores/ui/use-session-store"
