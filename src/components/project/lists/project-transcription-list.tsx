@@ -23,7 +23,6 @@ import { Transcription, Project } from "@/types/project"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { useRouter } from "next/navigation"
 import { ProjectItemSkeleton } from "../project-item-skeleton"
 import { ItemType } from "@/hooks/project/use-project-item-selection"
@@ -68,7 +67,6 @@ export function ProjectTranscriptionList({
   const updateTranscriptionDb = useTranscriptionDataStore((state) => state.updateTranscriptionDb)
   const deleteTranscriptionDb = useTranscriptionDataStore((state) => state.deleteTranscriptionDb)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
-  const isLegacyCreateBehavior = useLocalSettingsStore((state) => state.isLegacyCreateBehavior)
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false)
 
@@ -149,15 +147,9 @@ export function ProjectTranscriptionList({
                 })
                 const storeProject = useProjectStore.getState().currentProject
                 const base = storeProject && storeProject.id === currentProject.id ? storeProject.transcriptions : currentProject.transcriptions
-                if (!isLegacyCreateBehavior) {
-                  setCurrentId(created.id)
-                  router.push("/transcribe")
-                  updateProjectItems(currentProject.id, [...base, created.id], 'transcription')
-                } else {
-                  await updateProjectItems(currentProject.id, [...base, created.id], 'transcription')
-                  setTranscriptions(prev => [created, ...prev])
-                  setIsCreating(false)
-                }
+                setCurrentId(created.id)
+                router.push("/transcribe")
+                updateProjectItems(currentProject.id, [...base, created.id], 'transcription')
               } catch {
                 setIsCreating(false)
               }

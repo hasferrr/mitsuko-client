@@ -23,7 +23,6 @@ import { Extraction, Project } from "@/types/project"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { useRouter } from "next/navigation"
 import { ProjectItemSkeleton } from "../project-item-skeleton"
 import { ItemType } from "@/hooks/project/use-project-item-selection"
@@ -68,7 +67,6 @@ export function ProjectExtractionList({
   const updateExtractionDb = useExtractionDataStore((state) => state.updateExtractionDb)
   const deleteExtractionDb = useExtractionDataStore((state) => state.deleteExtractionDb)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
-  const isLegacyCreateBehavior = useLocalSettingsStore((state) => state.isLegacyCreateBehavior)
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false)
 
@@ -157,15 +155,9 @@ export function ProjectExtractionList({
                 )
                 const storeProject = useProjectStore.getState().currentProject
                 const base = storeProject && storeProject.id === currentProject.id ? storeProject.extractions : currentProject.extractions
-                if (!isLegacyCreateBehavior) {
-                  setCurrentId(created.id)
-                  router.push("/extract-context")
-                  updateProjectItems(currentProject.id, [...base, created.id], 'extraction')
-                } else {
-                  await updateProjectItems(currentProject.id, [...base, created.id], 'extraction')
-                  setExtractions(prev => [created, ...prev])
-                  setIsCreating(false)
-                }
+                setCurrentId(created.id)
+                router.push("/extract-context")
+                updateProjectItems(currentProject.id, [...base, created.id], 'extraction')
               } catch {
                 setIsCreating(false)
               }

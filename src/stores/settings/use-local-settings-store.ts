@@ -16,7 +16,6 @@ interface LocalSettingsStore {
   isDeleteAfterTranscription: boolean
   isSubtitlePerformanceModeEnabled: boolean
   isAutoEnableProjectSettings: boolean
-  isLegacyCreateBehavior: boolean
   dismissedDialogs: Record<string, boolean>
 
   addApiConfig: (config: CustomApiConfig) => void
@@ -30,7 +29,6 @@ interface LocalSettingsStore {
   setIsDeleteAfterTranscription: (enabled: boolean) => void
   setIsSubtitlePerformanceModeEnabled: (enabled: boolean) => void
   setIsAutoEnableProjectSettings: (enabled: boolean) => void
-  setIsLegacyCreateBehavior: (enabled: boolean) => void
   dismissDialog: (id: string) => void
   resetAllDismissedDialogs: () => void
 }
@@ -46,7 +44,6 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       isDeleteAfterTranscription: true,
       isSubtitlePerformanceModeEnabled: true,
       isAutoEnableProjectSettings: false,
-      isLegacyCreateBehavior: false,
       dismissedDialogs: {},
 
       addApiConfig: (config) =>
@@ -89,13 +86,12 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       setIsDeleteAfterTranscription: (enabled) => set({ isDeleteAfterTranscription: enabled }),
       setIsSubtitlePerformanceModeEnabled: (enabled) => set({ isSubtitlePerformanceModeEnabled: enabled }),
       setIsAutoEnableProjectSettings: (enabled) => set({ isAutoEnableProjectSettings: enabled }),
-      setIsLegacyCreateBehavior: (enabled) => set({ isLegacyCreateBehavior: enabled }),
       dismissDialog: (id) => set((state) => ({ dismissedDialogs: { ...state.dismissedDialogs, [id]: true } })),
       resetAllDismissedDialogs: () => set({ dismissedDialogs: {} }),
     }),
     {
       name: "api-settings-storage",
-      version: 5,
+      version: 6,
       migrate: (persistedState, version) => {
         if (version === 0) {
           const oldState = persistedState as {
@@ -143,18 +139,16 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
           }
         }
 
-        if (version < 4) {
-          const state = persistedState as { isLegacyCreateBehavior?: boolean }
-          if (typeof state.isLegacyCreateBehavior !== "boolean") {
-            state.isLegacyCreateBehavior = false
-          }
-        }
-
         if (version < 5) {
           const state = persistedState as { isAutoTemperatureEnabled?: boolean }
           if (state.isAutoTemperatureEnabled === false) {
             state.isAutoTemperatureEnabled = true
           }
+        }
+
+        if (version < 6) {
+          const state = persistedState as { isLegacyCreateBehavior?: boolean }
+          delete state.isLegacyCreateBehavior
         }
 
         return persistedState

@@ -23,7 +23,6 @@ import { Translation, Project } from "@/types/project"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { useRouter } from "next/navigation"
 import { ProjectItemSkeleton } from "../project-item-skeleton"
 import { ItemType } from "@/hooks/project/use-project-item-selection"
@@ -88,7 +87,6 @@ export function ProjectTranslationList({
   const updateTranslationDb = useTranslationDataStore((state) => state.updateTranslationDb)
   const deleteTranslationDb = useTranslationDataStore((state) => state.deleteTranslationDb)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
-  const isLegacyCreateBehavior = useLocalSettingsStore((state) => state.isLegacyCreateBehavior)
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false)
 
@@ -188,15 +186,9 @@ export function ProjectTranslationList({
                 )
                 const storeProject = useProjectStore.getState().currentProject
                 const base = storeProject && storeProject.id === currentProject.id ? storeProject.translations : currentProject.translations
-                if (!isLegacyCreateBehavior) {
-                  setCurrentId(created.id)
-                  router.push("/translate")
-                  updateProjectItems(currentProject.id, [...base, created.id], 'translation')
-                } else {
-                  await updateProjectItems(currentProject.id, [...base, created.id], 'translation')
-                  setTranslations(prev => [created, ...prev])
-                  setIsCreating(false)
-                }
+                setCurrentId(created.id)
+                router.push("/translate")
+                updateProjectItems(currentProject.id, [...base, created.id], 'translation')
               } catch {
                 setIsCreating(false)
               }
