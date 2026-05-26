@@ -18,7 +18,7 @@ import { useSnapPayment } from "@/hooks/use-snap-payment"
 import { useLemonSqueezyCache } from "@/hooks/use-lemonsqueezy-cache"
 import { toast } from "sonner"
 import { useState, useEffect, useRef } from "react"
-import { sleep } from "@/lib/utils"
+import { cn, sleep } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -56,6 +56,7 @@ export function PaymentOptionsDialog({
   const [paymentError, setPaymentError] = useState<string | null>(null)
   const [inputQuantity, setInputQuantity] = useState(1)
   const [hasConsented, setHasConsented] = useState(false)
+  const [hasConsentError, setHasConsentError] = useState(false)
   const lemonSqueezyCache = useLemonSqueezyCache()
 
   const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -258,60 +259,91 @@ export function PaymentOptionsDialog({
         <div className="flex flex-col sm:flex-row gap-8 py-2 px-1 overflow-y-auto">
           <div className="flex-1 space-y-4">
             <h3 className="text-lg font-semibold">Payment Method</h3>
-            <button
-              onClick={handlePopup}
-              disabled={isFetchingPayment || !hasConsented}
-              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-muted/50 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isFetchingPayment ? (
-                <Loader2 className="size-6 mr-4 text-sidebar-primary shrink-0 mt-1 animate-spin" />
-              ) : (
-                <CreditCard className="size-6 mr-4 text-sidebar-primary shrink-0 mt-1" />
-              )}
-              <div className="grow">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-sm">Pay in IDR</span>
-                  <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700">RECOMMENDED</Badge>
+            <div className="relative">
+              <button
+                onClick={handlePopup}
+                disabled={isFetchingPayment || !hasConsented}
+                className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-muted/50 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isFetchingPayment ? (
+                  <Loader2 className="size-6 mr-4 text-sidebar-primary shrink-0 mt-1 animate-spin" />
+                ) : (
+                  <CreditCard className="size-6 mr-4 text-sidebar-primary shrink-0 mt-1" />
+                )}
+                <div className="grow">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-medium text-sm">Pay in IDR</span>
+                    <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700">RECOMMENDED</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {isFetchingPayment ? "Preparing secure payment..." : "Continue payment securely in IDR with no additional fee."}
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {isFetchingPayment ? "Preparing secure payment..." : "Continue payment securely in IDR with no additional fee."}
-                </p>
-              </div>
-            </button>
-
-            <button
-              onClick={handleNewTab}
-              disabled={isFetchingPayment || !hasConsented}
-              className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-muted/50 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isFetchingPayment ? (
-                <Loader2 className="size-6 mr-4 text-muted-foreground shrink-0 mt-1 animate-spin" />
-              ) : (
-                <Image
-                  src={LemonSqueezyLogo}
-                  alt="Lemon Squeezy"
-                  width={24}
-                  height={24}
-                  className="size-6 mr-4 shrink-0 mt-1"
+              </button>
+              {!hasConsented && !isFetchingPayment && (
+                <button
+                  type="button"
+                  aria-label="Agree to terms before paying in IDR"
+                  onClick={() => setHasConsentError(true)}
+                  className="absolute inset-0 cursor-not-allowed rounded-lg"
                 />
               )}
-              <div className="grow">
-                <div className="font-medium text-sm mb-1">Pay with Lemon Squeezy</div>
-                <p className="text-xs text-muted-foreground">
-                  {isFetchingPayment ? "Preparing secure payment..." : "Proceed to Lemon Squeezy. A small fee applies."}
-                </p>
-              </div>
-            </button>
+            </div>
+
+            <div className="relative">
+              <button
+                onClick={handleNewTab}
+                disabled={isFetchingPayment || !hasConsented}
+                className="flex items-start w-full p-4 border rounded-lg text-left hover:bg-muted/50 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isFetchingPayment ? (
+                  <Loader2 className="size-6 mr-4 text-muted-foreground shrink-0 mt-1 animate-spin" />
+                ) : (
+                  <Image
+                    src={LemonSqueezyLogo}
+                    alt="Lemon Squeezy"
+                    width={24}
+                    height={24}
+                    className="size-6 mr-4 shrink-0 mt-1"
+                  />
+                )}
+                <div className="grow">
+                  <div className="font-medium text-sm mb-1">Pay with Lemon Squeezy</div>
+                  <p className="text-xs text-muted-foreground">
+                    {isFetchingPayment ? "Preparing secure payment..." : "Proceed to Lemon Squeezy. A small fee applies."}
+                  </p>
+                </div>
+              </button>
+              {!hasConsented && !isFetchingPayment && (
+                <button
+                  type="button"
+                  aria-label="Agree to terms before paying with Lemon Squeezy"
+                  onClick={() => setHasConsentError(true)}
+                  className="absolute inset-0 cursor-not-allowed rounded-lg"
+                />
+              )}
+            </div>
 
             <div className="flex items-center space-x-2 border-border">
               <Checkbox
                 id="consent"
                 checked={hasConsented}
-                onCheckedChange={(checked) => setHasConsented(checked === true)}
+                onCheckedChange={(checked) => {
+                  const isChecked = checked === true
+                  setHasConsented(isChecked)
+                  if (isChecked) setHasConsentError(false)
+                }}
+                className={cn(hasConsentError && "border-foreground")}
                 disabled={isFetchingPayment}
               />
               <div className="flex items-center gap-1">
-                <Label htmlFor="consent" className="text-xs text-[11px] text-muted-foreground leading-tight cursor-pointer">
+                <Label
+                  htmlFor="consent"
+                  className={cn(
+                    "text-xs text-[11px] leading-tight cursor-pointer",
+                    hasConsentError ? "text-foreground" : "text-muted-foreground"
+                  )}
+                >
                   I expressly request immediate access and acknowledge I lose any statutory right of withdrawal or any cooling-off period once credits are delivered.
                 </Label>
                 <Tooltip delayDuration={50}>
@@ -320,7 +352,7 @@ export function PaymentOptionsDialog({
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-xs text-[11px]">
                     <p>
-                      By checking this box, you confirm waiver of any refund rights under applicable consumer protection laws, including 14-day cooling-off periods where applicable.
+                      By checking this box, you agree to the Terms of Service and confirm waiver of any refund rights under applicable consumer protection laws, including 14-day cooling-off periods where applicable.
                     </p>
                   </TooltipContent>
                 </Tooltip>
