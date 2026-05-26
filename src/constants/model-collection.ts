@@ -594,6 +594,20 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
+        name: "DeepSeek V4 Pro (CN)",
+        subName: "deepseek-v4-pro",
+        maxInput: 1_048_576,
+        maxOutput: 384_000,
+        structuredOutput: false,
+        isPaid: true,
+        usage: "medium",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: false
+        }
+      },
+      {
         name: "DeepSeek V4 Flash",
         subName: "deepseek-v4-flash",
         maxInput: 1_048_576,
