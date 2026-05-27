@@ -20,6 +20,7 @@ interface TranscriptionControlsProps {
   models: TranscriptionModel | null
   localAudioDuration: number | undefined
   isTranscribing: boolean
+  isUploading: boolean
   isGlobalMaxDurationExceeded: boolean
   session: unknown
   onStart: () => void
@@ -34,6 +35,7 @@ export function TranscriptionControls({
   models,
   localAudioDuration,
   isTranscribing,
+  isUploading,
   isGlobalMaxDurationExceeded,
   session,
   onStart,
@@ -67,7 +69,7 @@ export function TranscriptionControls({
         <div className="flex gap-2">
           <Button
             className="w-full"
-            disabled={isTranscribing || !session || isGlobalMaxDurationExceeded}
+            disabled={isTranscribing || isUploading || !session || isGlobalMaxDurationExceeded}
             onClick={() => {
               onSetRightTab("transcript")
               onStart()
@@ -77,6 +79,11 @@ export function TranscriptionControls({
               <>
                 <Loader2 className="size-4 animate-spin" />
                 Transcribing
+              </>
+            ) : isUploading ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Uploading
               </>
             ) : (
               <>

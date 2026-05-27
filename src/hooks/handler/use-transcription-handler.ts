@@ -73,10 +73,16 @@ export const useTranscriptionHandler = ({
   const { setHasChanges } = useUnsavedChanges()
   const scrollToTop = useScrollToTop()
 
-  const handleStart = async () => {
+  interface HandleStartOptions {
+    uploadIdOverride?: string
+  }
+
+  const handleStart = async (options?: HandleStartOptions) => {
     await saveData(currentId)
 
-    if (!selectedUploadId) {
+    const uploadId = options?.uploadIdOverride ?? selectedUploadId
+
+    if (!uploadId) {
       toast.error("Please upload or select an uploaded file first")
       return
     }
@@ -96,7 +102,7 @@ export const useTranscriptionHandler = ({
     const projectName = project?.name || ""
 
     const requestBody = {
-      uploadId: selectedUploadId,
+      uploadId,
       language,
       selectedMode,
       customInstructions,

@@ -93,7 +93,7 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
     enabled: !!session,
   })
 
-  const { mutate: handleUpload } = useMutation({
+  const { mutate: handleUpload, mutateAsync: uploadSelectedFile } = useMutation({
     mutationFn: (file: File) => uploadFile(file, (progress) => setUpload(currentId, { progress, fileName: file.name }), localAudioDuration ?? 0),
     onMutate: () => {
       setIsUploading(currentId, true)
@@ -331,6 +331,21 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
     handleUpload(file)
   }
 
+  const handleStart = async () => {
+    if (activeTab === "upload" && file) {
+      setSelectedUploadId(currentId, null)
+      try {
+        const uploadId = await uploadSelectedFile(file)
+        await handleStartTranscription({ uploadIdOverride: uploadId })
+      } catch {
+        return
+      }
+      return
+    }
+
+    await handleStartTranscription()
+  }
+
   const handleCreateTranslation = async () => {
     if (isTranscribing) return
     if (!transcriptSubtitles.length) {
@@ -444,9 +459,10 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
             models={models}
             localAudioDuration={localAudioDuration}
             isTranscribing={isTranscribing}
+            isUploading={isUploading}
             isGlobalMaxDurationExceeded={isGlobalMaxDurationExceeded}
             session={session}
-            onStart={handleStartTranscription}
+            onStart={handleStart}
             onStop={handleStopTranscription}
             onSetRightTab={setRightTab}
           />
