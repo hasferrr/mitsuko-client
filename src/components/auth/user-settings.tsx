@@ -29,7 +29,7 @@ import { Settings2, RotateCcw } from "lucide-react"
 
 export function UserSettings() {
   const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
-  const toggleThirdPartyModel = useLocalSettingsStore((state) => state.toggleThirdPartyModel)
+  const setIsThirdPartyModelEnabled = useLocalSettingsStore((state) => state.setIsThirdPartyModelEnabled)
   const isSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.isSubtitlePerformanceModeEnabled)
   const setIsSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.setIsSubtitlePerformanceModeEnabled)
   const isAutoEnableProjectSettings = useLocalSettingsStore((state) => state.isAutoEnableProjectSettings)
@@ -46,12 +46,12 @@ export function UserSettings() {
     if (checked) {
       setIsThirdPartyDialogOpen(true)
     } else {
-      toggleThirdPartyModel()
+      setIsThirdPartyModelEnabled(false)
     }
   }
 
   const handleConfirm = () => {
-    toggleThirdPartyModel()
+    setIsThirdPartyModelEnabled(true)
     setIsThirdPartyDialogOpen(false)
   }
 

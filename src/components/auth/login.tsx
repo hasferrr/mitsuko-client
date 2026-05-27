@@ -17,16 +17,12 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog"
-import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { IconBrandGoogleFilled } from "@tabler/icons-react"
 import { Input } from "@/components/ui/input"
 
 export function Login() {
   const session = useSessionStore((state) => state.session)
   const setSession = useSessionStore((state) => state.setSession)
-
-  const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
-  const toggleThirdPartyModel = useLocalSettingsStore((state) => state.toggleThirdPartyModel)
 
   const [mounted, setMounted] = useState(false)
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
@@ -38,12 +34,6 @@ export function Login() {
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  useEffect(() => {
-    if (!session && isThirdPartyModelEnabled) {
-      toggleThirdPartyModel()
-    }
-  }, [session, isThirdPartyModelEnabled, toggleThirdPartyModel])
 
   const signUp = async () => {
     await supabase.auth.signInWithOAuth({
