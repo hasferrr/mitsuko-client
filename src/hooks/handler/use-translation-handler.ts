@@ -84,6 +84,7 @@ export const useTranslationHandler = ({
   const apiKey = selectedConfig?.apiKey ?? ""
   const customBaseUrl = selectedConfig?.customBaseUrl ?? ""
   const customModel = selectedConfig?.customModel ?? ""
+  const isNoStoreEnabled = useLocalSettingsStore((state) => state.isNoStoreEnabled)
 
   // Translation Store
   const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
@@ -250,7 +251,9 @@ export const useTranslationHandler = ({
 
     // Log subtitles
     const subtitleContent = generateSubtitleContent(currentId, "original", "o-n-t", parsed.type)
-    logSubtitle(title, subtitleContent, isBatch, projectName)
+    if (!isNoStoreEnabled) {
+      logSubtitle(title, subtitleContent, isBatch, projectName)
+    }
 
     const md5Hash = MD5(subtitleContent).toString()
 

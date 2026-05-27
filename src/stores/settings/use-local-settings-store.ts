@@ -16,6 +16,7 @@ interface LocalSettingsStore {
   isDeleteAfterTranscription: boolean
   isSubtitlePerformanceModeEnabled: boolean
   isAutoEnableProjectSettings: boolean
+  isNoStoreEnabled: boolean
   dismissedDialogs: Record<string, boolean>
 
   addApiConfig: (config: CustomApiConfig) => void
@@ -30,6 +31,7 @@ interface LocalSettingsStore {
   setIsDeleteAfterTranscription: (enabled: boolean) => void
   setIsSubtitlePerformanceModeEnabled: (enabled: boolean) => void
   setIsAutoEnableProjectSettings: (enabled: boolean) => void
+  setIsNoStoreEnabled: (enabled: boolean) => void
   dismissDialog: (id: string) => void
   resetAllDismissedDialogs: () => void
 }
@@ -45,6 +47,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       isDeleteAfterTranscription: true,
       isSubtitlePerformanceModeEnabled: true,
       isAutoEnableProjectSettings: false,
+      isNoStoreEnabled: false,
       dismissedDialogs: {},
 
       addApiConfig: (config) =>
@@ -88,12 +91,13 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       setIsDeleteAfterTranscription: (enabled) => set({ isDeleteAfterTranscription: enabled }),
       setIsSubtitlePerformanceModeEnabled: (enabled) => set({ isSubtitlePerformanceModeEnabled: enabled }),
       setIsAutoEnableProjectSettings: (enabled) => set({ isAutoEnableProjectSettings: enabled }),
+      setIsNoStoreEnabled: (enabled) => set({ isNoStoreEnabled: enabled }),
       dismissDialog: (id) => set((state) => ({ dismissedDialogs: { ...state.dismissedDialogs, [id]: true } })),
       resetAllDismissedDialogs: () => set({ dismissedDialogs: {} }),
     }),
     {
       name: "api-settings-storage",
-      version: 6,
+      version: 7,
       migrate: (persistedState, version) => {
         if (version === 0) {
           const oldState = persistedState as {

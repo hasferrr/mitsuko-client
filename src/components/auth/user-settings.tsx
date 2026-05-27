@@ -34,6 +34,8 @@ export function UserSettings() {
   const setIsSubtitlePerformanceModeEnabled = useLocalSettingsStore((state) => state.setIsSubtitlePerformanceModeEnabled)
   const isAutoEnableProjectSettings = useLocalSettingsStore((state) => state.isAutoEnableProjectSettings)
   const setIsAutoEnableProjectSettings = useLocalSettingsStore((state) => state.setIsAutoEnableProjectSettings)
+  const isNoStoreEnabled = useLocalSettingsStore((state) => state.isNoStoreEnabled)
+  const setIsNoStoreEnabled = useLocalSettingsStore((state) => state.setIsNoStoreEnabled)
   const dismissedDialogs = useLocalSettingsStore((state) => state.dismissedDialogs)
   const resetAllDismissedDialogs = useLocalSettingsStore((state) => state.resetAllDismissedDialogs)
   const [isThirdPartyDialogOpen, setIsThirdPartyDialogOpen] = useState(false)
@@ -168,6 +170,22 @@ export function UserSettings() {
               id="subtitle-performance-mode-switch"
               checked={!isSubtitlePerformanceModeEnabled}
               onCheckedChange={(checked) => setIsSubtitlePerformanceModeEnabled(!checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Don't store subtitle content
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                When enabled, your subtitles won't be saved on our servers. Enable this if you're working under an NDA (Non-Disclosure Agreement) or handling confidential content.
+              </p>
+            </div>
+            <Switch
+              id="no-store-switch"
+              checked={isNoStoreEnabled}
+              onCheckedChange={setIsNoStoreEnabled}
             />
           </div>
 
