@@ -67,6 +67,26 @@ export function Login() {
     })
   }
 
+  const signUpWithEmailPassword = () => {
+    startTransition(async () => {
+      setError(null)
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/login/`,
+        },
+      })
+      if (error) {
+        setError(error.message)
+      } else {
+        toast.success("Check your email for the confirmation link")
+        setEmail("")
+        setPassword("")
+      }
+    })
+  }
+
   const updatePassword = () => {
     startTransition(async () => {
       setError(null)
@@ -131,12 +151,23 @@ export function Login() {
                 disabled={isPending}
               />
             </div>
-            <Button
-              onClick={signInWithEmailPassword}
-              disabled={isPending || !email || !password}
-            >
-              Log in with password
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={signInWithEmailPassword}
+                disabled={isPending || !email || !password}
+              >
+                {process.env.NODE_ENV === "development" ? "Log in" : "Log in with password"}
+              </Button>
+              {process.env.NODE_ENV === "development" && (
+                <Button
+                  onClick={signUpWithEmailPassword}
+                  variant="outline"
+                  disabled={isPending || !email || !password}
+                >
+                  Sign up
+                </Button>
+              )}
+            </div>
           </>
         ) : (
           <button
