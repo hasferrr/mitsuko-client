@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useSessionStore } from "@/stores/ui/use-session-store"
 import { User } from "./user"
 import { UserSettings } from "./user-settings"
-import { LogOutIcon } from "lucide-react"
+import { KeyRoundIcon, LogOutIcon } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/dialog"
 import { IconBrandGoogleFilled } from "@tabler/icons-react"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
 
 export function Login() {
   const session = useSessionStore((state) => state.session)
@@ -29,17 +31,22 @@ export function Login() {
   const [isPending, startTransition] = useTransition()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
+  const [showEmailLogin, setShowEmailLogin] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const signUp = async () => {
+  const continueWithGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/login/`
+        redirectTo: `${window.location.origin}/auth/login/`,
+        scopes: "https://www.googleapis.com/auth/userinfo.email",
       }
     })
   }
@@ -53,26 +60,33 @@ export function Login() {
       })
       if (error) {
         setError(error.message)
+      } else {
+        setEmail("")
+        setPassword("")
       }
     })
   }
 
-  const signUpWithEmailPassword = () => {
+  const updatePassword = () => {
     startTransition(async () => {
       setError(null)
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/login/`,
-        },
+
+      if (newPassword !== confirmPassword) {
+        setError("Passwords do not match")
+        return
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
       })
+
       if (error) {
         setError(error.message)
       } else {
-        alert("Check your email for the confirmation link!")
-        setEmail("")
-        setPassword("")
+        toast.success("Password updated")
+        setNewPassword("")
+        setConfirmPassword("")
+        setIsPasswordDialogOpen(false)
       }
     })
   }
@@ -90,15 +104,15 @@ export function Login() {
   if (!session) {
     return (
       <div className="mx-auto flex max-w-sm flex-col items-center justify-center gap-4">
-        <Button onClick={signUp}>
+        <Button onClick={continueWithGoogle}>
           <IconBrandGoogleFilled className="size-4" />
-          Sign in with Google
+          Continue with Google
         </Button>
-        {process.env.NODE_ENV === "development" && (
+        {showEmailLogin ? (
           <>
             <div className="flex justify-center text-xs uppercase">
               <div className="bg-background px-2 text-muted-foreground">
-                Or continue with
+                Or log in with password
               </div>
             </div>
             <div className="flex flex-col gap-2">
@@ -117,22 +131,21 @@ export function Login() {
                 disabled={isPending}
               />
             </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={signInWithEmailPassword}
-                disabled={isPending}
-              >
-                Sign In
-              </Button>
-              <Button
-                onClick={signUpWithEmailPassword}
-                variant="outline"
-                disabled={isPending}
-              >
-                Sign Up
-              </Button>
-            </div>
+            <Button
+              onClick={signInWithEmailPassword}
+              disabled={isPending || !email || !password}
+            >
+              Log in with password
+            </Button>
           </>
+        ) : (
+          <button
+            type="button"
+            className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            onClick={() => setShowEmailLogin(true)}
+          >
+            Log in with password
+          </button>
         )}
         {error && <p className="text-sm text-destructive">{error}</p>}
       </div>
@@ -143,28 +156,80 @@ export function Login() {
     <div className="max-w-6xl flex flex-col gap-6 p-4 m-auto">
       <User />
       <UserSettings />
-      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <DialogTrigger asChild>
-          <Button disabled={isPending} className="w-fit" variant="outline">
-            <LogOutIcon className="size-4" />
-            Sign out
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Are you sure you want to sign out?</DialogTitle>
-            <DialogDescription>
-              You will be logged out of your account.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button disabled={isPending} onClick={signOut}>Sign out</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <div className="flex w-fit gap-2">
+        <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+          <DialogTrigger asChild>
+            <Button disabled={isPending} variant="outline">
+              <LogOutIcon className="size-4" />
+              Sign out
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you sure you want to sign out?</DialogTitle>
+              <DialogDescription>
+                You will be logged out of your account.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button disabled={isPending} onClick={signOut}>Sign out</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+          <DialogTrigger asChild>
+            <Button disabled={isPending} variant="outline">
+              <KeyRoundIcon className="size-4" />
+              Set password
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Set account password</DialogTitle>
+              <DialogDescription>
+                Add a password to your Google account so you can also sign in with your email address.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="new-password">Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  disabled={isPending}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="confirm-password">Confirm password</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={isPending}
+                />
+              </div>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button
+                disabled={isPending || !newPassword || !confirmPassword}
+                onClick={updatePassword}
+              >
+                Save password
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   )
 }
