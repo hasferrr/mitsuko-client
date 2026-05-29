@@ -6,7 +6,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import ImageLogo from "@/static/waifu.jpg"
+import ImageLogo from "@/static/waifu.png"
 
 export function SidebarHeaderIcon() {
   return (
@@ -19,8 +19,8 @@ export function SidebarHeaderIcon() {
         >
           <div className="flex aspect-square size-8 items-center justify-center">
             <Image
-              width={4 * 7}
-              height={4 * 7}
+              width={4 * 7 * 2}
+              height={4 * 7 * 2}
               src={ImageLogo}
               alt="Mitsuko Logo"
               className="size-7 object-cover rounded-lg"
