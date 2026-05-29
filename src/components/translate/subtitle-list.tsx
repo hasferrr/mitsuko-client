@@ -29,7 +29,7 @@ export const SubtitleList = memo(({
 
   if (!isSubtitlePerformanceModeEnabled) {
     return (
-      <div className="h-[510px] pr-4 overflow-y-auto">
+      <div className="h-[510px] pr-2 overflow-y-auto">
         <div className="space-y-4">
           {subtitles.map((subtitle) => (
             <SubtitleCard key={`sub-${subtitle.index}`} subtitle={subtitle} />
@@ -43,7 +43,7 @@ export const SubtitleList = memo(({
     <VirtualizedList
       id={translationId}
       items={subtitles}
-      className="h-[510px] pr-4 overflow-y-auto"
+      className="h-[510px] pr-2 overflow-y-auto"
       render={{
         key: (subtitle) => `sub-${subtitle.index}`,
         children: (subtitle) => <SubtitleCard subtitle={subtitle} />,
