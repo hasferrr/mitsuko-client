@@ -67,6 +67,12 @@ export function Login() {
     })
   }
 
+  const handleEmailPasswordSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (isPending || !email || !password) return
+    signInWithEmailPassword()
+  }
+
   const signUpWithEmailPassword = () => {
     startTransition(async () => {
       setError(null)
@@ -135,7 +141,7 @@ export function Login() {
                 Or log in with password
               </div>
             </div>
-            <div className="flex flex-col gap-2">
+            <form className="flex flex-col gap-2 items-center" onSubmit={handleEmailPasswordSubmit}>
               <Input
                 type="email"
                 placeholder="Email"
@@ -150,24 +156,25 @@ export function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isPending}
               />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={signInWithEmailPassword}
-                disabled={isPending || !email || !password}
-              >
-                {process.env.NODE_ENV === "development" ? "Log in" : "Log in with password"}
-              </Button>
-              {process.env.NODE_ENV === "development" && (
+              <div className="flex gap-2">
                 <Button
-                  onClick={signUpWithEmailPassword}
-                  variant="outline"
+                  type="submit"
                   disabled={isPending || !email || !password}
                 >
-                  Sign up
+                  {process.env.NODE_ENV === "development" ? "Log in" : "Log in with password"}
                 </Button>
-              )}
-            </div>
+                {process.env.NODE_ENV === "development" && (
+                  <Button
+                    type="button"
+                    onClick={signUpWithEmailPassword}
+                    variant="outline"
+                    disabled={isPending || !email || !password}
+                  >
+                    Sign up
+                  </Button>
+                )}
+              </div>
+            </form>
           </>
         ) : (
           <button
