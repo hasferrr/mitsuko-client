@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent } from "@/components/ui/card"
-import { File, Trash2, RefreshCw, Loader2 } from "lucide-react"
+import { File, Trash2, RefreshCw, Loader2, Plus } from "lucide-react"
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
 import { listUploads, deleteUpload } from "@/lib/api/uploads"
 import { UploadFileMeta } from "@/types/uploads"
@@ -25,6 +25,9 @@ interface ManageUploadsDialogProps {
   onOpenChange: (open: boolean) => void
   selectedUploadId?: string | null
   onSelectUpload?: (uploadId: string | null) => void
+  onUseUpload?: (upload: UploadFileMeta) => Promise<void> | void
+  usedUploadIds?: Set<string>
+  isUseUploadDisabled?: boolean
 }
 
 export function ManageUploadsDialog({
@@ -32,9 +35,13 @@ export function ManageUploadsDialog({
   onOpenChange,
   selectedUploadId,
   onSelectUpload,
+  onUseUpload,
+  usedUploadIds,
+  isUseUploadDisabled = false,
 }: ManageUploadsDialogProps) {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [usingUploadId, setUsingUploadId] = useState<string | null>(null)
 
   const session = useSessionStore((state) => state.session)
   const queryClient = useQueryClient()
@@ -78,6 +85,18 @@ export function ManageUploadsDialog({
     setIsDeleteDialogOpen(true)
   }
 
+  const handleUseUploadClick = async (e: React.MouseEvent, upload: UploadFileMeta) => {
+    e.stopPropagation()
+    if (!onUseUpload) return
+
+    try {
+      setUsingUploadId(upload.uploadId)
+      await onUseUpload(upload)
+    } finally {
+      setUsingUploadId(null)
+    }
+  }
+
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes'
     const k = 1024
@@ -100,7 +119,7 @@ export function ManageUploadsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Manage Uploaded Files</span>
@@ -163,6 +182,26 @@ export function ManageUploadsDialog({
                         <span className="block">{upload.duration ? formatDuration(upload.duration) : 'N/A'}</span>
                       </p>
                     </div>
+                    {onUseUpload && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => handleUseUploadClick(e, upload)}
+                        disabled={
+                          isUseUploadDisabled ||
+                          usingUploadId !== null ||
+                          upload.state !== "completed" ||
+                          usedUploadIds?.has(upload.uploadId)
+                        }
+                      >
+                        {usingUploadId === upload.uploadId ? (
+                          <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                          <Plus className="size-4" />
+                        )}
+                        {usedUploadIds?.has(upload.uploadId) ? "Added" : "Use"}
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"

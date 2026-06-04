@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
@@ -51,6 +51,7 @@ import { CopyTranscriptionSettingsDialog } from "./copy-transcription-settings-d
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
 import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/transcription/subtitle-generator"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
+import type { UploadFileMeta } from "@/types/uploads"
 
 interface BatchTranscriptionViewProps {
   defaultTranscriptionId: string
@@ -96,6 +97,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
   // Transcription Data Store
   const transcriptionData = useTranscriptionDataStore((state) => state.data)
   const loadTranscription = useTranscriptionDataStore((state) => state.getTranscriptionDb)
+  const updateTranscriptionDb = useTranscriptionDataStore((state) => state.updateTranscriptionDb)
 
   const setCurrentTranscriptionId = useTranscriptionDataStore((state) => state.setCurrentId)
   const saveTranscriptionData = useTranscriptionDataStore((state) => state.saveData)
@@ -108,6 +110,16 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
   const setFileAndUrl = useTranscriptionStore((state) => state.setFileAndUrl)
 
   const session = useSessionStore((state) => state.session)
+
+  const usedUploadIds = useMemo(() => {
+    if (!currentProject) return new Set<string>()
+
+    return new Set(
+      currentProject.transcriptions
+        .map(id => transcriptionData[id]?.selectedUploadId)
+        .filter((id): id is string => Boolean(id))
+    )
+  }, [currentProject, transcriptionData])
 
   // Files hooks
   const {
@@ -172,6 +184,32 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
         console.error(`Error processing file ${file.name}:`, error)
         toast.error(`Failed to add ${file.name} to batch`)
       }
+    }
+  }
+
+  const handleUseUploadedAudio = async (upload: UploadFileMeta) => {
+    if (!currentProject || !currentProject.isBatch) {
+      toast.error("Batch project not found")
+      return
+    }
+
+    if (usedUploadIds.has(upload.uploadId)) {
+      toast.info("Audio is already in this batch")
+      return
+    }
+
+    if (upload.state !== "completed") {
+      toast.error("Upload is not ready")
+      return
+    }
+
+    try {
+      const transcription = await createTranscriptionForBatch(currentProject.id, upload.fileName)
+      await updateTranscriptionDb(transcription.id, { selectedUploadId: upload.uploadId })
+      toast.success(`Added ${upload.fileName} to batch`)
+    } catch (error) {
+      const description = error instanceof Error ? error.message : undefined
+      toast.error("Failed to add uploaded audio to batch", { description })
     }
   }
 
@@ -578,6 +616,9 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
       <ManageUploadsDialog
         open={isManageFilesDialogOpen}
         onOpenChange={setIsManageFilesDialogOpen}
+        onUseUpload={handleUseUploadedAudio}
+        usedUploadIds={usedUploadIds}
+        isUseUploadDisabled={isProcessing}
       />
 
       <CopyTranscriptionSettingsDialog
