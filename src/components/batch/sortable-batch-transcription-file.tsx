@@ -93,11 +93,12 @@ export function SortableBatchTranscriptionFile({
           </div>
           <p
             className={cn(
-              "text-sm wrap-break-word break-all pr-2 line-clamp-4 font-light ml-6",
+              "text-sm wrap-break-word break-all pr-2 line-clamp-4 ml-6",
               batchFile.descriptionColor === "green" && "text-green-600",
               batchFile.descriptionColor === "blue" && "text-blue-600",
               batchFile.descriptionColor === "red" && "text-red-600",
               batchFile.descriptionColor === "yellow" && "text-yellow-600",
+              batchFile.descriptionColor === "purple" && "text-purple-600",
               !batchFile.descriptionColor && "text-muted-foreground"
             )}
           >

@@ -4,7 +4,7 @@ export interface BatchFile {
   progress: number
   title: string
   description: string
-  descriptionColor?: "default" | "green" | "blue" | "red" | "yellow"
+  descriptionColor?: "default" | "green" | "blue" | "red" | "yellow" | "purple"
   subtitlesCount: number
   translatedCount: number
   type: string

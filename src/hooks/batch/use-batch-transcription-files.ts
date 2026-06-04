@@ -61,8 +61,23 @@ export const useBatchTranscriptionFiles = (defaultTranscriptionId: string, order
         status = "pending"
       }
 
-      const description = uploadExists ? "Uploaded, selected" : hasUploadId ? "Upload not found (file deleted)" : hasLocalFile ? "Ready to upload" : "No audio selected"
-      const descriptionColor: BatchFile["descriptionColor"] = uploadExists ? "green" : hasUploadId ? "yellow" : hasLocalFile ? "blue" : "red"
+      const isCompletedWithoutAudio = status === "done" && !uploadExists && !hasLocalFile
+      let description = "No audio selected"
+      let descriptionColor: BatchFile["descriptionColor"] = "red"
+
+      if (isCompletedWithoutAudio) {
+        description = "Completed"
+        descriptionColor = "purple"
+      } else if (uploadExists) {
+        description = "Uploaded, selected"
+        descriptionColor = "green"
+      } else if (hasUploadId) {
+        description = "Upload not found (file deleted)"
+        descriptionColor = "yellow"
+      } else if (hasLocalFile) {
+        description = "Ready to upload"
+        descriptionColor = "blue"
+      }
 
       const settingsModel = isUseSharedSettings
         ? transcriptionData[defaultTranscriptionId]?.models
