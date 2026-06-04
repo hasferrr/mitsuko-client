@@ -704,7 +704,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               Start Batch Transcription
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
-              <div>
+              <div className="w-full">
                 <span className="block">Start transcribing <strong>{batchFiles.length}</strong> files?</span>
                 {isUseSharedSettings ? (
                   <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">

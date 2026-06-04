@@ -757,24 +757,26 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
               <Play className="size-5 text-sidebar-primary" />
               Start Batch Extraction
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              <span className="block mb-2">Are you sure you want to start extracting <strong>{batchFiles.length}</strong> files?</span>
-               {isUseSharedSettings ? (
-                <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
-                  <span className="block font-semibold">Shared Settings:</span>
-                  <ul className="list-disc list-inside">
-                    <li>
-                       {isSequentialExtraction ? "Process one-by-one (Sequential)" : `Process up to ${concurrentOperation} concurrently`}
-                    </li>
-                    <li>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</li>
-                  </ul>
-                </div>
-              ) : (
-                <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
-                  <span className="block font-semibold">Individual Settings:</span>
-                  Each file uses its own settings.
-                </div>
-              )}
+            <AlertDialogDescription asChild>
+              <div className="w-full">
+                <span className="block mb-2">Are you sure you want to start extracting <strong>{batchFiles.length}</strong> files?</span>
+                {isUseSharedSettings ? (
+                  <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
+                    <span className="block font-semibold">Shared Settings:</span>
+                    <ul className="list-disc list-inside">
+                      <li>
+                        {isSequentialExtraction ? "Process one-by-one (Sequential)" : `Process up to ${concurrentOperation} concurrently`}
+                      </li>
+                      <li>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</li>
+                    </ul>
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
+                    <span className="block font-semibold">Individual Settings:</span>
+                    Each file uses its own settings.
+                  </div>
+                )}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
