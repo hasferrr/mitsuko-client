@@ -179,7 +179,7 @@ export default function LogResultDialog({ log, onOpenChange, onApplyDirect }: Lo
 
   return (
     <Dialog open={!!log} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl flex flex-col">
+      <DialogContent className="sm:max-w-lg flex flex-col">
         <DialogHeader>
           <div className="space-y-1">
             <DialogTitle className="text-xl font-semibold truncate">

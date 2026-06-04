@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type ComponentProps } from "react"
 import {
   Dialog,
   DialogContent,
@@ -11,14 +11,22 @@ import { History } from "lucide-react"
 import TranscriptionHistory from "@/components/cloud/transcription-history"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { getContent, parseTranscription, parseTranscriptionWordsAndSegments } from "@/lib/parser/parser"
-import { TranscriptionLogItem } from "@/types/transcription-log"
+import type { TranscriptionLogItem } from "@/types/transcription-log"
 import { toast } from "sonner"
 
 interface TranscriptionHistoryDialogProps {
-  currentId: string
+  currentId?: string
+  onApplyHistory?: (raw: string, log: TranscriptionLogItem) => Promise<boolean | void> | boolean | void
+  buttonSize?: ComponentProps<typeof Button>["size"]
+  buttonClassName?: string
 }
 
-export function TranscriptionHistoryDialog({ currentId }: TranscriptionHistoryDialogProps) {
+export function TranscriptionHistoryDialog({
+  currentId,
+  onApplyHistory,
+  buttonSize,
+  buttonClassName,
+}: TranscriptionHistoryDialogProps) {
   const [open, setOpen] = useState(false)
 
   const setTitle = useTranscriptionDataStore(state => state.setTitle)
@@ -28,32 +36,49 @@ export function TranscriptionHistoryDialog({ currentId }: TranscriptionHistoryDi
   const setSegments = useTranscriptionDataStore(state => state.setSegments)
   const saveData = useTranscriptionDataStore(state => state.saveData)
 
-  const handleApplyDirect = async (raw: string, log: TranscriptionLogItem) => {
-    try {
-      const cleaned = getContent(raw)
-      const transcriptSubtitles = parseTranscription(raw)
-      const { words, segments } = parseTranscriptionWordsAndSegments(raw)
+  const handleApplyDirect = (raw: string, log: TranscriptionLogItem) => {
+    void (async () => {
+      try {
+        if (onApplyHistory) {
+          const shouldClose = await onApplyHistory(raw, log)
+          if (shouldClose !== false) {
+            setOpen(false)
+          }
+          return
+        }
 
-      const title = log.metadata.originalname || "Transcription"
-      setTitle(currentId, title)
-      setTranscriptionText(currentId, cleaned)
-      setTranscriptSubtitles(currentId, transcriptSubtitles)
-      setWords(currentId, words)
-      setSegments(currentId, segments)
-      await saveData(currentId)
+        if (!currentId) {
+          toast.error("No transcription selected")
+          return
+        }
 
-      toast.success("Transcription applied")
-      setOpen(false)
-    } catch (error) {
-      console.error("Failed to apply transcription:", error)
-      toast.error("Failed to apply transcription")
-    }
+        const cleaned = getContent(raw)
+        const transcriptSubtitles = parseTranscription(raw)
+        const { words, segments } = parseTranscriptionWordsAndSegments(raw)
+
+        const title = log.metadata.originalname || "Transcription"
+        setTitle(currentId, title)
+        setTranscriptionText(currentId, cleaned)
+        setTranscriptSubtitles(currentId, transcriptSubtitles)
+        setWords(currentId, words)
+        setSegments(currentId, segments)
+        await saveData(currentId)
+
+        toast.success("Transcription applied")
+        setOpen(false)
+      } catch (error) {
+        console.error("Failed to apply transcription:", error)
+        toast.error("Failed to apply transcription")
+      }
+    })()
   }
 
   return (
     <>
       <Button
         variant="outline"
+        size={buttonSize}
+        className={buttonClassName}
         onClick={() => setOpen(true)}
         title="Transcription History"
       >

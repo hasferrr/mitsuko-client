@@ -23,7 +23,7 @@ interface TranscriptionDataStore {
   createTranscriptionDb: (projectId: string, data: Parameters<typeof createDB>[1]) => Promise<Transcription>
   getTranscriptionDb: (transcriptionId: string, skipStoreUpdate?: boolean) => Promise<Transcription | undefined>
   getTranscriptionsDb: (transcriptionIds: string[]) => Promise<Transcription[]>
-  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language" | "selectedUploadId">>) => Promise<Transcription>
+  updateTranscriptionDb: (transcriptionId: string, changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language" | "words" | "segments" | "selectedUploadId">>) => Promise<Transcription>
   deleteTranscriptionDb: (projectId: string, transcriptionId: string) => Promise<void>
   moveTranscriptionDb: (sourceProjectId: string, targetProjectId: string, transcriptionId: string) => Promise<void>
   // settings copy method

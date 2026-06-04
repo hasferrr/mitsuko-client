@@ -41,6 +41,7 @@ import { useTranscriptionStore } from "@/stores/services/use-transcription-store
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ManageUploadsDialog } from "./manage-uploads-dialog"
 import { TranscriptionMain } from "@/components/transcribe/transcription-main"
+import { TranscriptionHistoryDialog } from "@/components/transcribe/transcription-history-dialog"
 import { SettingsTranscription } from "@/components/transcribe/settings-transcription"
 import { WhisperSettingsPanel } from "@/components/transcribe/whisper-settings-panel"
 import { useBatchTranscriptionFiles } from "@/hooks/batch/use-batch-transcription-files"
@@ -51,7 +52,9 @@ import { CopyTranscriptionSettingsDialog } from "./copy-transcription-settings-d
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
 import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/transcription/subtitle-generator"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
+import { getContent, parseTranscription, parseTranscriptionWordsAndSegments } from "@/lib/parser/parser"
 import type { UploadFileMeta } from "@/types/uploads"
+import type { TranscriptionLogItem } from "@/types/transcription-log"
 
 interface BatchTranscriptionViewProps {
   defaultTranscriptionId: string
@@ -211,6 +214,33 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
       const description = error instanceof Error ? error.message : undefined
       toast.error("Failed to add uploaded audio to batch", { description })
     }
+  }
+
+  const handleApplyTranscriptionHistory = async (raw: string, log: TranscriptionLogItem) => {
+    if (isProcessing) {
+      toast.info("Batch is processing. Stop it before applying history.")
+      return false
+    }
+
+    if (!currentProject || !currentProject.isBatch) {
+      toast.error("Batch project not found")
+      return false
+    }
+
+    const transcriptionText = getContent(raw)
+    const transcriptSubtitles = parseTranscription(raw)
+    const { words, segments } = parseTranscriptionWordsAndSegments(raw)
+    const title = log.metadata.originalname || "Transcription"
+
+    const transcription = await createTranscriptionForBatch(currentProject.id, title)
+    await updateTranscriptionDb(transcription.id, {
+      transcriptionText,
+      transcriptSubtitles,
+      words,
+      segments,
+    })
+
+    toast.success("Added transcription history to batch")
   }
 
   const handleDragEnd = (event: import("@dnd-kit/core").DragEndEvent) => {
@@ -428,6 +458,13 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
                 {selectedIds.size === batchFiles.length ? 'Deselect All' : 'Select All'}
               </Button>
             </>
+          )}
+          {!isSelecting && (
+            <TranscriptionHistoryDialog
+              onApplyHistory={handleApplyTranscriptionHistory}
+              buttonSize="sm"
+              buttonClassName="rounded-lg"
+            />
           )}
           {!isSelecting && (
             <Button

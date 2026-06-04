@@ -121,9 +121,16 @@ export default function useBatchTranscriptionHandler({
     errorCountRef.current = 0
     setHasChanges(true)
 
-    const filteredFiles = options.skipDone
+    const candidateFiles = options.skipDone
       ? batchFiles.filter(f => f.status !== "done")
       : batchFiles
+
+    const filteredFiles = candidateFiles.filter(file => {
+      const transcription = transcriptionData[file.id]
+      const hasAudio = Boolean(files[file.id] || transcription?.selectedUploadId)
+
+      return file.status !== "done" || hasAudio
+    })
 
     const ids = filteredFiles
       .map(f => f.id)
