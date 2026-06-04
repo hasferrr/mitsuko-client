@@ -29,6 +29,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useProjectStore } from "@/stores/data/use-project-store"
+import { useSetUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import Link from "@/components/link"
 import { BatchTranslationView } from "./batch-translation-view"
 import { BatchExtractionView } from "./batch-extraction-view"
@@ -43,6 +44,7 @@ export default function BatchMain() {
   const deleteProject = useProjectStore((state) => state.deleteProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const renameProject = useProjectStore((state) => state.renameProject)
+  const setHasChanges = useSetUnsavedChanges()
 
   const translationBasicSettingsId = currentProject?.defaultTranslationBasicSettingsId
   const translationAdvancedSettingsId = currentProject?.defaultTranslationAdvancedSettingsId
@@ -53,6 +55,7 @@ export default function BatchMain() {
   const handleBatchNameChange = (value: string) => {
     if (currentProject?.id && value.trim()) {
       renameProject(currentProject.id, value)
+      setHasChanges(true)
     }
   }
 

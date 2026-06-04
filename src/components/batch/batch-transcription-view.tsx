@@ -55,6 +55,7 @@ import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { getContent, parseTranscription, parseTranscriptionWordsAndSegments } from "@/lib/parser/parser"
 import type { UploadFileMeta } from "@/types/uploads"
 import type { TranscriptionLogItem } from "@/types/transcription-log"
+import { useSetUnsavedChanges } from "@/contexts/unsaved-changes-context"
 
 interface BatchTranscriptionViewProps {
   defaultTranscriptionId: string
@@ -85,6 +86,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
   const createTranscriptionForBatch = useProjectStore((state) => state.createTranscriptionForBatch)
   const removeTranscriptionFromBatch = useProjectStore((state) => state.removeTranscriptionFromBatch)
+  const setHasChanges = useSetUnsavedChanges()
 
   const [localOrder, setLocalOrder] = useState<string[]>(currentProject?.transcriptions ?? [])
 
@@ -183,6 +185,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
         // Store the local file in the transcription store
         await setFileAndUrl(transcription.id, file)
         await loadTranscription(transcription.id)
+        setHasChanges(true)
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error)
         toast.error(`Failed to add ${file.name} to batch`)
@@ -209,6 +212,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
     try {
       const transcription = await createTranscriptionForBatch(currentProject.id, upload.fileName)
       await updateTranscriptionDb(transcription.id, { selectedUploadId: upload.uploadId })
+      setHasChanges(true)
       toast.success(`Added ${upload.fileName} to batch`)
     } catch (error) {
       const description = error instanceof Error ? error.message : undefined
@@ -256,6 +260,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
     const newOrder = arrayMove(localOrder, oldIndex, newIndex)
     setLocalOrder(newOrder)
     updateProjectItems(currentProject.id, newOrder, 'transcriptions')
+    setHasChanges(true)
   }
 
   const handleSingleFileDownload = (batchFileId: string) => {
@@ -346,6 +351,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
     if (!currentProject || !deleteFileId) return
     try {
       await removeTranscriptionFromBatch(currentProject.id, deleteFileId)
+      setHasChanges(true)
       setDeleteFileId(null)
     } catch {
       toast.error('Failed to delete file')

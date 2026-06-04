@@ -68,6 +68,7 @@ import { BatchFileList } from "./batch-file-list"
 import { useBatchSelection } from "@/hooks/batch/use-batch-selection"
 import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { MAX_BATCH_CONCURRENT_OPERATION } from "@/constants/limits"
+import { useSetUnsavedChanges } from "@/contexts/unsaved-changes-context"
 
 interface BatchExtractionViewProps {
   basicSettingsId: string
@@ -99,6 +100,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
   const createExtractionForBatch = useProjectStore((state) => state.createExtractionForBatch)
   const removeExtractionFromBatch = useProjectStore((state) => state.removeExtractionFromBatch)
+  const setHasChanges = useSetUnsavedChanges()
 
   const [localOrder, setLocalOrder] = useState<string[]>(currentProject?.extractions ?? [])
 
@@ -202,6 +204,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
         const content = await file.text()
         const extractionId = await createExtractionForBatch(currentProject.id, file, content)
         await loadExtraction(extractionId)
+        setHasChanges(true)
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error)
         toast.error(`Failed to add ${file.name} to batch`)
@@ -222,6 +225,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
     const newOrder = arrayMove(localOrder, oldIndex, newIndex)
     setLocalOrder(newOrder)
     updateProjectItems(currentProject.id, newOrder, 'extractions')
+    setHasChanges(true)
   }
 
   const handleSingleFileDownload = (batchFileId: string) => {
@@ -363,6 +367,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
     if (!currentProject || !deleteFileId) return
     try {
       await removeExtractionFromBatch(currentProject.id, deleteFileId)
+      setHasChanges(true)
       setDeleteFileId(null)
     } catch {
       toast.error('Failed to delete file')
