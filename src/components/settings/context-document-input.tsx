@@ -5,8 +5,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
-import { FileText, ExternalLink, FolderDown, Settings2, WandSparkles, X } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { FileText, ExternalLink, FolderDown, Settings2, WandSparkles, X, Ban, Plus, Link2, Clock, ListTree, ChevronDown } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { AutoContextMode, AutoContextPreviousMode, Extraction } from "@/types/project"
 import { getContent } from "@/lib/parser/parser"
@@ -18,12 +18,65 @@ import { cleanExtractionResult, combineAutoContext, getExtractionProblem, findLa
 import { isAutoContextOwnedBy } from "@/lib/extraction/status"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ExtractionBadges } from "@/components/extract-context/extraction-badges"
+import { cn } from "@/lib/utils/cn"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
 interface Props {
   basicSettingsId: string
   translationId?: string
   onOpenExtraction?: (extractionId: string) => void
   onOpenExtractionSettings?: () => void
+}
+
+function ModeCard({
+  selected,
+  onClick,
+  icon: Icon,
+  title,
+  description,
+}: {
+  selected: boolean
+  onClick: () => void
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  description: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex items-start gap-3 rounded-lg border p-3 text-left transition-colors cursor-pointer",
+        selected
+          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+          : "border-border hover:border-foreground/20 hover:bg-muted/50",
+      )}
+    >
+      <div className={cn(
+        "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md",
+        selected ? "bg-primary/10 text-sidebar-primary" : "bg-muted text-muted-foreground",
+      )}>
+        <Icon className="size-4" />
+      </div>
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <span className={cn("text-sm font-medium", selected && "text-sidebar-primary")}>{title}</span>
+        <span className="text-xs text-muted-foreground">{description}</span>
+      </div>
+    </button>
+  )
+}
+
+function StatusMessage({ variant, children }: { variant: "info" | "warning" | "muted"; children: React.ReactNode }) {
+  return (
+    <div className={cn(
+      "flex items-start gap-2 rounded-md px-3 py-2 text-xs",
+      variant === "info" && "bg-primary/5 text-sidebar-primary",
+      variant === "warning" && "bg-destructive/5 text-destructive",
+      variant === "muted" && "bg-muted/50 text-muted-foreground",
+    )}>
+      {children}
+    </div>
+  )
 }
 
 export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOpenExtraction, onOpenExtractionSettings }: Props) => {
@@ -42,7 +95,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
 
   const [isContextDialogOpen, setIsContextDialogOpen] = useState(false)
   const [isAutoContextDialogOpen, setIsAutoContextDialogOpen] = useState(false)
-  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [projectExtractions, setProjectExtractions] = useState<Extraction[]>([])
 
   const { setHasChanges } = useUnsavedChanges()
@@ -117,7 +170,6 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
     const extraction = await getExtractionDb(extractionId)
     if (!extraction) return
     setCurrentExtractionId(extraction.id)
-    setIsAutoContextDialogOpen(false)
     onOpenExtraction?.(extraction.id)
   }
 
@@ -174,6 +226,8 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
       ? `${extractionPlaceholder}\n\n${contextDocument}`
       : extractionPlaceholder
   })()
+
+  const autoContextMode = translation?.autoContextMode ?? "disabled"
 
   return (
     <div className="flex flex-col gap-2">
@@ -251,96 +305,91 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
 
       {translation && (
         <Dialog open={isAutoContextDialogOpen} onOpenChange={setIsAutoContextDialogOpen}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[520px] max-h-[min(90dvh,800px)] flex flex-col">
             <DialogHeader>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="flex flex-col gap-2">
-                  <DialogTitle>Auto Context</DialogTitle>
-                  <DialogDescription>
-                    Generate or link extracted context when starting this translation.
-                  </DialogDescription>
-                </div>
-                {onOpenExtractionSettings && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="sm:shrink-0"
-                    onClick={() => {
-                      setIsAutoContextDialogOpen(false)
-                      onOpenExtractionSettings()
-                    }}
-                  >
-                    <Settings2 />
-                    Extraction Settings
-                  </Button>
-                )}
-              </div>
+              <DialogTitle>Auto Context</DialogTitle>
+              <DialogDescription>
+                Automatically attach extracted context when you start translating.
+              </DialogDescription>
             </DialogHeader>
 
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">Mode</label>
-                <Select value={translation.autoContextMode ?? "disabled"} onValueChange={(value) => handleAutoModeChange(value as AutoContextMode)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="disabled">Disabled</SelectItem>
-                      <SelectItem value="create-new">Create new before translation</SelectItem>
-                      <SelectItem value="use-existing">Use existing extraction</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+            <div className="flex flex-col gap-4 overflow-y-auto -mx-4 px-4">
+              <div className="flex flex-col gap-3">
+                <ModeCard
+                  selected={autoContextMode === "disabled"}
+                  onClick={() => handleAutoModeChange("disabled")}
+                  icon={Ban}
+                  title="Off"
+                  description="Only the manual context document will be used."
+                />
+                <ModeCard
+                  selected={autoContextMode === "create-new"}
+                  onClick={() => handleAutoModeChange("create-new")}
+                  icon={Plus}
+                  title="Extract & translate"
+                  description="Get context from this subtitle, then start translating with it."
+                />
+                <ModeCard
+                  selected={autoContextMode === "use-existing"}
+                  onClick={() => handleAutoModeChange("use-existing")}
+                  icon={Link2}
+                  title="Use existing extraction"
+                  description="Pick a finished context from this project to attach."
+                />
               </div>
 
-              {translation.autoContextMode === "use-existing" && (
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <label className="text-sm font-medium">Selected Extraction</label>
+              {autoContextMode === "use-existing" && (
+                <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/30 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="text-sm font-medium">Extraction to use</label>
+                    {translation.autoContextExtractionId && (
                       <Button
                         variant="ghost"
-                        size="sm"
+                        size="xs"
                         onClick={() => setAutoContextValue("autoContextExtractionId", null)}
-                        disabled={!translation.autoContextExtractionId}
                       >
                         <X />
-                        Deselect
+                        Clear
                       </Button>
-                    </div>
-                    <Select
-                      value={translation.autoContextExtractionId ?? ""}
-                      onValueChange={(value) => setAutoContextValue("autoContextExtractionId", value)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Choose an extraction" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          {projectExtractions.map((extraction) => (
-                            <SelectItem key={extraction.id} value={extraction.id}>
-                              <div className="flex min-w-0 items-center gap-2">
-                                <span className="truncate">{extraction.title || `Episode ${extraction.episodeNumber || "X"}`}</span>
-                                <ExtractionBadges extraction={extraction} runningIds={isExtractingSet} size="compact" />
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                    )}
                   </div>
+                  <Select
+                    value={translation.autoContextExtractionId ?? ""}
+                    onValueChange={(value) => setAutoContextValue("autoContextExtractionId", value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Choose an extraction…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {projectExtractions.map((extraction) => (
+                          <SelectItem key={extraction.id} value={extraction.id}>
+                            <div className="flex min-w-0 items-center gap-2">
+                              <span className="truncate">{extraction.title || `Episode ${extraction.episodeNumber || "X"}`}</span>
+                              <ExtractionBadges extraction={extraction} runningIds={isExtractingSet} size="compact" />
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
 
-                  {isSelectedExtractionRunning ? (
-                    <p className="text-xs text-muted-foreground">
-                      Translation will wait until this extraction finishes.
-                    </p>
-                  ) : selectedProblem && (
-                    <p className={isSelectedAutoOwned ? "text-xs text-muted-foreground" : "text-xs text-destructive"}>
+                  {isSelectedExtractionRunning && (
+                    <StatusMessage variant="info">
+                      Translation will wait for this extraction to finish.
+                    </StatusMessage>
+                  )}
+                  {!translation.autoContextExtractionId && (
+                    <StatusMessage variant="warning">
+                      No extraction selected. Pick one above to use as context.
+                    </StatusMessage>
+                  )}
+                  {!isSelectedExtractionRunning && selectedProblem && (
+                    <StatusMessage variant={isSelectedAutoOwned ? "info" : "warning"}>
                       {isSelectedAutoOwned
-                        ? "This linked auto-context extraction will rerun when translation starts."
+                        ? "This auto-context extraction will rerun when translation starts."
                         : selectedProblem}
-                    </p>
+                    </StatusMessage>
                   )}
                   {selectedExtraction && (
                     <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(selectedExtraction.id)}>
@@ -351,141 +400,174 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
                 </div>
               )}
 
-              {translation.autoContextMode === "create-new" && (
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium">Previous Context</label>
-                    <Select value={previousMode} onValueChange={(value) => handlePreviousModeChange(value as AutoContextPreviousMode)}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectItem value="latest">Latest previous context</SelectItem>
-                          <SelectItem value="selected">Selected extraction</SelectItem>
-                          <SelectItem value="none">None</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+              {autoContextMode === "create-new" && (
+                <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/30 p-3">
+                  <label className="text-sm font-medium">Feed previous context into this extraction</label>
+                  <p className="text-xs text-muted-foreground -mt-1">
+                    Optionally include context from an earlier extraction so the new one has continuity.
+                  </p>
+
+                  <div className="flex flex-col gap-1.5">
+                    <ModeCard
+                      selected={previousMode === "latest"}
+                      onClick={() => handlePreviousModeChange("latest")}
+                      icon={Clock}
+                      title="Latest available"
+                      description="Automatically use the most recent completed extraction."
+                    />
+                    <ModeCard
+                      selected={previousMode === "selected"}
+                      onClick={() => handlePreviousModeChange("selected")}
+                      icon={ListTree}
+                      title="Choose specific extraction"
+                      description="Pick a particular extraction to feed as previous context."
+                    />
+                    <ModeCard
+                      selected={previousMode === "none"}
+                      onClick={() => handlePreviousModeChange("none")}
+                      icon={Ban}
+                      title="None"
+                      description="Don't include any previous context."
+                    />
                   </div>
 
                   {previousMode === "latest" && (
                     <div className="flex flex-col gap-2">
                       {latestPreviousExtraction ? (
                         <>
-                          {isLatestPreviousRunning ? (
-                            <p className="text-xs text-muted-foreground">
-                              Translation will wait until this latest previous extraction finishes.
-                            </p>
-                          ) : latestPreviousProblem && (
-                            <p className="text-xs text-destructive">{latestPreviousProblem}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>Resolved to:</span>
+                            <span className="font-medium text-foreground truncate">
+                              {latestPreviousExtraction.title || `Episode ${latestPreviousExtraction.episodeNumber || "X"}`}
+                            </span>
+                            <ExtractionBadges extraction={latestPreviousExtraction} runningIds={isExtractingSet} size="compact" />
+                          </div>
+                          {isLatestPreviousRunning && (
+                            <StatusMessage variant="info">
+                              Translation will wait for this extraction to finish first.
+                            </StatusMessage>
                           )}
-                          <ExtractionBadges extraction={latestPreviousExtraction} runningIds={isExtractingSet} size="compact" />
+                          {!isLatestPreviousRunning && latestPreviousProblem && (
+                            <StatusMessage variant="warning">{latestPreviousProblem}</StatusMessage>
+                          )}
                           <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(latestPreviousExtraction.id)}>
                             <ExternalLink />
-                            Open Latest Previous Context
+                            View Extraction
                           </Button>
                         </>
                       ) : (
-                        <p className="text-xs text-muted-foreground">No previous context will be sent.</p>
+                        <StatusMessage variant="muted">
+                          No completed extraction found — previous context will be skipped.
+                        </StatusMessage>
                       )}
                     </div>
                   )}
 
                   {previousMode === "selected" && (
-                    <div className="flex flex-col gap-4">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center justify-between gap-2">
-                          <label className="text-sm font-medium">Selected Previous Extraction</label>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs text-muted-foreground">Pick extraction</span>
+                        {translation.autoContextPreviousExtractionId && (
                           <Button
                             variant="ghost"
-                            size="sm"
+                            size="xs"
                             onClick={async () => {
                               await setAutoContextValue("autoContextPreviousMode", "none")
                               await setAutoContextValue("autoContextPreviousExtractionId", null)
                             }}
-                            disabled={!translation.autoContextPreviousExtractionId}
                           >
                             <X />
-                            Deselect
+                            Clear
                           </Button>
-                        </div>
-                        <Select
-                          value={translation.autoContextPreviousExtractionId ?? ""}
-                          onValueChange={async (value) => {
-                            await setAutoContextValue("autoContextPreviousExtractionId", value)
-                            await setAutoContextValue("autoContextPreviousMode", "selected")
-                          }}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Choose an extraction" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              {projectExtractions.map((extraction) => (
-                                <SelectItem key={extraction.id} value={extraction.id}>
-                                  <div className="flex min-w-0 items-center gap-2">
-                                    <span className="truncate">{extraction.title || `Episode ${extraction.episodeNumber || "X"}`}</span>
-                                    <ExtractionBadges extraction={extraction} runningIds={isExtractingSet} size="compact" />
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
+                        )}
                       </div>
+                      <Select
+                        value={translation.autoContextPreviousExtractionId ?? ""}
+                        onValueChange={async (value) => {
+                          await setAutoContextValue("autoContextPreviousExtractionId", value)
+                          await setAutoContextValue("autoContextPreviousMode", "selected")
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Choose an extraction…" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {projectExtractions.map((extraction) => (
+                              <SelectItem key={extraction.id} value={extraction.id}>
+                                <div className="flex min-w-0 items-center gap-2">
+                                  <span className="truncate">{extraction.title || `Episode ${extraction.episodeNumber || "X"}`}</span>
+                                  <ExtractionBadges extraction={extraction} runningIds={isExtractingSet} size="compact" />
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
 
                       {previousProblem && (
-                        <p className="text-xs text-destructive">{previousProblem}</p>
+                        <StatusMessage variant="warning">{previousProblem}</StatusMessage>
                       )}
                       {previousExtraction && (
                         <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(previousExtraction.id)}>
                           <ExternalLink />
-                          Open Previous Context
+                          View Extraction
                         </Button>
                       )}
                     </div>
                   )}
-
-                  {previousMode === "none" && (
-                    <p className="text-xs text-muted-foreground">No previous context will be sent.</p>
-                  )}
-
                 </div>
+              )}
+
+              {autoContextMode !== "disabled" && (
+                <Collapsible open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="sm" className="w-full justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <FileText className="size-3.5" />
+                        Preview final context
+                      </span>
+                      <ChevronDown className={cn("size-3.5 transition-transform", isPreviewOpen && "rotate-180")} />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="pt-2">
+                      {previewDisplayValue ? (
+                        <Textarea
+                          readOnly
+                          value={previewDisplayValue}
+                          className="font-mono text-xs min-h-[80px] max-h-[200px] resize-none overflow-y-auto bg-muted/30"
+                        />
+                      ) : (
+                        <p className="text-xs text-muted-foreground py-3 text-center">No context will be sent.</p>
+                      )}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               )}
             </div>
 
-            {translation.autoContextMode !== "disabled" && (
-              <div className="border-t pt-4">
-                <Button variant="outline" size="sm" className="w-full" onClick={() => setIsPreviewDialogOpen(true)}>
-                  <FileText />
-                  Preview Final Context
+            <DialogFooter>
+              {onOpenExtractionSettings && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setIsAutoContextDialogOpen(false)
+                    onOpenExtractionSettings()
+                  }}
+                >
+                  <Settings2 />
+                  Extraction Settings
                 </Button>
-              </div>
-            )}
+              )}
+              <Button size="sm" onClick={() => setIsAutoContextDialogOpen(false)}>
+                Done
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
-
-      <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
-        <DialogContent className="sm:max-w-[560px]">
-          <DialogHeader>
-            <DialogTitle>Final Context Preview</DialogTitle>
-            <DialogDescription>
-              Combined context (auto + manual) sent with the translation request
-            </DialogDescription>
-          </DialogHeader>
-          {previewDisplayValue ? (
-            <Textarea
-              readOnly
-              value={previewDisplayValue}
-              className="font-mono text-xs min-h-[120px] max-h-[400px] resize-none overflow-y-auto bg-muted/30"
-            />
-          ) : (
-            <p className="text-sm text-muted-foreground py-4 text-center">No context will be sent.</p>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   )
 })
