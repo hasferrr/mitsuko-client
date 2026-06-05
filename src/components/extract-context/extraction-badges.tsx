@@ -8,7 +8,7 @@ import { Extraction, ExtractionStatus } from "@/types/project"
 const statusLabels: Record<ExtractionStatus, string> = {
   idle: "Draft",
   running: "Running",
-  completed: "Ready",
+  completed: "Done",
   failed: "Failed",
   stopped: "Stopped",
 }

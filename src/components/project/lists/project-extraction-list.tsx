@@ -83,7 +83,9 @@ export function ProjectExtractionList({
       title={`Episode ${extraction.episodeNumber || "X"}`}
       subtitle={extraction.title}
       description={extraction.contextResult}
-      badges={<ExtractionBadges extraction={extraction} runningIds={isExtractingSet} size="compact" className="shrink-0" />}
+      badges={extraction.status !== "completed" && extraction.status !== "running" && (
+        <ExtractionBadges extraction={extraction} runningIds={isExtractingSet} size="compact" className="shrink-0" />
+      )}
       date={extraction.updatedAt.toLocaleDateString()}
       handleEdit={async (newName) => {
         const updated = await updateExtractionDb(extraction.id, { episodeNumber: newName })
