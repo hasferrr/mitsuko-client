@@ -315,7 +315,7 @@ export const useTranslationHandler = ({
       if (fewShot.type === "manual") {
         try {
           usedFewShot = fewShotSchema.array().parse(JSON.parse(fewShot.value.trim() || "[]"))
-        } catch (error) {
+        } catch {
           toast.error("Few shot format is invalid! Please follow this format:", {
             description: "[" + JSON.stringify({ content: "string", translated: "string" }, null, 2) + "]",
             className: "select-none",
@@ -434,7 +434,7 @@ export const useTranslationHandler = ({
         rawResponse = result.raw
 
         onSuccessTranslation?.()
-      } catch (error) {
+      } catch {
         onErrorTranslation?.({ currentId, isContinuation: !!isContinuation })
 
         setIsTranslating(currentId, false)
