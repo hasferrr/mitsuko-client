@@ -30,13 +30,13 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { db } from "@/lib/db/db"
-import { Extraction, Translation } from "@/types/project"
+import { Extraction, ExtractionStatus, Translation } from "@/types/project"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
 import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
-import { inferEditedExtractionStatus } from "@/lib/extraction/status"
-import { ExtractionBadges } from "./extraction-badges"
+import { inferEditedExtractionStatus, getEffectiveExtractionStatus } from "@/lib/extraction/status"
+import { ExtractionStatusDropdown } from "./extraction-status-dropdown"
 
 interface ContextExtractorMainProps {
   currentId: string
@@ -142,6 +142,19 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
 
   const handleStartExtraction = async () => await handleStart(currentId, basicSettingsId, advancedSettingsId)
   const handleStopExtraction = () => handleStop(currentId)
+
+  const handleStatusChange = useCallback(
+    async (newStatus: ExtractionStatus) => {
+      mutateExtraction(currentId, "status", newStatus)
+      mutateExtraction(
+        currentId,
+        "completedAt",
+        newStatus === "completed" ? new Date() : null
+      )
+      await saveData(currentId)
+    },
+    [currentId, mutateExtraction, saveData]
+  )
 
   // Import Select Handlers
 
@@ -272,9 +285,6 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
           onBlur={() => saveData(currentId)}
           className="min-w-0 text-xl font-semibold"
         />
-        {extraction && (
-          <ExtractionBadges extraction={extraction} runningIds={isExtractingSet} className="shrink-0" />
-        )}
       </div>
 
       {/* Left Pane */}
@@ -461,7 +471,14 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
       </div>
 
       {/* Bottom Controls */}
-      <div className="lg:col-span-2 flex items-center justify-center gap-4 flex-wrap">
+      <div className="lg:col-span-2 flex items-center justify-center gap-3 flex-wrap">
+        {extraction && (
+          <ExtractionStatusDropdown
+            status={getEffectiveExtractionStatus(extraction, isExtractingSet)}
+            disabled={isExtracting}
+            onStatusChange={handleStatusChange}
+          />
+        )}
         <Button
           onClick={handleStartExtraction}
           disabled={isExtracting || !session}
