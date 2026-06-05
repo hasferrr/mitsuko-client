@@ -9,7 +9,6 @@ import { FileText, ExternalLink, FolderDown, WandSparkles, X } from "lucide-reac
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { AutoContextMode, AutoContextPreviousMode, Extraction } from "@/types/project"
-import { db } from "@/lib/db/db"
 import { getContent } from "@/lib/parser/parser"
 import { removeDoneTag } from "@/lib/utils"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
@@ -49,9 +48,9 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
 
   const loadProjectExtractions = useCallback(async () => {
     if (!currentProject) return
-    const extractionsData = await db.extractions.bulkGet(currentProject.extractions)
-    setProjectExtractions(extractionsData.filter((e): e is Extraction => !!e).toReversed())
-  }, [currentProject])
+    const extractions = await getExtractionsDb(currentProject.extractions)
+    setProjectExtractions(extractions.toReversed())
+  }, [currentProject, getExtractionsDb])
 
   useEffect(() => {
     if (!isAutoContextDialogOpen || !currentProject) return
