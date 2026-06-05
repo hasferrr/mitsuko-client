@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
-import { FileText, ExternalLink, FolderDown, WandSparkles, X } from "lucide-react"
+import { FileText, ExternalLink, FolderDown, Settings2, WandSparkles, X } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { AutoContextMode, AutoContextPreviousMode, Extraction } from "@/types/project"
@@ -23,9 +23,10 @@ interface Props {
   basicSettingsId: string
   translationId?: string
   onOpenExtraction?: (extractionId: string) => void
+  onOpenExtractionSettings?: () => void
 }
 
-export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOpenExtraction }: Props) => {
+export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOpenExtraction, onOpenExtractionSettings }: Props) => {
   const currentProject = useProjectStore((state) => state.currentProject)
   const contextDocument = useSettingsStore((state) => state.getContextDocument(basicSettingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
@@ -252,10 +253,28 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
         <Dialog open={isAutoContextDialogOpen} onOpenChange={setIsAutoContextDialogOpen}>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Auto Context</DialogTitle>
-              <DialogDescription>
-                Generate or link extracted context when starting this translation.
-              </DialogDescription>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex flex-col gap-2">
+                  <DialogTitle>Auto Context</DialogTitle>
+                  <DialogDescription>
+                    Generate or link extracted context when starting this translation.
+                  </DialogDescription>
+                </div>
+                {onOpenExtractionSettings && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="sm:shrink-0"
+                    onClick={() => {
+                      setIsAutoContextDialogOpen(false)
+                      onOpenExtractionSettings()
+                    }}
+                  >
+                    <Settings2 />
+                    Extraction Settings
+                  </Button>
+                )}
+              </div>
             </DialogHeader>
 
             <div className="flex flex-col gap-4">
