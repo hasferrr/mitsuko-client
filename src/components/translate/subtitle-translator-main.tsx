@@ -94,6 +94,14 @@ import { Translation } from "@/types/project"
 import { DownloadSection } from "@/components/shared/download-section"
 import { SUBTITLE_NAME_MAP, ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { useTranslationHandler } from "@/hooks/handler/use-translation-handler"
+import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
+import { ContextExtractorMain } from "@/components/extract-context/context-extractor-main"
+import { SettingsDialogue } from "@/components/settings/settings-dialogue"
+import {
+  GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
+  GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
+} from "@/constants/global-settings"
+import { useProjectStore } from "@/stores/data/use-project-store"
 
 interface SubtitleTranslatorMainProps {
   currentId: string
@@ -118,6 +126,10 @@ export default function SubtitleTranslatorMain({
   const setParsed = useTranslationDataStore((state) => state.setParsed)
   const setJsonResponse = useTranslationDataStore((state) => state.setJsonResponse)
   const saveData = useTranslationDataStore((state) => state.saveData)
+  const extractionData = useExtractionDataStore((state) => state.data)
+  const getExtractionDb = useExtractionDataStore((state) => state.getExtractionDb)
+  const currentProject = useProjectStore((state) => state.currentProject)
+  const updateProjectStore = useProjectStore((state) => state.updateProject)
 
   // Get current translation data
   const title = translation.title
@@ -170,9 +182,13 @@ export default function SubtitleTranslatorMain({
   const [isRetranslateDontShowAgain, setIsRetranslateDontShowAgain] = useState(false)
   const [pendingNewSubtitles, setPendingNewSubtitles] = useState<SubtitleNoTime[]>([])
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [isExtractionSettingsOpen, setIsExtractionSettingsOpen] = useState(false)
+  const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
   const [toType, setToType] = useState<SubtitleType>(parsed.type)
+  const [previewExtractionId, setPreviewExtractionId] = useState<string | null>(null)
+  const previewExtraction = previewExtractionId ? extractionData[previewExtractionId] : null
 
   // Custom Hooks
   const router = useRouter()
@@ -192,10 +208,19 @@ export default function SubtitleTranslatorMain({
     staleTime: 0,
   })
 
+  const openExtractionPreview = async (extractionId: string) => {
+    const extraction = await getExtractionDb(extractionId)
+    if (!extraction) {
+      toast.error("Selected context extraction was not found.")
+      return
+    }
+    setPreviewExtractionId(extraction.id)
+  }
+
   // Translation handler
   const { handleStart, handleStop, generateSubtitleContent } = useTranslationHandler({
     state: { toType, setActiveTab },
-    options: { isBatch: false },
+    options: { isBatch: false, onOpenExtraction: openExtractionPreview },
   })
 
   const handleStartTranslation = async (
@@ -588,7 +613,7 @@ export default function SubtitleTranslatorMain({
             <Button
               variant="outline"
               onClick={handleStopTranslation}
-              disabled={!isTranslating || !translation.response.response}
+              disabled={!isTranslating}
             >
               <Square className="size-4" />
               Stop
@@ -671,6 +696,9 @@ export default function SubtitleTranslatorMain({
                   <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
                     <ContextDocumentInput
                       basicSettingsId={basicSettingsId}
+                      translationId={currentId}
+                      onOpenExtraction={openExtractionPreview}
+                      onOpenExtractionSettings={currentProject ? () => setIsExtractionSettingsOpen(true) : undefined}
                     />
                   </DragAndDrop>
                     <CustomInstructionsInput
@@ -739,12 +767,61 @@ export default function SubtitleTranslatorMain({
         </div>
       </div>
 
+      {currentProject && (
+        <>
+          <SettingsDialogue
+            mode="project"
+            isOpen={isExtractionSettingsOpen}
+            onOpenChange={setIsExtractionSettingsOpen}
+            projectName={currentProject.name}
+            basicSettingsId={currentProject.defaultExtractionBasicSettingsId}
+            advancedSettingsId={currentProject.defaultExtractionAdvancedSettingsId}
+            resetFromBasicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
+            resetFromAdvancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
+            settingsParentType="extraction"
+            isDefaultEnabled={currentProject.isDefaultExtractionEnabled}
+            onDefaultEnabledChange={(enabled: boolean) => updateProjectStore(currentProject.id, { isDefaultExtractionEnabled: enabled })}
+            onOpenGlobalSettings={() => {
+              setIsExtractionSettingsOpen(false)
+              setIsGlobalExtractionSettingsOpen(true)
+            }}
+          />
+          <SettingsDialogue
+            mode="global"
+            isOpen={isGlobalExtractionSettingsOpen}
+            onOpenChange={setIsGlobalExtractionSettingsOpen}
+            basicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
+            advancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
+            settingsParentType="extraction"
+          />
+        </>
+      )}
+
       {/* History Panel */}
       <HistoryPanel
         isHistoryOpen={isHistoryOpen}
         setIsHistoryOpen={setIsHistoryOpen}
         advancedSettingsId={advancedSettingsId}
       />
+
+      {previewExtraction && (
+        <Dialog open={!!previewExtractionId} onOpenChange={(open) => !open && setPreviewExtractionId(null)}>
+          <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-[min(1100px,calc(100%-2rem))]">
+            <DialogHeader>
+              <DialogTitle>{previewExtraction.title || "Context Extraction"}</DialogTitle>
+              <DialogDescription>
+                Review, edit, or re-run this extraction.
+              </DialogDescription>
+            </DialogHeader>
+            <ContextExtractorMain
+              currentId={previewExtraction.id}
+              basicSettingsId={previewExtraction.basicSettingsId}
+              advancedSettingsId={previewExtraction.advancedSettingsId}
+              hideBackButton
+            />
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Initial Upload Dialog */}
       <Dialog open={isInitialUploadDialogOpen} onOpenChange={handleInitialUploadDialogChange}>

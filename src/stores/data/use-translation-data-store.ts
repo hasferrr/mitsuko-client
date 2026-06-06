@@ -27,7 +27,7 @@ export interface TranslationDataStore {
   ) => Promise<Translation>
   getTranslationDb: (translationId: string, skipStoreUpdate?: boolean) => Promise<Translation | undefined>
   getTranslationsDb: (translationIds: string[]) => Promise<Translation[]>
-  updateTranslationDb: (translationId: string, changes: Partial<Pick<Translation, "title" | "subtitles" | "parsed">>) => Promise<Translation>
+  updateTranslationDb: (translationId: string, changes: Partial<Translation>) => Promise<Translation>
   deleteTranslationDb: (projectId: string, translationId: string) => Promise<void>
   moveTranslationDb: (sourceProjectId: string, targetProjectId: string, translationId: string) => Promise<void>
   // setters

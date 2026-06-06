@@ -2,6 +2,11 @@ import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_B
 import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
 import { CustomInstruction } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'
+import {
+  AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX,
+  normalizeExtractionStatus,
+  stripExtractionDoneTag,
+} from '@/lib/extraction/status'
 
 class MyDatabase extends Dexie {
   projects!: Table<Project, string>
@@ -326,6 +331,54 @@ class MyDatabase extends Dexie {
         if (typeof project.isArchived === 'undefined') {
           project.isArchived = false
         }
+      })
+    })
+    this.version(26).stores({}).upgrade(async tx => {
+      await tx.table('translations').toCollection().modify(translation => {
+        if (typeof translation.autoContextMode === 'undefined') {
+          translation.autoContextMode = 'disabled'
+        }
+        if (typeof translation.autoContextExtractionId === 'undefined') {
+          translation.autoContextExtractionId = null
+        }
+        if (typeof translation.autoContextPreviousMode === 'undefined') {
+          translation.autoContextPreviousMode = 'latest'
+        }
+        if (typeof translation.autoContextPreviousExtractionId === 'undefined') {
+          translation.autoContextPreviousExtractionId = null
+        }
+      })
+    })
+    this.version(27).stores({}).upgrade(async tx => {
+      const projects = await tx.table('projects').toArray() as Project[]
+      const translations = await tx.table('translations').toArray() as Translation[]
+      const projectIsBatchMap = new Map(projects.map(project => [project.id, !!project.isBatch]))
+      const linkedOwnerMap = new Map<string, string>()
+
+      translations.forEach(translation => {
+        if (translation.autoContextExtractionId && !linkedOwnerMap.has(translation.autoContextExtractionId)) {
+          linkedOwnerMap.set(translation.autoContextExtractionId, translation.id)
+        }
+      })
+
+      await tx.table('extractions').toCollection().modify(extraction => {
+        const contextResult = typeof extraction.contextResult === 'string' ? extraction.contextResult : ''
+        const projectIsBatch = projectIsBatchMap.get(extraction.projectId) ?? false
+        const linkedOwnerId = linkedOwnerMap.get(extraction.id)
+        const looksAutoCreated = !!linkedOwnerId
+          && typeof extraction.title === 'string'
+          && extraction.title.startsWith(AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX)
+        const status = normalizeExtractionStatus(extraction.status, contextResult, projectIsBatch)
+        const completedAt = extraction.completedAt instanceof Date
+          ? extraction.completedAt
+          : extraction.completedAt ? new Date(extraction.completedAt) : null
+
+        extraction.contextResult = stripExtractionDoneTag(contextResult)
+        extraction.status = status
+        extraction.ownerTranslationId = typeof extraction.ownerTranslationId === 'string'
+          ? extraction.ownerTranslationId
+          : looksAutoCreated ? linkedOwnerId ?? null : null
+        extraction.completedAt = status === 'completed' ? completedAt ?? new Date() : null
       })
     })
   }

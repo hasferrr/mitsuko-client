@@ -3,7 +3,7 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { BatchFile } from "@/types/batch"
-import { hasDoneTag } from "@/lib/utils"
+import { cleanExtractionContent, getEffectiveExtractionStatus } from "@/lib/extraction/status"
 
 export const useBatchExtractionFiles = (order: string[], queueSet: Set<string>) => {
   const extractionData = useExtractionDataStore((state) => state.data)
@@ -15,18 +15,21 @@ export const useBatchExtractionFiles = (order: string[], queueSet: Set<string>) 
     return order.map(id => {
       const extraction = extractionData[id]
 
-      const partial = extraction?.contextResult && extraction.contextResult.trim() !== ""
-      const extracted = partial && hasDoneTag(extraction.contextResult)
+      const partial = extraction ? cleanExtractionContent(extraction.contextResult) !== "" : false
+      const effectiveStatus = extraction ? getEffectiveExtractionStatus(extraction, isExtractingSet) : "idle"
+      const extracted = effectiveStatus === "completed"
       const progress = extracted ? 100 : 0
 
       let status: BatchFile["status"]
 
       if (isExtractingSet.has(id)) {
         status = "processing"
-      } else if (extracted) {
-        status = "done"
       } else if (queueSet.has(id)) {
         status = "queued"
+      } else if (extracted) {
+        status = "done"
+      } else if (effectiveStatus === "failed" || effectiveStatus === "stopped") {
+        status = "error"
       } else if (partial) {
         status = "partial"
       } else {

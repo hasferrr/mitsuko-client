@@ -2,11 +2,15 @@ import { BasicSettings, Extraction, AdvancedSettings } from "@/types/project"
 import { db } from "./db"
 import { DEFAULT_EXTRACTION_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
+import { inferLegacyExtractionStatus, stripExtractionDoneTag } from "@/lib/extraction/status"
+
+export type ExtractionCreateInput = Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">
+  & Partial<Pick<Extraction, "status" | "ownerTranslationId" | "completedAt">>
 
 // Extraction CRUD functions
 export const createExtraction = async (
   projectId: string,
-  data: Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">,
+  data: ExtractionCreateInput,
   basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
   advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
 ): Promise<Extraction> => {
@@ -22,10 +26,16 @@ export const createExtraction = async (
       ...advancedSettingsData,
     })
 
+    const contextResult = stripExtractionDoneTag(data.contextResult)
+    const status = data.status ?? inferLegacyExtractionStatus(data.contextResult)
     const extraction: Extraction = {
       id,
       projectId,
       ...data,
+      contextResult,
+      status,
+      ownerTranslationId: data.ownerTranslationId ?? null,
+      completedAt: data.completedAt ?? (status === "completed" ? new Date() : null),
       basicSettingsId: basicSettings.id,
       advancedSettingsId: advancedSettings.id,
       createdAt: new Date(),
@@ -50,7 +60,7 @@ export const getExtraction = async (extractionId: string): Promise<Extraction | 
 
 export const updateExtraction = async (
   extractionId: string,
-  changes: Partial<Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext">>
+  changes: Partial<Extraction>
 ): Promise<Extraction> => {
   await db.extractions.update(extractionId, {
     ...changes,

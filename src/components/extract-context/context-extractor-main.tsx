@@ -30,11 +30,13 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { db } from "@/lib/db/db"
-import { Extraction, Translation } from "@/types/project"
+import { Extraction, ExtractionStatus, Translation } from "@/types/project"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
 import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
+import { inferEditedExtractionStatus, getEffectiveExtractionStatus } from "@/lib/extraction/status"
+import { ExtractionStatusDropdown } from "./extraction-status-dropdown"
 
 interface ContextExtractorMainProps {
   currentId: string
@@ -56,6 +58,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
 
   // Extraction Data Store
   const title = useExtractionDataStore((state) => state.getTitle(currentId))
+  const extraction = useExtractionDataStore((state) => state.data[currentId])
   const episodeNumber = useExtractionDataStore((state) => state.getEpisodeNumber(currentId))
   const subtitleContent = useExtractionDataStore((state) => state.getSubtitleContent(currentId))
   const previousContext = useExtractionDataStore((state) => state.getPreviousContext(currentId))
@@ -65,6 +68,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   const setSubtitleContent = useExtractionDataStore((state) => state.setSubtitleContent)
   const setPreviousContext = useExtractionDataStore((state) => state.setPreviousContext)
   const setContextResult = useExtractionDataStore((state) => state.setContextResult)
+  const mutateExtraction = useExtractionDataStore((state) => state.mutateData)
   const saveData = useExtractionDataStore((state) => state.saveData)
 
   // Extraction Store
@@ -138,6 +142,19 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
 
   const handleStartExtraction = async () => await handleStart(currentId, basicSettingsId, advancedSettingsId)
   const handleStopExtraction = () => handleStop(currentId)
+
+  const handleStatusChange = useCallback(
+    async (newStatus: ExtractionStatus) => {
+      mutateExtraction(currentId, "status", newStatus)
+      mutateExtraction(
+        currentId,
+        "completedAt",
+        newStatus === "completed" ? new Date() : null
+      )
+      await saveData(currentId)
+    },
+    [currentId, mutateExtraction, saveData]
+  )
 
   // Import Select Handlers
 
@@ -229,6 +246,9 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
         })
       }, 0)
     } else {
+      const status = inferEditedExtractionStatus(contextResult)
+      mutateExtraction(currentId, "status", status)
+      mutateExtraction(currentId, "completedAt", status === "completed" ? new Date() : null)
       await saveData(currentId)
     }
   }
@@ -263,7 +283,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
           value={title}
           onChange={(e) => setTitle(currentId, e.target.value)}
           onBlur={() => saveData(currentId)}
-          className="text-xl font-semibold"
+          className="min-w-0 text-xl font-semibold"
         />
       </div>
 
@@ -451,7 +471,14 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
       </div>
 
       {/* Bottom Controls */}
-      <div className="lg:col-span-2 flex items-center justify-center gap-4 flex-wrap">
+      <div className="lg:col-span-2 flex items-center justify-center gap-3 flex-wrap">
+        {extraction && (
+          <ExtractionStatusDropdown
+            status={getEffectiveExtractionStatus(extraction, isExtractingSet)}
+            disabled={isExtracting}
+            onStatusChange={handleStatusChange}
+          />
+        )}
         <Button
           onClick={handleStartExtraction}
           disabled={isExtracting || !session}
