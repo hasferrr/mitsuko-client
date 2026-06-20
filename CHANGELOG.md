@@ -14,6 +14,22 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### June 20
+
+- 🤖 **Model Updates:** Upgraded GLM 5.1 to GLM 5.2, now with a 1M token context window and 128K max output. Retired several older models to keep the lineup focused on the latest versions.
+
+### June 6
+
+- ✨ **Auto Context for Translations:** Automatically extract and attach context when you start translating. Mitsuko can pull fresh context from your subtitles, reuse an existing extraction from the project, or build on context from an earlier episode for continuity.
+
+### May 29
+
+- 🔐 **Account & Sign-In:** New accounts now start with Google. Once signed in, you can optionally set a password to also log in with your email address.
+
+### May 27
+
+- 🔒 **Privacy Mode:** A new "Don't store subtitle content" option in User Settings keeps your subtitles off our servers — ideal for NDA or confidential work.
+
 ### May 20
 
 - 🤖 **Model Updates:** Added Gemini 3.5 Flash in both free and paid tiers. It delivers near-Pro level reasoning at Flash-tier speed and cost, with a 1M token context window.
