@@ -94,45 +94,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "Gemini 2.5 Flash",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini 2.5 Flash Lite",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini 2.0 Flash",
-        maxInput: 1_048_576,
-        maxOutput: 8192,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
         name: "DeepSeek V4 Pro",
         subName: "deepseek-v4-pro",
         maxInput: 1_048_576,
@@ -147,9 +108,9 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "GLM 5.1",
-        maxInput: 202_800,
-        maxOutput: 65_536,
+        name: "GLM 5.2",
+        maxInput: 1_040_000,
+        maxOutput: 131_072,
         structuredOutput: true,
         isPaid: false,
         usage: "N/A",
@@ -237,45 +198,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
           isUseStructuredOutput: true
         }
       },
-      {
-        name: "Gemini 2.5 Flash",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "medium",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini 2.5 Flash Lite",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "very low",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini 2.0 Flash",
-        maxInput: 1_048_576,
-        maxOutput: 8192,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "very low",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
     ]
   },
   Anthropic: {
@@ -325,45 +247,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
           isUseStructuredOutput: true
         }
       },
-      {
-        name: "Grok 4.1 Fast",
-        maxInput: 2_000_000,
-        maxOutput: 30_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "low",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Grok 4",
-        maxInput: 256_000,
-        maxOutput: 256_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "high",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Grok 3 Mini",
-        maxInput: 131_072,
-        maxOutput: 131_072,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "low",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      }
     ]
   },
   OpenAI: {
@@ -404,34 +287,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         usage: "low",
-        isFormatReasoning: true,
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "GPT-5.2",
-        maxInput: 400_000,
-        maxOutput: 128_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "high",
-        isFormatReasoning: true,
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "GPT-5.1",
-        maxInput: 400_000,
-        maxOutput: 128_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "high",
         isFormatReasoning: true,
         default: {
           temperature: 1,
@@ -488,20 +343,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         usage: "high",
-        isFormatReasoning: true,
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "OpenAI o4-mini",
-        maxInput: 200_000,
-        maxOutput: 100_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "medium",
         isFormatReasoning: true,
         default: {
           temperature: 1,
@@ -655,9 +496,9 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "zai",
     models: [
       {
-        name: "GLM 5.1",
-        maxInput: 202_800,
-        maxOutput: 65_536,
+        name: "GLM 5.2",
+        maxInput: 1_040_000,
+        maxOutput: 131_072,
         structuredOutput: true,
         isPaid: true,
         usage: "medium",
