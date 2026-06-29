@@ -13,16 +13,16 @@ import type { ReactNode } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrackedLink } from "@/components/analytics/tracked-link"
+import Link from "@/components/link"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
-import type { SeoLandingPage as SeoLandingPageData } from "@/constants/seo-pages"
+import type { SolutionsLandingPage as SolutionsLandingPageData } from "@/constants/solutions-pages"
 
-type SeoLandingPageProps = {
-  page: SeoLandingPageData
+type SolutionsLandingPageProps = {
+  page: SolutionsLandingPageData
 }
 
-export function SeoLandingPage({ page }: SeoLandingPageProps) {
-  const pageUrl = `${DEPLOYMENT_URL}/${page.slug}`
+export function SolutionsLandingPage({ page }: SolutionsLandingPageProps) {
+  const pageUrl = `${DEPLOYMENT_URL}/solutions/${page.slug}`
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -93,24 +93,16 @@ export function SeoLandingPage({ page }: SeoLandingPageProps) {
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="rounded-full px-5">
-                <TrackedLink
-                  href={page.primaryCta.href}
-                  eventName={page.primaryCta.event}
-                  eventProperties={{ page: page.slug, placement: "hero_primary" }}
-                >
+                <Link href={page.primaryCta.href}>
                   {page.primaryCta.label}
                   <ArrowRight />
-                </TrackedLink>
+                </Link>
               </Button>
               {page.secondaryCta && (
                 <Button asChild variant="outline" size="lg" className="rounded-full px-5">
-                  <TrackedLink
-                    href={page.secondaryCta.href}
-                    eventName={page.secondaryCta.event}
-                    eventProperties={{ page: page.slug, placement: "hero_secondary" }}
-                  >
+                  <Link href={page.secondaryCta.href}>
                     {page.secondaryCta.label}
-                  </TrackedLink>
+                  </Link>
                 </Button>
               )}
             </div>
@@ -164,14 +156,10 @@ export function SeoLandingPage({ page }: SeoLandingPageProps) {
             <p className="mt-2 text-muted-foreground">{page.proofIntro}</p>
           </div>
           <Button asChild size="lg" className="rounded-full px-5">
-            <TrackedLink
-              href={page.primaryCta.href}
-              eventName={page.primaryCta.event}
-              eventProperties={{ page: page.slug, placement: "bottom_cta" }}
-            >
+            <Link href={page.primaryCta.href}>
               {page.primaryCta.label}
               <ArrowRight />
-            </TrackedLink>
+            </Link>
           </Button>
         </div>
       </section>
@@ -181,7 +169,7 @@ export function SeoLandingPage({ page }: SeoLandingPageProps) {
   )
 }
 
-function WorkflowPreview({ page }: { page: SeoLandingPageData }) {
+function WorkflowPreview({ page }: { page: SolutionsLandingPageData }) {
   switch (page.variant) {
     case "batch":
       return <BatchPreview />
@@ -436,7 +424,7 @@ function CreatorPreview() {
   )
 }
 
-function ProofPanel({ page }: { page: SeoLandingPageData }) {
+function ProofPanel({ page }: { page: SolutionsLandingPageData }) {
   const example = page.proofExamples[0]
 
   return (
@@ -465,7 +453,7 @@ function ProofPanel({ page }: { page: SeoLandingPageData }) {
   )
 }
 
-function AudiencePanel({ page }: { page: SeoLandingPageData }) {
+function AudiencePanel({ page }: { page: SolutionsLandingPageData }) {
   return (
     <Card className="shadow-xs">
       <CardHeader>
@@ -483,16 +471,14 @@ function AudiencePanel({ page }: { page: SeoLandingPageData }) {
         </div>
         <div className="grid gap-2 border-t border-border pt-4">
           {page.relatedLinks.slice(0, 3).map((link) => (
-            <TrackedLink
+            <Link
               key={link.href}
               href={link.href}
-              eventName="seo_related_link_clicked"
-              eventProperties={{ page: page.slug, href: link.href }}
               className="flex items-center justify-between rounded-lg p-2 text-sm hover:bg-muted"
             >
               <span>{link.label}</span>
               <ArrowRight className="size-4 text-muted-foreground" />
-            </TrackedLink>
+            </Link>
           ))}
         </div>
       </CardContent>

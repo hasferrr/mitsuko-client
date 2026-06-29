@@ -1,4 +1,4 @@
-export type SeoProofExample = {
+export type SolutionsProofExample = {
   contextLabel?: string
   context?: string
   sourceLabel: string
@@ -10,16 +10,16 @@ export type SeoProofExample = {
   note: string
 }
 
-export type SeoFaq = {
+export type SolutionsFaq = {
   question: string
   answer: string
 }
 
-export type SeoLandingVariant = "anime" | "ass" | "batch" | "agency" | "audio" | "creator"
+export type SolutionsLandingVariant = "anime" | "ass" | "batch" | "agency" | "audio" | "creator"
 
-export type SeoLandingPage = {
+export type SolutionsLandingPage = {
   slug: string
-  variant: SeoLandingVariant
+  variant: SolutionsLandingVariant
   title: string
   description: string
   keywords: string[]
@@ -30,29 +30,27 @@ export type SeoLandingPage = {
   primaryCta: {
     label: string
     href: string
-    event: string
   }
   secondaryCta?: {
     label: string
     href: string
-    event: string
   }
   proofTitle: string
   proofIntro: string
-  proofExamples: SeoProofExample[]
+  proofExamples: SolutionsProofExample[]
   workflowTitle: string
   workflowIntro: string
   workflow: string[]
   audienceTitle: string
   audience: string[]
-  faqs: SeoFaq[]
+  faqs: SolutionsFaq[]
   relatedLinks: {
     label: string
     href: string
   }[]
 }
 
-const animeProofExamples: SeoProofExample[] = [
+const animeProofExamples: SolutionsProofExample[] = [
   {
     contextLabel: "Scene context",
     context: "A first-year student just knocked over the club room supplies while their strict senior is about to walk in.",
@@ -75,7 +73,7 @@ const animeProofExamples: SeoProofExample[] = [
   },
 ]
 
-const formatProofExamples: SeoProofExample[] = [
+const formatProofExamples: SolutionsProofExample[] = [
   {
     sourceLabel: "ASS dialogue sample",
     source: "{\\an8}Don't move! That sign is the clue.",
@@ -96,16 +94,16 @@ const formatProofExamples: SeoProofExample[] = [
   },
 ]
 
-const agencyProofExamples: SeoProofExample[] = [
+const agencyProofExamples: SolutionsProofExample[] = [
   {
     contextLabel: "Project terminology",
-    context: "User glossary: 도련님 = Mr. Seo, 한강그룹 = Han River Holdings. The speaker is a secretary addressing the heir of a family-owned company.",
+    context: "User glossary: 도련님 = Mr. Park, 한강그룹 = Han River Holdings. The speaker is a secretary addressing the heir of a family-owned company.",
     sourceLabel: "Korean drama sample line",
     source: "도련님, 한강그룹 사람들이 벌써 로비에 와 있습니다.",
     genericLabel: "Literal machine translation",
     generic: "Young master, Hangang Group people already to the lobby have come.",
     mitsukoLabel: "Context-aware translation",
-    mitsuko: "Mr. Seo, the Han River Holdings representatives are already waiting in the lobby.",
+    mitsuko: "Mr. Park, the Han River Holdings representatives are already waiting in the lobby.",
     note: "Follows the user's glossary and role context instead of translating the Korean address and company name literally.",
   },
   {
@@ -119,7 +117,7 @@ const agencyProofExamples: SeoProofExample[] = [
   },
 ]
 
-const creatorProofExamples: SeoProofExample[] = [
+const creatorProofExamples: SolutionsProofExample[] = [
   {
     sourceLabel: "English creator sample",
     source: "Here's the mistake that ruined my first export.",
@@ -140,7 +138,7 @@ const creatorProofExamples: SeoProofExample[] = [
   },
 ]
 
-const batchProofExamples: SeoProofExample[] = [
+const batchProofExamples: SolutionsProofExample[] = [
   {
     sourceLabel: "Series batch sample",
     source: "Episode 03: The Council calls the artifact the Moon Key again.",
@@ -161,7 +159,7 @@ const batchProofExamples: SeoProofExample[] = [
   },
 ]
 
-const audioProofExamples: SeoProofExample[] = [
+const audioProofExamples: SolutionsProofExample[] = [
   {
     sourceLabel: "Spoken creator sample",
     source: "Okay, so we're gonna export this and fix the timing later.",
@@ -182,7 +180,7 @@ const audioProofExamples: SeoProofExample[] = [
   },
 ]
 
-export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
+export const SOLUTIONS_LANDING_PAGES: Record<string, SolutionsLandingPage> = {
   "anime-subtitle-translator": {
     slug: "anime-subtitle-translator",
     variant: "anime",
@@ -202,12 +200,10 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
     primaryCta: {
       label: "Translate subtitles",
       href: "/dashboard",
-      event: "seo_anime_primary_cta_clicked",
     },
     secondaryCta: {
       label: "Read the fansubbing guide",
       href: "/blog/the-art-of-fansubbing-behind-the-scenes-of-anime-subtitles",
-      event: "seo_anime_resource_clicked",
     },
     proofTitle: "Literal subtitles miss the relationship",
     proofIntro: "The draft should carry who is speaking, who they are speaking to, and how the scene feels.",
@@ -240,9 +236,9 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
       },
     ],
     relatedLinks: [
-      { label: "ASS subtitle translator", href: "/ass-subtitle-translator" },
-      { label: "Batch subtitle translation", href: "/batch-subtitle-translation" },
-      { label: "Subtitle localization for agencies", href: "/subtitle-localization-agencies" },
+      { label: "ASS subtitle translator", href: "/solutions/ass-subtitle-translator" },
+      { label: "Batch subtitle translation", href: "/solutions/batch-subtitle-translation" },
+      { label: "Subtitle localization for agencies", href: "/solutions/subtitle-localization-agencies" },
       { label: "Fansubbing workflow guide", href: "/blog/the-art-of-fansubbing-behind-the-scenes-of-anime-subtitles" },
     ],
   },
@@ -265,12 +261,10 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
     primaryCta: {
       label: "Translate ASS subtitles",
       href: "/dashboard",
-      event: "seo_ass_primary_cta_clicked",
     },
     secondaryCta: {
       label: "Compare anime workflows",
-      href: "/anime-subtitle-translator",
-      event: "seo_ass_secondary_cta_clicked",
+      href: "/solutions/anime-subtitle-translator",
     },
     proofTitle: "Keep the format work you already did",
     proofIntro: "ASS files carry positioning, style names, and override tags that should not be flattened into plain text.",
@@ -303,9 +297,9 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
       },
     ],
     relatedLinks: [
-      { label: "Anime subtitle translator", href: "/anime-subtitle-translator" },
-      { label: "Batch subtitle translation", href: "/batch-subtitle-translation" },
-      { label: "YouTube subtitle translator", href: "/youtube-subtitle-translator" },
+      { label: "Anime subtitle translator", href: "/solutions/anime-subtitle-translator" },
+      { label: "Batch subtitle translation", href: "/solutions/batch-subtitle-translation" },
+      { label: "YouTube subtitle translator", href: "/solutions/youtube-subtitle-translator" },
       { label: "Mitsuko workflow guide", href: "/blog/mitsuko-mastery-guide" },
     ],
   },
@@ -328,12 +322,10 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
     primaryCta: {
       label: "Start a batch project",
       href: "/batch",
-      event: "seo_batch_primary_cta_clicked",
     },
     secondaryCta: {
       label: "For agencies",
-      href: "/subtitle-localization-agencies",
-      event: "seo_batch_agency_clicked",
+      href: "/solutions/subtitle-localization-agencies",
     },
     proofTitle: "One queue, one set of rules",
     proofIntro: "Batch translation keeps files moving without setting up every subtitle one by one.",
@@ -366,9 +358,9 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
       },
     ],
     relatedLinks: [
-      { label: "Subtitle localization for agencies", href: "/subtitle-localization-agencies" },
-      { label: "ASS subtitle translator", href: "/ass-subtitle-translator" },
-      { label: "Audio to subtitles", href: "/audio-to-subtitles" },
+      { label: "Subtitle localization for agencies", href: "/solutions/subtitle-localization-agencies" },
+      { label: "ASS subtitle translator", href: "/solutions/ass-subtitle-translator" },
+      { label: "Audio to subtitles", href: "/solutions/audio-to-subtitles" },
       { label: "Pricing", href: "/pricing" },
     ],
   },
@@ -391,12 +383,10 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
     primaryCta: {
       label: "Contact us",
       href: "mailto:support@mitsuko.app?subject=Subtitle%20localization%20workflow",
-      event: "seo_agency_contact_clicked",
     },
     secondaryCta: {
       label: "Try Mitsuko",
       href: "/dashboard",
-      event: "seo_agency_try_clicked",
     },
     proofTitle: "Translate with agency context",
     proofIntro: "Mitsuko reads file context and follows your instructions for names, terms, tone, and client rules before your team reviews the result.",
@@ -429,10 +419,10 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
       },
     ],
     relatedLinks: [
-      { label: "Batch subtitle translation", href: "/batch-subtitle-translation" },
-      { label: "Audio to subtitles", href: "/audio-to-subtitles" },
-      { label: "ASS subtitle translator", href: "/ass-subtitle-translator" },
-      { label: "YouTube subtitle translator", href: "/youtube-subtitle-translator" },
+      { label: "Batch subtitle translation", href: "/solutions/batch-subtitle-translation" },
+      { label: "Audio to subtitles", href: "/solutions/audio-to-subtitles" },
+      { label: "ASS subtitle translator", href: "/solutions/ass-subtitle-translator" },
+      { label: "YouTube subtitle translator", href: "/solutions/youtube-subtitle-translator" },
       { label: "Pricing", href: "/pricing" },
     ],
   },
@@ -455,12 +445,10 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
     primaryCta: {
       label: "Transcribe audio",
       href: "/dashboard",
-      event: "seo_audio_primary_cta_clicked",
     },
     secondaryCta: {
       label: "Creator workflow",
-      href: "/youtube-subtitle-translator",
-      event: "seo_audio_creator_clicked",
+      href: "/solutions/youtube-subtitle-translator",
     },
     proofTitle: "A transcript is not enough",
     proofIntro: "Subtitle work needs readable lines, timestamps, and review before translation.",
@@ -493,9 +481,9 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
       },
     ],
     relatedLinks: [
-      { label: "YouTube subtitle translator", href: "/youtube-subtitle-translator" },
-      { label: "Batch subtitle translation", href: "/batch-subtitle-translation" },
-      { label: "Subtitle localization for agencies", href: "/subtitle-localization-agencies" },
+      { label: "YouTube subtitle translator", href: "/solutions/youtube-subtitle-translator" },
+      { label: "Batch subtitle translation", href: "/solutions/batch-subtitle-translation" },
+      { label: "Subtitle localization for agencies", href: "/solutions/subtitle-localization-agencies" },
       { label: "Pricing", href: "/pricing" },
     ],
   },
@@ -518,12 +506,10 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
     primaryCta: {
       label: "Localize a video",
       href: "/dashboard",
-      event: "seo_youtube_primary_cta_clicked",
     },
     secondaryCta: {
       label: "See pricing",
       href: "/pricing",
-      event: "seo_youtube_pricing_clicked",
     },
     proofTitle: "Keep the creator voice",
     proofIntro: "Creator subtitles should sound like the channel, not like a translated manual.",
@@ -556,13 +542,13 @@ export const SEO_LANDING_PAGES: Record<string, SeoLandingPage> = {
       },
     ],
     relatedLinks: [
-      { label: "Audio to subtitles", href: "/audio-to-subtitles" },
-      { label: "Batch subtitle translation", href: "/batch-subtitle-translation" },
-      { label: "Subtitle localization for agencies", href: "/subtitle-localization-agencies" },
-      { label: "Anime subtitle translator", href: "/anime-subtitle-translator" },
+      { label: "Audio to subtitles", href: "/solutions/audio-to-subtitles" },
+      { label: "Batch subtitle translation", href: "/solutions/batch-subtitle-translation" },
+      { label: "Subtitle localization for agencies", href: "/solutions/subtitle-localization-agencies" },
+      { label: "Anime subtitle translator", href: "/solutions/anime-subtitle-translator" },
       { label: "Pricing", href: "/pricing" },
     ],
   },
 }
 
-export const SEO_LANDING_PAGE_SLUGS = Object.keys(SEO_LANDING_PAGES)
+export const SOLUTIONS_LANDING_PAGE_SLUGS = Object.keys(SOLUTIONS_LANDING_PAGES)

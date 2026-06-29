@@ -55,6 +55,40 @@ const nextConfig = {
       },
     ]
   },
+  async redirects() {
+    return [
+      {
+        source: '/anime-subtitle-translator',
+        destination: '/solutions/anime-subtitle-translator',
+        permanent: true,
+      },
+      {
+        source: '/ass-subtitle-translator',
+        destination: '/solutions/ass-subtitle-translator',
+        permanent: true,
+      },
+      {
+        source: '/batch-subtitle-translation',
+        destination: '/solutions/batch-subtitle-translation',
+        permanent: true,
+      },
+      {
+        source: '/audio-to-subtitles',
+        destination: '/solutions/audio-to-subtitles',
+        permanent: true,
+      },
+      {
+        source: '/youtube-subtitle-translator',
+        destination: '/solutions/youtube-subtitle-translator',
+        permanent: true,
+      },
+      {
+        source: '/subtitle-localization-agencies',
+        destination: '/solutions/subtitle-localization-agencies',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 mergeConfig(nextConfig, userConfig)

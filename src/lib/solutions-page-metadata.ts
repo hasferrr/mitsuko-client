@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
-import type { SeoLandingPage } from "@/constants/seo-pages"
+import type { SolutionsLandingPage } from "@/constants/solutions-pages"
 
-export function createSeoLandingMetadata(page: SeoLandingPage): Metadata {
-  const url = `${DEPLOYMENT_URL}/${page.slug}`
+export function createSolutionsLandingMetadata(page: SolutionsLandingPage): Metadata {
+  const url = `${DEPLOYMENT_URL}/solutions/${page.slug}`
 
   return {
     title: page.title,

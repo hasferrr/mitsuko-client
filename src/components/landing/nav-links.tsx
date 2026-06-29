@@ -22,7 +22,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
-import { TrackedLink } from "@/components/analytics/tracked-link"
 
 interface NavLinksProps {
   isMobile?: boolean
@@ -34,25 +33,25 @@ const navLinkClass = "block text-foreground hover:text-muted-foreground transiti
 const audienceItems = [
   {
     label: "Localization agencies",
-    href: "/subtitle-localization-agencies",
+    href: "/solutions/subtitle-localization-agencies",
     icon: Building2,
     description: "Batch drafts, context extraction, and human review workflows",
   },
   {
     label: "Anime and drama teams",
-    href: "/anime-subtitle-translator",
+    href: "/solutions/anime-subtitle-translator",
     icon: Captions,
     description: "Translate tone, idioms, honorifics, and recurring voices",
   },
   {
     label: "Video creators",
-    href: "/youtube-subtitle-translator",
+    href: "/solutions/youtube-subtitle-translator",
     icon: Video,
     description: "Localize subtitles for international viewers",
   },
   {
     label: "Translators and editors",
-    href: "/ass-subtitle-translator",
+    href: "/solutions/ass-subtitle-translator",
     icon: Languages,
     description: "Create review-ready drafts while preserving subtitle structure",
   },
@@ -61,19 +60,19 @@ const audienceItems = [
 const workflowItems = [
   {
     label: "ASS subtitle translation",
-    href: "/ass-subtitle-translator",
+    href: "/solutions/ass-subtitle-translator",
     icon: FileStack,
     description: "Keep timing and style structure in the workflow",
   },
   {
     label: "Batch subtitle projects",
-    href: "/batch-subtitle-translation",
+    href: "/solutions/batch-subtitle-translation",
     icon: Layers,
     description: "Translate multiple files with shared settings",
   },
   {
     label: "Audio to subtitles",
-    href: "/audio-to-subtitles",
+    href: "/solutions/audio-to-subtitles",
     icon: AudioWaveform,
     description: "Transcribe audio into timed subtitles",
   },
@@ -130,7 +129,7 @@ function DesktopNavLinks() {
                 </div>
                 <div className="grid gap-1">
                   {audienceItems.map((item) => (
-                    <SolutionNavigationLink key={item.href} item={item} group="audience" />
+                    <SolutionNavigationLink key={item.href} item={item} />
                   ))}
                 </div>
               </div>
@@ -142,7 +141,7 @@ function DesktopNavLinks() {
                   </div>
                   <div className="grid gap-1">
                     {workflowItems.map((item) => (
-                      <SolutionNavigationLink key={item.href} item={item} group="workflow" compact />
+                      <SolutionNavigationLink key={item.href} item={item} compact />
                     ))}
                   </div>
                 </div>
@@ -151,7 +150,7 @@ function DesktopNavLinks() {
                   <div className="px-2 py-1.5 text-[10px] font-medium uppercase text-muted-foreground">
                     Resource
                   </div>
-                  <SolutionNavigationLink item={resourceItem} group="resource" compact />
+                  <SolutionNavigationLink item={resourceItem} compact />
                 </div>
               </div>
             </div>
@@ -200,12 +199,10 @@ function MobileNavLinks({ onLinkClick }: { onLinkClick?: () => void }) {
             {allSolutionItems.map((item) => {
               const Icon = item.icon
               return (
-                <TrackedLink
+                <Link
                   href={item.href}
                   key={item.href}
                   onClick={onLinkClick}
-                  eventName="solutions_nav_clicked"
-                  eventProperties={{ href: item.href, label: item.label, layout: "mobile" }}
                   className="flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-muted"
                 >
                   <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
@@ -213,7 +210,7 @@ function MobileNavLinks({ onLinkClick }: { onLinkClick?: () => void }) {
                     <span className="block text-sm font-medium text-foreground">{item.label}</span>
                     <span className="block text-xs leading-5 text-muted-foreground">{item.description}</span>
                   </span>
-                </TrackedLink>
+                </Link>
               )
             })}
           </div>
@@ -235,21 +232,17 @@ function MobileNavLinks({ onLinkClick }: { onLinkClick?: () => void }) {
 
 function SolutionNavigationLink({
   item,
-  group,
   compact,
 }: {
   item: typeof audienceItems[number]
-  group: "audience" | "workflow" | "resource"
   compact?: boolean
 }) {
   const Icon = item.icon
 
   return (
     <NavigationMenuLink asChild>
-      <TrackedLink
+      <Link
         href={item.href}
-        eventName="solutions_nav_clicked"
-        eventProperties={{ href: item.href, label: item.label, group, layout: "desktop" }}
         className="items-start"
       >
         <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
@@ -259,7 +252,7 @@ function SolutionNavigationLink({
             {item.description}
           </span>
         </span>
-      </TrackedLink>
+      </Link>
     </NavigationMenuLink>
   )
 }

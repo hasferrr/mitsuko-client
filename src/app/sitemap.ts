@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
-import { SEO_LANDING_PAGE_SLUGS } from '@/constants/seo-pages'
+import { SOLUTIONS_LANDING_PAGE_SLUGS } from '@/constants/solutions-pages'
 import { getAllPostsMeta } from '@/lib/blog'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -12,25 +12,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${DEPLOYMENT_URL}/anime-subtitle-translator`,
+      url: `${DEPLOYMENT_URL}/solutions/anime-subtitle-translator`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
-      url: `${DEPLOYMENT_URL}/ass-subtitle-translator`,
+      url: `${DEPLOYMENT_URL}/solutions/ass-subtitle-translator`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
-      url: `${DEPLOYMENT_URL}/subtitle-localization-agencies`,
+      url: `${DEPLOYMENT_URL}/solutions/subtitle-localization-agencies`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.85,
     },
     {
-      url: `${DEPLOYMENT_URL}/youtube-subtitle-translator`,
+      url: `${DEPLOYMENT_URL}/solutions/youtube-subtitle-translator`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.85,
@@ -87,8 +87,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const posts = await getAllPostsMeta()
   const baseUrls = new Set(base.map(entry => entry.url))
-  const seoEntries: MetadataRoute.Sitemap = SEO_LANDING_PAGE_SLUGS
-    .map(slug => `${DEPLOYMENT_URL}/${slug}`)
+  const solutionsEntries: MetadataRoute.Sitemap = SOLUTIONS_LANDING_PAGE_SLUGS
+    .map(slug => `${DEPLOYMENT_URL}/solutions/${slug}`)
     .filter(url => !baseUrls.has(url))
     .map(url => ({
       url,
@@ -103,5 +103,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }))
 
-  return [...base, ...seoEntries, ...postEntries]
+  return [...base, ...solutionsEntries, ...postEntries]
 }
