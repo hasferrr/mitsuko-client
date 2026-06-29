@@ -1,6 +1,6 @@
 export const META_TITLE = "Mitsuko"
-export const META_TITLE_LONG = "Mitsuko - The Most Accurate Subtitle Translator"
-export const META_DESCRIPTION = "Translate SRT, VTT, and ASS subtitles with context-aware AI for anime, drama, YouTube, localization agencies, batch projects, and audio-to-subtitles workflows in 100+ languages."
+export const META_TITLE_LONG = "Mitsuko - AI Subtitle Translator for SRT, VTT & ASS Files"
+export const META_DESCRIPTION = "Translate SRT, VTT, and ASS subtitles with context-aware AI. Batch translate episodes and transcribe audio in 100+ languages."
 
 export const META_KEYWORDS = [
   "translate subtitles",

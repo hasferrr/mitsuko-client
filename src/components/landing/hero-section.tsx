@@ -19,15 +19,15 @@ export default function HeroSection() {
   return (
     <div className="flex flex-col justify-between items-center text-center px-4 my-12">
       {/* Main heading */}
-      <h1 className="md:mt-8 w-full md:max-w-200 max-w-lg text-center font-semibold leading-[110%] text-balance md:text-5xl text-4xl tracking-tight">
-        The Most Accurate AI Subtitle Translator
+      <h1 className="md:mt-8 w-full md:max-w-200 max-w-lg text-center leading-[110%] font-semibold text-balance md:text-5xl text-4xl tracking-tight">
+        Translate an entire season without losing names, tone, or context.
       </h1>
 
       {/* Subheading */}
       <div className="text-foreground md:text-lg/[150%] text-base/[150%] mt-6 text-center md:max-w-xl max-w-lg">
         <p>
-          Translate SRT, VTT, and ASS subtitles with context-aware results.
-          Accelerate your localization workflow with Mitsuko!
+          Mitsuko is an AI Subtitle Translator for SRT, VTT, and ASS files.
+          Translate multiple subtitle in single click with context-awareness.
         </p>
       </div>
 
