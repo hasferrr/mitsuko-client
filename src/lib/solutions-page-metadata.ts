@@ -1,20 +1,28 @@
 import type { Metadata } from "next"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
-import type { SolutionsLandingPage } from "@/constants/solutions-pages"
 
-export function createSolutionsLandingMetadata(page: SolutionsLandingPage): Metadata {
-  const url = `${DEPLOYMENT_URL}/solutions/${page.slug}`
+type SolutionsLandingMeta = {
+  title: string
+  description: string
+  keywords?: string[]
+}
+
+export function createSolutionsLandingMetadata(
+  slug: string,
+  meta: SolutionsLandingMeta,
+): Metadata {
+  const url = `${DEPLOYMENT_URL}/solutions/${slug}`
 
   return {
-    title: page.title,
-    description: page.description,
-    keywords: page.keywords,
+    title: meta.title,
+    description: meta.description,
+    keywords: meta.keywords && meta.keywords.length ? meta.keywords : undefined,
     alternates: {
       canonical: url,
     },
     openGraph: {
-      title: page.title,
-      description: page.description,
+      title: meta.title,
+      description: meta.description,
       url,
       siteName: "Mitsuko",
       images: [
@@ -30,8 +38,8 @@ export function createSolutionsLandingMetadata(page: SolutionsLandingPage): Meta
     },
     twitter: {
       card: "summary_large_image",
-      title: page.title,
-      description: page.description,
+      title: meta.title,
+      description: meta.description,
       images: [`${DEPLOYMENT_URL}/og-image.png`],
     },
     robots: {

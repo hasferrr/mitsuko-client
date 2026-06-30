@@ -2,12 +2,20 @@ import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { META_TITLE, META_DESCRIPTION } from '@/constants/metadata'
 import { SOLUTIONS_LANDING_PAGES } from '@/constants/solutions-pages'
 import { getAllPostsMeta } from '@/lib/blog'
+import { getAllSolutionContent } from '@/lib/solutions-content'
 
 export const dynamic = 'force-static'
 
 export async function GET() {
   const posts = await getAllPostsMeta()
-  const pagesList = Object.values(SOLUTIONS_LANDING_PAGES).map(p => `- [${p.h1}](${DEPLOYMENT_URL}/solutions/${p.slug}): ${p.description}`).join('\n')
+  const solutions = await getAllSolutionContent()
+  const pagesList = solutions
+    .map(s => {
+      const shell = SOLUTIONS_LANDING_PAGES[s.slug]
+      const heading = shell ? shell.h1 : s.title
+      return `- [${heading}](${DEPLOYMENT_URL}/solutions/${s.slug}): ${s.description}`
+    })
+    .join('\n')
   const blogList = posts.map(p => `- [${p.title}](${DEPLOYMENT_URL}/blog/${p.slug}.md): ${p.description}`).join('\n')
   const content = `# ${META_TITLE}
 
@@ -29,3 +37,4 @@ ${blogList || '- No posts available yet'}
     }
   })
 }
+

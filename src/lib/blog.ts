@@ -27,6 +27,7 @@ export type Frontmatter = {
   updated?: string
   slug?: string
   tags?: string[]
+  keywords?: string[]
   image?: string
   imageAlt?: string
   author?: string
@@ -103,6 +104,12 @@ export function parseFrontmatter(raw: string): { data: Partial<Frontmatter>, con
       case 'tags': {
         const ref = { i }
         data.tags = parseArrayValue(valueRaw, fmLines, ref)
+        i = ref.i
+        break
+      }
+      case 'keywords': {
+        const ref = { i }
+        data.keywords = parseArrayValue(valueRaw, fmLines, ref)
         i = ref.i
         break
       }
