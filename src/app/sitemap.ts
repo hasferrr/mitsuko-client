@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { SOLUTIONS_LANDING_PAGE_SLUGS } from '@/constants/solutions-pages'
+import { getAllAlternativeContent } from '@/lib/alternatives-content'
 import { getAllPostsMeta } from '@/lib/blog'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -83,9 +84,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.6,
     },
+    {
+      url: `${DEPLOYMENT_URL}/alternatives`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
   ]
 
   const posts = await getAllPostsMeta()
+  const alternatives = await getAllAlternativeContent()
   const baseUrls = new Set(base.map(entry => entry.url))
   const solutionsEntries: MetadataRoute.Sitemap = SOLUTIONS_LANDING_PAGE_SLUGS
     .map(slug => `${DEPLOYMENT_URL}/solutions/${slug}`)
@@ -96,6 +104,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.85,
     }))
+  const alternativeEntries: MetadataRoute.Sitemap = alternatives.map(page => ({
+    url: `${DEPLOYMENT_URL}/alternatives/${page.slug}`,
+    lastModified: page.updated ? new Date(page.updated) : new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.75,
+  }))
   const postEntries: MetadataRoute.Sitemap = posts.map(p => ({
     url: `${DEPLOYMENT_URL}/blog/${p.slug}`,
     lastModified: new Date(p.updated || p.date),
@@ -103,5 +117,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }))
 
-  return [...base, ...solutionsEntries, ...postEntries]
+  return [...base, ...solutionsEntries, ...alternativeEntries, ...postEntries]
 }

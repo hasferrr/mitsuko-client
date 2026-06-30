@@ -68,13 +68,13 @@ export default async function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Pricing
+              <Link href="/alternatives" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Alternatives
               </Link>
             </li>
             <li>
-              <Link href="#" prefetch={false} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Documentation
+              <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Pricing
               </Link>
             </li>
             <li>
@@ -147,4 +147,3 @@ export default async function Footer() {
     </footer>
   )
 }
-
