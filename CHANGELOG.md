@@ -14,6 +14,10 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### July 1
+
+- 🤖 **Model Updates:** Added Claude 5 Sonnet, Anthropic's most capable Sonnet-class model with a 1M token context window and 128K max output, supporting adaptive thinking and structured output.
+
 ### June 20
 
 - 🤖 **Model Updates:** Upgraded GLM 5.1 to GLM 5.2, now with a 1M token context window and 128K max output. Retired several older models to keep the lineup focused on the latest versions.

@@ -204,6 +204,19 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "anthropic",
     models: [
       {
+        name: "Claude 5 Sonnet",
+        maxInput: 1_000_000,
+        maxOutput: 128_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "very high",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "Claude 4.6 Sonnet",
         maxInput: 200_000,
         maxOutput: 64_000,
