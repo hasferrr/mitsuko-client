@@ -8,7 +8,7 @@ import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { FileText, ExternalLink, FolderDown, Settings2, WandSparkles, X, Ban, Plus, Link2, Clock, ListTree, ChevronDown } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { useProjectStore } from "@/stores/data/use-project-store"
-import { AutoContextMode, AutoContextPreviousMode, Extraction } from "@/types/project"
+import { AutoContextMode, AutoContextPreviousMode, Extraction, Translation } from "@/types/project"
 import { getContent } from "@/lib/parser/parser"
 import { removeDoneTag } from "@/lib/utils"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
@@ -20,6 +20,9 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { ExtractionBadges } from "@/components/extract-context/extraction-badges"
 import { cn } from "@/lib/utils/cn"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+
+type AutoContextKey = "autoContextMode" | "autoContextExtractionId" | "autoContextPreviousMode" | "autoContextPreviousExtractionId"
+type AutoContextSetterMap = { [K in AutoContextKey]: (id: string, value: Translation[K]) => void }
 
 interface Props {
   basicSettingsId: string
@@ -85,8 +88,11 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
   const setContextDocument = (doc: string) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc)
   const translation = useTranslationDataStore((state) => translationId ? state.data[translationId] : null)
-  const mutateTranslation = useTranslationDataStore((state) => state.mutateData)
   const saveTranslation = useTranslationDataStore((state) => state.saveData)
+  const setAutoContextMode = useTranslationDataStore((state) => state.setAutoContextMode)
+  const setAutoContextExtractionId = useTranslationDataStore((state) => state.setAutoContextExtractionId)
+  const setAutoContextPreviousMode = useTranslationDataStore((state) => state.setAutoContextPreviousMode)
+  const setAutoContextPreviousExtractionId = useTranslationDataStore((state) => state.setAutoContextPreviousExtractionId)
   const extractionData = useExtractionDataStore((state) => state.data)
   const getExtractionsDb = useExtractionDataStore((state) => state.getExtractionsDb)
   const getExtractionDb = useExtractionDataStore((state) => state.getExtractionDb)
@@ -140,21 +146,28 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
     setIsContextDialogOpen(false)
   }
 
-  const setAutoContextValue = async <T extends "autoContextMode" | "autoContextExtractionId" | "autoContextPreviousMode" | "autoContextPreviousExtractionId">(
-    key: T,
-    value: NonNullable<typeof translation>[T],
+  const autoContextSetters: AutoContextSetterMap = {
+    autoContextMode: setAutoContextMode,
+    autoContextExtractionId: setAutoContextExtractionId,
+    autoContextPreviousMode: setAutoContextPreviousMode,
+    autoContextPreviousExtractionId: setAutoContextPreviousExtractionId,
+  }
+
+  const setAutoContextValue = async <K extends AutoContextKey>(
+    key: K,
+    value: Translation[K],
   ) => {
     if (!translationId) return
     setHasChanges(true)
-    mutateTranslation(translationId, key, value)
+    autoContextSetters[key](translationId, value)
     await saveTranslation(translationId)
   }
 
   const handleAutoModeChange = async (mode: AutoContextMode) => {
     if (!translationId) return
     setHasChanges(true)
-    mutateTranslation(translationId, "autoContextMode", mode)
-    mutateTranslation(translationId, "autoContextPreviousMode", "latest")
+    setAutoContextMode(translationId, mode)
+    setAutoContextPreviousMode(translationId, "latest")
     await saveTranslation(translationId)
   }
 

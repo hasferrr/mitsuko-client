@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { Extraction, BasicSettings, AdvancedSettings } from "@/types/project"
+import { Extraction, ExtractionStatus, BasicSettings, AdvancedSettings } from "@/types/project"
 import {
   ExtractionCreateInput,
   updateExtraction as updateDB,
@@ -43,6 +43,8 @@ export interface ExtractionDataStore {
   setSubtitleContent: (id: string, subtitleContent: string) => void
   setPreviousContext: (id: string, previousContext: string) => void
   setContextResult: (id: string, contextResult: string) => void
+  setStatus: (id: string, status: ExtractionStatus) => void
+  setCompletedAt: (id: string, completedAt: Date | null) => void
   // data manipulation methods
   mutateData: <T extends keyof Extraction>(id: string, key: T, value: Extraction[T]) => void
   mutateDataNoRender: <T extends keyof Extraction>(id: string, key: T, value: Extraction[T]) => void
@@ -189,6 +191,12 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
     } else {
       get().mutateDataNoRender(id, "contextResult", contextResult)
     }
+  },
+  setStatus: (id, status) => {
+    get().mutateData(id, "status", status)
+  },
+  setCompletedAt: (id, completedAt) => {
+    get().mutateData(id, "completedAt", completedAt)
   },
 
   // data manipulation methods

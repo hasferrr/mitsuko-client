@@ -68,7 +68,8 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   const setSubtitleContent = useExtractionDataStore((state) => state.setSubtitleContent)
   const setPreviousContext = useExtractionDataStore((state) => state.setPreviousContext)
   const setContextResult = useExtractionDataStore((state) => state.setContextResult)
-  const mutateExtraction = useExtractionDataStore((state) => state.mutateData)
+  const setStatus = useExtractionDataStore((state) => state.setStatus)
+  const setCompletedAt = useExtractionDataStore((state) => state.setCompletedAt)
   const saveData = useExtractionDataStore((state) => state.saveData)
 
   // Extraction Store
@@ -145,15 +146,11 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
 
   const handleStatusChange = useCallback(
     async (newStatus: ExtractionStatus) => {
-      mutateExtraction(currentId, "status", newStatus)
-      mutateExtraction(
-        currentId,
-        "completedAt",
-        newStatus === "completed" ? new Date() : null
-      )
+      setStatus(currentId, newStatus)
+      setCompletedAt(currentId, newStatus === "completed" ? new Date() : null)
       await saveData(currentId)
     },
-    [currentId, mutateExtraction, saveData]
+    [currentId, setStatus, setCompletedAt, saveData]
   )
 
   // Import Select Handlers
@@ -247,8 +244,8 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
       }, 0)
     } else {
       const status = inferEditedExtractionStatus(contextResult)
-      mutateExtraction(currentId, "status", status)
-      mutateExtraction(currentId, "completedAt", status === "completed" ? new Date() : null)
+      setStatus(currentId, status)
+      setCompletedAt(currentId, status === "completed" ? new Date() : null)
       await saveData(currentId)
     }
   }

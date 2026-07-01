@@ -23,7 +23,8 @@ export function useBatchSelection({ batchFiles, operationMode }: UseBatchSelecti
   const removeTranscriptionFromBatch = useProjectStore((state) => state.removeTranscriptionFromBatch)
 
   const extractionData = useExtractionDataStore((state) => state.data)
-  const mutateExtraction = useExtractionDataStore((state) => state.mutateData)
+  const setExtractionStatus = useExtractionDataStore((state) => state.setStatus)
+  const setExtractionCompletedAt = useExtractionDataStore((state) => state.setCompletedAt)
   const saveExtractionData = useExtractionDataStore((state) => state.saveData)
 
   const toggleSelectMode = () => {
@@ -72,14 +73,14 @@ export function useBatchSelection({ batchFiles, operationMode }: UseBatchSelecti
       if (!extraction) return
       const status = getEffectiveExtractionStatus(extraction, new Set())
       if (status === "completed") {
-        mutateExtraction(id, "status", "idle")
-        mutateExtraction(id, "completedAt", null)
+        setExtractionStatus(id, "idle")
+        setExtractionCompletedAt(id, null)
       } else if (!cleanExtractionContent(extraction.contextResult) || hasExtractionError(extraction.contextResult)) {
         toast.error("Only clean non-empty extraction results can be marked done")
         return
       } else {
-        mutateExtraction(id, "status", "completed")
-        mutateExtraction(id, "completedAt", new Date())
+        setExtractionStatus(id, "completed")
+        setExtractionCompletedAt(id, new Date())
       }
       await saveExtractionData(id)
     }))

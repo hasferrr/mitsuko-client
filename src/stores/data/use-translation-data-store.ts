@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { AdvancedSettings, BasicSettings, Translation } from "@/types/project"
+import { AdvancedSettings, BasicSettings, AutoContextMode, AutoContextPreviousMode, Translation } from "@/types/project"
 import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/subtitles"
 import {
   updateTranslation as updateDB,
@@ -40,6 +40,10 @@ export interface TranslationDataStore {
   setResponse: (id: string, response: string) => void
   setJsonResponse: (id: string, jsonResponse: SubOnlyTranslated[]) => void
   appendJsonResponse: (id: string, arr: SubOnlyTranslated[]) => void
+  setAutoContextMode: (id: string, autoContextMode: AutoContextMode) => void
+  setAutoContextExtractionId: (id: string, autoContextExtractionId: string | null) => void
+  setAutoContextPreviousMode: (id: string, autoContextPreviousMode: AutoContextPreviousMode) => void
+  setAutoContextPreviousExtractionId: (id: string, autoContextPreviousExtractionId: string | null) => void
   // data manipulation methods
   mutateData: <T extends keyof Translation>(id: string, key: T, value: Translation[T]) => void
   mutateDataNoRender: <T extends keyof Translation>(id: string, key: T, value: Translation[T]) => void
@@ -195,6 +199,18 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       ...translation.response,
       jsonResponse: [...currentJson, ...arr],
     })
+  },
+  setAutoContextMode: (id, autoContextMode) => {
+    get().mutateData(id, "autoContextMode", autoContextMode)
+  },
+  setAutoContextExtractionId: (id, autoContextExtractionId) => {
+    get().mutateData(id, "autoContextExtractionId", autoContextExtractionId)
+  },
+  setAutoContextPreviousMode: (id, autoContextPreviousMode) => {
+    get().mutateData(id, "autoContextPreviousMode", autoContextPreviousMode)
+  },
+  setAutoContextPreviousExtractionId: (id, autoContextPreviousExtractionId) => {
+    get().mutateData(id, "autoContextPreviousExtractionId", autoContextPreviousExtractionId)
   },
   // data manipulation methods
   mutateData: (id, key, value) => {

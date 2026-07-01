@@ -50,6 +50,8 @@ export const useExtractionHandler = ({
 
   // Extraction Data Store
   const setContextResult = useExtractionDataStore((state) => state.setContextResult)
+  const setStatus = useExtractionDataStore((state) => state.setStatus)
+  const setCompletedAt = useExtractionDataStore((state) => state.setCompletedAt)
   const saveData = useExtractionDataStore((state) => state.saveData)
 
   // Extraction Store
@@ -172,8 +174,8 @@ export const useExtractionHandler = ({
       }
 
       setContextResult(currentId, "")
-      useExtractionDataStore.getState().mutateData(currentId, "status", "running")
-      useExtractionDataStore.getState().mutateData(currentId, "completedAt", null)
+      setStatus(currentId, "running")
+      setCompletedAt(currentId, null)
       await saveData(currentId)
 
       await extractContext(
@@ -192,14 +194,14 @@ export const useExtractionHandler = ({
         throw new Error("Extraction result is not usable")
       }
 
-      useExtractionDataStore.getState().mutateData(currentId, "status", "completed")
-      useExtractionDataStore.getState().mutateData(currentId, "completedAt", new Date())
+      setStatus(currentId, "completed")
+      setCompletedAt(currentId, new Date())
       onSuccessTranslation?.({ currentId })
       return true
     } catch (error) {
       const nextStatus = error instanceof Error && error.name === "AbortError" ? "stopped" : "failed"
-      useExtractionDataStore.getState().mutateData(currentId, "status", nextStatus)
-      useExtractionDataStore.getState().mutateData(currentId, "completedAt", null)
+      setStatus(currentId, nextStatus)
+      setCompletedAt(currentId, null)
       await saveData(currentId)
 
       onErrorTranslation?.({ currentId })
@@ -218,8 +220,8 @@ export const useExtractionHandler = ({
   const handleStop = async (currentId: string) => {
     stopExtraction(currentId)
     setIsExtracting(currentId, false)
-    useExtractionDataStore.getState().mutateData(currentId, "status", "stopped")
-    useExtractionDataStore.getState().mutateData(currentId, "completedAt", null)
+    setStatus(currentId, "stopped")
+    setCompletedAt(currentId, null)
     await saveData(currentId)
   }
 

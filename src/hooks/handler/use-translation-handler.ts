@@ -582,9 +582,9 @@ export const useTranslationHandler = ({
         ?? await useExtractionDataStore.getState().getExtractionDb(extractionId)
       if (!extraction) return false
 
-      useExtractionDataStore.getState().mutateData(extractionId, "title", `${AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX} ${translation.title}`)
-      useExtractionDataStore.getState().mutateData(extractionId, "episodeNumber", translation.title)
-      useExtractionDataStore.getState().mutateData(extractionId, "subtitleContent", getTranslationSubtitleContent(translation))
+      useExtractionDataStore.getState().setTitle(extractionId, `${AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX} ${translation.title}`)
+      useExtractionDataStore.getState().setEpisodeNumber(extractionId, translation.title)
+      useExtractionDataStore.getState().setSubtitleContent(extractionId, getTranslationSubtitleContent(translation))
       await useExtractionDataStore.getState().saveData(extractionId)
 
       setAutoCreatedExtractionRun(currentId, extractionId, runToken)
@@ -746,15 +746,15 @@ export const useTranslationHandler = ({
     setAutoCreatedExtractionRun(currentId, created.id, runToken)
     const createdTranslationPatch = getAutoContextCreatedTranslationPatch(created.id, previousExtraction?.id)
     const persistCreatedTranslationLink = async () => {
-      translationStore.mutateData(currentId, "autoContextMode", createdTranslationPatch.autoContextMode)
-      translationStore.mutateData(currentId, "autoContextExtractionId", createdTranslationPatch.autoContextExtractionId)
-      translationStore.mutateData(currentId, "autoContextPreviousExtractionId", createdTranslationPatch.autoContextPreviousExtractionId)
+      translationStore.setAutoContextMode(currentId, createdTranslationPatch.autoContextMode)
+      translationStore.setAutoContextExtractionId(currentId, createdTranslationPatch.autoContextExtractionId)
+      translationStore.setAutoContextPreviousExtractionId(currentId, createdTranslationPatch.autoContextPreviousExtractionId)
       await translationStore.saveData(currentId)
     }
     const markCreatedExtractionStopped = async () => {
       const stoppedPatch = getStoppedAutoContextExtractionPatch()
-      extractionDataStore.mutateData(created.id, "status", stoppedPatch.status)
-      extractionDataStore.mutateData(created.id, "completedAt", stoppedPatch.completedAt)
+      extractionDataStore.setStatus(created.id, stoppedPatch.status)
+      extractionDataStore.setCompletedAt(created.id, stoppedPatch.completedAt)
       await extractionDataStore.saveData(created.id)
     }
 
