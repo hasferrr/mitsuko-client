@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { SubtitleNoTimeNoActorTranslated, SubtitleNoTimeTranslated } from "@/types/subtitles"
 import { AiStreamSubtitle } from "./ai-stream-subtitle"
+import { ErrorContent } from "./error-content"
 import { parseTranslationJsonWithContent } from "@/lib/parser/parser"
 import ReactMarkdown from "react-markdown"
 
@@ -20,6 +21,7 @@ interface AiStreamOutputProps {
 interface ParsedSegment {
   think: string
   output: string
+  error: string | null
 }
 
 export const AiStreamOutput = ({
@@ -39,17 +41,7 @@ export const AiStreamOutput = ({
 
   const parse = (content: string) => {
     try {
-      const errorMatch = content.match(/<error>([\s\S]*?)<\/error>/)
-      const message = []
-      if (errorMatch) {
-        message.push({
-          index: NaN,
-          content: errorMatch[1].trim(),
-          translated: "",
-        })
-      }
       const parsed = parseTranslationJsonWithContent(content)
-      parsed.push(...message)
       const changed =
         translatedSubtitles.length !== parsed.length ||
         translatedSubtitles.some((s, i) => s.index !== parsed[i]?.index || s.translated !== parsed[i]?.translated)
@@ -125,7 +117,7 @@ export const AiStreamOutput = ({
 
   const parsedContent = useMemo<ParsedSegment>(() => {
     const parts = content.split(/(<think>|<\/think>)/g)
-    const result: ParsedSegment = { think: "", output: "" }
+    const result: ParsedSegment = { think: "", output: "", error: null }
     let isThinking = false
 
     for (const part of parts) {
@@ -142,9 +134,13 @@ export const AiStreamOutput = ({
       }
     }
 
+    const errorMatch = result.output.match(/<error>([\s\S]*?)<\/error>/)
+    const output = result.output.replace(/<error>[\s\S]*?<\/error>/g, "").trim()
+
     return {
       think: result.think.trim(),
-      output: result.output.replace(/<\/?error>/g, '').trim()
+      output,
+      error: errorMatch ? errorMatch[1].trim() : null,
     }
   }, [content])
 
@@ -161,7 +157,7 @@ export const AiStreamOutput = ({
             ) : (
               <ChevronDown className="size-4 mr-1" />
             )}
-            {parsedContent.output || !isProcessing ? "Thought" : (
+            {parsedContent.output || parsedContent.error || !isProcessing ? "Thought" : (
               <span className="inline-flex">
                 {"Thinking...".split("").map((char, index) => (
                   <span
@@ -237,6 +233,9 @@ export const AiStreamOutput = ({
         <div className="whitespace-pre-wrap wrap-break-word text-sm p-1">
           {parsedContent.output}
         </div>
+      )}
+      {parsedContent.error && (
+        <ErrorContent message={parsedContent.error} className="mt-2" />
       )}
     </div>
   )
