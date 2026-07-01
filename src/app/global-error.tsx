@@ -4,6 +4,7 @@ import { RefreshCw } from 'lucide-react'
 import { useEffect } from 'react'
 import * as Sentry from '@sentry/nextjs'
 import posthog from 'posthog-js'
+import { isBrowserTranslationError } from '@/lib/utils'
 
 export default function GlobalError({
   error,
@@ -34,6 +35,12 @@ export default function GlobalError({
               <RefreshCw className="size-4" />
               Try again
             </button>
+            {isBrowserTranslationError(error) && (
+              <p className="text-muted-foreground max-w-md text-center py-2 border rounded-md mt-4">
+                Please turn off Google Translate or any translation extension for
+                Mitsuko website and try again.
+              </p>
+            )}
           </div>
         </div>
       </body>
