@@ -5,13 +5,14 @@ import {
   updateTranslation as updateDB,
   createTranslation as createDB,
   getTranslation as getDB,
+  getTranslations as getBulkDB,
   deleteTranslation as deleteDB,
   moveTranslation as moveDB,
 } from "@/lib/db/translation"
 import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
+import { getProject } from "@/lib/db/project"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { db } from "@/lib/db/db"
 import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, GLOBAL_TRANSLATION_BASIC_SETTINGS_ID } from "@/constants/global-settings"
 
@@ -61,7 +62,7 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     let advInput = advancedSettingsData
 
     if (bsInput === undefined || advInput === undefined) {
-      const project = await db.projects.get(projectId)
+      const project = await getProject(projectId)
       if (!project) throw new Error('Project not found')
 
       const basicSettingsId = (project.isBatch || project.isDefaultTranslationEnabled)
@@ -116,8 +117,7 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
   },
   getTranslationsDb: async (translationIds) => {
     if (translationIds.length === 0) return []
-    const translations = await db.translations.bulkGet(translationIds)
-    const found: Translation[] = translations.filter((t): t is Translation => t !== undefined)
+    const found = await getBulkDB(translationIds)
     if (found.length) {
       set(state => ({
         data: {

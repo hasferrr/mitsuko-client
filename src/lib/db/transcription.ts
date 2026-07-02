@@ -52,6 +52,11 @@ export const getTranscription = async (transcriptionId: string): Promise<Transcr
   return db.transcriptions.get(transcriptionId)
 }
 
+export const getTranscriptions = async (transcriptionIds: string[]): Promise<Transcription[]> => {
+  const items = await db.transcriptions.bulkGet(transcriptionIds)
+  return items.filter((t): t is Transcription => t !== undefined)
+}
+
 export const updateTranscription = async (
   transcriptionId: string,
   changes: Partial<Pick<Transcription, "title" | "transcriptionText" | "transcriptSubtitles" | "selectedMode" | "customInstructions" | "models" | "language" | "words" | "segments" | "selectedUploadId">>

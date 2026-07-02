@@ -58,6 +58,11 @@ export const getExtraction = async (extractionId: string): Promise<Extraction | 
   return db.extractions.get(extractionId)
 }
 
+export const getExtractions = async (extractionIds: string[]): Promise<Extraction[]> => {
+  const items = await db.extractions.bulkGet(extractionIds)
+  return items.filter((e): e is Extraction => e !== undefined)
+}
+
 export const updateExtraction = async (
   extractionId: string,
   changes: Partial<Extraction>

@@ -4,10 +4,11 @@ import {
   updateTranscription as updateDB,
   createTranscription as createDB,
   getTranscription as getDB,
+  getTranscriptions as getBulkDB,
   deleteTranscription as deleteDB,
   moveTranscription as moveDB,
 } from "@/lib/db/transcription"
-import { db } from "@/lib/db/db"
+import { getProject } from "@/lib/db/project"
 import { Subtitle } from "@/types/subtitles"
 import { DEFAULT_TRANSCRIPTION_SETTINGS } from "@/constants/default"
 import { GLOBAL_TRANSCRIPTION_SETTINGS_ID } from "@/constants/global-settings"
@@ -83,7 +84,7 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
       resolvedData.selectedMode === undefined ||
       resolvedData.customInstructions === undefined
     ) {
-      const project = await db.projects.get(projectId)
+      const project = await getProject(projectId)
       if (project) {
         const defaultId = (project.isBatch || project.isDefaultTranscriptionEnabled)
           ? project.defaultTranscriptionId
@@ -115,8 +116,7 @@ export const useTranscriptionDataStore = create<TranscriptionDataStore>((set, ge
   },
   getTranscriptionsDb: async (transcriptionIds) => {
     if (transcriptionIds.length === 0) return []
-    const transcriptions = await db.transcriptions.bulkGet(transcriptionIds)
-    const found: Transcription[] = transcriptions.filter((t): t is Transcription => t !== undefined)
+    const found = await getBulkDB(transcriptionIds)
     if (found.length) {
       set(state => ({
         data: {

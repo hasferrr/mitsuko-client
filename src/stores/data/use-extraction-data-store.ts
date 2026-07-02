@@ -5,13 +5,14 @@ import {
   updateExtraction as updateDB,
   createExtraction as createDB,
   getExtraction as getDB,
+  getExtractions as getBulkDB,
   deleteExtraction as deleteDB,
   moveExtraction as moveDB,
 } from "@/lib/db/extraction"
 import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
+import { getProject } from "@/lib/db/project"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { db } from "@/lib/db/db"
 import { DEFAULT_EXTRACTION_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID } from "@/constants/global-settings"
 
@@ -62,7 +63,7 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
     let advInput = advancedSettingsData
 
     if (bsInput === undefined || advInput === undefined) {
-      const project = await db.projects.get(projectId)
+      const project = await getProject(projectId)
       if (!project) throw new Error('Project not found')
 
       const basicSettingsId = (project.isBatch || project.isDefaultExtractionEnabled)
@@ -122,8 +123,7 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
   },
   getExtractionsDb: async (extractionIds) => {
     if (extractionIds.length === 0) return []
-    const extractions = await db.extractions.bulkGet(extractionIds)
-    const found: Extraction[] = extractions.filter((e): e is Extraction => e !== undefined)
+    const found = await getBulkDB(extractionIds)
     if (found.length) {
       set(state => ({
         data: {

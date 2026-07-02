@@ -58,6 +58,11 @@ export const getTranslation = async (translationId: string): Promise<Translation
   return db.translations.get(translationId)
 }
 
+export const getTranslations = async (translationIds: string[]): Promise<Translation[]> => {
+  const items = await db.translations.bulkGet(translationIds)
+  return items.filter((t): t is Translation => t !== undefined)
+}
+
 export const updateTranslation = async (
   translationId: string,
   changes: Partial<Translation>
