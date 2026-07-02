@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useSnapStore } from "@/stores/ui/use-snap-store"
+import { usePaymentConsentStore } from "@/stores/ui/use-payment-consent-store"
 import { ProductId } from "@/types/product"
 import { CreditCard, Info, Loader2, Minus, Plus } from "lucide-react"
 import { useSnapPayment } from "@/hooks/use-snap-payment"
@@ -55,7 +56,6 @@ export function PaymentOptionsDialog({
   const [isFetchingPayment, setIsFetchingPayment] = useState(false)
   const [paymentError, setPaymentError] = useState<string | null>(null)
   const [inputQuantity, setInputQuantity] = useState(1)
-  const [hasConsented, setHasConsented] = useState(false)
   const [hasConsentError, setHasConsentError] = useState(false)
   const lemonSqueezyCache = useLemonSqueezyCache()
 
@@ -68,6 +68,9 @@ export function PaymentOptionsDialog({
   const getSnapData = useSnapStore((state) => state.getSnapData)
   const removeSnapData = useSnapStore((state) => state.removeSnapData)
   const setSnapData = useSnapStore((state) => state.setSnapData)
+
+  const hasConsented = usePaymentConsentStore((state) => state.hasConsented)
+  const setHasConsented = usePaymentConsentStore((state) => state.setHasConsented)
 
   const snapData = !!userId ? getSnapData(userId, productId) : undefined
   const currentQuantity = snapData?.quantity ?? inputQuantity
