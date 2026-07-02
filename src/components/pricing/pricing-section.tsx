@@ -25,6 +25,7 @@ interface PricingSectionProps {
   redirectToPricingPage?: boolean
   showDescription?: boolean
   showLink?: boolean
+  loadSnapScript?: boolean
 }
 
 export default function PricingSection({
@@ -32,6 +33,7 @@ export default function PricingSection({
   redirectToPricingPage,
   showDescription,
   showLink,
+  loadSnapScript,
 }: PricingSectionProps) {
   const idrRate = useExchangeRateStore((state) => state.idrRate)
   const isIdrRateLoading = useExchangeRateStore((state) => state.isIdrRateLoading)
@@ -45,6 +47,31 @@ export default function PricingSection({
         : prev
     )
   }, [idrRate])
+
+  useEffect(() => {
+    if (!loadSnapScript) return
+
+    const midtransScriptUrl = process.env.NODE_ENV === 'production'
+      ? 'https://app.midtrans.com/snap/snap.js'
+      : 'https://app.sandbox.midtrans.com/snap/snap.js'
+
+    const scriptTag = document.createElement('script')
+    scriptTag.src = midtransScriptUrl
+
+    const myMidtransClientKey = process.env.NODE_ENV === 'production'
+      ? process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
+      : process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY_TEST
+
+    if (myMidtransClientKey) {
+      scriptTag.setAttribute('data-client-key', myMidtransClientKey)
+    }
+
+    document.body.appendChild(scriptTag)
+
+    return () => {
+      document.body.removeChild(scriptTag)
+    }
+  }, [loadSnapScript])
 
   const handleCurrencyChange = (value: string) => {
     if (value === "$") {
