@@ -27,9 +27,9 @@ import { MaxCompletionTokenInput, ModelSelection, SubtitleCleanupSwitch, CustomI
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { useSessionStore } from "@/stores/ui/use-session-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
+import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { db } from "@/lib/db/db"
 import { Extraction, ExtractionStatus, Translation } from "@/types/project"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { AiStreamOutput } from "../ai-stream/ai-stream-output"
@@ -71,6 +71,8 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   const setStatus = useExtractionDataStore((state) => state.setStatus)
   const setCompletedAt = useExtractionDataStore((state) => state.setCompletedAt)
   const saveData = useExtractionDataStore((state) => state.saveData)
+  const getExtractionsDb = useExtractionDataStore((state) => state.getExtractionsDb)
+  const getTranslationsDb = useTranslationDataStore((state) => state.getTranslationsDb)
 
   // Extraction Store
   const isExtractingSet = useExtractionStore((state) => state.isExtractingSet)
@@ -254,15 +256,15 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
 
   const loadProjectExtractions = useCallback(async () => {
     if (!currentProject) return
-    const extractionsData = await db.extractions.bulkGet(currentProject.extractions)
-    setProjectExtractions(extractionsData.filter((e): e is Extraction => !!e && e.id !== currentId).toReversed())
-  }, [currentProject, currentId])
+    const extractionsData = await getExtractionsDb(currentProject.extractions)
+    setProjectExtractions(extractionsData.filter((e) => e.id !== currentId).toReversed())
+  }, [currentProject, currentId, getExtractionsDb])
 
   const loadProjectTranslations = useCallback(async () => {
     if (!currentProject) return
-    const translationsData = await db.translations.bulkGet(currentProject.translations)
-    setProjectTranslations(translationsData.filter((t): t is Translation => !!t).toReversed())
-  }, [currentProject])
+    const translationsData = await getTranslationsDb(currentProject.translations)
+    setProjectTranslations(translationsData.toReversed())
+  }, [currentProject, getTranslationsDb])
 
   return (
     <div translate="no" className="grid md:grid-cols-2 gap-6 gap-y-4 container mx-auto py-6 px-4 max-w-5xl">

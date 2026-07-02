@@ -12,7 +12,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { Translation } from "@/types/project"
-import { db } from "@/lib/db/db"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
@@ -44,6 +43,8 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
   const setFewShotEndIndex = (index: number) => _setFewShotEndIndex(basicSettingsId, index)
 
   const currentTranslationId = useTranslationDataStore((state) => state.currentId)
+  const getTranslationsDb = useTranslationDataStore((state) => state.getTranslationsDb)
+  const getTranslationDb = useTranslationDataStore((state) => state.getTranslationDb)
   const currentProject = useProjectStore((state) => state.currentProject)
 
   const { setHasChanges } = useUnsavedChanges()
@@ -54,17 +55,17 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
 
   const loadAvailableTranslations = useCallback(async () => {
     if (!currentProject) return
-    const translationsData = await db.translations.bulkGet(currentProject.translations)
+    const translationsData = await getTranslationsDb(currentProject.translations)
     setAvailableTranslations(
       translationsData
-        .filter((t): t is Translation => !!t && t.id !== currentTranslationId)
+        .filter((t) => t.id !== currentTranslationId)
         .toReversed()
     )
-  }, [currentProject, currentTranslationId])
+  }, [currentProject, currentTranslationId, getTranslationsDb])
 
   useEffect(() => {
     if (fewShotType === 'linked' && fewShotLinkedId) {
-      db.translations.get(fewShotLinkedId).then(translation => {
+      getTranslationDb(fewShotLinkedId, true).then(translation => {
         if (translation) {
           setLinkedTranslationTitle(translation.title)
           const lineCount = translation.subtitles?.length || 0
@@ -84,7 +85,7 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFewShotEnabled, fewShotType, fewShotLinkedId, setFewShotStartIndex, setFewShotEndIndex, parent])
+  }, [isFewShotEnabled, fewShotType, fewShotLinkedId, setFewShotStartIndex, setFewShotEndIndex, parent, getTranslationDb])
 
   const handleFewShotValueChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHasChanges(true)
