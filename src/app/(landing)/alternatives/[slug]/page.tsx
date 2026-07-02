@@ -2,8 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { AlternativeContentPage } from "@/components/landing/alternative-content-page"
 import { ALTERNATIVES_LANDING_PAGES, ALTERNATIVES_PAGE_SLUGS } from "@/constants/alternatives-pages"
-import { createAlternativeLandingMetadata } from "@/lib/alternatives-page-metadata"
-import { getAlternativeContent } from "@/lib/alternatives-content"
+import { createAlternativeLandingMetadata, getAlternativeContent } from "@/lib/content/alternatives"
 
 export const dynamic = "force-static"
 

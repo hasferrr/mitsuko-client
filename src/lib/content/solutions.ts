@@ -1,7 +1,9 @@
+import type { Metadata } from "next"
 import fs from "fs/promises"
 import path from "path"
 import { SOLUTIONS_LANDING_PAGE_SLUGS } from "@/constants/solutions-pages"
-import { parseFrontmatter } from "@/lib/blog"
+import { parseFrontmatter } from "@/lib/content/frontmatter"
+import { createLandingMetadata, type LandingMeta } from "@/lib/content/landing-metadata"
 
 export type SolutionContentMeta = {
   slug: string
@@ -44,4 +46,13 @@ export async function getAllSolutionContent(): Promise<SolutionContent[]> {
     SOLUTIONS_LANDING_PAGE_SLUGS.map(slug => getSolutionContent(slug)),
   )
   return entries.filter((entry): entry is SolutionContent => entry !== null)
+}
+
+export function createSolutionsLandingMetadata(slug: string, meta: LandingMeta): Metadata {
+  return createLandingMetadata({
+    slug,
+    basePath: "solutions",
+    ogImageAlt: "Mitsuko subtitle localization workflow",
+    meta,
+  })
 }

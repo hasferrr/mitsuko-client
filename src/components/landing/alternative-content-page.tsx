@@ -5,7 +5,7 @@ import Link from "@/components/link"
 import { MarkdownProse } from "@/components/markdown-prose"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
 import type { AlternativeLandingPage as AlternativeLandingPageData } from "@/constants/alternatives-pages"
-import type { AlternativeContentMeta } from "@/lib/alternatives-content"
+import type { AlternativeContentMeta } from "@/lib/content/alternatives"
 
 type AlternativeContentPageProps = {
   shell: AlternativeLandingPageData

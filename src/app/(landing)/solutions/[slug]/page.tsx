@@ -2,8 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { SolutionsContentPage } from "@/components/landing/solutions-content-page"
 import { SOLUTIONS_LANDING_PAGES, SOLUTIONS_LANDING_PAGE_SLUGS } from "@/constants/solutions-pages"
-import { createSolutionsLandingMetadata } from "@/lib/solutions-page-metadata"
-import { getSolutionContent } from "@/lib/solutions-content"
+import { createSolutionsLandingMetadata, getSolutionContent } from "@/lib/content/solutions"
 
 export const dynamic = "force-static"
 

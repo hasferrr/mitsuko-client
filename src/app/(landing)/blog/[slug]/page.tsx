@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from "@/components/link"
 import { MarkdownProse } from "@/components/markdown-prose"
 import { DEPLOYMENT_URL } from '@/constants/external-links'
-import { getAdjacentPosts, getAllPostsMeta, getPostBySlug } from '@/lib/blog'
+import { getAdjacentPosts, getAllPostsMeta, getPostBySlug } from '@/lib/content/blog'
 
 export const dynamic = 'force-static'
 

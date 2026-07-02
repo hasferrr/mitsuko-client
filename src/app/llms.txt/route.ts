@@ -1,9 +1,9 @@
 import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { META_TITLE, META_DESCRIPTION } from '@/constants/metadata'
 import { SOLUTIONS_LANDING_PAGES } from '@/constants/solutions-pages'
-import { getAllAlternativeContent } from '@/lib/alternatives-content'
-import { getAllPostsMeta } from '@/lib/blog'
-import { getAllSolutionContent } from '@/lib/solutions-content'
+import { getAllAlternativeContent } from '@/lib/content/alternatives'
+import { getAllPostsMeta } from '@/lib/content/blog'
+import { getAllSolutionContent } from '@/lib/content/solutions'
 
 export const dynamic = 'force-static'
 

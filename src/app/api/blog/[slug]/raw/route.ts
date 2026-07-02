@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
-import { parseFrontmatter, toSlug } from '@/lib/blog'
+import { parseFrontmatter } from '@/lib/content/frontmatter'
+import { toSlug } from '@/lib/content/blog'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
 
 const BLOG_DIR = path.join(process.cwd(), 'content', 'blog')

@@ -6,7 +6,7 @@ import Link from "@/components/link"
 import { MarkdownProse } from "@/components/markdown-prose"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
 import type { SolutionsLandingPage as SolutionsLandingPageData } from "@/constants/solutions-pages"
-import type { SolutionContentMeta } from "@/lib/solutions-content"
+import type { SolutionContentMeta } from "@/lib/content/solutions"
 
 type SolutionsContentPageProps = {
   shell: SolutionsLandingPageData

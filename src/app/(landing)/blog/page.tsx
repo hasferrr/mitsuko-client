@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from "@/components/link"
 import { DEPLOYMENT_URL } from '@/constants/external-links'
-import { getAllPostsMeta } from '@/lib/blog'
+import { getAllPostsMeta } from '@/lib/content/blog'
 
 export const dynamic = 'force-static'
 

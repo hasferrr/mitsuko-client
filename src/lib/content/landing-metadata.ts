@@ -1,17 +1,20 @@
 import type { Metadata } from "next"
 import { DEPLOYMENT_URL } from "@/constants/external-links"
 
-type AlternativeLandingMeta = {
+export type LandingMeta = {
   title: string
   description: string
   keywords?: string[]
 }
 
-export function createAlternativeLandingMetadata(
-  slug: string,
-  meta: AlternativeLandingMeta,
-): Metadata {
-  const url = `${DEPLOYMENT_URL}/alternatives/${slug}`
+export function createLandingMetadata(args: {
+  slug: string
+  basePath: string
+  ogImageAlt: string
+  meta: LandingMeta
+}): Metadata {
+  const { slug, basePath, ogImageAlt, meta } = args
+  const url = `${DEPLOYMENT_URL}/${basePath}/${slug}`
 
   return {
     title: meta.title,
@@ -30,7 +33,7 @@ export function createAlternativeLandingMetadata(
           url: `${DEPLOYMENT_URL}/og-image.png`,
           width: 1200,
           height: 630,
-          alt: "Mitsuko subtitle translation workspace",
+          alt: ogImageAlt,
         },
       ],
       locale: "en_US",

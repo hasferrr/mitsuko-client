@@ -1,7 +1,9 @@
+import type { Metadata } from "next"
 import fs from "fs/promises"
 import path from "path"
 import { ALTERNATIVES_PAGE_SLUGS } from "@/constants/alternatives-pages"
-import { parseFrontmatter } from "@/lib/blog"
+import { parseFrontmatter } from "@/lib/content/frontmatter"
+import { createLandingMetadata, type LandingMeta } from "@/lib/content/landing-metadata"
 
 export type AlternativeContentMeta = {
   slug: string
@@ -46,4 +48,13 @@ export async function getAllAlternativeContent(): Promise<AlternativeContent[]> 
     ALTERNATIVES_PAGE_SLUGS.map(slug => getAlternativeContent(slug)),
   )
   return entries.filter((entry): entry is AlternativeContent => entry !== null)
+}
+
+export function createAlternativeLandingMetadata(slug: string, meta: LandingMeta): Metadata {
+  return createLandingMetadata({
+    slug,
+    basePath: "alternatives",
+    ogImageAlt: "Mitsuko subtitle translation workspace",
+    meta,
+  })
 }

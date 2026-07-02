@@ -1,8 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { SOLUTIONS_LANDING_PAGE_SLUGS } from '@/constants/solutions-pages'
-import { getAllAlternativeContent } from '@/lib/alternatives-content'
-import { getAllPostsMeta } from '@/lib/blog'
+import { getAllAlternativeContent } from '@/lib/content/alternatives'
+import { getAllPostsMeta } from '@/lib/content/blog'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base: MetadataRoute.Sitemap = [
