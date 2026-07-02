@@ -4,7 +4,7 @@ import { RefreshCw } from 'lucide-react'
 import { useEffect } from 'react'
 import * as Sentry from '@sentry/nextjs'
 import posthog from 'posthog-js'
-import { isBrowserTranslationError } from '@/lib/utils'
+import { isBrowserTranslationError } from '@/lib/utils/translate-error'
 
 export default function GlobalError({
   error,

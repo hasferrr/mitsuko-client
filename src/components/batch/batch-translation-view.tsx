@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
-import { cn, createUtf8SubtitleBlob } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { createUtf8SubtitleBlob } from "@/lib/utils/file"
 import {
   AlertDialog,
   AlertDialogAction,

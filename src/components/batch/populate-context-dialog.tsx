@@ -12,7 +12,7 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { getContent } from "@/lib/parser/parser"
-import { removeDoneTag } from "@/lib/utils"
+import { removeDoneTag } from "@/lib/utils/done-tag"
 
 interface PopulateContextDialogProps {
   open: boolean

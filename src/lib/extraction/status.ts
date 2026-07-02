@@ -1,5 +1,5 @@
 import { getContent } from "@/lib/parser/parser"
-import { hasDoneTag, removeDoneTag } from "@/lib/utils"
+import { hasDoneTag, removeDoneTag } from "@/lib/utils/done-tag"
 import { Extraction, ExtractionStatus } from "@/types/project"
 
 const EXTRACTION_STATUSES: ExtractionStatus[] = ["idle", "running", "completed", "failed", "stopped"]

@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "@/components/link"
-import { capitalize, cn } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { capitalize } from "@/lib/utils/format"
 import { Card, CardHeader } from "@/components/ui/card"
 import { RefreshCw, Plus } from "lucide-react"
 import { Button } from "../ui/button"

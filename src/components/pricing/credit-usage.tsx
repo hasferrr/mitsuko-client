@@ -1,7 +1,8 @@
 import { getModelCostData } from '@/lib/api/get-model-cost-data'
 import { ModelCost } from '@/types/model-cost'
 import { PAID_MODELS } from "@/constants/model-collection"
-import { cn, formatTokens } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { formatTokens } from "@/lib/utils/format"
 import { Card, CardContent } from "@/components/ui/card"
 import { priorityModels } from '@/constants/model-preferences'
 import ModelNameWithBadges from './model-name-with-badges'

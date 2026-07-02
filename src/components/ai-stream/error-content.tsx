@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react"
 import { AlertCircle, ChevronDown, ChevronRight } from "lucide-react"
-import { cn, extractErrorJson } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { extractErrorJson } from "@/lib/utils/error-json"
 
 interface ErrorContentProps {
   message: string

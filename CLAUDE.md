@@ -49,7 +49,7 @@ Never run the development server.
 - `src/lib/subtitles/` - SRT/ASS/VTT parsers and generators
 - `src/lib/parser/` - AI response parsing and cleaning
 - `src/lib/api/` - Backend API integration (streaming, credit management)
-- `src/lib/utils/` - Utility modules split by domain (`cn.ts`, `format.ts`, `math.ts`, `audio.ts`, `file.ts`, `async.ts`, `done-tag.ts`); barrel re-exported from `src/lib/utils.ts`
+- `src/lib/utils/` - Utility modules split by domain (`format.ts`, `math.ts`, `audio.ts`, `file.ts`, `async.ts`, `done-tag.ts`); `cn()` is defined directly in `src/lib/utils.ts`, import each utility from its specific module (e.g., `@/lib/utils/format`)
 - `src/lib/transcription/` - Transcription utilities: subtitle generation from word-level timestamps with CPS optimization
 - `src/lib/translation/` - Translation utilities: context memory strategies (full, minimal, split) for AI completion requests
 - `src/components/` - Feature components organized by domain (translate, batch, transcribe)
@@ -133,7 +133,7 @@ Dexie database is at version 24. When modifying data models in `src/types/`:
 - **No `any` type** — use specific types, `unknown` with type guards, or proper type definitions
 - Use named imports from React (e.g., `import { useEffect, useState } from "react"`)
 - Use path alias `@/*` for imports from `src/`
-- Use `cn()` from `@/lib/utils` for conditional Tailwind classes (or directly from `@/lib/utils/cn`)
+- Use `cn()` from `@/lib/utils` for conditional Tailwind classes
 - Use `toast.error()`/`toast.success()` from `sonner` for user feedback
 - **Use `@/components/link`** instead of `next/link` — it wraps Next.js `Link` with route-level prefetch policy (`src/lib/route-prefetch-policy.ts`). ESLint enforces this via `no-restricted-imports`.
 - **Tailwind v4** with CSS-based config in `src/app/globals.css` (no `tailwind.config.*`)

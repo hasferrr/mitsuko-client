@@ -17,7 +17,8 @@ import {
 import { AlignCenter, Download } from "lucide-react"
 import { DownloadOption, CombinedFormat, SubtitleType } from "@/types/subtitles"
 import { SUBTITLE_NAME_MAP } from "@/constants/subtitle-formats"
-import { cn, createUtf8SubtitleBlob } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { createUtf8SubtitleBlob } from "@/lib/utils/file"
 
 type GenerateContentResult = string | Blob | Promise<string | Blob | undefined> | undefined
 

@@ -30,7 +30,7 @@ import { removeContentBetween } from "@/lib/subtitles/utils/remove-content-betwe
 import { removeLineBreaks } from "@/lib/subtitles/utils/remove-line-breaks"
 import { shiftSubtitles } from "@/lib/subtitles/timestamp"
 import { SubtitleTranslated } from "@/types/subtitles"
-import { sleep } from "@/lib/utils"
+import { sleep } from "@/lib/utils/async"
 
 interface SubtitleToolsProps {
   isOpen: boolean

@@ -7,7 +7,7 @@ import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-stor
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constants/limits"
-import { minMax } from "@/lib/utils"
+import { minMax } from "@/lib/utils/math"
 import { useSessionStore } from "@/stores/ui/use-session-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { fetchUserCreditData } from "@/lib/api/user-credit"

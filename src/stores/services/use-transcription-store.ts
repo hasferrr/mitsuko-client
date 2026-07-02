@@ -3,7 +3,7 @@ import { handleStream } from "@/lib/api/stream"
 import { create } from "zustand"
 import { RefObject } from "react"
 import { TranscriptionRequestBody } from "@/types/request"
-import { calculateAudioDuration } from "@/lib/utils"
+import { calculateAudioDuration } from "@/lib/utils/audio"
 import { createServiceSlice } from "../factories/create-service-slice"
 
 interface TranscriptionStore {

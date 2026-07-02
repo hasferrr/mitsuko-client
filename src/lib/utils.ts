@@ -1,9 +1,6 @@
-export { cn } from "./utils/cn"
-export { minMax } from "./utils/math"
-export { sleep } from "./utils/async"
-export { capitalize, formatTokens, formatReasoning } from "./utils/format"
-export { calculateAudioDuration } from "./utils/audio"
-export { createUtf8SubtitleBlob } from "./utils/file"
-export { hasDoneTag, removeDoneTag, addDoneTag } from "./utils/done-tag"
-export { isBrowserTranslationError } from "./utils/translate-error"
-export { extractErrorJson } from "./utils/error-json"
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}

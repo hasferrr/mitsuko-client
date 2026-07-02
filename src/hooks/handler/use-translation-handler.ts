@@ -10,7 +10,8 @@ import {
   CombinedFormat,
   SubtitleType,
 } from "@/types/subtitles"
-import { minMax, sleep } from "@/lib/utils"
+import { minMax } from "@/lib/utils/math"
+import { sleep } from "@/lib/utils/async"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"

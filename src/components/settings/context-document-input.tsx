@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { AutoContextMode, AutoContextPreviousMode, Extraction, Translation } from "@/types/project"
 import { getContent } from "@/lib/parser/parser"
-import { removeDoneTag } from "@/lib/utils"
+import { removeDoneTag } from "@/lib/utils/done-tag"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
@@ -18,7 +18,7 @@ import { cleanExtractionResult, combineAutoContext, getExtractionProblem, findLa
 import { isAutoContextOwnedBy } from "@/lib/extraction/status"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ExtractionBadges } from "@/components/extract-context/extraction-badges"
-import { cn } from "@/lib/utils/cn"
+import { cn } from "@/lib/utils"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
 type AutoContextKey = "autoContextMode" | "autoContextExtractionId" | "autoContextPreviousMode" | "autoContextPreviousExtractionId"

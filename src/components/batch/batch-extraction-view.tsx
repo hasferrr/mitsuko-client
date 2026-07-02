@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
-import { cn, removeDoneTag } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { removeDoneTag } from "@/lib/utils/done-tag"
 import {
   AlertDialog,
   AlertDialogAction,
