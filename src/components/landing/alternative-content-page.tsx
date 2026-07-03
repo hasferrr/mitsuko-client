@@ -81,7 +81,7 @@ export function AlternativeContentPage({ shell, meta, content }: AlternativeCont
   }
 
   return (
-    <main className="w-full">
+    <div className="w-full">
       <section className="border-b border-border bg-white dark:bg-[#0f0f0f]">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-14 md:px-6 md:py-18">
           <div className="flex flex-col justify-center gap-6">
@@ -255,6 +255,6 @@ export function AlternativeContentPage({ shell, meta, content }: AlternativeCont
       </section>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-    </main>
+    </div>
   )
 }

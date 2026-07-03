@@ -6,7 +6,9 @@ export default function HomeLayout({ children }: PropsWithChildren) {
   return (
     <div className="min-h-screen text-foreground flex flex-col">
       <Navbar />
-      {children}
+      <main role="main" className="flex-1">
+        {children}
+      </main>
       <Footer />
     </div>
   )

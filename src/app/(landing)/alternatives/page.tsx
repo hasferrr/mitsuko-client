@@ -55,7 +55,7 @@ export default function AlternativesIndexPage() {
   const pages = Object.values(ALTERNATIVES_LANDING_PAGES)
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-16 md:px-6">
+    <div className="mx-auto w-full max-w-5xl px-4 py-16 md:px-6">
       <div className="max-w-3xl">
         <h1 className="text-4xl font-semibold tracking-tight text-balance md:text-5xl">
           Mitsuko alternatives for subtitle translation teams
@@ -84,6 +84,6 @@ export default function AlternativesIndexPage() {
           </article>
         ))}
       </div>
-    </main>
+    </div>
   )
 }

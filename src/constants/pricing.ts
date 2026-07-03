@@ -12,8 +12,8 @@ export function getFallbackUsdToIdrRate(): number {
 }
 
 export const CURRENCIES: { USD: CurrencyData; IDR: CurrencyData } = {
-  USD: { symbol: "$", rate: 1 },
-  IDR: { symbol: "Rp", rate: getFallbackUsdToIdrRate() },
+  USD: { key: "usd", symbol: "$", rate: 1 },
+  IDR: { key: "idr", symbol: "Rp", rate: getFallbackUsdToIdrRate() },
 }
 
 export const SUBSCRIPTION_PLANS: {

@@ -62,7 +62,7 @@ function BlogJsonLd() {
 export default async function BlogIndexPage() {
   const posts = await getAllPostsMeta()
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 md:px-6 py-16">
+    <div className="mx-auto w-full max-w-3xl px-4 md:px-6 py-16">
       <div className="w-full max-w-3xl">
         <h1 className="text-3xl font-semibold tracking-tight">Mitsuko Blog</h1>
         <p className="mt-2 text-muted-foreground">Guides, tips, and updates for AI subtitle translation and transcription</p>
@@ -95,6 +95,6 @@ export default async function BlogIndexPage() {
         )}
       </div>
       <BlogJsonLd />
-    </main>
+    </div>
   )
 }

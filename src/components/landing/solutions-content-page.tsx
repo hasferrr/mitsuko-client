@@ -64,7 +64,7 @@ export function SolutionsContentPage({ shell, meta, content }: SolutionsContentP
   }
 
   return (
-    <main className="w-full">
+    <div className="w-full">
       <section className="mx-auto w-full max-w-3xl px-4 pt-14 pb-6 md:px-6 md:pt-18">
         <div className="flex flex-col gap-6">
           <div className="flex flex-wrap gap-2">
@@ -153,6 +153,6 @@ export function SolutionsContentPage({ shell, meta, content }: SolutionsContentP
       </section>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-    </main>
+    </div>
   )
 }

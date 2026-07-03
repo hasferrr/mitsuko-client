@@ -22,7 +22,7 @@ export default function Navbar() {
   }, [pathname])
 
   return (
-    <header className="sticky top-0 z-50 w-full flex justify-center">
+    <header role="banner" className="sticky top-0 z-50 w-full flex justify-center">
       <div className="w-full lg:px-24 bg-background/80 backdrop-blur-md supports-backdrop-filter:bg-background/60">
         <div className="px-6 max-w-5xl mx-auto flex h-16 items-center justify-between relative">
           <div className="flex items-center gap-4 md:gap-8">
@@ -51,7 +51,7 @@ export default function Navbar() {
             )}
           </div>
 
-          <nav className="hidden md:flex items-center gap-8 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <nav role="navigation" className="hidden md:flex items-center gap-8 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <NavLinks />
           </nav>
 
@@ -86,7 +86,7 @@ export default function Navbar() {
 
         {isMobileMenuOpen && (
           <div className="md:hidden w-full px-6 pb-4 border-t border-border/30">
-            <nav className="flex flex-col space-y-2 mt-2">
+            <nav role="navigation" className="flex flex-col space-y-2 mt-2">
               <NavLinks isMobile onLinkClick={() => setIsMobileMenuOpen(false)} />
             </nav>
           </div>

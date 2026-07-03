@@ -74,11 +74,11 @@ export default function PricingSection({
   }, [loadSnapScript])
 
   const handleCurrencyChange = (value: string) => {
-    if (value === "$") {
+    if (value === CURRENCIES.USD.key) {
       setCurrency(CURRENCIES.USD)
     } else {
       void fetchIdrRate()
-      setCurrency({ symbol: CURRENCIES.IDR.symbol, rate: idrRate })
+      setCurrency({ ...CURRENCIES.IDR, rate: idrRate })
     }
   }
 

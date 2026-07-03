@@ -1,6 +1,7 @@
 import { ProductId } from "./product"
 
 export interface CurrencyData {
+  key: string
   symbol: string
   rate: number
 }

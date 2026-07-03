@@ -40,7 +40,7 @@ export default async function Footer() {
   const posts = await getAllPostsMeta()
   const latest = posts.slice(0, 4)
   return (
-    <footer className="border-t border-border py-12 px-4 mt-4">
+    <footer role="contentinfo" className="border-t border-border py-12 px-4 mt-4">
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-11 gap-8">
         <div className="lg:col-span-3 lg:mr-8">
           <h3 className="text-base font-medium mb-4 text-foreground">About</h3>

@@ -100,7 +100,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const { prev, next } = await getAdjacentPosts(post.slug)
   const url = `${DEPLOYMENT_URL}/blog/${post.slug}`
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 md:px-6 py-16 text-left">
+    <div className="mx-auto w-full max-w-3xl px-4 md:px-6 py-16 text-left">
       <div className="mb-6">
         <Link href="/blog" className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1">← Back to blog</Link>
       </div>
@@ -151,6 +151,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         updated={post.updated}
         image={post.image}
       />
-    </main>
+    </div>
   )
 }
