@@ -17,6 +17,7 @@ import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { toast } from "sonner"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
+import { useProcessingIndicatorStore } from "@/stores/ui/use-processing-indicator-store"
 import MD5 from "crypto-js/md5"
 import { inferEditedExtractionStatus } from "@/lib/extraction/status"
 
@@ -200,6 +201,11 @@ export const useExtractionHandler = ({
       return true
     } catch (error) {
       const nextStatus = error instanceof Error && error.name === "AbortError" ? "stopped" : "failed"
+      if (nextStatus === "stopped") {
+        useProcessingIndicatorStore.getState().markStopped("extraction", currentId)
+      } else {
+        useProcessingIndicatorStore.getState().markError("extraction", currentId)
+      }
       setStatus(currentId, nextStatus)
       setCompletedAt(currentId, null)
       await saveData(currentId)
@@ -218,6 +224,7 @@ export const useExtractionHandler = ({
   }
 
   const handleStop = async (currentId: string) => {
+    useProcessingIndicatorStore.getState().markStopped("extraction", currentId)
     stopExtraction(currentId)
     setIsExtracting(currentId, false)
     setStatus(currentId, "stopped")

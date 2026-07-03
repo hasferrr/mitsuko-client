@@ -19,7 +19,7 @@ export function UploadIndicator() {
   if (activeUploads.length === 0) return null
 
   return (
-    <div className="fixed bottom-4 right-4 w-[300px] z-50 space-y-2">
+    <div className="w-[300px] flex flex-col gap-2">
       {activeUploads.map(({ id, upload }) => (
         <Card key={id}>
           <CardHeader>

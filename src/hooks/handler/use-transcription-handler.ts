@@ -17,6 +17,7 @@ import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/tra
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
+import { useProcessingIndicatorStore } from "@/stores/ui/use-processing-indicator-store"
 
 interface UseTranscriptionHandlerProps {
   state: {
@@ -162,6 +163,11 @@ export const useTranscriptionHandler = ({
         setSelectedUploadId(currentId, null)
       }
     } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        useProcessingIndicatorStore.getState().markStopped("transcription", currentId)
+      } else {
+        useProcessingIndicatorStore.getState().markError("transcription", currentId)
+      }
       console.error(error)
     } finally {
       setIsTranscribing(currentId, false)
@@ -176,8 +182,9 @@ export const useTranscriptionHandler = ({
   }
 
   const handleStop = async () => {
-    setIsTranscribing(currentId, false)
+    useProcessingIndicatorStore.getState().markStopped("transcription", currentId)
     stopTranscription(currentId)
+    setIsTranscribing(currentId, false)
     await saveData(currentId)
   }
 

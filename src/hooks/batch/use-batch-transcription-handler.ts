@@ -19,6 +19,7 @@ import { UserCreditData } from "@/types/user"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
+import { useProcessingIndicatorStore } from "@/stores/ui/use-processing-indicator-store"
 
 interface UseBatchTranscriptionHandlerProps {
   defaultTranscriptionId: string
@@ -310,8 +311,10 @@ export default function useBatchTranscriptionHandler({
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
         console.log("Transcription aborted")
+        useProcessingIndicatorStore.getState().markStopped("transcription", id)
       } else {
         toast.error(`Transcription failed: ${transcriptionData[id]?.title || id}`)
+        useProcessingIndicatorStore.getState().markError("transcription", id)
         errorCountRef.current += 1
         if (errorCountRef.current >= 5) {
           handleStopBatchTranscription()
@@ -331,8 +334,13 @@ export default function useBatchTranscriptionHandler({
     queueAbortRef.current = true
     batchFiles.forEach(file => {
       if (isTranscribingSet.has(file.id)) {
-        setIsTranscribing(file.id, false)
+        const processingStore = useProcessingIndicatorStore.getState()
+        const processingItem = processingStore.items[`transcription:${file.id}`]
+        if (!processingItem?.pendingStatus) {
+          processingStore.markStopped("transcription", file.id)
+        }
         stopTranscription(file.id)
+        setIsTranscribing(file.id, false)
       }
     })
     setQueueSet(new Set())

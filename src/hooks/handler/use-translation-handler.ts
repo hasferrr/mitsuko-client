@@ -48,6 +48,7 @@ import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
 import { convertSubtitle } from "@/lib/subtitles/utils/convert-subtitle"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
+import { useProcessingIndicatorStore } from "@/stores/ui/use-processing-indicator-store"
 import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
@@ -326,6 +327,7 @@ export const useTranslationHandler = ({
             },
           })
           setActiveTab("basic")
+          useProcessingIndicatorStore.getState().markError("translation", currentId)
           setIsTranslating(currentId, false)
           return
         }
@@ -435,7 +437,12 @@ export const useTranslationHandler = ({
         rawResponse = result.raw
 
         onSuccessTranslation?.()
-      } catch {
+      } catch (streamError) {
+        if (streamError instanceof Error && streamError.name === "AbortError") {
+          useProcessingIndicatorStore.getState().markStopped("translation", currentId)
+        } else {
+          useProcessingIndicatorStore.getState().markError("translation", currentId)
+        }
         onErrorTranslation?.({ currentId, isContinuation: !!isContinuation })
 
         setIsTranslating(currentId, false)
@@ -509,6 +516,7 @@ export const useTranslationHandler = ({
         if (sameChunkCount >= STUCK_CHUNK_THRESHOLD) {
           console.error("Translation stopped: Stuck on the same chunk")
           toast.error("Translation stopped: Stuck on the same chunk")
+          useProcessingIndicatorStore.getState().markError("translation", currentId)
           stopTranslation(currentId)
           break
         }
@@ -825,7 +833,9 @@ export const useTranslationHandler = ({
         runToken,
       )
       if (contextDocumentOverride === null) {
+        const processingStore = useProcessingIndicatorStore.getState()
         if (isAutoContextRunCurrent(params.currentId, runToken)) {
+          processingStore.markError("translation", params.currentId)
           setIsTranslating(params.currentId, false)
         }
         return
@@ -836,6 +846,7 @@ export const useTranslationHandler = ({
       shouldClearActive = !params.isContinuation
     } catch {
       if (isAutoContextRunCurrent(params.currentId, runToken)) {
+        useProcessingIndicatorStore.getState().markError("translation", params.currentId)
         toast.error("Failed to prepare auto-context. Translation was not started.")
       }
     } finally {
@@ -847,6 +858,9 @@ export const useTranslationHandler = ({
   }
 
   const handleStop = (currentId: string) => {
+    if (useTranslationStore.getState().isTranslatingSet.has(currentId)) {
+      useProcessingIndicatorStore.getState().markStopped("translation", currentId)
+    }
     autoContextRunTokenRef.current.delete(currentId)
     const ownedExtractionRun = autoCreatedExtractionByTranslationRef.current.get(currentId)
     if (ownedExtractionRun) {
