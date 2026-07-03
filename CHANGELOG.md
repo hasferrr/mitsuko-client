@@ -14,6 +14,11 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### July 3
+
+- 🔔 **Processing Notifications:** Mitsuko can now notify you when translations, transcriptions, extractions, or batch jobs finish, so you can safely switch tabs while long tasks run.
+- 📊 **Live Processing Indicator:** A new activity indicator shows what is currently running, including progress and quick access back to active work.
+
 ### July 1
 
 - 🤖 **Model Updates:** Added Claude 5 Sonnet, Anthropic's most capable Sonnet-class model with a 1M token context window and 128K max output, supporting adaptive thinking and structured output.
