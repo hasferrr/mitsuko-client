@@ -496,7 +496,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
           )}
         </Button>
 
-        <Button variant="outline" onClick={handleStopExtraction} disabled={!isExtracting || !contextResult}>
+        <Button variant="outline" onClick={handleStopExtraction} disabled={!isExtracting}>
           <Square className="size-4" />
           Stop
         </Button>
