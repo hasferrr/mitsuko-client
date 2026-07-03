@@ -17,6 +17,7 @@ interface LocalSettingsStore {
   isSubtitlePerformanceModeEnabled: boolean
   isAutoEnableProjectSettings: boolean
   isNoStoreEnabled: boolean
+  isCompletionNotificationEnabled: boolean
   dismissedDialogs: Record<string, boolean>
 
   addApiConfig: (config: CustomApiConfig) => void
@@ -32,6 +33,7 @@ interface LocalSettingsStore {
   setIsSubtitlePerformanceModeEnabled: (enabled: boolean) => void
   setIsAutoEnableProjectSettings: (enabled: boolean) => void
   setIsNoStoreEnabled: (enabled: boolean) => void
+  setIsCompletionNotificationEnabled: (enabled: boolean) => void
   dismissDialog: (id: string) => void
   resetAllDismissedDialogs: () => void
 }
@@ -48,6 +50,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       isSubtitlePerformanceModeEnabled: true,
       isAutoEnableProjectSettings: false,
       isNoStoreEnabled: false,
+      isCompletionNotificationEnabled: false,
       dismissedDialogs: {},
 
       addApiConfig: (config) =>
@@ -92,12 +95,13 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       setIsSubtitlePerformanceModeEnabled: (enabled) => set({ isSubtitlePerformanceModeEnabled: enabled }),
       setIsAutoEnableProjectSettings: (enabled) => set({ isAutoEnableProjectSettings: enabled }),
       setIsNoStoreEnabled: (enabled) => set({ isNoStoreEnabled: enabled }),
+      setIsCompletionNotificationEnabled: (enabled) => set({ isCompletionNotificationEnabled: enabled }),
       dismissDialog: (id) => set((state) => ({ dismissedDialogs: { ...state.dismissedDialogs, [id]: true } })),
       resetAllDismissedDialogs: () => set({ dismissedDialogs: {} }),
     }),
     {
       name: "api-settings-storage",
-      version: 7,
+      version: 8,
       migrate: (persistedState, version) => {
         if (version === 0) {
           const oldState = persistedState as {
@@ -155,6 +159,13 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
         if (version < 6) {
           const state = persistedState as { isLegacyCreateBehavior?: boolean }
           delete state.isLegacyCreateBehavior
+        }
+
+        if (version < 8) {
+          const state = persistedState as { isCompletionNotificationEnabled?: boolean }
+          if (typeof state.isCompletionNotificationEnabled !== "boolean") {
+            state.isCompletionNotificationEnabled = false
+          }
         }
 
         return persistedState

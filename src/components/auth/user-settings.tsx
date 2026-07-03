@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useState } from "react"
 import { Settings2, RotateCcw } from "lucide-react"
+import { requestNotificationPermission } from "@/lib/utils/notification"
 
 export function UserSettings() {
   const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
@@ -36,6 +37,8 @@ export function UserSettings() {
   const setIsAutoEnableProjectSettings = useLocalSettingsStore((state) => state.setIsAutoEnableProjectSettings)
   const isNoStoreEnabled = useLocalSettingsStore((state) => state.isNoStoreEnabled)
   const setIsNoStoreEnabled = useLocalSettingsStore((state) => state.setIsNoStoreEnabled)
+  const isCompletionNotificationEnabled = useLocalSettingsStore((state) => state.isCompletionNotificationEnabled)
+  const setIsCompletionNotificationEnabled = useLocalSettingsStore((state) => state.setIsCompletionNotificationEnabled)
   const dismissedDialogs = useLocalSettingsStore((state) => state.dismissedDialogs)
   const resetAllDismissedDialogs = useLocalSettingsStore((state) => state.resetAllDismissedDialogs)
   const [isThirdPartyDialogOpen, setIsThirdPartyDialogOpen] = useState(false)
@@ -43,6 +46,15 @@ export function UserSettings() {
   const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
   const [isGlobalTranscriptionSettingsOpen, setIsGlobalTranscriptionSettingsOpen] = useState(false)
   const [isResetDismissalsDialogOpen, setIsResetDismissalsDialogOpen] = useState(false)
+
+  const handleCompletionNotificationChange = async (checked: boolean) => {
+    if (checked) {
+      const isGranted = await requestNotificationPermission()
+      setIsCompletionNotificationEnabled(isGranted)
+      return
+    }
+    setIsCompletionNotificationEnabled(checked)
+  }
 
   const handleCheckedChange = (checked: boolean) => {
     if (checked) {
@@ -186,6 +198,22 @@ export function UserSettings() {
               id="no-store-switch"
               checked={isNoStoreEnabled}
               onCheckedChange={setIsNoStoreEnabled}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
+                Enable completion notification
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Play a notification sound and show a browser notification when all processing tasks finish. Off by default.
+              </p>
+            </div>
+            <Switch
+              id="completion-notification-switch"
+              checked={isCompletionNotificationEnabled}
+              onCheckedChange={handleCompletionNotificationChange}
             />
           </div>
 

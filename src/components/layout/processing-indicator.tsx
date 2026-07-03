@@ -15,6 +15,7 @@ import {
   useProcessingIndicatorStore,
   type TrackedProcessingItem,
 } from "@/stores/ui/use-processing-indicator-store"
+import { useProcessingCompleteNotification } from "@/hooks/use-processing-complete-notification"
 import type { ProjectType } from "@/types/project"
 
 const TYPE_META: Record<ProjectType, { label: string; route: string }> = {
@@ -38,6 +39,8 @@ export function ProcessingIndicator() {
   const items = useProcessingIndicatorStore((s) => s.items)
   const clearItem = useProcessingIndicatorStore((s) => s.clearItem)
   const clearCompleted = useProcessingIndicatorStore((s) => s.clearCompleted)
+
+  useProcessingCompleteNotification()
 
   useEffect(() => {
     reconcile({
