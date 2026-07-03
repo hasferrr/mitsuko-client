@@ -19,6 +19,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ProjectItemList } from "../project-item-list"
+import { ProjectEmptyState } from "../project-empty-state"
 import { Extraction, Project } from "@/types/project"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
@@ -58,7 +59,7 @@ export function ProjectExtractionList({
   isSelecting = false,
 }: ProjectExtractionListProps) {
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
@@ -70,6 +71,31 @@ export function ProjectExtractionList({
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false)
+
+  const handleCreate = async () => {
+    setIsCreating(true)
+    try {
+      const created = await createExtractionDb(
+        currentProject.id,
+        {
+          title: "",
+          episodeNumber: "",
+          subtitleContent: "",
+          previousContext: "",
+          contextResult: ""
+        },
+        undefined,
+        undefined,
+      )
+      const storeProject = useProjectStore.getState().currentProject
+      const base = storeProject && storeProject.id === currentProject.id ? storeProject.extractions : currentProject.extractions
+      setCurrentId(created.id)
+      router.push("/extract-context")
+      updateProjectItems(currentProject.id, [...base, created.id], 'extraction')
+    } catch {
+      setIsCreating(false)
+    }
+  }
 
   const extractionComponentList = extractions.map((extraction) => (
     <ProjectItemList
@@ -114,6 +140,8 @@ export function ProjectExtractionList({
     ? Array.from({ length: 3 }).map((_, i) => <ProjectItemSkeleton key={`extraction-skeleton-${i}`} />)
     : extractionComponentList
 
+  const isEmpty = !isLoadingData && extractions.length === 0
+
   return (
     <Card size="sm">
       <CardContent className="flex flex-col gap-4">
@@ -142,37 +170,21 @@ export function ProjectExtractionList({
             size="sm"
             variant="outline"
             disabled={isCreating}
-            onClick={async () => {
-              setIsCreating(true)
-              try {
-                const created = await createExtractionDb(
-                  currentProject.id,
-                  {
-                    title: "",
-                    episodeNumber: "",
-                    subtitleContent: "",
-                    previousContext: "",
-                    contextResult: ""
-                  },
-                  undefined,
-                  undefined,
-                )
-                const storeProject = useProjectStore.getState().currentProject
-                const base = storeProject && storeProject.id === currentProject.id ? storeProject.extractions : currentProject.extractions
-                setCurrentId(created.id)
-                router.push("/extract-context")
-                updateProjectItems(currentProject.id, [...base, created.id], 'extraction')
-              } catch {
-                setIsCreating(false)
-              }
-            }}
+            onClick={handleCreate}
           >
             {isCreating ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
             New Extraction
           </Button>
         </div>
       </div>
-      {selectMode ? (
+      {isEmpty ? (
+        <ProjectEmptyState
+          icon={<FileText className="size-5 text-purple-500" />}
+          title="No extractions yet"
+          description="Create a new extraction to generate context from subtitles."
+          accentColor="purple"
+        />
+      ) : selectMode ? (
         <div className="space-y-3">
           {itemsList}
         </div>

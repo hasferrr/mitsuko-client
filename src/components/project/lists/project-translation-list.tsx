@@ -19,6 +19,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ProjectItemList } from "../project-item-list"
+import { ProjectEmptyState } from "../project-empty-state"
 import { Translation, Project } from "@/types/project"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
@@ -77,7 +78,7 @@ export function ProjectTranslationList({
   isSelecting = false,
 }: ProjectTranslationListProps) {
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
@@ -89,6 +90,32 @@ export function ProjectTranslationList({
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false)
+
+  const handleCreate = async () => {
+    setIsCreating(true)
+    try {
+      const created = await createTranslationDb(
+        currentProject.id,
+        {
+          title: `Subtitle ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
+          subtitles: [],
+          parsed: {
+            type: "srt",
+            data: null
+          }
+        },
+        undefined,
+        undefined,
+      )
+      const storeProject = useProjectStore.getState().currentProject
+      const base = storeProject && storeProject.id === currentProject.id ? storeProject.translations : currentProject.translations
+      setCurrentId(created.id)
+      router.push("/translate")
+      updateProjectItems(currentProject.id, [...base, created.id], 'translation')
+    } catch {
+      setIsCreating(false)
+    }
+  }
 
   const translationComponentList = translations.map((translation) => {
     const totalLines = translation.subtitles.length
@@ -140,6 +167,8 @@ export function ProjectTranslationList({
     ? Array.from({ length: 3 }).map((_, i) => <ProjectItemSkeleton key={`translation-skeleton-${i}`} />)
     : translationComponentList
 
+  const isEmpty = !isLoadingData && translations.length === 0
+
   return (
     <Card size="sm">
       <CardContent className="flex flex-col gap-4">
@@ -168,38 +197,21 @@ export function ProjectTranslationList({
             size="sm"
             variant="outline"
             disabled={isCreating}
-            onClick={async () => {
-              setIsCreating(true)
-              try {
-                const created = await createTranslationDb(
-                  currentProject.id,
-                  {
-                    title: `Subtitle ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
-                    subtitles: [],
-                    parsed: {
-                      type: "srt",
-                      data: null
-                    }
-                  },
-                  undefined,
-                  undefined,
-                )
-                const storeProject = useProjectStore.getState().currentProject
-                const base = storeProject && storeProject.id === currentProject.id ? storeProject.translations : currentProject.translations
-                setCurrentId(created.id)
-                router.push("/translate")
-                updateProjectItems(currentProject.id, [...base, created.id], 'translation')
-              } catch {
-                setIsCreating(false)
-              }
-            }}
+            onClick={handleCreate}
           >
             {isCreating ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
             New Translation
           </Button>
         </div>
       </div>
-      {selectMode ? (
+      {isEmpty ? (
+        <ProjectEmptyState
+          icon={<Globe className="size-5 text-blue-500" />}
+          title="No translations yet"
+          description="Create a new translation to start translating subtitles."
+          accentColor="blue"
+        />
+      ) : selectMode ? (
         <div className="space-y-3">
           {itemsList}
         </div>

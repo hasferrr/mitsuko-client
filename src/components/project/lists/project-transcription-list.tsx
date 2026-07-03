@@ -19,6 +19,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ProjectItemList } from "../project-item-list"
+import { ProjectEmptyState } from "../project-empty-state"
 import { Transcription, Project } from "@/types/project"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
@@ -57,7 +58,7 @@ export function ProjectTranscriptionList({
   isSelecting = false,
 }: ProjectTranscriptionListProps) {
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
@@ -69,6 +70,24 @@ export function ProjectTranscriptionList({
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false)
+
+  const handleCreate = async () => {
+    setIsCreating(true)
+    try {
+      const created = await createTranscriptionDb(currentProject.id, {
+        title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
+        transcriptionText: "",
+        transcriptSubtitles: [],
+      })
+      const storeProject = useProjectStore.getState().currentProject
+      const base = storeProject && storeProject.id === currentProject.id ? storeProject.transcriptions : currentProject.transcriptions
+      setCurrentId(created.id)
+      router.push("/transcribe")
+      updateProjectItems(currentProject.id, [...base, created.id], 'transcription')
+    } catch {
+      setIsCreating(false)
+    }
+  }
 
   const transcriptionComponentList = transcriptions.map((transcription) => (
     <ProjectItemList
@@ -109,6 +128,8 @@ export function ProjectTranscriptionList({
     ? Array.from({ length: 3 }).map((_, i) => <ProjectItemSkeleton key={`transcription-skeleton-${i}`} />)
     : transcriptionComponentList
 
+  const isEmpty = !isLoadingData && transcriptions.length === 0
+
   return (
     <Card size="sm">
       <CardContent className="flex flex-col gap-4">
@@ -137,30 +158,21 @@ export function ProjectTranscriptionList({
             size="sm"
             variant="outline"
             disabled={isCreating}
-            onClick={async () => {
-              setIsCreating(true)
-              try {
-                const created = await createTranscriptionDb(currentProject.id, {
-                  title: `Audio ${new Date().toLocaleDateString()} ${crypto.randomUUID().slice(0, 5)}`,
-                  transcriptionText: "",
-                  transcriptSubtitles: [],
-                })
-                const storeProject = useProjectStore.getState().currentProject
-                const base = storeProject && storeProject.id === currentProject.id ? storeProject.transcriptions : currentProject.transcriptions
-                setCurrentId(created.id)
-                router.push("/transcribe")
-                updateProjectItems(currentProject.id, [...base, created.id], 'transcription')
-              } catch {
-                setIsCreating(false)
-              }
-            }}
+            onClick={handleCreate}
           >
             {isCreating ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
             New Transcription
           </Button>
         </div>
       </div>
-      {selectMode ? (
+      {isEmpty ? (
+        <ProjectEmptyState
+          icon={<Headphones className="size-5 text-green-500" />}
+          title="No transcriptions yet"
+          description="Create a new transcription to turn audio into text."
+          accentColor="green"
+        />
+      ) : selectMode ? (
         <div className="space-y-3">
           {itemsList}
         </div>

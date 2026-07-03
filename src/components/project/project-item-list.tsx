@@ -144,78 +144,77 @@ export const ProjectItemList = ({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "p-3 touch-none",
+        "p-3 touch-none transition-colors transition-shadow",
+        !isDragging && "hover:bg-muted/30 hover:ring-foreground/10",
         selectMode && "select-none",
-        selected && "ring-primary bg-primary/5 dark:bg-primary/10"
+        selected && "bg-primary/5 dark:bg-primary/10"
       )}
       onClick={selectMode ? (e) => { e.stopPropagation(); onSelectToggle?.() } : undefined}
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 sm:gap-3">
-          {selectMode ? (
-            <Checkbox
-              checked={selected}
-              onCheckedChange={onSelectToggle}
-              onClick={(e) => e.stopPropagation()}
-            />
-          ) : (
-            <button {...attributes} {...listeners} className="cursor-grab">
-              <GripVertical className="size-5 text-muted-foreground" />
-            </button>
-          )}
-          <div className="bg-secondary p-2 rounded-lg">{icon}</div>
-          <div
-            className="cursor-pointer hover:bg-muted/50 rounded-lg py-1 -my-1 px-2 -mx-1 group/title"
-            onClick={handleTitleClick}
-          >
-            <div className="flex items-center gap-2">
-              <h4 className={cn("text-sm font-medium wrap-break-word break-all line-clamp-1 min-w-fit group-hover/title:underline cursor-pointer", (!title || title === "Episode X") && "italic pr-1")}>
-                {title || "No title"}
-              </h4>
-              {subtitle && (
-                <span className="text-xs text-muted-foreground font-extralight wrap-break-word break-all line-clamp-1">
-                  {subtitle}
-                </span>
-              )}
-              {badges}
-            </div>
-            <p className="text-xs text-muted-foreground line-clamp-2 wrap-break-word" style={{ overflowWrap: "anywhere" }}>
-              {description.substring(0, 250)}
-            </p>
-            <p className="text-xs text-muted-foreground sm:hidden block">{date}</p>
+      <div className="flex items-center gap-2 sm:gap-3">
+        {selectMode ? (
+          <Checkbox
+            checked={selected}
+            onCheckedChange={onSelectToggle}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <button {...attributes} {...listeners} className="cursor-grab text-muted-foreground/40 hover:text-muted-foreground transition-colors shrink-0">
+            <GripVertical className="size-4" />
+          </button>
+        )}
+        <div className="bg-secondary p-2 rounded-lg shrink-0">{icon}</div>
+        <div
+          className="flex-1 min-w-0 cursor-pointer rounded-md px-1 -mx-1 transition-colors group/title"
+          onClick={handleTitleClick}
+        >
+          <div className="flex items-center gap-2">
+            <h4 className={cn(
+              "text-sm font-medium line-clamp-1 min-w-fit transition-colors group-hover/title:text-foreground",
+              (!title || title === "Episode X") && "italic pr-1",
+            )}>
+              {title || "No title"}
+            </h4>
+            {subtitle && (
+              <span className="text-xs text-muted-foreground font-extralight line-clamp-1">
+                {subtitle}
+              </span>
+            )}
+            {badges}
           </div>
+          <p className="text-xs text-muted-foreground line-clamp-2" style={{ overflowWrap: "anywhere" }}>
+            {description.substring(0, 250)}
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <p className="text-xs text-muted-foreground sm:block hidden">{date}</p>
-          {!selectMode && (
-          <>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            onClick={() => setIsMoveOpen(true)}
-            disabled={isProcessing}
-          >
-            <SquareArrowOutUpRight className="size-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            onClick={() => setIsEditOpen(true)}
-            disabled={isProcessing}
-          >
-            <Edit className="size-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            onClick={() => setIsDeleteOpen(true)}
-            disabled={isProcessing}
-          >
-            <Trash className="size-4" />
-          </Button>
-          </>
-          )}
-        </div>
+        <span className="text-xs text-muted-foreground/70 shrink-0 tabular-nums hidden sm:block">{date}</span>
+        {!selectMode && (
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={() => setIsMoveOpen(true)}
+              disabled={isProcessing}
+            >
+              <SquareArrowOutUpRight className="size-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={() => setIsEditOpen(true)}
+              disabled={isProcessing}
+            >
+              <Edit className="size-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={() => setIsDeleteOpen(true)}
+              disabled={isProcessing}
+            >
+              <Trash className="size-4" />
+            </Button>
+          </div>
+        )}
       </div>
 
       <EditDialogue
