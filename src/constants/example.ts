@@ -1,4 +1,7 @@
-export const _translationResult = `
+import { parseTranscription, parseTranslationJson } from "@/lib/parser/parser"
+import { SubtitleTranslated } from "@/types/subtitles"
+
+const translationResult = `
 <think>
 We are translating from Japanese to Indonesian.
  We have the input JSON with subtitles. We must output a JSON with the same structure, adding the "translated" field for each subtitle.
@@ -300,7 +303,7 @@ We are translating from Japanese to Indonesian.
 }
 `.trim()
 
-export const _extractionResult = `
+const extractionResult = `
 Character List:
 - Rintaro Tsumugi: A tall, blond-haired high school student whose intimidating appearance causes others to misjudge him as a scary delinquent. - Tends to be self-deprecating and quick to blame himself. - Son of the Patiseri Plain owner; friends with Usami and Saku; forms a connection with Kaoruko.
 - Kaoruko Waguri: A small-statured high school girl who is a frequent and enthusiastic customer at Patiseri Plain. - Polite and direct, not easily intimidated. - A student at Kikyo Academy who defends Rintaro's character and is not afraid of his appearance.
@@ -322,7 +325,7 @@ Setting:
 - St. Benigaoka Station: The local train station near Patiseri Plain.
 `.trim()
 
-export const _transcriptionResult = `
+const transcriptionResult = `
 00:07,450 --> 00:10,450
 月影揺れる夜の小道
 (Tsukikage yureru yoru no komichi)
@@ -511,3 +514,138 @@ export const _transcriptionResult = `
 明日もまた光の中へ
 (Ashita mo mata hikari no naka e)
 `.trim()
+
+export const EXAMPLE_TITLE = "Blue.Box.S01E16 (example)"
+export const EXAMPLE_SUBTITLES: SubtitleTranslated[] = [
+  {
+    "index": 1,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 16, "ms": 50 },
+      "end": { "h": 0, "m": 0, "s": 16, "ms": 930 }
+    },
+    "actor": "千夏(ちなつ)",
+    "content": "おはよう",
+    "translated": "Pagi"
+  },
+  {
+    "index": 2,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 17, "ms": 550 },
+      "end": { "h": 0, "m": 0, "s": 19, "ms": 260 }
+    },
+    "actor": "大喜(たいき)",
+    "content": "おはようございます",
+    "translated": "Selamat pagi"
+  },
+  {
+    "index": 3,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 19, "ms": 350 },
+      "end": { "h": 0, "m": 0, "s": 21, "ms": 350 }
+    },
+    "actor": "千夏",
+    "content": "相変わらず早起きだね",
+    "translated": "Kamu masih bangun pagi seperti biasa ya?"
+  },
+  {
+    "index": 4,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 21, "ms": 850 },
+      "end": { "h": 0, "m": 0, "s": 23, "ms": 310 }
+    },
+    "actor": "",
+    "content": "今日から新学期ですし",
+    "translated": "Lagipula, hari ini mulai semester baru"
+  },
+  {
+    "index": 5,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 23, "ms": 390 },
+      "end": { "h": 0, "m": 0, "s": 25, "ms": 480 }
+    },
+    "actor": "",
+    "content": "すごい寝ぐせ",
+    "translated": "Rambutmu acak-acakan banget"
+  },
+  {
+    "index": 6,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 25, "ms": 560 },
+      "end": { "h": 0, "m": 0, "s": 26, "ms": 440 }
+    },
+    "actor": "",
+    "content": "ここら辺",
+    "translated": "Di sekitar sini"
+  },
+  {
+    "index": 7,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 26, "ms": 520 },
+      "end": { "h": 0, "m": 0, "s": 27, "ms": 520 }
+    },
+    "actor": "",
+    "content": "えっ！",
+    "translated": "Hah?!"
+  },
+  {
+    "index": 8,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 28, "ms": 190 },
+      "end": { "h": 0, "m": 0, "s": 28, "ms": 820 }
+    },
+    "actor": "",
+    "content": "あ…",
+    "translated": "Ah..."
+  },
+  {
+    "index": 9,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 29, "ms": 980 },
+      "end": { "h": 0, "m": 0, "s": 31, "ms": 400 }
+    },
+    "actor": "",
+    "content": "マヌケポーズ！",
+    "translated": "Pose konyol!"
+  },
+  {
+    "index": 10,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 34, "ms": 360 },
+      "end": { "h": 0, "m": 0, "s": 35, "ms": 450 }
+    },
+    "actor": "大喜",
+    "content": "海に行ってから",
+    "translated": "Sejak pergi ke pantai"
+  },
+  {
+    "index": 11,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 36, "ms": 30 },
+      "end": { "h": 0, "m": 0, "s": 39, "ms": 330 }
+    },
+    "actor": "",
+    "content": "千夏先輩との間にあった\nわだかまりみたいなものが",
+    "translated": "rasa canggung yang dulu ada antara aku dan Senior Chinatsu"
+  },
+  {
+    "index": 12,
+    "timestamp": {
+      "start": { "h": 0, "m": 0, "s": 39, "ms": 410 },
+      "end": { "h": 0, "m": 0, "s": 40, "ms": 950 }
+    },
+    "actor": "",
+    "content": "なくなった気がする",
+    "translated": "sepertinya sudah hilang"
+  },
+]
+export const EXAMPLE_RESPONSE = {
+  response: translationResult,
+  jsonResponse: parseTranslationJson(translationResult),
+}
+
+export const EXAMPLE_EXTRACTION_TITLE = "KHRS S01E01 (example)"
+export const EXAMPLE_EXTRACTION_RESULT = extractionResult
+
+export const EXAMPLE_TRANSCRIPTION_TITLE = "01. カゲロウノ調.flac (example)"
+export const EXAMPLE_TRANSCRIPTION_RESULT = transcriptionResult
+export const EXAMPLE_TRANSCRIPTION_JSON = parseTranscription(transcriptionResult)

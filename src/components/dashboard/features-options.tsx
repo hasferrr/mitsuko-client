@@ -9,17 +9,17 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
+import { DEFAULT_TRANSLATION_SETTINGS } from "@/constants/default"
 import {
-  DEFAULT_EXTRACTION_RESULT,
-  DEFAULT_EXTRACTION_TITLE,
-  DEFAULT_RESPONSE,
-  DEFAULT_SUBTITLES,
-  DEFAULT_TITLE,
-  DEFAULT_TRANSLATION_SETTINGS,
-  DEFAULT_TRANSCRIPTION_JSON,
-  DEFAULT_TRANSCRIPTION_RESULT,
-  DEFAULT_TRANSCRIPTION_TITLE,
-} from "@/constants/default"
+  EXAMPLE_EXTRACTION_RESULT,
+  EXAMPLE_EXTRACTION_TITLE,
+  EXAMPLE_RESPONSE,
+  EXAMPLE_SUBTITLES,
+  EXAMPLE_TITLE,
+  EXAMPLE_TRANSCRIPTION_JSON,
+  EXAMPLE_TRANSCRIPTION_RESULT,
+  EXAMPLE_TRANSCRIPTION_TITLE,
+} from "@/constants/example"
 
 const features = {
   translation: [
@@ -80,10 +80,10 @@ export function FeaturesOptions() {
     switch (option) {
       case "translate": {
         const translation = await createTranslationDb(defaultProject.id, {
-          title: DEFAULT_TITLE,
-          subtitles: DEFAULT_SUBTITLES,
+          title: EXAMPLE_TITLE,
+          subtitles: EXAMPLE_SUBTITLES,
           parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
-          response: DEFAULT_RESPONSE,
+          response: EXAMPLE_RESPONSE,
         }, undefined, undefined)
         setCurrentTranslationId(translation.id)
         upsertTranslationData(translation.id, translation)
@@ -91,9 +91,9 @@ export function FeaturesOptions() {
       }
       case "transcribe": {
         const transcription = await createTranscriptionDb(defaultProject.id, {
-          title: DEFAULT_TRANSCRIPTION_TITLE,
-          transcriptionText: DEFAULT_TRANSCRIPTION_RESULT,
-          transcriptSubtitles: DEFAULT_TRANSCRIPTION_JSON
+          title: EXAMPLE_TRANSCRIPTION_TITLE,
+          transcriptionText: EXAMPLE_TRANSCRIPTION_RESULT,
+          transcriptSubtitles: EXAMPLE_TRANSCRIPTION_JSON
         })
         setCurrentTranscriptionId(transcription.id)
         upsertTranscriptionData(transcription.id, transcription)
@@ -101,11 +101,11 @@ export function FeaturesOptions() {
       }
       case "extract-context": {
         const extraction = await createExtractionDb(defaultProject.id, {
-          title: DEFAULT_EXTRACTION_TITLE,
+          title: EXAMPLE_EXTRACTION_TITLE,
           episodeNumber: "",
           subtitleContent: "",
           previousContext: "",
-          contextResult: DEFAULT_EXTRACTION_RESULT
+          contextResult: EXAMPLE_EXTRACTION_RESULT
         }, undefined, undefined)
         setCurrentExtractionId(extraction.id)
         upsertExtractionData(extraction.id, extraction)
