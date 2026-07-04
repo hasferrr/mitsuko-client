@@ -1,4 +1,8 @@
-import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
+import {
+  DEFAULT_ADVANCED_SETTINGS,
+  DEFAULT_BASIC_SETTINGS,
+  DEFAULT_EXTRACTION_BASIC_SETTINGS,
+} from '@/constants/default'
 import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
 import { CustomInstruction } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'
@@ -13,6 +17,7 @@ import {
   GLOBAL_TRANSLATION_SETTINGS_ID,
 } from '@/constants/global-settings'
 import { buildTranslationTemplate } from '@/lib/translation/template'
+import { buildTranscriptionTemplate } from '@/lib/transcription/template'
 
 class MyDatabase extends Dexie {
   projects!: Table<Project, string>
@@ -294,18 +299,10 @@ class MyDatabase extends Dexie {
       for (const project of projects) {
         if (!project.defaultTranscriptionId) {
           const transcriptionId = crypto.randomUUID()
-          const newTranscription: Transcription = {
+          const newTranscription = buildTranscriptionTemplate({
             id: transcriptionId,
             projectId: project.id,
-            title: '',
-            transcriptionText: '',
-            transcriptSubtitles: [],
-            ...DEFAULT_TRANSCRIPTION_SETTINGS,
-            words: [],
-            segments: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }
+          })
           newTranscriptions.push(newTranscription)
           projectUpdates.push({ id: project.id, changes: { defaultTranscriptionId: transcriptionId } })
         }

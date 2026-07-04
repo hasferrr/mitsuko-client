@@ -13,7 +13,11 @@ import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
 import { getProject } from "@/lib/db/project"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
+import {
+  DEFAULT_BASIC_SETTINGS,
+  DEFAULT_ADVANCED_SETTINGS,
+  DEFAULT_TRANSLATION_SETTINGS,
+} from "@/constants/default"
 import { GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_SETTINGS_ID } from "@/constants/global-settings"
 import { resolveNewTranslationAutoContextMode } from "@/lib/translation/auto-context-defaults"
 
@@ -122,9 +126,9 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       ? {
           ...data,
           autoContextMode,
-          autoContextExtractionId: null,
-          autoContextPreviousMode: 'latest' as const,
-          autoContextPreviousExtractionId: null,
+          autoContextExtractionId: DEFAULT_TRANSLATION_SETTINGS.autoContextExtractionId,
+          autoContextPreviousMode: DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode,
+          autoContextPreviousExtractionId: DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousExtractionId,
         }
       : { ...data, autoContextMode }
 
@@ -199,7 +203,7 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     get().mutateData(id, "parsed", parsed)
   },
   resetParsed: (id) => {
-    const initialParsed: Parsed = { type: "srt", data: null }
+    const initialParsed: Parsed = { ...DEFAULT_TRANSLATION_SETTINGS.parsed }
     get().mutateData(id, "parsed", initialParsed)
   },
   updateSubtitle: (id, index, field, value) => {

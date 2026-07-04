@@ -15,6 +15,7 @@ import {
   DEFAULT_RESPONSE,
   DEFAULT_SUBTITLES,
   DEFAULT_TITLE,
+  DEFAULT_TRANSLATION_SETTINGS,
   DEFAULT_TRANSCRIPTION_JSON,
   DEFAULT_TRANSCRIPTION_RESULT,
   DEFAULT_TRANSCRIPTION_TITLE,
@@ -81,7 +82,7 @@ export function FeaturesOptions() {
         const translation = await createTranslationDb(defaultProject.id, {
           title: DEFAULT_TITLE,
           subtitles: DEFAULT_SUBTITLES,
-          parsed: { type: "srt", data: null },
+          parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
           response: DEFAULT_RESPONSE,
         }, undefined, undefined)
         setCurrentTranslationId(translation.id)

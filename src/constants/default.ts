@@ -1,6 +1,6 @@
 import { SubtitleTranslated } from "@/types/subtitles"
 import { FREE_MODELS } from "./model-collection"
-import { AdvancedSettings, BasicSettings, Transcription } from "@/types/project"
+import { AdvancedSettings, BasicSettings, Translation, Transcription } from "@/types/project"
 import { _extractionResult, _transcriptionResult, _translationResult } from "./default-result"
 import { parseTranscription, parseTranslationJson } from "@/lib/parser/parser"
 
@@ -41,11 +41,27 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
   isMaxCompletionTokensAuto: true,
 }
 
-export const DEFAULT_TRANSCRIPTION_SETTINGS: Pick<Transcription, "selectedMode" | "customInstructions" | "models" | "language" | "selectedUploadId"> = {
+export const DEFAULT_TRANSLATION_SETTINGS: Omit<Translation, "id" | "createdAt" | "updatedAt" | "projectId" | "basicSettingsId" | "advancedSettingsId"> = {
+  title: "",
+  subtitles: [],
+  parsed: { type: "srt", data: null },
+  autoContextMode: "disabled",
+  autoContextExtractionId: null,
+  autoContextPreviousMode: "latest",
+  autoContextPreviousExtractionId: null,
+  response: { response: "", jsonResponse: [] },
+}
+
+export const DEFAULT_TRANSCRIPTION_SETTINGS: Omit<Transcription, "id" | "createdAt" | "updatedAt" | "projectId"> = {
+  title: "",
+  transcriptionText: "",
+  transcriptSubtitles: [],
   selectedMode: "sentence",
   customInstructions: "",
   models: "mitsuko-premium",
   language: "auto",
+  words: [],
+  segments: [],
   selectedUploadId: null,
 }
 

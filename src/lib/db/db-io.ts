@@ -2,7 +2,12 @@ import { db } from './db'
 import { DatabaseExport, databaseExportConstructor, generateNewIds } from './db-constructor'
 import { databaseExportSchema } from './db-schema'
 import { Project, Translation, Extraction, BasicSettings, AdvancedSettings, Transcription } from '@/types/project'
-import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
+import {
+  DEFAULT_BASIC_SETTINGS,
+  DEFAULT_ADVANCED_SETTINGS,
+  DEFAULT_EXTRACTION_BASIC_SETTINGS,
+  DEFAULT_TRANSLATION_SETTINGS,
+} from '@/constants/default'
 import {
   GLOBAL_ADVANCED_SETTINGS_ID,
   GLOBAL_BASIC_SETTINGS_ID,
@@ -14,6 +19,7 @@ import {
   GLOBAL_TRANSCRIPTION_SETTINGS_ID
 } from '@/constants/global-settings'
 import { buildTranslationTemplate } from '@/lib/translation/template'
+import { buildTranscriptionTemplate } from '@/lib/transcription/template'
 import { normalizeAutoContextDefault } from '@/lib/translation/auto-context-defaults'
 import { getOrCreateGlobalTranslationSettings } from '@/lib/db/global-settings'
 
@@ -319,18 +325,11 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
       const getTranscriptionById = (id: string) => convertedData.transcriptions.find(t => t.id === id)
       if (!project.defaultTranscriptionId || !getTranscriptionById(project.defaultTranscriptionId)) {
         const transcriptionId = crypto.randomUUID()
-        const newDefaultTranscription: Transcription = {
+        const newDefaultTranscription = buildTranscriptionTemplate({
           id: transcriptionId,
           projectId: project.id,
-          title: '',
-          ...DEFAULT_TRANSCRIPTION_SETTINGS,
-          transcriptionText: '',
-          transcriptSubtitles: [],
-          words: [],
-          segments: [],
-          createdAt: now,
-          updatedAt: now,
-        }
+          now,
+        })
         convertedData.transcriptions.push(newDefaultTranscription)
         project.defaultTranscriptionId = transcriptionId
       }
@@ -339,9 +338,9 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
       if (template) {
         template.projectId = project.id
         template.autoContextMode = normalizeAutoContextDefault(template.autoContextMode)
-        template.autoContextExtractionId = null
-        template.autoContextPreviousMode = 'latest'
-        template.autoContextPreviousExtractionId = null
+        template.autoContextExtractionId = DEFAULT_TRANSLATION_SETTINGS.autoContextExtractionId
+        template.autoContextPreviousMode = DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode
+        template.autoContextPreviousExtractionId = DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousExtractionId
       } else {
         const translationId = crypto.randomUUID()
         const template = buildTranslationTemplate({

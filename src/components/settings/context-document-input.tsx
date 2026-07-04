@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { ExtractionBadges } from "@/components/extract-context/extraction-badges"
 import { cn } from "@/lib/utils"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { DEFAULT_TRANSLATION_SETTINGS } from "@/constants/default"
 
 type AutoContextKey = "autoContextMode" | "autoContextExtractionId" | "autoContextPreviousMode" | "autoContextPreviousExtractionId"
 type AutoContextSetterMap = { [K in AutoContextKey]: (id: string, value: Translation[K]) => void }
@@ -193,7 +194,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, isTe
   }
 
   const selectedExtraction = translation?.autoContextExtractionId ? extractionData[translation.autoContextExtractionId] : null
-  const previousMode = translation?.autoContextPreviousMode ?? "latest"
+  const previousMode = translation?.autoContextPreviousMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode
   const latestPreviousExtraction = translation
     ? findLatestExtraction(projectExtractions, translation.projectId, isExtractingSet)
     : null
@@ -246,7 +247,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, isTe
       : extractionPlaceholder
   })()
 
-  const autoContextMode = translation?.autoContextMode ?? "disabled"
+  const autoContextMode = translation?.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
 
   return (
     <div className="flex flex-col gap-2">

@@ -3,8 +3,8 @@ import { BasicSettings, AdvancedSettings, Transcription, Translation } from '@/t
 import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS } from '@/constants/default'
 import { getBasicSettings, getAdvancedSettings } from './settings'
 import { GLOBAL_ADVANCED_SETTINGS_ID, GLOBAL_BASIC_SETTINGS_ID, GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_SETTINGS_ID, GLOBAL_TRANSCRIPTION_SETTINGS_ID } from '@/constants/global-settings'
-import { DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
 import { buildTranslationTemplate } from '@/lib/translation/template'
+import { buildTranscriptionTemplate } from '@/lib/transcription/template'
 
 export const upsertBasicSettingsWithId = async (
   id: string,
@@ -97,18 +97,12 @@ export const getOrCreateGlobalTranscriptionSettings = async (): Promise<Transcri
   if (existing) return existing
 
   const now = new Date()
-  const defaultTranscription: Transcription = {
+  const defaultTranscription = buildTranscriptionTemplate({
     id: GLOBAL_TRANSCRIPTION_SETTINGS_ID,
     projectId: 'global',
     title: 'Global Transcription Settings',
-    ...DEFAULT_TRANSCRIPTION_SETTINGS,
-    transcriptionText: '',
-    transcriptSubtitles: [],
-    words: [],
-    segments: [],
-    createdAt: now,
-    updatedAt: now,
-  }
+    now,
+  })
   await db.transcriptions.put(defaultTranscription)
   return defaultTranscription
 }

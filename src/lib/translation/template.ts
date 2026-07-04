@@ -1,12 +1,13 @@
 import { Translation } from '@/types/project'
 import { normalizeAutoContextDefault } from '@/lib/translation/auto-context-defaults'
+import { DEFAULT_TRANSLATION_SETTINGS } from '@/constants/default'
 
 export function buildTranslationTemplate({
   id,
   projectId,
   basicSettingsId,
   advancedSettingsId,
-  autoContextMode = 'disabled',
+  autoContextMode = DEFAULT_TRANSLATION_SETTINGS.autoContextMode,
   now = new Date(),
 }: {
   id: string
@@ -19,16 +20,16 @@ export function buildTranslationTemplate({
   return {
     id,
     projectId,
-    title: '',
-    subtitles: [],
-    parsed: { type: 'srt', data: null },
+    ...DEFAULT_TRANSLATION_SETTINGS,
+    subtitles: [...DEFAULT_TRANSLATION_SETTINGS.subtitles],
+    parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
     basicSettingsId,
     advancedSettingsId,
     autoContextMode: normalizeAutoContextDefault(autoContextMode),
-    autoContextExtractionId: null,
-    autoContextPreviousMode: 'latest',
-    autoContextPreviousExtractionId: null,
-    response: { response: '', jsonResponse: [] },
+    response: {
+      ...DEFAULT_TRANSLATION_SETTINGS.response,
+      jsonResponse: [...DEFAULT_TRANSLATION_SETTINGS.response.jsonResponse],
+    },
     createdAt: now,
     updatedAt: now,
   }

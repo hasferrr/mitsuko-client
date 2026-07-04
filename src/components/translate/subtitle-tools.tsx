@@ -31,6 +31,7 @@ import { removeLineBreaks } from "@/lib/subtitles/utils/remove-line-breaks"
 import { shiftSubtitles } from "@/lib/subtitles/timestamp"
 import { SubtitleTranslated } from "@/types/subtitles"
 import { sleep } from "@/lib/utils/async"
+import { DEFAULT_TRANSLATION_SETTINGS } from "@/constants/default"
 
 interface SubtitleToolsProps {
   isOpen: boolean
@@ -57,7 +58,7 @@ export const SubtitleTools = memo(({ isOpen, setIsOpen, children }: SubtitleTool
 
   const translation = currentId ? translationData[currentId] : null
   const subtitles = translation?.subtitles ?? []
-  const parsed = translation?.parsed ?? { type: "srt", data: null }
+  const parsed = translation?.parsed ?? { ...DEFAULT_TRANSLATION_SETTINGS.parsed }
 
   const handleSetSubtitles = async (newSubtitles: SubtitleTranslated[]) => {
     if (!currentId) return

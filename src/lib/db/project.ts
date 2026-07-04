@@ -1,10 +1,10 @@
-import { Project, Transcription } from "@/types/project"
+import { Project } from "@/types/project"
 import { db } from "./db"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
 import { getOrCreateGlobalBasicSettings, getOrCreateGlobalAdvancedSettings, getOrCreateGlobalTranslationBasicSettings, getOrCreateGlobalTranslationAdvancedSettings, getOrCreateGlobalExtractionBasicSettings, getOrCreateGlobalExtractionAdvancedSettings, getOrCreateGlobalTranscriptionSettings, getOrCreateGlobalTranslationSettings } from "./global-settings"
-import { DEFAULT_TRANSCRIPTION_SETTINGS } from "@/constants/default"
 import { normalizeAutoContextDefault } from "@/lib/translation/auto-context-defaults"
 import { buildTranslationTemplate } from "@/lib/translation/template"
+import { buildTranscriptionTemplate } from "@/lib/transcription/template"
 
 const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(obj: T) => {
   const { id, createdAt, updatedAt, ...rest } = obj
@@ -43,22 +43,17 @@ export const createProject = async (name: string, isBatch = false, isAutoEnableP
     // Create default transcription for batch settings
     const globalTranscriptionSettings = await getOrCreateGlobalTranscriptionSettings()
     const defaultTranscriptionId = crypto.randomUUID()
-    const defaultTranscription: Transcription = {
+    const defaultTranscription = buildTranscriptionTemplate({
       id: defaultTranscriptionId,
       projectId: id,
-      title: '',
-      ...DEFAULT_TRANSCRIPTION_SETTINGS,
-      models: globalTranscriptionSettings.models,
-      language: globalTranscriptionSettings.language,
-      selectedMode: globalTranscriptionSettings.selectedMode,
-      customInstructions: globalTranscriptionSettings.customInstructions,
-      transcriptionText: '',
-      transcriptSubtitles: [],
-      words: [],
-      segments: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
+      settings: {
+        models: globalTranscriptionSettings.models,
+        language: globalTranscriptionSettings.language,
+        selectedMode: globalTranscriptionSettings.selectedMode,
+        customInstructions: globalTranscriptionSettings.customInstructions,
+        selectedUploadId: globalTranscriptionSettings.selectedUploadId,
+      },
+    })
     await db.transcriptions.add(defaultTranscription)
 
     const globalTranslationSettings = await getOrCreateGlobalTranslationSettings()

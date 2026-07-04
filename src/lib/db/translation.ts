@@ -3,6 +3,7 @@ import { db } from "./db"
 import {
   DEFAULT_BASIC_SETTINGS,
   DEFAULT_ADVANCED_SETTINGS,
+  DEFAULT_TRANSLATION_SETTINGS,
 } from "@/constants/default"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
 
@@ -31,13 +32,13 @@ export const createTranslation = async (
       ...data,
       basicSettingsId: basicSettings.id,
       advancedSettingsId: advancedSettings.id,
-      autoContextMode: data.autoContextMode ?? "disabled",
-      autoContextExtractionId: data.autoContextExtractionId ?? null,
-      autoContextPreviousMode: data.autoContextPreviousMode ?? "latest",
-      autoContextPreviousExtractionId: data.autoContextPreviousExtractionId ?? null,
+      autoContextMode: data.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode,
+      autoContextExtractionId: data.autoContextExtractionId ?? DEFAULT_TRANSLATION_SETTINGS.autoContextExtractionId,
+      autoContextPreviousMode: data.autoContextPreviousMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode,
+      autoContextPreviousExtractionId: data.autoContextPreviousExtractionId ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousExtractionId,
       response: data.response ?? {
-        response: "",
-        jsonResponse: [],
+        ...DEFAULT_TRANSLATION_SETTINGS.response,
+        jsonResponse: [...DEFAULT_TRANSLATION_SETTINGS.response.jsonResponse],
       },
       createdAt: new Date(),
       updatedAt: new Date()

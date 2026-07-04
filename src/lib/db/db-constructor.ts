@@ -1,4 +1,9 @@
-import { DEFAULT_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS, DEFAULT_TRANSCRIPTION_SETTINGS } from '@/constants/default'
+import {
+  DEFAULT_ADVANCED_SETTINGS,
+  DEFAULT_BASIC_SETTINGS,
+  DEFAULT_TRANSCRIPTION_SETTINGS,
+  DEFAULT_TRANSLATION_SETTINGS,
+} from '@/constants/default'
 import {
   Project,
   Translation,
@@ -80,9 +85,9 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       id: uuidv4(),
       basicSettingsId: basicSettingsMap.get(translation.basicSettingsId)?.id ?? translation.basicSettingsId,
       advancedSettingsId: advancedSettingsMap.get(translation.advancedSettingsId)?.id ?? translation.advancedSettingsId,
-      autoContextExtractionId: translation.autoContextExtractionId ?? null,
-      autoContextPreviousMode: translation.autoContextPreviousMode ?? "latest",
-      autoContextPreviousExtractionId: translation.autoContextPreviousExtractionId ?? null,
+      autoContextExtractionId: translation.autoContextExtractionId ?? DEFAULT_TRANSLATION_SETTINGS.autoContextExtractionId,
+      autoContextPreviousMode: translation.autoContextPreviousMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode,
+      autoContextPreviousExtractionId: translation.autoContextPreviousExtractionId ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousExtractionId,
       projectId: "",
     })
   }
@@ -267,24 +272,27 @@ function projectConstructor(project: Partial<Project>): Project {
 function translationConstructor(translation: Partial<Translation>): Translation {
   return {
     id: translation.id ?? uuidv4(),
-    title: translation.title ?? "Translation X",
-    subtitles: translation.subtitles ?? [],
+    title: translation.title ?? DEFAULT_TRANSLATION_SETTINGS.title,
+    subtitles: translation.subtitles ?? [...DEFAULT_TRANSLATION_SETTINGS.subtitles],
     parsed: sanitizeParsed(translation.parsed),
     createdAt: translation.createdAt ?? new Date(),
     updatedAt: translation.updatedAt ?? new Date(),
     projectId: translation.projectId ?? "",
     basicSettingsId: translation.basicSettingsId ?? "",
     advancedSettingsId: translation.advancedSettingsId ?? "",
-    autoContextMode: translation.autoContextMode ?? "disabled",
-    autoContextExtractionId: translation.autoContextExtractionId ?? null,
-    autoContextPreviousMode: translation.autoContextPreviousMode ?? "latest",
-    autoContextPreviousExtractionId: translation.autoContextPreviousExtractionId ?? null,
-    response: translation.response ?? { response: "", jsonResponse: [] },
+    autoContextMode: translation.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode,
+    autoContextExtractionId: translation.autoContextExtractionId ?? DEFAULT_TRANSLATION_SETTINGS.autoContextExtractionId,
+    autoContextPreviousMode: translation.autoContextPreviousMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode,
+    autoContextPreviousExtractionId: translation.autoContextPreviousExtractionId ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousExtractionId,
+    response: translation.response ?? {
+      ...DEFAULT_TRANSLATION_SETTINGS.response,
+      jsonResponse: [...DEFAULT_TRANSLATION_SETTINGS.response.jsonResponse],
+    },
   }
 }
 
 function sanitizeParsed(parsed: Translation['parsed'] | undefined): Translation['parsed'] {
-  const safeParsed = parsed ?? { type: "srt", data: null }
+  const safeParsed = parsed ?? { ...DEFAULT_TRANSLATION_SETTINGS.parsed }
   if (safeParsed.type === "ass" && safeParsed.data) {
     const data = { ...safeParsed.data } as typeof safeParsed.data & { subtitles?: unknown }
     if ("subtitles" in data) {
@@ -301,9 +309,9 @@ function sanitizeParsed(parsed: Translation['parsed'] | undefined): Translation[
 function transcriptionConstructor(transcription: Partial<Transcription>): Transcription {
   return {
     id: transcription.id ?? uuidv4(),
-    title: transcription.title ?? "Transcription X",
-    transcriptionText: transcription.transcriptionText ?? "",
-    transcriptSubtitles: transcription.transcriptSubtitles ?? [],
+    title: transcription.title ?? DEFAULT_TRANSCRIPTION_SETTINGS.title,
+    transcriptionText: transcription.transcriptionText ?? DEFAULT_TRANSCRIPTION_SETTINGS.transcriptionText,
+    transcriptSubtitles: transcription.transcriptSubtitles ?? [...DEFAULT_TRANSCRIPTION_SETTINGS.transcriptSubtitles],
     language: transcription.language ?? DEFAULT_TRANSCRIPTION_SETTINGS.language,
     selectedMode: transcription.selectedMode ?? DEFAULT_TRANSCRIPTION_SETTINGS.selectedMode,
     customInstructions: transcription.customInstructions ?? DEFAULT_TRANSCRIPTION_SETTINGS.customInstructions,
@@ -311,8 +319,8 @@ function transcriptionConstructor(transcription: Partial<Transcription>): Transc
     createdAt: transcription.createdAt ?? new Date(),
     updatedAt: transcription.updatedAt ?? new Date(),
     projectId: transcription.projectId ?? "",
-    words: transcription.words ?? [],
-    segments: transcription.segments ?? [],
+    words: transcription.words ?? [...DEFAULT_TRANSCRIPTION_SETTINGS.words],
+    segments: transcription.segments ?? [...DEFAULT_TRANSCRIPTION_SETTINGS.segments],
     selectedUploadId: transcription.selectedUploadId ?? DEFAULT_TRANSCRIPTION_SETTINGS.selectedUploadId,
   }
 }

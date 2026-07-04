@@ -50,6 +50,7 @@ import { SettingsParentType } from "@/types/project"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { GLOBAL_TRANSLATION_SETTINGS_ID } from "@/constants/global-settings"
 import { normalizeAutoContextDefault } from "@/lib/translation/auto-context-defaults"
+import { DEFAULT_TRANSLATION_SETTINGS } from "@/constants/default"
 
 interface BaseSettingsDialogueProps {
   isOpen: boolean
@@ -125,13 +126,13 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
     const resetAutoContext = async () => {
       if (settingsParentType !== 'translation' || !props.defaultTranslationId) return
       const mode = isGlobal
-        ? 'disabled'
+        ? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
         : normalizeAutoContextDefault((await getTranslationDb(GLOBAL_TRANSLATION_SETTINGS_ID, true))?.autoContextMode)
       await updateTranslationDb(props.defaultTranslationId, {
         autoContextMode: mode,
-        autoContextExtractionId: null,
-        autoContextPreviousMode: 'latest',
-        autoContextPreviousExtractionId: null,
+        autoContextExtractionId: DEFAULT_TRANSLATION_SETTINGS.autoContextExtractionId,
+        autoContextPreviousMode: DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode,
+        autoContextPreviousExtractionId: DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousExtractionId,
       })
     }
 

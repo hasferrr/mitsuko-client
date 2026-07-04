@@ -42,6 +42,7 @@ import { useQuery } from "@tanstack/react-query"
 import { logSubtitle } from "@/lib/api/subtitle-log"
 import MD5 from "crypto-js/md5"
 import { z } from "zod"
+import { DEFAULT_TRANSLATION_SETTINGS } from "@/constants/default"
 import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { combineSubtitleContent } from "@/lib/subtitles/utils/combine-subtitle"
@@ -572,7 +573,7 @@ export const useTranslationHandler = ({
     const extractionDataStore = useExtractionDataStore.getState()
     const projectStore = useProjectStore.getState()
     const translation = translationStore.data[currentId]
-    const mode = translation.autoContextMode ?? "disabled"
+    const mode = translation.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
 
     if (isBatch || mode === "disabled") return useSettingsStore.getState().getContextDocument(basicSettingsId)
 
@@ -700,7 +701,7 @@ export const useTranslationHandler = ({
         ?? await extractionDataStore.getExtractionDb(extractionId)
     }
 
-    const previousMode = translation.autoContextPreviousMode ?? "latest"
+    const previousMode = translation.autoContextPreviousMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode
     let previousExtraction = null as Awaited<ReturnType<typeof getProjectExtraction>> | null
 
     if (previousMode === "selected") {

@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils"
 import { createUtf8SubtitleBlob } from "@/lib/utils/file"
 import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { generateWordsSubtitles, generateSegmentsTranscription } from "@/lib/transcription/subtitle-generator"
+import { DEFAULT_TRANSLATION_SETTINGS } from "@/constants/default"
 import { useTranscriptionHandler } from "@/hooks/handler/use-transcription-handler"
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
 import { WhisperSettingsPanel } from "./whisper-settings-panel"
@@ -369,7 +370,7 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
         {
           title,
           subtitles,
-          parsed: { type: "srt", data: null },
+          parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
         },
         undefined,
         undefined,
