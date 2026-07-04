@@ -206,7 +206,7 @@ export function ProjectTranslationList({
       </div>
       {isEmpty ? (
         <ProjectEmptyState
-          icon={<Globe className="size-5 text-blue-500" />}
+          icon={<Globe className="size-5" />}
           title="No translations yet"
           description="Create a new translation to start translating subtitles."
           accentColor="blue"

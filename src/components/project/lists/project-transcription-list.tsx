@@ -167,7 +167,7 @@ export function ProjectTranscriptionList({
       </div>
       {isEmpty ? (
         <ProjectEmptyState
-          icon={<Headphones className="size-5 text-green-500" />}
+          icon={<Headphones className="size-5" />}
           title="No transcriptions yet"
           description="Create a new transcription to turn audio into text."
           accentColor="green"

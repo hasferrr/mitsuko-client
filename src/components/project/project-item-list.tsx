@@ -145,9 +145,11 @@ export const ProjectItemList = ({
       style={style}
       className={cn(
         "p-3 touch-none transition-colors transition-shadow",
-        !isDragging && "hover:bg-muted/30 hover:ring-foreground/10",
+        !isDragging && "hover:ring-foreground/10",
+        !isDragging && !selected && "hover:bg-muted/30",
         selectMode && "select-none",
-        selected && "bg-primary/5 dark:bg-primary/10"
+        selected && "bg-primary/5 dark:bg-primary/10",
+        selected && !isDragging && "hover:bg-primary/10 dark:hover:bg-primary/15",
       )}
       onClick={selectMode ? (e) => { e.stopPropagation(); onSelectToggle?.() } : undefined}
     >

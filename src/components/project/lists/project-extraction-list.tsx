@@ -179,7 +179,7 @@ export function ProjectExtractionList({
       </div>
       {isEmpty ? (
         <ProjectEmptyState
-          icon={<FileText className="size-5 text-purple-500" />}
+          icon={<FileText className="size-5" />}
           title="No extractions yet"
           description="Create a new extraction to generate context from subtitles."
           accentColor="purple"
