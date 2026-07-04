@@ -10,8 +10,12 @@ import {
   GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
   GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
   GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSLATION_SETTINGS_ID,
   GLOBAL_TRANSCRIPTION_SETTINGS_ID
 } from '@/constants/global-settings'
+import { buildTranslationTemplate } from '@/lib/translation/template'
+import { normalizeAutoContextDefault } from '@/lib/translation/auto-context-defaults'
+import { getOrCreateGlobalTranslationSettings } from '@/lib/db/global-settings'
 
 const GLOBAL_BASIC_IDS = [
   GLOBAL_BASIC_SETTINGS_ID,
@@ -27,7 +31,7 @@ const GLOBAL_ADVANCED_IDS = [
 export async function exportDatabase(): Promise<string> {
   const exportData: DatabaseExport = {
     projects: await db.projects.toArray(),
-    translations: await db.translations.toArray(),
+    translations: (await db.translations.toArray()).filter(t => t.id !== GLOBAL_TRANSLATION_SETTINGS_ID),
     transcriptions: (await db.transcriptions.toArray()).filter(t => t.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID),
     extractions: await db.extractions.toArray(),
     projectOrders: await db.projectOrders.toArray(),
@@ -226,6 +230,9 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
     const importData = JSON.parse(jsonString)
     const validated = databaseExportSchema.parse(importData) as unknown as Partial<DatabaseExport>
     const convertedData = databaseExportConstructor(validated)
+    convertedData.translations = convertedData.translations.filter(t => t.id !== GLOBAL_TRANSLATION_SETTINGS_ID)
+    let translationById = new Map(convertedData.translations.map(t => [t.id, t]))
+    await getOrCreateGlobalTranslationSettings()
 
     const ensureProjectDefaultSettings = (project: Project) => {
       const now = new Date()
@@ -327,6 +334,27 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
         convertedData.transcriptions.push(newDefaultTranscription)
         project.defaultTranscriptionId = transcriptionId
       }
+
+      const template = translationById.get(project.defaultTranslationId)
+      if (template) {
+        template.projectId = project.id
+        template.autoContextMode = normalizeAutoContextDefault(template.autoContextMode)
+        template.autoContextExtractionId = null
+        template.autoContextPreviousMode = 'latest'
+        template.autoContextPreviousExtractionId = null
+      } else {
+        const translationId = crypto.randomUUID()
+        const template = buildTranslationTemplate({
+          id: translationId,
+          projectId: project.id,
+          basicSettingsId: project.defaultTranslationBasicSettingsId,
+          advancedSettingsId: project.defaultTranslationAdvancedSettingsId,
+          now,
+        })
+        convertedData.translations.push(template)
+        translationById.set(template.id, template)
+        project.defaultTranslationId = translationId
+      }
     }
 
     // Start a transaction to ensure atomic import
@@ -343,7 +371,7 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
         // Clear all tables (except global settings)
         await Promise.all([
           db.projects.clear(),
-          db.translations.clear(),
+          db.translations.filter(t => t.id !== GLOBAL_TRANSLATION_SETTINGS_ID).delete(),
           db.transcriptions.filter(t => t.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID).delete(),
           db.extractions.clear(),
           db.projectOrders.clear(),
@@ -381,6 +409,7 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
         convertedData.projectOrders = dataWithNewIds.projectOrders
         convertedData.basicSettings = dataWithNewIds.basicSettings
         convertedData.advancedSettings = dataWithNewIds.advancedSettings
+        translationById = new Map(convertedData.translations.map(t => [t.id, t]))
 
         // TODO: Move this to db-constructor.ts
         // Ensure projects have default settings

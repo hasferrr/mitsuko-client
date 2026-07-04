@@ -6,6 +6,7 @@ const projectSchema = z.object({
   translations: z.array(z.string()).optional(),
   transcriptions: z.array(z.string()).optional(),
   extractions: z.array(z.string()).optional(),
+  defaultTranslationId: z.string().optional(),
   isBatch: z.boolean().optional(),
   isDefaultTranslationEnabled: z.boolean().optional(),
   isDefaultExtractionEnabled: z.boolean().optional(),

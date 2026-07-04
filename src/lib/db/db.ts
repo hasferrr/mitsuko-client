@@ -7,6 +7,12 @@ import {
   normalizeExtractionStatus,
   stripExtractionDoneTag,
 } from '@/lib/extraction/status'
+import {
+  GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
+  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSLATION_SETTINGS_ID,
+} from '@/constants/global-settings'
+import { buildTranslationTemplate } from '@/lib/translation/template'
 
 class MyDatabase extends Dexie {
   projects!: Table<Project, string>
@@ -380,6 +386,35 @@ class MyDatabase extends Dexie {
           : looksAutoCreated ? linkedOwnerId ?? null : null
         extraction.completedAt = status === 'completed' ? completedAt ?? new Date() : null
       })
+    })
+    this.version(28).stores({}).upgrade(async tx => {
+      const projects = await tx.table('projects').toArray() as Project[]
+      const translationsTable = tx.table('translations')
+      const now = new Date()
+      const templates: Translation[] = []
+      const updatedProjects: Project[] = []
+
+      for (const project of projects) {
+        const id = crypto.randomUUID()
+        templates.push(buildTranslationTemplate({
+          id,
+          projectId: project.id,
+          basicSettingsId: project.defaultTranslationBasicSettingsId,
+          advancedSettingsId: project.defaultTranslationAdvancedSettingsId,
+          now,
+        }))
+        updatedProjects.push({ ...project, defaultTranslationId: id })
+      }
+
+      templates.push(buildTranslationTemplate({
+        id: GLOBAL_TRANSLATION_SETTINGS_ID,
+        projectId: 'global',
+        basicSettingsId: GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+        advancedSettingsId: GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
+        now,
+      }))
+      await tx.table('projects').bulkPut(updatedProjects)
+      await translationsTable.bulkPut(templates)
     })
   }
 }

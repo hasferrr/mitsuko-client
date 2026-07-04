@@ -11,6 +11,7 @@ import {
   GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
   GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
   GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSLATION_SETTINGS_ID,
   GLOBAL_TRANSCRIPTION_SETTINGS_ID
 } from "@/constants/global-settings"
 import { TranscriptionSettingsDialogue } from "@/components/settings/transcription-settings-dialogue"
@@ -241,6 +242,7 @@ export function UserSettings() {
         onOpenChange={setIsGlobalTranslationSettingsOpen}
         basicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
         advancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
+        defaultTranslationId={GLOBAL_TRANSLATION_SETTINGS_ID}
         settingsParentType="translation"
       />
       <TranscriptionSettingsDialogue

@@ -220,6 +220,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     projectToDelete.transcriptions.forEach((tid: string) => transcriptionStore.removeData(tid))
     projectToDelete.extractions.forEach((eid: string) => extractionStore.removeData(eid))
     projectToDelete.translations.forEach((tid: string) => translationStore.removeData(tid))
+    translationStore.removeData(projectToDelete.defaultTranslationId)
 
     set({
       projects: previousProjects.filter(p => p.id !== id),

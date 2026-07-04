@@ -76,7 +76,7 @@ Project
 ├── transcriptions: Transcription[]  # Audio transcription histories (settings stored on entity)
 ├── extractions: Extraction[]        # Context extraction histories
 └── Default Settings (per feature)
-    ├── Translation: defaultTranslationBasicSettingsId + defaultTranslationAdvancedSettingsId
+    ├── Translation: defaultTranslationBasicSettingsId + defaultTranslationAdvancedSettingsId + defaultTranslationId
     ├── Extraction: defaultExtractionBasicSettingsId + defaultExtractionAdvancedSettingsId
     └── Transcription: defaultTranscriptionId (stores settings directly on transcription)
 ```
@@ -91,6 +91,7 @@ Project
 **Settings Inheritance:**
 - Each Translation/Extraction stores its own `basicSettingsId` and `advancedSettingsId`
 - Transcriptions store settings directly on the entity (no separate settings table)
+- Translation auto-context defaults are stored on hidden template translations (`defaultTranslationId` per project and `GLOBAL_TRANSLATION_SETTINGS_ID` globally)
 - When creating a new item, which settings it inherits depends on the project's enable flags:
   - `isDefaultTranslationEnabled = true` → use project's `defaultTranslationBasicSettingsId`
   - `isDefaultTranslationEnabled = false` → use global settings (from `src/constants/global-settings.ts`)
@@ -108,6 +109,8 @@ Settings exist at multiple levels:
 1. **Global settings** - Default settings for all projects (stored with special IDs in `src/constants/global-settings.ts`)
 2. **Project default settings** - Per-project defaults for each feature (translation, extraction, transcription)
 3. **Item settings** - Individual translation/extraction settings
+
+`src/contexts/project-context.tsx` is the app-level hydration point for IndexedDB-backed defaults. It calls `ensureGlobalDefaultsExist()` first so required global records exist, then preloads global/default records that the UI expects to read synchronously from Zustand. When adding a new global template or default entity that drives settings UI, add a store loader there instead of fetching it ad hoc when a dialog first opens.
 
 ### API Integration
 

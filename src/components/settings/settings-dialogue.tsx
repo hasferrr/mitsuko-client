@@ -47,6 +47,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SettingsParentType } from "@/types/project"
+import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+import { GLOBAL_TRANSLATION_SETTINGS_ID } from "@/constants/global-settings"
+import { normalizeAutoContextDefault } from "@/lib/translation/auto-context-defaults"
 
 interface BaseSettingsDialogueProps {
   isOpen: boolean
@@ -54,6 +57,7 @@ interface BaseSettingsDialogueProps {
   basicSettingsId: string
   advancedSettingsId: string
   settingsParentType: SettingsParentType
+  defaultTranslationId?: string
 }
 
 interface GlobalSettingsDialogueProps extends BaseSettingsDialogueProps {
@@ -94,6 +98,8 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
   const resetAdvancedSettingsToGlobal = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsToGlobal)
   const resetBasicSettingsFrom = useSettingsStore((s) => s.resetBasicSettingsFrom)
   const resetAdvancedSettingsFrom = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsFrom)
+  const getTranslationDb = useTranslationDataStore((s) => s.getTranslationDb)
+  const updateTranslationDb = useTranslationDataStore((s) => s.updateTranslationDb)
 
   const dialogTitle = isGlobal
     ? "Global Settings"
@@ -116,10 +122,24 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
         : `Default settings for "${projectName}" will go here.`
 
   const handleResetAll = async () => {
+    const resetAutoContext = async () => {
+      if (settingsParentType !== 'translation' || !props.defaultTranslationId) return
+      const mode = isGlobal
+        ? 'disabled'
+        : normalizeAutoContextDefault((await getTranslationDb(GLOBAL_TRANSLATION_SETTINGS_ID, true))?.autoContextMode)
+      await updateTranslationDb(props.defaultTranslationId, {
+        autoContextMode: mode,
+        autoContextExtractionId: null,
+        autoContextPreviousMode: 'latest',
+        autoContextPreviousExtractionId: null,
+      })
+    }
+
     if (isGlobal) {
       await Promise.all([
         resetBasicSettings(basicSettingsId),
         resetAdvancedSettings(advancedSettingsId, basicSettingsId),
+        resetAutoContext(),
       ])
       return
     }
@@ -135,6 +155,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
     await Promise.all([
       basicResetPromise,
       advancedResetPromise,
+      resetAutoContext(),
     ])
   }
 
@@ -224,6 +245,8 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                       <CardContent className="space-y-6">
                         <ContextDocumentInput
                           basicSettingsId={basicSettingsId}
+                          translationId={props.defaultTranslationId}
+                          isTemplateTranslation={!!props.defaultTranslationId}
                         />
                         <CustomInstructionsInput
                           basicSettingsId={basicSettingsId}

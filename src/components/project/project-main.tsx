@@ -11,6 +11,7 @@ import {
   GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
   GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
   GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSLATION_SETTINGS_ID,
   GLOBAL_TRANSCRIPTION_SETTINGS_ID,
 } from "@/constants/global-settings"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -104,6 +105,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         projectName={currentProject.name}
         basicSettingsId={currentProject.defaultTranslationBasicSettingsId}
         advancedSettingsId={currentProject.defaultTranslationAdvancedSettingsId}
+        defaultTranslationId={currentProject.defaultTranslationId}
         resetFromBasicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
         resetFromAdvancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
         settingsParentType="translation"
@@ -153,6 +155,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         onOpenChange={setIsGlobalTranslationSettingsOpen}
         basicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
         advancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
+        defaultTranslationId={GLOBAL_TRANSLATION_SETTINGS_ID}
         settingsParentType="translation"
       />
 

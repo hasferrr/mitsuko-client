@@ -12,7 +12,13 @@ cleanedExtractionResult + "\n\n" + currentContextDocumentTextarea
 
 The saved Context Document textarea is not overwritten. Batch translation is excluded. Continue and Fill Missing Translations also resolve auto context before starting.
 
-## Translation Fields
+## Configurable Defaults
+
+Project and global translation defaults are stored as hidden template translations. Their Auto dialog offers only Off and Extract & translate. A project template is used when project translation defaults are enabled; otherwise the global template is used. Batch translations always start with auto context disabled. Changing a default affects only translations created afterward.
+
+Template translations are not included in project translation lists, counts, or processing queues. They store no operational extraction links. A template's `use-existing` or invalid mode is treated as disabled.
+
+## Operational Translation Fields
 
 Each `Translation` stores:
 

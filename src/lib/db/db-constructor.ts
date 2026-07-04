@@ -172,6 +172,12 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       basicSettingsMap.get(project.defaultTranslationBasicSettingsId)?.id ?? project.defaultTranslationBasicSettingsId
     const newDefaultTranslationAdvancedSettingsId =
       advancedSettingsMap.get(project.defaultTranslationAdvancedSettingsId)?.id ?? project.defaultTranslationAdvancedSettingsId
+    const newDefaultTranslationId =
+      translationsMap.get(project.defaultTranslationId)?.id ?? project.defaultTranslationId
+    const newDefaultTranslation = translationsMap.get(project.defaultTranslationId)
+    if (newDefaultTranslation) {
+      newDefaultTranslation.projectId = newId
+    }
     const newDefaultExtractionBasicSettingsId =
       basicSettingsMap.get(project.defaultExtractionBasicSettingsId)?.id ?? project.defaultExtractionBasicSettingsId
     const newDefaultExtractionAdvancedSettingsId =
@@ -189,6 +195,7 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       defaultAdvancedSettingsId: newDefaultAdvancedSettingsId,
       defaultTranslationBasicSettingsId: newDefaultTranslationBasicSettingsId,
       defaultTranslationAdvancedSettingsId: newDefaultTranslationAdvancedSettingsId,
+      defaultTranslationId: newDefaultTranslationId,
       defaultExtractionBasicSettingsId: newDefaultExtractionBasicSettingsId,
       defaultExtractionAdvancedSettingsId: newDefaultExtractionAdvancedSettingsId,
       defaultTranscriptionId: newDefaultTranscriptionId,
@@ -245,6 +252,7 @@ function projectConstructor(project: Partial<Project>): Project {
     defaultAdvancedSettingsId: project.defaultAdvancedSettingsId ?? "",
     defaultTranslationBasicSettingsId: project.defaultTranslationBasicSettingsId ?? "",
     defaultTranslationAdvancedSettingsId: project.defaultTranslationAdvancedSettingsId ?? "",
+    defaultTranslationId: project.defaultTranslationId ?? "",
     defaultExtractionBasicSettingsId: project.defaultExtractionBasicSettingsId ?? "",
     defaultExtractionAdvancedSettingsId: project.defaultExtractionAdvancedSettingsId ?? "",
     defaultTranscriptionId: project.defaultTranscriptionId ?? "",

@@ -88,6 +88,28 @@ describe("databaseExportConstructor", () => {
 })
 
 describe("generateNewIds", () => {
+  test("remaps a hidden default translation", () => {
+    const data = databaseExportConstructor({
+      projects: [{
+        id: "project-1",
+        defaultTranslationId: "template-1",
+      } as Partial<Project> as Project],
+      translations: [{
+        id: "template-1",
+        projectId: "project-1",
+        autoContextMode: "create-new",
+      } as Partial<Translation> as Translation],
+    })
+
+    const remapped = generateNewIds(data)
+    const project = remapped.projects[0]
+    const template = remapped.translations.find(item => item.id === project.defaultTranslationId)
+
+    expect(project.defaultTranslationId).not.toBe("template-1")
+    expect(template?.projectId).toBe(project.id)
+    expect(project.translations).not.toContain(project.defaultTranslationId)
+  })
+
   test("remaps auto context extraction links", () => {
     const data = databaseExportConstructor({
       projects: [{

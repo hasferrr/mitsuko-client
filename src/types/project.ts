@@ -25,6 +25,7 @@ export interface Project {
   defaultAdvancedSettingsId: string
   defaultTranslationBasicSettingsId: string
   defaultTranslationAdvancedSettingsId: string
+  defaultTranslationId: string
   defaultExtractionBasicSettingsId: string
   defaultExtractionAdvancedSettingsId: string
   defaultTranscriptionId: string

@@ -27,6 +27,7 @@ type AutoContextSetterMap = { [K in AutoContextKey]: (id: string, value: Transla
 interface Props {
   basicSettingsId: string
   translationId?: string
+  isTemplateTranslation?: boolean
   onOpenExtraction?: (extractionId: string) => void
   onOpenExtractionSettings?: () => void
 }
@@ -82,13 +83,14 @@ function StatusMessage({ variant, children }: { variant: "info" | "warning" | "m
   )
 }
 
-export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOpenExtraction, onOpenExtractionSettings }: Props) => {
+export const ContextDocumentInput = memo(({ basicSettingsId, translationId, isTemplateTranslation = false, onOpenExtraction, onOpenExtractionSettings }: Props) => {
   const currentProject = useProjectStore((state) => state.currentProject)
   const contextDocument = useSettingsStore((state) => state.getContextDocument(basicSettingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
   const setContextDocument = (doc: string) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc)
   const translation = useTranslationDataStore((state) => translationId ? state.data[translationId] : null)
   const saveTranslation = useTranslationDataStore((state) => state.saveData)
+  const getTranslationDb = useTranslationDataStore((state) => state.getTranslationDb)
   const setAutoContextMode = useTranslationDataStore((state) => state.setAutoContextMode)
   const setAutoContextExtractionId = useTranslationDataStore((state) => state.setAutoContextExtractionId)
   const setAutoContextPreviousMode = useTranslationDataStore((state) => state.setAutoContextPreviousMode)
@@ -105,6 +107,10 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
   const [projectExtractions, setProjectExtractions] = useState<Extraction[]>([])
 
   const { setHasChanges } = useUnsavedChanges()
+
+  useEffect(() => {
+    if (translationId && !translation) getTranslationDb(translationId)
+  }, [getTranslationDb, translation, translationId])
 
   const loadProjectExtractions = useCallback(async () => {
     if (!currentProject) return
@@ -342,16 +348,18 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
                   title="Extract & translate"
                   description="Get context from this subtitle, then start translating with it."
                 />
-                <ModeCard
-                  selected={autoContextMode === "use-existing"}
-                  onClick={() => handleAutoModeChange("use-existing")}
-                  icon={Link2}
-                  title="Use existing extraction"
-                  description="Pick a finished context from this project to attach."
-                />
+                {!isTemplateTranslation && (
+                  <ModeCard
+                    selected={autoContextMode === "use-existing"}
+                    onClick={() => handleAutoModeChange("use-existing")}
+                    icon={Link2}
+                    title="Use existing extraction"
+                    description="Pick a finished context from this project to attach."
+                  />
+                )}
               </div>
 
-              {autoContextMode === "use-existing" && (
+              {!isTemplateTranslation && autoContextMode === "use-existing" && (
                 <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/30 p-3">
                   <div className="flex items-center justify-between gap-2">
                     <label className="text-sm font-medium">Extraction to use</label>
@@ -413,7 +421,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
                 </div>
               )}
 
-              {autoContextMode === "create-new" && (
+              {!isTemplateTranslation && autoContextMode === "create-new" && (
                 <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/30 p-3">
                   <label className="text-sm font-medium">Feed previous context into this extraction</label>
                   <p className="text-xs text-muted-foreground -mt-1">
@@ -532,7 +540,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
                 </div>
               )}
 
-              {autoContextMode !== "disabled" && (
+              {!isTemplateTranslation && autoContextMode !== "disabled" && (
                 <Collapsible open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" size="sm" className="w-full justify-between">
@@ -561,7 +569,7 @@ export const ContextDocumentInput = memo(({ basicSettingsId, translationId, onOp
             </div>
 
             <DialogFooter>
-              {onOpenExtractionSettings && (
+              {!isTemplateTranslation && onOpenExtractionSettings && (
                 <Button
                   variant="outline"
                   size="sm"
