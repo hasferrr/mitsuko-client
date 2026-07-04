@@ -32,7 +32,7 @@ interface CreateEditInstructionDialogProps {
 }
 
 export function CreateEditInstructionDialog({ children, instruction }: CreateEditInstructionDialogProps) {
-  const { create, update, loading } = useCustomInstructionStore()
+  const { create, update } = useCustomInstructionStore()
   const [isOpen, setIsOpen] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -118,7 +118,7 @@ export function CreateEditInstructionDialog({ children, instruction }: CreateEdi
             />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction type="submit" disabled={loading || !form.formState.isValid}>Save</AlertDialogAction>
+              <AlertDialogAction type="submit" disabled={form.formState.isSubmitting || !form.formState.isValid}>Save</AlertDialogAction>
             </AlertDialogFooter>
           </form>
         </Form>

@@ -296,7 +296,7 @@ export default function PublicLibrary() {
                     <User className="size-3 mr-1" />
                     <span>{item.user_id.split('-')[0]}</span>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
                     <div className="flex items-center">
                       <Calendar className="size-3 mr-1" />
                       <span>{formatDate(item.created_at)}</span>
@@ -304,7 +304,8 @@ export default function PublicLibrary() {
                     {session?.user.id === item.user_id && (
                       <Button
                         variant="link"
-                        className="text-muted-foreground hover:text-foreground p-0 size-3 [&_svg]:h-3 [&_svg]:w-3"
+                        size="xs"
+                        className="text-muted-foreground hover:text-foreground"
                         onClick={e => {
                           e.stopPropagation()
                           if (item.id) handleDeleteClick(item.id)
@@ -316,6 +317,7 @@ export default function PublicLibrary() {
                         ) : (
                           <Trash />
                         )}
+                        Delete
                       </Button>
                     )}
                   </div>

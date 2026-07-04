@@ -5,3 +5,10 @@ export interface CustomInstruction {
   createdAt?: Date
   updatedAt?: Date
 }
+
+export interface CustomInstructionOrder {
+  id: string
+  order: string[]
+  createdAt: Date
+  updatedAt: Date
+}

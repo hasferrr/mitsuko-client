@@ -4,7 +4,7 @@ import {
   DEFAULT_EXTRACTION_BASIC_SETTINGS,
 } from '@/constants/default'
 import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
-import { CustomInstruction } from '@/types/custom-instruction'
+import { CustomInstruction, CustomInstructionOrder } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'
 import {
   AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX,
@@ -28,6 +28,7 @@ class MyDatabase extends Dexie {
   basicSettings!: Table<BasicSettings, string>
   advancedSettings!: Table<AdvancedSettings, string>
   customInstructions!: Table<CustomInstruction, string>
+  customInstructionOrders!: Table<CustomInstructionOrder, string>
 
   constructor() {
     super('myDatabase')
@@ -412,6 +413,9 @@ class MyDatabase extends Dexie {
       }))
       await tx.table('projects').bulkPut(updatedProjects)
       await translationsTable.bulkPut(templates)
+    })
+    this.version(29).stores({
+      customInstructionOrders: 'id',
     })
   }
 }

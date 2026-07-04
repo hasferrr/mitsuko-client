@@ -5,89 +5,96 @@ import {
   deleteCustomInstruction as deleteDB,
   getAllCustomInstructions as getAllDB,
   updateCustomInstruction as updateDB,
-  bulkCreateCustomInstructions as bulkCreateDB
+  bulkCreateCustomInstructions as bulkCreateDB,
+  updateCustomInstructionOrder as updateOrderDB,
 } from '@/lib/db/custom-instruction'
 
 interface CustomInstructionStore {
   customInstructions: CustomInstruction[]
-  loading: boolean
   error: string | null
   load: () => Promise<void>
   create: (name: string, content: string) => Promise<CustomInstruction>
   update: (id: string, changes: Partial<Pick<CustomInstruction, 'name' | 'content'>>) => Promise<void>
   remove: (id: string) => Promise<void>
   bulkCreate: (instructions: CustomInstruction[]) => Promise<void>
+  reorder: (newOrder: string[]) => Promise<void>
 }
 
-export const useCustomInstructionStore = create<CustomInstructionStore>((set) => ({
+export const useCustomInstructionStore = create<CustomInstructionStore>((set, get) => ({
   customInstructions: [],
-  loading: false,
   error: null,
 
   load: async () => {
-    set({ loading: true, error: null })
+    set({ error: null })
     try {
       const data = await getAllDB()
-      set({ customInstructions: data, loading: false })
+      set({ customInstructions: data })
     } catch {
-      set({ error: 'Failed to load custom instructions', loading: false })
+      set({ error: 'Failed to load custom instructions' })
     }
   },
 
   create: async (name, content) => {
-    set({ loading: true })
     try {
       const newItem = await createDB({ name, content })
       set((state) => ({
         customInstructions: [...state.customInstructions, newItem],
-        loading: false
       }))
       return newItem
     } catch (error) {
-      set({ error: 'Failed to create custom instruction', loading: false })
+      set({ error: 'Failed to create custom instruction' })
       throw error
     }
   },
 
   update: async (id, changes) => {
-    set({ loading: true })
     try {
       const updated = await updateDB(id, changes)
       set((state) => ({
         customInstructions: state.customInstructions.map(item =>
           item.id === id ? updated : item
         ),
-        loading: false
       }))
     } catch {
-      set({ error: 'Failed to update custom instruction', loading: false })
+      set({ error: 'Failed to update custom instruction' })
     }
   },
 
   remove: async (id) => {
-    set({ loading: true })
     try {
       await deleteDB(id)
       set((state) => ({
         customInstructions: state.customInstructions.filter(item => item.id !== id),
-        loading: false
       }))
     } catch {
-      set({ error: 'Failed to delete custom instruction', loading: false })
+      set({ error: 'Failed to delete custom instruction' })
     }
   },
 
   bulkCreate: async (instructions) => {
-    set({ loading: true })
     try {
       await bulkCreateDB(instructions)
       set((state) => ({
         customInstructions: [...state.customInstructions, ...instructions],
-        loading: false
       }))
     } catch (error) {
-      set({ error: 'Failed to import custom instructions', loading: false })
+      set({ error: 'Failed to import custom instructions' })
       throw error
+    }
+  },
+
+  reorder: async (newOrder) => {
+    const previousInstructions = get().customInstructions
+    const reordered = newOrder
+      .map(id => previousInstructions.find(item => item.id === id))
+      .filter((item): item is CustomInstruction => Boolean(item))
+    set({ customInstructions: reordered })
+
+    try {
+      await updateOrderDB(newOrder)
+    } catch (error) {
+      console.error('Failed to reorder custom instructions', error)
+      set({ customInstructions: previousInstructions, error: 'Failed to reorder custom instructions' })
     }
   }
 }))

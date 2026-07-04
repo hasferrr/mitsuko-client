@@ -23,6 +23,7 @@ import {
   Search,
   Loader2,
   Globe,
+  GripVertical,
 } from 'lucide-react'
 import {
   Card,
@@ -38,9 +39,27 @@ import { ExportInstructionsControls } from './export-instructions-controls'
 import { CreateEditInstructionDialog } from './create-edit-instruction-dialog'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createPublicCustomInstruction } from '@/lib/api/custom-instruction'
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  useSortable,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { CustomInstruction } from '@/types/custom-instruction'
 
 export default function MyLibrary() {
-  const { customInstructions, load, remove, loading } =
+  const { customInstructions, load, remove, reorder } =
     useCustomInstructionStore()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -72,6 +91,27 @@ export default function MyLibrary() {
   useEffect(() => {
     load()
   }, [load])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = customInstructions.findIndex(item => item.id === active.id)
+    const newIndex = customInstructions.findIndex(item => item.id === over.id)
+    if (oldIndex === -1 || newIndex === -1) return
+    const newOrder = arrayMove(
+      customInstructions.map(item => item.id),
+      oldIndex,
+      newIndex,
+    )
+    await reorder(newOrder)
+  }
 
   const handleDelete = (id: string) => {
     setDeleteId(id)
@@ -179,11 +219,7 @@ export default function MyLibrary() {
         </div>
       )}
 
-      {loading ? (
-        <div className="flex justify-center items-center py-8">
-          <p className="text-muted-foreground">Loading instructions...</p>
-        </div>
-      ) : customInstructions.length === 0 ? (
+      {customInstructions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 px-4 border border-dashed rounded-lg">
           <FileText className="size-12 text-muted-foreground mb-4" />
           <h2 className="text-xl font-medium mb-2 text-center">Your Library is Empty</h2>
@@ -210,79 +246,32 @@ export default function MyLibrary() {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredInstructions.map(item => (
-                <CreateEditInstructionDialog key={item.id} instruction={item}>
-                  <Card
-                    className={cn(
-                      "overflow-hidden h-full flex flex-col transition-colors duration-300 relative",
-                      "cursor-pointer",
-                      selectedIds.has(item.id) && "ring-primary"
-                    )}
-                    onClick={(e) => {
-                      if (isSelectionMode) {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        handleToggleSelection(item.id)
-                      }
-                    }}
-                  >
-                    {isSelectionMode && (
-                      <Checkbox
-                        checked={selectedIds.has(item.id)}
-                        onCheckedChange={() => handleToggleSelection(item.id)}
-                        className="absolute top-3 right-3 z-10"
-                        aria-label={`Select ${item.name}`}
-                      />
-                    )}
-                    <CardHeader>
-                      <CardTitle>{item.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="grow">
-                      <p className="text-sm text-muted-foreground line-clamp-4">
-                        {item.content}
-                      </p>
-                    </CardContent>
-                    <CardFooter className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={e => {
-                          e.stopPropagation()
-                          if (item.id) {
-                            handleOpenPublishDialog(
-                              item.id,
-                              item.name,
-                              item.content,
-                            )
-                          }
-                        }}
-                        disabled={isSelectionMode || publishingId === item.id}
-                      >
-                        {publishingId === item.id ? (
-                          <Loader2 className="size-4 animate-spin" />
-                        ) : (
-                          <Globe className="size-4" />
-                        )}
-                      </Button>
-                      <Button variant="outline" size="sm" disabled={isSelectionMode}>
-                        <Pencil className="size-4" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => { e.stopPropagation(); handleDelete(item.id!) }}
-                        disabled={isSelectionMode}
-                      >
-                        <Trash className="size-4" />
-                        Delete
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </CreateEditInstructionDialog>
-              ))}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={filteredInstructions.map(item => item.id)}
+                strategy={rectSortingStrategy}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredInstructions.map(item => (
+                    <SortableInstructionCard
+                      key={item.id}
+                      item={item}
+                      isSelectionMode={isSelectionMode}
+                      isSelected={selectedIds.has(item.id)}
+                      publishingId={publishingId}
+                      isSearching={searchQuery !== ''}
+                      onToggleSelection={handleToggleSelection}
+                      onOpenPublishDialog={handleOpenPublishDialog}
+                      onDelete={handleDelete}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
         </>
       )}
@@ -293,12 +282,10 @@ export default function MyLibrary() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Are you sure you want to publish this instruction?
+              Publish this instruction?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will make your custom instruction publicly available for
-              other users to view and import. You can hide it later if you
-              wish.
+              This will make your instruction public so others can import it. You can hide it later.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -347,5 +334,126 @@ export default function MyLibrary() {
         </AlertDialogContent>
       </AlertDialog>
     </>
+  )
+}
+
+interface SortableInstructionCardProps {
+  item: CustomInstruction
+  isSelectionMode: boolean
+  isSelected: boolean
+  publishingId: string | null
+  isSearching: boolean
+  onToggleSelection: (id: string) => void
+  onOpenPublishDialog: (id: string, name: string, content: string) => void
+  onDelete: (id: string) => void
+}
+
+function SortableInstructionCard({
+  item,
+  isSelectionMode,
+  isSelected,
+  publishingId,
+  isSearching,
+  onToggleSelection,
+  onOpenPublishDialog,
+  onDelete,
+}: SortableInstructionCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: item.id,
+    disabled: isSelectionMode || isSearching,
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 1 : 0,
+  }
+
+  const canDrag = !isSelectionMode && !isSearching
+
+  return (
+    <CreateEditInstructionDialog instruction={item}>
+      <Card
+        ref={setNodeRef}
+        style={style}
+        className={cn(
+          "overflow-hidden h-full flex flex-col transition-colors duration-300 relative",
+          "cursor-pointer",
+          isSelected && "ring-primary",
+          isDragging && "opacity-50",
+        )}
+        onClick={(e) => {
+          if (isSelectionMode) {
+            e.preventDefault()
+            e.stopPropagation()
+            onToggleSelection(item.id)
+          }
+        }}
+      >
+        {isSelectionMode && (
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={() => onToggleSelection(item.id)}
+            className="absolute top-3 right-3 z-10"
+            aria-label={`Select ${item.name}`}
+          />
+        )}
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
+          <CardTitle className="truncate">{item.name}</CardTitle>
+          {canDrag && (
+            <div
+              className="shrink-0 rounded-md p-1 cursor-grab hover:bg-muted text-muted-foreground hover:text-foreground focus:outline-hidden"
+              {...attributes}
+              {...listeners}
+              onClick={e => e.stopPropagation()}
+            >
+              <GripVertical className="size-4" />
+            </div>
+          )}
+        </CardHeader>
+        <CardContent className="grow">
+          <p className="text-sm text-muted-foreground line-clamp-4">
+            {item.content}
+          </p>
+        </CardContent>
+        <CardFooter className="flex justify-end gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={e => {
+              e.stopPropagation()
+              onOpenPublishDialog(item.id, item.name, item.content)
+            }}
+            disabled={isSelectionMode || publishingId === item.id}
+          >
+            {publishingId === item.id ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Globe className="size-4" />
+            )}
+          </Button>
+          <Button variant="outline" size="sm" disabled={isSelectionMode}>
+            <Pencil className="size-4" />
+            Edit
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); onDelete(item.id) }}
+            disabled={isSelectionMode}
+          >
+            <Trash className="size-4" />
+            Delete
+          </Button>
+        </CardFooter>
+      </Card>
+    </CreateEditInstructionDialog>
   )
 }

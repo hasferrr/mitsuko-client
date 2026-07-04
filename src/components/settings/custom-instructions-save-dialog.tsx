@@ -15,17 +15,22 @@ interface CustomInstructionsSaveDialogProps {
 export function CustomInstructionsSaveDialog({ customInstructions }: CustomInstructionsSaveDialogProps) {
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
   const [newInstructionName, setNewInstructionName] = useState("")
+  const [isSaving, setIsSaving] = useState(false)
 
   const {
-    loading: instructionsLoading,
     create: createInstruction,
   } = useCustomInstructionStore()
 
   const handleSaveToLibrary = async () => {
     if (!newInstructionName.trim() || !customInstructions.trim()) return
-    await createInstruction(newInstructionName, customInstructions)
-    setIsSaveDialogOpen(false)
-    setNewInstructionName("")
+    setIsSaving(true)
+    try {
+      await createInstruction(newInstructionName, customInstructions)
+      setIsSaveDialogOpen(false)
+      setNewInstructionName("")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -59,8 +64,8 @@ export function CustomInstructionsSaveDialog({ customInstructions }: CustomInstr
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setIsSaveDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveToLibrary} disabled={!newInstructionName.trim() || instructionsLoading}>
-              {instructionsLoading ? "Saving..." : "Save to Library"}
+            <Button onClick={handleSaveToLibrary} disabled={!newInstructionName.trim() || isSaving}>
+              {isSaving ? "Saving..." : "Save to Library"}
             </Button>
           </DialogFooter>
         </DialogContent>

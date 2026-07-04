@@ -19,7 +19,6 @@ export function CustomInstructionsLibraryControls({ onSelectFromLibrary }: Custo
   const {
     customInstructions: libraryInstructions,
     load: loadInstructions,
-    loading: instructionsLoading,
   } = useCustomInstructionStore()
 
   const openLibraryDialog = () => {
@@ -63,11 +62,7 @@ export function CustomInstructionsLibraryControls({ onSelectFromLibrary }: Custo
             />
           )}
           <div className="max-h-[350px] overflow-y-auto">
-            {instructionsLoading ? (
-              <div className="py-6 text-center text-muted-foreground">
-                Loading...
-              </div>
-            ) : libraryInstructions.length === 0 ? (
+            {libraryInstructions.length === 0 ? (
               <div className="py-6 text-center text-muted-foreground">
                 No custom instructions found in your library.
               </div>
