@@ -122,7 +122,7 @@ All AI processing happens in the backend (chizuru-translator). The frontend:
 
 ### Database Migrations
 
-Dexie database is at version 24. When modifying data models in `src/types/`:
+Dexie database migrations live in `src/lib/db/db.ts`. When modifying data models in `src/types/`:
 
 1. Update the TypeScript interface
 2. Increment `this.version(X)` in `src/lib/db/db.ts`
