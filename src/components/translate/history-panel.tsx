@@ -201,7 +201,15 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
 
   return (
     <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
-      <DialogContent className="grid min-h-[min(700px,92vh)] max-h-[92vh] grid-rows-[auto_minmax(0,1fr)_auto] sm:max-w-[min(1200px,calc(100%-2rem))]">
+      <DialogContent
+        onInteractOutside={(e) => {
+          const target = e.detail.originalEvent.target as HTMLElement | null
+          if (target?.closest("[data-slot='dialog-content']")) {
+            e.preventDefault()
+          }
+        }}
+        className="grid min-h-[min(700px,92vh)] max-h-[92vh] grid-rows-[auto_minmax(0,1fr)_auto] sm:max-w-[min(1200px,calc(100%-2rem))]"
+      >
         <DialogHeader>
           <DialogTitle>Translation History</DialogTitle>
           <DialogDescription>
