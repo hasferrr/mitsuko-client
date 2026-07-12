@@ -27,6 +27,13 @@ import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-setting
 import { useHistoryStore, type HistoryItem } from "@/stores/ui/use-history-store"
 import { toast } from "sonner"
 import { HISTORY_MAX_ITEMS } from "@/constants/limits"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 interface HistoryPanelProps {
   isHistoryOpen: boolean
@@ -192,17 +199,23 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
   const [showImportConfirm, setShowImportConfirm] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  if (!isHistoryOpen) return null
-
   return (
-    <>
-      <ResizablePanelGroup
-        orientation="horizontal"
-        className="max-w-4xl mx-auto h-[1000px] border rounded-lg"
-      >
-        {/* Left Panel: History List */}
-        <ResizablePanel defaultSize={30} minSize={20}>
-          <ScrollArea className="h-[550px]">
+    <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+      <DialogContent className="grid min-h-[min(700px,92vh)] max-h-[92vh] grid-rows-[auto_minmax(0,1fr)_auto] sm:max-w-[min(1200px,calc(100%-2rem))]">
+        <DialogHeader>
+          <DialogTitle>Translation History</DialogTitle>
+          <DialogDescription>
+            Review saved translation responses or apply one to the current subtitles.
+          </DialogDescription>
+        </DialogHeader>
+
+        <ResizablePanelGroup
+          orientation="horizontal"
+          className="h-[min(70vh,1000px)] min-h-0 overflow-hidden rounded-lg border"
+        >
+          {/* Left Panel: History List */}
+          <ResizablePanel defaultSize={30} minSize={20}>
+            <ScrollArea className="h-full">
             {history.toReversed().map((item, reversedIndex) => {
               const index = history.length - reversedIndex - 1
               return (
@@ -230,13 +243,13 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
               )
             }
             )}
-          </ScrollArea>
-        </ResizablePanel>
+            </ScrollArea>
+          </ResizablePanel>
 
-        <ResizableHandle />
+          <ResizableHandle />
 
         {/* Right Panel: Split Vertically into Three */}
-        <ResizablePanel defaultSize={70} minSize={10}>
+          <ResizablePanel defaultSize={70} minSize={10}>
           <ResizablePanelGroup
             orientation="vertical"
             className="h-full"
@@ -303,19 +316,19 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
               </ScrollArea>
             </ResizablePanel>
           </ResizablePanelGroup>
-        </ResizablePanel>
+          </ResizablePanel>
 
-      </ResizablePanelGroup>
+        </ResizablePanelGroup>
 
-      {/* History Action Buttons */}
-      <div className="flex justify-center gap-4 mt-4 flex-wrap">
-        <Button variant="outline" disabled={history.length === 0} onClick={handleExportAll}>
-          <FileJson className="size-4" /> Export All
-        </Button>
+        {/* History Action Buttons */}
+        <div className="flex flex-wrap justify-center gap-4">
+          <Button variant="outline" disabled={history.length === 0} onClick={handleExportAll}>
+            <FileJson className="size-4" /> Export All
+          </Button>
 
-        <Button variant="outline" onClick={handleImport}>
-          <FileUp className="size-4" /> Import
-        </Button>
+          <Button variant="outline" onClick={handleImport}>
+            <FileUp className="size-4" /> Import
+          </Button>
 
         <AlertDialog open={showImportConfirm} onOpenChange={setShowImportConfirm}>
           <AlertDialogContent>
@@ -399,7 +412,8 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
-    </>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

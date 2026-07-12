@@ -504,9 +504,7 @@ export default function SubtitleTranslatorMain({
       </div>
 
       {/* Main Content */}
-      <div
-        className={cn("grid md:grid-cols-[1fr_402px] gap-6", isHistoryOpen && "hidden")}
-      >
+      <div className="grid gap-6 md:grid-cols-[1fr_402px]">
         {/* Left Column - Subtitles */}
         <div className="space-y-4">
           <div className="flex items-center justify-between mr-4 gap-1.5">
