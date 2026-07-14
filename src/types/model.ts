@@ -15,6 +15,7 @@ export type UsageLevel =
   | "medium"
   | "high"
   | "very high"
+  | "extremely high"
   | "N/A"
 
 export interface Model {

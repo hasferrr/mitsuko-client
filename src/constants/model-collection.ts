@@ -204,6 +204,19 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "anthropic",
     models: [
       {
+        name: "Claude Opus 4.8",
+        maxInput: 1_000_000,
+        maxOutput: 128_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "extremely high",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "Claude 5 Sonnet",
         maxInput: 1_000_000,
         maxOutput: 128_000,
@@ -248,6 +261,19 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "xai",
     models: [
       {
+        name: "Grok 4.5",
+        maxInput: 500_000,
+        maxOutput: 500_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "high",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "Grok 4.3",
         maxInput: 1_000_000,
         maxOutput: 1_000_000,
@@ -265,6 +291,62 @@ const RAW_PAID_MODELS: PaidModelCollection = {
   OpenAI: {
     provider: "openai",
     models: [
+      {
+        name: "GPT-5.6 Sol",
+        maxInput: 1_050_000,
+        maxOutput: 128_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "extremely high",
+        isFormatReasoning: true,
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "GPT-5.6 Terra",
+        maxInput: 1_050_000,
+        maxOutput: 128_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "high",
+        isFormatReasoning: true,
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "GPT-5.6 Luna",
+        maxInput: 1_050_000,
+        maxOutput: 128_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "medium",
+        isFormatReasoning: true,
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "GPT-5.5",
+        maxInput: 1_050_000,
+        maxOutput: 128_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "extremely high",
+        isFormatReasoning: true,
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
       {
         name: "GPT-5.4",
         maxInput: 1_050_000,
