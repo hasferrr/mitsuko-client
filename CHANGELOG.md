@@ -14,6 +14,11 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### July 15
+
+- 🤖 **Model Updates:** Added Claude Opus 4.8, Grok 4.5, GPT-5.6 Sol, GPT-5.6 Terra, GPT-5.6 Luna, and GPT-5.5, with refreshed Claude model names for consistency.
+- 🔥 **High-Cost Model Safety:** Models with extremely high credit usage are now hidden by default. You can enable them in User Settings after confirming the additional cost.
+
 ### July 3
 
 - 🔔 **Processing Notifications:** Mitsuko can now notify you when translations, transcriptions, extractions, or batch jobs finish, so you can safely switch tabs while long tasks run.
