@@ -217,7 +217,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "Claude 5 Sonnet",
+        name: "Claude Sonnet 5",
         maxInput: 1_000_000,
         maxOutput: 128_000,
         structuredOutput: true,
@@ -230,7 +230,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "Claude 4.6 Sonnet",
+        name: "Claude Sonnet 4.6",
         maxInput: 200_000,
         maxOutput: 64_000,
         structuredOutput: true,
@@ -243,7 +243,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         }
       },
       {
-        name: "Claude 4.5 Haiku",
+        name: "Claude Haiku 4.5",
         maxInput: 200_000,
         maxOutput: 64_000,
         structuredOutput: true,
@@ -613,4 +613,22 @@ export const PAID_MODELS = excludeModelsByName(RAW_PAID_MODELS, EXCLUDE_PAID_MOD
 export const MODEL_COLLECTION: ModelCollection = {
   ...PAID_MODELS,
   ...FREE_MODELS,
+}
+
+export const getSelectableModelCollection = (
+  includeExtremelyHighCostModels: boolean
+): ModelCollection => {
+  if (includeExtremelyHighCostModels) return MODEL_COLLECTION
+
+  const result: ModelCollection = {}
+
+  for (const [key, group] of Object.entries(MODEL_COLLECTION)) {
+    const models = group.models.filter((model) => model.usage !== "extremely high")
+
+    if (models.length > 0) {
+      result[key] = { ...group, models }
+    }
+  }
+
+  return result
 }

@@ -18,6 +18,7 @@ interface LocalSettingsStore {
   isAutoEnableProjectSettings: boolean
   isNoStoreEnabled: boolean
   isCompletionNotificationEnabled: boolean
+  isExtremelyHighCostModelEnabled: boolean
   dismissedDialogs: Record<string, boolean>
 
   addApiConfig: (config: CustomApiConfig) => void
@@ -34,6 +35,7 @@ interface LocalSettingsStore {
   setIsAutoEnableProjectSettings: (enabled: boolean) => void
   setIsNoStoreEnabled: (enabled: boolean) => void
   setIsCompletionNotificationEnabled: (enabled: boolean) => void
+  setIsExtremelyHighCostModelEnabled: (enabled: boolean) => void
   dismissDialog: (id: string) => void
   resetAllDismissedDialogs: () => void
 }
@@ -51,6 +53,7 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       isAutoEnableProjectSettings: false,
       isNoStoreEnabled: false,
       isCompletionNotificationEnabled: false,
+      isExtremelyHighCostModelEnabled: false,
       dismissedDialogs: {},
 
       addApiConfig: (config) =>
@@ -96,12 +99,13 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
       setIsAutoEnableProjectSettings: (enabled) => set({ isAutoEnableProjectSettings: enabled }),
       setIsNoStoreEnabled: (enabled) => set({ isNoStoreEnabled: enabled }),
       setIsCompletionNotificationEnabled: (enabled) => set({ isCompletionNotificationEnabled: enabled }),
+      setIsExtremelyHighCostModelEnabled: (enabled) => set({ isExtremelyHighCostModelEnabled: enabled }),
       dismissDialog: (id) => set((state) => ({ dismissedDialogs: { ...state.dismissedDialogs, [id]: true } })),
       resetAllDismissedDialogs: () => set({ dismissedDialogs: {} }),
     }),
     {
       name: "api-settings-storage",
-      version: 8,
+      version: 9,
       migrate: (persistedState, version) => {
         if (version === 0) {
           const oldState = persistedState as {
@@ -166,6 +170,11 @@ export const useLocalSettingsStore = create<LocalSettingsStore>()(
           if (typeof state.isCompletionNotificationEnabled !== "boolean") {
             state.isCompletionNotificationEnabled = false
           }
+        }
+
+        if (version < 9) {
+          const state = persistedState as { isExtremelyHighCostModelEnabled?: boolean }
+          state.isExtremelyHighCostModelEnabled = false
         }
 
         return persistedState

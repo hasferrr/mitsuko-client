@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Popover as RadixPopover } from "radix-ui"
 type PopoverProps = RadixPopover.PopoverProps
-import { ChevronsUpDown } from "lucide-react"
+import { ChevronsUpDown, Flame } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -23,7 +23,7 @@ import {
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { Model, ModelProvider } from "@/types/model"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { MODEL_COLLECTION } from "@/constants/model-collection"
+import { getSelectableModelCollection } from "@/constants/model-collection"
 import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useModelCosts } from "@/contexts/model-cost-context"
@@ -68,7 +68,6 @@ export function ModelSelector({
   disabled,
   ...props
 }: ModelSelectorProps) {
-  const models = MODEL_COLLECTION
   const [open, setOpen] = useState(false)
 
   // Settings Store
@@ -85,6 +84,8 @@ export function ModelSelector({
 
   // Local Settings Store
   const isAutoTemperatureEnabled = useLocalSettingsStore((state) => state.isAutoTemperatureEnabled)
+  const isExtremelyHighCostModelEnabled = useLocalSettingsStore((state) => state.isExtremelyHighCostModelEnabled)
+  const models = getSelectableModelCollection(isExtremelyHighCostModelEnabled)
 
   // Get model costs Map from context
   const modelCostsMap = useModelCosts()
@@ -132,10 +133,13 @@ export function ModelSelector({
           className="flex grow justify-between"
           disabled={disabled}
         >
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <span className="truncate" title={modelDetail ? modelDetail.name : undefined}>
               {modelDetail ? modelDetail.name : "Select a model..."}
             </span>
+            {modelDetail?.usage === "extremely high" && (
+              <Flame className="size-4 shrink-0 text-destructive" />
+            )}
             {modelDetail && (
               <Badge
                 variant={modelDetail.isPaid ? "default" : "secondary"}
@@ -212,8 +216,11 @@ function ModelItem({ model, modelKey, cost, isSelected, onSelect }: ModelItemPro
           value={`${model.name}-${modelKey}-${model.isPaid ? "premium" : "free"}`}
           data-checked={isSelected || undefined}
         >
-          <span>
+          <span className="flex items-center gap-1">
             {model.name}
+            {model.usage === "extremely high" && (
+              <Flame className="size-3.5 shrink-0 text-destructive" />
+            )}
             {cost && cost.discount > 0 && (
               <span className="text-green-500">
                 ({cost.discount * 100}% off)
@@ -281,10 +288,13 @@ function ModelDescription({ model, cost, isSelected }: ModelDescriptionProps) {
               </>
             ) : (
               <>
-                <p>
+                <p className="flex items-center gap-1">
                   Credit Usage: <span className="capitalize font-semibold">
                     {model.usage}
                   </span>
+                  {model.usage === "extremely high" && (
+                    <Flame className="size-3.5 shrink-0 text-destructive" />
+                  )}
                 </p>
                 <p>Input: {cost.creditPerInputToken} credits/token</p>
                 <p>Output: {cost.creditPerOutputToken} credits/token</p>

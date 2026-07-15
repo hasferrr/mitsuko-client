@@ -40,9 +40,12 @@ export function UserSettings() {
   const setIsNoStoreEnabled = useLocalSettingsStore((state) => state.setIsNoStoreEnabled)
   const isCompletionNotificationEnabled = useLocalSettingsStore((state) => state.isCompletionNotificationEnabled)
   const setIsCompletionNotificationEnabled = useLocalSettingsStore((state) => state.setIsCompletionNotificationEnabled)
+  const isExtremelyHighCostModelEnabled = useLocalSettingsStore((state) => state.isExtremelyHighCostModelEnabled)
+  const setIsExtremelyHighCostModelEnabled = useLocalSettingsStore((state) => state.setIsExtremelyHighCostModelEnabled)
   const dismissedDialogs = useLocalSettingsStore((state) => state.dismissedDialogs)
   const resetAllDismissedDialogs = useLocalSettingsStore((state) => state.resetAllDismissedDialogs)
   const [isThirdPartyDialogOpen, setIsThirdPartyDialogOpen] = useState(false)
+  const [isExtremelyHighCostDialogOpen, setIsExtremelyHighCostDialogOpen] = useState(false)
   const [isGlobalTranslationSettingsOpen, setIsGlobalTranslationSettingsOpen] = useState(false)
   const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
   const [isGlobalTranscriptionSettingsOpen, setIsGlobalTranscriptionSettingsOpen] = useState(false)
@@ -62,6 +65,14 @@ export function UserSettings() {
       setIsThirdPartyDialogOpen(true)
     } else {
       setIsThirdPartyModelEnabled(false)
+    }
+  }
+
+  const handleExtremelyHighCostModelChange = (checked: boolean) => {
+    if (checked) {
+      setIsExtremelyHighCostDialogOpen(true)
+    } else {
+      setIsExtremelyHighCostModelEnabled(false)
     }
   }
 
@@ -221,6 +232,22 @@ export function UserSettings() {
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-col gap-2">
               <Label>
+                Enable extremely high-cost models
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-lg">
+                Show models with extremely high credit usage in model selectors. Disabled by default.
+              </p>
+            </div>
+            <Switch
+              id="extremely-high-cost-model-switch"
+              checked={isExtremelyHighCostModelEnabled}
+              onCheckedChange={handleExtremelyHighCostModelChange}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>
                 Enable Third-Party Model
               </Label>
               <p className="text-xs text-muted-foreground max-w-lg">
@@ -270,6 +297,27 @@ export function UserSettings() {
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirm}>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={isExtremelyHighCostDialogOpen} onOpenChange={setIsExtremelyHighCostDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Enable Extremely High-Cost Models?</AlertDialogTitle>
+            <AlertDialogDescription>
+              These models can burn through your credits very quickly. Enable them only if you accept the higher cost.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setIsExtremelyHighCostModelEnabled(true)
+                setIsExtremelyHighCostDialogOpen(false)
+              }}
+            >
+              Enable
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
