@@ -36,14 +36,14 @@ describe('buildTranscriptionTemplate', () => {
         language: 'Japanese',
         selectedMode: 'clause',
         customInstructions: 'Use speaker labels',
-        models: 'mitsuko-free',
+        models: 'whisper-large-v3',
       },
     })
 
     expect(template.language).toBe('Japanese')
     expect(template.selectedMode).toBe('clause')
     expect(template.customInstructions).toBe('Use speaker labels')
-    expect(template.models).toBe('mitsuko-free')
+    expect(template.models).toBe('whisper-large-v3')
     expect(template.transcriptionText).toBe('')
     expect(template.words).toEqual([])
   })

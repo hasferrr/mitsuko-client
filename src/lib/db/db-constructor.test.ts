@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { databaseExportConstructor, generateNewIds } from "@/lib/db/db-constructor"
-import { Extraction, Project, Translation } from "@/types/project"
+import { Extraction, Project, Transcription, Translation } from "@/types/project"
 
 describe("databaseExportConstructor", () => {
   test("adds auto context defaults to existing translations", () => {
@@ -84,6 +84,17 @@ describe("databaseExportConstructor", () => {
     })
 
     expect(data.extractions[0].ownerTranslationId).toBe("translation-1")
+  })
+
+  test("migrates removed free transcription models to premium", () => {
+    const data = databaseExportConstructor({
+      transcriptions: [{
+        id: "transcription-1",
+        models: "mitsuko-free",
+      } as unknown as Transcription],
+    })
+
+    expect(data.transcriptions[0].models).toBe("mitsuko-premium")
   })
 })
 

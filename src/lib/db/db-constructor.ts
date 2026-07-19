@@ -326,7 +326,7 @@ function transcriptionConstructor(transcription: Partial<Transcription>): Transc
 }
 
 function migrateModelName(model: string | null | undefined): Transcription['models'] | null | undefined {
-  if (model === 'free') return 'mitsuko-free'
+  if (model === 'free' || model === 'mitsuko-free') return 'mitsuko-premium'
   if (model === 'premium') return 'mitsuko-premium'
   return model as Transcription['models'] | null | undefined
 }
