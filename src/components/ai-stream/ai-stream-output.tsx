@@ -14,8 +14,37 @@ interface AiStreamOutputProps {
   className?: string
   subtitles?: SubtitleNoTimeTranslated[]
   isProcessing: boolean
+  pendingStructuredOutputPlaceholder?: string
   defaultCollapsed?: boolean
   showThinking?: boolean
+}
+
+export const getUnparsedOutput = ({
+  output,
+  isProcessing,
+  isThinkingOnly,
+  hasParsedStructuredOutput,
+  pendingStructuredOutputPlaceholder,
+}: {
+  output: string
+  isProcessing: boolean
+  isThinkingOnly: boolean
+  hasParsedStructuredOutput: boolean
+  pendingStructuredOutputPlaceholder?: string
+}) => {
+  if (hasParsedStructuredOutput) {
+    return ""
+  }
+
+  if (isThinkingOnly) {
+    return ""
+  }
+
+  if (isProcessing && pendingStructuredOutputPlaceholder) {
+    return pendingStructuredOutputPlaceholder
+  }
+
+  return output
 }
 
 interface ParsedSegment {
@@ -29,6 +58,7 @@ export const AiStreamOutput = ({
   className,
   subtitles: subtitlesProp = [],
   isProcessing,
+  pendingStructuredOutputPlaceholder,
   defaultCollapsed = false,
   showThinking = true,
 }: AiStreamOutputProps) => {
@@ -144,6 +174,18 @@ export const AiStreamOutput = ({
     }
   }, [content])
 
+  const unparsedOutput = getUnparsedOutput({
+    output: parsedContent.output,
+    isProcessing,
+    isThinkingOnly: !!parsedContent.think && !parsedContent.output,
+    hasParsedStructuredOutput: translatedSubtitles.length > 0,
+    pendingStructuredOutputPlaceholder,
+  })
+  const isPendingStructuredOutput =
+    !!pendingStructuredOutputPlaceholder &&
+    unparsedOutput === pendingStructuredOutputPlaceholder &&
+    isProcessing
+
   return (
     <div className={cn("text-sm", className)}>
       {showThinking && parsedContent.think && (
@@ -227,11 +269,27 @@ export const AiStreamOutput = ({
         <AiStreamSubtitle
           initialSubtitles={initialSubtitles}
           translatedSubtitles={translatedSubtitles}
+          isProcessing={isProcessing}
         />
       )}
-      {parsedContent.output && translatedSubtitles.length === 0 && (
-        <div className="whitespace-pre-wrap wrap-break-word text-sm p-1">
-          {parsedContent.output}
+      {unparsedOutput && (
+        <div className={cn(
+          "whitespace-pre-wrap wrap-break-word text-sm p-1",
+          isPendingStructuredOutput && "text-muted-foreground",
+        )}>
+          {isPendingStructuredOutput ? (
+            <span className="inline-flex">
+              {unparsedOutput.split("").map((char, index) => (
+                <span
+                  key={index}
+                  className="animate-[thinking_2s_ease-in-out_infinite]"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  {char}
+                </span>
+              ))}
+            </span>
+          ) : unparsedOutput}
         </div>
       )}
       {parsedContent.error && (

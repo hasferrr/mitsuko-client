@@ -131,6 +131,7 @@ export const SubtitleResultOutput = memo(() => {
               content={response.trim() || "Translation output will appear here..."}
               subtitles={subtitles}
               isProcessing={isTranslating}
+              pendingStructuredOutputPlaceholder="Translation output will appear here..."
             />
           </CardContent>
         </Card>

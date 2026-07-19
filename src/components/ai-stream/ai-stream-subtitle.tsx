@@ -1,13 +1,19 @@
 import { AnimatePresence, motion } from "framer-motion"
 import { SubtitleNoTimeNoActorTranslated, SubtitleNoTimeTranslated } from "@/types/subtitles"
 import { memo } from "react"
+import { TranslationStreamIndicator } from "./translation-stream-indicator"
 
 interface AiStreamSubtitleProps {
   initialSubtitles: SubtitleNoTimeTranslated[]
   translatedSubtitles: SubtitleNoTimeNoActorTranslated[]
+  isProcessing: boolean
 }
 
-export const AiStreamSubtitle = memo(({ initialSubtitles, translatedSubtitles }: AiStreamSubtitleProps) => {
+export const AiStreamSubtitle = memo(({
+  initialSubtitles,
+  translatedSubtitles,
+  isProcessing,
+}: AiStreamSubtitleProps) => {
   return (
     <AnimatePresence>
       {translatedSubtitles.map((subtitle) => (
@@ -21,6 +27,9 @@ export const AiStreamSubtitle = memo(({ initialSubtitles, translatedSubtitles }:
           }}
         />
       ))}
+      {isProcessing && (
+        <TranslationStreamIndicator key="translation-status" />
+      )}
     </AnimatePresence>
   )
 })
