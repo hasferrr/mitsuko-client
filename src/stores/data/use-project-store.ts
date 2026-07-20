@@ -97,11 +97,6 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       // upsert associated settings into stores
       const settingsStore = useSettingsStore.getState()
       const advancedSettingsStore = useAdvancedSettingsStore.getState()
-      const bs = await getBasicSettings(newProject.defaultBasicSettingsId)
-      if (bs) settingsStore.upsertData(bs.id, bs)
-      const ads = await getAdvancedSettings(newProject.defaultAdvancedSettingsId)
-      if (ads) advancedSettingsStore.upsertData(ads.id, ads)
-
       const translationBs = await getBasicSettings(newProject.defaultTranslationBasicSettingsId)
       if (translationBs) settingsStore.upsertData(translationBs.id, translationBs)
       const translationAds = await getAdvancedSettings(newProject.defaultTranslationAdvancedSettingsId)

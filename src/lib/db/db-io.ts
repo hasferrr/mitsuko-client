@@ -9,8 +9,6 @@ import {
   DEFAULT_TRANSLATION_SETTINGS,
 } from '@/constants/default'
 import {
-  GLOBAL_ADVANCED_SETTINGS_ID,
-  GLOBAL_BASIC_SETTINGS_ID,
   GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
   GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
   GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
@@ -22,15 +20,14 @@ import { buildTranslationTemplate } from '@/lib/translation/template'
 import { buildTranscriptionTemplate } from '@/lib/transcription/template'
 import { normalizeAutoContextDefault } from '@/lib/translation/auto-context-defaults'
 import { getOrCreateGlobalTranslationSettings } from '@/lib/db/global-settings'
+import { getOrphanedLegacySettingsIds, LegacyProjectSettingsReferences } from './legacy-settings'
 
-const GLOBAL_BASIC_IDS = [
-  GLOBAL_BASIC_SETTINGS_ID,
+const FEATURE_GLOBAL_BASIC_IDS = [
   GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
   GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
 ]
 
-const GLOBAL_ADVANCED_IDS = [
-  GLOBAL_ADVANCED_SETTINGS_ID,
+const FEATURE_GLOBAL_ADVANCED_IDS = [
   GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
   GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
 ]
@@ -41,8 +38,8 @@ export async function exportDatabase(): Promise<string> {
     transcriptions: (await db.transcriptions.toArray()).filter(t => t.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID),
     extractions: await db.extractions.toArray(),
     projectOrders: await db.projectOrders.toArray(),
-    basicSettings: (await db.basicSettings.toArray()).filter(s => !GLOBAL_BASIC_IDS.includes(s.id)),
-    advancedSettings: (await db.advancedSettings.toArray()).filter(s => !GLOBAL_ADVANCED_IDS.includes(s.id)),
+    basicSettings: (await db.basicSettings.toArray()).filter(s => !FEATURE_GLOBAL_BASIC_IDS.includes(s.id)),
+    advancedSettings: (await db.advancedSettings.toArray()).filter(s => !FEATURE_GLOBAL_ADVANCED_IDS.includes(s.id)),
   }
 
   if (process.env.NODE_ENV === 'development') {
@@ -76,12 +73,6 @@ export async function exportProject(
   const basicSettingsIds = new Set<string>()
   const advancedSettingsIds = new Set<string>()
 
-  if (project.defaultBasicSettingsId) {
-    basicSettingsIds.add(project.defaultBasicSettingsId)
-  }
-  if (project.defaultAdvancedSettingsId) {
-    advancedSettingsIds.add(project.defaultAdvancedSettingsId)
-  }
   if (project.defaultTranslationBasicSettingsId) {
     basicSettingsIds.add(project.defaultTranslationBasicSettingsId)
   }
@@ -107,10 +98,10 @@ export async function exportProject(
 
   const basicSettings = (
     await db.basicSettings.bulkGet(Array.from(basicSettingsIds))
-  ).filter((s): s is BasicSettings => s !== undefined && !GLOBAL_BASIC_IDS.includes(s.id))
+  ).filter((s): s is BasicSettings => s !== undefined && !FEATURE_GLOBAL_BASIC_IDS.includes(s.id))
   const advancedSettings = (
     await db.advancedSettings.bulkGet(Array.from(advancedSettingsIds))
-  ).filter((s): s is AdvancedSettings => s !== undefined && !GLOBAL_ADVANCED_IDS.includes(s.id))
+  ).filter((s): s is AdvancedSettings => s !== undefined && !FEATURE_GLOBAL_ADVANCED_IDS.includes(s.id))
 
   const projectOrders = await db.projectOrders.limit(1).toArray()
   const projectOrder =
@@ -176,8 +167,6 @@ export async function exportProjects(
     const basicSettingsIds = new Set<string>()
     const advancedSettingsIds = new Set<string>()
 
-    if (project.defaultBasicSettingsId) basicSettingsIds.add(project.defaultBasicSettingsId)
-    if (project.defaultAdvancedSettingsId) advancedSettingsIds.add(project.defaultAdvancedSettingsId)
     if (project.defaultTranslationBasicSettingsId) basicSettingsIds.add(project.defaultTranslationBasicSettingsId)
     if (project.defaultTranslationAdvancedSettingsId) advancedSettingsIds.add(project.defaultTranslationAdvancedSettingsId)
     if (project.defaultExtractionBasicSettingsId) basicSettingsIds.add(project.defaultExtractionBasicSettingsId)
@@ -194,13 +183,13 @@ export async function exportProjects(
 
     const newBasicSettings = (
       await db.basicSettings.bulkGet(Array.from(basicSettingsIds))
-    ).filter((s): s is BasicSettings => s !== undefined && !GLOBAL_BASIC_IDS.includes(s.id) && !seenBasicIds.has(s.id))
+    ).filter((s): s is BasicSettings => s !== undefined && !FEATURE_GLOBAL_BASIC_IDS.includes(s.id) && !seenBasicIds.has(s.id))
     newBasicSettings.forEach(s => seenBasicIds.add(s.id))
     allBasicSettings.push(...newBasicSettings)
 
     const newAdvancedSettings = (
       await db.advancedSettings.bulkGet(Array.from(advancedSettingsIds))
-    ).filter((s): s is AdvancedSettings => s !== undefined && !GLOBAL_ADVANCED_IDS.includes(s.id) && !seenAdvancedIds.has(s.id))
+    ).filter((s): s is AdvancedSettings => s !== undefined && !FEATURE_GLOBAL_ADVANCED_IDS.includes(s.id) && !seenAdvancedIds.has(s.id))
     newAdvancedSettings.forEach(s => seenAdvancedIds.add(s.id))
     allAdvancedSettings.push(...newAdvancedSettings)
   }
@@ -235,7 +224,16 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
   try {
     const importData = JSON.parse(jsonString)
     const validated = databaseExportSchema.parse(importData) as unknown as Partial<DatabaseExport>
+    const legacyProjects = validated.projects as unknown as LegacyProjectSettingsReferences[]
     const convertedData = databaseExportConstructor(validated)
+    const orphanedLegacySettings = getOrphanedLegacySettingsIds({
+      legacyProjects,
+      projects: convertedData.projects,
+      translations: convertedData.translations,
+      extractions: convertedData.extractions,
+    })
+    convertedData.basicSettings = convertedData.basicSettings.filter(settings => !orphanedLegacySettings.basic.has(settings.id))
+    convertedData.advancedSettings = convertedData.advancedSettings.filter(settings => !orphanedLegacySettings.advanced.has(settings.id))
     convertedData.translations = convertedData.translations.filter(t => t.id !== GLOBAL_TRANSLATION_SETTINGS_ID)
     let translationById = new Map(convertedData.translations.map(t => [t.id, t]))
     await getOrCreateGlobalTranslationSettings()
@@ -246,37 +244,10 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
       const getBasicSettingsById = (id: string) => convertedData.basicSettings.find(s => s.id === id)
       const getAdvancedSettingsById = (id: string) => convertedData.advancedSettings.find(s => s.id === id)
 
-      if (!project.defaultBasicSettingsId || !getBasicSettingsById(project.defaultBasicSettingsId)) {
-        const basicSettingsId = crypto.randomUUID()
-        const newBasicSettings: BasicSettings = {
-          id: basicSettingsId,
-          ...DEFAULT_BASIC_SETTINGS,
-          createdAt: now,
-          updatedAt: now,
-        }
-        convertedData.basicSettings.push(newBasicSettings)
-        project.defaultBasicSettingsId = basicSettingsId
-      }
-
-      if (!project.defaultAdvancedSettingsId || !getAdvancedSettingsById(project.defaultAdvancedSettingsId)) {
-        const advancedSettingsId = crypto.randomUUID()
-        const newAdvancedSettings: AdvancedSettings = {
-          id: advancedSettingsId,
-          ...DEFAULT_ADVANCED_SETTINGS,
-          createdAt: now,
-          updatedAt: now,
-        }
-        convertedData.advancedSettings.push(newAdvancedSettings)
-        project.defaultAdvancedSettingsId = advancedSettingsId
-      }
-
-      const baseBasicSettings = getBasicSettingsById(project.defaultBasicSettingsId) ?? null
-      const baseAdvancedSettings = getAdvancedSettingsById(project.defaultAdvancedSettingsId) ?? null
-
       if (!project.defaultTranslationBasicSettingsId || !getBasicSettingsById(project.defaultTranslationBasicSettingsId)) {
         const basicSettingsId = crypto.randomUUID()
         const newBasicSettings: BasicSettings = {
-          ...(baseBasicSettings ? { ...baseBasicSettings } : { ...DEFAULT_BASIC_SETTINGS }),
+          ...DEFAULT_BASIC_SETTINGS,
           id: basicSettingsId,
           createdAt: now,
           updatedAt: now,
@@ -288,7 +259,7 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
       if (!project.defaultTranslationAdvancedSettingsId || !getAdvancedSettingsById(project.defaultTranslationAdvancedSettingsId)) {
         const advancedSettingsId = crypto.randomUUID()
         const newAdvancedSettings: AdvancedSettings = {
-          ...(baseAdvancedSettings ? { ...baseAdvancedSettings } : { ...DEFAULT_ADVANCED_SETTINGS }),
+          ...DEFAULT_ADVANCED_SETTINGS,
           id: advancedSettingsId,
           createdAt: now,
           updatedAt: now,
@@ -375,10 +346,10 @@ export async function importDatabase(jsonString: string, clearExisting: boolean)
           db.extractions.clear(),
           db.projectOrders.clear(),
           db.basicSettings
-            .filter(s => !GLOBAL_BASIC_IDS.includes(s.id))
+            .filter(s => !FEATURE_GLOBAL_BASIC_IDS.includes(s.id))
             .delete(),
           db.advancedSettings
-            .filter(s => !GLOBAL_ADVANCED_IDS.includes(s.id))
+            .filter(s => !FEATURE_GLOBAL_ADVANCED_IDS.includes(s.id))
             .delete()
         ])
 

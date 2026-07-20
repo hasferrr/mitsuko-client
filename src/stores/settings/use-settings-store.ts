@@ -8,7 +8,7 @@ import {
   getBasicSettings,
 } from "@/lib/db/settings"
 import { DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS } from "@/constants/default"
-import { GLOBAL_BASIC_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID } from "@/constants/global-settings"
+import { GLOBAL_EXTRACTION_BASIC_SETTINGS_ID } from "@/constants/global-settings"
 import { BASIC_SETTING_KEYS } from "./settings-keys"
 import type { BasicKey } from "./settings-keys"
 import { copySettingsKeys } from "../utils/copy-settings"
@@ -50,7 +50,6 @@ interface SettingsStore {
     toId: string,
     keys: K[],
   ) => Promise<void>
-  resetBasicSettingsToGlobal: (id: string) => Promise<void>
   resetBasicSettingsFrom: (fromId: string, toId: string) => Promise<void>
 }
 
@@ -216,10 +215,6 @@ export const useSettingsStore = create<SettingsStore>()(
           saveData: get().saveData,
           setData: set,
         })
-      },
-      resetBasicSettingsToGlobal: async (id: string) => {
-        const keys: BasicKey[] = [...BASIC_SETTING_KEYS]
-        await get().copyBasicSettingsKeys(GLOBAL_BASIC_SETTINGS_ID, id, keys)
       },
       resetBasicSettingsFrom: async (fromId: string, toId: string) => {
         const keys: BasicKey[] = [...BASIC_SETTING_KEYS]

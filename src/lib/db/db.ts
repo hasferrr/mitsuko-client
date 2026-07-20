@@ -18,6 +18,9 @@ import {
 } from '@/constants/global-settings'
 import { buildTranslationTemplate } from '@/lib/translation/template'
 import { buildTranscriptionTemplate } from '@/lib/transcription/template'
+import { getOrphanedLegacySettingsIds, LegacyProjectSettingsReferences } from './legacy-settings'
+
+type LegacyProject = Project & LegacyProjectSettingsReferences
 
 class MyDatabase extends Dexie {
   projects!: Table<Project, string>
@@ -102,7 +105,7 @@ class MyDatabase extends Dexie {
       const newBasicSettingsList: BasicSettings[] = []
       const newAdvancedSettingsList: AdvancedSettings[] = []
 
-      await tx.table('projects').toCollection().modify(async (project: Project) => {
+      await tx.table('projects').toCollection().modify(async (project: LegacyProject) => {
         if (typeof project.defaultBasicSettingsId === 'undefined') {
           const basicSettingsId = crypto.randomUUID()
           const newBasicSettings: BasicSettings = {
@@ -197,7 +200,7 @@ class MyDatabase extends Dexie {
       const basicSettingsTable = tx.table('basicSettings')
       const advancedSettingsTable = tx.table('advancedSettings')
 
-      const projects = await projectsTable.toArray() as Project[]
+      const projects = await projectsTable.toArray() as LegacyProject[]
       const newBasicSettingsList: BasicSettings[] = []
       const newAdvancedSettingsList: AdvancedSettings[] = []
       const projectUpdates: { id: string; changes: Partial<Project> }[] = []
@@ -421,6 +424,27 @@ class MyDatabase extends Dexie {
       await tx.table('projects').toCollection().modify(project => {
         project.lastBatchOperationMode = 'translation'
       })
+    })
+    this.version(31).stores({}).upgrade(async tx => {
+      const projectsTable = tx.table('projects')
+      const basicSettingsTable = tx.table('basicSettings')
+      const advancedSettingsTable = tx.table('advancedSettings')
+      const legacyProjects = await projectsTable.toArray() as LegacyProject[]
+      const translations = await tx.table('translations').toArray() as Translation[]
+      const extractions = await tx.table('extractions').toArray() as Extraction[]
+      const orphaned = getOrphanedLegacySettingsIds({
+        legacyProjects,
+        projects: legacyProjects,
+        translations,
+        extractions,
+      })
+
+      await projectsTable.toCollection().modify((project: LegacyProject) => {
+        delete project.defaultBasicSettingsId
+        delete project.defaultAdvancedSettingsId
+      })
+      await basicSettingsTable.bulkDelete(['global-basic-settings', ...orphaned.basic])
+      await advancedSettingsTable.bulkDelete(['global-advanced-settings', ...orphaned.advanced])
     })
   }
 }

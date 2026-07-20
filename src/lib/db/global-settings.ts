@@ -2,7 +2,7 @@ import { db } from './db'
 import { BasicSettings, AdvancedSettings, Transcription, Translation } from '@/types/project'
 import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS } from '@/constants/default'
 import { getBasicSettings, getAdvancedSettings } from './settings'
-import { GLOBAL_ADVANCED_SETTINGS_ID, GLOBAL_BASIC_SETTINGS_ID, GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_SETTINGS_ID, GLOBAL_TRANSCRIPTION_SETTINGS_ID } from '@/constants/global-settings'
+import { GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_SETTINGS_ID, GLOBAL_TRANSCRIPTION_SETTINGS_ID } from '@/constants/global-settings'
 import { buildTranslationTemplate } from '@/lib/translation/template'
 import { buildTranscriptionTemplate } from '@/lib/transcription/template'
 
@@ -32,36 +32,9 @@ export const upsertAdvancedSettingsWithId = async (
   return record
 }
 
-export const getGlobalBasicSettings = async (): Promise<BasicSettings | undefined> => {
-  return getBasicSettings(GLOBAL_BASIC_SETTINGS_ID)
-}
-
-export const getGlobalAdvancedSettings = async (): Promise<AdvancedSettings | undefined> => {
-  return getAdvancedSettings(GLOBAL_ADVANCED_SETTINGS_ID)
-}
-
-export const getOrCreateGlobalBasicSettings = async (): Promise<BasicSettings> => {
-  const existing = await getGlobalBasicSettings()
-  if (existing) return existing
-  return upsertBasicSettingsWithId(GLOBAL_BASIC_SETTINGS_ID, { ...DEFAULT_BASIC_SETTINGS })
-}
-
-export const getOrCreateGlobalAdvancedSettings = async (): Promise<AdvancedSettings> => {
-  const existing = await getGlobalAdvancedSettings()
-  if (existing) return existing
-  return upsertAdvancedSettingsWithId(GLOBAL_ADVANCED_SETTINGS_ID, { ...DEFAULT_ADVANCED_SETTINGS })
-}
-
 export const getOrCreateGlobalTranslationBasicSettings = async (): Promise<BasicSettings> => {
   const existing = await getBasicSettings(GLOBAL_TRANSLATION_BASIC_SETTINGS_ID)
   if (existing) return existing
-
-  const globalBasic = await getGlobalBasicSettings()
-  if (globalBasic) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, createdAt, updatedAt, ...rest } = globalBasic
-    return upsertBasicSettingsWithId(GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, rest)
-  }
 
   return upsertBasicSettingsWithId(GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, { ...DEFAULT_BASIC_SETTINGS })
 }
@@ -69,13 +42,6 @@ export const getOrCreateGlobalTranslationBasicSettings = async (): Promise<Basic
 export const getOrCreateGlobalTranslationAdvancedSettings = async (): Promise<AdvancedSettings> => {
   const existing = await getAdvancedSettings(GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID)
   if (existing) return existing
-
-  const globalAdvanced = await getGlobalAdvancedSettings()
-  if (globalAdvanced) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, createdAt, updatedAt, ...rest } = globalAdvanced
-    return upsertAdvancedSettingsWithId(GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, rest)
-  }
 
   return upsertAdvancedSettingsWithId(GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, { ...DEFAULT_ADVANCED_SETTINGS })
 }
@@ -123,8 +89,6 @@ export const getOrCreateGlobalTranslationSettings = async (): Promise<Translatio
 
 export const ensureGlobalDefaultsExist = async (): Promise<void> => {
   await Promise.all([
-    getOrCreateGlobalBasicSettings(),
-    getOrCreateGlobalAdvancedSettings(),
     getOrCreateGlobalTranslationBasicSettings(),
     getOrCreateGlobalTranslationAdvancedSettings(),
     getOrCreateGlobalTranslationSettings(),

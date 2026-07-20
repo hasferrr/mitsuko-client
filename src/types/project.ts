@@ -21,8 +21,6 @@ export interface Project {
   translations: string[] // Array of Translation IDs
   transcriptions: string[] // Array of Transcription IDs
   extractions: string[] // Array of Extraction IDs
-  defaultBasicSettingsId: string
-  defaultAdvancedSettingsId: string
   defaultTranslationBasicSettingsId: string
   defaultTranslationAdvancedSettingsId: string
   defaultTranslationId: string

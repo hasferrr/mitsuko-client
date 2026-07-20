@@ -1,7 +1,7 @@
 import { Project } from "@/types/project"
 import { db } from "./db"
 import { createBasicSettings, createAdvancedSettings } from "./settings"
-import { getOrCreateGlobalBasicSettings, getOrCreateGlobalAdvancedSettings, getOrCreateGlobalTranslationBasicSettings, getOrCreateGlobalTranslationAdvancedSettings, getOrCreateGlobalExtractionBasicSettings, getOrCreateGlobalExtractionAdvancedSettings, getOrCreateGlobalTranscriptionSettings, getOrCreateGlobalTranslationSettings } from "./global-settings"
+import { getOrCreateGlobalTranslationBasicSettings, getOrCreateGlobalTranslationAdvancedSettings, getOrCreateGlobalExtractionBasicSettings, getOrCreateGlobalExtractionAdvancedSettings, getOrCreateGlobalTranscriptionSettings, getOrCreateGlobalTranslationSettings } from "./global-settings"
 import { normalizeAutoContextDefault } from "@/lib/translation/auto-context-defaults"
 import { buildTranslationTemplate } from "@/lib/translation/template"
 import { buildTranscriptionTemplate } from "@/lib/transcription/template"
@@ -20,19 +20,11 @@ export const createProject = async (name: string, isBatch = false, isAutoEnableP
     // Batch projects always have default settings enabled
     const enableFlags = isBatch ? true : isAutoEnableProjectSettings
 
-    const globalBasic = await getOrCreateGlobalBasicSettings()
-    const basicTemplate = stripMeta(globalBasic)
-    const basicSettings = await createBasicSettings(basicTemplate)
-
     const globalTranslationBasic = await getOrCreateGlobalTranslationBasicSettings()
     const translationBasicSettings = await createBasicSettings(stripMeta(globalTranslationBasic))
 
     const globalExtractionBasic = await getOrCreateGlobalExtractionBasicSettings()
     const extractionBasicSettings = await createBasicSettings(stripMeta(globalExtractionBasic))
-
-    const globalAdvanced = await getOrCreateGlobalAdvancedSettings()
-    const advancedTemplate = stripMeta(globalAdvanced)
-    const advancedSettings = await createAdvancedSettings(advancedTemplate)
 
     const globalTranslationAdvanced = await getOrCreateGlobalTranslationAdvancedSettings()
     const translationAdvancedSettings = await createAdvancedSettings(stripMeta(globalTranslationAdvanced))
@@ -73,8 +65,6 @@ export const createProject = async (name: string, isBatch = false, isAutoEnableP
       translations: [],
       transcriptions: [],
       extractions: [],
-      defaultBasicSettingsId: basicSettings.id,
-      defaultAdvancedSettingsId: advancedSettings.id,
       defaultTranslationBasicSettingsId: translationBasicSettings.id,
       defaultTranslationAdvancedSettingsId: translationAdvancedSettings.id,
       defaultTranslationId,
@@ -187,16 +177,10 @@ export const deleteProject = async (id: string): Promise<void> => {
       ...translations.filter(t => t).map(t => t!.basicSettingsId),
       ...extractions.filter(e => e).map(e => e!.basicSettingsId)
     ]
-    if (project.defaultBasicSettingsId) {
-      basicSettingsIds.push(project.defaultBasicSettingsId)
-    }
     const advancedSettingsIds = [
       ...translations.filter(t => t).map(t => t!.advancedSettingsId),
       ...extractions.filter(e => e).map(e => e!.advancedSettingsId)
     ]
-    if (project.defaultAdvancedSettingsId) {
-      advancedSettingsIds.push(project.defaultAdvancedSettingsId)
-    }
     if (project.defaultTranslationBasicSettingsId) {
       basicSettingsIds.push(project.defaultTranslationBasicSettingsId)
     }

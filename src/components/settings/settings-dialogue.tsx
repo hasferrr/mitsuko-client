@@ -68,8 +68,8 @@ interface GlobalSettingsDialogueProps extends BaseSettingsDialogueProps {
 interface ProjectSettingsDialogueProps extends BaseSettingsDialogueProps {
   mode: 'project'
   projectName: string
-  resetFromBasicSettingsId?: string
-  resetFromAdvancedSettingsId?: string
+  resetFromBasicSettingsId: string
+  resetFromAdvancedSettingsId: string
   isDefaultEnabled?: boolean
   onDefaultEnabledChange?: (enabled: boolean) => void
   onOpenGlobalSettings?: () => void
@@ -95,8 +95,6 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
   const onOpenGlobalSettings = props.mode === 'project' ? props.onOpenGlobalSettings : undefined
   const resetBasicSettings = useSettingsStore((s) => s.resetBasicSettings)
   const resetAdvancedSettings = useAdvancedSettingsStore((s) => s.resetAdvancedSettings)
-  const resetBasicSettingsToGlobal = useSettingsStore((s) => s.resetBasicSettingsToGlobal)
-  const resetAdvancedSettingsToGlobal = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsToGlobal)
   const resetBasicSettingsFrom = useSettingsStore((s) => s.resetBasicSettingsFrom)
   const resetAdvancedSettingsFrom = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsFrom)
   const getTranslationDb = useTranslationDataStore((s) => s.getTranslationDb)
@@ -145,17 +143,9 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
       return
     }
 
-    const basicResetPromise = resetFromBasicSettingsId
-      ? resetBasicSettingsFrom(resetFromBasicSettingsId, basicSettingsId)
-      : resetBasicSettingsToGlobal(basicSettingsId)
-
-    const advancedResetPromise = resetFromAdvancedSettingsId
-      ? resetAdvancedSettingsFrom(resetFromAdvancedSettingsId, advancedSettingsId)
-      : resetAdvancedSettingsToGlobal(advancedSettingsId)
-
     await Promise.all([
-      basicResetPromise,
-      advancedResetPromise,
+      resetBasicSettingsFrom(resetFromBasicSettingsId!, basicSettingsId),
+      resetAdvancedSettingsFrom(resetFromAdvancedSettingsId!, advancedSettingsId),
       resetAutoContext(),
     ])
   }
