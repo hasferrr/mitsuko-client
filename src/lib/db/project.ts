@@ -84,6 +84,7 @@ export const createProject = async (name: string, isBatch = false, isAutoEnableP
       createdAt: new Date(),
       updatedAt: new Date(),
       isBatch,
+      lastBatchOperationMode: 'translation',
       isDefaultTranslationEnabled: enableFlags,
       isDefaultExtractionEnabled: enableFlags,
       isDefaultTranscriptionEnabled: enableFlags,

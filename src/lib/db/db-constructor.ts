@@ -262,6 +262,7 @@ function projectConstructor(project: Partial<Project>): Project {
     defaultExtractionAdvancedSettingsId: project.defaultExtractionAdvancedSettingsId ?? "",
     defaultTranscriptionId: project.defaultTranscriptionId ?? "",
     isBatch: project.isBatch ?? false,
+    lastBatchOperationMode: project.lastBatchOperationMode ?? 'translation',
     isDefaultTranslationEnabled: typeof project.isDefaultTranslationEnabled === 'boolean' ? project.isDefaultTranslationEnabled : false,
     isDefaultExtractionEnabled: typeof project.isDefaultExtractionEnabled === 'boolean' ? project.isDefaultExtractionEnabled : false,
     isDefaultTranscriptionEnabled: typeof project.isDefaultTranscriptionEnabled === 'boolean' ? project.isDefaultTranscriptionEnabled : false,

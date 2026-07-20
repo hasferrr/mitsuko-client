@@ -3,6 +3,22 @@ import { databaseExportConstructor, generateNewIds } from "@/lib/db/db-construct
 import { Extraction, Project, Transcription, Translation } from "@/types/project"
 
 describe("databaseExportConstructor", () => {
+  test("defaults a legacy project's batch operation mode to translation", () => {
+    const data = databaseExportConstructor({
+      projects: [{ id: "project-1" } as Partial<Project> as Project],
+    })
+
+    expect(data.projects[0].lastBatchOperationMode).toBe("translation")
+  })
+
+  test.each(["transcription", "extraction"] as const)("preserves a valid imported %s mode", mode => {
+    const data = databaseExportConstructor({
+      projects: [{ id: "project-1", lastBatchOperationMode: mode } as Partial<Project> as Project],
+    })
+
+    expect(data.projects[0].lastBatchOperationMode).toBe(mode)
+  })
+
   test("adds auto context defaults to existing translations", () => {
     const data = databaseExportConstructor({
       translations: [{
@@ -99,6 +115,20 @@ describe("databaseExportConstructor", () => {
 })
 
 describe("generateNewIds", () => {
+  test("preserves a project's batch operation mode", () => {
+    const data = databaseExportConstructor({
+      projects: [{
+        id: "project-1",
+        lastBatchOperationMode: "extraction",
+      } as Partial<Project> as Project],
+    })
+
+    const remapped = generateNewIds(data)
+
+    expect(remapped.projects[0].id).not.toBe("project-1")
+    expect(remapped.projects[0].lastBatchOperationMode).toBe("extraction")
+  })
+
   test("remaps a hidden default translation", () => {
     const data = databaseExportConstructor({
       projects: [{

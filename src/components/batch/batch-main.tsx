@@ -34,16 +34,23 @@ import Link from "@/components/link"
 import { BatchTranslationView } from "./batch-translation-view"
 import { BatchExtractionView } from "./batch-extraction-view"
 import { BatchTranscriptionView } from "./batch-transcription-view"
+import type { ProjectType } from "@/types/project"
 
 export default function BatchMain() {
-  const [operationMode, setOperationMode] = useState<"translation" | "transcription" | "extraction">("translation")
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-
   // Project Store
   const currentProject = useProjectStore((state) => state.currentProject)
   const deleteProject = useProjectStore((state) => state.deleteProject)
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
   const renameProject = useProjectStore((state) => state.renameProject)
+  const updateProject = useProjectStore((state) => state.updateProject)
+
+  // State
+  const [operationMode, setOperationMode] = useState<ProjectType>(
+    currentProject?.lastBatchOperationMode ?? "translation"
+  )
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
+  // Other Hooks
   const setHasChanges = useSetUnsavedChanges()
 
   const translationBasicSettingsId = currentProject?.defaultTranslationBasicSettingsId
@@ -64,6 +71,13 @@ export default function BatchMain() {
       await deleteProject(currentProject.id)
       setIsDeleteDialogOpen(false)
       setCurrentProject(null)
+    }
+  }
+
+  const handleOperationModeChange = (value: ProjectType) => {
+    setOperationMode(value)
+    if (currentProject?.id) {
+      void updateProject(currentProject.id, { lastBatchOperationMode: value })
     }
   }
 
@@ -90,7 +104,7 @@ export default function BatchMain() {
             onChange={(e) => handleBatchNameChange(e.target.value)}
           />
         </div>
-        <Select value={operationMode} onValueChange={(value: "translation" | "transcription" | "extraction") => setOperationMode(value)}>
+        <Select value={operationMode} onValueChange={handleOperationModeChange}>
           <SelectTrigger className="w-fit">
             <SelectValue />
           </SelectTrigger>

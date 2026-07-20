@@ -417,6 +417,11 @@ class MyDatabase extends Dexie {
     this.version(29).stores({
       customInstructionOrders: 'id',
     })
+    this.version(30).stores({}).upgrade(async tx => {
+      await tx.table('projects').toCollection().modify(project => {
+        project.lastBatchOperationMode = 'translation'
+      })
+    })
   }
 }
 

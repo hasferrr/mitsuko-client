@@ -8,6 +8,7 @@ const projectSchema = z.object({
   extractions: z.array(z.string()).optional(),
   defaultTranslationId: z.string().optional(),
   isBatch: z.boolean().optional(),
+  lastBatchOperationMode: z.enum(["translation", "transcription", "extraction"]).optional(),
   isDefaultTranslationEnabled: z.boolean().optional(),
   isDefaultExtractionEnabled: z.boolean().optional(),
   isDefaultTranscriptionEnabled: z.boolean().optional(),
