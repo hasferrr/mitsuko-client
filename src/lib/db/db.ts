@@ -443,8 +443,10 @@ class MyDatabase extends Dexie {
         delete project.defaultBasicSettingsId
         delete project.defaultAdvancedSettingsId
       })
-      await basicSettingsTable.bulkDelete(['global-basic-settings', ...orphaned.basic])
-      await advancedSettingsTable.bulkDelete(['global-advanced-settings', ...orphaned.advanced])
+      await basicSettingsTable.delete('global-basic-settings')
+      await advancedSettingsTable.delete('global-advanced-settings')
+      await basicSettingsTable.bulkDelete([...orphaned.basic])
+      await advancedSettingsTable.bulkDelete([...orphaned.advanced])
     })
   }
 }
