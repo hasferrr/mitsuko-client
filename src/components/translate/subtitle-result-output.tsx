@@ -40,8 +40,14 @@ export const SubtitleResultOutput = memo(() => {
     return JSON.stringify(jsonResponse, null, 2)
   }, [jsonResponse])
 
-  useAutoScroll(response, topContainerRef, 500)
-  useAutoScroll(response, topTextareaRef)
+  useAutoScroll(response, topContainerRef, {
+    isProcessing: isTranslating,
+    resetKey: currentId,
+  })
+  useAutoScroll(response, topTextareaRef, {
+    isProcessing: isTranslating,
+    resetKey: currentId,
+  })
 
   const handleChangeJSONInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditValue(e.target.value)

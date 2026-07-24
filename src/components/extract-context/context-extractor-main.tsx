@@ -92,7 +92,10 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
   const contextResultEditRef = useRef<HTMLTextAreaElement | null>(null)
 
   const { setHasChanges } = useUnsavedChanges()
-  useAutoScroll(contextResult, contextResultRef)
+  useAutoScroll(contextResult, contextResultRef, {
+    isProcessing: isExtracting,
+    resetKey: currentId,
+  })
 
   useEffect(() => {
     return () => {

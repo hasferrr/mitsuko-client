@@ -147,8 +147,14 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const router = useRouter()
-  useAutoScroll(transcriptionText, transcriptionAreaRef)
-  useAutoScroll(transcriptionText, transcriptionResultRef)
+  useAutoScroll(transcriptionText, transcriptionAreaRef, {
+    isProcessing: isTranscribing,
+    resetKey: currentId,
+  })
+  useAutoScroll(transcriptionText, transcriptionResultRef, {
+    isProcessing: isTranscribing,
+    resetKey: currentId,
+  })
   const { setHasChanges } = useUnsavedChanges()
 
   useEffect(() => {
