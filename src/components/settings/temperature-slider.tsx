@@ -13,18 +13,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useLocalSettingsStore } from '@/stores/settings/use-local-settings-store'
 import { TEMPERATURE_MIN, TEMPERATURE_MAX } from "@/constants/limits"
 
 interface TemperatureSliderProps {
-  advancedSettingsId: string
+  settingsId: string
 }
 
-export const TemperatureSlider = memo(({ advancedSettingsId }: TemperatureSliderProps) => {
-  const temperature = useAdvancedSettingsStore((state) => state.getTemperature(advancedSettingsId))
-  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setTemperature = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "temperature", value)
+export const TemperatureSlider = memo(({ settingsId }: TemperatureSliderProps) => {
+  const temperature = useSettingsStore((state) => state.getTemperature(settingsId))
+  const setAdvancedSettingsValue = useSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setTemperature = (value: number) => setAdvancedSettingsValue(settingsId, "temperature", value)
 
   const isAutoTemperatureEnabled = useLocalSettingsStore((state) => state.isAutoTemperatureEnabled)
   const setIsAutoTemperatureEnabled = useLocalSettingsStore((state) => state.setIsAutoTemperatureEnabled)

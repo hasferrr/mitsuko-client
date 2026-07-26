@@ -52,7 +52,6 @@ import {
 import { cn } from "@/lib/utils"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import {
   AlertDialog,
@@ -98,16 +97,14 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { ContextExtractorMain } from "@/components/extract-context/context-extractor-main"
 import { SettingsDialogue } from "@/components/settings/settings-dialogue"
 import {
-  GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
-  GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
+  GLOBAL_EXTRACTION_SETTINGS_ID,
 } from "@/constants/global-settings"
 import { useProjectStore } from "@/stores/data/use-project-store"
 
 interface SubtitleTranslatorMainProps {
   currentId: string
   translation: Translation
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
   isSharedSettings?: boolean
   hideBackButton?: boolean
 }
@@ -115,8 +112,7 @@ interface SubtitleTranslatorMainProps {
 export default function SubtitleTranslatorMain({
   currentId,
   translation,
-  basicSettingsId,
-  advancedSettingsId,
+  settingsId,
   isSharedSettings,
   hideBackButton,
 }: SubtitleTranslatorMainProps) {
@@ -139,17 +135,17 @@ export default function SubtitleTranslatorMain({
   const maxSubtitles = 1000
 
   // Basic Settings Store
-  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))
-  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(basicSettingsId))
-  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
+  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(settingsId))
+  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(settingsId))
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(settingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(settingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
-  const setContextDocument = (doc: string) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc)
+  const setContextDocument = (doc: string) => setBasicSettingsValue(settingsId, "contextDocument", doc)
 
   // Advanced Settings Store
-  const resetIndex = useAdvancedSettingsStore((state) => state.resetIndex)
-  const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex(advancedSettingsId))
-  const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex(advancedSettingsId))
+  const resetIndex = useSettingsStore((state) => state.resetIndex)
+  const startIndex = useSettingsStore((state) => state.getStartIndex(settingsId))
+  const endIndex = useSettingsStore((state) => state.getEndIndex(settingsId))
 
   // Translation Store
   const isTranslatingSet = useTranslationStore((state) => state.isTranslatingSet)
@@ -230,8 +226,7 @@ export default function SubtitleTranslatorMain({
   ) => {
     await handleStart({
       currentId,
-      basicSettingsId,
-      advancedSettingsId,
+      settingsId,
       overrideStartIndexParam,
       overrideEndIndexParam,
       isContinuation,
@@ -360,7 +355,7 @@ export default function SubtitleTranslatorMain({
         }
 
         setSubtitles(currentId, parsedSubtitles)
-        resetIndex(advancedSettingsId, 1, parsedSubtitles.length)
+        resetIndex(settingsId, 1, parsedSubtitles.length)
 
         const fileName = pendingFile.name.split('.')
         fileName.pop()
@@ -685,25 +680,24 @@ export default function SubtitleTranslatorMain({
                   <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 )}
                 <LanguageSelection
-                    basicSettingsId={basicSettingsId}
+                    settingsId={settingsId}
                   />
                   <ModelSelection
-                    basicSettingsId={basicSettingsId}
-                    advancedSettingsId={advancedSettingsId}
+                    settingsId={settingsId}
                   />
                   <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
                     <ContextDocumentInput
-                      basicSettingsId={basicSettingsId}
+                      settingsId={settingsId}
                       translationId={currentId}
                       onOpenExtraction={openExtractionPreview}
                       onOpenExtractionSettings={currentProject ? () => setIsExtractionSettingsOpen(true) : undefined}
                     />
                   </DragAndDrop>
                     <CustomInstructionsInput
-                      basicSettingsId={basicSettingsId}
+                      settingsId={settingsId}
                     />
                     <FewShotInput
-                      basicSettingsId={basicSettingsId}
+                      settingsId={settingsId}
                     />
                 </CardContent>
               </Card>
@@ -713,19 +707,19 @@ export default function SubtitleTranslatorMain({
             <Card>
               <CardContent className={cn("space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
                 <ModelDetail
-                    basicSettingsId={basicSettingsId}
+                    settingsId={settingsId}
                   />
                   {isSharedSettings && (
                     <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                   )}
                   <TemperatureSlider
-                    advancedSettingsId={advancedSettingsId}
+                    settingsId={settingsId}
                   />
                   <StartIndexInput
-                    advancedSettingsId={advancedSettingsId}
+                    settingsId={settingsId}
                   />
                   <EndIndexInput
-                    advancedSettingsId={advancedSettingsId}
+                    settingsId={settingsId}
                   />
                   <Card size="sm" className="ring-muted-foreground/20">
                     <CardContent className="space-y-4">
@@ -734,25 +728,22 @@ export default function SubtitleTranslatorMain({
                   </Card>
                   <p className="text-sm font-semibold">Technical Options</p>
                   <SplitSizeInput
-                    advancedSettingsId={advancedSettingsId}
+                    settingsId={settingsId}
                   />
                   <MaxCompletionTokenInput
-                    basicSettingsId={basicSettingsId}
-                    advancedSettingsId={advancedSettingsId}
+                    settingsId={settingsId}
                   />
                   <StructuredOutputSwitch
-                    basicSettingsId={basicSettingsId}
-                    advancedSettingsId={advancedSettingsId}
+                    settingsId={settingsId}
                   />
                   <FullContextMemorySwitch
-                    advancedSettingsId={advancedSettingsId}
+                    settingsId={settingsId}
                   />
                   <BetterContextCachingSwitch
-                    advancedSettingsId={advancedSettingsId}
+                    settingsId={settingsId}
                   />
                   <AdvancedSettingsResetButton
-                    basicSettingsId={basicSettingsId}
-                    advancedSettingsId={advancedSettingsId}
+                    settingsId={settingsId}
                   />
                 </CardContent>
               </Card>
@@ -772,10 +763,8 @@ export default function SubtitleTranslatorMain({
             isOpen={isExtractionSettingsOpen}
             onOpenChange={setIsExtractionSettingsOpen}
             projectName={currentProject.name}
-            basicSettingsId={currentProject.defaultExtractionBasicSettingsId}
-            advancedSettingsId={currentProject.defaultExtractionAdvancedSettingsId}
-            resetFromBasicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
-            resetFromAdvancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
+            settingsId={currentProject.defaultExtractionSettingsId}
+            resetFromSettingsId={GLOBAL_EXTRACTION_SETTINGS_ID}
             settingsParentType="extraction"
             isDefaultEnabled={currentProject.isDefaultExtractionEnabled}
             onDefaultEnabledChange={(enabled: boolean) => updateProjectStore(currentProject.id, { isDefaultExtractionEnabled: enabled })}
@@ -788,8 +777,7 @@ export default function SubtitleTranslatorMain({
             mode="global"
             isOpen={isGlobalExtractionSettingsOpen}
             onOpenChange={setIsGlobalExtractionSettingsOpen}
-            basicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
-            advancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
+            settingsId={GLOBAL_EXTRACTION_SETTINGS_ID}
             settingsParentType="extraction"
           />
         </>
@@ -799,7 +787,7 @@ export default function SubtitleTranslatorMain({
       <HistoryPanel
         isHistoryOpen={isHistoryOpen}
         setIsHistoryOpen={setIsHistoryOpen}
-        advancedSettingsId={advancedSettingsId}
+        settingsId={settingsId}
       />
 
       {previewExtraction && (
@@ -813,8 +801,7 @@ export default function SubtitleTranslatorMain({
             </DialogHeader>
             <ContextExtractorMain
               currentId={previewExtraction.id}
-              basicSettingsId={previewExtraction.basicSettingsId}
-              advancedSettingsId={previewExtraction.advancedSettingsId}
+              settingsId={previewExtraction.settingsId}
               hideBackButton
             />
           </DialogContent>

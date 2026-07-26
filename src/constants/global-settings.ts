@@ -1,6 +1,8 @@
-export const GLOBAL_TRANSLATION_BASIC_SETTINGS_ID = 'global-translation-basic-settings'
-export const GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID = 'global-translation-advanced-settings'
 export const GLOBAL_TRANSLATION_SETTINGS_ID = 'global-translation-settings'
-export const GLOBAL_EXTRACTION_BASIC_SETTINGS_ID = 'global-extraction-basic-settings'
-export const GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID = 'global-extraction-advanced-settings'
+export const GLOBAL_EXTRACTION_SETTINGS_ID = 'global-extraction-settings'
 export const GLOBAL_TRANSCRIPTION_SETTINGS_ID = 'global-transcription-settings'
+
+export const LEGACY_GLOBAL_TRANSLATION_BASIC_SETTINGS_ID = 'global-translation-basic-settings'
+export const LEGACY_GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID = 'global-translation-advanced-settings'
+export const LEGACY_GLOBAL_EXTRACTION_BASIC_SETTINGS_ID = 'global-extraction-basic-settings'
+export const LEGACY_GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID = 'global-extraction-advanced-settings'

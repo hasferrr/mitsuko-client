@@ -1,5 +1,5 @@
 import { FREE_MODELS } from "./model-collection"
-import { AdvancedSettings, BasicSettings, Translation, Transcription } from "@/types/project"
+import { AdvancedSettings, BasicSettings, Settings, Translation, Transcription } from "@/types/project"
 
 const getDefaultModel = (modelName: string) => {
   const freeModels = FREE_MODELS["Free Models"].models
@@ -38,7 +38,17 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
   isMaxCompletionTokensAuto: true,
 }
 
-export const DEFAULT_TRANSLATION_SETTINGS: Omit<Translation, "id" | "createdAt" | "updatedAt" | "projectId" | "basicSettingsId" | "advancedSettingsId"> = {
+export const DEFAULT_SETTINGS: Omit<Settings, "id" | "createdAt" | "updatedAt"> = {
+  ...DEFAULT_BASIC_SETTINGS,
+  ...DEFAULT_ADVANCED_SETTINGS,
+}
+
+export const DEFAULT_EXTRACTION_SETTINGS: Omit<Settings, "id" | "createdAt" | "updatedAt"> = {
+  ...DEFAULT_EXTRACTION_BASIC_SETTINGS,
+  ...DEFAULT_ADVANCED_SETTINGS,
+}
+
+export const DEFAULT_TRANSLATION_SETTINGS: Omit<Translation, "id" | "createdAt" | "updatedAt" | "projectId" | "settingsId"> = {
   title: "",
   subtitles: [],
   parsed: { type: "srt", data: null },

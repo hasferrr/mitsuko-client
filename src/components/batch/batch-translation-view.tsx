@@ -69,11 +69,10 @@ import { MAX_BATCH_CONCURRENT_OPERATION } from "@/constants/limits"
 import { useSetUnsavedChanges } from "@/contexts/unsaved-changes-context"
 
 interface BatchTranslationViewProps {
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
 }
 
-export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: BatchTranslationViewProps) {
+export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) {
   const [activeTab, setActiveTab] = useState("basic")
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
@@ -110,10 +109,10 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
   const concurrentOperation = useBatchSettingsStore(state => state.getConcurrent(currentProject?.id))
   const setConcurrentOperation = useBatchSettingsStore(state => state.setConcurrentTranslations)
 
-  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))
-  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(basicSettingsId))
-  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
+  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(settingsId))
+  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(settingsId))
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(settingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(settingsId))
 
   // Data Stores
   const translationData = useTranslationDataStore((state) => state.data)
@@ -158,8 +157,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
     handleStopBatchTranslation,
     generateSubtitleContent,
   } = useBatchTranslationHandler({
-    basicSettingsId,
-    advancedSettingsId,
+    settingsId,
     batchFiles,
     isBatchTranslating: isProcessing,
     state: {
@@ -551,11 +549,11 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
             <Card>
               <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
-                <LanguageSelection basicSettingsId={basicSettingsId} />
-                <ModelSelection basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />
-                <ContextDocumentInput basicSettingsId={basicSettingsId} />
-                <CustomInstructionsInput basicSettingsId={basicSettingsId} />
-                <FewShotInput basicSettingsId={basicSettingsId} />
+                <LanguageSelection settingsId={settingsId} />
+                <ModelSelection settingsId={settingsId} />
+                <ContextDocumentInput settingsId={settingsId} />
+                <CustomInstructionsInput settingsId={settingsId} />
+                <FewShotInput settingsId={settingsId} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -564,18 +562,18 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
             <Card>
               <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
-                <ModelDetail basicSettingsId={basicSettingsId} />
-                <TemperatureSlider advancedSettingsId={advancedSettingsId} />
+                <ModelDetail settingsId={settingsId} />
+                <TemperatureSlider settingsId={settingsId} />
                 <div className="border border-muted-foreground/20 rounded-md p-4 space-y-4">
                   <AdvancedReasoningSwitch />
                 </div>
                 <p className="text-sm font-semibold">Technical Options</p>
-                <SplitSizeInput advancedSettingsId={advancedSettingsId} />
-                <MaxCompletionTokenInput basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />
-                <StructuredOutputSwitch basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />
-                <FullContextMemorySwitch advancedSettingsId={advancedSettingsId} />
-                <BetterContextCachingSwitch advancedSettingsId={advancedSettingsId} />
-                <AdvancedSettingsResetButton basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />
+                <SplitSizeInput settingsId={settingsId} />
+                <MaxCompletionTokenInput settingsId={settingsId} />
+                <StructuredOutputSwitch settingsId={settingsId} />
+                <FullContextMemorySwitch settingsId={settingsId} />
+                <BetterContextCachingSwitch settingsId={settingsId} />
+                <AdvancedSettingsResetButton settingsId={settingsId} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -596,8 +594,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
         operationMode="translation"
         translationBatchFiles={batchFiles}
         extractionBatchFiles={extractionBatchFiles}
-        sharedBasicSettingsId={basicSettingsId}
-        sharedAdvancedSettingsId={advancedSettingsId}
+        sharedSettingsId={settingsId}
       />
 
       <AlertDialog open={!!deleteFileId} onOpenChange={(open) => !open && setDeleteFileId(null)}>
@@ -716,8 +713,7 @@ export function BatchTranslationView({ basicSettingsId, advancedSettingsId }: Ba
               <SubtitleTranslatorMain
                 currentId={previewId}
                 translation={translationData[previewId]}
-                basicSettingsId={isUseSharedSettings ? basicSettingsId : translationData[previewId].basicSettingsId}
-                advancedSettingsId={isUseSharedSettings ? advancedSettingsId : translationData[previewId].advancedSettingsId}
+                settingsId={isUseSharedSettings ? settingsId : translationData[previewId].settingsId}
                 isSharedSettings={isUseSharedSettings}
                 hideBackButton
               />

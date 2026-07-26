@@ -2,17 +2,16 @@
 
 import { memo } from "react"
 import { Switch } from "@/components/ui/switch"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
 
 interface Props {
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
 }
 
-export const StructuredOutputSwitch = memo(({ advancedSettingsId }: Props) => {
-  const useStructuredOutput = useAdvancedSettingsStore((state) => state.getIsUseStructuredOutput(advancedSettingsId))
-  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setUseStructuredOutput = (value: boolean) => setAdvancedSettingsValue(advancedSettingsId, "isUseStructuredOutput", value)
+export const StructuredOutputSwitch = memo(({ settingsId }: Props) => {
+  const useStructuredOutput = useSettingsStore((state) => state.getIsUseStructuredOutput(settingsId))
+  const setAdvancedSettingsValue = useSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setUseStructuredOutput = (value: boolean) => setAdvancedSettingsValue(settingsId, "isUseStructuredOutput", value)
 
   return (
     <div className="space-y-2">

@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { CheckCircle, FileJson, FileUp, Trash, XCircle } from "lucide-react"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useHistoryStore, type HistoryItem } from "@/stores/ui/use-history-store"
 import { toast } from "sonner"
 import { HISTORY_MAX_ITEMS } from "@/constants/limits"
@@ -38,10 +38,10 @@ import {
 interface HistoryPanelProps {
   isHistoryOpen: boolean
   setIsHistoryOpen: (value: boolean) => void
-  advancedSettingsId: string
+  settingsId: string
 }
 
-export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettingsId }: HistoryPanelProps) {
+export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, settingsId }: HistoryPanelProps) {
   const currentId = useTranslationDataStore((state) => state.currentId)
   const setTitle = useTranslationDataStore((state) => state.setTitle)
   const setSubtitles = useTranslationDataStore((state) => state.setSubtitles)
@@ -51,7 +51,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
   const saveData = useTranslationDataStore((state) => state.saveData)
 
   // Advanced Settings Store
-  const resetIndex = useAdvancedSettingsStore((state) => state.resetIndex)
+  const resetIndex = useSettingsStore((state) => state.resetIndex)
 
   // History Store & State
   const history = useHistoryStore((state) => state.history)
@@ -98,7 +98,7 @@ export function HistoryPanel({ isHistoryOpen, setIsHistoryOpen, advancedSettings
       setJsonResponse(currentId, selectedHistoryItem.json)
       await saveData(currentId)
       setIsHistoryOpen(false)
-      resetIndex(advancedSettingsId, 1, selectedHistoryItem.subtitles.length)
+      resetIndex(settingsId, 1, selectedHistoryItem.subtitles.length)
     } catch (error) {
       console.error("Error applying history:", error)
     }

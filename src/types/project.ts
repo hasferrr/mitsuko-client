@@ -21,11 +21,9 @@ export interface Project {
   translations: string[] // Array of Translation IDs
   transcriptions: string[] // Array of Transcription IDs
   extractions: string[] // Array of Extraction IDs
-  defaultTranslationBasicSettingsId: string
-  defaultTranslationAdvancedSettingsId: string
+  defaultTranslationSettingsId: string
   defaultTranslationId: string
-  defaultExtractionBasicSettingsId: string
-  defaultExtractionAdvancedSettingsId: string
+  defaultExtractionSettingsId: string
   defaultTranscriptionId: string
   createdAt: Date
   updatedAt: Date
@@ -45,8 +43,7 @@ export interface Translation {
   createdAt: Date
   updatedAt: Date
   projectId: string
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
   autoContextMode: AutoContextMode
   autoContextExtractionId: string | null
   autoContextPreviousMode: AutoContextPreviousMode
@@ -96,8 +93,7 @@ export interface Extraction {
   createdAt: Date
   updatedAt: Date
   projectId: string
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
 }
 
 export interface BasicSettings {
@@ -133,6 +129,27 @@ export interface AdvancedSettings {
   isMaxCompletionTokensAuto: boolean
   createdAt: Date
   updatedAt: Date
+}
+
+export type Settings = Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>
+  & Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>
+  & Pick<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>
+
+export interface LegacyProject extends Omit<Project, 'defaultTranslationSettingsId' | 'defaultExtractionSettingsId'> {
+  defaultTranslationBasicSettingsId: string
+  defaultTranslationAdvancedSettingsId: string
+  defaultExtractionBasicSettingsId: string
+  defaultExtractionAdvancedSettingsId: string
+}
+
+export interface LegacyTranslation extends Omit<Translation, 'settingsId'> {
+  basicSettingsId: string
+  advancedSettingsId: string
+}
+
+export interface LegacyExtraction extends Omit<Extraction, 'settingsId'> {
+  basicSettingsId: string
+  advancedSettingsId: string
 }
 
 export interface ResponseTranslation {

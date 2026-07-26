@@ -23,7 +23,7 @@ export default function SubtitleTranslator() {
     return <div className="p-4">No translation project selected</div>
   }
 
-  if (!translation.basicSettingsId || !translation.advancedSettingsId) {
+  if (!translation.settingsId) {
     return <div className="p-4">Invalid settings data</div>
   }
 
@@ -31,8 +31,7 @@ export default function SubtitleTranslator() {
     <SubtitleTranslatorMain
       currentId={currentId}
       translation={translation}
-      basicSettingsId={translation.basicSettingsId}
-      advancedSettingsId={translation.advancedSettingsId}
+      settingsId={translation.settingsId}
     />
   )
 }

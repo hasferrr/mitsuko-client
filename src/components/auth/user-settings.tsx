@@ -7,10 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { SettingsDialogue } from "@/components/settings/settings-dialogue"
 import {
-  GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
-  GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
-  GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
-  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_EXTRACTION_SETTINGS_ID,
   GLOBAL_TRANSLATION_SETTINGS_ID,
   GLOBAL_TRANSCRIPTION_SETTINGS_ID
 } from "@/constants/global-settings"
@@ -267,8 +264,7 @@ export function UserSettings() {
         mode="global"
         isOpen={isGlobalTranslationSettingsOpen}
         onOpenChange={setIsGlobalTranslationSettingsOpen}
-        basicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
-        advancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
+        settingsId={GLOBAL_TRANSLATION_SETTINGS_ID}
         defaultTranslationId={GLOBAL_TRANSLATION_SETTINGS_ID}
         settingsParentType="translation"
       />
@@ -282,8 +278,7 @@ export function UserSettings() {
         mode="global"
         isOpen={isGlobalExtractionSettingsOpen}
         onOpenChange={setIsGlobalExtractionSettingsOpen}
-        basicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
-        advancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
+        settingsId={GLOBAL_EXTRACTION_SETTINGS_ID}
         settingsParentType="extraction"
       />
       <AlertDialog open={isThirdPartyDialogOpen} onOpenChange={setIsThirdPartyDialogOpen}>

@@ -2,17 +2,17 @@
 
 import { memo } from "react"
 import { Input } from "@/components/ui/input"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { SPLIT_SIZE_MIN, SPLIT_SIZE_MAX } from "@/constants/limits"
 
 interface Props {
-  advancedSettingsId: string
+  settingsId: string
 }
 
-export const SplitSizeInput = memo(({ advancedSettingsId }: Props) => {
-  const splitSize = useAdvancedSettingsStore((state) => state.getSplitSize(advancedSettingsId))
-  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setSplitSize = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "splitSize", value)
+export const SplitSizeInput = memo(({ settingsId }: Props) => {
+  const splitSize = useSettingsStore((state) => state.getSplitSize(settingsId))
+  const setAdvancedSettingsValue = useSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setSplitSize = (value: number) => setAdvancedSettingsValue(settingsId, "splitSize", value)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value

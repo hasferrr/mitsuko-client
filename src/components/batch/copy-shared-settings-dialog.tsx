@@ -9,9 +9,8 @@ import type { BatchFile } from "@/types/batch"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { BASIC_SETTING_KEYS, ADVANCED_SETTING_KEYS } from "@/stores/settings/settings-keys"
-import type { BasicKey, AdvancedKey } from "@/stores/settings/settings-keys"
+import type { BasicKey, AdvancedKey, SettingsKey } from "@/stores/settings/settings-keys"
 import { ListChecks, ListX, Loader2 } from "lucide-react"
 
 interface CopySharedSettingsDialogProps {
@@ -20,8 +19,7 @@ interface CopySharedSettingsDialogProps {
   operationMode: 'translation' | 'extraction'
   translationBatchFiles: BatchFile[]
   extractionBatchFiles: BatchFile[]
-  sharedBasicSettingsId: string
-  sharedAdvancedSettingsId: string
+  sharedSettingsId: string
 }
 
 const BASIC_KEY_LABELS: Record<BasicKey, string> = {
@@ -58,8 +56,7 @@ export function CopySharedSettingsDialog({
   operationMode,
   translationBatchFiles,
   extractionBatchFiles,
-  sharedBasicSettingsId,
-  sharedAdvancedSettingsId,
+  sharedSettingsId,
 }: CopySharedSettingsDialogProps) {
   const translationIds = useMemo(() => translationBatchFiles.map(b => b.id), [translationBatchFiles])
   const extractionIds = useMemo(() => extractionBatchFiles.map(b => b.id), [extractionBatchFiles])
@@ -69,8 +66,7 @@ export function CopySharedSettingsDialog({
   const translationStore = useTranslationDataStore(s => s.data)
   const getExtractionsDb = useExtractionDataStore(s => s.getExtractionsDb)
   const extractionStore = useExtractionDataStore(s => s.data)
-  const copyBasicSettingsKeys = useSettingsStore(s => s.copyBasicSettingsKeys)
-  const copyAdvancedSettingsKeys = useAdvancedSettingsStore(s => s.copyAdvancedSettingsKeys)
+  const copySettingsKeys = useSettingsStore(s => s.copySettingsKeys)
 
   // Local selection states
   const [tBasicSel, setTBasicSel] = useState<Set<BasicKey>>(new Set())
@@ -154,16 +150,9 @@ export function CopySharedSettingsDialog({
         for (const tId of translationIds) {
           const translation = translationStore[tId]
           if (!translation) continue
-          let touched = false
-          if (tBasicKeys.length > 0) {
-            ops.push(copyBasicSettingsKeys(sharedBasicSettingsId, translation.basicSettingsId, tBasicKeys))
-            touched = true
-          }
-          if (tAdvKeys.length > 0) {
-            ops.push(copyAdvancedSettingsKeys(sharedAdvancedSettingsId, translation.advancedSettingsId, tAdvKeys))
-            touched = true
-          }
-          if (touched) tApplied += 1
+          const keys: SettingsKey[] = [...tBasicKeys, ...tAdvKeys]
+          ops.push(copySettingsKeys(sharedSettingsId, translation.settingsId, keys))
+          tApplied += 1
         }
       }
 
@@ -172,16 +161,9 @@ export function CopySharedSettingsDialog({
         for (const eId of extractionIds) {
           const extraction = extractionStore[eId]
           if (!extraction) continue
-          let touched = false
-          if (eBasicKeys.length > 0) {
-            ops.push(copyBasicSettingsKeys(sharedBasicSettingsId, extraction.basicSettingsId, eBasicKeys))
-            touched = true
-          }
-          if (eAdvKeys.length > 0) {
-            ops.push(copyAdvancedSettingsKeys(sharedAdvancedSettingsId, extraction.advancedSettingsId, eAdvKeys))
-            touched = true
-          }
-          if (touched) eApplied += 1
+          const keys: SettingsKey[] = [...eBasicKeys, ...eAdvKeys]
+          ops.push(copySettingsKeys(sharedSettingsId, extraction.settingsId, keys))
+          eApplied += 1
         }
       }
 

@@ -1,29 +1,25 @@
-import { BasicSettings, Extraction, AdvancedSettings } from "@/types/project"
-import { db } from "./db"
-import { DEFAULT_EXTRACTION_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
-import { createBasicSettings, createAdvancedSettings } from "./settings"
+import { Extraction, Settings } from "@/types/project"
+import { db } from "@/lib/db/db"
+import { DEFAULT_EXTRACTION_SETTINGS } from "@/constants/default"
+import { createSettings } from "@/lib/db/settings"
 import { inferLegacyExtractionStatus, stripExtractionDoneTag } from "@/lib/extraction/status"
+import { deleteSettingsIfUnreferenced } from "@/lib/db/settings-references"
 
 export type ExtractionCreateInput = Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">
   & Partial<Pick<Extraction, "status" | "ownerTranslationId" | "completedAt">>
 
-// Extraction CRUD functions
+type SettingsData = Omit<Settings, "id" | "createdAt" | "updatedAt">
+
 export const createExtraction = async (
   projectId: string,
   data: ExtractionCreateInput,
-  basicSettingsData: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
-  advancedSettingsData: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
+  settingsData: Partial<SettingsData> = {},
 ): Promise<Extraction> => {
-  return db.transaction('rw', db.projects, db.extractions, db.basicSettings, db.advancedSettings, async () => {
+  return db.transaction('rw', db.projects, db.extractions, db.settings, async () => {
     const id = crypto.randomUUID()
-
-    const basicSettings = await createBasicSettings({
-      ...DEFAULT_EXTRACTION_BASIC_SETTINGS,
-      ...basicSettingsData,
-    })
-    const advancedSettings = await createAdvancedSettings({
-      ...DEFAULT_ADVANCED_SETTINGS,
-      ...advancedSettingsData,
+    const settings = await createSettings({
+      ...DEFAULT_EXTRACTION_SETTINGS,
+      ...settingsData,
     })
 
     const contextResult = stripExtractionDoneTag(data.contextResult)
@@ -36,14 +32,12 @@ export const createExtraction = async (
       status,
       ownerTranslationId: data.ownerTranslationId ?? null,
       completedAt: data.completedAt ?? (status === "completed" ? new Date() : null),
-      basicSettingsId: basicSettings.id,
-      advancedSettingsId: advancedSettings.id,
+      settingsId: settings.id,
       createdAt: new Date(),
       updatedAt: new Date()
     }
 
     await db.extractions.add(extraction)
-
     await db.projects.update(projectId, project => {
       if (!project) return
       project.extractions.push(id)
@@ -100,18 +94,16 @@ export const moveExtraction = async (
 }
 
 export const deleteExtraction = async (projectId: string, extractionId: string): Promise<void> => {
-  return db.transaction('rw', db.projects, db.extractions, db.basicSettings, db.advancedSettings, async () => {
+  return db.transaction('rw', db.projects, db.translations, db.extractions, db.settings, async () => {
     const extraction = await db.extractions.get(extractionId)
     if (!extraction) return
 
-    await db.basicSettings.delete(extraction.basicSettingsId)
-    await db.advancedSettings.delete(extraction.advancedSettingsId)
     await db.extractions.delete(extractionId)
-
     await db.projects.update(projectId, project => {
       if (!project) return
       project.extractions = project.extractions.filter(id => id !== extractionId)
       project.updatedAt = new Date()
     })
+    await deleteSettingsIfUnreferenced([extraction.settingsId])
   })
 }

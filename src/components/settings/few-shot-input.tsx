@@ -18,16 +18,16 @@ import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 interface Props {
-  basicSettingsId: string
+  settingsId: string
 }
 
-export const FewShotInput = memo(({ basicSettingsId }: Props) => {
-  const isFewShotEnabled = useSettingsStore((state) => state.getFewShotIsEnabled(basicSettingsId))
-  const fewShotValue = useSettingsStore((state) => state.getFewShotValue(basicSettingsId))
-  const fewShotLinkedId = useSettingsStore((state) => state.getFewShotLinkedId(basicSettingsId))
-  const fewShotType = useSettingsStore((state) => state.getFewShotType(basicSettingsId))
-  const fewShotStartIndex = useSettingsStore((state) => state.getFewShotStartIndex(basicSettingsId))
-  const fewShotEndIndex = useSettingsStore((state) => state.getFewShotEndIndex(basicSettingsId))
+export const FewShotInput = memo(({ settingsId }: Props) => {
+  const isFewShotEnabled = useSettingsStore((state) => state.getFewShotIsEnabled(settingsId))
+  const fewShotValue = useSettingsStore((state) => state.getFewShotValue(settingsId))
+  const fewShotLinkedId = useSettingsStore((state) => state.getFewShotLinkedId(settingsId))
+  const fewShotType = useSettingsStore((state) => state.getFewShotType(settingsId))
+  const fewShotStartIndex = useSettingsStore((state) => state.getFewShotStartIndex(settingsId))
+  const fewShotEndIndex = useSettingsStore((state) => state.getFewShotEndIndex(settingsId))
   const _setIsFewShotEnabled = useSettingsStore((state) => state.setIsFewShotEnabled)
   const _setFewShotValue = useSettingsStore((state) => state.setFewShotValue)
   const _setFewShotLinkedId = useSettingsStore((state) => state.setFewShotLinkedId)
@@ -35,12 +35,12 @@ export const FewShotInput = memo(({ basicSettingsId }: Props) => {
   const _setFewShotStartIndex = useSettingsStore((state) => state.setFewShotStartIndex)
   const _setFewShotEndIndex = useSettingsStore((state) => state.setFewShotEndIndex)
 
-  const setIsFewShotEnabled = (isEnabled: boolean) => _setIsFewShotEnabled(basicSettingsId, isEnabled)
-  const setFewShotValue = (value: string) => _setFewShotValue(basicSettingsId, value)
-  const setFewShotLinkedId = (linkedId: string) => _setFewShotLinkedId(basicSettingsId, linkedId)
-  const setFewShotType = (type: 'manual' | 'linked') => _setFewShotType(basicSettingsId, type)
-  const setFewShotStartIndex = (index: number) => _setFewShotStartIndex(basicSettingsId, index)
-  const setFewShotEndIndex = (index: number) => _setFewShotEndIndex(basicSettingsId, index)
+  const setIsFewShotEnabled = (isEnabled: boolean) => _setIsFewShotEnabled(settingsId, isEnabled)
+  const setFewShotValue = (value: string) => _setFewShotValue(settingsId, value)
+  const setFewShotLinkedId = (linkedId: string) => _setFewShotLinkedId(settingsId, linkedId)
+  const setFewShotType = (type: 'manual' | 'linked') => _setFewShotType(settingsId, type)
+  const setFewShotStartIndex = (index: number) => _setFewShotStartIndex(settingsId, index)
+  const setFewShotEndIndex = (index: number) => _setFewShotEndIndex(settingsId, index)
 
   const currentTranslationId = useTranslationDataStore((state) => state.currentId)
   const getTranslationsDb = useTranslationDataStore((state) => state.getTranslationsDb)

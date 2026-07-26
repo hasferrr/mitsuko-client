@@ -25,7 +25,6 @@ import { ZodError } from "zod"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useRouter } from "next/navigation"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 
 interface ExportImportDialogueProps {
   isOpen: boolean
@@ -43,7 +42,6 @@ export function ExportImportDialogue({
   const [deleteExisting, setDeleteExisting] = useState(false)
   const loadProjects = useProjectStore(state => state.loadProjects)
   const loadSettings = useSettingsStore((state) => state.loadSettings)
-  const loadAdvancedSettings = useAdvancedSettingsStore((state) => state.loadSettings)
 
   useEffect(() => {
     if (isOpen) {
@@ -108,7 +106,6 @@ export function ExportImportDialogue({
           await Promise.all([
             loadProjects(),
             loadSettings(),
-            loadAdvancedSettings(),
           ])
           toast.success("Database imported successfully")
           setIsOpen(false)

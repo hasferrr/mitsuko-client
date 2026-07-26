@@ -72,11 +72,10 @@ import { MAX_BATCH_CONCURRENT_OPERATION } from "@/constants/limits"
 import { useSetUnsavedChanges } from "@/contexts/unsaved-changes-context"
 
 interface BatchExtractionViewProps {
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
 }
 
-export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: BatchExtractionViewProps) {
+export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
   const [activeTab, setActiveTab] = useState("basic")
   // Although extraction doesn't support "combinedFormat" or "toType" in the same way,
   // DownloadSection expects these props. We can keep local state or just pass defaults.
@@ -117,8 +116,8 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
   const extractionMode = useBatchSettingsStore(state => state.getExtractionMode(currentProject?.id))
   const setExtractionMode = useBatchSettingsStore(state => state.setExtractionMode)
 
-  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(settingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(settingsId))
 
   // Data Stores
   const extractionData = useExtractionDataStore((state) => state.data)
@@ -166,8 +165,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
     handleContinueBatchExtraction,
     handleStopBatchExtraction,
   } = useBatchExtractionHandler({
-    basicSettingsId,
-    advancedSettingsId,
+    settingsId,
     batchFiles,
     isBatchExtracting: isProcessing,
     state: {
@@ -178,8 +176,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
 
   // We need generateSubtitleContent from translation handler for importing subs
   const { generateSubtitleContent } = useBatchTranslationHandler({
-    basicSettingsId,
-    advancedSettingsId,
+    settingsId,
     batchFiles: translationBatchFiles,
     isBatchTranslating: false,
     state: {
@@ -661,7 +658,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
             <Card>
               <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
-                <ModelSelection basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />
+                <ModelSelection settingsId={settingsId} />
                 <SubtitleCleanupSwitch />
               </CardContent>
             </Card>
@@ -671,9 +668,9 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
             <Card>
               <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
-                <ModelDetail basicSettingsId={basicSettingsId} />
-                <MaxCompletionTokenInput basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />
-                <AdvancedSettingsResetButton basicSettingsId={basicSettingsId} advancedSettingsId={advancedSettingsId} />
+                <ModelDetail settingsId={settingsId} />
+                <MaxCompletionTokenInput settingsId={settingsId} />
+                <AdvancedSettingsResetButton settingsId={settingsId} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -701,8 +698,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
         operationMode="extraction"
         translationBatchFiles={translationBatchFiles}
         extractionBatchFiles={batchFiles}
-        sharedBasicSettingsId={basicSettingsId}
-        sharedAdvancedSettingsId={advancedSettingsId}
+        sharedSettingsId={settingsId}
       />
 
       <AlertDialog open={!!deleteFileId} onOpenChange={(open) => !open && setDeleteFileId(null)}>
@@ -821,8 +817,7 @@ export function BatchExtractionView({ basicSettingsId, advancedSettingsId }: Bat
             <div className="max-h-[80vh] overflow-y-auto">
               <ContextExtractorMain
                 currentId={previewId}
-                basicSettingsId={isUseSharedSettings ? basicSettingsId : extractionData[previewId].basicSettingsId}
-                advancedSettingsId={isUseSharedSettings ? advancedSettingsId : extractionData[previewId].advancedSettingsId}
+                settingsId={isUseSharedSettings ? settingsId : extractionData[previewId].settingsId}
                 isSharedSettings={isUseSharedSettings}
                 hideBackButton
               />

@@ -20,8 +20,7 @@ import { BatchFile } from "@/types/batch"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
 
 interface UseBatchTranslationHandlerProps {
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
   batchFiles: BatchFile[]
   isBatchTranslating: boolean
   state: {
@@ -34,8 +33,7 @@ interface UseBatchTranslationHandlerProps {
 }
 
 export default function useBatchTranslationHandler({
-  basicSettingsId,
-  advancedSettingsId,
+  settingsId,
   batchFiles,
   isBatchTranslating,
   state: {
@@ -162,8 +160,8 @@ export default function useBatchTranslationHandler({
 
         // Refetch user credits after each file completes
         const bsIdToUse = isUseSharedSettings
-          ? basicSettingsId
-          : (translationData[id]?.basicSettingsId || basicSettingsId)
+          ? settingsId
+          : (translationData[id]?.settingsId || settingsId)
         const modelDetail = getModelDetail(bsIdToUse)
         const isUseCustomModel = getIsUseCustomModel(bsIdToUse)
         const isUsingCredits = !isUseCustomModel && !!modelDetail?.isPaid
@@ -253,18 +251,13 @@ export default function useBatchTranslationHandler({
     isContinuation?: boolean
   ) => {
     // Delegate to centralized translation handler
-    const bsIdToUse = isUseSharedSettings
-      ? basicSettingsId
-      : (translationData[currentId]?.basicSettingsId || basicSettingsId)
-
-    const adsIdToUse = isUseSharedSettings
-      ? advancedSettingsId
-      : (translationData[currentId]?.advancedSettingsId || advancedSettingsId)
+    const settingsIdToUse = isUseSharedSettings
+      ? settingsId
+      : (translationData[currentId]?.settingsId || settingsId)
 
     await baseStartTranslation({
       currentId,
-      basicSettingsId: bsIdToUse,
-      advancedSettingsId: adsIdToUse,
+      settingsId: settingsIdToUse,
       overrideStartIndexParam,
       overrideEndIndexParam,
       isContinuation
@@ -317,8 +310,8 @@ export default function useBatchTranslationHandler({
 
     setIsTranslating(currentId, false)
     const bsIdToUse = isUseSharedSettings
-      ? basicSettingsId
-      : (translationData[currentId]?.basicSettingsId || basicSettingsId)
+      ? settingsId
+      : (translationData[currentId]?.settingsId || settingsId)
     const modelDetail = getModelDetail(bsIdToUse)
     const isUseCustomModel = getIsUseCustomModel(bsIdToUse)
     const isUsingCredits = !isUseCustomModel && !!modelDetail?.isPaid

@@ -1,8 +1,6 @@
-import { BasicSettings, AdvancedSettings } from "@/types/project"
+import { Settings } from "@/types/project"
 
-type BasicKey = keyof Omit<BasicSettings, "id" | "createdAt" | "updatedAt">
-
-type AdvancedKey = keyof Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">
+type SettingsKey = keyof Omit<Settings, "id" | "createdAt" | "updatedAt">
 
 const BASIC_SETTING_KEYS = [
   "sourceLanguage",
@@ -12,7 +10,7 @@ const BASIC_SETTING_KEYS = [
   "contextDocument",
   "customInstructions",
   "fewShot",
-] as const satisfies readonly BasicKey[]
+] as const satisfies readonly SettingsKey[]
 
 const ADVANCED_SETTING_KEYS = [
   "temperature",
@@ -24,15 +22,16 @@ const ADVANCED_SETTING_KEYS = [
   "isUseStructuredOutput",
   "isUseFullContextMemory",
   "isBetterContextCaching",
-] as const satisfies readonly AdvancedKey[]
+] as const satisfies readonly SettingsKey[]
 
-type MissingBasicKey = Exclude<BasicKey, (typeof BASIC_SETTING_KEYS)[number]>
-const _assertAllBasicKeysPresent: MissingBasicKey extends never ? true : never = true
-void _assertAllBasicKeysPresent
+type BasicKey = (typeof BASIC_SETTING_KEYS)[number]
+type AdvancedKey = (typeof ADVANCED_SETTING_KEYS)[number]
+type MissingSettingsKey = Exclude<SettingsKey, BasicKey | AdvancedKey>
+type OverlappingSettingsKey = Extract<BasicKey, AdvancedKey>
+const _assertAllSettingsKeysPresent: MissingSettingsKey extends never ? true : never = true
+const _assertNoOverlappingSettingsKeys: OverlappingSettingsKey extends never ? true : never = true
+void _assertAllSettingsKeysPresent
+void _assertNoOverlappingSettingsKeys
 
-type MissingAdvancedKey = Exclude<AdvancedKey, (typeof ADVANCED_SETTING_KEYS)[number]>
-const _assertAllAdvancedKeysPresent: MissingAdvancedKey extends never ? true : never = true
-void _assertAllAdvancedKeysPresent
-
-export type { BasicKey, AdvancedKey }
-export { BASIC_SETTING_KEYS, ADVANCED_SETTING_KEYS }
+export type { AdvancedKey, BasicKey, SettingsKey }
+export { ADVANCED_SETTING_KEYS, BASIC_SETTING_KEYS }

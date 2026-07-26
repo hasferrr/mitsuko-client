@@ -14,7 +14,6 @@ import { minMax } from "@/lib/utils/math"
 import { sleep } from "@/lib/utils/async"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { useHistoryStore } from "@/stores/ui/use-history-store"
 import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import {
@@ -231,8 +230,7 @@ export const useTranslationHandler = ({
 
   interface HandleStartParams {
     currentId: string
-    basicSettingsId: string
-    advancedSettingsId: string
+    settingsId: string
     overrideStartIndexParam?: number
     overrideEndIndexParam?: number
     isContinuation?: boolean
@@ -241,8 +239,7 @@ export const useTranslationHandler = ({
 
   const handleStart = async ({
     currentId,
-    basicSettingsId,
-    advancedSettingsId,
+    settingsId,
     overrideStartIndexParam,
     overrideEndIndexParam,
     isContinuation,
@@ -258,23 +255,23 @@ export const useTranslationHandler = ({
 
     // Basic Settings Store
     const bscStoreState = useSettingsStore.getState()
-    const sourceLanguage = bscStoreState.getSourceLanguage(basicSettingsId)
-    const targetLanguage = bscStoreState.getTargetLanguage(basicSettingsId)
-    const modelDetail = bscStoreState.getModelDetail(basicSettingsId)
-    const isUseCustomModel = bscStoreState.getIsUseCustomModel(basicSettingsId)
-    const contextDocument = contextDocumentOverride ?? bscStoreState.getContextDocument(basicSettingsId)
-    const customInstructions = bscStoreState.getCustomInstructions(basicSettingsId)
-    const fewShot = bscStoreState.getFewShot(basicSettingsId)
+    const sourceLanguage = bscStoreState.getSourceLanguage(settingsId)
+    const targetLanguage = bscStoreState.getTargetLanguage(settingsId)
+    const modelDetail = bscStoreState.getModelDetail(settingsId)
+    const isUseCustomModel = bscStoreState.getIsUseCustomModel(settingsId)
+    const contextDocument = contextDocumentOverride ?? bscStoreState.getContextDocument(settingsId)
+    const customInstructions = bscStoreState.getCustomInstructions(settingsId)
+    const fewShot = bscStoreState.getFewShot(settingsId)
 
     // Advanced Settings Store
-    const advStoreState = useAdvancedSettingsStore.getState()
-    const temperature = advStoreState.getTemperature(advancedSettingsId)
-    const maxCompletionTokens = advStoreState.getMaxCompletionTokens(advancedSettingsId)
-    const isMaxCompletionTokensAuto = advStoreState.getIsMaxCompletionTokensAuto(advancedSettingsId)
-    const splitSize = advStoreState.getSplitSize(advancedSettingsId)
-    const isUseStructuredOutput = advStoreState.getIsUseStructuredOutput(advancedSettingsId)
-    const isUseFullContextMemory = advStoreState.getIsUseFullContextMemory(advancedSettingsId)
-    const isBetterContextCaching = advStoreState.getIsBetterContextCaching(advancedSettingsId)
+    const advStoreState = useSettingsStore.getState()
+    const temperature = advStoreState.getTemperature(settingsId)
+    const maxCompletionTokens = advStoreState.getMaxCompletionTokens(settingsId)
+    const isMaxCompletionTokensAuto = advStoreState.getIsMaxCompletionTokensAuto(settingsId)
+    const splitSize = advStoreState.getSplitSize(settingsId)
+    const isUseStructuredOutput = advStoreState.getIsUseStructuredOutput(settingsId)
+    const isUseFullContextMemory = advStoreState.getIsUseFullContextMemory(settingsId)
+    const isBetterContextCaching = advStoreState.getIsBetterContextCaching(settingsId)
 
     const firstChunk = (size: number, s: number, e: number) => {
       const subtitleChunks: SubtitleNoTime[][] = []
@@ -347,8 +344,8 @@ export const useTranslationHandler = ({
     const allRawResponses: string[] = []
 
     // Split subtitles into chunks, starting from startIndex - 1
-    const storeStartIndex = useAdvancedSettingsStore.getState().getStartIndex(advancedSettingsId)
-    const storeEndIndex = useAdvancedSettingsStore.getState().getEndIndex(advancedSettingsId)
+    const storeStartIndex = useSettingsStore.getState().getStartIndex(settingsId)
+    const storeEndIndex = useSettingsStore.getState().getEndIndex(settingsId)
 
     const sIndexToUse = overrideStartIndexParam !== undefined
       ? overrideStartIndexParam
@@ -566,7 +563,7 @@ export const useTranslationHandler = ({
 
   const resolveAutoContextDocument = async (
     currentId: string,
-    basicSettingsId: string,
+    settingsId: string,
     runToken: AutoContextRunToken,
   ): Promise<string | null> => {
     const translationStore = useTranslationDataStore.getState()
@@ -575,7 +572,7 @@ export const useTranslationHandler = ({
     const translation = translationStore.data[currentId]
     const mode = translation.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
 
-    if (isBatch || mode === "disabled") return useSettingsStore.getState().getContextDocument(basicSettingsId)
+    if (isBatch || mode === "disabled") return useSettingsStore.getState().getContextDocument(settingsId)
 
     const project = await projectStore.getProjectDb(translation.projectId)
     if (!isAutoContextRunActive(currentId, runToken)) return null
@@ -603,7 +600,7 @@ export const useTranslationHandler = ({
         return false
       }
       try {
-        return await handleStartExtraction(extractionId, extraction.basicSettingsId, extraction.advancedSettingsId)
+        return await handleStartExtraction(extractionId, extraction.settingsId)
       } finally {
         clearAutoCreatedExtractionRun(currentId, extractionId, runToken)
       }
@@ -673,7 +670,7 @@ export const useTranslationHandler = ({
 
           return combineAutoContext(
             cleanExtractionResult(updatedExtraction.contextResult),
-            useSettingsStore.getState().getContextDocument(basicSettingsId),
+            useSettingsStore.getState().getContextDocument(settingsId),
           )
         }
 
@@ -688,7 +685,7 @@ export const useTranslationHandler = ({
 
       return combineAutoContext(
         cleanExtractionResult(extraction.contextResult),
-        useSettingsStore.getState().getContextDocument(basicSettingsId),
+        useSettingsStore.getState().getContextDocument(settingsId),
       )
     }
 
@@ -779,7 +776,7 @@ export const useTranslationHandler = ({
 
     let success = false
     try {
-      success = await handleStartExtraction(created.id, created.basicSettingsId, created.advancedSettingsId)
+      success = await handleStartExtraction(created.id, created.settingsId)
     } finally {
       clearAutoCreatedExtractionRun(currentId, created.id, runToken)
     }
@@ -814,7 +811,7 @@ export const useTranslationHandler = ({
 
     return combineAutoContext(
       cleanExtractionResult(updatedExtraction.contextResult),
-      useSettingsStore.getState().getContextDocument(basicSettingsId),
+      useSettingsStore.getState().getContextDocument(settingsId),
     )
   }
 
@@ -830,7 +827,7 @@ export const useTranslationHandler = ({
       setIsTranslating(params.currentId, true)
       const contextDocumentOverride = await resolveAutoContextDocument(
         params.currentId,
-        params.basicSettingsId,
+        params.settingsId,
         runToken,
       )
       if (contextDocumentOverride === null) {

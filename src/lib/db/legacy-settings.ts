@@ -1,4 +1,4 @@
-import { Extraction, Project, Translation } from "@/types/project"
+import { LegacyExtraction as Extraction, LegacyProject as Project, LegacyTranslation as Translation } from "@/types/project"
 
 export interface LegacyProjectSettingsReferences {
   defaultBasicSettingsId?: string

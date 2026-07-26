@@ -53,11 +53,9 @@ export default function BatchMain() {
   // Other Hooks
   const setHasChanges = useSetUnsavedChanges()
 
-  const translationBasicSettingsId = currentProject?.defaultTranslationBasicSettingsId
-  const translationAdvancedSettingsId = currentProject?.defaultTranslationAdvancedSettingsId
+  const translationSettingsId = currentProject?.defaultTranslationSettingsId
 
-  const extractionBasicSettingsId = currentProject?.defaultExtractionBasicSettingsId
-  const extractionAdvancedSettingsId = currentProject?.defaultExtractionAdvancedSettingsId
+  const extractionSettingsId = currentProject?.defaultExtractionSettingsId
 
   const handleBatchNameChange = (value: string) => {
     if (currentProject?.id && value.trim()) {
@@ -150,16 +148,14 @@ export default function BatchMain() {
       </div>
 
       {/* Main Content */}
-      {operationMode === 'translation' && translationBasicSettingsId && translationAdvancedSettingsId && (
+      {operationMode === 'translation' && translationSettingsId && (
         <BatchTranslationView
-          basicSettingsId={translationBasicSettingsId}
-          advancedSettingsId={translationAdvancedSettingsId}
+          settingsId={translationSettingsId}
         />
       )}
-      {operationMode === 'extraction' && extractionBasicSettingsId && extractionAdvancedSettingsId && (
+      {operationMode === 'extraction' && extractionSettingsId && (
         <BatchExtractionView
-          basicSettingsId={extractionBasicSettingsId}
-          advancedSettingsId={extractionAdvancedSettingsId}
+          settingsId={extractionSettingsId}
         />
       )}
       {operationMode === 'transcription' && currentProject?.defaultTranscriptionId && (

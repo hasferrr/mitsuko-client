@@ -11,22 +11,20 @@ import { ModelSelector } from "@/components/settings/model-selector"
 import WhichModels from "@/components/pricing/which-models"
 import { CustomApiConfigManager } from "./custom-api-config-manager"
 interface ModelSelectionProps {
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
   showUseCustomModelSwitch?: boolean
 }
 
 export const ModelSelection = memo(({
-  basicSettingsId,
-  advancedSettingsId,
+  settingsId,
   showUseCustomModelSwitch = true
 }: ModelSelectionProps) => {
   // Settings Store
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(settingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
   const setIsUseCustomModel = useCallback((value: boolean) => {
-    setBasicSettingsValue(basicSettingsId, "isUseCustomModel", value)
-  }, [basicSettingsId, setBasicSettingsValue])
+    setBasicSettingsValue(settingsId, "isUseCustomModel", value)
+  }, [settingsId, setBasicSettingsValue])
 
   // API Settings Store
   const isThirdPartyModelEnabled = useLocalSettingsStore((state) => state.isThirdPartyModelEnabled)
@@ -44,8 +42,7 @@ export const ModelSelection = memo(({
         <label className="text-sm font-medium">Model</label>
         <div className="flex items-center gap-2">
           <ModelSelector
-            basicSettingsId={basicSettingsId}
-            advancedSettingsId={advancedSettingsId}
+            settingsId={settingsId}
             disabled={isUseCustomModel}
           />
           <Button

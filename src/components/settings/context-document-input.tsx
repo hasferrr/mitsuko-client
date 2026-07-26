@@ -26,7 +26,7 @@ type AutoContextKey = "autoContextMode" | "autoContextExtractionId" | "autoConte
 type AutoContextSetterMap = { [K in AutoContextKey]: (id: string, value: Translation[K]) => void }
 
 interface Props {
-  basicSettingsId: string
+  settingsId: string
   translationId?: string
   isTemplateTranslation?: boolean
   onOpenExtraction?: (extractionId: string) => void
@@ -84,11 +84,11 @@ function StatusMessage({ variant, children }: { variant: "info" | "warning" | "m
   )
 }
 
-export const ContextDocumentInput = memo(({ basicSettingsId, translationId, isTemplateTranslation = false, onOpenExtraction, onOpenExtractionSettings }: Props) => {
+export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplateTranslation = false, onOpenExtraction, onOpenExtractionSettings }: Props) => {
   const currentProject = useProjectStore((state) => state.currentProject)
-  const contextDocument = useSettingsStore((state) => state.getContextDocument(basicSettingsId))
+  const contextDocument = useSettingsStore((state) => state.getContextDocument(settingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
-  const setContextDocument = (doc: string) => setBasicSettingsValue(basicSettingsId, "contextDocument", doc)
+  const setContextDocument = (doc: string) => setBasicSettingsValue(settingsId, "contextDocument", doc)
   const translation = useTranslationDataStore((state) => translationId ? state.data[translationId] : null)
   const saveTranslation = useTranslationDataStore((state) => state.saveData)
   const getTranslationDb = useTranslationDataStore((state) => state.getTranslationDb)

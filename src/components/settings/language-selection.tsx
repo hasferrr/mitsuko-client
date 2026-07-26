@@ -6,15 +6,15 @@ import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { LANGUAGES } from "@/constants/lang"
 
 interface LanguageSelectionProps {
-  basicSettingsId: string
+  settingsId: string
 }
 
-export const LanguageSelection = memo(({ basicSettingsId }: LanguageSelectionProps) => {
-  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(basicSettingsId))
-  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(basicSettingsId))
+export const LanguageSelection = memo(({ settingsId }: LanguageSelectionProps) => {
+  const sourceLanguage = useSettingsStore((state) => state.getSourceLanguage(settingsId))
+  const targetLanguage = useSettingsStore((state) => state.getTargetLanguage(settingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
-  const setSourceLanguage = (language: string) => setBasicSettingsValue(basicSettingsId, "sourceLanguage", language)
-  const setTargetLanguage = (language: string) => setBasicSettingsValue(basicSettingsId, "targetLanguage", language)
+  const setSourceLanguage = (language: string) => setBasicSettingsValue(settingsId, "sourceLanguage", language)
+  const setTargetLanguage = (language: string) => setBasicSettingsValue(settingsId, "targetLanguage", language)
 
   return (
     <div className="grid gap-4 md:grid-cols-2">

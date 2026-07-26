@@ -14,9 +14,8 @@ import { useTranscriptionDataStore } from "./use-transcription-data-store"
 import { useTranslationDataStore } from "./use-translation-data-store"
 import { useExtractionDataStore } from "./use-extraction-data-store"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
-import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
+import { getSettings } from "@/lib/db/settings"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SubtitleTranslated } from "@/types/subtitles"
 import { deleteTranslation } from "@/lib/db/translation"
 import { deleteExtraction } from "@/lib/db/extraction"
@@ -96,16 +95,12 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
 
       // upsert associated settings into stores
       const settingsStore = useSettingsStore.getState()
-      const advancedSettingsStore = useAdvancedSettingsStore.getState()
-      const translationBs = await getBasicSettings(newProject.defaultTranslationBasicSettingsId)
-      if (translationBs) settingsStore.upsertData(translationBs.id, translationBs)
-      const translationAds = await getAdvancedSettings(newProject.defaultTranslationAdvancedSettingsId)
-      if (translationAds) advancedSettingsStore.upsertData(translationAds.id, translationAds)
-
-      const extractionBs = await getBasicSettings(newProject.defaultExtractionBasicSettingsId)
-      if (extractionBs) settingsStore.upsertData(extractionBs.id, extractionBs)
-      const extractionAds = await getAdvancedSettings(newProject.defaultExtractionAdvancedSettingsId)
-      if (extractionAds) advancedSettingsStore.upsertData(extractionAds.id, extractionAds)
+      const [translationSettings, extractionSettings] = await Promise.all([
+        getSettings(newProject.defaultTranslationSettingsId),
+        getSettings(newProject.defaultExtractionSettingsId),
+      ])
+      if (translationSettings) settingsStore.upsertData(translationSettings.id, translationSettings)
+      if (extractionSettings) settingsStore.upsertData(extractionSettings.id, extractionSettings)
 
       set((state) => ({
         projects: [newProject, ...state.projects],

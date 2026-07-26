@@ -18,8 +18,7 @@ import {
 import { cleanExtractionContent, isExtractionUsable } from "@/lib/extraction/status"
 
 interface UseBatchExtractionHandlerProps {
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
   batchFiles: BatchFile[]
   isBatchExtracting: boolean
   state: {
@@ -29,8 +28,7 @@ interface UseBatchExtractionHandlerProps {
 }
 
 export default function useBatchExtractionHandler({
-  basicSettingsId,
-  advancedSettingsId,
+  settingsId,
   batchFiles,
   isBatchExtracting,
   state: { setActiveTab, setQueueSet },
@@ -361,18 +359,13 @@ export default function useBatchExtractionHandler({
     currentId: string,
   ) => {
     // Delegate to centralized extraction handler
-    const bsIdToUse = isUseSharedSettings
-      ? basicSettingsId
-      : (extractionData[currentId]?.basicSettingsId || basicSettingsId)
-
-    const adsIdToUse = isUseSharedSettings
-      ? advancedSettingsId
-      : (extractionData[currentId]?.advancedSettingsId || advancedSettingsId)
+    const settingsIdToUse = isUseSharedSettings
+      ? settingsId
+      : (extractionData[currentId]?.settingsId || settingsId)
 
     await baseStartExtraction(
       currentId,
-      bsIdToUse,
-      adsIdToUse,
+      settingsIdToUse,
     )
   }
 

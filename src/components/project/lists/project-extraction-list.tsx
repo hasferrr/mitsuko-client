@@ -84,8 +84,6 @@ export function ProjectExtractionList({
           previousContext: "",
           contextResult: ""
         },
-        undefined,
-        undefined,
       )
       const storeProject = useProjectStore.getState().currentProject
       const base = storeProject && storeProject.id === currentProject.id ? storeProject.extractions : currentProject.extractions

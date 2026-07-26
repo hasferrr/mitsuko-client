@@ -7,10 +7,7 @@ import { Project } from "@/types/project"
 import { SettingsDialogue } from "../settings/settings-dialogue"
 import { TranscriptionSettingsDialogue } from "../settings/transcription-settings-dialogue"
 import {
-  GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
-  GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
-  GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
-  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_EXTRACTION_SETTINGS_ID,
   GLOBAL_TRANSLATION_SETTINGS_ID,
   GLOBAL_TRANSCRIPTION_SETTINGS_ID,
 } from "@/constants/global-settings"
@@ -103,11 +100,9 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         isOpen={isTranslationSettingsModalOpen}
         onOpenChange={setIsTranslationSettingsModalOpen}
         projectName={currentProject.name}
-        basicSettingsId={currentProject.defaultTranslationBasicSettingsId}
-        advancedSettingsId={currentProject.defaultTranslationAdvancedSettingsId}
+        settingsId={currentProject.defaultTranslationSettingsId}
         defaultTranslationId={currentProject.defaultTranslationId}
-        resetFromBasicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
-        resetFromAdvancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
+        resetFromSettingsId={GLOBAL_TRANSLATION_SETTINGS_ID}
         settingsParentType="translation"
         isDefaultEnabled={currentProject.isDefaultTranslationEnabled}
         onDefaultEnabledChange={(enabled: boolean) => updateProjectStore(currentProject.id, { isDefaultTranslationEnabled: enabled })}
@@ -122,10 +117,8 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         isOpen={isExtractionSettingsModalOpen}
         onOpenChange={setIsExtractionSettingsModalOpen}
         projectName={currentProject.name}
-        basicSettingsId={currentProject.defaultExtractionBasicSettingsId}
-        advancedSettingsId={currentProject.defaultExtractionAdvancedSettingsId}
-        resetFromBasicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
-        resetFromAdvancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
+        settingsId={currentProject.defaultExtractionSettingsId}
+        resetFromSettingsId={GLOBAL_EXTRACTION_SETTINGS_ID}
         settingsParentType="extraction"
         isDefaultEnabled={currentProject.isDefaultExtractionEnabled}
         onDefaultEnabledChange={(enabled: boolean) => updateProjectStore(currentProject.id, { isDefaultExtractionEnabled: enabled })}
@@ -153,8 +146,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         mode="global"
         isOpen={isGlobalTranslationSettingsOpen}
         onOpenChange={setIsGlobalTranslationSettingsOpen}
-        basicSettingsId={GLOBAL_TRANSLATION_BASIC_SETTINGS_ID}
-        advancedSettingsId={GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID}
+        settingsId={GLOBAL_TRANSLATION_SETTINGS_ID}
         defaultTranslationId={GLOBAL_TRANSLATION_SETTINGS_ID}
         settingsParentType="translation"
       />
@@ -163,8 +155,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
         mode="global"
         isOpen={isGlobalExtractionSettingsOpen}
         onOpenChange={setIsGlobalExtractionSettingsOpen}
-        basicSettingsId={GLOBAL_EXTRACTION_BASIC_SETTINGS_ID}
-        advancedSettingsId={GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID}
+        settingsId={GLOBAL_EXTRACTION_SETTINGS_ID}
         settingsParentType="extraction"
       />
 

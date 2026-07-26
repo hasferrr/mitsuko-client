@@ -4,21 +4,21 @@ import { memo } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ChevronsRight } from "lucide-react"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface Props {
-  advancedSettingsId: string
+  settingsId: string
 }
 
-export const StartIndexInput = memo(({ advancedSettingsId }: Props) => {
-  const startIndex = useAdvancedSettingsStore((state) => state.getStartIndex(advancedSettingsId))
-  const endIndex = useAdvancedSettingsStore((state) => state.getEndIndex(advancedSettingsId))
+export const StartIndexInput = memo(({ settingsId }: Props) => {
+  const startIndex = useSettingsStore((state) => state.getStartIndex(settingsId))
+  const endIndex = useSettingsStore((state) => state.getEndIndex(settingsId))
 
-  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setStartIndex = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "startIndex", value)
-  const setEndIndex = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "endIndex", value)
+  const setAdvancedSettingsValue = useSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setStartIndex = (value: number) => setAdvancedSettingsValue(settingsId, "startIndex", value)
+  const setEndIndex = (value: number) => setAdvancedSettingsValue(settingsId, "endIndex", value)
 
   const currentId = useTranslationDataStore((state) => state.currentId)
   const translationData = useTranslationDataStore((state) => state.data)

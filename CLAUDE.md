@@ -39,7 +39,7 @@ Never run the development server.
 
 ### Key Directories
 - `src/stores/` - Zustand stores:
-  - `settings/` - Basic, Advanced, Local, Whisper, and Batch settings stores
+  - `settings/` - Unified translation/extraction settings plus Local, Whisper, and Batch settings stores
   - `services/` - Translation, transcription, extraction service stores (use `createServiceSlice` factory)
   - `factories/` - Store factory functions (e.g., `createServiceSlice` for shared Set + AbortController pattern)
   - `utils/` - Shared store utilities (e.g., `copySettingsKeys` for settings copy/reset)
@@ -76,24 +76,23 @@ Project
 ├── transcriptions: Transcription[]  # Audio transcription histories (settings stored on entity)
 ├── extractions: Extraction[]        # Context extraction histories
 └── Default Settings (per feature)
-    ├── Translation: defaultTranslationBasicSettingsId + defaultTranslationAdvancedSettingsId + defaultTranslationId
-    ├── Extraction: defaultExtractionBasicSettingsId + defaultExtractionAdvancedSettingsId
+    ├── Translation: defaultTranslationSettingsId + defaultTranslationId
+    ├── Extraction: defaultExtractionSettingsId
     └── Transcription: defaultTranscriptionId (stores settings directly on transcription)
 ```
 
 **Entity Relationships:**
-- `Translation` - Single subtitle file translation with `basicSettingsId` and `advancedSettingsId`
+- `Translation` - Single subtitle file translation with a unified `settingsId`
 - `Transcription` - Audio-to-text with word-level timestamps, segments, and settings stored directly on entity (language, selectedMode, models, customInstructions)
-- `Extraction` - Context analysis from subtitles with `basicSettingsId` and `advancedSettingsId`
-- `BasicSettings` - Source/target language, model selection, context document, custom instructions, few-shot config
-- `AdvancedSettings` - Temperature, split size, token limits, structured output, context caching options
+- `Extraction` - Context analysis from subtitles with a unified `settingsId`
+- `Settings` - Unified basic fields (languages, model, context, instructions, few-shot config) and advanced fields (temperature, split size, token limits, structured output, context caching)
 
 **Settings Inheritance:**
-- Each Translation/Extraction stores its own `basicSettingsId` and `advancedSettingsId`
+- Each Translation/Extraction stores one `settingsId` that references a unified `Settings` record
 - Transcriptions store settings directly on the entity (no separate settings table)
 - Translation auto-context defaults are stored on hidden template translations (`defaultTranslationId` per project and `GLOBAL_TRANSLATION_SETTINGS_ID` globally)
 - When creating a new item, which settings it inherits depends on the project's enable flags:
-  - `isDefaultTranslationEnabled = true` → use project's `defaultTranslationBasicSettingsId`
+  - `isDefaultTranslationEnabled = true` → inherit the project's `defaultTranslationSettingsId`
   - `isDefaultTranslationEnabled = false` → use global settings (from `src/constants/global-settings.ts`)
 - Same pattern applies for Extraction (`isDefaultExtractionEnabled`) and Transcription (`isDefaultTranscriptionEnabled`)
 
@@ -196,9 +195,9 @@ Use semantic tokens instead of hardcoded colors:
 Use store selectors with settings IDs:
 
 ```tsx
-const modelDetail = useSettingsStore(state => state.getModelDetail(basicSettingsId))
+const modelDetail = useSettingsStore(state => state.getModelDetail(settingsId))
 const setBasicSettingsValue = useSettingsStore(state => state.setBasicSettingsValue)
-// Usage: setBasicSettingsValue(basicSettingsId, "sourceLanguage", "en")
+// Usage: setBasicSettingsValue(settingsId, "sourceLanguage", "en")
 ```
 
 ## Service Store Pattern
@@ -213,7 +212,8 @@ Each store keeps backward-compatible aliases (e.g., `setIsTranslating` → `setA
 
 ## Important Files
 
-- `src/lib/db/db.ts` - Database schema and migrations (version 24+)
+- `src/lib/db/db.ts` - Database schema and migrations (version 32+; unified settings migration)
+- `src/lib/db/settings.ts` - Unified translation/extraction settings CRUD
 - `src/lib/db/global-settings.ts` - Global settings management
 - `src/lib/db/db-io.ts` - Database import/export functionality
 - `src/lib/db/db-schema.ts` - Zod schemas for import validation (`databaseExportSchema` validates between `JSON.parse` and `databaseExportConstructor`)

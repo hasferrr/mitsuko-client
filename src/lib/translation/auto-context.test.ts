@@ -23,8 +23,7 @@ const extraction = (id: string, contextResult: string, overrides: Partial<Extrac
   createdAt: new Date(),
   updatedAt: new Date(),
   projectId: "project-1",
-  basicSettingsId: `${id}-basic`,
-  advancedSettingsId: `${id}-advanced`,
+  settingsId: `${id}-settings`,
   ...overrides,
 })
 

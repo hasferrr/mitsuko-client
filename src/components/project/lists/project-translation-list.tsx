@@ -104,8 +104,6 @@ export function ProjectTranslationList({
             data: null
           }
         },
-        undefined,
-        undefined,
       )
       const storeProject = useProjectStore.getState().currentProject
       const base = storeProject && storeProject.id === currentProject.id ? storeProject.translations : currentProject.translations

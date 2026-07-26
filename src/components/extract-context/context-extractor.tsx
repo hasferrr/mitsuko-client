@@ -22,15 +22,14 @@ export const ContextExtractor = () => {
     return <div className="p-4">No extraction project selected</div>
   }
 
-  if (!extraction.basicSettingsId || !extraction.advancedSettingsId) {
+  if (!extraction.settingsId) {
     return <div className="p-4">Invalid settings data</div>
   }
 
   return (
     <ContextExtractorMain
       currentId={currentId}
-      basicSettingsId={extraction.basicSettingsId}
-      advancedSettingsId={extraction.advancedSettingsId}
+      settingsId={extraction.settingsId}
     />
   )
 }

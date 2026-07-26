@@ -1,56 +1,62 @@
 import { create } from "zustand"
-import { Model } from "@/types/model"
-import { BasicSettings } from "@/types/project"
 import { persist } from "zustand/middleware"
-import {
-  updateBasicSettings,
-  getAllBasicSettings,
-  getBasicSettings,
-} from "@/lib/db/settings"
-import { DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS } from "@/constants/default"
-import { GLOBAL_EXTRACTION_BASIC_SETTINGS_ID } from "@/constants/global-settings"
-import { BASIC_SETTING_KEYS } from "./settings-keys"
-import type { BasicKey } from "./settings-keys"
-import { copySettingsKeys } from "../utils/copy-settings"
+import { Model } from "@/types/model"
+import { Settings } from "@/types/project"
+import { getAllSettings, getSettings, updateSettings } from "@/lib/db/settings"
+import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS } from "@/constants/default"
+import { GLOBAL_EXTRACTION_SETTINGS_ID } from "@/constants/global-settings"
+import { ADVANCED_SETTING_KEYS, BASIC_SETTING_KEYS } from "@/stores/settings/settings-keys"
+import type { AdvancedKey, BasicKey, SettingsKey } from "@/stores/settings/settings-keys"
+import { copySettingsKeys } from "@/stores/utils/copy-settings"
+import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+
+type SettingsData = Omit<Settings, "id" | "createdAt" | "updatedAt">
+type AdvancedSettingsValues = Pick<SettingsData, AdvancedKey>
 
 interface SettingsStore {
-  data: Record<string, BasicSettings>
+  data: Record<string, Settings>
   loadSettings: () => Promise<void>
-  upsertData: (id: string, value: BasicSettings) => void
-  mutateData: <T extends keyof BasicSettings>(id: string, key: T, value: BasicSettings[T]) => void
+  upsertData: (id: string, value: Settings) => void
+  mutateData: <K extends keyof Settings>(id: string, key: K, value: Settings[K]) => void
   saveData: (id: string) => Promise<void>
-  getBasicSettings: (id: string) => BasicSettings | null
+  getSettings: (id: string) => Settings | null
   getSourceLanguage: (id: string) => string
   getTargetLanguage: (id: string) => string
   getModelDetail: (id: string) => Model | null
   getIsUseCustomModel: (id: string) => boolean
   getContextDocument: (id: string) => string
   getCustomInstructions: (id: string) => string
-  getFewShot: (id: string) => BasicSettings['fewShot']
+  getFewShot: (id: string) => Settings["fewShot"]
   getFewShotIsEnabled: (id: string) => boolean
   getFewShotValue: (id: string) => string
   getFewShotLinkedId: (id: string) => string
-  getFewShotType: (id: string) => 'manual' | 'linked'
+  getFewShotType: (id: string) => "manual" | "linked"
   getFewShotStartIndex: (id: string) => number | undefined
   getFewShotEndIndex: (id: string) => number | undefined
+  getTemperature: (id: string) => number
+  getMaxCompletionTokens: (id: string) => number
+  getIsMaxCompletionTokensAuto: (id: string) => boolean
+  getSplitSize: (id: string) => number
+  getStartIndex: (id: string) => number
+  getEndIndex: (id: string) => number
+  getIsUseStructuredOutput: (id: string) => boolean
+  getIsUseFullContextMemory: (id: string) => boolean
+  getIsBetterContextCaching: (id: string) => boolean
   resetBasicSettings: (id: string) => void
-  setBasicSettingsValue: (
-    id: string,
-    key: keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>,
-    value: BasicSettings[keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>],
-  ) => void
-  setIsFewShotEnabled: (id: string, isEnabled: boolean) => void
+  resetAdvancedSettings: (id: string) => void
+  resetSettings: (id: string) => Promise<void>
+  setBasicSettingsValue: <K extends BasicKey>(id: string, key: K, value: Settings[K]) => void
+  setAdvancedSettingsValue: <K extends AdvancedKey>(id: string, key: K, value: Settings[K]) => void
+  setIsFewShotEnabled: (id: string, value: boolean) => void
   setFewShotValue: (id: string, value: string) => void
-  setFewShotLinkedId: (id: string, linkedId: string) => void
-  setFewShotType: (id: string, type: 'manual' | 'linked') => void
-  setFewShotStartIndex: (id: string, index: number) => void
-  setFewShotEndIndex: (id: string, index: number) => void
-  copyBasicSettingsKeys: <K extends keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>>(
-    fromId: string,
-    toId: string,
-    keys: K[],
-  ) => Promise<void>
-  resetBasicSettingsFrom: (fromId: string, toId: string) => Promise<void>
+  setFewShotLinkedId: (id: string, value: string) => void
+  setFewShotType: (id: string, value: "manual" | "linked") => void
+  setFewShotStartIndex: (id: string, value: number) => void
+  setFewShotEndIndex: (id: string, value: number) => void
+  resetIndex: (id: string, start: number | null, end: number | null) => void
+  applyModelDefaults: <T extends Partial<SettingsData>>(settings: T, model: Model | null) => T
+  copySettingsKeys: (fromId: string, toId: string, keys: SettingsKey[]) => Promise<void>
+  resetSettingsFrom: (fromId: string, toId: string) => Promise<void>
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -59,171 +65,133 @@ export const useSettingsStore = create<SettingsStore>()(
       data: {},
       loadSettings: async () => {
         try {
-          const list = await getAllBasicSettings()
-          const mapped = Object.fromEntries(list.map(s => [s.id, s])) as Record<string, BasicSettings>
-          set(state => ({ ...state, data: { ...state.data, ...mapped } }))
+          const settings = await getAllSettings()
+          set(state => ({ data: { ...state.data, ...Object.fromEntries(settings.map(item => [item.id, item])) } }))
         } catch (error) {
           console.error("Failed to load settings", error)
         }
       },
-      getBasicSettings: (id) => {
-        return get().data[id] ?? null
-      },
-      getSourceLanguage: (id) => {
-        return get().data[id]?.sourceLanguage ?? DEFAULT_BASIC_SETTINGS.sourceLanguage
-      },
-      getTargetLanguage: (id) => {
-        return get().data[id]?.targetLanguage ?? DEFAULT_BASIC_SETTINGS.targetLanguage
-      },
-      getModelDetail: (id) => {
-        return get().data[id]?.modelDetail ?? DEFAULT_BASIC_SETTINGS.modelDetail
-      },
-      getIsUseCustomModel: (id) => {
-        return get().data[id]?.isUseCustomModel ?? DEFAULT_BASIC_SETTINGS.isUseCustomModel
-      },
-      getContextDocument: (id) => {
-        return get().data[id]?.contextDocument ?? DEFAULT_BASIC_SETTINGS.contextDocument
-      },
-      getCustomInstructions: (id) => {
-        return get().data[id]?.customInstructions ?? DEFAULT_BASIC_SETTINGS.customInstructions
-      },
-      getFewShot: (id) => {
-        return get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
-      },
-      getFewShotIsEnabled: (id) => {
-        return get().data[id]?.fewShot?.isEnabled ?? DEFAULT_BASIC_SETTINGS.fewShot.isEnabled
-      },
-      getFewShotValue: (id) => {
-        return get().data[id]?.fewShot?.value ?? DEFAULT_BASIC_SETTINGS.fewShot.value
-      },
-      getFewShotLinkedId: (id) => {
-        return get().data[id]?.fewShot?.linkedId ?? DEFAULT_BASIC_SETTINGS.fewShot.linkedId
-      },
-      getFewShotType: (id) => {
-        return get().data[id]?.fewShot?.type ?? DEFAULT_BASIC_SETTINGS.fewShot.type
-      },
-      getFewShotStartIndex: (id) => {
-        return get().data[id]?.fewShot?.fewShotStartIndex ?? DEFAULT_BASIC_SETTINGS.fewShot.fewShotStartIndex
-      },
-      getFewShotEndIndex: (id) => {
-        return get().data[id]?.fewShot?.fewShotEndIndex ?? DEFAULT_BASIC_SETTINGS.fewShot.fewShotEndIndex
-      },
-      upsertData: (id, value) => {
-        set(state => ({
-          ...state,
-          data: {
-            ...state.data,
-            [id]: value
-          }
-        }))
-      },
-      mutateData: (id, key, value) => {
-        set(state => {
-          const data = state.data[id]
-          if (!data) return state
-          return {
-            ...state,
-            data: {
-              ...state.data,
-              [id]: {
-                ...data,
-                [key]: value
-              }
-            }
-          }
-        })
-      },
-      saveData: async (id) => {
-        const settings = get().data[id]
-        if (!settings) {
-          console.error("Settings not found in store")
-          return
-        }
+      upsertData: (id, value) => set(state => ({ data: { ...state.data, [id]: value } })),
+      mutateData: (id, key, value) => set(state => {
+        const current = state.data[id]
+        return current ? { data: { ...state.data, [id]: { ...current, [key]: value } } } : state
+      }),
+      saveData: async id => {
+        const current = get().data[id]
+        if (!current) return
         try {
-          await updateBasicSettings(id, settings)
+          await updateSettings(id, current)
         } catch (error) {
           console.error("Failed to save settings data:", error)
         }
       },
-      resetBasicSettings: (id) => {
-        const isExtraction = id === GLOBAL_EXTRACTION_BASIC_SETTINGS_ID
-        const defaults = isExtraction ? DEFAULT_EXTRACTION_BASIC_SETTINGS : DEFAULT_BASIC_SETTINGS
-        set(state => {
-          const current = state.data[id]
-          if (!current) return state
-          return {
-            ...state,
-            data: {
-              ...state.data,
-              [id]: {
-                ...current,
-                ...defaults,
-              },
-            },
-          }
-        })
-        get().saveData(id)
+      getSettings: id => get().data[id] ?? null,
+      getSourceLanguage: id => get().data[id]?.sourceLanguage ?? DEFAULT_BASIC_SETTINGS.sourceLanguage,
+      getTargetLanguage: id => get().data[id]?.targetLanguage ?? DEFAULT_BASIC_SETTINGS.targetLanguage,
+      getModelDetail: id => get().data[id]?.modelDetail ?? DEFAULT_BASIC_SETTINGS.modelDetail,
+      getIsUseCustomModel: id => get().data[id]?.isUseCustomModel ?? DEFAULT_BASIC_SETTINGS.isUseCustomModel,
+      getContextDocument: id => get().data[id]?.contextDocument ?? DEFAULT_BASIC_SETTINGS.contextDocument,
+      getCustomInstructions: id => get().data[id]?.customInstructions ?? DEFAULT_BASIC_SETTINGS.customInstructions,
+      getFewShot: id => get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot,
+      getFewShotIsEnabled: id => get().getFewShot(id).isEnabled,
+      getFewShotValue: id => get().getFewShot(id).value,
+      getFewShotLinkedId: id => get().getFewShot(id).linkedId,
+      getFewShotType: id => get().getFewShot(id).type,
+      getFewShotStartIndex: id => get().getFewShot(id).fewShotStartIndex,
+      getFewShotEndIndex: id => get().getFewShot(id).fewShotEndIndex,
+      getTemperature: id => get().data[id]?.temperature ?? DEFAULT_ADVANCED_SETTINGS.temperature,
+      getMaxCompletionTokens: id => get().data[id]?.maxCompletionTokens ?? DEFAULT_ADVANCED_SETTINGS.maxCompletionTokens,
+      getIsMaxCompletionTokensAuto: id => get().data[id]?.isMaxCompletionTokensAuto ?? DEFAULT_ADVANCED_SETTINGS.isMaxCompletionTokensAuto,
+      getSplitSize: id => get().data[id]?.splitSize ?? DEFAULT_ADVANCED_SETTINGS.splitSize,
+      getStartIndex: id => get().data[id]?.startIndex ?? DEFAULT_ADVANCED_SETTINGS.startIndex,
+      getEndIndex: id => get().data[id]?.endIndex ?? DEFAULT_ADVANCED_SETTINGS.endIndex,
+      getIsUseStructuredOutput: id => get().data[id]?.isUseStructuredOutput ?? DEFAULT_ADVANCED_SETTINGS.isUseStructuredOutput,
+      getIsUseFullContextMemory: id => get().data[id]?.isUseFullContextMemory ?? DEFAULT_ADVANCED_SETTINGS.isUseFullContextMemory,
+      getIsBetterContextCaching: id => get().data[id]?.isBetterContextCaching ?? DEFAULT_ADVANCED_SETTINGS.isBetterContextCaching,
+      resetBasicSettings: id => {
+        const current = get().data[id]
+        if (!current) return
+        const defaults = id === GLOBAL_EXTRACTION_SETTINGS_ID ? DEFAULT_EXTRACTION_BASIC_SETTINGS : DEFAULT_BASIC_SETTINGS
+        get().upsertData(id, { ...current, ...defaults })
+        void get().saveData(id)
+      },
+      resetAdvancedSettings: id => {
+        const current = get().data[id]
+        if (!current) return
+        const base: AdvancedSettingsValues = {
+          ...DEFAULT_ADVANCED_SETTINGS,
+          isUseStructuredOutput: current.isUseCustomModel ? true : current.modelDetail?.structuredOutput ?? true,
+        }
+        get().upsertData(id, { ...current, ...get().applyModelDefaults(base, current.modelDetail) })
+        void get().saveData(id)
+      },
+      resetSettings: async id => {
+        const current = get().data[id]
+        if (!current) return
+        const basic = id === GLOBAL_EXTRACTION_SETTINGS_ID ? DEFAULT_EXTRACTION_BASIC_SETTINGS : DEFAULT_BASIC_SETTINGS
+        const advanced = get().applyModelDefaults({
+          ...DEFAULT_ADVANCED_SETTINGS,
+          isUseStructuredOutput: basic.isUseCustomModel ? true : basic.modelDetail?.structuredOutput ?? true,
+        }, basic.modelDetail)
+        get().upsertData(id, { ...current, ...basic, ...advanced })
+        await get().saveData(id)
       },
       setBasicSettingsValue: (id, key, value) => {
         get().mutateData(id, key, value)
-        get().saveData(id)
+        void get().saveData(id)
+      },
+      setAdvancedSettingsValue: (id, key, value) => {
+        get().mutateData(id, key, value)
+        void get().saveData(id)
       },
       setIsFewShotEnabled: (id, isEnabled) => {
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
-        const newFewShot = { ...currentFewShot, isEnabled }
-        get().mutateData(id, "fewShot", newFewShot)
-        get().saveData(id)
+        get().mutateData(id, "fewShot", { ...get().getFewShot(id), isEnabled })
+        void get().saveData(id)
       },
       setFewShotValue: (id, value) => {
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
-        const newFewShot = { ...currentFewShot, value }
-        get().mutateData(id, "fewShot", newFewShot)
-        get().saveData(id)
+        get().mutateData(id, "fewShot", { ...get().getFewShot(id), value })
+        void get().saveData(id)
       },
       setFewShotLinkedId: (id, linkedId) => {
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
-        const newFewShot = { ...currentFewShot, linkedId }
-        get().mutateData(id, "fewShot", newFewShot)
-        get().saveData(id)
+        get().mutateData(id, "fewShot", { ...get().getFewShot(id), linkedId })
+        void get().saveData(id)
       },
       setFewShotType: (id, type) => {
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
-        const newFewShot = { ...currentFewShot, type }
-        get().mutateData(id, "fewShot", newFewShot)
-        get().saveData(id)
+        get().mutateData(id, "fewShot", { ...get().getFewShot(id), type })
+        void get().saveData(id)
       },
-      setFewShotStartIndex: (id, index) => {
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
-        const newFewShot = { ...currentFewShot, fewShotStartIndex: index }
-        get().mutateData(id, "fewShot", newFewShot)
-        get().saveData(id)
+      setFewShotStartIndex: (id, fewShotStartIndex) => {
+        get().mutateData(id, "fewShot", { ...get().getFewShot(id), fewShotStartIndex })
+        void get().saveData(id)
       },
-      setFewShotEndIndex: (id, index) => {
-        const currentFewShot = get().data[id]?.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot
-        const newFewShot = { ...currentFewShot, fewShotEndIndex: index }
-        get().mutateData(id, "fewShot", newFewShot)
-        get().saveData(id)
+      setFewShotEndIndex: (id, fewShotEndIndex) => {
+        get().mutateData(id, "fewShot", { ...get().getFewShot(id), fewShotEndIndex })
+        void get().saveData(id)
       },
-      copyBasicSettingsKeys: async <K extends keyof Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>>(fromId: string, toId: string, keys: K[]) => {
-        await copySettingsKeys<BasicSettings>({
-          fromId,
-          toId,
-          keys,
-          getData: () => get().data,
-          upsertData: get().upsertData,
-          fetchFromDb: getBasicSettings,
-          saveData: get().saveData,
-          setData: set,
-        })
+      resetIndex: (id, start, end) => {
+        const subtitles = useTranslationDataStore.getState().data[id]?.subtitles ?? []
+        get().mutateData(id, "startIndex", start || 1)
+        get().mutateData(id, "endIndex", end || subtitles.length || 100000)
+        void get().saveData(id)
       },
-      resetBasicSettingsFrom: async (fromId: string, toId: string) => {
-        const keys: BasicKey[] = [...BASIC_SETTING_KEYS]
-        await get().copyBasicSettingsKeys(fromId, toId, keys)
-      },
+      applyModelDefaults: (settings, model) => ({
+        ...settings,
+        ...(model?.default?.maxCompletionTokens === undefined ? {} : { maxCompletionTokens: model.default.maxCompletionTokens }),
+        ...(model?.default?.isMaxCompletionTokensAuto === undefined ? {} : { isMaxCompletionTokensAuto: model.default.isMaxCompletionTokensAuto }),
+        ...(model?.default?.isUseStructuredOutput === undefined ? {} : { isUseStructuredOutput: model.default.isUseStructuredOutput }),
+      }) as typeof settings,
+      copySettingsKeys: (fromId, toId, keys) => copySettingsKeys<Settings>({
+        fromId,
+        toId,
+        keys,
+        getData: () => get().data,
+        upsertData: get().upsertData,
+        fetchFromDb: getSettings,
+        saveData: get().saveData,
+        setData: set,
+      }),
+      resetSettingsFrom: (fromId, toId) => get().copySettingsKeys(fromId, toId, [...BASIC_SETTING_KEYS, ...ADVANCED_SETTING_KEYS]),
     }),
-    {
-      name: "settings-storage",
-      partialize: () => ({}),
-    }
-  )
+    { name: "settings-storage", partialize: () => ({}) },
+  ),
 )

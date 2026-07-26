@@ -1,61 +1,38 @@
-import { db } from './db'
-import { BasicSettings, AdvancedSettings, Transcription, Translation } from '@/types/project'
-import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS } from '@/constants/default'
-import { getBasicSettings, getAdvancedSettings } from './settings'
-import { GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_SETTINGS_ID, GLOBAL_TRANSCRIPTION_SETTINGS_ID } from '@/constants/global-settings'
+import { db } from '@/lib/db/db'
+import { Settings, Transcription, Translation } from '@/types/project'
+import { DEFAULT_EXTRACTION_SETTINGS, DEFAULT_SETTINGS } from '@/constants/default'
+import { getSettings } from '@/lib/db/settings'
+import {
+  GLOBAL_EXTRACTION_SETTINGS_ID,
+  GLOBAL_TRANSLATION_SETTINGS_ID,
+  GLOBAL_TRANSCRIPTION_SETTINGS_ID,
+} from '@/constants/global-settings'
 import { buildTranslationTemplate } from '@/lib/translation/template'
 import { buildTranscriptionTemplate } from '@/lib/transcription/template'
 
-export const upsertBasicSettingsWithId = async (
+export const upsertSettingsWithId = async (
   id: string,
-  settings: Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>,
-): Promise<BasicSettings> => {
+  settings: Omit<Settings, 'id' | 'createdAt' | 'updatedAt'>,
+): Promise<Settings> => {
   const now = new Date()
-  const existing = await db.basicSettings.get(id)
-  const record: BasicSettings = existing
+  const existing = await db.settings.get(id)
+  const record: Settings = existing
     ? { ...existing, ...settings, id, updatedAt: now }
     : { ...settings, id, createdAt: now, updatedAt: now }
-  await db.basicSettings.put(record)
+  await db.settings.put(record)
   return record
 }
 
-export const upsertAdvancedSettingsWithId = async (
-  id: string,
-  settings: Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>,
-): Promise<AdvancedSettings> => {
-  const now = new Date()
-  const existing = await db.advancedSettings.get(id)
-  const record: AdvancedSettings = existing
-    ? { ...existing, ...settings, id, updatedAt: now }
-    : { ...settings, id, createdAt: now, updatedAt: now }
-  await db.advancedSettings.put(record)
-  return record
+export const getOrCreateGlobalTranslationSettingsRecord = async (): Promise<Settings> => {
+  const existing = await getSettings(GLOBAL_TRANSLATION_SETTINGS_ID)
+  if (existing) return existing
+  return upsertSettingsWithId(GLOBAL_TRANSLATION_SETTINGS_ID, { ...DEFAULT_SETTINGS })
 }
 
-export const getOrCreateGlobalTranslationBasicSettings = async (): Promise<BasicSettings> => {
-  const existing = await getBasicSettings(GLOBAL_TRANSLATION_BASIC_SETTINGS_ID)
+export const getOrCreateGlobalExtractionSettings = async (): Promise<Settings> => {
+  const existing = await getSettings(GLOBAL_EXTRACTION_SETTINGS_ID)
   if (existing) return existing
-
-  return upsertBasicSettingsWithId(GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, { ...DEFAULT_BASIC_SETTINGS })
-}
-
-export const getOrCreateGlobalTranslationAdvancedSettings = async (): Promise<AdvancedSettings> => {
-  const existing = await getAdvancedSettings(GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID)
-  if (existing) return existing
-
-  return upsertAdvancedSettingsWithId(GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, { ...DEFAULT_ADVANCED_SETTINGS })
-}
-
-export const getOrCreateGlobalExtractionBasicSettings = async (): Promise<BasicSettings> => {
-  const existing = await getBasicSettings(GLOBAL_EXTRACTION_BASIC_SETTINGS_ID)
-  if (existing) return existing
-  return upsertBasicSettingsWithId(GLOBAL_EXTRACTION_BASIC_SETTINGS_ID, { ...DEFAULT_EXTRACTION_BASIC_SETTINGS })
-}
-
-export const getOrCreateGlobalExtractionAdvancedSettings = async (): Promise<AdvancedSettings> => {
-  const existing = await getAdvancedSettings(GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID)
-  if (existing) return existing
-  return upsertAdvancedSettingsWithId(GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, { ...DEFAULT_ADVANCED_SETTINGS })
+  return upsertSettingsWithId(GLOBAL_EXTRACTION_SETTINGS_ID, { ...DEFAULT_EXTRACTION_SETTINGS })
 }
 
 export const getOrCreateGlobalTranscriptionSettings = async (): Promise<Transcription> => {
@@ -80,8 +57,7 @@ export const getOrCreateGlobalTranslationSettings = async (): Promise<Translatio
   const translation = buildTranslationTemplate({
     id: GLOBAL_TRANSLATION_SETTINGS_ID,
     projectId: 'global',
-    basicSettingsId: GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
-    advancedSettingsId: GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
+    settingsId: GLOBAL_TRANSLATION_SETTINGS_ID,
   })
   await db.translations.put(translation)
   return translation
@@ -89,11 +65,9 @@ export const getOrCreateGlobalTranslationSettings = async (): Promise<Translatio
 
 export const ensureGlobalDefaultsExist = async (): Promise<void> => {
   await Promise.all([
-    getOrCreateGlobalTranslationBasicSettings(),
-    getOrCreateGlobalTranslationAdvancedSettings(),
+    getOrCreateGlobalTranslationSettingsRecord(),
     getOrCreateGlobalTranslationSettings(),
-    getOrCreateGlobalExtractionBasicSettings(),
-    getOrCreateGlobalExtractionAdvancedSettings(),
+    getOrCreateGlobalExtractionSettings(),
     getOrCreateGlobalTranscriptionSettings(),
   ])
 }

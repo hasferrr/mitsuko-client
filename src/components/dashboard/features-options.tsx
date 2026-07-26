@@ -84,7 +84,7 @@ export function FeaturesOptions() {
           subtitles: EXAMPLE_SUBTITLES,
           parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
           response: EXAMPLE_RESPONSE,
-        }, undefined, undefined)
+        })
         setCurrentTranslationId(translation.id)
         upsertTranslationData(translation.id, translation)
         break
@@ -106,7 +106,7 @@ export function FeaturesOptions() {
           subtitleContent: "",
           previousContext: "",
           contextResult: EXAMPLE_EXTRACTION_RESULT
-        }, undefined, undefined)
+        })
         setCurrentExtractionId(extraction.id)
         upsertExtractionData(extraction.id, extraction)
         break

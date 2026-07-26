@@ -12,14 +12,14 @@ import { CustomInstructionsLibraryControls } from "@/components/settings/custom-
 import { CustomInstructionsSaveDialog } from "@/components/settings/custom-instructions-save-dialog"
 
 interface Props {
-  basicSettingsId: string
+  settingsId: string
   hidePresets?: boolean
 }
 
-export const CustomInstructionsInput = memo(({ basicSettingsId, hidePresets }: Props) => {
-  const customInstructions = useSettingsStore((state) => state.getCustomInstructions(basicSettingsId))
+export const CustomInstructionsInput = memo(({ settingsId, hidePresets }: Props) => {
+  const customInstructions = useSettingsStore((state) => state.getCustomInstructions(settingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
-  const setCustomInstructions = (instructions: string) => setBasicSettingsValue(basicSettingsId, "customInstructions", instructions)
+  const setCustomInstructions = (instructions: string) => setBasicSettingsValue(settingsId, "customInstructions", instructions)
 
   const [isPresetsDialogOpen, setIsPresetsDialogOpen] = useState(false)
 

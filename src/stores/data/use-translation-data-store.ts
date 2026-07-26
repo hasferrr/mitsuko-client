@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { AdvancedSettings, BasicSettings, AutoContextMode, AutoContextPreviousMode, Translation } from "@/types/project"
+import { Settings, AutoContextMode, AutoContextPreviousMode, Translation } from "@/types/project"
 import { SubOnlyTranslated, SubtitleTranslated, Parsed } from "@/types/subtitles"
 import {
   updateTranslation as updateDB,
@@ -9,16 +9,14 @@ import {
   deleteTranslation as deleteDB,
   moveTranslation as moveDB,
 } from "@/lib/db/translation"
-import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
+import { getSettings } from "@/lib/db/settings"
 import { getProject } from "@/lib/db/project"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import {
-  DEFAULT_BASIC_SETTINGS,
-  DEFAULT_ADVANCED_SETTINGS,
+  DEFAULT_SETTINGS,
   DEFAULT_TRANSLATION_SETTINGS,
 } from "@/constants/default"
-import { GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, GLOBAL_TRANSLATION_BASIC_SETTINGS_ID, GLOBAL_TRANSLATION_SETTINGS_ID } from "@/constants/global-settings"
+import { GLOBAL_TRANSLATION_SETTINGS_ID } from "@/constants/global-settings"
 import { resolveNewTranslationAutoContextMode } from "@/lib/translation/auto-context-defaults"
 
 export interface TranslationDataStore {
@@ -30,8 +28,7 @@ export interface TranslationDataStore {
   createTranslationDb: (
     projectId: string,
     data: Parameters<typeof createDB>[1],
-    basicSettingsData?: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
-    advancedSettingsData?: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
+    settingsData?: Partial<Omit<Settings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Translation>
   getTranslationDb: (translationId: string, skipStoreUpdate?: boolean) => Promise<Translation | undefined>
   getTranslationsDb: (translationIds: string[]) => Promise<Translation[]>
@@ -74,41 +71,18 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     }
   },
   // CRUD methods
-  createTranslationDb: async (projectId, data, basicSettingsData, advancedSettingsData) => {
-    let bsInput = basicSettingsData
-    let advInput = advancedSettingsData
+  createTranslationDb: async (projectId, data, settingsData) => {
     const project = await getProject(projectId)
     if (!project) throw new Error('Project not found')
 
-    if (bsInput === undefined || advInput === undefined) {
-      const basicSettingsId = (project.isBatch || project.isDefaultTranslationEnabled)
-        ? project.defaultTranslationBasicSettingsId
-        : GLOBAL_TRANSLATION_BASIC_SETTINGS_ID
-      const advancedSettingsId = (project.isBatch || project.isDefaultTranslationEnabled)
-        ? project.defaultTranslationAdvancedSettingsId
-        : GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID
-
-      const bsFromDb = await getBasicSettings(basicSettingsId)
-      const adsFromDb = await getAdvancedSettings(advancedSettingsId)
-
-      const modelDetail = (bsInput?.modelDetail ?? bsFromDb?.modelDetail) ?? null
-      const applyModelDefaults = useAdvancedSettingsStore.getState().applyModelDefaults
-
-      if (bsInput === undefined) {
-        if (bsFromDb) {
-          bsInput = bsFromDb
-        } else {
-          bsInput = DEFAULT_BASIC_SETTINGS
-        }
-      }
-
-      if (advInput === undefined) {
-        if (adsFromDb) {
-          advInput = applyModelDefaults(adsFromDb, modelDetail)
-        } else {
-          advInput = applyModelDefaults(DEFAULT_ADVANCED_SETTINGS, modelDetail)
-        }
-      }
+    let settingsInput = settingsData
+    if (settingsInput === undefined) {
+      const settingsId = (project.isBatch || project.isDefaultTranslationEnabled)
+        ? project.defaultTranslationSettingsId
+        : GLOBAL_TRANSLATION_SETTINGS_ID
+      const inherited = await getSettings(settingsId)
+      const base = inherited ?? DEFAULT_SETTINGS
+      settingsInput = useSettingsStore.getState().applyModelDefaults(base, base.modelDetail)
     }
 
     const explicitMode = data.autoContextMode
@@ -132,16 +106,12 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
         }
       : { ...data, autoContextMode }
 
-    const translation = await createDB(projectId, resolvedData, bsInput ?? {}, advInput ?? {})
+    const translation = await createDB(projectId, resolvedData, settingsInput ?? {})
     set(state => ({ data: { ...state.data, [translation.id]: translation } }))
 
     // upsert associated settings into stores
-    const settingsStore = useSettingsStore.getState()
-    const advSettingsStore = useAdvancedSettingsStore.getState()
-    const bs = await getBasicSettings(translation.basicSettingsId)
-    if (bs) settingsStore.upsertData(bs.id, bs)
-    const ads = await getAdvancedSettings(translation.advancedSettingsId)
-    if (ads) advSettingsStore.upsertData(ads.id, ads)
+    const createdSettings = await getSettings(translation.settingsId)
+    if (createdSettings) useSettingsStore.getState().upsertData(createdSettings.id, createdSettings)
 
     return translation
   },

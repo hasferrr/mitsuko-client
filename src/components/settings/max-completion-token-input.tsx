@@ -4,22 +4,20 @@ import { memo } from "react"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constants/limits"
 
 interface MaxCompletionTokenInputProps {
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
 }
 
-export const MaxCompletionTokenInput = memo(({ basicSettingsId, advancedSettingsId }: MaxCompletionTokenInputProps) => {
-  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
-  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(basicSettingsId))
-  const maxCompletionTokens = useAdvancedSettingsStore((state) => state.getMaxCompletionTokens(advancedSettingsId))
-  const isMaxCompletionTokensAuto = useAdvancedSettingsStore((state) => state.getIsMaxCompletionTokensAuto(advancedSettingsId))
-  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setMaxCompletionTokens = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "maxCompletionTokens", value)
-  const setIsMaxCompletionTokensAuto = (value: boolean) => setAdvancedSettingsValue(advancedSettingsId, "isMaxCompletionTokensAuto", value)
+export const MaxCompletionTokenInput = memo(({ settingsId }: MaxCompletionTokenInputProps) => {
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(settingsId))
+  const isUseCustomModel = useSettingsStore((state) => state.getIsUseCustomModel(settingsId))
+  const maxCompletionTokens = useSettingsStore((state) => state.getMaxCompletionTokens(settingsId))
+  const isMaxCompletionTokensAuto = useSettingsStore((state) => state.getIsMaxCompletionTokensAuto(settingsId))
+  const setAdvancedSettingsValue = useSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setMaxCompletionTokens = (value: number) => setAdvancedSettingsValue(settingsId, "maxCompletionTokens", value)
+  const setIsMaxCompletionTokensAuto = (value: boolean) => setAdvancedSettingsValue(settingsId, "isMaxCompletionTokensAuto", value)
 
   const maxToken = isUseCustomModel || !modelDetail
     ? MAX_COMPLETION_TOKENS_MAX

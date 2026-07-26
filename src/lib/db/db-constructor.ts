@@ -1,264 +1,284 @@
 import {
   DEFAULT_ADVANCED_SETTINGS,
   DEFAULT_BASIC_SETTINGS,
+  DEFAULT_EXTRACTION_BASIC_SETTINGS,
+  DEFAULT_EXTRACTION_SETTINGS,
+  DEFAULT_SETTINGS,
   DEFAULT_TRANSCRIPTION_SETTINGS,
   DEFAULT_TRANSLATION_SETTINGS,
 } from '@/constants/default'
 import {
-  Project,
-  Translation,
-  Transcription,
-  Extraction,
-  ProjectOrder,
-  BasicSettings,
   AdvancedSettings,
+  BasicSettings,
+  Extraction,
+  LegacyExtraction,
+  LegacyProject,
+  LegacyTranslation,
+  Project,
+  ProjectOrder,
+  Settings,
+  Transcription,
+  Translation,
 } from '@/types/project'
-import {
-  AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX,
-  normalizeExtractionStatus,
-  stripExtractionDoneTag,
-} from '@/lib/extraction/status'
+import { AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX, normalizeExtractionStatus, stripExtractionDoneTag } from '@/lib/extraction/status'
 
 const uuidv4 = () => crypto.randomUUID()
 
 export interface DatabaseExport {
+  formatVersion: 2
   projects: Project[]
   translations: Translation[]
   transcriptions: Transcription[]
   extractions: Extraction[]
-  projectOrders: ProjectOrder[] // Only contains one item or empty array
+  projectOrders: ProjectOrder[]
+  settings: Settings[]
+}
+
+export interface LegacyDatabaseExport {
+  projects: LegacyProject[]
+  translations: LegacyTranslation[]
+  transcriptions: Transcription[]
+  extractions: LegacyExtraction[]
+  projectOrders: ProjectOrder[]
   basicSettings: BasicSettings[]
   advancedSettings: AdvancedSettings[]
 }
 
-
-// TODO: Importing database: Check for every field in the database and make sure it's not null,
-// and if it is, add the default value and also related tables
-// by implementing this approach, we can make sure it is scalable and easy to maintain
-
 export function databaseExportConstructor(data: Partial<DatabaseExport>): DatabaseExport {
   const projects = convertDates(data.projects?.map(projectConstructor) ?? [])
   const translations = convertDates(data.translations?.map(translationConstructor) ?? [])
-  const projectIsBatchMap = new Map(projects.map(project => [project.id, project.isBatch]))
-  const linkedOwnerMap = new Map<string, string>()
-
-  translations.forEach(translation => {
-    if (translation.autoContextExtractionId && !linkedOwnerMap.has(translation.autoContextExtractionId)) {
-      linkedOwnerMap.set(translation.autoContextExtractionId, translation.id)
+  const extractionInputs = data.extractions ?? []
+  const settingsOwnership = buildSettingsOwnership(projects, translations, extractionInputs)
+  const projectIsBatch = new Map(projects.map(project => [project.id, project.isBatch]))
+  const linkedOwner = new Map<string, string>()
+  for (const translation of translations) {
+    if (translation.autoContextExtractionId && !linkedOwner.has(translation.autoContextExtractionId)) {
+      linkedOwner.set(translation.autoContextExtractionId, translation.id)
     }
-  })
-
+  }
   return {
+    formatVersion: 2,
     projects,
     translations,
     transcriptions: convertDates(data.transcriptions?.map(transcriptionConstructor) ?? []),
     extractions: convertDates(data.extractions?.map(extraction => extractionConstructor(
       extraction,
-      projectIsBatchMap.get(extraction.projectId ?? "") ?? false,
-      linkedOwnerMap.get(extraction.id ?? ""),
+      projectIsBatch.get(extraction.projectId ?? '') ?? false,
+      linkedOwner.get(extraction.id ?? ''),
     )) ?? []),
     projectOrders: convertDates(data.projectOrders?.map(projectOrderConstructor) ?? []),
-    basicSettings: convertDates(data.basicSettings?.map(basicSettingsConstructor) ?? []),
-    advancedSettings: convertDates(data.advancedSettings?.map(advancedSettingsConstructor) ?? []),
+    settings: convertDates(data.settings?.map(settings => settingsConstructor(
+      settings,
+      settingsOwnership.get(settings.id ?? ''),
+    )) ?? []),
   }
 }
 
-export function generateNewIds(data: DatabaseExport): DatabaseExport {
-  // Create maps of old IDs to new Items
-  const basicSettingsMap: Map<string, BasicSettings> = new Map()
-  const advancedSettingsMap: Map<string, AdvancedSettings> = new Map()
-  const translationsMap: Map<string, Translation> = new Map()
-  const transcriptionsMap: Map<string, Transcription> = new Map()
-  const extractionsMap: Map<string, Extraction> = new Map()
-  const projectIdMap: Map<string, string> = new Map()
+export function convertLegacyDatabaseExport(data: Partial<LegacyDatabaseExport>): DatabaseExport {
+  const basicSettings = new Map((data.basicSettings ?? []).map(item => [item.id, item]))
+  const advancedSettings = new Map((data.advancedSettings ?? []).map(item => [item.id, item]))
+  const settings: Settings[] = []
+  const pairIds = new Map<string, string>()
 
-  for (const basicSetting of data.basicSettings) {
-    basicSettingsMap.set(basicSetting.id, { ...basicSetting, id: uuidv4() })
-  }
-  for (const advancedSetting of data.advancedSettings) {
-    advancedSettingsMap.set(advancedSetting.id, { ...advancedSetting, id: uuidv4() })
-  }
-
-  for (const translation of data.translations) {
-    translationsMap.set(translation.id, {
-      ...translation,
-      id: uuidv4(),
-      basicSettingsId: basicSettingsMap.get(translation.basicSettingsId)?.id ?? translation.basicSettingsId,
-      advancedSettingsId: advancedSettingsMap.get(translation.advancedSettingsId)?.id ?? translation.advancedSettingsId,
-      autoContextExtractionId: translation.autoContextExtractionId ?? DEFAULT_TRANSLATION_SETTINGS.autoContextExtractionId,
-      autoContextPreviousMode: translation.autoContextPreviousMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode,
-      autoContextPreviousExtractionId: translation.autoContextPreviousExtractionId ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousExtractionId,
-      projectId: "",
+  const mergePair = (basicId: string, advancedId: string, feature: 'translation' | 'extraction') => {
+    const basic = basicSettings.get(basicId)
+    const advanced = advancedSettings.get(advancedId)
+    const key = JSON.stringify([basicId || null, advancedId || null, basic ? null : feature])
+    const shouldReuse = Boolean(basicId || advancedId)
+    const existing = shouldReuse ? pairIds.get(key) : undefined
+    if (existing) return existing
+    const now = new Date()
+    const timestamps = mergeSettingsTimestamps(basic, advanced, now)
+    const id = uuidv4()
+    settings.push({
+      ...(feature === 'extraction' ? DEFAULT_EXTRACTION_BASIC_SETTINGS : DEFAULT_BASIC_SETTINGS),
+      ...DEFAULT_ADVANCED_SETTINGS,
+      ...basic,
+      ...advanced,
+      id,
+      ...timestamps,
     })
+    if (shouldReuse) pairIds.set(key, id)
+    return id
   }
 
-  for (const basicSetting of data.basicSettings) {
-    const newBasicSetting = basicSettingsMap.get(basicSetting.id)
-    if (newBasicSetting && newBasicSetting.fewShot.type === 'linked' && newBasicSetting.fewShot.linkedId) {
-      const newLinkedId = translationsMap.get(newBasicSetting.fewShot.linkedId)?.id
-      if (newLinkedId) {
-        newBasicSetting.fewShot = {
-          ...newBasicSetting.fewShot,
-          linkedId: newLinkedId,
-        }
+  const translations = (data.translations ?? []).map(item => {
+    const { basicSettingsId, advancedSettingsId, ...translation } = item
+    return translationConstructor({
+      ...translation,
+      settingsId: mergePair(basicSettingsId, advancedSettingsId, 'translation'),
+    })
+  })
+  const projectIsBatch = new Map((data.projects ?? []).map(project => [project.id, project.isBatch ?? false]))
+  const extractions = (data.extractions ?? []).map(item => {
+    const { basicSettingsId, advancedSettingsId, ...extraction } = item
+    return extractionConstructor({
+      ...extraction,
+      settingsId: mergePair(basicSettingsId, advancedSettingsId, 'extraction'),
+    }, projectIsBatch.get(extraction.projectId) ?? false)
+  })
+  const projects = (data.projects ?? []).map(item => {
+    const {
+      defaultTranslationBasicSettingsId,
+      defaultTranslationAdvancedSettingsId,
+      defaultExtractionBasicSettingsId,
+      defaultExtractionAdvancedSettingsId,
+      ...project
+    } = item
+    return projectConstructor({
+      ...project,
+      defaultTranslationSettingsId: mergePair(
+        defaultTranslationBasicSettingsId,
+        defaultTranslationAdvancedSettingsId,
+        'translation',
+      ),
+      defaultExtractionSettingsId: mergePair(
+        defaultExtractionBasicSettingsId,
+        defaultExtractionAdvancedSettingsId,
+        'extraction',
+      ),
+    })
+  })
+
+  return databaseExportConstructor({
+    formatVersion: 2,
+    projects,
+    translations,
+    transcriptions: data.transcriptions ?? [],
+    extractions,
+    projectOrders: data.projectOrders ?? [],
+    settings,
+  })
+}
+
+export function normalizeDatabaseExport(
+  data: Partial<DatabaseExport> & Partial<LegacyDatabaseExport>,
+): DatabaseExport {
+  return data.formatVersion === 2 || Array.isArray(data.settings)
+    ? databaseExportConstructor(data)
+    : convertLegacyDatabaseExport(data)
+}
+
+export function generateNewIds(data: DatabaseExport): DatabaseExport {
+  const settingsMap = new Map(data.settings.map(settings => [settings.id, { ...settings, id: uuidv4() }]))
+  const translationsMap = new Map(data.translations.map(translation => [translation.id, {
+    ...translation,
+    id: uuidv4(),
+    projectId: '',
+    settingsId: settingsMap.get(translation.settingsId)?.id ?? translation.settingsId,
+  }]))
+  const extractionsMap = new Map(data.extractions.map(extraction => [extraction.id, {
+    ...extraction,
+    id: uuidv4(),
+    projectId: '',
+    settingsId: settingsMap.get(extraction.settingsId)?.id ?? extraction.settingsId,
+    ownerTranslationId: extraction.ownerTranslationId
+      ? translationsMap.get(extraction.ownerTranslationId)?.id ?? extraction.ownerTranslationId
+      : null,
+  }]))
+  const transcriptionsMap = new Map(data.transcriptions.map(transcription => [transcription.id, {
+    ...transcription,
+    id: uuidv4(),
+    projectId: '',
+  }]))
+  const projectIdMap = new Map<string, string>()
+
+  for (const setting of settingsMap.values()) {
+    if (setting.fewShot.type === 'linked' && setting.fewShot.linkedId) {
+      setting.fewShot = {
+        ...setting.fewShot,
+        linkedId: translationsMap.get(setting.fewShot.linkedId)?.id ?? setting.fewShot.linkedId,
       }
     }
   }
-
-  for (const extraction of data.extractions) {
-    extractionsMap.set(extraction.id, {
-      ...extraction,
-      id: uuidv4(),
-      basicSettingsId: basicSettingsMap.get(extraction.basicSettingsId)?.id ?? extraction.basicSettingsId,
-      advancedSettingsId: advancedSettingsMap.get(extraction.advancedSettingsId)?.id ?? extraction.advancedSettingsId,
-      ownerTranslationId: extraction.ownerTranslationId
-        ? translationsMap.get(extraction.ownerTranslationId)?.id ?? extraction.ownerTranslationId
-        : null,
-      projectId: "",
-    })
-  }
-
   for (const translation of data.translations) {
-    const newTranslation = translationsMap.get(translation.id)
-    if (!newTranslation) continue
-    newTranslation.autoContextExtractionId = translation.autoContextExtractionId
+    const remapped = translationsMap.get(translation.id)
+    if (!remapped) continue
+    remapped.autoContextExtractionId = translation.autoContextExtractionId
       ? extractionsMap.get(translation.autoContextExtractionId)?.id ?? translation.autoContextExtractionId
       : null
-    newTranslation.autoContextPreviousExtractionId = translation.autoContextPreviousExtractionId
+    remapped.autoContextPreviousExtractionId = translation.autoContextPreviousExtractionId
       ? extractionsMap.get(translation.autoContextPreviousExtractionId)?.id ?? translation.autoContextPreviousExtractionId
       : null
   }
 
-  for (const transcription of data.transcriptions) {
-    transcriptionsMap.set(transcription.id, {
-      ...transcription,
-      id: uuidv4(),
-      projectId: "",
+  const projects = data.projects.map(project => {
+    const id = uuidv4()
+    projectIdMap.set(project.id, id)
+    const translations = project.translations.map(oldId => {
+      const item = translationsMap.get(oldId)
+      if (item) item.projectId = id
+      return item?.id ?? oldId
     })
-  }
-
-  // Create new projects with new IDs
-  const newProjects = data.projects.map(project => {
-    const newId = uuidv4()
-    projectIdMap.set(project.id, newId)
-
-    const newTranslationsId = project.translations.map(translationId => {
-      const newTranslation = translationsMap.get(translationId)
-      if (newTranslation) {
-        newTranslation.projectId = newId
-        return newTranslation.id
-      } else {
-        return translationId
-      }
+    const extractions = project.extractions.map(oldId => {
+      const item = extractionsMap.get(oldId)
+      if (item) item.projectId = id
+      return item?.id ?? oldId
     })
-    const newExtractionsId = project.extractions.map(extractionId => {
-      const newExtraction = extractionsMap.get(extractionId)
-      if (newExtraction) {
-        newExtraction.projectId = newId
-        return newExtraction.id
-      } else {
-        return extractionId
-      }
+    const transcriptions = project.transcriptions.map(oldId => {
+      const item = transcriptionsMap.get(oldId)
+      if (item) item.projectId = id
+      return item?.id ?? oldId
     })
-    const newTranscriptionsId = project.transcriptions.map(transcriptionId => {
-      const newTranscription = transcriptionsMap.get(transcriptionId)
-      if (newTranscription) {
-        newTranscription.projectId = newId
-        return newTranscription.id
-      } else {
-        return transcriptionId
-      }
-    })
-
-    const newDefaultTranslationBasicSettingsId =
-      basicSettingsMap.get(project.defaultTranslationBasicSettingsId)?.id ?? project.defaultTranslationBasicSettingsId
-    const newDefaultTranslationAdvancedSettingsId =
-      advancedSettingsMap.get(project.defaultTranslationAdvancedSettingsId)?.id ?? project.defaultTranslationAdvancedSettingsId
-    const newDefaultTranslationId =
-      translationsMap.get(project.defaultTranslationId)?.id ?? project.defaultTranslationId
-    const newDefaultTranslation = translationsMap.get(project.defaultTranslationId)
-    if (newDefaultTranslation) {
-      newDefaultTranslation.projectId = newId
-    }
-    const newDefaultExtractionBasicSettingsId =
-      basicSettingsMap.get(project.defaultExtractionBasicSettingsId)?.id ?? project.defaultExtractionBasicSettingsId
-    const newDefaultExtractionAdvancedSettingsId =
-      advancedSettingsMap.get(project.defaultExtractionAdvancedSettingsId)?.id ?? project.defaultExtractionAdvancedSettingsId
-    const newDefaultTranscriptionId =
-      transcriptionsMap.get(project.defaultTranscriptionId)?.id ?? project.defaultTranscriptionId
-
+    const defaultTranslation = translationsMap.get(project.defaultTranslationId)
+    if (defaultTranslation) defaultTranslation.projectId = id
+    const defaultTranscription = transcriptionsMap.get(project.defaultTranscriptionId)
+    if (defaultTranscription) defaultTranscription.projectId = id
     return {
       ...project,
-      id: newId,
-      translations: newTranslationsId,
-      transcriptions: newTranscriptionsId,
-      extractions: newExtractionsId,
-      defaultTranslationBasicSettingsId: newDefaultTranslationBasicSettingsId,
-      defaultTranslationAdvancedSettingsId: newDefaultTranslationAdvancedSettingsId,
-      defaultTranslationId: newDefaultTranslationId,
-      defaultExtractionBasicSettingsId: newDefaultExtractionBasicSettingsId,
-      defaultExtractionAdvancedSettingsId: newDefaultExtractionAdvancedSettingsId,
-      defaultTranscriptionId: newDefaultTranscriptionId,
-      isBatch: project.isBatch ?? false,
-      isDefaultTranslationEnabled: typeof project.isDefaultTranslationEnabled === 'boolean' ? project.isDefaultTranslationEnabled : false,
-      isDefaultExtractionEnabled: typeof project.isDefaultExtractionEnabled === 'boolean' ? project.isDefaultExtractionEnabled : false,
-      isDefaultTranscriptionEnabled: typeof project.isDefaultTranscriptionEnabled === 'boolean' ? project.isDefaultTranscriptionEnabled : false,
-      isArchived: project.isArchived ?? false,
+      id,
+      translations,
+      extractions,
+      transcriptions,
+      defaultTranslationSettingsId: settingsMap.get(project.defaultTranslationSettingsId)?.id ?? project.defaultTranslationSettingsId,
+      defaultExtractionSettingsId: settingsMap.get(project.defaultExtractionSettingsId)?.id ?? project.defaultExtractionSettingsId,
+      defaultTranslationId: defaultTranslation?.id ?? project.defaultTranslationId,
+      defaultTranscriptionId: defaultTranscription?.id ?? project.defaultTranscriptionId,
     }
   })
-
-  const newTranslations = Array.from(translationsMap.values())
-  const newTranscriptions = Array.from(transcriptionsMap.values())
-  const newExtractions = Array.from(extractionsMap.values())
-  const newBasicSettings = Array.from(basicSettingsMap.values())
-  const newAdvancedSettings = Array.from(advancedSettingsMap.values())
-
-  const newProjectOrders = data.projectOrders.at(0)
-  if (newProjectOrders) {
-    newProjectOrders.order = newProjectOrders.order
-      .map(oldId => projectIdMap.get(oldId))
-      .filter((id): id is string => !!id)
-  }
+  const projectOrder = data.projectOrders.at(0)
+  const projectOrders = projectOrder ? [{
+    ...projectOrder,
+    order: projectOrder.order.map(id => projectIdMap.get(id)).filter((id): id is string => !!id),
+  }] : []
 
   return {
-    projects: newProjects,
-    translations: newTranslations,
-    transcriptions: newTranscriptions,
-    extractions: newExtractions,
-    projectOrders: newProjectOrders ? [newProjectOrders] : [],
-    basicSettings: newBasicSettings,
-    advancedSettings: newAdvancedSettings
+    formatVersion: 2,
+    projects,
+    translations: [...translationsMap.values()],
+    transcriptions: [...transcriptionsMap.values()],
+    extractions: [...extractionsMap.values()],
+    projectOrders,
+    settings: [...settingsMap.values()],
   }
 }
 
 function convertDates<T extends { createdAt?: string | Date; updatedAt?: string | Date }>(items: T[]): T[] {
   return items.map(item => ({
     ...item,
-    createdAt: (typeof item.createdAt === 'string' ? new Date(item.createdAt) : item.createdAt) ?? new Date(),
-    updatedAt: (typeof item.updatedAt === 'string' ? new Date(item.updatedAt) : item.updatedAt) ?? new Date(),
+    createdAt: typeof item.createdAt === 'string' ? new Date(item.createdAt) : item.createdAt ?? new Date(),
+    updatedAt: typeof item.updatedAt === 'string' ? new Date(item.updatedAt) : item.updatedAt ?? new Date(),
   }))
 }
 
 function projectConstructor(project: Partial<Project>): Project {
   return {
     id: project.id ?? uuidv4(),
-    name: project.name ?? "Project X",
-    createdAt: project.createdAt ?? new Date(),
-    updatedAt: project.updatedAt ?? new Date(),
+    name: project.name ?? 'Project X',
     translations: project.translations ?? [],
     transcriptions: project.transcriptions ?? [],
     extractions: project.extractions ?? [],
-    defaultTranslationBasicSettingsId: project.defaultTranslationBasicSettingsId ?? "",
-    defaultTranslationAdvancedSettingsId: project.defaultTranslationAdvancedSettingsId ?? "",
-    defaultTranslationId: project.defaultTranslationId ?? "",
-    defaultExtractionBasicSettingsId: project.defaultExtractionBasicSettingsId ?? "",
-    defaultExtractionAdvancedSettingsId: project.defaultExtractionAdvancedSettingsId ?? "",
-    defaultTranscriptionId: project.defaultTranscriptionId ?? "",
+    defaultTranslationSettingsId: project.defaultTranslationSettingsId ?? '',
+    defaultTranslationId: project.defaultTranslationId ?? '',
+    defaultExtractionSettingsId: project.defaultExtractionSettingsId ?? '',
+    defaultTranscriptionId: project.defaultTranscriptionId ?? '',
+    createdAt: project.createdAt ?? new Date(),
+    updatedAt: project.updatedAt ?? new Date(),
     isBatch: project.isBatch ?? false,
     lastBatchOperationMode: project.lastBatchOperationMode ?? 'translation',
-    isDefaultTranslationEnabled: typeof project.isDefaultTranslationEnabled === 'boolean' ? project.isDefaultTranslationEnabled : false,
-    isDefaultExtractionEnabled: typeof project.isDefaultExtractionEnabled === 'boolean' ? project.isDefaultExtractionEnabled : false,
-    isDefaultTranscriptionEnabled: typeof project.isDefaultTranscriptionEnabled === 'boolean' ? project.isDefaultTranscriptionEnabled : false,
+    isDefaultTranslationEnabled: project.isDefaultTranslationEnabled ?? false,
+    isDefaultExtractionEnabled: project.isDefaultExtractionEnabled ?? false,
+    isDefaultTranscriptionEnabled: project.isDefaultTranscriptionEnabled ?? false,
     isArchived: project.isArchived ?? false,
   }
 }
@@ -267,133 +287,140 @@ function translationConstructor(translation: Partial<Translation>): Translation 
   return {
     id: translation.id ?? uuidv4(),
     title: translation.title ?? DEFAULT_TRANSLATION_SETTINGS.title,
-    subtitles: translation.subtitles ?? [...DEFAULT_TRANSLATION_SETTINGS.subtitles],
+    subtitles: translation.subtitles ?? [],
     parsed: sanitizeParsed(translation.parsed),
+    projectId: translation.projectId ?? '',
+    settingsId: translation.settingsId ?? '',
+    autoContextMode: translation.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode,
+    autoContextExtractionId: translation.autoContextExtractionId ?? null,
+    autoContextPreviousMode: translation.autoContextPreviousMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode,
+    autoContextPreviousExtractionId: translation.autoContextPreviousExtractionId ?? null,
+    response: translation.response ?? { response: '', jsonResponse: [] },
     createdAt: translation.createdAt ?? new Date(),
     updatedAt: translation.updatedAt ?? new Date(),
-    projectId: translation.projectId ?? "",
-    basicSettingsId: translation.basicSettingsId ?? "",
-    advancedSettingsId: translation.advancedSettingsId ?? "",
-    autoContextMode: translation.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode,
-    autoContextExtractionId: translation.autoContextExtractionId ?? DEFAULT_TRANSLATION_SETTINGS.autoContextExtractionId,
-    autoContextPreviousMode: translation.autoContextPreviousMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode,
-    autoContextPreviousExtractionId: translation.autoContextPreviousExtractionId ?? DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousExtractionId,
-    response: translation.response ?? {
-      ...DEFAULT_TRANSLATION_SETTINGS.response,
-      jsonResponse: [...DEFAULT_TRANSLATION_SETTINGS.response.jsonResponse],
-    },
   }
 }
 
 function sanitizeParsed(parsed: Translation['parsed'] | undefined): Translation['parsed'] {
-  const safeParsed = parsed ?? { ...DEFAULT_TRANSLATION_SETTINGS.parsed }
-  if (safeParsed.type === "ass" && safeParsed.data) {
-    const data = { ...safeParsed.data } as typeof safeParsed.data & { subtitles?: unknown }
-    if ("subtitles" in data) {
-      delete data.subtitles
-      return {
-        ...safeParsed,
-        data,
-      }
-    }
+  const safe = parsed ?? { ...DEFAULT_TRANSLATION_SETTINGS.parsed }
+  if (safe.type === 'ass' && safe.data) {
+    const data = { ...safe.data } as typeof safe.data & { subtitles?: unknown }
+    delete data.subtitles
+    return { ...safe, data }
   }
-  return safeParsed
+  return safe
 }
 
 function transcriptionConstructor(transcription: Partial<Transcription>): Transcription {
+  const legacyModel = transcription.models as string | null | undefined
   return {
     id: transcription.id ?? uuidv4(),
     title: transcription.title ?? DEFAULT_TRANSCRIPTION_SETTINGS.title,
-    transcriptionText: transcription.transcriptionText ?? DEFAULT_TRANSCRIPTION_SETTINGS.transcriptionText,
-    transcriptSubtitles: transcription.transcriptSubtitles ?? [...DEFAULT_TRANSCRIPTION_SETTINGS.transcriptSubtitles],
+    transcriptionText: transcription.transcriptionText ?? '',
+    transcriptSubtitles: transcription.transcriptSubtitles ?? [],
     language: transcription.language ?? DEFAULT_TRANSCRIPTION_SETTINGS.language,
     selectedMode: transcription.selectedMode ?? DEFAULT_TRANSCRIPTION_SETTINGS.selectedMode,
-    customInstructions: transcription.customInstructions ?? DEFAULT_TRANSCRIPTION_SETTINGS.customInstructions,
-    models: migrateModelName(transcription.models) ?? DEFAULT_TRANSCRIPTION_SETTINGS.models,
+    customInstructions: transcription.customInstructions ?? '',
+    models: legacyModel === 'free' || legacyModel === 'mitsuko-free' || legacyModel === 'premium'
+      ? 'mitsuko-premium'
+      : transcription.models ?? DEFAULT_TRANSCRIPTION_SETTINGS.models,
+    projectId: transcription.projectId ?? '',
+    words: transcription.words ?? [],
+    segments: transcription.segments ?? [],
+    selectedUploadId: transcription.selectedUploadId ?? null,
     createdAt: transcription.createdAt ?? new Date(),
     updatedAt: transcription.updatedAt ?? new Date(),
-    projectId: transcription.projectId ?? "",
-    words: transcription.words ?? [...DEFAULT_TRANSCRIPTION_SETTINGS.words],
-    segments: transcription.segments ?? [...DEFAULT_TRANSCRIPTION_SETTINGS.segments],
-    selectedUploadId: transcription.selectedUploadId ?? DEFAULT_TRANSCRIPTION_SETTINGS.selectedUploadId,
   }
 }
 
-function migrateModelName(model: string | null | undefined): Transcription['models'] | null | undefined {
-  if (model === 'free' || model === 'mitsuko-free') return 'mitsuko-premium'
-  if (model === 'premium') return 'mitsuko-premium'
-  return model as Transcription['models'] | null | undefined
-}
-
-function extractionConstructor(
-  extraction: Partial<Extraction>,
-  projectIsBatch = false,
-  linkedOwnerId?: string,
-): Extraction {
-  const contextResult = extraction.contextResult ?? ""
+function extractionConstructor(extraction: Partial<Extraction>, isBatch = false, linkedOwnerId?: string): Extraction {
+  const rawContextResult = extraction.contextResult ?? ''
+  const status = normalizeExtractionStatus(extraction.status, rawContextResult, isBatch)
+  const contextResult = stripExtractionDoneTag(rawContextResult)
   const looksAutoCreated = !!linkedOwnerId
-    && typeof extraction.title === "string"
+    && typeof extraction.title === 'string'
     && extraction.title.startsWith(AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX)
-  const status = normalizeExtractionStatus(extraction.status, contextResult, projectIsBatch)
   const completedAt = extraction.completedAt instanceof Date
     ? extraction.completedAt
     : extraction.completedAt ? new Date(extraction.completedAt) : null
-
   return {
     id: extraction.id ?? uuidv4(),
-    title: extraction.title ?? "",
-    episodeNumber: extraction.episodeNumber ?? "",
-    subtitleContent: extraction.subtitleContent ?? "",
-    previousContext: extraction.previousContext ?? "",
-    contextResult: stripExtractionDoneTag(contextResult),
+    title: extraction.title ?? '',
+    episodeNumber: extraction.episodeNumber ?? '',
+    subtitleContent: extraction.subtitleContent ?? '',
+    previousContext: extraction.previousContext ?? '',
+    contextResult,
     status,
     ownerTranslationId: extraction.ownerTranslationId ?? (looksAutoCreated ? linkedOwnerId ?? null : null),
-    completedAt: status === "completed" ? completedAt ?? new Date() : null,
+    completedAt: status === 'completed' ? completedAt ?? new Date() : null,
+    projectId: extraction.projectId ?? '',
+    settingsId: extraction.settingsId ?? '',
     createdAt: extraction.createdAt ?? new Date(),
     updatedAt: extraction.updatedAt ?? new Date(),
-    projectId: extraction.projectId ?? "",
-    basicSettingsId: extraction.basicSettingsId ?? "",
-    advancedSettingsId: extraction.advancedSettingsId ?? "",
   }
 }
 
-function basicSettingsConstructor(basicSettings: Partial<BasicSettings>): BasicSettings {
+function settingsConstructor(
+  settings: Partial<Settings>,
+  ownership?: Set<'translation' | 'extraction'>,
+): Settings {
+  const defaults = ownership?.has('translation') || !ownership?.has('extraction')
+    ? DEFAULT_SETTINGS
+    : DEFAULT_EXTRACTION_SETTINGS
   return {
-    id: basicSettings.id ?? uuidv4(),
-    sourceLanguage: basicSettings.sourceLanguage ?? DEFAULT_BASIC_SETTINGS.sourceLanguage,
-    targetLanguage: basicSettings.targetLanguage ?? DEFAULT_BASIC_SETTINGS.targetLanguage,
-    modelDetail: basicSettings.modelDetail ?? DEFAULT_BASIC_SETTINGS.modelDetail,
-    isUseCustomModel: basicSettings.isUseCustomModel ?? DEFAULT_BASIC_SETTINGS.isUseCustomModel,
-    contextDocument: basicSettings.contextDocument ?? DEFAULT_BASIC_SETTINGS.contextDocument,
-    customInstructions: basicSettings.customInstructions ?? DEFAULT_BASIC_SETTINGS.customInstructions,
-    fewShot: basicSettings.fewShot ?? DEFAULT_BASIC_SETTINGS.fewShot,
-    createdAt: basicSettings.createdAt ?? new Date(),
-    updatedAt: basicSettings.updatedAt ?? new Date(),
+    ...defaults,
+    ...settings,
+    fewShot: { ...defaults.fewShot, ...settings.fewShot },
+    id: settings.id ?? uuidv4(),
+    createdAt: settings.createdAt ?? new Date(),
+    updatedAt: settings.updatedAt ?? new Date(),
   }
 }
 
-function advancedSettingsConstructor(advancedSettings: Partial<AdvancedSettings>): AdvancedSettings {
+function buildSettingsOwnership(
+  projects: Project[],
+  translations: Translation[],
+  extractions: Partial<Extraction>[],
+): Map<string, Set<'translation' | 'extraction'>> {
+  const ownership = new Map<string, Set<'translation' | 'extraction'>>()
+  const add = (id: string | undefined, feature: 'translation' | 'extraction') => {
+    if (!id) return
+    const owners = ownership.get(id) ?? new Set()
+    owners.add(feature)
+    ownership.set(id, owners)
+  }
+  for (const project of projects) {
+    add(project.defaultTranslationSettingsId, 'translation')
+    add(project.defaultExtractionSettingsId, 'extraction')
+  }
+  for (const translation of translations) add(translation.settingsId, 'translation')
+  for (const extraction of extractions) add(extraction.settingsId, 'extraction')
+  return ownership
+}
+
+type Timestamped = { createdAt?: string | Date; updatedAt?: string | Date }
+
+export function mergeSettingsTimestamps(
+  basic: Timestamped | undefined,
+  advanced: Timestamped | undefined,
+  fallback: Date,
+): { createdAt: Date; updatedAt: Date } {
+  const dates = (values: (string | Date | undefined)[]) => values
+    .filter((value): value is string | Date => value !== undefined)
+    .map(value => value instanceof Date ? value : new Date(value))
+  const created = dates([basic?.createdAt, advanced?.createdAt])
+  const updated = dates([basic?.updatedAt, advanced?.updatedAt])
   return {
-    id: advancedSettings.id ?? uuidv4(),
-    temperature: advancedSettings.temperature ?? DEFAULT_ADVANCED_SETTINGS.temperature,
-    startIndex: advancedSettings.startIndex ?? DEFAULT_ADVANCED_SETTINGS.startIndex,
-    endIndex: advancedSettings.endIndex ?? DEFAULT_ADVANCED_SETTINGS.endIndex,
-    splitSize: advancedSettings.splitSize ?? DEFAULT_ADVANCED_SETTINGS.splitSize,
-    maxCompletionTokens: advancedSettings.maxCompletionTokens ?? DEFAULT_ADVANCED_SETTINGS.maxCompletionTokens,
-    isUseStructuredOutput: advancedSettings.isUseStructuredOutput ?? DEFAULT_ADVANCED_SETTINGS.isUseStructuredOutput,
-    isUseFullContextMemory: advancedSettings.isUseFullContextMemory ?? DEFAULT_ADVANCED_SETTINGS.isUseFullContextMemory,
-    isBetterContextCaching: advancedSettings.isBetterContextCaching ?? DEFAULT_ADVANCED_SETTINGS.isBetterContextCaching,
-    isMaxCompletionTokensAuto: advancedSettings.isMaxCompletionTokensAuto ?? DEFAULT_ADVANCED_SETTINGS.isMaxCompletionTokensAuto,
-    createdAt: advancedSettings.createdAt ?? new Date(),
-    updatedAt: advancedSettings.updatedAt ?? new Date(),
+    createdAt: created.length ? new Date(Math.min(...created.map(date => date.getTime()))) : fallback,
+    updatedAt: updated.length ? new Date(Math.max(...updated.map(date => date.getTime()))) : fallback,
   }
 }
 
-function projectOrderConstructor(projectOrder: Partial<ProjectOrder>): ProjectOrder {
+function projectOrderConstructor(order: Partial<ProjectOrder>): ProjectOrder {
   return {
-    id: projectOrder.id ?? uuidv4(),
-    order: projectOrder.order ?? [],
-    createdAt: projectOrder.createdAt ?? new Date(),
-    updatedAt: projectOrder.updatedAt ?? new Date(),
+    id: order.id ?? uuidv4(),
+    order: order.order ?? [],
+    createdAt: order.createdAt ?? new Date(),
+    updatedAt: order.updatedAt ?? new Date(),
   }
 }

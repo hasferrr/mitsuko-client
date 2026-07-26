@@ -7,8 +7,7 @@ describe('buildTranslationTemplate', () => {
     const template = buildTranslationTemplate({
       id: 'template-1',
       projectId: 'project-1',
-      basicSettingsId: 'basic-1',
-      advancedSettingsId: 'advanced-1',
+      settingsId: 'settings-1',
       now,
     })
 
@@ -18,8 +17,7 @@ describe('buildTranslationTemplate', () => {
       title: '',
       subtitles: [],
       parsed: { type: 'srt', data: null },
-      basicSettingsId: 'basic-1',
-      advancedSettingsId: 'advanced-1',
+      settingsId: 'settings-1',
       autoContextMode: 'disabled',
       autoContextExtractionId: null,
       autoContextPreviousMode: 'latest',
@@ -34,8 +32,7 @@ describe('buildTranslationTemplate', () => {
     const template = buildTranslationTemplate({
       id: 'template-1',
       projectId: 'project-1',
-      basicSettingsId: 'basic-1',
-      advancedSettingsId: 'advanced-1',
+      settingsId: 'settings-1',
       autoContextMode: 'use-existing',
     })
 

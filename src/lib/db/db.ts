@@ -3,7 +3,8 @@ import {
   DEFAULT_BASIC_SETTINGS,
   DEFAULT_EXTRACTION_BASIC_SETTINGS,
 } from '@/constants/default'
-import { Project, Translation, Transcription, Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
+import { LegacyProject as Project, LegacyTranslation as Translation, Transcription, LegacyExtraction as Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
+import { Project as CurrentProject, Translation as CurrentTranslation, Extraction as CurrentExtraction, Settings } from '@/types/project'
 import { CustomInstruction, CustomInstructionOrder } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'
 import {
@@ -12,9 +13,14 @@ import {
   stripExtractionDoneTag,
 } from '@/lib/extraction/status'
 import {
-  GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
-  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  LEGACY_GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
+  LEGACY_GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
   GLOBAL_TRANSLATION_SETTINGS_ID,
+} from '@/constants/global-settings'
+import {
+  LEGACY_GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
+  LEGACY_GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
+  GLOBAL_EXTRACTION_SETTINGS_ID,
 } from '@/constants/global-settings'
 import { buildTranslationTemplate } from '@/lib/translation/template'
 import { buildTranscriptionTemplate } from '@/lib/transcription/template'
@@ -22,19 +28,18 @@ import { getOrphanedLegacySettingsIds, LegacyProjectSettingsReferences } from '.
 
 type LegacyProject = Project & LegacyProjectSettingsReferences
 
-class MyDatabase extends Dexie {
-  projects!: Table<Project, string>
-  translations!: Table<Translation, string>
+export class MyDatabase extends Dexie {
+  projects!: Table<CurrentProject, string>
+  translations!: Table<CurrentTranslation, string>
   transcriptions!: Table<Transcription, string>
-  extractions!: Table<Extraction, string>
+  extractions!: Table<CurrentExtraction, string>
   projectOrders!: Table<ProjectOrder, string>
-  basicSettings!: Table<BasicSettings, string>
-  advancedSettings!: Table<AdvancedSettings, string>
+  settings!: Table<Settings, string>
   customInstructions!: Table<CustomInstruction, string>
   customInstructionOrders!: Table<CustomInstructionOrder, string>
 
-  constructor() {
-    super('myDatabase')
+  constructor(name = 'myDatabase') {
+    super(name)
     this.version(6).stores({
       projects: 'id, name, createdAt, updatedAt',
       translations: 'id, projectId, title, createdAt, updatedAt',
@@ -410,8 +415,8 @@ class MyDatabase extends Dexie {
       templates.push(buildTranslationTemplate({
         id: GLOBAL_TRANSLATION_SETTINGS_ID,
         projectId: 'global',
-        basicSettingsId: GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
-        advancedSettingsId: GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
+        basicSettingsId: LEGACY_GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+        advancedSettingsId: LEGACY_GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
         now,
       }))
       await tx.table('projects').bulkPut(updatedProjects)
@@ -447,6 +452,145 @@ class MyDatabase extends Dexie {
       await advancedSettingsTable.delete('global-advanced-settings')
       await basicSettingsTable.bulkDelete([...orphaned.basic])
       await advancedSettingsTable.bulkDelete([...orphaned.advanced])
+    })
+    this.version(32).stores({
+      projects: 'id, name, createdAt, updatedAt, defaultTranslationSettingsId, defaultExtractionSettingsId',
+      translations: 'id, projectId, settingsId, title, createdAt, updatedAt',
+      extractions: 'id, projectId, settingsId, episodeNumber, createdAt, updatedAt',
+      settings: 'id, createdAt, updatedAt',
+      basicSettings: null,
+      advancedSettings: null,
+    }).upgrade(async tx => {
+      const projectsTable = tx.table('projects')
+      const translationsTable = tx.table('translations')
+      const extractionsTable = tx.table('extractions')
+      const basicSettingsTable = tx.table('basicSettings')
+      const advancedSettingsTable = tx.table('advancedSettings')
+      const settingsTable = tx.table('settings')
+
+      const projects = await projectsTable.toArray() as LegacyProject[]
+      const translations = await translationsTable.toArray() as Translation[]
+      const extractions = await extractionsTable.toArray() as Extraction[]
+      const basicSettings = await basicSettingsTable.toArray() as BasicSettings[]
+      const advancedSettings = await advancedSettingsTable.toArray() as AdvancedSettings[]
+      const basicById = new Map(basicSettings.map(settings => [settings.id, settings]))
+      const advancedById = new Map(advancedSettings.map(settings => [settings.id, settings]))
+      const pairToSettingsId = new Map<string, string>()
+      const unifiedSettings: Settings[] = []
+
+      const mergePair = (
+        basicSettingsId: string,
+        advancedSettingsId: string,
+        feature: 'translation' | 'extraction',
+      ) => {
+        const basic = basicById.get(basicSettingsId)
+        const advanced = advancedById.get(advancedSettingsId)
+        const pairKey = JSON.stringify([
+          basicSettingsId || null,
+          advancedSettingsId || null,
+          basic ? null : feature,
+        ])
+        const shouldReuse = Boolean(basicSettingsId || advancedSettingsId)
+        const existingId = shouldReuse ? pairToSettingsId.get(pairKey) : undefined
+        if (existingId) return existingId
+
+        const id = basicSettingsId === LEGACY_GLOBAL_TRANSLATION_BASIC_SETTINGS_ID
+          && advancedSettingsId === LEGACY_GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID
+          ? GLOBAL_TRANSLATION_SETTINGS_ID
+          : basicSettingsId === LEGACY_GLOBAL_EXTRACTION_BASIC_SETTINGS_ID
+            && advancedSettingsId === LEGACY_GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID
+            ? GLOBAL_EXTRACTION_SETTINGS_ID
+            : crypto.randomUUID()
+        const now = new Date()
+        const basicDefaults = feature === 'extraction'
+          ? DEFAULT_EXTRACTION_BASIC_SETTINGS
+          : DEFAULT_BASIC_SETTINGS
+        const createdAt = basic?.createdAt && advanced?.createdAt
+          ? new Date(Math.min(basic.createdAt.getTime(), advanced.createdAt.getTime()))
+          : basic?.createdAt ?? advanced?.createdAt ?? now
+        const updatedAt = basic?.updatedAt && advanced?.updatedAt
+          ? new Date(Math.max(basic.updatedAt.getTime(), advanced.updatedAt.getTime()))
+          : basic?.updatedAt ?? advanced?.updatedAt ?? now
+
+        unifiedSettings.push({
+          ...basicDefaults,
+          ...DEFAULT_ADVANCED_SETTINGS,
+          ...basic,
+          ...advanced,
+          id,
+          createdAt,
+          updatedAt,
+        })
+        if (shouldReuse) pairToSettingsId.set(pairKey, id)
+        return id
+      }
+
+      mergePair(
+        LEGACY_GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+        LEGACY_GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
+        'translation',
+      )
+      mergePair(
+        LEGACY_GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
+        LEGACY_GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
+        'extraction',
+      )
+
+      const migratedTranslations = translations.map(translation => {
+        const settingsId = mergePair(
+          translation.basicSettingsId,
+          translation.advancedSettingsId,
+          'translation',
+        )
+        const { basicSettingsId, advancedSettingsId, ...rest } = translation
+        void basicSettingsId
+        void advancedSettingsId
+        return { ...rest, settingsId } as CurrentTranslation
+      })
+      const migratedExtractions = extractions.map(extraction => {
+        const settingsId = mergePair(
+          extraction.basicSettingsId,
+          extraction.advancedSettingsId,
+          'extraction',
+        )
+        const { basicSettingsId, advancedSettingsId, ...rest } = extraction
+        void basicSettingsId
+        void advancedSettingsId
+        return { ...rest, settingsId } as CurrentExtraction
+      })
+      const migratedProjects = projects.map(project => {
+        const defaultTranslationSettingsId = mergePair(
+          project.defaultTranslationBasicSettingsId,
+          project.defaultTranslationAdvancedSettingsId,
+          'translation',
+        )
+        const defaultExtractionSettingsId = mergePair(
+          project.defaultExtractionBasicSettingsId,
+          project.defaultExtractionAdvancedSettingsId,
+          'extraction',
+        )
+        const {
+          defaultTranslationBasicSettingsId,
+          defaultTranslationAdvancedSettingsId,
+          defaultExtractionBasicSettingsId,
+          defaultExtractionAdvancedSettingsId,
+          ...rest
+        } = project
+        void defaultTranslationBasicSettingsId
+        void defaultTranslationAdvancedSettingsId
+        void defaultExtractionBasicSettingsId
+        void defaultExtractionAdvancedSettingsId
+        return {
+          ...rest,
+          defaultTranslationSettingsId,
+          defaultExtractionSettingsId,
+        } as CurrentProject
+      })
+
+      await settingsTable.bulkPut(unifiedSettings)
+      await translationsTable.bulkPut(migratedTranslations)
+      await extractionsTable.bulkPut(migratedExtractions)
+      await projectsTable.bulkPut(migratedProjects)
     })
   }
 }

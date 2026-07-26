@@ -1,417 +1,235 @@
-import { db } from './db'
-import { DatabaseExport, databaseExportConstructor, generateNewIds } from './db-constructor'
-import { databaseExportSchema } from './db-schema'
-import { Project, Translation, Extraction, BasicSettings, AdvancedSettings, Transcription } from '@/types/project'
+import { db } from '@/lib/db/db'
 import {
-  DEFAULT_BASIC_SETTINGS,
-  DEFAULT_ADVANCED_SETTINGS,
-  DEFAULT_EXTRACTION_BASIC_SETTINGS,
-  DEFAULT_TRANSLATION_SETTINGS,
-} from '@/constants/default'
+  DatabaseExport,
+  LegacyDatabaseExport,
+  databaseExportConstructor,
+  generateNewIds,
+  normalizeDatabaseExport,
+} from '@/lib/db/db-constructor'
+import { databaseExportSchema } from '@/lib/db/db-schema'
+import { Project, Settings } from '@/types/project'
+import { DEFAULT_EXTRACTION_SETTINGS, DEFAULT_SETTINGS, DEFAULT_TRANSLATION_SETTINGS } from '@/constants/default'
 import {
-  GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
-  GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
-  GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
-  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_EXTRACTION_SETTINGS_ID,
   GLOBAL_TRANSLATION_SETTINGS_ID,
-  GLOBAL_TRANSCRIPTION_SETTINGS_ID
+  GLOBAL_TRANSCRIPTION_SETTINGS_ID,
 } from '@/constants/global-settings'
 import { buildTranslationTemplate } from '@/lib/translation/template'
 import { buildTranscriptionTemplate } from '@/lib/transcription/template'
 import { normalizeAutoContextDefault } from '@/lib/translation/auto-context-defaults'
-import { getOrCreateGlobalTranslationSettings } from '@/lib/db/global-settings'
-import { getOrphanedLegacySettingsIds, LegacyProjectSettingsReferences } from './legacy-settings'
+import { ensureGlobalDefaultsExist } from '@/lib/db/global-settings'
 
-const FEATURE_GLOBAL_BASIC_IDS = [
-  GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
-  GLOBAL_EXTRACTION_BASIC_SETTINGS_ID,
-]
+const GLOBAL_SETTINGS_IDS = [GLOBAL_TRANSLATION_SETTINGS_ID, GLOBAL_EXTRACTION_SETTINGS_ID]
 
-const FEATURE_GLOBAL_ADVANCED_IDS = [
-  GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
-  GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID,
-]
+const stringifyExport = (data: DatabaseExport) => JSON.stringify(
+  sanitizeExport(databaseExportConstructor(data)),
+  null,
+  process.env.NODE_ENV === 'development' ? 2 : undefined,
+)
+
 export async function exportDatabase(): Promise<string> {
-  const exportData: DatabaseExport = {
+  return stringifyExport({
+    formatVersion: 2,
     projects: await db.projects.toArray(),
-    translations: (await db.translations.toArray()).filter(t => t.id !== GLOBAL_TRANSLATION_SETTINGS_ID),
-    transcriptions: (await db.transcriptions.toArray()).filter(t => t.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID),
+    translations: (await db.translations.toArray()).filter(item => item.id !== GLOBAL_TRANSLATION_SETTINGS_ID),
+    transcriptions: (await db.transcriptions.toArray()).filter(item => item.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID),
     extractions: await db.extractions.toArray(),
     projectOrders: await db.projectOrders.toArray(),
-    basicSettings: (await db.basicSettings.toArray()).filter(s => !FEATURE_GLOBAL_BASIC_IDS.includes(s.id)),
-    advancedSettings: (await db.advancedSettings.toArray()).filter(s => !FEATURE_GLOBAL_ADVANCED_IDS.includes(s.id)),
-  }
-
-  if (process.env.NODE_ENV === 'development') {
-    return JSON.stringify(databaseExportConstructor(exportData), null, 2)
-  }
-
-  return JSON.stringify(databaseExportConstructor(exportData))
+    settings: (await db.settings.toArray()).filter(item => !GLOBAL_SETTINGS_IDS.includes(item.id)),
+  })
 }
 
-export async function exportProject(
-  projectId: string
-): Promise<{ name: string; content: string } | null> {
-  const project = await db.projects.get(projectId)
-  if (!project) {
-    return null
+async function getProjectExport(projectIds: string[]): Promise<DatabaseExport | null> {
+  const projects = (await db.projects.bulkGet(projectIds)).filter((project): project is Project => !!project)
+  if (projects.length === 0) return null
+  const projectIdSet = new Set(projects.map(project => project.id))
+  const selectedProjectIds = [...projectIdSet]
+  const [translations, transcriptions, extractions] = await Promise.all([
+    db.translations.where('projectId').anyOf(selectedProjectIds).toArray(),
+    db.transcriptions.where('projectId').anyOf(selectedProjectIds).toArray(),
+    db.extractions.where('projectId').anyOf(selectedProjectIds).toArray(),
+  ])
+  const settingsIds = new Set<string>()
+  for (const project of projects) {
+    settingsIds.add(project.defaultTranslationSettingsId)
+    settingsIds.add(project.defaultExtractionSettingsId)
   }
-
-  const translations = await db.translations
-    .where("projectId")
-    .equals(projectId)
-    .toArray()
-  const transcriptions = await db.transcriptions
-    .where("projectId")
-    .equals(projectId)
-    .toArray()
-  const extractions = await db.extractions
-    .where("projectId")
-    .equals(projectId)
-    .toArray()
-
-  const basicSettingsIds = new Set<string>()
-  const advancedSettingsIds = new Set<string>()
-
-  if (project.defaultTranslationBasicSettingsId) {
-    basicSettingsIds.add(project.defaultTranslationBasicSettingsId)
-  }
-  if (project.defaultTranslationAdvancedSettingsId) {
-    advancedSettingsIds.add(project.defaultTranslationAdvancedSettingsId)
-  }
-  if (project.defaultExtractionBasicSettingsId) {
-    basicSettingsIds.add(project.defaultExtractionBasicSettingsId)
-  }
-  if (project.defaultExtractionAdvancedSettingsId) {
-    advancedSettingsIds.add(project.defaultExtractionAdvancedSettingsId)
-  }
-
-  translations.forEach((t) => {
-    basicSettingsIds.add(t.basicSettingsId)
-    advancedSettingsIds.add(t.advancedSettingsId)
-  })
-
-  extractions.forEach((e) => {
-    basicSettingsIds.add(e.basicSettingsId)
-    advancedSettingsIds.add(e.advancedSettingsId)
-  })
-
-  const basicSettings = (
-    await db.basicSettings.bulkGet(Array.from(basicSettingsIds))
-  ).filter((s): s is BasicSettings => s !== undefined && !FEATURE_GLOBAL_BASIC_IDS.includes(s.id))
-  const advancedSettings = (
-    await db.advancedSettings.bulkGet(Array.from(advancedSettingsIds))
-  ).filter((s): s is AdvancedSettings => s !== undefined && !FEATURE_GLOBAL_ADVANCED_IDS.includes(s.id))
-
-  const projectOrders = await db.projectOrders.limit(1).toArray()
-  const projectOrder =
-    projectOrders.length > 0
-      ? projectOrders[0]
-      : {
-          id: crypto.randomUUID(),
-          order: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }
-
-  const exportData: DatabaseExport = {
-    projects: [project],
-    translations,
-    transcriptions,
-    extractions,
-    projectOrders: [{ ...projectOrder, order: [project.id] }],
-    basicSettings,
-    advancedSettings,
-  }
-
-  const content =
-    process.env.NODE_ENV === "development"
-      ? JSON.stringify(databaseExportConstructor(exportData), null, 2)
-      : JSON.stringify(databaseExportConstructor(exportData))
-
+  for (const item of [...translations, ...extractions]) settingsIds.add(item.settingsId)
+  const settings = (await db.settings.bulkGet([...settingsIds])).filter(
+    (item): item is Settings => !!item && !GLOBAL_SETTINGS_IDS.includes(item.id),
+  )
+  const currentOrder = await db.projectOrders.get('main')
   return {
-    name: project.name,
-    content,
+    formatVersion: 2,
+    projects,
+    translations,
+    transcriptions: transcriptions.filter(item => item.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID),
+    extractions,
+    projectOrders: [{
+      id: currentOrder?.id ?? 'main',
+      order: currentOrder?.order.filter(id => projectIdSet.has(id)) ?? projects.map(project => project.id),
+      createdAt: currentOrder?.createdAt ?? new Date(),
+      updatedAt: currentOrder?.updatedAt ?? new Date(),
+    }],
+    settings,
   }
 }
 
-export async function exportProjects(
-  projectIds: string[]
-): Promise<{ content: string } | null> {
-  if (projectIds.length === 0) return null
+export async function exportProject(projectId: string): Promise<{ name: string; content: string } | null> {
+  const data = await getProjectExport([projectId])
+  if (!data) return null
+  return { name: data.projects[0].name, content: stringifyExport(data) }
+}
 
-  const allProjects: Project[] = []
-  const allTranslations: Translation[] = []
-  const allTranscriptions: Transcription[] = []
-  const allExtractions: Extraction[] = []
-  const allBasicSettings: BasicSettings[] = []
-  const allAdvancedSettings: AdvancedSettings[] = []
-  const seenBasicIds = new Set<string>()
-  const seenAdvancedIds = new Set<string>()
+export async function exportProjects(projectIds: string[]): Promise<{ content: string } | null> {
+  const data = await getProjectExport(projectIds)
+  return data ? { content: stringifyExport(data) } : null
+}
 
-  for (const projectId of projectIds) {
-    const project = await db.projects.get(projectId)
-    if (!project) continue
+function createDefaultSettings(
+  defaults: Omit<Settings, 'id' | 'createdAt' | 'updatedAt'>,
+  now: Date,
+): Settings {
+  return { ...defaults, id: crypto.randomUUID(), createdAt: now, updatedAt: now }
+}
 
-    allProjects.push(project)
-
-    const [translations, transcriptions, extractions] = await Promise.all([
-      db.translations.where("projectId").equals(projectId).toArray(),
-      db.transcriptions.where("projectId").equals(projectId).toArray(),
-      db.extractions.where("projectId").equals(projectId).toArray(),
-    ])
-    allTranslations.push(...translations)
-    allTranscriptions.push(...transcriptions)
-    allExtractions.push(...extractions)
-
-    const basicSettingsIds = new Set<string>()
-    const advancedSettingsIds = new Set<string>()
-
-    if (project.defaultTranslationBasicSettingsId) basicSettingsIds.add(project.defaultTranslationBasicSettingsId)
-    if (project.defaultTranslationAdvancedSettingsId) advancedSettingsIds.add(project.defaultTranslationAdvancedSettingsId)
-    if (project.defaultExtractionBasicSettingsId) basicSettingsIds.add(project.defaultExtractionBasicSettingsId)
-    if (project.defaultExtractionAdvancedSettingsId) advancedSettingsIds.add(project.defaultExtractionAdvancedSettingsId)
-
-    translations.forEach(t => {
-      basicSettingsIds.add(t.basicSettingsId)
-      advancedSettingsIds.add(t.advancedSettingsId)
-    })
-    extractions.forEach(e => {
-      basicSettingsIds.add(e.basicSettingsId)
-      advancedSettingsIds.add(e.advancedSettingsId)
-    })
-
-    const newBasicSettings = (
-      await db.basicSettings.bulkGet(Array.from(basicSettingsIds))
-    ).filter((s): s is BasicSettings => s !== undefined && !FEATURE_GLOBAL_BASIC_IDS.includes(s.id) && !seenBasicIds.has(s.id))
-    newBasicSettings.forEach(s => seenBasicIds.add(s.id))
-    allBasicSettings.push(...newBasicSettings)
-
-    const newAdvancedSettings = (
-      await db.advancedSettings.bulkGet(Array.from(advancedSettingsIds))
-    ).filter((s): s is AdvancedSettings => s !== undefined && !FEATURE_GLOBAL_ADVANCED_IDS.includes(s.id) && !seenAdvancedIds.has(s.id))
-    newAdvancedSettings.forEach(s => seenAdvancedIds.add(s.id))
-    allAdvancedSettings.push(...newAdvancedSettings)
+function normalizeSettingsReferences(source: DatabaseExport): DatabaseExport {
+  const data = structuredClone(source)
+  const settingsById = new Map(data.settings.map(settings => [settings.id, settings]))
+  const translationById = new Map(data.translations.map(item => [item.id, item]))
+  const transcriptionById = new Map(data.transcriptions.map(item => [item.id, item]))
+  const repaired = new Map<string, Settings>()
+  const now = new Date()
+  const globals = new Set(GLOBAL_SETTINGS_IDS)
+  const repair = (
+    currentId: string,
+    feature: 'translation' | 'extraction',
+  ) => {
+    if (settingsById.has(currentId) || globals.has(currentId)) return currentId
+    const key = currentId ? `${feature}:${currentId}` : ''
+    const existing = key ? repaired.get(key) : undefined
+    if (existing) return existing.id
+    const settings = createDefaultSettings(
+      feature === 'translation' ? DEFAULT_SETTINGS : DEFAULT_EXTRACTION_SETTINGS,
+      now,
+    )
+    data.settings.push(settings)
+    settingsById.set(settings.id, settings)
+    if (key) repaired.set(key, settings)
+    return settings.id
   }
 
-  if (allProjects.length === 0) return null
-
-  const projectOrders = await db.projectOrders.limit(1).toArray()
-  const projectOrder =
-    projectOrders.length > 0
-      ? projectOrders[0]
-      : { id: crypto.randomUUID(), order: [], createdAt: new Date(), updatedAt: new Date() }
-
-  const exportData: DatabaseExport = {
-    projects: allProjects,
-    translations: allTranslations,
-    transcriptions: allTranscriptions.filter(t => t.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID),
-    extractions: allExtractions,
-    projectOrders: [{ ...projectOrder, order: allProjects.map(p => p.id) }],
-    basicSettings: allBasicSettings,
-    advancedSettings: allAdvancedSettings,
+  for (const project of data.projects) {
+    project.defaultTranslationSettingsId = repair(project.defaultTranslationSettingsId, 'translation')
+    project.defaultExtractionSettingsId = repair(project.defaultExtractionSettingsId, 'extraction')
+    const template = translationById.get(project.defaultTranslationId)
+    if (template) {
+      template.projectId = project.id
+      template.settingsId = project.defaultTranslationSettingsId
+      template.autoContextMode = normalizeAutoContextDefault(template.autoContextMode)
+      template.autoContextExtractionId = DEFAULT_TRANSLATION_SETTINGS.autoContextExtractionId
+      template.autoContextPreviousMode = DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode
+      template.autoContextPreviousExtractionId = DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousExtractionId
+    } else {
+      const item = buildTranslationTemplate({
+        id: crypto.randomUUID(),
+        projectId: project.id,
+        settingsId: project.defaultTranslationSettingsId,
+      })
+      data.translations.push(item)
+      translationById.set(item.id, item)
+      project.defaultTranslationId = item.id
+    }
+    if (!transcriptionById.has(project.defaultTranscriptionId)) {
+      const item = buildTranscriptionTemplate({ id: crypto.randomUUID(), projectId: project.id })
+      data.transcriptions.push(item)
+      transcriptionById.set(item.id, item)
+      project.defaultTranscriptionId = item.id
+    }
   }
+  for (const translation of data.translations) {
+    translation.settingsId = repair(translation.settingsId, 'translation')
+  }
+  for (const extraction of data.extractions) {
+    extraction.settingsId = repair(extraction.settingsId, 'extraction')
+  }
+  return data
+}
 
-  const content =
-    process.env.NODE_ENV === "development"
-      ? JSON.stringify(databaseExportConstructor(exportData), null, 2)
-      : JSON.stringify(databaseExportConstructor(exportData))
-
-  return { content }
+export function sanitizeExport(source: DatabaseExport): DatabaseExport {
+  const data = structuredClone(source)
+  const translationIds = new Set(data.translations.map(item => item.id))
+  const extractionIds = new Set(data.extractions.map(item => item.id))
+  for (const settings of data.settings) {
+    if (settings.fewShot.type === 'linked' && !translationIds.has(settings.fewShot.linkedId)) {
+      settings.fewShot = { ...settings.fewShot, isEnabled: false, linkedId: '' }
+    }
+  }
+  for (const translation of data.translations) {
+    if (translation.autoContextExtractionId !== null
+      && !extractionIds.has(translation.autoContextExtractionId)) {
+      translation.autoContextExtractionId = null
+      if (translation.autoContextMode === 'use-existing') translation.autoContextMode = 'disabled'
+    }
+    if (translation.autoContextPreviousExtractionId !== null
+      && !extractionIds.has(translation.autoContextPreviousExtractionId)) {
+      translation.autoContextPreviousExtractionId = null
+      if (translation.autoContextPreviousMode === 'selected') translation.autoContextPreviousMode = 'none'
+    }
+  }
+  for (const extraction of data.extractions) {
+    if (extraction.ownerTranslationId !== null && !translationIds.has(extraction.ownerTranslationId)) {
+      extraction.ownerTranslationId = null
+    }
+  }
+  return data
 }
 
 export async function importDatabase(jsonString: string, clearExisting: boolean): Promise<void> {
-  try {
-    const importData = JSON.parse(jsonString)
-    const validated = databaseExportSchema.parse(importData) as unknown as Partial<DatabaseExport>
-    const legacyProjects = validated.projects as unknown as LegacyProjectSettingsReferences[]
-    const convertedData = databaseExportConstructor(validated)
-    const orphanedLegacySettings = getOrphanedLegacySettingsIds({
-      legacyProjects,
-      projects: convertedData.projects,
-      translations: convertedData.translations,
-      extractions: convertedData.extractions,
-    })
-    convertedData.basicSettings = convertedData.basicSettings.filter(settings => !orphanedLegacySettings.basic.has(settings.id))
-    convertedData.advancedSettings = convertedData.advancedSettings.filter(settings => !orphanedLegacySettings.advanced.has(settings.id))
-    convertedData.translations = convertedData.translations.filter(t => t.id !== GLOBAL_TRANSLATION_SETTINGS_ID)
-    let translationById = new Map(convertedData.translations.map(t => [t.id, t]))
-    await getOrCreateGlobalTranslationSettings()
+  const parsed = databaseExportSchema.parse(JSON.parse(jsonString))
+  let normalized = normalizeDatabaseExport(parsed as unknown as Partial<DatabaseExport> & Partial<LegacyDatabaseExport>)
+  normalized.translations = normalized.translations.filter(item => item.id !== GLOBAL_TRANSLATION_SETTINGS_ID)
+  normalized.transcriptions = normalized.transcriptions.filter(item => item.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID)
+  normalized.settings = normalized.settings.filter(item => !GLOBAL_SETTINGS_IDS.includes(item.id))
+  normalized = normalizeSettingsReferences(normalized)
+  const data = clearExisting ? normalized : generateNewIds(normalized)
+  await ensureGlobalDefaultsExist()
 
-    const ensureProjectDefaultSettings = (project: Project) => {
-      const now = new Date()
-
-      const getBasicSettingsById = (id: string) => convertedData.basicSettings.find(s => s.id === id)
-      const getAdvancedSettingsById = (id: string) => convertedData.advancedSettings.find(s => s.id === id)
-
-      if (!project.defaultTranslationBasicSettingsId || !getBasicSettingsById(project.defaultTranslationBasicSettingsId)) {
-        const basicSettingsId = crypto.randomUUID()
-        const newBasicSettings: BasicSettings = {
-          ...DEFAULT_BASIC_SETTINGS,
-          id: basicSettingsId,
-          createdAt: now,
-          updatedAt: now,
-        }
-        convertedData.basicSettings.push(newBasicSettings)
-        project.defaultTranslationBasicSettingsId = basicSettingsId
-      }
-
-      if (!project.defaultTranslationAdvancedSettingsId || !getAdvancedSettingsById(project.defaultTranslationAdvancedSettingsId)) {
-        const advancedSettingsId = crypto.randomUUID()
-        const newAdvancedSettings: AdvancedSettings = {
-          ...DEFAULT_ADVANCED_SETTINGS,
-          id: advancedSettingsId,
-          createdAt: now,
-          updatedAt: now,
-        }
-        convertedData.advancedSettings.push(newAdvancedSettings)
-        project.defaultTranslationAdvancedSettingsId = advancedSettingsId
-      }
-
-      if (!project.defaultExtractionBasicSettingsId || !getBasicSettingsById(project.defaultExtractionBasicSettingsId)) {
-        const basicSettingsId = crypto.randomUUID()
-        const newBasicSettings: BasicSettings = {
-          ...DEFAULT_EXTRACTION_BASIC_SETTINGS,
-          id: basicSettingsId,
-          createdAt: now,
-          updatedAt: now,
-        }
-        convertedData.basicSettings.push(newBasicSettings)
-        project.defaultExtractionBasicSettingsId = basicSettingsId
-      }
-
-      if (!project.defaultExtractionAdvancedSettingsId || !getAdvancedSettingsById(project.defaultExtractionAdvancedSettingsId)) {
-        const advancedSettingsId = crypto.randomUUID()
-        const newAdvancedSettings: AdvancedSettings = {
-          ...DEFAULT_ADVANCED_SETTINGS,
-          id: advancedSettingsId,
-          createdAt: now,
-          updatedAt: now,
-        }
-        convertedData.advancedSettings.push(newAdvancedSettings)
-        project.defaultExtractionAdvancedSettingsId = advancedSettingsId
-      }
-
-      // Check if defaultTranscriptionId exists and the transcription exists in import data
-      const getTranscriptionById = (id: string) => convertedData.transcriptions.find(t => t.id === id)
-      if (!project.defaultTranscriptionId || !getTranscriptionById(project.defaultTranscriptionId)) {
-        const transcriptionId = crypto.randomUUID()
-        const newDefaultTranscription = buildTranscriptionTemplate({
-          id: transcriptionId,
-          projectId: project.id,
-          now,
-        })
-        convertedData.transcriptions.push(newDefaultTranscription)
-        project.defaultTranscriptionId = transcriptionId
-      }
-
-      const template = translationById.get(project.defaultTranslationId)
-      if (template) {
-        template.projectId = project.id
-        template.autoContextMode = normalizeAutoContextDefault(template.autoContextMode)
-        template.autoContextExtractionId = DEFAULT_TRANSLATION_SETTINGS.autoContextExtractionId
-        template.autoContextPreviousMode = DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousMode
-        template.autoContextPreviousExtractionId = DEFAULT_TRANSLATION_SETTINGS.autoContextPreviousExtractionId
-      } else {
-        const translationId = crypto.randomUUID()
-        const template = buildTranslationTemplate({
-          id: translationId,
-          projectId: project.id,
-          basicSettingsId: project.defaultTranslationBasicSettingsId,
-          advancedSettingsId: project.defaultTranslationAdvancedSettingsId,
-          now,
-        })
-        convertedData.translations.push(template)
-        translationById.set(template.id, template)
-        project.defaultTranslationId = translationId
-      }
+  await db.transaction('rw', [
+    db.projects,
+    db.translations,
+    db.transcriptions,
+    db.extractions,
+    db.projectOrders,
+    db.settings,
+  ], async () => {
+    if (clearExisting) {
+      await Promise.all([
+        db.projects.clear(),
+        db.translations.filter(item => item.id !== GLOBAL_TRANSLATION_SETTINGS_ID).delete(),
+        db.transcriptions.filter(item => item.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID).delete(),
+        db.extractions.clear(),
+        db.projectOrders.clear(),
+        db.settings.filter(item => !GLOBAL_SETTINGS_IDS.includes(item.id)).delete(),
+      ])
+    } else {
+      const importedOrder = data.projectOrders.at(0)?.order ?? data.projects.map(project => project.id)
+      const currentOrder = await db.projectOrders.get('main')
+      data.projectOrders = [{
+        id: 'main',
+        order: [...importedOrder, ...(currentOrder?.order ?? [])],
+        createdAt: currentOrder?.createdAt ?? new Date(),
+        updatedAt: new Date(),
+      }]
     }
 
-    // Start a transaction to ensure atomic import
-    await db.transaction('rw', [
-      db.projects,
-      db.translations,
-      db.transcriptions,
-      db.extractions,
-      db.projectOrders,
-      db.basicSettings,
-      db.advancedSettings
-    ], async () => {
-      if (clearExisting) {
-        // Clear all tables (except global settings)
-        await Promise.all([
-          db.projects.clear(),
-          db.translations.filter(t => t.id !== GLOBAL_TRANSLATION_SETTINGS_ID).delete(),
-          db.transcriptions.filter(t => t.id !== GLOBAL_TRANSCRIPTION_SETTINGS_ID).delete(),
-          db.extractions.clear(),
-          db.projectOrders.clear(),
-          db.basicSettings
-            .filter(s => !FEATURE_GLOBAL_BASIC_IDS.includes(s.id))
-            .delete(),
-          db.advancedSettings
-            .filter(s => !FEATURE_GLOBAL_ADVANCED_IDS.includes(s.id))
-            .delete()
-        ])
-
-        // TODO: Move this to db-constructor.ts
-        // Ensure projects have default settings
-        convertedData.projects.forEach((project: Project) => {
-          ensureProjectDefaultSettings(project)
-        })
-
-        // Add new items
-        await Promise.all([
-          db.projects.bulkAdd(convertedData.projects),
-          db.translations.bulkAdd(convertedData.translations),
-          db.transcriptions.bulkAdd(convertedData.transcriptions),
-          db.extractions.bulkAdd(convertedData.extractions),
-          db.projectOrders.bulkAdd(convertedData.projectOrders),
-          db.basicSettings.bulkAdd(convertedData.basicSettings),
-          db.advancedSettings.bulkAdd(convertedData.advancedSettings)
-        ])
-      } else {
-        // Generate new IDs for all items
-        const dataWithNewIds = generateNewIds(convertedData)
-        convertedData.projects = dataWithNewIds.projects
-        convertedData.translations = dataWithNewIds.translations
-        convertedData.transcriptions = dataWithNewIds.transcriptions
-        convertedData.extractions = dataWithNewIds.extractions
-        convertedData.projectOrders = dataWithNewIds.projectOrders
-        convertedData.basicSettings = dataWithNewIds.basicSettings
-        convertedData.advancedSettings = dataWithNewIds.advancedSettings
-        translationById = new Map(convertedData.translations.map(t => [t.id, t]))
-
-        // TODO: Move this to db-constructor.ts
-        // Ensure projects have default settings
-        convertedData.projects.forEach((project: Project) => {
-          ensureProjectDefaultSettings(project)
-        })
-
-        // Update current project order
-        const importedOrder = convertedData.projectOrders.at(0)?.order ?? convertedData.projects.map(project => project.id)
-        let currentProjectOrder = await db.projectOrders.get(convertedData.projectOrders.at(0)?.id ?? "")
-        if (currentProjectOrder) {
-          currentProjectOrder.order = [...importedOrder, ...currentProjectOrder.order]
-        } else {
-          currentProjectOrder = dataWithNewIds.projectOrders.at(0)
-        }
-        if (currentProjectOrder) {
-          await db.projectOrders.put(currentProjectOrder)
-        }
-
-        // Import data into each table
-        await Promise.all([
-          db.projects.bulkAdd(convertedData.projects),
-          db.translations.bulkAdd(convertedData.translations),
-          db.transcriptions.bulkAdd(convertedData.transcriptions),
-          db.extractions.bulkAdd(convertedData.extractions),
-          db.basicSettings.bulkAdd(convertedData.basicSettings),
-          db.advancedSettings.bulkAdd(convertedData.advancedSettings),
-        ])
-      }
-    })
-  } catch (error) {
-    console.error('Error importing database:', error)
-    throw error
-  }
+    await Promise.all([
+      db.projects.bulkAdd(data.projects),
+      db.translations.bulkAdd(data.translations),
+      db.transcriptions.bulkAdd(data.transcriptions),
+      db.extractions.bulkAdd(data.extractions),
+      db.settings.bulkAdd(data.settings),
+      db.projectOrders.bulkPut(data.projectOrders),
+    ])
+  })
 }

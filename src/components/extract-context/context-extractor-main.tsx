@@ -41,13 +41,12 @@ import { ExtractionStatusDropdown } from "./extraction-status-dropdown"
 
 interface ContextExtractorMainProps {
   currentId: string
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
   isSharedSettings?: boolean
   hideBackButton?: boolean
 }
 
-export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSettingsId, isSharedSettings, hideBackButton }: ContextExtractorMainProps) => {
+export const ContextExtractorMain = ({ currentId, settingsId, isSharedSettings, hideBackButton }: ContextExtractorMainProps) => {
   const [activeTab, setActiveTab] = useState("settings")
   const [isEpisodeNumberValid, setIsEpisodeNumberValid] = useState(true)
   const [isSubtitleContentValid, setIsSubtitleContentValid] = useState(true)
@@ -147,7 +146,7 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
     setIsEditingResult,
   })
 
-  const handleStartExtraction = async () => await handleStart(currentId, basicSettingsId, advancedSettingsId)
+  const handleStartExtraction = async () => await handleStart(currentId, settingsId)
   const handleStopExtraction = () => handleStop(currentId)
 
   const handleStatusChange = useCallback(
@@ -427,13 +426,11 @@ export const ContextExtractorMain = ({ currentId, basicSettingsId, advancedSetti
                   <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 )}
                 <ModelSelection
-                  basicSettingsId={basicSettingsId}
-                  advancedSettingsId={advancedSettingsId}
+                  settingsId={settingsId}
                 />
-                <CustomInstructionsInput basicSettingsId={basicSettingsId} hidePresets />
+                <CustomInstructionsInput settingsId={settingsId} hidePresets />
                 <MaxCompletionTokenInput
-                  basicSettingsId={basicSettingsId}
-                  advancedSettingsId={advancedSettingsId}
+                  settingsId={settingsId}
                 />
                 <SubtitleCleanupSwitch />
               </CardContent>

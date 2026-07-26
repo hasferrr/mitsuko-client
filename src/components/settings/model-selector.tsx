@@ -24,7 +24,6 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { Model, ModelProvider } from "@/types/model"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { getSelectableModelCollection } from "@/constants/model-collection"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
 import { useModelCosts } from "@/contexts/model-cost-context"
 import { ModelCreditCost } from "@/types/model-cost"
@@ -56,31 +55,29 @@ const ModelProviderIcon = ({ provider }: { provider: ModelProvider }) => {
 }
 
 interface ModelSelectorProps extends PopoverProps {
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
   disabled?: boolean
   className?: string
 }
 
 export function ModelSelector({
-  basicSettingsId,
-  advancedSettingsId,
+  settingsId,
   disabled,
   ...props
 }: ModelSelectorProps) {
   const [open, setOpen] = useState(false)
 
   // Settings Store
-  const modelDetail = useSettingsStore((state) => state.getModelDetail(basicSettingsId))
+  const modelDetail = useSettingsStore((state) => state.getModelDetail(settingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
-  const setModelDetail = (model: Model | null) => setBasicSettingsValue(basicSettingsId, "modelDetail", model)
+  const setModelDetail = (model: Model | null) => setBasicSettingsValue(settingsId, "modelDetail", model)
 
   // Advanced Settings Store
-  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setTemperature = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "temperature", value)
-  const setIsUseStructuredOutput = (value: boolean) => setAdvancedSettingsValue(advancedSettingsId, "isUseStructuredOutput", value)
-  const setIsMaxCompletionTokensAuto = (value: boolean) => setAdvancedSettingsValue(advancedSettingsId, "isMaxCompletionTokensAuto", value)
-  const setMaxCompletionTokens = (value: number) => setAdvancedSettingsValue(advancedSettingsId, "maxCompletionTokens", value)
+  const setAdvancedSettingsValue = useSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setTemperature = (value: number) => setAdvancedSettingsValue(settingsId, "temperature", value)
+  const setIsUseStructuredOutput = (value: boolean) => setAdvancedSettingsValue(settingsId, "isUseStructuredOutput", value)
+  const setIsMaxCompletionTokensAuto = (value: boolean) => setAdvancedSettingsValue(settingsId, "isMaxCompletionTokensAuto", value)
+  const setMaxCompletionTokens = (value: number) => setAdvancedSettingsValue(settingsId, "maxCompletionTokens", value)
 
   // Local Settings Store
   const isAutoTemperatureEnabled = useLocalSettingsStore((state) => state.isAutoTemperatureEnabled)

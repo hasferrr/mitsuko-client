@@ -5,7 +5,6 @@ import { useUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
 import { useLocalSettingsStore } from "@/stores/settings/use-local-settings-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { MAX_COMPLETION_TOKENS_MIN, MAX_COMPLETION_TOKENS_MAX } from "@/constants/limits"
 import { minMax } from "@/lib/utils/math"
 import { useSessionStore } from "@/stores/ui/use-session-store"
@@ -75,17 +74,16 @@ export const useExtractionHandler = ({
 
   const handleStart = async (
     currentId: string,
-    basicSettingsId: string,
-    advancedSettingsId: string,
+    settingsId: string,
   ) => {
     // Settings Store
-    const modelDetail = useSettingsStore.getState().getModelDetail(basicSettingsId)
-    const isUseCustomModel = useSettingsStore.getState().getIsUseCustomModel(basicSettingsId)
-    const customInstructions = useSettingsStore.getState().getCustomInstructions(basicSettingsId)
+    const modelDetail = useSettingsStore.getState().getModelDetail(settingsId)
+    const isUseCustomModel = useSettingsStore.getState().getIsUseCustomModel(settingsId)
+    const customInstructions = useSettingsStore.getState().getCustomInstructions(settingsId)
 
     // Advanced Settings Store
-    const maxCompletionTokens = useAdvancedSettingsStore.getState().getMaxCompletionTokens(advancedSettingsId)
-    const isMaxCompletionTokensAuto = useAdvancedSettingsStore.getState().getIsMaxCompletionTokensAuto(advancedSettingsId)
+    const maxCompletionTokens = useSettingsStore.getState().getMaxCompletionTokens(settingsId)
+    const isMaxCompletionTokensAuto = useSettingsStore.getState().getIsMaxCompletionTokensAuto(settingsId)
 
     // Extraction Data Store
     const extData = useExtractionDataStore.getState().data[currentId]

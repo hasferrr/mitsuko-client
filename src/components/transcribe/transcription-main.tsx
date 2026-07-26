@@ -378,8 +378,6 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
           subtitles,
           parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
         },
-        undefined,
-        undefined,
       )
 
       setTranslationCurrentId(translation.id)

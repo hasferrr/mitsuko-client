@@ -1,10 +1,11 @@
 import { Project } from "@/types/project"
-import { db } from "./db"
-import { createBasicSettings, createAdvancedSettings } from "./settings"
-import { getOrCreateGlobalTranslationBasicSettings, getOrCreateGlobalTranslationAdvancedSettings, getOrCreateGlobalExtractionBasicSettings, getOrCreateGlobalExtractionAdvancedSettings, getOrCreateGlobalTranscriptionSettings, getOrCreateGlobalTranslationSettings } from "./global-settings"
+import { db } from "@/lib/db/db"
+import { createSettings } from "@/lib/db/settings"
+import { getOrCreateGlobalExtractionSettings, getOrCreateGlobalTranscriptionSettings, getOrCreateGlobalTranslationSettings, getOrCreateGlobalTranslationSettingsRecord } from "@/lib/db/global-settings"
 import { normalizeAutoContextDefault } from "@/lib/translation/auto-context-defaults"
 import { buildTranslationTemplate } from "@/lib/translation/template"
 import { buildTranscriptionTemplate } from "@/lib/transcription/template"
+import { deleteSettingsIfUnreferenced } from "@/lib/db/settings-references"
 
 const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(obj: T) => {
   const { id, createdAt, updatedAt, ...rest } = obj
@@ -14,23 +15,17 @@ const stripMeta = <T extends { id: string; createdAt: Date; updatedAt: Date }>(o
 
 // Project CRUD functions
 export const createProject = async (name: string, isBatch = false, isAutoEnableProjectSettings = false): Promise<Project> => {
-  return db.transaction('rw', [db.projects, db.projectOrders, db.basicSettings, db.advancedSettings, db.transcriptions, db.translations], async () => {
+  return db.transaction('rw', [db.projects, db.projectOrders, db.settings, db.transcriptions, db.translations], async () => {
     const id = crypto.randomUUID()
 
     // Batch projects always have default settings enabled
     const enableFlags = isBatch ? true : isAutoEnableProjectSettings
 
-    const globalTranslationBasic = await getOrCreateGlobalTranslationBasicSettings()
-    const translationBasicSettings = await createBasicSettings(stripMeta(globalTranslationBasic))
+    const globalTranslationSettings = await getOrCreateGlobalTranslationSettingsRecord()
+    const translationSettings = await createSettings(stripMeta(globalTranslationSettings))
 
-    const globalExtractionBasic = await getOrCreateGlobalExtractionBasicSettings()
-    const extractionBasicSettings = await createBasicSettings(stripMeta(globalExtractionBasic))
-
-    const globalTranslationAdvanced = await getOrCreateGlobalTranslationAdvancedSettings()
-    const translationAdvancedSettings = await createAdvancedSettings(stripMeta(globalTranslationAdvanced))
-
-    const globalExtractionAdvanced = await getOrCreateGlobalExtractionAdvancedSettings()
-    const extractionAdvancedSettings = await createAdvancedSettings(stripMeta(globalExtractionAdvanced))
+    const globalExtractionSettings = await getOrCreateGlobalExtractionSettings()
+    const extractionSettings = await createSettings(stripMeta(globalExtractionSettings))
 
     // Create default transcription for batch settings
     const globalTranscriptionSettings = await getOrCreateGlobalTranscriptionSettings()
@@ -48,14 +43,13 @@ export const createProject = async (name: string, isBatch = false, isAutoEnableP
     })
     await db.transcriptions.add(defaultTranscription)
 
-    const globalTranslationSettings = await getOrCreateGlobalTranslationSettings()
+    const globalTranslationTemplate = await getOrCreateGlobalTranslationSettings()
     const defaultTranslationId = crypto.randomUUID()
     const defaultTranslation = buildTranslationTemplate({
       id: defaultTranslationId,
       projectId: id,
-      basicSettingsId: translationBasicSettings.id,
-      advancedSettingsId: translationAdvancedSettings.id,
-      autoContextMode: isBatch ? 'disabled' : normalizeAutoContextDefault(globalTranslationSettings.autoContextMode),
+      settingsId: translationSettings.id,
+      autoContextMode: isBatch ? 'disabled' : normalizeAutoContextDefault(globalTranslationTemplate.autoContextMode),
     })
     await db.translations.add(defaultTranslation)
 
@@ -65,11 +59,9 @@ export const createProject = async (name: string, isBatch = false, isAutoEnableP
       translations: [],
       transcriptions: [],
       extractions: [],
-      defaultTranslationBasicSettingsId: translationBasicSettings.id,
-      defaultTranslationAdvancedSettingsId: translationAdvancedSettings.id,
+      defaultTranslationSettingsId: translationSettings.id,
       defaultTranslationId,
-      defaultExtractionBasicSettingsId: extractionBasicSettings.id,
-      defaultExtractionAdvancedSettingsId: extractionAdvancedSettings.id,
+      defaultExtractionSettingsId: extractionSettings.id,
       defaultTranscriptionId,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -153,7 +145,7 @@ export const updateProjectItems = async (id: string, items: string[], type: 'tra
 }
 
 export const deleteProject = async (id: string): Promise<void> => {
-  return db.transaction('rw', [db.projects, db.translations, db.transcriptions, db.extractions, db.projectOrders, db.basicSettings, db.advancedSettings], async () => {
+  return db.transaction('rw', [db.projects, db.translations, db.transcriptions, db.extractions, db.projectOrders, db.settings], async () => {
     const project = await db.projects.get(id)
     if (!project) return
 
@@ -172,27 +164,12 @@ export const deleteProject = async (id: string): Promise<void> => {
     const translations = await db.translations.bulkGet(project.translations)
     const extractions = await db.extractions.bulkGet(project.extractions)
 
-    // Collect all settings IDs to delete
-    const basicSettingsIds = [
-      ...translations.filter(t => t).map(t => t!.basicSettingsId),
-      ...extractions.filter(e => e).map(e => e!.basicSettingsId)
+    const settingsIds = [
+      ...translations.filter(t => t).map(t => t!.settingsId),
+      ...extractions.filter(e => e).map(e => e!.settingsId),
+      project.defaultTranslationSettingsId,
+      project.defaultExtractionSettingsId,
     ]
-    const advancedSettingsIds = [
-      ...translations.filter(t => t).map(t => t!.advancedSettingsId),
-      ...extractions.filter(e => e).map(e => e!.advancedSettingsId)
-    ]
-    if (project.defaultTranslationBasicSettingsId) {
-      basicSettingsIds.push(project.defaultTranslationBasicSettingsId)
-    }
-    if (project.defaultTranslationAdvancedSettingsId) {
-      advancedSettingsIds.push(project.defaultTranslationAdvancedSettingsId)
-    }
-    if (project.defaultExtractionBasicSettingsId) {
-      basicSettingsIds.push(project.defaultExtractionBasicSettingsId)
-    }
-    if (project.defaultExtractionAdvancedSettingsId) {
-      advancedSettingsIds.push(project.defaultExtractionAdvancedSettingsId)
-    }
 
     // Collect transcription IDs to delete (includes defaultTranscriptionId)
     const transcriptionIds = [...project.transcriptions]
@@ -205,12 +182,11 @@ export const deleteProject = async (id: string): Promise<void> => {
       db.translations.bulkDelete([...project.translations, project.defaultTranslationId].filter(Boolean)),
       db.transcriptions.bulkDelete(transcriptionIds),
       db.extractions.bulkDelete(project.extractions),
-      db.basicSettings.bulkDelete(basicSettingsIds),
-      db.advancedSettings.bulkDelete(advancedSettingsIds),
       filterOrders(),
     ])
 
     await db.projects.delete(id)
+    await deleteSettingsIfUnreferenced(settingsIds)
   })
 }
 

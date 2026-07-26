@@ -2,20 +2,19 @@
 
 import { useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
 
 interface Props {
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
 }
 
-export const AdvancedSettingsResetButton = ({ basicSettingsId, advancedSettingsId }: Props) => {
-  const resetAdvancedSettings = useAdvancedSettingsStore((state) => state.resetAdvancedSettings)
+export const AdvancedSettingsResetButton = ({ settingsId }: Props) => {
+  const resetAdvancedSettings = useSettingsStore((state) => state.resetAdvancedSettings)
   const [value, setValue] = useState("Reset Settings")
   const buttonRef = useRef<HTMLButtonElement | null>(null)
 
   const handleReset = () => {
-    resetAdvancedSettings(advancedSettingsId, basicSettingsId)
+    resetAdvancedSettings(settingsId)
     setValue("✅ Reset Success")
     setTimeout(() => setValue("Reset Settings"), 2000)
   }

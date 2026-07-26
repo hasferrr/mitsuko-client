@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { Extraction, ExtractionStatus, BasicSettings, AdvancedSettings } from "@/types/project"
+import { Extraction, ExtractionStatus, Settings } from "@/types/project"
 import {
   ExtractionCreateInput,
   updateExtraction as updateDB,
@@ -9,12 +9,11 @@ import {
   deleteExtraction as deleteDB,
   moveExtraction as moveDB,
 } from "@/lib/db/extraction"
-import { getBasicSettings, getAdvancedSettings } from "@/lib/db/settings"
+import { getSettings } from "@/lib/db/settings"
 import { getProject } from "@/lib/db/project"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
-import { DEFAULT_EXTRACTION_BASIC_SETTINGS, DEFAULT_ADVANCED_SETTINGS } from "@/constants/default"
-import { GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, GLOBAL_EXTRACTION_BASIC_SETTINGS_ID } from "@/constants/global-settings"
+import { DEFAULT_EXTRACTION_SETTINGS } from "@/constants/default"
+import { GLOBAL_EXTRACTION_SETTINGS_ID } from "@/constants/global-settings"
 
 export interface ExtractionDataStore {
   currentId: string | null
@@ -23,8 +22,7 @@ export interface ExtractionDataStore {
   createExtractionDb: (
     projectId: string,
     data: ExtractionCreateInput,
-    basicSettingsData?: Partial<Omit<BasicSettings, "id" | "createdAt" | "updatedAt">>,
-    advancedSettingsData?: Partial<Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt">>,
+    settingsData?: Partial<Omit<Settings, "id" | "createdAt" | "updatedAt">>,
   ) => Promise<Extraction>
   getExtractionDb: (extractionId: string, skipStoreUpdate?: boolean) => Promise<Extraction | undefined>
   getExtractionsDb: (extractionIds: string[]) => Promise<Extraction[]>
@@ -58,54 +56,26 @@ export const useExtractionDataStore = create<ExtractionDataStore>((set, get) => 
   currentId: null,
   data: {},
   // CRUD methods
-  createExtractionDb: async (projectId, data, basicSettingsData, advancedSettingsData) => {
-    let bsInput = basicSettingsData
-    let advInput = advancedSettingsData
-
-    if (bsInput === undefined || advInput === undefined) {
+  createExtractionDb: async (projectId, data, settingsData) => {
+    let settingsInput = settingsData
+    if (settingsInput === undefined) {
       const project = await getProject(projectId)
       if (!project) throw new Error('Project not found')
 
-      const basicSettingsId = (project.isBatch || project.isDefaultExtractionEnabled)
-        ? project.defaultExtractionBasicSettingsId
-        : GLOBAL_EXTRACTION_BASIC_SETTINGS_ID
-      const advancedSettingsId = (project.isBatch || project.isDefaultExtractionEnabled)
-        ? project.defaultExtractionAdvancedSettingsId
-        : GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID
-
-      const bsFromDb = await getBasicSettings(basicSettingsId)
-      const adsFromDb = await getAdvancedSettings(advancedSettingsId)
-
-      const modelDetail = (bsInput?.modelDetail ?? bsFromDb?.modelDetail) ?? null
-      const applyModelDefaults = useAdvancedSettingsStore.getState().applyModelDefaults
-
-      if (bsInput === undefined) {
-        if (bsFromDb) {
-          bsInput = bsFromDb
-        } else {
-          bsInput = DEFAULT_EXTRACTION_BASIC_SETTINGS
-        }
-      }
-
-      if (advInput === undefined) {
-        if (adsFromDb) {
-          advInput = applyModelDefaults(adsFromDb, modelDetail)
-        } else {
-          advInput = applyModelDefaults(DEFAULT_ADVANCED_SETTINGS, modelDetail)
-        }
-      }
+      const settingsId = (project.isBatch || project.isDefaultExtractionEnabled)
+        ? project.defaultExtractionSettingsId
+        : GLOBAL_EXTRACTION_SETTINGS_ID
+      const inherited = await getSettings(settingsId)
+      const base = inherited ?? DEFAULT_EXTRACTION_SETTINGS
+      settingsInput = useSettingsStore.getState().applyModelDefaults(base, base.modelDetail)
     }
 
-    const extraction = await createDB(projectId, data, bsInput ?? {}, advInput ?? {})
+    const extraction = await createDB(projectId, data, settingsInput ?? {})
     set(state => ({ data: { ...state.data, [extraction.id]: extraction } }))
 
     // upsert associated settings into stores
-    const settingsStore = useSettingsStore.getState()
-    const advancedSettingsStore = useAdvancedSettingsStore.getState()
-    const bs = await getBasicSettings(extraction.basicSettingsId)
-    if (bs) settingsStore.upsertData(bs.id, bs)
-    const ads = await getAdvancedSettings(extraction.advancedSettingsId)
-    if (ads) advancedSettingsStore.upsertData(ads.id, ads)
+    const createdSettings = await getSettings(extraction.settingsId)
+    if (createdSettings) useSettingsStore.getState().upsertData(createdSettings.id, createdSettings)
 
     return extraction
   },

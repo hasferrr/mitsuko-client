@@ -173,7 +173,7 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
         const extraction = extractionStore[eId]
         const translation = translationStore[tId]
         if (!translation) continue
-        const bsId = translation.basicSettingsId
+        const bsId = translation.settingsId
         const context = removeDoneTag(getContent(extraction?.contextResult ?? "")).trim()
         if (!context) empties += 1
         setBasicSettingsValue(bsId, "contextDocument", context)

@@ -2,16 +2,16 @@
 
 import { memo } from "react"
 import { Switch } from "@/components/ui/switch"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
+import { useSettingsStore } from "@/stores/settings/use-settings-store"
 
 interface Props {
-  advancedSettingsId: string
+  settingsId: string
 }
 
-export const FullContextMemorySwitch = memo(({ advancedSettingsId }: Props) => {
-  const isUseFullContextMemory = useAdvancedSettingsStore((state) => state.getIsUseFullContextMemory(advancedSettingsId))
-  const setAdvancedSettingsValue = useAdvancedSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setIsUseFullContextMemory = (value: boolean) => setAdvancedSettingsValue(advancedSettingsId, "isUseFullContextMemory", value)
+export const FullContextMemorySwitch = memo(({ settingsId }: Props) => {
+  const isUseFullContextMemory = useSettingsStore((state) => state.getIsUseFullContextMemory(settingsId))
+  const setAdvancedSettingsValue = useSettingsStore((state) => state.setAdvancedSettingsValue)
+  const setIsUseFullContextMemory = (value: boolean) => setAdvancedSettingsValue(settingsId, "isUseFullContextMemory", value)
 
   const handleCheckedChange = (checked: boolean) => {
     setIsUseFullContextMemory(checked)

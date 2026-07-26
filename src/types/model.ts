@@ -1,4 +1,4 @@
-import { AdvancedSettings } from "./project"
+import { Settings } from "@/types/project"
 
 export type ModelProvider =
   | "google"
@@ -27,7 +27,7 @@ export interface Model {
   isPaid: boolean
   usage: UsageLevel
   isFormatReasoning?: boolean
-  default?: Partial<Pick<AdvancedSettings,
+  default?: Partial<Pick<Settings,
     | 'temperature'
     | 'isUseStructuredOutput'
     | 'isMaxCompletionTokensAuto'

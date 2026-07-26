@@ -45,7 +45,6 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Card, CardContent } from "@/components/ui/card"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { useAdvancedSettingsStore } from "@/stores/settings/use-advanced-settings-store"
 import { SettingsParentType } from "@/types/project"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { GLOBAL_TRANSLATION_SETTINGS_ID } from "@/constants/global-settings"
@@ -55,8 +54,7 @@ import { DEFAULT_TRANSLATION_SETTINGS } from "@/constants/default"
 interface BaseSettingsDialogueProps {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
-  basicSettingsId: string
-  advancedSettingsId: string
+  settingsId: string
   settingsParentType: SettingsParentType
   defaultTranslationId?: string
 }
@@ -68,8 +66,7 @@ interface GlobalSettingsDialogueProps extends BaseSettingsDialogueProps {
 interface ProjectSettingsDialogueProps extends BaseSettingsDialogueProps {
   mode: 'project'
   projectName: string
-  resetFromBasicSettingsId: string
-  resetFromAdvancedSettingsId: string
+  resetFromSettingsId: string
   isDefaultEnabled?: boolean
   onDefaultEnabledChange?: (enabled: boolean) => void
   onOpenGlobalSettings?: () => void
@@ -81,22 +78,18 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
   const {
     isOpen,
     onOpenChange,
-    basicSettingsId,
-    advancedSettingsId,
+    settingsId,
     settingsParentType,
   } = props
 
   const isGlobal = props.mode === 'global'
   const projectName = props.mode === 'project' ? props.projectName : ''
-  const resetFromBasicSettingsId = props.mode === 'project' ? props.resetFromBasicSettingsId : undefined
-  const resetFromAdvancedSettingsId = props.mode === 'project' ? props.resetFromAdvancedSettingsId : undefined
+  const resetFromSettingsId = props.mode === 'project' ? props.resetFromSettingsId : undefined
   const isDefaultEnabled = props.mode === 'project' ? props.isDefaultEnabled : undefined
   const onDefaultEnabledChange = props.mode === 'project' ? props.onDefaultEnabledChange : undefined
   const onOpenGlobalSettings = props.mode === 'project' ? props.onOpenGlobalSettings : undefined
-  const resetBasicSettings = useSettingsStore((s) => s.resetBasicSettings)
-  const resetAdvancedSettings = useAdvancedSettingsStore((s) => s.resetAdvancedSettings)
-  const resetBasicSettingsFrom = useSettingsStore((s) => s.resetBasicSettingsFrom)
-  const resetAdvancedSettingsFrom = useAdvancedSettingsStore((s) => s.resetAdvancedSettingsFrom)
+  const resetSettings = useSettingsStore((s) => s.resetSettings)
+  const resetSettingsFrom = useSettingsStore((s) => s.resetSettingsFrom)
   const getTranslationDb = useTranslationDataStore((s) => s.getTranslationDb)
   const updateTranslationDb = useTranslationDataStore((s) => s.updateTranslationDb)
 
@@ -135,17 +128,12 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
     }
 
     if (isGlobal) {
-      await Promise.all([
-        resetBasicSettings(basicSettingsId),
-        resetAdvancedSettings(advancedSettingsId, basicSettingsId),
-        resetAutoContext(),
-      ])
+      await Promise.all([resetSettings(settingsId), resetAutoContext()])
       return
     }
 
     await Promise.all([
-      resetBasicSettingsFrom(resetFromBasicSettingsId!, basicSettingsId),
-      resetAdvancedSettingsFrom(resetFromAdvancedSettingsId!, advancedSettingsId),
+      resetSettingsFrom(resetFromSettingsId!, settingsId),
       resetAutoContext(),
     ])
   }
@@ -184,8 +172,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
           {settingsParentType === 'extraction' ? (
             <div className="space-y-4">
               <ModelSelection
-                basicSettingsId={basicSettingsId}
-                advancedSettingsId={advancedSettingsId}
+                settingsId={settingsId}
               />
               <Accordion type="multiple" className="border-none space-y-4">
                 <AccordionItem value="instruction-settings" className="border-none">
@@ -195,7 +182,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                   <AccordionContent className="pt-4 pb-2">
                     <Card size="sm" className="ring-0 border">
                       <CardContent className="space-y-6">
-                        <CustomInstructionsInput basicSettingsId={basicSettingsId} hidePresets />
+                        <CustomInstructionsInput settingsId={settingsId} hidePresets />
                       </CardContent>
                     </Card>
                   </AccordionContent>
@@ -208,8 +195,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                     <Card size="sm" className="ring-0 border">
                       <CardContent className="space-y-6">
                         <MaxCompletionTokenInput
-                          basicSettingsId={basicSettingsId}
-                          advancedSettingsId={advancedSettingsId}
+                          settingsId={settingsId}
                         />
                       </CardContent>
                     </Card>
@@ -220,11 +206,10 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
           ) : (
             <div className="space-y-4">
               <LanguageSelection
-                basicSettingsId={basicSettingsId}
+                settingsId={settingsId}
               />
               <ModelSelection
-                basicSettingsId={basicSettingsId}
-                advancedSettingsId={advancedSettingsId}
+                settingsId={settingsId}
               />
               <Accordion type="multiple" className="border-none space-y-4">
                 <AccordionItem value="context-settings" className="border-none">
@@ -235,15 +220,15 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                     <Card size="sm" className="ring-0 border">
                       <CardContent className="space-y-6">
                         <ContextDocumentInput
-                          basicSettingsId={basicSettingsId}
+                          settingsId={settingsId}
                           translationId={props.defaultTranslationId}
                           isTemplateTranslation={!!props.defaultTranslationId}
                         />
                         <CustomInstructionsInput
-                          basicSettingsId={basicSettingsId}
+                          settingsId={settingsId}
                         />
                         <FewShotInput
-                          basicSettingsId={basicSettingsId}
+                          settingsId={settingsId}
                         />
                       </CardContent>
                     </Card>
@@ -257,29 +242,26 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                     <Card size="sm" className="ring-0 border">
                       <CardContent className="space-y-6">
                         <TemperatureSlider
-                          advancedSettingsId={advancedSettingsId}
+                          settingsId={settingsId}
                         />
                         <p className="text-sm font-semibold">Technical Options</p>
                         <SplitSizeInput
-                          advancedSettingsId={advancedSettingsId}
+                          settingsId={settingsId}
                         />
                         <MaxCompletionTokenInput
-                          basicSettingsId={basicSettingsId}
-                          advancedSettingsId={advancedSettingsId}
+                          settingsId={settingsId}
                         />
                         <StructuredOutputSwitch
-                          basicSettingsId={basicSettingsId}
-                          advancedSettingsId={advancedSettingsId}
+                          settingsId={settingsId}
                         />
                         <FullContextMemorySwitch
-                          advancedSettingsId={advancedSettingsId}
+                          settingsId={settingsId}
                         />
                         <BetterContextCachingSwitch
-                          advancedSettingsId={advancedSettingsId}
+                          settingsId={settingsId}
                         />
                         <AdvancedSettingsResetButton
-                          basicSettingsId={basicSettingsId}
-                          advancedSettingsId={advancedSettingsId}
+                          settingsId={settingsId}
                         />
                       </CardContent>
                     </Card>
