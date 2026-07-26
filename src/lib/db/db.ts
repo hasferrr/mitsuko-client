@@ -3,7 +3,8 @@ import {
   DEFAULT_BASIC_SETTINGS,
   DEFAULT_EXTRACTION_BASIC_SETTINGS,
 } from '@/constants/default'
-import { LegacyProject as Project, LegacyTranslation as Translation, Transcription, LegacyExtraction as Extraction, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
+import { LegacyProject as Project, LegacyTranslation as Translation, LegacyExtraction as Extraction } from '@/types/legacy-project'
+import { Transcription, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
 import { Project as CurrentProject, Translation as CurrentTranslation, Extraction as CurrentExtraction, Settings } from '@/types/project'
 import { CustomInstruction, CustomInstructionOrder } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'

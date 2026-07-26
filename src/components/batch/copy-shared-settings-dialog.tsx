@@ -9,8 +9,7 @@ import type { BatchFile } from "@/types/batch"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { BASIC_SETTING_KEYS, ADVANCED_SETTING_KEYS } from "@/stores/settings/settings-keys"
-import type { BasicKey, AdvancedKey, SettingsKey } from "@/stores/settings/settings-keys"
+import type { AdvancedSettingsKey, BasicSettingsKey, SettingsKey } from "@/types/project"
 import { ListChecks, ListX, Loader2 } from "lucide-react"
 
 interface CopySharedSettingsDialogProps {
@@ -22,30 +21,27 @@ interface CopySharedSettingsDialogProps {
   sharedSettingsId: string
 }
 
-const BASIC_KEY_LABELS: Record<BasicKey, string> = {
-  sourceLanguage: "Source Language",
-  targetLanguage: "Target Language",
-  modelDetail: "Model",
-  isUseCustomModel: "Use Custom Model",
-  contextDocument: "Context Document",
-  customInstructions: "Custom Instructions",
-  fewShot: "Few Shot",
-}
+const BASIC_KEYS = [
+  { key: "sourceLanguage", label: "Source Language" },
+  { key: "targetLanguage", label: "Target Language" },
+  { key: "modelDetail", label: "Model" },
+  { key: "isUseCustomModel", label: "Use Custom Model" },
+  { key: "contextDocument", label: "Context Document" },
+  { key: "customInstructions", label: "Custom Instructions" },
+  { key: "fewShot", label: "Few Shot" },
+] satisfies { key: BasicSettingsKey; label: string }[]
 
-const ADVANCED_KEY_LABELS: Record<AdvancedKey, string> = {
-  temperature: "Temperature",
-  splitSize: "Split Size",
-  startIndex: "Start Index",
-  endIndex: "End Index",
-  isMaxCompletionTokensAuto: "Auto Max Completion Tokens",
-  maxCompletionTokens: "Max Completion Tokens",
-  isUseStructuredOutput: "Structured Output",
-  isUseFullContextMemory: "Full Context Memory",
-  isBetterContextCaching: "Minimal Context Memory",
-}
-
-const BASIC_KEYS = BASIC_SETTING_KEYS.map(key => ({ key, label: BASIC_KEY_LABELS[key] }))
-const ADVANCED_KEYS = ADVANCED_SETTING_KEYS.map(key => ({ key, label: ADVANCED_KEY_LABELS[key] }))
+const ADVANCED_KEYS = [
+  { key: "temperature", label: "Temperature" },
+  { key: "splitSize", label: "Split Size" },
+  { key: "startIndex", label: "Start Index" },
+  { key: "endIndex", label: "End Index" },
+  { key: "isMaxCompletionTokensAuto", label: "Auto Max Completion Tokens" },
+  { key: "maxCompletionTokens", label: "Max Completion Tokens" },
+  { key: "isUseStructuredOutput", label: "Structured Output" },
+  { key: "isUseFullContextMemory", label: "Full Context Memory" },
+  { key: "isBetterContextCaching", label: "Minimal Context Memory" },
+] satisfies { key: AdvancedSettingsKey; label: string }[]
 
 const BASIC_KEYS_FOR_EXTRACTION = BASIC_KEYS.filter(({ key }) => key === 'modelDetail' || key === 'isUseCustomModel')
 const ADVANCED_KEYS_FOR_EXTRACTION = ADVANCED_KEYS.filter(({ key }) => key === 'isMaxCompletionTokensAuto' || key === 'maxCompletionTokens')
@@ -69,10 +65,10 @@ export function CopySharedSettingsDialog({
   const copySettingsKeys = useSettingsStore(s => s.copySettingsKeys)
 
   // Local selection states
-  const [tBasicSel, setTBasicSel] = useState<Set<BasicKey>>(new Set())
-  const [tAdvSel, setTAdvSel] = useState<Set<AdvancedKey>>(new Set())
-  const [eBasicSel, setEBasicSel] = useState<Set<BasicKey>>(new Set())
-  const [eAdvSel, setEAdvSel] = useState<Set<AdvancedKey>>(new Set())
+  const [tBasicSel, setTBasicSel] = useState<Set<BasicSettingsKey>>(new Set())
+  const [tAdvSel, setTAdvSel] = useState<Set<AdvancedSettingsKey>>(new Set())
+  const [eBasicSel, setEBasicSel] = useState<Set<BasicSettingsKey>>(new Set())
+  const [eAdvSel, setEAdvSel] = useState<Set<AdvancedSettingsKey>>(new Set())
 
   const [isLoading, setIsLoading] = useState(false)
   const [isApplying, setIsApplying] = useState(false)
@@ -122,10 +118,10 @@ export function CopySharedSettingsDialog({
   }
 
   const handleApply = async () => {
-    const tBasicKeys = Array.from(tBasicSel) as BasicKey[]
-    const tAdvKeys = Array.from(tAdvSel) as AdvancedKey[]
-    const eBasicKeys = Array.from(eBasicSel) as BasicKey[]
-    const eAdvKeys = Array.from(eAdvSel) as AdvancedKey[]
+    const tBasicKeys = Array.from(tBasicSel)
+    const tAdvKeys = Array.from(tAdvSel)
+    const eBasicKeys = Array.from(eBasicSel)
+    const eAdvKeys = Array.from(eAdvSel)
 
     if (operationMode === 'translation') {
       if (tBasicKeys.length === 0 && tAdvKeys.length === 0) {
@@ -201,7 +197,7 @@ export function CopySharedSettingsDialog({
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-semibold">Translation — Basic Settings</p>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setAll(setTBasicSel, BASIC_KEYS.map(k => k.key) as readonly BasicKey[], true)} disabled={isLoading}>
+                    <Button variant="outline" size="sm" onClick={() => setAll(setTBasicSel, BASIC_KEYS.map(k => k.key), true)} disabled={isLoading}>
                       <ListChecks className="size-4" />
                       Select All
                     </Button>
@@ -226,7 +222,7 @@ export function CopySharedSettingsDialog({
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-semibold">Translation — Advanced Settings</p>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setAll(setTAdvSel, ADVANCED_KEYS.map(k => k.key) as readonly AdvancedKey[], true)} disabled={isLoading}>
+                    <Button variant="outline" size="sm" onClick={() => setAll(setTAdvSel, ADVANCED_KEYS.map(k => k.key), true)} disabled={isLoading}>
                       <ListChecks className="size-4" />
                       Select All
                     </Button>
@@ -255,7 +251,7 @@ export function CopySharedSettingsDialog({
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-semibold">Extraction — Basic Settings</p>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setAll(setEBasicSel, BASIC_KEYS.map(k => k.key) as readonly BasicKey[], true)} disabled={isLoading}>
+                    <Button variant="outline" size="sm" onClick={() => setAll(setEBasicSel, BASIC_KEYS.map(k => k.key), true)} disabled={isLoading}>
                       <ListChecks className="size-4" />
                       Select All
                     </Button>
@@ -280,7 +276,7 @@ export function CopySharedSettingsDialog({
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-semibold">Extraction — Advanced Settings</p>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setAll(setEAdvSel, ADVANCED_KEYS.map(k => k.key) as readonly AdvancedKey[], true)} disabled={isLoading}>
+                    <Button variant="outline" size="sm" onClick={() => setAll(setEAdvSel, ADVANCED_KEYS.map(k => k.key), true)} disabled={isLoading}>
                       <ListChecks className="size-4" />
                       Select All
                     </Button>

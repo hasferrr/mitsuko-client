@@ -1,17 +1,39 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { Model } from "@/types/model"
-import { Settings } from "@/types/project"
+import {
+  AdvancedSettingsKey,
+  BasicSettingsKey,
+  Settings,
+  SettingsKey,
+} from "@/types/project"
 import { getAllSettings, getSettings, updateSettings } from "@/lib/db/settings"
 import { DEFAULT_ADVANCED_SETTINGS, DEFAULT_BASIC_SETTINGS, DEFAULT_EXTRACTION_BASIC_SETTINGS } from "@/constants/default"
 import { GLOBAL_EXTRACTION_SETTINGS_ID } from "@/constants/global-settings"
-import { ADVANCED_SETTING_KEYS, BASIC_SETTING_KEYS } from "@/stores/settings/settings-keys"
-import type { AdvancedKey, BasicKey, SettingsKey } from "@/stores/settings/settings-keys"
 import { copySettingsKeys } from "@/stores/utils/copy-settings"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 
 type SettingsData = Omit<Settings, "id" | "createdAt" | "updatedAt">
-type AdvancedSettingsValues = Pick<SettingsData, AdvancedKey>
+type AdvancedSettingsValues = Pick<SettingsData, AdvancedSettingsKey>
+
+const SETTINGS_KEYS = [
+  "sourceLanguage",
+  "targetLanguage",
+  "modelDetail",
+  "isUseCustomModel",
+  "contextDocument",
+  "customInstructions",
+  "fewShot",
+  "temperature",
+  "splitSize",
+  "startIndex",
+  "endIndex",
+  "isMaxCompletionTokensAuto",
+  "maxCompletionTokens",
+  "isUseStructuredOutput",
+  "isUseFullContextMemory",
+  "isBetterContextCaching",
+] satisfies SettingsKey[]
 
 interface SettingsStore {
   data: Record<string, Settings>
@@ -45,8 +67,8 @@ interface SettingsStore {
   resetBasicSettings: (id: string) => void
   resetAdvancedSettings: (id: string) => void
   resetSettings: (id: string) => Promise<void>
-  setBasicSettingsValue: <K extends BasicKey>(id: string, key: K, value: Settings[K]) => void
-  setAdvancedSettingsValue: <K extends AdvancedKey>(id: string, key: K, value: Settings[K]) => void
+  setBasicSettingsValue: <K extends BasicSettingsKey>(id: string, key: K, value: Settings[K]) => void
+  setAdvancedSettingsValue: <K extends AdvancedSettingsKey>(id: string, key: K, value: Settings[K]) => void
   setIsFewShotEnabled: (id: string, value: boolean) => void
   setFewShotValue: (id: string, value: string) => void
   setFewShotLinkedId: (id: string, value: string) => void
@@ -190,7 +212,11 @@ export const useSettingsStore = create<SettingsStore>()(
         saveData: get().saveData,
         setData: set,
       }),
-      resetSettingsFrom: (fromId, toId) => get().copySettingsKeys(fromId, toId, [...BASIC_SETTING_KEYS, ...ADVANCED_SETTING_KEYS]),
+      resetSettingsFrom: (fromId, toId) => get().copySettingsKeys(
+        fromId,
+        toId,
+        SETTINGS_KEYS,
+      ),
     }),
     { name: "settings-storage", partialize: () => ({}) },
   ),

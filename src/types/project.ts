@@ -131,26 +131,15 @@ export interface AdvancedSettings {
   updatedAt: Date
 }
 
+type SettingsMetadataKey = 'id' | 'createdAt' | 'updatedAt'
+
+export type BasicSettingsKey = Exclude<keyof BasicSettings, SettingsMetadataKey>
+export type AdvancedSettingsKey = Exclude<keyof AdvancedSettings, SettingsMetadataKey>
+export type SettingsKey = BasicSettingsKey | AdvancedSettingsKey
+
 export type Settings = Omit<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>
   & Omit<AdvancedSettings, 'id' | 'createdAt' | 'updatedAt'>
   & Pick<BasicSettings, 'id' | 'createdAt' | 'updatedAt'>
-
-export interface LegacyProject extends Omit<Project, 'defaultTranslationSettingsId' | 'defaultExtractionSettingsId'> {
-  defaultTranslationBasicSettingsId: string
-  defaultTranslationAdvancedSettingsId: string
-  defaultExtractionBasicSettingsId: string
-  defaultExtractionAdvancedSettingsId: string
-}
-
-export interface LegacyTranslation extends Omit<Translation, 'settingsId'> {
-  basicSettingsId: string
-  advancedSettingsId: string
-}
-
-export interface LegacyExtraction extends Omit<Extraction, 'settingsId'> {
-  basicSettingsId: string
-  advancedSettingsId: string
-}
 
 export interface ResponseTranslation {
   response: string

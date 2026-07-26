@@ -11,15 +11,13 @@ import {
   AdvancedSettings,
   BasicSettings,
   Extraction,
-  LegacyExtraction,
-  LegacyProject,
-  LegacyTranslation,
   Project,
   ProjectOrder,
   Settings,
   Transcription,
   Translation,
 } from '@/types/project'
+import { LegacyExtraction, LegacyProject, LegacyTranslation } from '@/types/legacy-project'
 import { AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX, normalizeExtractionStatus, stripExtractionDoneTag } from '@/lib/extraction/status'
 
 const uuidv4 = () => crypto.randomUUID()

@@ -1,4 +1,5 @@
-import { LegacyTranslation, Translation } from '@/types/project'
+import { LegacyTranslation } from '@/types/legacy-project'
+import { Translation } from '@/types/project'
 import { normalizeAutoContextDefault } from '@/lib/translation/auto-context-defaults'
 import { DEFAULT_TRANSLATION_SETTINGS } from '@/constants/default'
 
