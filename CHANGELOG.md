@@ -14,6 +14,11 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### July 26
+
+- 🤖 **Model Updates:** Added Gemini 3.6 Flash in both free and paid tiers, with a 1M token context window and structured output support.
+- ⚙️ **Import & Export Update:** Database backups now use the new unified settings format while remaining compatible with older backups.
+
 ### July 15
 
 - 🤖 **Model Updates:** Added Claude Opus 4.8, Grok 4.5, GPT-5.6 Sol, GPT-5.6 Terra, GPT-5.6 Luna, and GPT-5.5, with refreshed Claude model names for consistency.
