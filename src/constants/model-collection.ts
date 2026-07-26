@@ -52,6 +52,20 @@ const RAW_FREE_MODELS: FreeModelCollection = {
     provider: "unknown",
     models: [
       {
+        name: "Gemini 3.6 Flash",
+        subName: "gemini-3.6-flash",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
         name: "Gemini 3.5 Flash",
         subName: "gemini-3.5-flash",
         maxInput: 1_048_576,
@@ -131,6 +145,20 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       {
         name: "Gemini 3.1 Pro",
         subName: "gemini-3.1-pro-preview",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "high",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Gemini 3.6 Flash",
+        subName: "gemini-3.6-flash",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
