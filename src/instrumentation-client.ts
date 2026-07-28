@@ -18,7 +18,7 @@ Sentry.init({
   ],
   tracesSampleRate: 1,
   enableLogs: true,
-  replaysSessionSampleRate: 0,
+  replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
   sendDefaultPii: true,
 })
@@ -26,7 +26,7 @@ Sentry.init({
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
 
 posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-  api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || '/api/occurrunces',
+  api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || '/api/pancake',
   ui_host: 'https://us.posthog.com',
   defaults: '2025-11-30',
   capture_exceptions: true,
