@@ -78,7 +78,7 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
     }
     load()
     return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [open, translationIds.join("|"), extractionIds.join("|")])
 
   const handleShift = (tId: string, dir: -1 | 1) => {

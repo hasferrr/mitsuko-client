@@ -64,7 +64,7 @@ export function CopyTranscriptionSettingsDialog({
     }
     load()
     return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [open, transcriptionIds.join("|")])
 
   // Helpers

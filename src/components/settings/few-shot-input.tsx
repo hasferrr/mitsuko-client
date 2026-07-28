@@ -84,7 +84,7 @@ export const FewShotInput = memo(({ settingsId }: Props) => {
         }
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [isFewShotEnabled, fewShotType, fewShotLinkedId, setFewShotStartIndex, setFewShotEndIndex, parent, getTranslationDb])
 
   const handleFewShotValueChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

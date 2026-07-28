@@ -80,7 +80,7 @@ export function RenameEpisodesDialog({ open, onOpenChange, batchFiles }: RenameE
     return () => {
       cancelled = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [open, ids.join("")])
 
   const handleResetPreview = () => {

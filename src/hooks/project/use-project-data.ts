@@ -38,7 +38,6 @@ export function useProjectData(currentProject: Project) {
         translationsData,
         transcriptionsData,
         extractionsData,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _defaultTranscription,
       ] = await Promise.all([
         getTranslationsDb(currentProject.translations),
@@ -54,7 +53,7 @@ export function useProjectData(currentProject: Project) {
     }
 
     loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [currentProject.id])
 
   const prevTranslatingRef = useRef<Set<string>>(new Set())

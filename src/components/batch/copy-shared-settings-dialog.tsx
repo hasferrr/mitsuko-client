@@ -100,7 +100,7 @@ export function CopySharedSettingsDialog({
     }
     load()
     return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [open, operationMode, translationIds.join("|"), extractionIds.join("|")])
 
   // Helpers
