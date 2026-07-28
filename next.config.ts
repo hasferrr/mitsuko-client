@@ -1,14 +1,7 @@
+import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
 
-let userConfig = undefined
-try {
-  userConfig = await import('./v0-user-next.config')
-} catch {
-  // ignore error
-}
-
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   experimental: {
     useTypeScriptCli: true,
   },
@@ -19,8 +12,7 @@ const nextConfig = {
     unoptimized: false,
   },
   reactCompiler: true,
-  // Required to support PostHog trailing slash API requests
-  skipTrailingSlashRedirect: true,
+  skipTrailingSlashRedirect: true, // PostHog
   async rewrites() {
     return [
       {
@@ -92,28 +84,6 @@ const nextConfig = {
       },
     ]
   },
-}
-
-mergeConfig(nextConfig, userConfig)
-
-function mergeConfig(nextConfig, userConfig) {
-  if (!userConfig) {
-    return
-  }
-
-  for (const key in userConfig) {
-    if (
-      typeof nextConfig[key] === 'object' &&
-      !Array.isArray(nextConfig[key])
-    ) {
-      nextConfig[key] = {
-        ...nextConfig[key],
-        ...userConfig[key],
-      }
-    } else {
-      nextConfig[key] = userConfig[key]
-    }
-  }
 }
 
 export default withSentryConfig(nextConfig, {
