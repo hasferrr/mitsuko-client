@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useId, useState } from "react"
 import { Popover as RadixPopover } from "radix-ui"
 type PopoverProps = RadixPopover.PopoverProps
 import { ChevronsUpDown, Flame } from "lucide-react"
@@ -66,6 +66,7 @@ export function ModelSelector({
   ...props
 }: ModelSelectorProps) {
   const [open, setOpen] = useState(false)
+  const listboxId = useId()
 
   // Settings Store
   const modelDetail = useSettingsStore((state) => state.getModelDetail(settingsId))
@@ -126,6 +127,7 @@ export function ModelSelector({
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          aria-controls={listboxId}
           aria-label="Select a model"
           className="flex grow justify-between"
           disabled={disabled}
@@ -157,7 +159,7 @@ export function ModelSelector({
       >
         <Command className="min-w-[320px]" loop defaultValue={`${modelDetail?.name}-${modelDetail?.isPaid ? "paid" : "free"}`}>
           <CommandInput placeholder="Search Models..." />
-          <CommandList>
+          <CommandList id={listboxId}>
             <CommandEmpty>No Models found.</CommandEmpty>
             {Object.entries(models).map(([key, value]) => (
               <CommandGroup key={key} heading={(

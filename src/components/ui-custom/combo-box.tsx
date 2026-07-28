@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useId, useState } from "react"
 import { ChevronsUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -35,6 +35,7 @@ export function ComboBox({
   disabled,
 }: ComboBoxProps<string>) {
   const [open, setOpen] = useState(false)
+  const listboxId = useId()
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -43,6 +44,7 @@ export function ComboBox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          aria-controls={listboxId}
           className="flex grow justify-between"
           disabled={disabled}
         >
@@ -53,7 +55,7 @@ export function ComboBox({
       <PopoverContent className="w-full p-0" align="start">
         <Command defaultValue={value}>
           <CommandInput placeholder={`Search ${name}...`} className="h-9" />
-          <CommandList>
+          <CommandList id={listboxId}>
             <CommandEmpty>{name ? `No ${name} found.` : "Not found."}</CommandEmpty>
             <CommandGroup>
               {data.map((label) => (
