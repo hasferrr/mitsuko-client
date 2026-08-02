@@ -573,7 +573,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       },
       {
         name: "DeepSeek V4 Flash",
-        subName: "deepseek-v4-flash",
+        subName: "deepseek-v4-flash-0731",
         maxInput: 1_048_576,
         maxOutput: 384_000,
         structuredOutput: false,
