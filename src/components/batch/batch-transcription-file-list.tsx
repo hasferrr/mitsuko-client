@@ -73,11 +73,11 @@ export function BatchTranscriptionFileList({
       />
       <div className="flex h-[510px] flex-col gap-2 overflow-x-hidden overflow-y-auto pr-2">
         {preparation && (
-          <div className="flex flex-col gap-2 rounded-lg border border-border p-3">
+          <div className="flex shrink-0 flex-col gap-2 rounded-lg border border-border p-3">
             <div className="flex items-center gap-2">
               <Loader2 className="size-4 shrink-0 animate-spin text-sidebar-primary" />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm">{preparation.fileName}</p>
+                <p className="line-clamp-4 wrap-break-word break-all text-sm">{preparation.fileName}</p>
                 <p className="text-xs text-muted-foreground">
                   {preparation.progress.stage === "inspecting" ? "Inspecting" : "Extracting audio"}
                   {` • ${preparation.itemIndex} of ${preparation.itemCount}`}

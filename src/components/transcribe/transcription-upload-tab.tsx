@@ -4,17 +4,12 @@ import { type RefObject, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import {
-  File,
-  Loader2,
-  Clock,
-  Upload,
-  X,
-} from "lucide-react"
+import { FileAudio2, Loader2, Clock, Upload, X } from "lucide-react"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { MAX_FILE_SIZE, GLOBAL_MAX_DURATION_SECONDS, TRANSCRIPTION_FILE_ACCEPT } from "@/constants/transcription"
 import type { MediaPreparationProgress } from "@/lib/transcription/prepare-transcription-media"
 import type { TranscriptionLocalFileMetadata } from "@/stores/services/use-transcription-store"
+import { AudioPreview } from "./audio-preview"
 
 interface TranscriptionUploadTabProps {
   file: File | null | undefined
@@ -119,7 +114,9 @@ export function TranscriptionUploadTab({
           <Card size="sm">
             <CardContent className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <File className="size-6 text-sidebar-primary" />
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                <FileAudio2 className="size-4 text-sidebar-primary" />
+              </div>
               <div className="flex-1 line-clamp-3 text-sm">{file.name}</div>
               <Button
                 variant="ghost"
@@ -132,7 +129,7 @@ export function TranscriptionUploadTab({
             </div>
 
             {audioUrl && !isPreviewUnavailable && (
-              <audio controls className="h-10 w-full" src={audioUrl} onError={() => setIsPreviewUnavailable(true)} />
+              <AudioPreview src={audioUrl} onError={() => setIsPreviewUnavailable(true)} />
             )}
             {isPreviewUnavailable && (
               <p className="text-xs text-muted-foreground">Preview unavailable; the file can still be uploaded.</p>
@@ -144,7 +141,7 @@ export function TranscriptionUploadTab({
               </p>
               {localFileMetadata?.wasExtracted && (
                 <p>
-                  Extracted from {localFileMetadata.originalFileName} • {localFileMetadata.codec?.toUpperCase() ?? "Unknown codec"} • No re-encoding
+                  Extracted from &quot;{localFileMetadata.originalFileName}&quot; • {localFileMetadata.codec?.toUpperCase() ?? "Unknown codec"} • No re-encoding
                 </p>
               )}
               {localFileMetadata?.isPrepared && file.size > MAX_FILE_SIZE &&

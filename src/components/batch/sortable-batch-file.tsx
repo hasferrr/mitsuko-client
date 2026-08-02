@@ -9,6 +9,7 @@ import {
   Download,
   X,
   GripVertical,
+  Loader2,
 } from "lucide-react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
@@ -89,7 +90,7 @@ export function SortableBatchFile({
           >
             {!!batchFile.title ? (
               <>
-                {batchFile.showEpisodePrefix && "Episode "}
+                {batchFile.showEpisodePrefix && <span className="font-semibold">Episode </span>}
                 {batchFile.title}
               </>
             ) : (
@@ -105,7 +106,12 @@ export function SortableBatchFile({
         <div className="flex items-center gap-1 shrink-0">
           {batchFile.status === 'pending' && <Badge variant="secondary">Pending</Badge>}
           {batchFile.status === 'partial' && <Badge variant="outline">Partial</Badge>}
-          {batchFile.status === 'processing' && <Badge variant="outline">Processing ({batchFile.progress.toFixed(0)}%)</Badge>}
+          {batchFile.status === 'processing' && (
+            <Badge variant="outline">
+              <Loader2 data-icon="inline-start" className="animate-spin" />
+              Processing ({batchFile.progress.toFixed(0)}%)
+            </Badge>
+          )}
           {batchFile.status === 'queued' && <Badge variant="secondary" className="bg-transparent">Queued</Badge>}
           {batchFile.status === 'done' && (
             <>

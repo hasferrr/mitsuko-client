@@ -11,6 +11,7 @@ import {
   GripVertical,
   FileAudio,
   AlertTriangle,
+  Loader2,
 } from "lucide-react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
@@ -58,7 +59,7 @@ export function SortableBatchTranscriptionFile({
       ref={setNodeRef as unknown as React.RefObject<HTMLDivElement>}
       style={style}
       className={cn(
-        "ring-0 border",
+        "shrink-0 ring-0 border",
         selectMode && "select-none",
         selected && "border-primary bg-primary/5 dark:bg-primary/10"
       )}
@@ -127,7 +128,12 @@ export function SortableBatchTranscriptionFile({
               {batchFile.progress > 0 ? `Uploading ${batchFile.progress.toFixed(0)}%` : "Uploading"}
             </Badge>
           )}
-          {batchFile.status === 'processing' && <Badge variant="outline">Processing</Badge>}
+          {batchFile.status === 'processing' && (
+            <Badge variant="outline">
+              <Loader2 data-icon="inline-start" className="animate-spin" />
+              Processing
+            </Badge>
+          )}
           {batchFile.status === 'queued' && <Badge variant="secondary" className="bg-transparent">Queued</Badge>}
           {batchFile.status === 'done' && (
             <>
