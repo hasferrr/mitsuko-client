@@ -9,11 +9,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-bun build            # Production build (rarely used)
-bun check            # Type checking (use this instead of build)
-bun lint             # Run Oxlint
-bun test             # Run all tests (uses Bun's built-in test runner)
-bun test <file-path> # Run specific test (e.g., bun test src/lib/parser/cleaner.test.ts)
+bun run build            # Production build (rarely used)
+bun run check            # Type checking (use this instead of build)
+bun run lint             # Run Oxlint
+bun run test             # Run all tests (uses Bun's built-in test runner)
+bun run test <file-path> # Run specific test (e.g., bun run test src/lib/parser/cleaner.test.ts)
 ```
 
 Never run the development server.

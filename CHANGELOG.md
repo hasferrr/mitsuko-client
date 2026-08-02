@@ -14,6 +14,11 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### August 2
+
+- 🎬 **Video Transcription:** Upload MP4, MOV, MKV, WebM, and MPEG-TS videos directly. Mitsuko extracts their audio in your browser, with progress tracking and support for canceling the preparation step.
+- 🤖 **Model Updates:** Updated DeepSeek V4 Flash to its latest July 31 release.
+
 ### July 26
 
 - 🤖 **Model Updates:** Added Gemini 3.6 Flash in both free and paid tiers, with a 1M token context window and structured output support.
