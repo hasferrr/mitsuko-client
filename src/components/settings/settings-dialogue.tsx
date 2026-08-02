@@ -182,7 +182,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                   <AccordionContent className="pt-4 pb-2">
                     <Card size="sm" className="ring-0 border">
                       <CardContent className="space-y-6">
-                        <CustomInstructionsInput settingsId={settingsId} hidePresets />
+                        <CustomInstructionsInput settingsId={settingsId} presetType="extraction" />
                       </CardContent>
                     </Card>
                   </AccordionContent>

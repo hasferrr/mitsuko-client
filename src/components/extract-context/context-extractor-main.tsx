@@ -428,7 +428,7 @@ export const ContextExtractorMain = ({ currentId, settingsId, isSharedSettings, 
                 <ModelSelection
                   settingsId={settingsId}
                 />
-                <CustomInstructionsInput settingsId={settingsId} hidePresets />
+                <CustomInstructionsInput settingsId={settingsId} presetType="extraction" />
                 <MaxCompletionTokenInput
                   settingsId={settingsId}
                 />

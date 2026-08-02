@@ -36,6 +36,28 @@ export const customInstructionPresets = [
   },
 ]
 
+export const extractionInstructionPresets = [
+  {
+    title: "Compact Plot Summaries Every 20 Episodes",
+    instruction: `**Plot Summary:**
+- Before appending this episode, compact completed groups of 20 consecutive, individually listed episode summaries from "previous_context". Replace each such group with one concise range entry labeled exactly "Episode X-Y: [Summary]" (maximum 3-5 sentences), using only information already present in those episode summaries.
+- Compact only groups that come before the current episode. Keep the current episode and any remaining group of fewer than 20 individual episodes as separate entries.
+- Preserve ALL existing range entries (for example, "Episode 1-20") as-is and keep them in chronological order. Never remove, overwrite, merge, re-summarize, or expand a previously compacted range when compacting a newer group.
+- Example: when processing Episode 21 and "previous_context" contains individual entries for Episodes 1 through 20, replace those entries with "Episode 1-20: [Concise combined summary]", then append "Episode 21: [Summary]".
+- Example: when processing Episode 41 and "previous_context" already contains "Episode 1-20" plus individual entries for Episodes 21 through 40, keep "Episode 1-20", compact Episodes 21 through 40 into "Episode 21-40", then append "Episode 41".
+
+Example:
+
+Plot Summary:
+Episode 1-20: [Previously compacted summary]
+Episode 21-40: [Newer compacted summary]
+Episode 41: [Summary]
+Episode 42: [Summary]
+...
+Episode N: [Summary]`,
+  },
+]
+
 export const transcriptionInstructionPresets = [
   {
     title: "High Accuracy Focus",
