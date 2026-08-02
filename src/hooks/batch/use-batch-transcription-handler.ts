@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
 import { useBatchSettingsStore } from "@/stores/settings/use-batch-settings-store"
@@ -20,6 +20,23 @@ import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { useWhisperSettingsStore } from "@/stores/settings/use-whisper-settings-store"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
 import { useProcessingIndicatorStore } from "@/stores/ui/use-processing-indicator-store"
+import {
+  GLOBAL_MAX_DURATION_SECONDS,
+  isModelDurationLimitExceeded,
+} from "@/constants/transcription"
+import {
+  getMediaPreparationErrorMessage,
+  MediaPreparationError,
+  prepareTranscriptionMedia,
+  type MediaPreparationProgress,
+} from "@/lib/transcription/prepare-transcription-media"
+
+export interface BatchPreparationState {
+  fileName: string
+  itemIndex: number
+  itemCount: number
+  progress: MediaPreparationProgress
+}
 
 interface UseBatchTranscriptionHandlerProps {
   defaultTranscriptionId: string
@@ -27,6 +44,7 @@ interface UseBatchTranscriptionHandlerProps {
   isBatchTranscribing: boolean
   state: {
     setQueueSet: React.Dispatch<React.SetStateAction<Set<string>>>
+    setBatchPreparation: React.Dispatch<React.SetStateAction<BatchPreparationState | null>>
   }
 }
 
@@ -36,11 +54,15 @@ export default function useBatchTranscriptionHandler({
   isBatchTranscribing,
   state: {
     setQueueSet,
+    setBatchPreparation,
   },
 }: UseBatchTranscriptionHandlerProps) {
   const queueAbortRef = useRef(false)
   const errorCountRef = useRef(0)
   const isUploadingSetRef = useRef<Set<string>>(new Set())
+  const preparationControllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => () => preparationControllerRef.current?.abort(), [])
 
   // Project Store
   const currentProject = useProjectStore((state) => state.currentProject)
@@ -66,7 +88,6 @@ export default function useBatchTranscriptionHandler({
   const setIsTranscribing = useTranscriptionStore((state) => state.setIsTranscribing)
   const stopTranscription = useTranscriptionStore((state) => state.stopTranscription)
   const files = useTranscriptionStore((state) => state.files)
-  const fileDurations = useTranscriptionStore((state) => state.fileDurations)
   const setFileAndUrl = useTranscriptionStore((state) => state.setFileAndUrl)
   const startTranscription = useTranscriptionStore((state) => state.startTranscription)
 
@@ -169,7 +190,7 @@ export default function useBatchTranscriptionHandler({
       })
 
       try {
-        await processTranscription(id)
+        await processTranscription(id, index, ids.length)
       } finally {
         setIsTranscribing(id, false)
         await launch()
@@ -179,9 +200,75 @@ export default function useBatchTranscriptionHandler({
     await launch()
   }
 
-  const processTranscription = async (id: string) => {
-    const localFile = files[id]
+  const processTranscription = async (id: string, itemIndex: number, itemCount: number) => {
+    const transcriptionState = useTranscriptionStore.getState()
+    let localFile = transcriptionState.files[id]
+    let duration = transcriptionState.fileDurations[id] ?? 0
+    const metadata = transcriptionState.localFileMetadata[id]
     let uploadId = transcriptionData[id]?.selectedUploadId
+
+    if (localFile && !uploadId && !metadata?.isPrepared) {
+      const controller = new AbortController()
+      preparationControllerRef.current = controller
+      const sourceFileName = metadata?.originalFileName ?? localFile.name
+      setBatchPreparation({
+        fileName: sourceFileName,
+        itemIndex,
+        itemCount,
+        progress: { stage: "inspecting", percentage: null },
+      })
+
+      try {
+        const prepared = await prepareTranscriptionMedia(localFile, {
+          signal: controller.signal,
+          onProgress: (progress) => {
+            if (preparationControllerRef.current === controller) {
+              setBatchPreparation({ fileName: sourceFileName, itemIndex, itemCount, progress })
+            }
+          },
+        })
+        if (controller.signal.aborted || queueAbortRef.current) return
+
+        await setFileAndUrl(id, prepared.file, {
+          knownDuration: prepared.duration,
+          originalFileName: sourceFileName,
+          isPrepared: true,
+          wasExtracted: prepared.wasExtracted,
+          codec: prepared.codec,
+        })
+        localFile = prepared.file
+        duration = prepared.duration
+      } catch (error) {
+        if (error instanceof MediaPreparationError) {
+          if (error.code !== "aborted") {
+            toast.error(`Could not prepare ${sourceFileName}`, {
+              description: getMediaPreparationErrorMessage(error),
+            })
+          }
+        } else {
+          console.error(`Failed to prepare ${sourceFileName} for batch transcription`, error)
+          toast.error(`Could not extract audio from ${sourceFileName}`)
+        }
+        return
+      } finally {
+        if (preparationControllerRef.current === controller) {
+          preparationControllerRef.current = null
+          setBatchPreparation(null)
+        }
+      }
+    }
+
+    if (localFile && !uploadId) {
+      const settings = getSettingsForTranscription(id)
+      if (duration > GLOBAL_MAX_DURATION_SECONDS) {
+        toast.error(`Audio duration exceeds ${GLOBAL_MAX_DURATION_SECONDS / 60} minutes limit: ${transcriptionData[id]?.title || id}`)
+        return
+      }
+      if (isModelDurationLimitExceeded(settings.models, duration)) {
+        toast.error(`Audio duration exceeds the selected model's limit: ${transcriptionData[id]?.title || id}`)
+        return
+      }
+    }
 
     // Step 1: Upload file if local file exists
     if (localFile && !uploadId) {
@@ -190,7 +277,7 @@ export default function useBatchTranscriptionHandler({
         setIsUploading(id, true)
         uploadId = await uploadFile(localFile, (progress) => {
           setUpload(id, { progress, fileName: localFile.name })
-        }, fileDurations[id] ?? 0)
+        }, duration)
         setUpload(id, null)
         await setFileAndUrl(id, null)
         setSelectedUploadId(id, uploadId)
@@ -332,6 +419,9 @@ export default function useBatchTranscriptionHandler({
 
   const handleStopBatchTranscription = () => {
     queueAbortRef.current = true
+    preparationControllerRef.current?.abort()
+    preparationControllerRef.current = null
+    setBatchPreparation(null)
     batchFiles.forEach(file => {
       if (isTranscribingSet.has(file.id)) {
         const processingStore = useProcessingIndicatorStore.getState()
@@ -347,9 +437,18 @@ export default function useBatchTranscriptionHandler({
     isUploadingSetRef.current.clear()
   }
 
+  const handleCancelBatchPreparation = () => {
+    queueAbortRef.current = true
+    preparationControllerRef.current?.abort()
+    preparationControllerRef.current = null
+    setBatchPreparation(null)
+    setQueueSet(new Set())
+  }
+
   return {
     handleStartBatchTranscription,
     handleContinueBatchTranscription,
     handleStopBatchTranscription,
+    handleCancelBatchPreparation,
   }
 }

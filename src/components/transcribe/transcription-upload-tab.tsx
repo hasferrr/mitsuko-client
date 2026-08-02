@@ -1,8 +1,9 @@
 "use client"
 
-import { type RefObject } from "react"
+import { type RefObject, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
 import {
   File,
   Loader2,
@@ -11,11 +12,15 @@ import {
   X,
 } from "lucide-react"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
-import { MAX_FILE_SIZE, GLOBAL_MAX_DURATION_SECONDS } from "@/constants/transcription"
+import { MAX_FILE_SIZE, GLOBAL_MAX_DURATION_SECONDS, TRANSCRIPTION_FILE_ACCEPT } from "@/constants/transcription"
+import type { MediaPreparationProgress } from "@/lib/transcription/prepare-transcription-media"
+import type { TranscriptionLocalFileMetadata } from "@/stores/services/use-transcription-store"
 
 interface TranscriptionUploadTabProps {
   file: File | null | undefined
   audioUrl: string | null | undefined
+  localFileMetadata: TranscriptionLocalFileMetadata | undefined
+  mediaPreparation: { sourceFileName: string; progress: MediaPreparationProgress } | null
   isUploading: boolean
   isGlobalMaxDurationExceeded: boolean
   uploadProgress: { percentage: number } | null | undefined
@@ -24,12 +29,15 @@ interface TranscriptionUploadTabProps {
   onDragAndDropClick: () => void
   onDropFiles: (files: FileList) => void
   onRemoveFile: () => void
+  onCancelPreparation: () => void
   onUploadSelectedFile: () => void
 }
 
 export function TranscriptionUploadTab({
   file,
   audioUrl,
+  localFileMetadata,
+  mediaPreparation,
   isUploading,
   isGlobalMaxDurationExceeded,
   uploadProgress,
@@ -38,17 +46,24 @@ export function TranscriptionUploadTab({
   onDragAndDropClick,
   onDropFiles,
   onRemoveFile,
+  onCancelPreparation,
   onUploadSelectedFile,
 }: TranscriptionUploadTabProps) {
+  const [isPreviewUnavailable, setIsPreviewUnavailable] = useState(false)
+
+  useEffect(() => {
+    setIsPreviewUnavailable(false)
+  }, [audioUrl])
+
   return (
     <Card size="sm">
-      <CardContent className="space-y-4">
-      <h2 className="text-lg font-medium">Upload Audio</h2>
+      <CardContent className="flex flex-col gap-4">
+      <h2 className="text-lg font-medium">Upload audio or video</h2>
 
-      {!file && (
+      {!file && !mediaPreparation && (
         <DragAndDrop
           onDropFiles={onDropFiles}
-          disabled={isUploading}
+          disabled={isUploading || Boolean(mediaPreparation)}
           className="rounded-lg"
         >
           <div
@@ -57,7 +72,9 @@ export function TranscriptionUploadTab({
           >
             <Upload className="size-10 text-muted-foreground mb-3" />
             <p className="text-muted-foreground text-sm mb-1">Click to upload or drag and drop</p>
-            <p className="text-muted-foreground text-xs">AAC, FLAC, MP3, and more (max {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB)</p>
+            <p className="text-muted-foreground text-xs">
+              AAC, FLAC, MP3, MP4, MKV, and more (max {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB)
+            </p>
           </div>
         </DragAndDrop>
       )}
@@ -65,7 +82,8 @@ export function TranscriptionUploadTab({
       <input
         ref={fileInputRef}
         type="file"
-        accept=".aac,audio/wav,audio/mp3,audio/aiff,audio/ogg,audio/flac"
+        accept={TRANSCRIPTION_FILE_ACCEPT}
+        disabled={isUploading || Boolean(mediaPreparation)}
         onChange={(e) => {
           if (e.target.files) {
             onDropFiles(e.target.files)
@@ -74,36 +92,67 @@ export function TranscriptionUploadTab({
         className="hidden"
       />
 
-      {file && (
-        <div className="space-y-3">
+      {mediaPreparation && (
+        <Card size="sm">
+          <CardContent className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <Loader2 className="size-5 animate-spin text-sidebar-primary" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm">{mediaPreparation.sourceFileName}</p>
+                <p className="text-xs text-muted-foreground">
+                  {mediaPreparation.progress.stage === "inspecting"
+                    ? "Inspecting media…"
+                    : `Extracting audio${mediaPreparation.progress.percentage === null ? "…" : ` • ${mediaPreparation.progress.percentage.toFixed(0)}%`}`}
+                </p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={onCancelPreparation}>Cancel</Button>
+            </div>
+            {mediaPreparation.progress.stage === "extracting" && mediaPreparation.progress.percentage !== null && (
+              <Progress value={mediaPreparation.progress.percentage} />
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {file && !mediaPreparation && (
+        <div className="flex flex-col gap-3">
           <Card size="sm">
-            <CardContent className="space-y-3">
-            <div className="flex items-center mb-3">
-              <File className="size-6 text-sidebar-primary mr-2" />
+            <CardContent className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <File className="size-6 text-sidebar-primary" />
               <div className="flex-1 line-clamp-3 text-sm">{file.name}</div>
               <Button
                 variant="ghost"
                 size="sm"
-                className="size-6 p-0"
                 onClick={onRemoveFile}
                 disabled={isUploading}
               >
-                <X className="size-4" />
+                <X />
               </Button>
             </div>
 
-            {audioUrl && <audio controls className="w-full h-10 mb-2" src={audioUrl} />}
+            {audioUrl && !isPreviewUnavailable && (
+              <audio controls className="h-10 w-full" src={audioUrl} onError={() => setIsPreviewUnavailable(true)} />
+            )}
+            {isPreviewUnavailable && (
+              <p className="text-xs text-muted-foreground">Preview unavailable; the file can still be uploaded.</p>
+            )}
 
             <div className="text-xs text-muted-foreground flex flex-col">
               <p>
                 {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type}
               </p>
-              {file.size > MAX_FILE_SIZE &&
+              {localFileMetadata?.wasExtracted && (
+                <p>
+                  Extracted from {localFileMetadata.originalFileName} • {localFileMetadata.codec?.toUpperCase() ?? "Unknown codec"} • No re-encoding
+                </p>
+              )}
+              {localFileMetadata?.isPrepared && file.size > MAX_FILE_SIZE &&
                 <p className="text-destructive">File size exceeds {Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB</p>}
             </div>
             </CardContent>
           </Card>
-          {isGlobalMaxDurationExceeded ? (
+          {localFileMetadata?.isPrepared && isGlobalMaxDurationExceeded ? (
             <div className="flex items-center gap-2 text-destructive text-xs">
               <div className="size-3">
                 <Clock className="size-3" />
@@ -126,10 +175,10 @@ export function TranscriptionUploadTab({
           <Button
             variant="outline"
             onClick={onUploadSelectedFile}
-            disabled={isUploading || !session || (isGlobalMaxDurationExceeded)}
+            disabled={isUploading || Boolean(mediaPreparation) || !session || isGlobalMaxDurationExceeded}
             className="w-full border-primary/25 hover:border-primary/50"
           >
-            {isUploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
+            {isUploading ? <Loader2 className="animate-spin" /> : <Upload />}
             Upload Selected File {uploadProgress && `(${uploadProgress.percentage}%)`}
           </Button>
         </div>

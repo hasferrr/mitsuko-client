@@ -25,6 +25,7 @@ interface SortableBatchTranscriptionFileProps {
   selectMode?: boolean
   selected?: boolean
   onSelectToggle?: (id: string) => void
+  disabled?: boolean
 }
 
 export function SortableBatchTranscriptionFile({
@@ -35,18 +36,19 @@ export function SortableBatchTranscriptionFile({
   selectMode = false,
   selected = false,
   onSelectToggle,
+  disabled = false,
 }: SortableBatchTranscriptionFileProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id, disabled: selectMode })
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id, disabled: selectMode || disabled })
   const style = { transform: CSS.Transform.toString(transform), transition }
 
   const handleTitleClick = () => {
-    if (!selectMode) {
+    if (!selectMode && !disabled) {
       onClick(batchFile.id)
     }
   }
 
   const handleCardClick = () => {
-    if (selectMode) {
+    if (selectMode && !disabled) {
       onSelectToggle?.(batchFile.id)
     }
   }
@@ -71,7 +73,7 @@ export function SortableBatchTranscriptionFile({
             className="shrink-0"
           />
         ) : (
-          <button {...attributes} {...listeners} className="cursor-grab shrink-0">
+          <button {...attributes} {...listeners} disabled={disabled} className="cursor-grab shrink-0">
             <GripVertical className="size-5 text-muted-foreground" />
           </button>
         )}
@@ -81,8 +83,8 @@ export function SortableBatchTranscriptionFile({
             <p
               className={cn("text-sm wrap-break-word break-all pr-2 line-clamp-4 flex-1", !selectMode && "hover:underline cursor-pointer")}
               onClick={handleTitleClick}
-              tabIndex={!selectMode ? 0 : undefined}
-              role={!selectMode ? "button" : undefined}
+              tabIndex={!selectMode && !disabled ? 0 : undefined}
+              role={!selectMode && !disabled ? "button" : undefined}
             >
               {batchFile.title ? (
                 batchFile.title
@@ -131,7 +133,7 @@ export function SortableBatchTranscriptionFile({
             <>
                <Tooltip delayDuration={50}>
                  <TooltipTrigger asChild>
-                   <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id) }}>
+                   <Button variant="ghost" size="sm" disabled={disabled} onClick={(e) => { e.stopPropagation(); onDownload(batchFile.id) }}>
                      <Download className="size-4" />
                    </Button>
                  </TooltipTrigger>
@@ -147,7 +149,7 @@ export function SortableBatchTranscriptionFile({
             </Badge>
           )}
           {!selectMode && (
-            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDelete(batchFile.id) }}>
+            <Button variant="ghost" size="sm" disabled={disabled} onClick={(e) => { e.stopPropagation(); onDelete(batchFile.id) }}>
               <X className="size-4" />
             </Button>
           )}

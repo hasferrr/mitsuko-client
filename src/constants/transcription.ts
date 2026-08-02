@@ -4,6 +4,55 @@ import { TranscriptionModel } from "@/types/project"
 export const MAX_FILE_SIZE = 512 * 1024 * 1024
 export const GLOBAL_MAX_DURATION_SECONDS = 3 * 60 * 60
 
+const TRANSCRIPTION_FILE_SELECTOR_VALUES = [
+  ".aac",
+  ".aif",
+  ".aiff",
+  ".flac",
+  ".m4a",
+  ".mp3",
+  ".oga",
+  ".ogg",
+  ".wav",
+  "audio/aac",
+  "audio/aiff",
+  "audio/flac",
+  "audio/m4a",
+  "audio/mp3",
+  "audio/mp4",
+  "audio/mpeg",
+  "audio/ogg",
+  "audio/wav",
+  "audio/x-aiff",
+  "audio/x-m4a",
+  "audio/x-wav",
+  ".mp4",
+  ".m4v",
+  ".mov",
+  ".mkv",
+  ".webm",
+  ".ts",
+  ".mts",
+  ".m2ts",
+  "video/mp4",
+  "video/quicktime",
+  "video/x-matroska",
+  "video/webm",
+  "video/mp2t",
+  "audio/webm",
+  "application/webm",
+] as const
+
+export const TRANSCRIPTION_FILE_ACCEPT = TRANSCRIPTION_FILE_SELECTOR_VALUES.join(",")
+
+export const isAcceptedTranscriptionSelection = (file: Pick<File, "name" | "type">) => {
+  const lowerName = file.name.toLowerCase()
+  const mimeType = file.type.toLowerCase().split(";", 1)[0]?.trim() ?? ""
+  return TRANSCRIPTION_FILE_SELECTOR_VALUES.some(value => (
+    value.startsWith(".") ? lowerName.endsWith(value) : mimeType === value
+  ))
+}
+
 interface ModelRecord {
   maxDuration: number
 }

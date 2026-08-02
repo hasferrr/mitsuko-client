@@ -19,6 +19,7 @@ interface TranscriptionHistoryDialogProps {
   onApplyHistory?: (raw: string, log: TranscriptionLogItem) => Promise<boolean | void> | boolean | void
   buttonSize?: ComponentProps<typeof Button>["size"]
   buttonClassName?: string
+  buttonDisabled?: boolean
 }
 
 export function TranscriptionHistoryDialog({
@@ -26,6 +27,7 @@ export function TranscriptionHistoryDialog({
   onApplyHistory,
   buttonSize,
   buttonClassName,
+  buttonDisabled,
 }: TranscriptionHistoryDialogProps) {
   const [open, setOpen] = useState(false)
 
@@ -79,6 +81,7 @@ export function TranscriptionHistoryDialog({
         variant="outline"
         size={buttonSize}
         className={buttonClassName}
+        disabled={buttonDisabled}
         onClick={() => setOpen(true)}
         title="Transcription History"
       >

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, type ChangeEvent, useEffect } from "react"
+import { useState, useRef, type ChangeEvent, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -17,7 +17,12 @@ import { listUploads, deleteUpload } from "@/lib/api/uploads"
 import { UploadFileMeta } from "@/types/uploads"
 import { Input } from "@/components/ui/input"
 import { uploadFile } from "@/lib/api/file-upload"
-import { MAX_FILE_SIZE, GLOBAL_MAX_DURATION_SECONDS, isAsrModel } from "@/constants/transcription"
+import {
+  GLOBAL_MAX_DURATION_SECONDS,
+  isAcceptedTranscriptionSelection,
+  isAsrModel,
+  isModelDurationLimitExceeded,
+} from "@/constants/transcription"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
@@ -38,12 +43,24 @@ import { TranscriptionSelectTab } from "./transcription-select-tab"
 import { TranscriptionControls } from "./transcription-controls"
 import { TranscriptionResultPanel } from "./transcription-result-panel"
 import { TranscriptionNextActions } from "./transcription-next-actions"
+import {
+  getMediaPreparationErrorMessage,
+  MediaPreparationError,
+  prepareTranscriptionMedia,
+  type MediaPreparationProgress,
+} from "@/lib/transcription/prepare-transcription-media"
 
 interface TranscriptionMainProps {
   currentId: string
   settingsId?: string
   isSharedSettings?: boolean
   hideBackButton?: boolean
+}
+
+interface UploadPayload {
+  file: File
+  duration: number
+  originalFileName: string
 }
 
 export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hideBackButton }: TranscriptionMainProps) {
@@ -63,6 +80,7 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
   const file = useTranscriptionStore((state) => state.files[currentId])
   const audioUrl = useTranscriptionStore((state) => state.audioUrls[currentId])
   const localAudioDuration = useTranscriptionStore((state) => state.fileDurations[currentId])
+  const localFileMetadata = useTranscriptionStore((state) => state.localFileMetadata[currentId])
   const isTranscribingSet = useTranscriptionStore((state) => state.isTranscribingSet)
   const setFileAndUrl = useTranscriptionStore((state) => state.setFileAndUrl)
   const isTranscribing = isTranscribingSet.has(currentId)
@@ -95,12 +113,16 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
     enabled: !!session,
   })
 
-  const { mutate: handleUpload, mutateAsync: uploadSelectedFile } = useMutation({
-    mutationFn: (file: File) => uploadFile(file, (progress) => setUpload(currentId, { progress, fileName: file.name }), localAudioDuration ?? 0),
+  const { mutateAsync: uploadSelectedFile } = useMutation({
+    mutationFn: ({ file: uploadFileValue, duration }: UploadPayload) => uploadFile(
+      uploadFileValue,
+      (progress) => setUpload(currentId, { progress, fileName: uploadFileValue.name }),
+      duration,
+    ),
     onMutate: () => {
       setIsUploading(currentId, true)
     },
-    onSuccess: async (uploadId) => {
+    onSuccess: async (uploadId, variables) => {
       toast.success("File uploaded successfully")
       queryClient.invalidateQueries({ queryKey: ["uploads"] })
       setUpload(currentId, null)
@@ -109,9 +131,7 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
       setActiveTab("select")
       if (uploadId) {
         setSelectedUploadId(currentId, uploadId)
-        if (file) {
-          setTitle(currentId, file.name)
-        }
+        setTitle(currentId, variables.originalFileName)
       }
     },
     onError: (err: Error) => {
@@ -140,11 +160,17 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [rightTab, setRightTab] = useState<"transcript" | "subtitles">("transcript")
-  const isGlobalMaxDurationExceeded = localAudioDuration > GLOBAL_MAX_DURATION_SECONDS
+  const [mediaPreparation, setMediaPreparation] = useState<{
+    sourceFileName: string
+    progress: MediaPreparationProgress
+  } | null>(null)
+  const isPrepared = localFileMetadata?.isPrepared ?? false
+  const isGlobalMaxDurationExceeded = isPrepared && localAudioDuration > GLOBAL_MAX_DURATION_SECONDS
 
   const transcriptionAreaRef = useRef<HTMLTextAreaElement>(null)
   const transcriptionResultRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const mediaPreparationControllerRef = useRef<AbortController | null>(null)
 
   const router = useRouter()
   useAutoScroll(transcriptionText, transcriptionAreaRef, {
@@ -162,6 +188,16 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
       saveData(currentId)
     }
   }, [currentId, saveData])
+
+  useEffect(() => {
+    mediaPreparationControllerRef.current?.abort()
+    mediaPreparationControllerRef.current = null
+    setMediaPreparation(null)
+    return () => {
+      mediaPreparationControllerRef.current?.abort()
+      mediaPreparationControllerRef.current = null
+    }
+  }, [currentId])
 
   useEffect(() => {
     if (selectedUploadId) {
@@ -308,20 +344,107 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
     fileInputRef.current?.click()
   }
 
-  const handleDropFiles = (files: FileList) => {
+  const handleCancelMediaPreparation = useCallback(() => {
+    mediaPreparationControllerRef.current?.abort()
+    mediaPreparationControllerRef.current = null
+    setMediaPreparation(null)
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }, [])
+
+  const handleDropFiles = async (files: FileList) => {
     const selectedFile = files[0]
     if (!selectedFile) return
-    if (!selectedFile.type.startsWith("audio/")) {
-      toast.error("Invalid file type", { description: "Please select an audio file" })
-      return
+
+    mediaPreparationControllerRef.current?.abort()
+    try {
+      if (!isAcceptedTranscriptionSelection(selectedFile)) {
+        toast.error("Could not add this file", { description: "Please select a supported audio or video file." })
+        return
+      }
+      setTitle(currentId, selectedFile.name)
+      await setFileAndUrl(currentId, selectedFile, {
+        knownDuration: 0,
+        originalFileName: selectedFile.name,
+        isPrepared: false,
+        wasExtracted: false,
+      })
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = ""
     }
-    if (selectedFile.size > MAX_FILE_SIZE) {
-      toast.error("File too large", { description: "Please choose smaller file" })
-      return
+  }
+
+  const ensureCurrentFilePrepared = async () => {
+    const state = useTranscriptionStore.getState()
+    const selectedFile = state.files[currentId]
+    const metadata = state.localFileMetadata[currentId]
+    if (!selectedFile) return null
+
+    if (metadata?.isPrepared) {
+      return {
+        file: selectedFile,
+        duration: state.fileDurations[currentId] ?? 0,
+        originalFileName: metadata.originalFileName,
+      }
     }
 
-    setTitle(currentId, selectedFile.name)
-    setFileAndUrl(currentId, selectedFile)
+    const controller = new AbortController()
+    mediaPreparationControllerRef.current?.abort()
+    mediaPreparationControllerRef.current = controller
+    const sourceFileName = metadata?.originalFileName ?? selectedFile.name
+    setMediaPreparation({ sourceFileName, progress: { stage: "inspecting", percentage: null } })
+
+    try {
+      const prepared = await prepareTranscriptionMedia(selectedFile, {
+        signal: controller.signal,
+        onProgress: (progress) => {
+          if (mediaPreparationControllerRef.current === controller) {
+            setMediaPreparation({ sourceFileName, progress })
+          }
+        },
+      })
+      if (mediaPreparationControllerRef.current !== controller) return null
+
+      await setFileAndUrl(currentId, prepared.file, {
+        knownDuration: prepared.duration,
+        originalFileName: sourceFileName,
+        isPrepared: true,
+        wasExtracted: prepared.wasExtracted,
+        codec: prepared.codec,
+      })
+      setTitle(currentId, sourceFileName)
+      return {
+        file: prepared.file,
+        duration: prepared.duration,
+        originalFileName: sourceFileName,
+      }
+    } catch (error) {
+      if (error instanceof MediaPreparationError) {
+        if (error.code !== "aborted") {
+          toast.error("Could not prepare this file", { description: getMediaPreparationErrorMessage(error) })
+        }
+      } else {
+        console.error("Failed to extract audio from selected media", error)
+        toast.error("Could not extract audio", { description: "The selected video could not be prepared for transcription." })
+      }
+      return null
+    } finally {
+      if (mediaPreparationControllerRef.current === controller) {
+        mediaPreparationControllerRef.current = null
+        setMediaPreparation(null)
+      }
+    }
+  }
+
+  const validatePreparedDuration = (duration: number, checkModel: boolean) => {
+    if (duration > GLOBAL_MAX_DURATION_SECONDS) {
+      toast.error(`Audio duration exceeds ${GLOBAL_MAX_DURATION_SECONDS / 60} minutes limit.`)
+      return false
+    }
+    if (checkModel && isModelDurationLimitExceeded(models, duration)) {
+      toast.error("Audio duration exceeds the selected model's limit.")
+      return false
+    }
+    return true
   }
 
   const handleSelectUpload = (upload: UploadFileMeta) => {
@@ -333,17 +456,24 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
     }
   }
 
-  const handleUploadSelectedFile = () => {
+  const handleUploadSelectedFile = async () => {
     setSelectedUploadId(currentId, null)
-    if (!file) return
-    handleUpload(file)
+    const prepared = await ensureCurrentFilePrepared()
+    if (!prepared || !validatePreparedDuration(prepared.duration, false)) return
+    try {
+      await uploadSelectedFile(prepared)
+    } catch {
+      return
+    }
   }
 
   const handleStart = async () => {
     if (activeTab === "upload" && file) {
       setSelectedUploadId(currentId, null)
+      const prepared = await ensureCurrentFilePrepared()
+      if (!prepared || !validatePreparedDuration(prepared.duration, true)) return
       try {
-        const uploadId = await uploadSelectedFile(file)
+        const uploadId = await uploadSelectedFile(prepared)
         await handleStartTranscription({ uploadIdOverride: uploadId })
       } catch {
         return
@@ -423,6 +553,8 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
               <TranscriptionUploadTab
                 file={file}
                 audioUrl={audioUrl}
+                localFileMetadata={localFileMetadata}
+                mediaPreparation={mediaPreparation}
                 isUploading={isUploading}
                 isGlobalMaxDurationExceeded={isGlobalMaxDurationExceeded}
                 uploadProgress={uploadProgress}
@@ -430,6 +562,7 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
                 fileInputRef={fileInputRef}
                 onDragAndDropClick={handleDragAndDropClick}
                 onDropFiles={handleDropFiles}
+                onCancelPreparation={handleCancelMediaPreparation}
                 onRemoveFile={() => setFileAndUrl(currentId, null)}
                 onUploadSelectedFile={handleUploadSelectedFile}
               />
@@ -465,11 +598,12 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
             models={models}
             localAudioDuration={localAudioDuration}
             isTranscribing={isTranscribing}
+            isPreparing={Boolean(mediaPreparation)}
             isUploading={isUploading}
             isGlobalMaxDurationExceeded={isGlobalMaxDurationExceeded}
             session={session}
             onStart={handleStart}
-            onStop={handleStopTranscription}
+            onStop={mediaPreparation ? handleCancelMediaPreparation : handleStopTranscription}
             onSetRightTab={setRightTab}
           />
         </div>

@@ -46,7 +46,7 @@ import { TranscriptionHistoryDialog } from "@/components/transcribe/transcriptio
 import { SettingsTranscription } from "@/components/transcribe/settings-transcription"
 import { WhisperSettingsPanel } from "@/components/transcribe/whisper-settings-panel"
 import { useBatchTranscriptionFiles } from "@/hooks/batch/use-batch-transcription-files"
-import useBatchTranscriptionHandler from "@/hooks/batch/use-batch-transcription-handler"
+import useBatchTranscriptionHandler, { type BatchPreparationState } from "@/hooks/batch/use-batch-transcription-handler"
 import { BatchTranscriptionFileList } from "./batch-transcription-file-list"
 import { useBatchSelection } from "@/hooks/batch/use-batch-selection"
 import { CopyTranscriptionSettingsDialog } from "./copy-transcription-settings-dialog"
@@ -57,6 +57,7 @@ import { getContent, parseTranscription, parseTranscriptionWordsAndSegments } fr
 import type { UploadFileMeta } from "@/types/uploads"
 import type { TranscriptionLogItem } from "@/types/transcription-log"
 import { useSetUnsavedChanges } from "@/contexts/unsaved-changes-context"
+import { isAcceptedTranscriptionSelection } from "@/constants/transcription"
 
 interface BatchTranscriptionViewProps {
   defaultTranscriptionId: string
@@ -69,6 +70,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
   const [queueSet, setQueueSet] = useState<Set<string>>(new Set())
   const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
   const [isManageFilesDialogOpen, setIsManageFilesDialogOpen] = useState(false)
+  const [batchPreparation, setBatchPreparation] = useState<BatchPreparationState | null>(null)
 
   // Dialogs
   const [isRestartDialogOpen, setIsRestartDialogOpen] = useState(false)
@@ -137,6 +139,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
     localOrder,
     queueSet
   )
+  const isBatchBusy = isProcessing || Boolean(batchPreparation)
 
   // Selection Hook
   const {
@@ -155,46 +158,48 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
     handleStartBatchTranscription,
     handleContinueBatchTranscription,
     handleStopBatchTranscription,
+    handleCancelBatchPreparation,
   } = useBatchTranscriptionHandler({
     defaultTranscriptionId,
     batchFiles,
     isBatchTranscribing: isProcessing,
     state: {
       setQueueSet,
+      setBatchPreparation,
     },
   })
 
   // Handlers
   const handleFileDrop = async (droppedFiles: FileList | File[]) => {
-    if (!droppedFiles || !currentProject || !currentProject.isBatch) return
+    if (!droppedFiles || !currentProject || !currentProject.isBatch || batchPreparation) return
     const filesArray = 'item' in droppedFiles ? Array.from(droppedFiles) : droppedFiles
 
-    for await (const file of filesArray) {
-      // Check if it's an audio file
-      const isAudioFile = file.type.startsWith("audio/") ||
-        [".mp3", ".wav", ".flac", ".m4a", ".ogg", ".webm", ".aac"].some(ext =>
-          file.name.toLowerCase().endsWith(ext)
-        )
-
-      if (!isAudioFile) {
-        toast.error(`Unsupported file type: ${file.name}`)
-        continue
-      }
-
+    for (const file of filesArray) {
       try {
+        if (!isAcceptedTranscriptionSelection(file)) {
+          toast.error(`Could not add ${file.name}`, {
+            description: "Please select a supported audio or video file.",
+          })
+          continue
+        }
         const transcription = await createTranscriptionForBatch(currentProject.id, file.name)
-        // Store the local file in the transcription store
-        await setFileAndUrl(transcription.id, file)
+        await setFileAndUrl(transcription.id, file, {
+          knownDuration: 0,
+          originalFileName: file.name,
+          isPrepared: false,
+          wasExtracted: false,
+        })
         await loadTranscription(transcription.id)
         setHasChanges(true)
       } catch (error) {
-        console.error(`Error processing file ${file.name}:`, error)
-        toast.error(`Failed to add ${file.name} to batch`)
+        console.error(`Failed to add ${file.name} to batch transcription`, error)
+        toast.error(`Could not add ${file.name}`)
       }
     }
   }
 
   const handleUseUploadedAudio = async (upload: UploadFileMeta) => {
+    if (isBatchBusy) return
     if (!currentProject || !currentProject.isBatch) {
       toast.error("Batch project not found")
       return
@@ -222,7 +227,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
   }
 
   const handleApplyTranscriptionHistory = async (raw: string, log: TranscriptionLogItem) => {
-    if (isProcessing) {
+    if (isBatchBusy) {
       toast.info("Batch is processing. Stop it before applying history.")
       return false
     }
@@ -249,6 +254,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
   }
 
   const handleDragEnd = (event: import("@dnd-kit/core").DragEndEvent) => {
+    if (batchPreparation) return
     const { active, over } = event
     if (!over || !currentProject) return
     if (active.id === over.id) return
@@ -349,7 +355,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
   }
 
   const confirmDeleteFile = async () => {
-    if (!currentProject || !deleteFileId) return
+    if (!currentProject || !deleteFileId || isBatchBusy) return
     try {
       await removeTranscriptionFromBatch(currentProject.id, deleteFileId)
       setHasChanges(true)
@@ -405,7 +411,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
   }
 
   const handleOpenStartBatchDialog = () => {
-    if (batchFiles.length === 0 || isProcessing) return
+    if (batchFiles.length === 0 || isBatchBusy) return
 
     let totalFiles = 0
     let transcribedFiles = 0
@@ -449,7 +455,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
                 size="sm"
                 className="rounded-lg"
                 onClick={() => setIsDeleteSelectedDialogOpen(true)}
-                disabled={selectedIds.size === 0}
+                disabled={isBatchBusy || selectedIds.size === 0}
               >
                 <Trash className="size-4" />
                 Delete
@@ -459,7 +465,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
                 size="sm"
                 className="rounded-lg"
                 onClick={handleSelectAllToggle}
-                disabled={batchFiles.length === 0}
+                disabled={isBatchBusy || batchFiles.length === 0}
               >
                 <ListChecks className="size-4" />
                 {selectedIds.size === batchFiles.length ? 'Deselect All' : 'Select All'}
@@ -471,6 +477,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               onApplyHistory={handleApplyTranscriptionHistory}
               buttonSize="sm"
               buttonClassName="rounded-lg"
+              buttonDisabled={isBatchBusy}
             />
           )}
           {!isSelecting && (
@@ -479,7 +486,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               size="sm"
               className="rounded-lg"
               onClick={() => setIsManageFilesDialogOpen(true)}
-              disabled={isProcessing}
+              disabled={isBatchBusy}
             >
               <FolderOpen className="size-4" />
               Manage Files
@@ -491,7 +498,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               size="sm"
               className="rounded-lg"
               onClick={() => document.getElementById(uploadInputId)?.click()}
-              disabled={isProcessing}
+              disabled={isBatchBusy}
             >
               <Upload className="size-4" />
               Upload
@@ -502,7 +509,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             size="sm"
             className="rounded-lg"
             onClick={toggleSelectMode}
-            disabled={isProcessing || batchFiles.length === 0}
+            disabled={isBatchBusy || batchFiles.length === 0}
           >
             <CheckSquare className="size-4" />
             {isSelecting ? 'Cancel' : 'Select'}
@@ -513,6 +520,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           files={batchFiles}
           order={localOrder}
           isProcessing={isProcessing}
+          preparation={batchPreparation}
           selectMode={isSelecting}
           selectedIds={selectedIds}
           onDrop={handleFileDrop}
@@ -522,6 +530,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           onClick={handlePreview}
           onSelectToggle={handleSelectToggle}
           uploadInputId={uploadInputId}
+          onCancelPreparation={handleCancelBatchPreparation}
         />
 
         <div className="flex flex-wrap items-center gap-4 w-full">
@@ -529,7 +538,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             size="lg"
             className="flex-1"
             onClick={handleOpenStartBatchDialog}
-            disabled={isProcessing || !session || batchFiles.length === 0 || isSelecting}
+            disabled={isBatchBusy || !session || batchFiles.length === 0 || isSelecting}
           >
             {isProcessing ? (
               <>
@@ -548,7 +557,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             size="lg"
             className="flex-1"
             onClick={handleStopBatchTranscription}
-            disabled={!isProcessing}
+            disabled={!isProcessing && !batchPreparation}
           >
             <Square className="size-4" />
             Stop All
@@ -560,7 +569,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           size="lg"
           className="w-full border-primary/25 hover:border-primary/50"
           onClick={() => setIsContinueDialogOpen(true)}
-          disabled={isProcessing || !session || batchFiles.length === 0 || (batchFiles.length - finishedCount <= 0) || isSelecting}
+          disabled={isBatchBusy || !session || batchFiles.length === 0 || (batchFiles.length - finishedCount <= 0) || isSelecting}
         >
           <FastForward className="size-4" />
           Continue Batch Transcription ({batchFiles.length - finishedCount} remaining)
@@ -602,7 +611,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
                 id="shared-settings-switch"
                 checked={isUseSharedSettings}
                 onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                disabled={isProcessing}
+                disabled={isBatchBusy}
                 className="data-[state=checked]:bg-primary"
               />
             </div>
@@ -628,7 +637,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
                 size="sm"
                 className="rounded-lg"
                 onClick={() => setIsCopySettingsDialogOpen(true)}
-                disabled={isProcessing || batchFiles.length === 0}
+                disabled={isBatchBusy || batchFiles.length === 0}
               >
                 <ListChecks className="size-4" />
                 Copy Shared Settings...
@@ -650,7 +659,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             <WhisperSettingsPanel
               showApplyButton
               onApplyClick={() => setIsApplyWhisperDialogOpen(true)}
-              applyDisabled={isProcessing}
+              applyDisabled={isBatchBusy}
             />
           </TabsContent>
         </Tabs>
@@ -662,7 +671,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
         onOpenChange={setIsManageFilesDialogOpen}
         onUseUpload={handleUseUploadedAudio}
         usedUploadIds={usedUploadIds}
-        isUseUploadDisabled={isProcessing}
+        isUseUploadDisabled={isBatchBusy}
       />
 
       <CopyTranscriptionSettingsDialog
@@ -732,7 +741,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setIsStartDialogOpen(false); handleStartBatchTranscription() }}>Start Transcription</AlertDialogAction>
+            <AlertDialogAction disabled={isBatchBusy} onClick={() => { setIsStartDialogOpen(false); handleStartBatchTranscription() }}>Start Transcription</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -754,7 +763,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setIsRestartDialogOpen(false); handleStartBatchTranscription() }}>Restart Transcription</AlertDialogAction>
+            <AlertDialogAction disabled={isBatchBusy} onClick={() => { setIsRestartDialogOpen(false); handleStartBatchTranscription() }}>Restart Transcription</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -773,7 +782,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setIsContinueDialogOpen(false); handleContinueBatchTranscription() }}>Continue</AlertDialogAction>
+            <AlertDialogAction disabled={isBatchBusy} onClick={() => { setIsContinueDialogOpen(false); handleContinueBatchTranscription() }}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -20,6 +20,7 @@ interface TranscriptionControlsProps {
   models: TranscriptionModel | null
   localAudioDuration: number | undefined
   isTranscribing: boolean
+  isPreparing: boolean
   isUploading: boolean
   isGlobalMaxDurationExceeded: boolean
   session: unknown
@@ -35,6 +36,7 @@ export function TranscriptionControls({
   models,
   localAudioDuration,
   isTranscribing,
+  isPreparing,
   isUploading,
   isGlobalMaxDurationExceeded,
   session,
@@ -55,7 +57,7 @@ export function TranscriptionControls({
           <SettingsTranscription transcriptionId={settingsId ?? currentId} />
         </div>
 
-        {isModelDurationLimitExceeded(models, localAudioDuration || 0) && (
+        {localAudioDuration !== undefined && localAudioDuration > 0 && isModelDurationLimitExceeded(models, localAudioDuration) && (
           <div className="flex items-center gap-2 text-destructive text-xs">
             <div className="size-3">
               <Clock className="size-3" />
@@ -69,7 +71,7 @@ export function TranscriptionControls({
         <div className="flex gap-2">
           <Button
             className="w-full"
-            disabled={isTranscribing || isUploading || !session || isGlobalMaxDurationExceeded}
+            disabled={isTranscribing || isPreparing || isUploading || !session || isGlobalMaxDurationExceeded}
             onClick={() => {
               onSetRightTab("transcript")
               onStart()
@@ -79,6 +81,11 @@ export function TranscriptionControls({
               <>
                 <Loader2 className="size-4 animate-spin" />
                 Transcribing
+              </>
+            ) : isPreparing ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Preparing
               </>
             ) : isUploading ? (
               <>
@@ -96,7 +103,7 @@ export function TranscriptionControls({
           <Button
             variant="outline"
             className="w-full"
-            disabled={!isTranscribing}
+            disabled={!isTranscribing && !isPreparing}
             onClick={onStop}
           >
             <Square className="size-4" />
