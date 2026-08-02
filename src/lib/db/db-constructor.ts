@@ -8,7 +8,6 @@ import {
   DEFAULT_TRANSLATION_SETTINGS,
 } from '@/constants/default'
 import {
-  AdvancedSettings,
   BasicSettings,
   Extraction,
   Project,
@@ -17,7 +16,7 @@ import {
   Transcription,
   Translation,
 } from '@/types/project'
-import { LegacyExtraction, LegacyProject, LegacyTranslation } from '@/types/legacy-project'
+import { LegacyAdvancedSettings, LegacyExtraction, LegacyProject, LegacyTranslation } from '@/types/legacy-project'
 import { AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX, normalizeExtractionStatus, stripExtractionDoneTag } from '@/lib/extraction/status'
 
 const uuidv4 = () => crypto.randomUUID()
@@ -39,7 +38,7 @@ export interface LegacyDatabaseExport {
   extractions: LegacyExtraction[]
   projectOrders: ProjectOrder[]
   basicSettings: BasicSettings[]
-  advancedSettings: AdvancedSettings[]
+  advancedSettings: LegacyAdvancedSettings[]
 }
 
 export function databaseExportConstructor(data: Partial<DatabaseExport>): DatabaseExport {
@@ -88,14 +87,13 @@ export function convertLegacyDatabaseExport(data: Partial<LegacyDatabaseExport>)
     const now = new Date()
     const timestamps = mergeSettingsTimestamps(basic, advanced, now)
     const id = uuidv4()
-    settings.push({
+    settings.push(settingsConstructor({
       ...(feature === 'extraction' ? DEFAULT_EXTRACTION_BASIC_SETTINGS : DEFAULT_BASIC_SETTINGS),
-      ...DEFAULT_ADVANCED_SETTINGS,
       ...basic,
       ...advanced,
       id,
       ...timestamps,
-    })
+    }))
     if (shouldReuse) pairIds.set(key, id)
     return id
   }
@@ -358,16 +356,25 @@ function extractionConstructor(extraction: Partial<Extraction>, isBatch = false,
   }
 }
 
+type ImportedSettings = Partial<Settings> & { isBetterContextCaching?: boolean }
+
 function settingsConstructor(
-  settings: Partial<Settings>,
+  settings: ImportedSettings,
   ownership?: Set<'translation' | 'extraction'>,
 ): Settings {
   const defaults = ownership?.has('translation') || !ownership?.has('extraction')
     ? DEFAULT_SETTINGS
     : DEFAULT_EXTRACTION_SETTINGS
+  const { isBetterContextCaching, ...currentSettings } = settings
+  const isMinimalContextMode = typeof settings.isMinimalContextMode === 'boolean'
+    ? settings.isMinimalContextMode
+    : typeof isBetterContextCaching === 'boolean'
+      ? !isBetterContextCaching
+      : DEFAULT_ADVANCED_SETTINGS.isMinimalContextMode
   return {
     ...defaults,
-    ...settings,
+    ...currentSettings,
+    isMinimalContextMode,
     fewShot: { ...defaults.fewShot, ...settings.fewShot },
     id: settings.id ?? uuidv4(),
     createdAt: settings.createdAt ?? new Date(),

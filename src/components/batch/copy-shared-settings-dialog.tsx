@@ -40,7 +40,7 @@ const ADVANCED_KEYS = [
   { key: "maxCompletionTokens", label: "Max Completion Tokens" },
   { key: "isUseStructuredOutput", label: "Structured Output" },
   { key: "isUseFullContextMemory", label: "Full Context Memory" },
-  { key: "isBetterContextCaching", label: "Minimal Context Memory" },
+  { key: "isMinimalContextMode", label: "Minimal Context Memory" },
 ] satisfies { key: AdvancedSettingsKey; label: string }[]
 
 const BASIC_KEYS_FOR_EXTRACTION = BASIC_KEYS.filter(({ key }) => key === 'modelDetail' || key === 'isUseCustomModel')

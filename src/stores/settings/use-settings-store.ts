@@ -32,7 +32,7 @@ const SETTINGS_KEYS = [
   "maxCompletionTokens",
   "isUseStructuredOutput",
   "isUseFullContextMemory",
-  "isBetterContextCaching",
+  "isMinimalContextMode",
 ] satisfies SettingsKey[]
 
 interface SettingsStore {
@@ -63,7 +63,7 @@ interface SettingsStore {
   getEndIndex: (id: string) => number
   getIsUseStructuredOutput: (id: string) => boolean
   getIsUseFullContextMemory: (id: string) => boolean
-  getIsBetterContextCaching: (id: string) => boolean
+  getIsMinimalContextMode: (id: string) => boolean
   resetBasicSettings: (id: string) => void
   resetAdvancedSettings: (id: string) => void
   resetSettings: (id: string) => Promise<void>
@@ -129,7 +129,7 @@ export const useSettingsStore = create<SettingsStore>()(
       getEndIndex: id => get().data[id]?.endIndex ?? DEFAULT_ADVANCED_SETTINGS.endIndex,
       getIsUseStructuredOutput: id => get().data[id]?.isUseStructuredOutput ?? DEFAULT_ADVANCED_SETTINGS.isUseStructuredOutput,
       getIsUseFullContextMemory: id => get().data[id]?.isUseFullContextMemory ?? DEFAULT_ADVANCED_SETTINGS.isUseFullContextMemory,
-      getIsBetterContextCaching: id => get().data[id]?.isBetterContextCaching ?? DEFAULT_ADVANCED_SETTINGS.isBetterContextCaching,
+      getIsMinimalContextMode: id => get().data[id]?.isMinimalContextMode ?? DEFAULT_ADVANCED_SETTINGS.isMinimalContextMode,
       resetBasicSettings: id => {
         const current = get().data[id]
         if (!current) return

@@ -17,6 +17,33 @@ describe("database export conversion", () => {
     expect(data.settings[0].id).toBe("settings-1")
     expect(data).not.toHaveProperty("basicSettings")
     expect(data).not.toHaveProperty("advancedSettings")
+    expect(data.settings[0]).toHaveProperty("isMinimalContextMode", false)
+    expect(data.settings[0]).not.toHaveProperty("isBetterContextCaching")
+  })
+
+  test("normalizes current and legacy context mode fields", () => {
+    const normalized = databaseExportConstructor({
+      settings: [
+        { id: "new-true", isMinimalContextMode: true },
+        { id: "new-false", isMinimalContextMode: false },
+        { id: "legacy-true", isBetterContextCaching: true },
+        { id: "legacy-false", isBetterContextCaching: false },
+        { id: "both", isMinimalContextMode: true, isBetterContextCaching: true },
+        { id: "missing" },
+      ] as never,
+    }).settings
+
+    expect(normalized.map(item => item.isMinimalContextMode)).toEqual([true, false, false, true, true, false])
+    for (const item of normalized) expect(item).not.toHaveProperty("isBetterContextCaching")
+  })
+
+  test("inverts the legacy split-settings context field", () => {
+    const data = convertLegacyDatabaseExport({
+      advancedSettings: [{ id: "advanced", isBetterContextCaching: false }] as never,
+      translations: [{ id: "translation", basicSettingsId: "", advancedSettingsId: "advanced" }] as never,
+    })
+    expect(data.settings[0].isMinimalContextMode).toBe(true)
+    expect(data.settings[0]).not.toHaveProperty("isBetterContextCaching")
   })
 
   test("merges each shared legacy pair once", () => {

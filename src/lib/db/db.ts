@@ -5,6 +5,7 @@ import {
 } from '@/constants/default'
 import { LegacyProject as Project, LegacyTranslation as Translation, LegacyExtraction as Extraction } from '@/types/legacy-project'
 import { Transcription, ProjectOrder, BasicSettings, AdvancedSettings } from '@/types/project'
+import type { LegacyAdvancedSettings } from '@/types/legacy-project'
 import { Project as CurrentProject, Translation as CurrentTranslation, Extraction as CurrentExtraction, Settings } from '@/types/project'
 import { CustomInstruction, CustomInstructionOrder } from '@/types/custom-instruction'
 import Dexie, { Table } from 'dexie'
@@ -473,7 +474,7 @@ export class MyDatabase extends Dexie {
       const translations = await translationsTable.toArray() as Translation[]
       const extractions = await extractionsTable.toArray() as Extraction[]
       const basicSettings = await basicSettingsTable.toArray() as BasicSettings[]
-      const advancedSettings = await advancedSettingsTable.toArray() as AdvancedSettings[]
+      const advancedSettings = await advancedSettingsTable.toArray() as LegacyAdvancedSettings[]
       const basicById = new Map(basicSettings.map(settings => [settings.id, settings]))
       const advancedById = new Map(advancedSettings.map(settings => [settings.id, settings]))
       const pairToSettingsId = new Map<string, string>()
@@ -592,6 +593,17 @@ export class MyDatabase extends Dexie {
       await translationsTable.bulkPut(migratedTranslations)
       await extractionsTable.bulkPut(migratedExtractions)
       await projectsTable.bulkPut(migratedProjects)
+    })
+    this.version(33).stores({}).upgrade(async tx => {
+      await tx.table('settings').toCollection().modify((settings: Record<string, unknown>) => {
+        const isMinimalContextMode = typeof settings.isBetterContextCaching === 'boolean'
+          ? !settings.isBetterContextCaching
+          : typeof settings.isMinimalContextMode === 'boolean'
+            ? settings.isMinimalContextMode
+            : DEFAULT_ADVANCED_SETTINGS.isMinimalContextMode
+        settings.isMinimalContextMode = isMinimalContextMode
+        delete settings.isBetterContextCaching
+      })
     })
   }
 }

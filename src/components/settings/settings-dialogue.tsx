@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import {
   AdvancedSettingsResetButton,
-  BetterContextCachingSwitch,
+  MinimalContextModeSwitch,
   ContextDocumentInput,
   CustomInstructionsInput,
   FewShotInput,
@@ -257,7 +257,7 @@ export const SettingsDialogue: React.FC<SettingsDialogueProps> = (props) => {
                         <FullContextMemorySwitch
                           settingsId={settingsId}
                         />
-                        <BetterContextCachingSwitch
+                        <MinimalContextModeSwitch
                           settingsId={settingsId}
                         />
                         <AdvancedSettingsResetButton

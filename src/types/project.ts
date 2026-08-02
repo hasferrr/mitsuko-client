@@ -125,7 +125,7 @@ export interface AdvancedSettings {
   maxCompletionTokens: number
   isUseStructuredOutput: boolean
   isUseFullContextMemory: boolean
-  isBetterContextCaching: boolean
+  isMinimalContextMode: boolean
   isMaxCompletionTokensAuto: boolean
   createdAt: Date
   updatedAt: Date

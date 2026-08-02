@@ -52,7 +52,7 @@ describe('version 32 settings migration', () => {
       { ...DEFAULT_EXTRACTION_BASIC_SETTINGS, id: LEGACY_GLOBAL_EXTRACTION_BASIC_SETTINGS_ID, createdAt: now, updatedAt: now },
     ])
     await legacy.table('advancedSettings').bulkAdd([
-      { ...DEFAULT_ADVANCED_SETTINGS, id: 'shared-advanced', createdAt: now, updatedAt: now },
+      { ...DEFAULT_ADVANCED_SETTINGS, isBetterContextCaching: false, id: 'shared-advanced', createdAt: now, updatedAt: now },
       { ...DEFAULT_ADVANCED_SETTINGS, id: LEGACY_GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID, createdAt: now, updatedAt: now },
       { ...DEFAULT_ADVANCED_SETTINGS, id: LEGACY_GLOBAL_EXTRACTION_ADVANCED_SETTINGS_ID, createdAt: now, updatedAt: now },
     ])
@@ -127,6 +127,9 @@ describe('version 32 settings migration', () => {
     expect(upgraded.translations.schema.indexes.some(index => index.name === 'settingsId')).toBe(true)
     expect(upgraded.extractions.schema.indexes.some(index => index.name === 'settingsId')).toBe(true)
     expect(project?.defaultTranslationSettingsId).toBe(translation?.settingsId)
+    const sharedSettings = await upgraded.settings.get(translation!.settingsId)
+    expect(sharedSettings?.isMinimalContextMode).toBe(true)
+    expect(sharedSettings).not.toHaveProperty('isBetterContextCaching')
     expect(project?.defaultExtractionSettingsId).toBe(extraction?.settingsId)
     expect(project).not.toHaveProperty('defaultTranslationBasicSettingsId')
     expect(translation).not.toHaveProperty('basicSettingsId')

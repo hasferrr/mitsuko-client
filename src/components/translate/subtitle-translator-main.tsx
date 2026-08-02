@@ -37,7 +37,7 @@ import {
   StructuredOutputSwitch,
   FullContextMemorySwitch,
   AdvancedSettingsResetButton,
-  BetterContextCachingSwitch,
+  MinimalContextModeSwitch,
   CustomInstructionsInput,
   FewShotInput,
   AdvancedReasoningSwitch,
@@ -739,7 +739,7 @@ export default function SubtitleTranslatorMain({
                   <FullContextMemorySwitch
                     settingsId={settingsId}
                   />
-                  <BetterContextCachingSwitch
+                  <MinimalContextModeSwitch
                     settingsId={settingsId}
                   />
                   <AdvancedSettingsResetButton

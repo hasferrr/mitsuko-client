@@ -6,10 +6,10 @@ export type ContextStrategy = "full" | "minimal" | "split"
 
 export function determineContextStrategy(
   isUseFullContextMemory: boolean,
-  isBetterContextCaching: boolean
+  isMinimalContextMode: boolean
 ): ContextStrategy {
   if (isUseFullContextMemory) return "full"
-  if (!isBetterContextCaching) return "minimal"
+  if (isMinimalContextMode) return "minimal"
   return "split"
 }
 

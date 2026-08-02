@@ -271,7 +271,7 @@ export const useTranslationHandler = ({
     const splitSize = advStoreState.getSplitSize(settingsId)
     const isUseStructuredOutput = advStoreState.getIsUseStructuredOutput(settingsId)
     const isUseFullContextMemory = advStoreState.getIsUseFullContextMemory(settingsId)
-    const isBetterContextCaching = advStoreState.getIsBetterContextCaching(settingsId)
+    const isMinimalContextMode = advStoreState.getIsMinimalContextMode(settingsId)
 
     const firstChunk = (size: number, s: number, e: number) => {
       const subtitleChunks: SubtitleNoTime[][] = []
@@ -363,7 +363,7 @@ export const useTranslationHandler = ({
 
     const subtitleChunks = firstChunk(size, adjustedStartIndex, adjustedEndIndex)
 
-    const contextStrategy = determineContextStrategy(isUseFullContextMemory, isBetterContextCaching)
+    const contextStrategy = determineContextStrategy(isUseFullContextMemory, isMinimalContextMode)
 
     // Prepare context for the first chunk
     let context = sIndexToUse > 1

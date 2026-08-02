@@ -34,7 +34,7 @@ export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt
   maxCompletionTokens: 64000,
   isUseStructuredOutput: true,
   isUseFullContextMemory: false,
-  isBetterContextCaching: true, // true means it is NOT using Minimal Context Mode
+  isMinimalContextMode: false,
   isMaxCompletionTokensAuto: true,
 }
 

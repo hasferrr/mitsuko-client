@@ -8,13 +8,11 @@ interface Props {
   settingsId: string
 }
 
-export const BetterContextCachingSwitch = memo(({ settingsId }: Props) => {
-  const isBetterContextCaching = useSettingsStore((state) => state.getIsBetterContextCaching(settingsId))
+export const MinimalContextModeSwitch = memo(({ settingsId }: Props) => {
+  const isMinimalContextMode = useSettingsStore((state) => state.getIsMinimalContextMode(settingsId))
   const isUseFullContextMemory = useSettingsStore((state) => state.getIsUseFullContextMemory(settingsId))
   const setAdvancedSettingsValue = useSettingsStore((state) => state.setAdvancedSettingsValue)
-  const setIsBetterContextCaching = (value: boolean) => setAdvancedSettingsValue(settingsId, "isBetterContextCaching", value)
-
-  const isMinimalContextMode = !isBetterContextCaching
+  const setIsMinimalContextMode = (value: boolean) => setAdvancedSettingsValue(settingsId, "isMinimalContextMode", value)
 
   return (
     <div className="space-y-2">
@@ -22,7 +20,7 @@ export const BetterContextCachingSwitch = memo(({ settingsId }: Props) => {
         <label className="text-sm font-medium">Minimal Context Mode</label>
         <Switch
           checked={isUseFullContextMemory ? false : isMinimalContextMode}
-          onCheckedChange={(value) => setIsBetterContextCaching(!value)}
+          onCheckedChange={setIsMinimalContextMode}
           disabled={isUseFullContextMemory}
         />
       </div>

@@ -39,7 +39,7 @@ import {
   StructuredOutputSwitch,
   FullContextMemorySwitch,
   AdvancedSettingsResetButton,
-  BetterContextCachingSwitch,
+  MinimalContextModeSwitch,
   CustomInstructionsInput,
   FewShotInput,
   AdvancedReasoningSwitch,
@@ -572,7 +572,7 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
                 <MaxCompletionTokenInput settingsId={settingsId} />
                 <StructuredOutputSwitch settingsId={settingsId} />
                 <FullContextMemorySwitch settingsId={settingsId} />
-                <BetterContextCachingSwitch settingsId={settingsId} />
+                <MinimalContextModeSwitch settingsId={settingsId} />
                 <AdvancedSettingsResetButton settingsId={settingsId} />
               </CardContent>
             </Card>

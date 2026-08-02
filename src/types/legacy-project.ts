@@ -1,4 +1,9 @@
-import type { Extraction, Project, Translation } from "./project"
+import type { AdvancedSettings, Extraction, Project, Translation } from "./project"
+
+export type LegacyAdvancedSettings = Omit<AdvancedSettings, "isMinimalContextMode"> & {
+  isMinimalContextMode?: boolean
+  isBetterContextCaching?: boolean
+}
 
 export interface LegacyProject extends Omit<Project, "defaultTranslationSettingsId" | "defaultExtractionSettingsId"> {
   defaultTranslationBasicSettingsId: string
