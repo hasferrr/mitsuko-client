@@ -16,7 +16,7 @@ describe('buildTranscriptionTemplate', () => {
       title: '',
       transcriptionText: '',
       transcriptSubtitles: [],
-      selectedMode: 'sentence',
+      selectedMode: 'clause',
       customInstructions: '',
       models: 'mitsuko-premium',
       language: 'auto',

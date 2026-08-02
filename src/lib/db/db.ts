@@ -17,6 +17,7 @@ import {
 import {
   LEGACY_GLOBAL_TRANSLATION_ADVANCED_SETTINGS_ID,
   LEGACY_GLOBAL_TRANSLATION_BASIC_SETTINGS_ID,
+  GLOBAL_TRANSCRIPTION_SETTINGS_ID,
   GLOBAL_TRANSLATION_SETTINGS_ID,
 } from '@/constants/global-settings'
 import {
@@ -603,6 +604,19 @@ export class MyDatabase extends Dexie {
             : DEFAULT_ADVANCED_SETTINGS.isMinimalContextMode
         settings.isMinimalContextMode = isMinimalContextMode
         delete settings.isBetterContextCaching
+      })
+    })
+    this.version(34).stores({}).upgrade(async tx => {
+      const projects = await tx.table('projects').toArray() as CurrentProject[]
+      const settingsIds = [
+        GLOBAL_TRANSCRIPTION_SETTINGS_ID,
+        ...projects.map(project => project.defaultTranscriptionId),
+      ]
+
+      await tx.table('transcriptions').where('id').anyOf(settingsIds).modify((transcription: Transcription) => {
+        if (transcription.selectedMode === 'sentence') {
+          transcription.selectedMode = 'clause'
+        }
       })
     })
   }

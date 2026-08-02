@@ -101,6 +101,7 @@ export function TranscriptionControls({
           </Button>
 
           <Button
+            hidden
             variant="outline"
             className="w-full"
             disabled={!isTranscribing && !isPreparing}

@@ -63,7 +63,7 @@ export const DEFAULT_TRANSCRIPTION_SETTINGS: Omit<Transcription, "id" | "created
   title: "",
   transcriptionText: "",
   transcriptSubtitles: [],
-  selectedMode: "sentence",
+  selectedMode: "clause",
   customInstructions: "",
   models: "mitsuko-premium",
   language: "auto",

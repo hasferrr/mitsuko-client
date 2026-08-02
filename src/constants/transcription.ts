@@ -71,8 +71,8 @@ export const LANGUAGES = [
 ]
 
 export const MODES = [
-  { value: "clause", label: "Mode 1: Clauses & Sentences (Experimental)" },
-  { value: "sentence", label: "Mode 2: Sentences" },
+  { value: "clause", label: "Mode 1: Short, Natural Clause/Sentence" },
+  { value: "sentence", label: "Mode 2: Default, Long Sentence" },
 ]
 
 const ASR_MODELS_SET = new Set<TranscriptionModel>([

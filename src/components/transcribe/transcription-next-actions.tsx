@@ -58,7 +58,7 @@ export function TranscriptionNextActions({
                 </div>
                 <div>
                   <h3 className="text-sm font-medium">Export</h3>
-                  <p className="text-xs text-muted-foreground">Export transcription as SRT subtitle</p>
+                  <p className="text-xs text-muted-foreground">Export transcription result as SRT subtitle</p>
                 </div>
               </div>
               <Button
