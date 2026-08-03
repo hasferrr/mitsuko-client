@@ -140,7 +140,6 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
   // Project Store
   const currentProject = useProjectStore((state) => state.currentProject)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
-  const updateProject = useProjectStore((state) => state.updateProject)
   const createTranslationForBatch = useProjectStore((state) => state.createTranslationForBatch)
   const removeTranslationFromBatch = useProjectStore((state) => state.removeTranslationFromBatch)
   const setHasChanges = useSetUnsavedChanges()
@@ -697,10 +696,6 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
             settingsId={currentProject.defaultExtractionSettingsId}
             resetFromSettingsId={GLOBAL_EXTRACTION_SETTINGS_ID}
             settingsParentType="extraction"
-            isDefaultEnabled={currentProject.isDefaultExtractionEnabled}
-            onDefaultEnabledChange={(enabled) => void updateProject(currentProject.id, {
-              isDefaultExtractionEnabled: enabled,
-            })}
             onOpenGlobalSettings={() => {
               setIsExtractionSettingsOpen(false)
               setIsGlobalExtractionSettingsOpen(true)
