@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
   Download,
+  FileText,
   X,
   GripVertical,
   Loader2,
 } from "lucide-react"
-import { RiLinksLine } from "@remixicon/react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
@@ -165,7 +165,7 @@ export function SortableBatchFile({
                     onPreviewAutoContext(batchFile.id)
                   }}
                 >
-                  <RiLinksLine data-icon="inline-start" />
+                  <FileText className="size-4" />
                   <span className="sr-only">Preview final context</span>
                 </Button>
               </TooltipTrigger>

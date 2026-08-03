@@ -499,7 +499,9 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
           onDelete={setDeleteFileId}
           onDownload={handleSingleFileDownload}
           onClick={handlePreview}
-          onPreviewAutoContext={setPreviewAutoContextId}
+          onPreviewAutoContext={currentProject?.isBatchAutoContextEnabled
+            ? setPreviewAutoContextId
+            : undefined}
           onSelectToggle={handleSelectToggle}
           uploadInputId={uploadInputId}
         />
