@@ -66,6 +66,7 @@ import { useSessionStore } from "@/stores/ui/use-session-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
+import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { PopulateContextDialog } from "./populate-context-dialog"
 import { CopySharedSettingsDialog } from "./copy-shared-settings-dialog"
@@ -82,6 +83,7 @@ import { MAX_BATCH_CONCURRENT_OPERATION } from "@/constants/limits"
 import { useSetUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { BatchTranslationStage } from "@/types/batch"
 import { BatchAutoContextSettings } from "@/components/batch/batch-auto-context-settings"
+import { BatchAutoContextPreviewDialog } from "@/components/batch/batch-auto-context-preview-dialog"
 import { ContextExtractorMain } from "@/components/extract-context/context-extractor-main"
 import { SettingsDialogue } from "@/components/settings/settings-dialogue"
 import { GLOBAL_EXTRACTION_SETTINGS_ID } from "@/constants/global-settings"
@@ -120,6 +122,7 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
   const [toType, setToType] = useState<SubtitleType | "no-change">("no-change")
 
   const [previewId, setPreviewId] = useState<string | null>(null)
+  const [previewAutoContextId, setPreviewAutoContextId] = useState<string | null>(null)
   const [previewExtractionId, setPreviewExtractionId] = useState<string | null>(null)
   const [queueSet, setQueueSet] = useState<Set<string>>(new Set())
   const [autoContextStageMap, setAutoContextStageMap] = useState<Record<string, BatchTranslationStage>>({})
@@ -169,6 +172,20 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
   const extractionData = useExtractionDataStore((state) => state.data)
   const getExtractionDb = useExtractionDataStore((state) => state.getExtractionDb)
   const setCurrentExtractionId = useExtractionDataStore((state) => state.setCurrentId)
+  const isExtractingSet = useExtractionStore((state) => state.isExtractingSet)
+
+  const previewAutoContextTranslation = previewAutoContextId
+    ? translationData[previewAutoContextId]
+    : null
+  const previewAutoContextExtraction = previewAutoContextTranslation?.autoContextExtractionId
+    ? extractionData[previewAutoContextTranslation.autoContextExtractionId]
+    : null
+  const previewAutoContextSettingsId = previewAutoContextTranslation
+    ? (isUseSharedSettings ? settingsId : previewAutoContextTranslation.settingsId)
+    : null
+  const previewAutoContextDocument = useSettingsStore((state) => previewAutoContextSettingsId
+    ? state.getContextDocument(previewAutoContextSettingsId)
+    : "")
 
   const session = useSessionStore((state) => state.session)
 
@@ -482,7 +499,7 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
           onDelete={setDeleteFileId}
           onDownload={handleSingleFileDownload}
           onClick={handlePreview}
-          onOpenExtraction={handleOpenExtraction}
+          onPreviewAutoContext={setPreviewAutoContextId}
           onSelectToggle={handleSelectToggle}
           uploadInputId={uploadInputId}
         />
@@ -865,6 +882,21 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
           )}
         </DialogContent>
       </Dialog>
+
+      {previewAutoContextTranslation && previewAutoContextExtraction && (
+        <BatchAutoContextPreviewDialog
+          open={!!previewAutoContextId}
+          onOpenChange={(open) => {
+            if (!open) setPreviewAutoContextId(null)
+          }}
+          translation={previewAutoContextTranslation}
+          extraction={previewAutoContextExtraction}
+          contextDocument={previewAutoContextDocument}
+          autoContextEnabled={!!currentProject?.isBatchAutoContextEnabled}
+          runningIds={isExtractingSet}
+          onOpenExtraction={handleOpenExtraction}
+        />
+      )}
 
       <Dialog
         open={!!previewExtractionId}

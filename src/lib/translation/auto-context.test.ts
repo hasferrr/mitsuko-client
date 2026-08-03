@@ -4,6 +4,7 @@ import {
   combineAutoContext,
   findLatestExtraction,
   getAutoContextCreatedTranslationPatch,
+  getBatchAutoContextPreview,
   getExtractionProblem,
   getStoppedAutoContextExtractionPatch,
 } from "@/lib/translation/auto-context"
@@ -111,6 +112,54 @@ describe("combineAutoContext", () => {
     const manualContext = "Manual context"
 
     expect(combineAutoContext(autoContext, manualContext)).toBe("Manual context\n\nGenerated context")
+  })
+})
+
+describe("getBatchAutoContextPreview", () => {
+  test("combines manual context with a completed owned extraction", () => {
+    expect(getBatchAutoContextPreview({
+      contextDocument: "Manual context",
+      enabled: true,
+      extraction: extraction("episode-1", "Generated context\n\n<done>", {
+        ownerTranslationId: "translation-1",
+      }),
+      isOwned: true,
+      isRunning: false,
+      extractionProblem: null,
+    })).toBe("Manual context\n\nGenerated context")
+  })
+
+  test("previews only manual context when Batch Auto Context is off", () => {
+    expect(getBatchAutoContextPreview({
+      contextDocument: "Manual context",
+      enabled: false,
+      extraction: extraction("episode-1", "Generated context"),
+      isOwned: true,
+      isRunning: false,
+      extractionProblem: null,
+    })).toBe("Manual context")
+  })
+
+  test("explains when an owned extraction still needs to be created", () => {
+    expect(getBatchAutoContextPreview({
+      contextDocument: "",
+      enabled: true,
+      extraction: null,
+      isOwned: false,
+      isRunning: false,
+      extractionProblem: null,
+    })).toBe("[Extraction has not run yet — it will be created when batch translation starts]")
+  })
+
+  test("explains when an invalid owned extraction will be regenerated", () => {
+    expect(getBatchAutoContextPreview({
+      contextDocument: "Manual context",
+      enabled: true,
+      extraction: extraction("episode-1", "partial", { status: "stopped" }),
+      isOwned: true,
+      isRunning: false,
+      extractionProblem: "Selected context extraction was stopped.",
+    })).toBe("Manual context\n\n[Extraction will be regenerated when batch translation starts]")
   })
 })
 

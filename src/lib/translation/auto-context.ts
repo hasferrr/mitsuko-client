@@ -33,6 +33,34 @@ export function combineAutoContext(cleanedExtractionResult: string, contextDocum
     .join("\n\n")
 }
 
+export function getBatchAutoContextPreview({
+  contextDocument,
+  enabled,
+  extraction,
+  isOwned,
+  isRunning,
+  extractionProblem,
+}: {
+  contextDocument: string
+  enabled: boolean
+  extraction: Extraction | null
+  isOwned: boolean
+  isRunning: boolean
+  extractionProblem: string | null
+}): string {
+  if (!enabled) return contextDocument
+
+  const autoContext = !extraction || !isOwned
+    ? "[Extraction has not run yet — it will be created when batch translation starts]"
+    : isRunning
+      ? "[Extraction is still running]"
+      : extractionProblem
+        ? "[Extraction will be regenerated when batch translation starts]"
+        : cleanExtractionResult(extraction.contextResult)
+
+  return combineAutoContext(autoContext, contextDocument)
+}
+
 export function getAutoContextCreatedTranslationPatch(
   extractionId: string,
   previousExtractionId: string | null | undefined,

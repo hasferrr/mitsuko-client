@@ -23,7 +23,7 @@ interface SortableBatchFileProps {
   onDelete: (id: string) => void
   onDownload: (id: string) => void
   onClick: (id: string) => void
-  onOpenExtraction?: (id: string) => void
+  onPreviewAutoContext?: (id: string) => void
   isProcessing?: boolean
   selectMode?: boolean
   selected?: boolean
@@ -36,7 +36,7 @@ export function SortableBatchFile({
   onDelete,
   onDownload,
   onClick,
-  onOpenExtraction,
+  onPreviewAutoContext,
   isProcessing = false,
   selectMode = false,
   selected = false,
@@ -153,7 +153,7 @@ export function SortableBatchFile({
               {batchFile.translationStage === "context-error" ? "Context error" : "Error"}
             </Badge>
           )}
-          {!selectMode && batchFile.linkedExtractionId && onOpenExtraction && (
+          {!selectMode && batchFile.linkedExtractionId && onPreviewAutoContext && (
             <Tooltip delayDuration={50}>
               <TooltipTrigger asChild>
                 <Button
@@ -162,14 +162,14 @@ export function SortableBatchFile({
                   disabled={isProcessing}
                   onClick={(event) => {
                     event.stopPropagation()
-                    onOpenExtraction(batchFile.linkedExtractionId as string)
+                    onPreviewAutoContext(batchFile.id)
                   }}
                 >
-                  <RiLinksLine />
-                  <span className="sr-only">Open linked Auto Context</span>
+                  <RiLinksLine data-icon="inline-start" />
+                  <span className="sr-only">Preview final context</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Open linked Auto Context</TooltipContent>
+              <TooltipContent>Preview final context</TooltipContent>
             </Tooltip>
           )}
           {!selectMode && (

@@ -14,7 +14,7 @@ import { removeDoneTag } from "@/lib/utils/done-tag"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
-import { cleanExtractionResult, combineAutoContext, getExtractionProblem, findLatestExtraction } from "@/lib/translation/auto-context"
+import { cleanExtractionResult, combineAutoContext, getBatchAutoContextPreview, getExtractionProblem, findLatestExtraction } from "@/lib/translation/auto-context"
 import { isAutoContextOwnedBy } from "@/lib/extraction/status"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ExtractionBadges } from "@/components/extract-context/extraction-badges"
@@ -239,10 +239,7 @@ export const ContextDocumentInput = memo(({
 
   const previewCleanedExtraction = (() => {
     if (!translation || !selectedExtraction) return ""
-    if (isBatchManagedAutoContext) {
-      if (!isBatchAutoContextEnabled || !isSelectedAutoOwned || isSelectedExtractionRunning || selectedProblem) return ""
-      return cleanExtractionResult(selectedExtraction.contextResult)
-    }
+    if (isBatchManagedAutoContext) return ""
     if (translation.autoContextMode === "disabled") return ""
     if (isSelectedExtractionRunning) return ""
     if (selectedProblem && !isSelectedAutoOwned) return ""
@@ -256,18 +253,14 @@ export const ContextDocumentInput = memo(({
 
   const previewDisplayValue = (() => {
     if (isBatchManagedAutoContext) {
-      if (!isBatchAutoContextEnabled) return contextDocument || ""
-      const extractionPlaceholder = isSelectedExtractionRunning
-        ? "[Extraction is still running]"
-        : !selectedExtraction || !isSelectedAutoOwned
-          ? "[Extraction has not run yet — it will be created when batch translation starts]"
-          : selectedProblem
-            ? "[Extraction will be regenerated when batch translation starts]"
-            : ""
-      if (!extractionPlaceholder) return previewCombinedContext || ""
-      return contextDocument
-        ? `${contextDocument}\n\n${extractionPlaceholder}`
-        : extractionPlaceholder
+      return getBatchAutoContextPreview({
+        contextDocument,
+        enabled: isBatchAutoContextEnabled,
+        extraction: selectedExtraction,
+        isOwned: isSelectedAutoOwned,
+        isRunning: isSelectedExtractionRunning,
+        extractionProblem: selectedProblem,
+      })
     }
     if (!translation || translation.autoContextMode === "disabled") {
       return previewCombinedContext || ""
