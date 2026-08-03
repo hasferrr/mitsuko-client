@@ -155,7 +155,7 @@ export function SortableBatchFile({
               {batchFile.translationStage === "context-error" ? "Context error" : "Error"}
             </Badge>
           )}
-          {!selectMode && batchFile.linkedExtractionId && onPreviewAutoContext && (
+          {batchFile.linkedExtractionId && onPreviewAutoContext && (
             <Tooltip delayDuration={50}>
               <TooltipTrigger asChild>
                 <Button
