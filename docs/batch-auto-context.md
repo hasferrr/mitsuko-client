@@ -55,6 +55,8 @@ A Translation failure is isolated. It does not stop the extraction chain or late
 
 Reordering, inserting, removing, or moving files while idle changes predecessor relationships. The next run reruns the suffix beginning at the first changed predecessor. Reordering and all batch Auto Context controls are locked while processing.
 
+Completion timestamps do not invalidate the chain. A usable linked extraction is reused even if its predecessor completed later. It reruns only when its recorded predecessor changed, it is unusable, an earlier chain item must be created or rerun, or Regenerate Auto Context is selected.
+
 Editing source subtitles or a Translation title does not invalidate a usable extraction. Regenerate Auto Context is the explicit way to refresh the chain after such edits.
 
 If a user manually repairs an extraction result and marks it completed, the pipeline treats it as usable. If an owned extraction was deleted, the next run creates and links a replacement.

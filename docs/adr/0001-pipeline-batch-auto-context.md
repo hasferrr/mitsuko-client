@@ -20,4 +20,6 @@ New Auto Context extractions copy the project's default extraction settings and 
 
 Users may explicitly link existing project extractions to batch Translations. This makes the selected extraction owned by that Translation, records the mapped predecessor chain, and detaches any replaced owned extraction without deleting it. A Starting Context remains unowned and cannot also be assigned through this action.
 
+Completion timestamps do not determine Context Chain validity. A usable linked extraction is reused even when its predecessor completed later. It is rerun only when its recorded predecessor no longer matches the chain, it is unusable, an earlier chain item must be created or rerun, or the user explicitly selects Regenerate Auto Context.
+
 Editing a Translation's source subtitles or title does not invalidate a usable extraction or its chain suffix. Users who want updated context after such edits opt into Regenerate Auto Context during Restart.

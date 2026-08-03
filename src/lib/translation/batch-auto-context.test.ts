@@ -93,7 +93,7 @@ describe("buildBatchAutoContextPlan", () => {
     expect(plan.items.map(item => item.action)).toEqual(["create", "rerun"])
   })
 
-  test("reruns the suffix when the previous extraction is newer", () => {
+  test("reuses linked completed extractions regardless of completion order", () => {
     const first = translation("translation-1")
     const second = translation("translation-2", {
       autoContextPreviousExtractionId: "translation-1-extraction",
@@ -114,7 +114,7 @@ describe("buildBatchAutoContextPlan", () => {
       startingExtractionId: null,
     })
 
-    expect(plan.items.map(item => item.action)).toEqual(["reuse", "rerun"])
+    expect(plan.items.map(item => item.action)).toEqual(["reuse", "reuse"])
   })
 
   test("reruns a failed owned extraction in place and repairs the suffix", () => {

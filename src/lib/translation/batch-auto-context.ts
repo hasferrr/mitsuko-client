@@ -66,10 +66,7 @@ export function getBatchAutoContextAction({
   if (regenerate || upstreamChanged) return "rerun"
   if (recordedPreviousExtractionId !== (expectedPreviousExtraction?.id ?? null)) return "rerun"
   if (!isExtractionUsable(extraction, projectId, runningIds)) return "rerun"
-
-  const previousCompletedAt = expectedPreviousExtraction?.completedAt?.getTime() ?? 0
-  const completedAt = extraction.completedAt?.getTime() ?? 0
-  return previousCompletedAt > completedAt ? "rerun" : "reuse"
+  return "reuse"
 }
 
 export function buildBatchAutoContextPlan({
