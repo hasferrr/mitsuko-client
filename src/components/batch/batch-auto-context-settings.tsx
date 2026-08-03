@@ -88,8 +88,8 @@ export function BatchAutoContextSettings({
     <FieldGroup className="gap-4">
       <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
         <FieldContent>
-          <FieldTitle>Auto Context</FieldTitle>
-          <FieldDescription>
+          <FieldTitle className="text-sm font-semibold">Auto Context</FieldTitle>
+          <FieldDescription className="text-xs">
             Build one linked context extraction per file in batch order.
           </FieldDescription>
         </FieldContent>
@@ -104,7 +104,9 @@ export function BatchAutoContextSettings({
 
       {enabled && (
         <Field data-invalid={!!selectedProblem || undefined} data-disabled={isProcessing || undefined}>
-          <FieldLabel htmlFor="batch-auto-context-starting-context">Starting Context</FieldLabel>
+          <FieldLabel htmlFor="batch-auto-context-starting-context" className="text-sm font-semibold">
+            Starting Context
+          </FieldLabel>
           <Select
             value={selectedId ?? NO_STARTING_CONTEXT}
             onValueChange={value => void updateAutoContext({
@@ -131,19 +133,19 @@ export function BatchAutoContextSettings({
               </SelectGroup>
             </SelectContent>
           </Select>
-          <FieldDescription>
+          <FieldDescription className="text-xs">
             {selectedExtraction
               ? "Used by this batch as Starting Context. It remains independent and is not moved or deleted with a Translation."
               : "Optional existing extraction used before the first file. There is no implicit latest selection."}
           </FieldDescription>
-          {selectedProblem && <FieldError>{selectedProblem}</FieldError>}
+          {selectedProblem && <FieldError className="text-xs">{selectedProblem}</FieldError>}
         </Field>
       )}
 
       <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
         <FieldContent>
-          <FieldTitle>Extraction Settings</FieldTitle>
-          <FieldDescription>
+          <FieldTitle className="text-sm font-semibold">Extraction Settings</FieldTitle>
+          <FieldDescription className="text-xs">
             New linked extractions copy the project extraction defaults.
           </FieldDescription>
         </FieldContent>

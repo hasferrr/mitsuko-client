@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Field,
@@ -554,17 +554,13 @@ export function BatchTranslationView({ settingsId, onOpenExtractionSettings }: B
           </TabsList>
 
           {/* Batch Settings */}
-          <Card size="sm" className="mt-4 w-full">
-            <CardHeader>
-              <CardTitle>Batch Settings</CardTitle>
-              <CardDescription>Control translation concurrency and the context pipeline.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <FieldGroup className="gap-5">
+          <Card size="sm" className="mt-4 w-full shadow-xs">
+            <CardContent className="flex flex-col gap-4">
+              <FieldGroup className="gap-4">
                 <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
                   <FieldContent>
-                    <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
-                    <FieldDescription>
+                    <FieldLabel htmlFor="shared-settings-switch" className="text-sm font-semibold">Settings Mode</FieldLabel>
+                    <FieldDescription className="text-xs">
                       {isUseSharedSettings ? "Using shared batch settings" : "Using individual file settings"}
                     </FieldDescription>
                   </FieldContent>
@@ -578,8 +574,8 @@ export function BatchTranslationView({ settingsId, onOpenExtractionSettings }: B
 
                 <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
                   <FieldContent>
-                    <FieldTitle>Max Concurrent Translations</FieldTitle>
-                    <FieldDescription>
+                    <FieldTitle className="text-sm font-semibold">Max Concurrent Translations</FieldTitle>
+                    <FieldDescription className="text-xs">
                       The serial extraction worker runs in addition to these slots. Max {MAX_BATCH_CONCURRENT_OPERATION}.
                     </FieldDescription>
                   </FieldContent>
@@ -622,23 +618,20 @@ export function BatchTranslationView({ settingsId, onOpenExtractionSettings }: B
                   isProcessing={isProcessing}
                   onOpenExtractionSettings={onOpenExtractionSettings}
                 />
-
-                <Field orientation="horizontal" data-disabled={isProcessing || batchFiles.length === 0 || undefined}>
-                  <FieldContent>
-                    <FieldTitle>Individual Settings</FieldTitle>
-                    <FieldDescription>Copy shared settings into selected translation or extraction files.</FieldDescription>
-                  </FieldContent>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsCopySharedDialogOpen(true)}
-                    disabled={isProcessing || batchFiles.length === 0}
-                  >
-                    <ListChecks data-icon="inline-start" />
-                    Copy Settings
-                  </Button>
-                </Field>
               </FieldGroup>
+
+              <div className="flex items-center justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-lg"
+                  onClick={() => setIsCopySharedDialogOpen(true)}
+                  disabled={isProcessing || batchFiles.length === 0}
+                >
+                  <ListChecks data-icon="inline-start" />
+                  Copy Shared Settings...
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
