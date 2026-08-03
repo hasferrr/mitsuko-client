@@ -83,11 +83,8 @@ import { useSetUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { BatchTranslationStage } from "@/types/batch"
 import { BatchAutoContextSettings } from "@/components/batch/batch-auto-context-settings"
 import { ContextExtractorMain } from "@/components/extract-context/context-extractor-main"
-
-interface BatchTranslationViewProps {
-  settingsId: string
-  onOpenExtractionSettings: () => void
-}
+import { SettingsDialogue } from "@/components/settings/settings-dialogue"
+import { GLOBAL_EXTRACTION_SETTINGS_ID } from "@/constants/global-settings"
 
 function BatchRunSummary({
   summary,
@@ -116,7 +113,7 @@ function BatchRunSummary({
   )
 }
 
-export function BatchTranslationView({ settingsId, onOpenExtractionSettings }: BatchTranslationViewProps) {
+export function BatchTranslationView({ settingsId }: { settingsId: string }) {
   const [activeTab, setActiveTab] = useState("basic")
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
@@ -134,6 +131,8 @@ export function BatchTranslationView({ settingsId, onOpenExtractionSettings }: B
   const [isContinueDialogOpen, setIsContinueDialogOpen] = useState(false)
   const [isPopulateDialogOpen, setIsPopulateDialogOpen] = useState(false)
   const [isCopySharedDialogOpen, setIsCopySharedDialogOpen] = useState(false)
+  const [isExtractionSettingsOpen, setIsExtractionSettingsOpen] = useState(false)
+  const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
   const [translatedStats, setTranslatedStats] = useState({ translated: 0, total: 0 })
   const [runSummary, setRunSummary] = useState<BatchTranslationRunSummary | null>(null)
   const [regenerateAutoContext, setRegenerateAutoContext] = useState(false)
@@ -141,6 +140,7 @@ export function BatchTranslationView({ settingsId, onOpenExtractionSettings }: B
   // Project Store
   const currentProject = useProjectStore((state) => state.currentProject)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
+  const updateProject = useProjectStore((state) => state.updateProject)
   const createTranslationForBatch = useProjectStore((state) => state.createTranslationForBatch)
   const removeTranslationFromBatch = useProjectStore((state) => state.removeTranslationFromBatch)
   const setHasChanges = useSetUnsavedChanges()
@@ -616,7 +616,7 @@ export function BatchTranslationView({ settingsId, onOpenExtractionSettings }: B
 
                 <BatchAutoContextSettings
                   isProcessing={isProcessing}
-                  onOpenExtractionSettings={onOpenExtractionSettings}
+                  onOpenExtractionSettings={() => setIsExtractionSettingsOpen(true)}
                 />
               </FieldGroup>
 
@@ -686,6 +686,35 @@ export function BatchTranslationView({ settingsId, onOpenExtractionSettings }: B
         extractionBatchFiles={extractionBatchFiles}
         sharedSettingsId={settingsId}
       />
+
+      {currentProject && (
+        <>
+          <SettingsDialogue
+            mode="project"
+            isOpen={isExtractionSettingsOpen}
+            onOpenChange={setIsExtractionSettingsOpen}
+            projectName={currentProject.name}
+            settingsId={currentProject.defaultExtractionSettingsId}
+            resetFromSettingsId={GLOBAL_EXTRACTION_SETTINGS_ID}
+            settingsParentType="extraction"
+            isDefaultEnabled={currentProject.isDefaultExtractionEnabled}
+            onDefaultEnabledChange={(enabled) => void updateProject(currentProject.id, {
+              isDefaultExtractionEnabled: enabled,
+            })}
+            onOpenGlobalSettings={() => {
+              setIsExtractionSettingsOpen(false)
+              setIsGlobalExtractionSettingsOpen(true)
+            }}
+          />
+          <SettingsDialogue
+            mode="global"
+            isOpen={isGlobalExtractionSettingsOpen}
+            onOpenChange={setIsGlobalExtractionSettingsOpen}
+            settingsId={GLOBAL_EXTRACTION_SETTINGS_ID}
+            settingsParentType="extraction"
+          />
+        </>
+      )}
 
       <AlertDialog open={!!deleteFileId} onOpenChange={(open) => !open && setDeleteFileId(null)}>
         <AlertDialogContent>

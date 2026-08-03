@@ -151,7 +151,6 @@ export default function BatchMain() {
       {operationMode === 'translation' && translationSettingsId && (
         <BatchTranslationView
           settingsId={translationSettingsId}
-          onOpenExtractionSettings={() => handleOperationModeChange("extraction")}
         />
       )}
       {operationMode === 'extraction' && extractionSettingsId && (

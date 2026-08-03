@@ -103,62 +103,64 @@ export function BatchAutoContextSettings({
       </Field>
 
       {enabled && (
-        <Field data-invalid={!!selectedProblem || undefined} data-disabled={isProcessing || undefined}>
-          <FieldLabel htmlFor="batch-auto-context-starting-context" className="text-sm font-semibold">
-            Starting Context
-          </FieldLabel>
-          <Select
-            value={selectedId ?? NO_STARTING_CONTEXT}
-            onValueChange={value => void updateAutoContext({
-              batchAutoContextStartingExtractionId: value === NO_STARTING_CONTEXT ? null : value,
-            })}
-            disabled={isProcessing}
-          >
-            <SelectTrigger id="batch-auto-context-starting-context" aria-invalid={!!selectedProblem}>
-              <SelectValue placeholder="None" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value={NO_STARTING_CONTEXT}>None</SelectItem>
-                {selectedId && !selectedIsEligible && (
-                  <SelectItem value={selectedId} disabled>
-                    {selectedExtraction?.title || "Unavailable extraction"}
-                  </SelectItem>
-                )}
-                {eligibleExtractions.map(extraction => (
-                  <SelectItem key={extraction.id} value={extraction.id}>
-                    {extraction.title || extraction.episodeNumber || "Untitled extraction"}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <FieldDescription className="text-xs">
-            {selectedExtraction
-              ? "Used by this batch as Starting Context. It remains independent and is not moved or deleted with a Translation."
-              : "Optional existing extraction used before the first file. There is no implicit latest selection."}
-          </FieldDescription>
-          {selectedProblem && <FieldError className="text-xs">{selectedProblem}</FieldError>}
-        </Field>
-      )}
+        <>
+          <Field data-invalid={!!selectedProblem || undefined} data-disabled={isProcessing || undefined}>
+            <FieldLabel htmlFor="batch-auto-context-starting-context" className="text-sm font-semibold">
+              Starting Context
+            </FieldLabel>
+            <Select
+              value={selectedId ?? NO_STARTING_CONTEXT}
+              onValueChange={value => void updateAutoContext({
+                batchAutoContextStartingExtractionId: value === NO_STARTING_CONTEXT ? null : value,
+              })}
+              disabled={isProcessing}
+            >
+              <SelectTrigger id="batch-auto-context-starting-context" aria-invalid={!!selectedProblem}>
+                <SelectValue placeholder="None" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value={NO_STARTING_CONTEXT}>None</SelectItem>
+                  {selectedId && !selectedIsEligible && (
+                    <SelectItem value={selectedId} disabled>
+                      {selectedExtraction?.title || "Unavailable extraction"}
+                    </SelectItem>
+                  )}
+                  {eligibleExtractions.map(extraction => (
+                    <SelectItem key={extraction.id} value={extraction.id}>
+                      {extraction.title || extraction.episodeNumber || "Untitled extraction"}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <FieldDescription className="text-xs">
+              {selectedExtraction
+                ? "Used by this batch as Starting Context. It remains independent and is not moved or deleted with a Translation."
+                : "Optional existing extraction used before the first file. There is no implicit latest selection."}
+            </FieldDescription>
+            {selectedProblem && <FieldError className="text-xs">{selectedProblem}</FieldError>}
+          </Field>
 
-      <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
-        <FieldContent>
-          <FieldTitle className="text-sm font-semibold">Extraction Settings</FieldTitle>
-          <FieldDescription className="text-xs">
-            New linked extractions copy the project extraction defaults.
-          </FieldDescription>
-        </FieldContent>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onOpenExtractionSettings}
-          disabled={isProcessing}
-        >
-          <RiSettings3Line data-icon="inline-start" />
-          Configure
-        </Button>
-      </Field>
+          <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
+            <FieldContent>
+              <FieldTitle className="text-sm font-semibold">Extraction Settings</FieldTitle>
+              <FieldDescription className="text-xs">
+                New linked extractions copy the project extraction defaults.
+              </FieldDescription>
+            </FieldContent>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onOpenExtractionSettings}
+              disabled={isProcessing}
+            >
+              <RiSettings3Line data-icon="inline-start" />
+              Configure
+            </Button>
+          </Field>
+        </>
+      )}
     </FieldGroup>
   )
 }
