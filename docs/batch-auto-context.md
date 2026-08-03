@@ -39,7 +39,7 @@ owned Auto Context extraction
 
 ## Continue, Restart, And Stop
 
-Continue repairs the extraction chain through completed and unfinished files, but it does not retranslate completed Translations. This allows Auto Context to be enabled after part of a batch has already been translated.
+Continue repairs the extraction chain through completed and unfinished files, but it does not retranslate completed Translations. A failed or stopped extraction is rerun in place without automatically rerunning the usable extractions below it. This allows Auto Context to be enabled after part of a batch has already been translated.
 
 Restart retranslates every file. By default it reuses valid Context Extractions. Selecting Regenerate Auto Context reruns the complete owned extraction chain before and during the restart pipeline.
 
@@ -47,7 +47,7 @@ Stop aborts the current extraction and every active Translation, clears queued w
 
 ## Failure Rules
 
-An extraction failure stops later dependent extraction and Translation work. Translations already active are allowed to finish. Continue reruns the failed owned extraction in place.
+An extraction failure stops later dependent extraction and Translation work. Translations already active are allowed to finish. Continue reruns only the failed owned extraction in place, then reuses usable downstream extractions whose recorded predecessor identity is still correct.
 
 A Translation failure is isolated. It does not stop the extraction chain or later Translations.
 
@@ -55,7 +55,7 @@ A Translation failure is isolated. It does not stop the extraction chain or late
 
 Reordering, inserting, removing, or moving files while idle changes predecessor relationships. The next run reruns the suffix beginning at the first changed predecessor. Reordering and all batch Auto Context controls are locked while processing.
 
-Completion timestamps do not invalidate the chain. A usable linked extraction is reused even if its predecessor completed later. It reruns only when its recorded predecessor changed, it is unusable, an earlier chain item must be created or rerun, or Regenerate Auto Context is selected.
+Completion timestamps do not invalidate the chain. A usable linked extraction is reused even if its predecessor completed later or was rerun in place. It reruns only when its recorded predecessor changed, it is unusable, an earlier chain item must be created, or Regenerate Auto Context is selected.
 
 Editing source subtitles or a Translation title does not invalidate a usable extraction. Regenerate Auto Context is the explicit way to refresh the chain after such edits.
 

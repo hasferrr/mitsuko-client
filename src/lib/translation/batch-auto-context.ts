@@ -112,7 +112,7 @@ export function buildBatchAutoContextPlan({
       extractionId: extraction?.id ?? null,
       action,
     })
-    upstreamChanged = upstreamChanged || action !== "reuse"
+    upstreamChanged = upstreamChanged || action === "create"
     expectedPreviousExtraction = extraction
   }
 

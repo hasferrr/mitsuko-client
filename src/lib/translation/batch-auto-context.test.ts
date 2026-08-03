@@ -117,32 +117,37 @@ describe("buildBatchAutoContextPlan", () => {
     expect(plan.items.map(item => item.action)).toEqual(["reuse", "reuse"])
   })
 
-  test("reruns a failed owned extraction in place and repairs the suffix", () => {
+  test("reruns only the failed owned extraction when the chain identity is unchanged", () => {
     const first = translation("translation-1")
     const second = translation("translation-2", {
       autoContextPreviousExtractionId: "translation-1-extraction",
     })
+    const third = translation("translation-3", {
+      autoContextPreviousExtractionId: "translation-2-extraction",
+    })
     const extractions = {
-      "translation-1-extraction": extraction("translation-1-extraction", first.id, {
+      "translation-1-extraction": extraction("translation-1-extraction", first.id),
+      "translation-2-extraction": extraction("translation-2-extraction", second.id, {
         status: "failed",
         contextResult: "<error>failed</error>",
         completedAt: null,
       }),
-      "translation-2-extraction": extraction("translation-2-extraction", second.id),
+      "translation-3-extraction": extraction("translation-3-extraction", third.id),
     }
 
     const plan = buildBatchAutoContextPlan({
       projectId: "project-1",
-      translationIds: [first.id, second.id],
+      translationIds: [first.id, second.id, third.id],
       extractionIds: Object.keys(extractions),
-      translations: { [first.id]: first, [second.id]: second },
+      translations: { [first.id]: first, [second.id]: second, [third.id]: third },
       extractions,
       startingExtractionId: null,
     })
 
     expect(plan.items).toEqual([
-      { translationId: first.id, extractionId: "translation-1-extraction", action: "rerun" },
+      { translationId: first.id, extractionId: "translation-1-extraction", action: "reuse" },
       { translationId: second.id, extractionId: "translation-2-extraction", action: "rerun" },
+      { translationId: third.id, extractionId: "translation-3-extraction", action: "reuse" },
     ])
   })
 

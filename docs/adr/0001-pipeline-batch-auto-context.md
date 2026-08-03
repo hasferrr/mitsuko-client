@@ -12,7 +12,7 @@ Moving a Translation between projects clears the ownership link while preserving
 
 Batch order is locked during processing. When files are reordered, inserted, or removed while idle, the next run reruns owned extractions in place from the first changed predecessor onward. Restart retranslates against the repaired chain, while Continue repairs the chain required by unfinished work without changing completed Translations.
 
-An extraction failure halts later dependent work, but a Translation failure does not: once a file's extraction is usable, the Context Chain continues and later Translations may start. Continue retries the incomplete Translation separately.
+An extraction failure halts later dependent work, but a Translation failure does not: once a file's extraction is usable, the Context Chain continues and later Translations may start. Continue reruns only the failed or stopped extraction in place, reuses usable extractions below it when their recorded predecessor identity is unchanged, and retries incomplete Translations separately.
 
 The first extraction may be seeded by a Starting Context selected explicitly from usable project extractions that are not owned by a Translation in the current batch. The alternatives are a specific extraction or None; there is no implicit Latest option because its identity could change between Stop and Continue. A missing, running, or otherwise unusable selected Starting Context blocks the batch before any work begins rather than falling back to empty context.
 
@@ -20,6 +20,6 @@ New Auto Context extractions copy the project's default extraction settings and 
 
 Users may explicitly link existing project extractions to batch Translations. This makes the selected extraction owned by that Translation, records the mapped predecessor chain, and detaches any replaced owned extraction without deleting it. A Starting Context remains unowned and cannot also be assigned through this action.
 
-Completion timestamps do not determine Context Chain validity. A usable linked extraction is reused even when its predecessor completed later. It is rerun only when its recorded predecessor no longer matches the chain, it is unusable, an earlier chain item must be created or rerun, or the user explicitly selects Regenerate Auto Context.
+Completion timestamps do not determine Context Chain validity. A usable linked extraction is reused even when its predecessor completed later or was rerun in place. It is rerun only when its recorded predecessor no longer matches the chain, it is unusable, an earlier chain item must be created, or the user explicitly selects Regenerate Auto Context.
 
 Editing a Translation's source subtitles or title does not invalidate a usable extraction or its chain suffix. Users who want updated context after such edits opt into Regenerate Auto Context during Restart.

@@ -517,7 +517,7 @@ export default function useBatchTranslationHandler({
       }
 
       previousExtraction = extraction
-      upstreamChanged = upstreamChanged || action !== "reuse"
+      upstreamChanged = upstreamChanged || action === "create"
     }
 
     if (runToken !== batchRunTokenRef.current) return
