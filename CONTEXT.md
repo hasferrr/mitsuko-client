@@ -21,7 +21,7 @@ A Context Extraction prepared for one Translation before that Translation begins
 _Avoid_: Shared batch extraction
 
 **Owned Auto Context Extraction**:
-A Context Extraction created specifically for one Translation as part of Auto Context. It is deleted or moved between projects with that Translation.
+A Context Extraction created specifically for one Translation as part of Auto Context. It is detached and retained in its existing project when that Translation is moved or deleted.
 _Avoid_: Selected Context Extraction
 
 **Context Chain**:

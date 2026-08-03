@@ -734,9 +734,6 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
             <AlertDialogTitle>Remove File</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to remove this file from the batch?
-              {batchFiles.find(file => file.id === deleteFileId)?.linkedExtractionId && (
-                <span className="mt-2 block">Its owned Auto Context extraction will also be deleted.</span>
-              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -6,9 +6,9 @@ Disabling Batch Auto Context does not unlink or delete its Context Extractions. 
 
 If a batch-owned extraction is deleted, the next run creates a replacement and updates its Translation's link. This recovery does not apply to a deleted Starting Context because that extraction was selected explicitly rather than owned by the batch.
 
-Deleting a Translation deletes its Owned Auto Context Extraction and that extraction's settings. It does not delete a manually selected extraction, an unowned extraction, or a Starting Context.
+Deleting a Translation clears the ownership link while preserving its Owned Auto Context Extraction and that extraction's settings. It also preserves a manually selected extraction, an unowned extraction, or a Starting Context.
 
-Moving a Translation between projects moves its Owned Auto Context Extraction and preserves their link and settings. Manually selected extractions do not move with the Translation.
+Moving a Translation between projects clears the ownership link while preserving its Owned Auto Context Extraction and settings in the source project. Manually selected extractions also remain unchanged.
 
 Batch order is locked during processing. When files are reordered, inserted, or removed while idle, the next run reruns owned extractions in place from the first changed predecessor onward. Restart retranslates against the repaired chain, while Continue repairs the chain required by unfinished work without changing completed Translations.
 

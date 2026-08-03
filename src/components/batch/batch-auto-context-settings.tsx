@@ -136,7 +136,7 @@ export function BatchAutoContextSettings({
             </Select>
             <FieldDescription className="text-xs">
               {selectedExtraction
-                ? "Used by this batch as Starting Context. It remains independent and is not moved or deleted with a Translation."
+                ? "Used by this batch as Starting Context."
                 : "Optional existing extraction used before the first file. There is no implicit latest selection."}
             </FieldDescription>
             {selectedProblem && <FieldError className="text-xs">{selectedProblem}</FieldError>}

@@ -25,6 +25,8 @@ import { DEFAULT_TRANSLATION_SETTINGS } from "@/constants/default"
 type AutoContextKey = "autoContextMode" | "autoContextExtractionId" | "autoContextPreviousMode" | "autoContextPreviousExtractionId"
 type AutoContextSetterMap = { [K in AutoContextKey]: (id: string, value: Translation[K]) => void }
 
+const OWNED_EXTRACTION_MESSAGE = "Created for this Translation."
+
 interface Props {
   settingsId: string
   translationId?: string
@@ -402,7 +404,7 @@ export const ContextDocumentInput = memo(({
                     {selectedExtraction ? (
                       <StatusMessage variant={isSelectedAutoOwned ? "info" : "warning"}>
                         {isSelectedAutoOwned
-                          ? "Owned by this Translation. Moving or deleting the Translation also moves or deletes this extraction."
+                          ? OWNED_EXTRACTION_MESSAGE
                           : "Used by this Translation, but not owned by it. This extraction remains independent."}
                       </StatusMessage>
                     ) : (
@@ -507,7 +509,7 @@ export const ContextDocumentInput = memo(({
                   {selectedExtraction && (
                     <StatusMessage variant={isSelectedAutoOwned ? "info" : "muted"}>
                       {isSelectedAutoOwned
-                        ? "Owned by this Translation. Moving or deleting the Translation also moves or deletes this extraction."
+                        ? OWNED_EXTRACTION_MESSAGE
                         : "Used by this Translation, but not owned by it. This extraction remains independent."}
                     </StatusMessage>
                   )}

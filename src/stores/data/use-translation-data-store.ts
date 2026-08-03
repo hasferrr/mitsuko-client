@@ -142,9 +142,13 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     return translation
   },
   deleteTranslationDb: async (projectId, translationId) => {
-    const deletedExtractionIds = await deleteDB(projectId, translationId)
+    const detachedExtractionIds = await deleteDB(projectId, translationId)
     const extractionStore = useExtractionDataStore.getState()
-    deletedExtractionIds.forEach(id => extractionStore.removeData(id))
+    detachedExtractionIds.forEach(id => {
+      const extraction = extractionStore.data[id]
+      if (!extraction) return
+      extractionStore.upsertData(id, { ...extraction, ownerTranslationId: null, updatedAt: new Date() })
+    })
     set(state => {
       const newData = { ...state.data }
       delete newData[translationId]
@@ -155,7 +159,7 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     }
   },
   moveTranslationDb: async (sourceProjectId, targetProjectId, translationId) => {
-    const movedExtractionIds = await moveDB(sourceProjectId, targetProjectId, translationId)
+    const detachedExtractionIds = await moveDB(sourceProjectId, targetProjectId, translationId)
     const data = get().data[translationId]
     if (data) {
       set(state => ({
@@ -163,10 +167,10 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
       }))
     }
     const extractionStore = useExtractionDataStore.getState()
-    movedExtractionIds.forEach(id => {
+    detachedExtractionIds.forEach(id => {
       const extraction = extractionStore.data[id]
       if (!extraction) return
-      extractionStore.upsertData(id, { ...extraction, projectId: targetProjectId, updatedAt: new Date() })
+      extractionStore.upsertData(id, { ...extraction, ownerTranslationId: null, updatedAt: new Date() })
     })
   },
 

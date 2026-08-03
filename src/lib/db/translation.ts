@@ -82,26 +82,23 @@ export const moveTranslation = async (
       .filter(extraction => extraction.ownerTranslationId === translationId)
       .toArray()
     const ownedExtractionIds = ownedExtractions.map(extraction => extraction.id)
+    const updatedAt = new Date()
 
-    await db.translations.update(translationId, { projectId: targetProjectId, updatedAt: new Date() })
+    await db.translations.update(translationId, { projectId: targetProjectId, updatedAt })
     await Promise.all(ownedExtractionIds.map(id => {
-      return db.extractions.update(id, { projectId: targetProjectId, updatedAt: new Date() })
+      return db.extractions.update(id, { ownerTranslationId: null, updatedAt })
     }))
 
     await db.projects.update(sourceProjectId, project => {
       if (!project) return
       project.translations = project.translations.filter(id => id !== translationId)
-      project.extractions = project.extractions.filter(id => !ownedExtractionIds.includes(id))
-      project.updatedAt = new Date()
+      project.updatedAt = updatedAt
     })
 
     await db.projects.update(targetProjectId, project => {
       if (!project) return
       if (!project.translations.includes(translationId)) project.translations.push(translationId)
-      for (const extractionId of ownedExtractionIds) {
-        if (!project.extractions.includes(extractionId)) project.extractions.push(extractionId)
-      }
-      project.updatedAt = new Date()
+      project.updatedAt = updatedAt
     })
 
     return ownedExtractionIds
@@ -117,17 +114,18 @@ export const deleteTranslation = async (projectId: string, translationId: string
       .filter(extraction => extraction.ownerTranslationId === translationId)
       .toArray()
     const ownedExtractionIds = ownedExtractions.map(extraction => extraction.id)
-    const ownedSettingsIds = ownedExtractions.map(extraction => extraction.settingsId)
+    const updatedAt = new Date()
 
     await db.translations.delete(translationId)
-    await db.extractions.bulkDelete(ownedExtractionIds)
+    await Promise.all(ownedExtractionIds.map(extractionId => {
+      return db.extractions.update(extractionId, { ownerTranslationId: null, updatedAt })
+    }))
     await db.projects.update(projectId, project => {
       if (!project) return
       project.translations = project.translations.filter(tId => tId !== translationId)
-      project.extractions = project.extractions.filter(eId => !ownedExtractionIds.includes(eId))
-      project.updatedAt = new Date()
+      project.updatedAt = updatedAt
     })
-    await deleteSettingsIfUnreferenced([translation.settingsId, ...ownedSettingsIds])
+    await deleteSettingsIfUnreferenced([translation.settingsId])
     return ownedExtractionIds
   })
 }

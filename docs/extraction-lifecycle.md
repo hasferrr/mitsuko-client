@@ -18,8 +18,8 @@ Each `Extraction` stores:
 
 Ownership also controls entity lifecycle:
 
-- deleting a Translation deletes its owned Auto Context extraction and the extraction's settings
-- moving a Translation between projects moves its owned Auto Context extraction and preserves the link
+- deleting a Translation clears ownership while preserving the Auto Context extraction and its settings
+- moving a Translation between projects clears ownership while preserving the Auto Context extraction and its settings in the source project
 - manually selected or Starting Context extractions are used by a Translation or batch but are not owned, so they do not cascade
 
 ## Status Rules

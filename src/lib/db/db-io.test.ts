@@ -394,8 +394,8 @@ describe('unified settings persistence', () => {
 })
 
 describe('owned Auto Context extraction lifecycle', () => {
-  test('deleting a Translation cascades only to its owned extraction', async () => {
-    const project = await createProject('Cascade Project')
+  test('deleting a Translation detaches and preserves its owned extraction', async () => {
+    const project = await createProject('Detach Project')
     const translation = await createTranslation(project.id, {
       title: 'Episode 1',
       subtitles: [],
@@ -418,19 +418,21 @@ describe('owned Auto Context extraction lifecycle', () => {
     })
     await updateTranslation(translation.id, { autoContextExtractionId: used.id })
 
-    const deletedIds = await deleteTranslation(project.id, translation.id)
+    const detachedIds = await deleteTranslation(project.id, translation.id)
     const updatedProject = await db.projects.get(project.id)
+    const detachedExtraction = await db.extractions.get(owned.id)
 
-    expect(deletedIds).toEqual([owned.id])
+    expect(detachedIds).toEqual([owned.id])
     expect(await db.translations.get(translation.id)).toBeUndefined()
-    expect(await db.extractions.get(owned.id)).toBeUndefined()
+    expect(detachedExtraction?.ownerTranslationId).toBeNull()
     expect(await db.extractions.get(used.id)).toBeDefined()
-    expect(updatedProject?.extractions).toEqual([used.id])
-    expect(await db.settings.get(owned.settingsId)).toBeUndefined()
+    expect(updatedProject?.extractions).toEqual([owned.id, used.id])
+    expect(await db.settings.get(owned.settingsId)).toBeDefined()
     expect(await db.settings.get(used.settingsId)).toBeDefined()
+    expect(await db.settings.get(translation.settingsId)).toBeUndefined()
   })
 
-  test('moving a Translation moves only its owned extraction', async () => {
+  test('moving a Translation detaches and leaves its owned extraction in the source project', async () => {
     const source = await createProject('Source Project')
     const target = await createProject('Target Project')
     const translation = await createTranslation(source.id, {
@@ -455,7 +457,7 @@ describe('owned Auto Context extraction lifecycle', () => {
     })
     await updateTranslation(translation.id, { autoContextExtractionId: used.id })
 
-    const movedIds = await moveTranslation(source.id, target.id, translation.id)
+    const detachedIds = await moveTranslation(source.id, target.id, translation.id)
     const [updatedSource, updatedTarget, movedTranslation, movedOwned, unmovedUsed] = await Promise.all([
       db.projects.get(source.id),
       db.projects.get(target.id),
@@ -464,14 +466,15 @@ describe('owned Auto Context extraction lifecycle', () => {
       db.extractions.get(used.id),
     ])
 
-    expect(movedIds).toEqual([owned.id])
+    expect(detachedIds).toEqual([owned.id])
     expect(updatedSource?.translations).not.toContain(translation.id)
-    expect(updatedSource?.extractions).toEqual([used.id])
+    expect(updatedSource?.extractions).toEqual([owned.id, used.id])
     expect(updatedTarget?.translations).toContain(translation.id)
-    expect(updatedTarget?.extractions).toContain(owned.id)
+    expect(updatedTarget?.extractions).toEqual([])
     expect(movedTranslation?.projectId).toBe(target.id)
     expect(movedTranslation?.autoContextExtractionId).toBe(used.id)
-    expect(movedOwned?.projectId).toBe(target.id)
+    expect(movedOwned?.projectId).toBe(source.id)
+    expect(movedOwned?.ownerTranslationId).toBeNull()
     expect(unmovedUsed?.projectId).toBe(source.id)
   })
 })

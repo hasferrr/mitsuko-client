@@ -63,4 +63,4 @@ A newly created owned extraction copies the project's default extraction setting
 
 Owned extractions are titled `Auto Context for {Translation title}`. The Translation UI shows the linked extraction title, status, and Open action. The extraction UI identifies its owning Translation and provides an Open Translation action.
 
-Deleting a Translation deletes its owned extraction and that extraction's settings. Moving a Translation moves its owned extraction to the target project. A manually selected extraction or Starting Context is merely used by the Translation or batch and neither deletes nor moves with it.
+Deleting a Translation detaches and preserves its owned extraction and that extraction's settings. Moving a Translation also detaches the owned extraction and leaves it in the source project. A manually selected extraction or Starting Context is merely used by the Translation or batch and remains unchanged.
