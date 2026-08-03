@@ -691,7 +691,7 @@ export default function SubtitleTranslatorMain({
                   <ContextDocumentInput
                     settingsId={settingsId}
                     translationId={currentId}
-                    isManualContextReadOnly={!!isSharedSettings}
+                    isDisabled={!!isSharedSettings}
                     onOpenExtraction={openExtractionPreview}
                     onOpenExtractionSettings={currentProject ? () => setIsExtractionSettingsOpen(true) : undefined}
                   />

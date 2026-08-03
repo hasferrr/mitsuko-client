@@ -29,7 +29,7 @@ interface Props {
   settingsId: string
   translationId?: string
   isTemplateTranslation?: boolean
-  isManualContextReadOnly?: boolean
+  isDisabled?: boolean
   onOpenExtraction?: (extractionId: string) => void
   onOpenExtractionSettings?: () => void
 }
@@ -89,7 +89,7 @@ export const ContextDocumentInput = memo(({
   settingsId,
   translationId,
   isTemplateTranslation = false,
-  isManualContextReadOnly = false,
+  isDisabled = false,
   onOpenExtraction,
   onOpenExtractionSettings,
 }: Props) => {
@@ -279,7 +279,12 @@ export const ContextDocumentInput = memo(({
   })()
 
   return (
-    <div className="flex flex-col gap-2">
+    <div
+      data-disabled={isDisabled || undefined}
+      aria-disabled={isDisabled}
+      inert={isDisabled ? true : undefined}
+      className={cn("flex flex-col gap-2", isDisabled && "pointer-events-none opacity-50")}
+    >
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium">Context Document</label>
         <div className="flex items-center gap-1.5">
@@ -291,19 +296,18 @@ export const ContextDocumentInput = memo(({
                 setIsAutoContextDialogOpen(true)
               }}
             >
-              <WandSparkles />
+              <WandSparkles data-icon="inline-start" />
               Auto
             </Button>
           )}
           <Button
             variant="outline"
-            disabled={isManualContextReadOnly}
             onClick={() => {
               loadProjectExtractions()
               setIsContextDialogOpen(true)
             }}
           >
-            <FolderDown />
+            <FolderDown data-icon="inline-start" />
             Import
           </Button>
         </div>
@@ -311,13 +315,13 @@ export const ContextDocumentInput = memo(({
       <Textarea
         value={contextDocument}
         onChange={handleContextDocumentChange}
-        readOnly={isManualContextReadOnly}
+        readOnly={isDisabled}
         className="min-h-[120px] h-[120px] max-h-[300px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
         placeholder="Add context about the video..."
         onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`)}
       />
       <p className="text-xs text-muted-foreground">
-        {isManualContextReadOnly
+        {isDisabled
           ? "This batch uses the shared manual Context Document. Auto Context remains linked to this Translation."
           : (
             <>
