@@ -70,12 +70,18 @@ export function BatchAutoContextPreviewDialog({
             </Alert>
           )}
 
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5 text-sm font-medium">
-              <FileText className="size-4 text-muted-foreground" />
-              Preview final context
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 items-start gap-1.5">
+              <FileText className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+              <div className="min-w-0">
+                <div className="text-sm font-medium">Preview final context</div>
+                <div className="line-clamp-1 break-all text-xs text-muted-foreground">
+                  {extraction.title || "Untitled context"}
+                  {extraction.episodeNumber && ` · Episode ${extraction.episodeNumber}`}
+                </div>
+              </div>
             </div>
-            <ExtractionBadges extraction={extraction} runningIds={runningIds} size="compact" />
+            <ExtractionBadges extraction={extraction} runningIds={runningIds} size="compact" className="shrink-0" />
           </div>
 
           {preview ? (

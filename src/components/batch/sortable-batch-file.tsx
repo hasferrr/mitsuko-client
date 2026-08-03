@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
   Download,
+  File,
   FileText,
   FileWarning,
   X,
@@ -16,6 +17,9 @@ import {
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
+import { cleanExtractionContent, getEffectiveExtractionStatus } from "@/lib/extraction/status"
+import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
+import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { DownloadOption } from "@/types/subtitles"
 import { BatchFile } from "../../types/batch"
 
@@ -49,6 +53,10 @@ export function SortableBatchFile({
     disabled: selectMode || isProcessing,
   })
   const style = { transform: CSS.Transform.toString(transform), transition }
+  const linkedExtraction = useExtractionDataStore((state) => (
+    batchFile.linkedExtractionId ? state.data[batchFile.linkedExtractionId] : undefined
+  ))
+  const isExtractingSet = useExtractionStore((state) => state.isExtractingSet)
 
   const handleTitleClick = () => {
     if (!selectMode) {
@@ -67,7 +75,11 @@ export function SortableBatchFile({
     : downloadOption === "translated"
       ? "Translated Text"
       : "Original + Translated"
-  const hasAutoContextError = batchFile.status === "error"
+  const hasAutoContextError = batchFile.translationStage === "context-error"
+  const linkedExtractionIsEmptyOrDraft = linkedExtraction
+    ? getEffectiveExtractionStatus(linkedExtraction, isExtractingSet) === "idle"
+      || cleanExtractionContent(linkedExtraction.contextResult) === ""
+    : false
 
   return (
     <Card
@@ -169,7 +181,9 @@ export function SortableBatchFile({
                 >
                   {hasAutoContextError
                     ? <FileWarning className="size-4" />
-                    : <FileText className="size-4" />}
+                    : linkedExtractionIsEmptyOrDraft
+                      ? <File className="size-4" />
+                      : <FileText className="size-4" />}
                   <span className="sr-only">Preview final context</span>
                 </Button>
               </TooltipTrigger>
