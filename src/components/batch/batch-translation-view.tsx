@@ -557,20 +557,20 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
           <Card size="sm" className="mt-4 w-full shadow-xs">
             <CardContent className="flex flex-col gap-4">
               <FieldGroup className="gap-4">
-                <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
-                  <FieldContent>
-                    <FieldLabel htmlFor="shared-settings-switch" className="text-sm font-semibold">Settings Mode</FieldLabel>
-                    <FieldDescription className="text-xs">
-                      {isUseSharedSettings ? "Using shared batch settings" : "Using individual file settings"}
-                    </FieldDescription>
-                  </FieldContent>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="shared-settings-switch" className="flex flex-col">
+                    <span className="text-sm font-semibold">Settings Mode</span>
+                    <span className="text-xs text-muted-foreground">
+                      {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
+                    </span>
+                  </label>
                   <Switch
                     id="shared-settings-switch"
                     checked={isUseSharedSettings}
                     onCheckedChange={checked => setUseSharedSettings(currentProject?.id ?? "", checked)}
                     disabled={isProcessing}
                   />
-                </Field>
+                </div>
 
                 <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
                   <FieldContent>
