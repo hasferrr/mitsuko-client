@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import { ChevronLeft, ChevronRight, ArrowLeft, Loader2, ListChecks, ListX, ListRestart } from "lucide-react"
@@ -19,17 +19,37 @@ interface PopulateContextDialogProps {
   onOpenChange: (open: boolean) => void
   translationBatchFiles: BatchFile[]
   extractionBatchFiles: BatchFile[]
+  mode?: "populate" | "link"
+  startingExtractionId?: string | null
 }
 
-export function PopulateContextDialog({ open, onOpenChange, translationBatchFiles, extractionBatchFiles }: PopulateContextDialogProps) {
+export function PopulateContextDialog({
+  open,
+  onOpenChange,
+  translationBatchFiles,
+  extractionBatchFiles,
+  mode = "populate",
+  startingExtractionId = null,
+}: PopulateContextDialogProps) {
+  const isLinkMode = mode === "link"
   const translationIds = useMemo(() => translationBatchFiles.map(b => b.id), [translationBatchFiles])
-  const extractionIds = useMemo(() => extractionBatchFiles.map(b => b.id), [extractionBatchFiles])
+  const mappingExtractionBatchFiles = useMemo(() => {
+    return isLinkMode
+      ? extractionBatchFiles.filter(file => file.id !== startingExtractionId)
+      : extractionBatchFiles
+  }, [extractionBatchFiles, isLinkMode, startingExtractionId])
+  const extractionIds = useMemo(
+    () => mappingExtractionBatchFiles.map(b => b.id),
+    [mappingExtractionBatchFiles],
+  )
 
   // Stores
   const getTranslationsDb = useTranslationDataStore(s => s.getTranslationsDb)
   const translationStore = useTranslationDataStore(s => s.data)
+  const updateTranslationDb = useTranslationDataStore(s => s.updateTranslationDb)
   const getExtractionsDb = useExtractionDataStore(s => s.getExtractionsDb)
   const extractionStore = useExtractionDataStore(s => s.data)
+  const updateExtractionDb = useExtractionDataStore(s => s.updateExtractionDb)
   const setBasicSettingsValue = useSettingsStore(s => s.setBasicSettingsValue)
 
   // Local state
@@ -58,19 +78,22 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
           getExtractionsDb(extractionIds),
         ])
         if (cancelled) return
-        // Default mapping by index alignment
+        const loadedTranslations = useTranslationDataStore.getState().data
         const initMap: Record<string, string | null> = {}
         const initSel: Record<string, boolean> = {}
         for (let i = 0; i < translationIds.length; i++) {
           const tId = translationIds[i]
-          const eId = extractionIds[i] ?? null
+          const linkedId = loadedTranslations[tId]?.autoContextExtractionId
+          const eId = isLinkMode && linkedId && extractionIds.includes(linkedId)
+            ? linkedId
+            : extractionIds[i] ?? null
           initMap[tId] = eId
           initSel[tId] = !!eId
         }
         setMapping(initMap)
         setSelected(initSel)
       } catch (e) {
-        console.error("Failed to load items for Populate Context dialog", e)
+        console.error(`Failed to load items for ${isLinkMode ? "Link" : "Populate"} Context dialog`, e)
         toast.error("Failed to load items")
       } finally {
         setIsLoading(false)
@@ -79,7 +102,7 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
     load()
     return () => { cancelled = true }
     // oxlint-disable-next-line react/exhaustive-deps
-  }, [open, translationIds.join("|"), extractionIds.join("|")])
+  }, [open, isLinkMode, translationIds.join("|"), extractionIds.join("|")])
 
   const handleShift = (tId: string, dir: -1 | 1) => {
     const cur = mapping[tId]
@@ -164,6 +187,95 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
   const handleApply = async () => {
     setIsApplying(true)
     try {
+      if (isLinkMode) {
+        const links = translationIds.flatMap(translationId => {
+          const extractionId = mapping[translationId]
+          return selected[translationId] && extractionId
+            ? [{ translationId, extractionId }]
+            : []
+        })
+        const linkedExtractionIds = links.map(link => link.extractionId)
+        if (new Set(linkedExtractionIds).size !== linkedExtractionIds.length) {
+          toast.error("Each extraction can only be linked to one translation.")
+          return
+        }
+
+        const selectedTranslationIds = new Set(links.map(link => link.translationId))
+        const currentTranslations = useTranslationDataStore.getState().data
+        const currentExtractions = useExtractionDataStore.getState().data
+        const ownershipConflict = links.find(({ translationId, extractionId }) => {
+          const ownerId = currentExtractions[extractionId]?.ownerTranslationId
+          return ownerId && ownerId !== translationId && !selectedTranslationIds.has(ownerId)
+        })
+        if (ownershipConflict) {
+          const extraction = currentExtractions[ownershipConflict.extractionId]
+          const owner = extraction.ownerTranslationId ? currentTranslations[extraction.ownerTranslationId] : null
+          toast.error(`${extraction.title || "This extraction"} is already linked to ${owner?.title || "another translation"}.`)
+          return
+        }
+
+        const linkedIdByTranslation = new Map(links.map(link => [link.translationId, link.extractionId]))
+        const plannedOwnerByExtraction = new Map(
+          Object.values(currentExtractions).map(extraction => [extraction.id, extraction.ownerTranslationId]),
+        )
+        for (const extraction of Object.values(currentExtractions)) {
+          if (
+            extraction.ownerTranslationId
+            && selectedTranslationIds.has(extraction.ownerTranslationId)
+            && linkedIdByTranslation.get(extraction.ownerTranslationId) !== extraction.id
+          ) {
+            plannedOwnerByExtraction.set(extraction.id, null)
+          }
+        }
+        links.forEach(({ translationId, extractionId }) => {
+          plannedOwnerByExtraction.set(extractionId, translationId)
+        })
+
+        let previousExtractionId = startingExtractionId
+        const translationChanges = new Map<string, {
+          autoContextMode: "use-existing"
+          autoContextExtractionId: string
+          autoContextPreviousMode: "selected" | "none"
+          autoContextPreviousExtractionId: string | null
+        }>()
+        for (const translationId of translationIds) {
+          const linkedId = linkedIdByTranslation.get(translationId)
+          if (linkedId) {
+            translationChanges.set(translationId, {
+              autoContextMode: "use-existing",
+              autoContextExtractionId: linkedId,
+              autoContextPreviousMode: previousExtractionId ? "selected" : "none",
+              autoContextPreviousExtractionId: previousExtractionId,
+            })
+          }
+
+          const projectedExtractionId = linkedId ?? currentTranslations[translationId]?.autoContextExtractionId
+          previousExtractionId = projectedExtractionId
+            && plannedOwnerByExtraction.get(projectedExtractionId) === translationId
+            ? projectedExtractionId
+            : null
+        }
+
+        const extractionUpdates = Object.values(currentExtractions).flatMap(extraction => {
+          const plannedOwnerId = plannedOwnerByExtraction.get(extraction.id) ?? null
+          return extraction.ownerTranslationId !== plannedOwnerId
+            ? [updateExtractionDb(extraction.id, { ownerTranslationId: plannedOwnerId })]
+            : []
+        })
+        await Promise.all(extractionUpdates)
+        await Promise.all([...translationChanges].map(([translationId, changes]) => {
+          return updateTranslationDb(translationId, changes)
+        }))
+
+        if (links.length > 0) {
+          toast.success(`Linked context for ${links.length} translation${links.length === 1 ? "" : "s"}`)
+        } else {
+          toast.message("Nothing to link")
+        }
+        onOpenChange(false)
+        return
+      }
+
       let applied = 0
       let empties = 0
       for (const tId of translationIds) {
@@ -197,22 +309,26 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Populate Context Document from Extractions</DialogTitle>
+          <DialogTitle>
+            {isLinkMode
+              ? "Link Context Extractions to Translations"
+              : "Populate Context Document from Extractions"}
+          </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           {/* Controls */}
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={handleSelectAllToggle} disabled={isLoading || translationIds.length === 0}>
-              <ListChecks className="size-4" />
+              <ListChecks data-icon="inline-start" />
               Select All
             </Button>
             <Button variant="outline" size="sm" onClick={handleDeselectAll} disabled={isLoading || translationIds.length === 0}>
-              <ListX className="size-4" />
+              <ListX data-icon="inline-start" />
               Deselect All
             </Button>
             <Button variant="outline" size="sm" onClick={handleResetMapping} disabled={isLoading}>
-              <ListRestart className="size-4" />
+              <ListRestart data-icon="inline-start" />
               Reset Mapping
             </Button>
 
@@ -223,22 +339,23 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
                 size="icon"
                 onClick={() => handleShiftAll(-1)}
                 disabled={isLoading || extractionIds.length === 0}
+                aria-label="Shift all mappings left"
               >
-                <ChevronLeft className="size-4" />
+                <ChevronLeft />
               </Button>
-              <div
-                className="h-8 px-4 text-xs cursor-default select-none pointer-events-none border border-input bg-background rounded-md inline-flex items-center justify-center"
-                aria-hidden
-              >
-                Shift All
-              </div>
+              <Button variant="outline" asChild>
+                <span className="pointer-events-none" aria-hidden>
+                  Shift All
+                </span>
+              </Button>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => handleShiftAll(+1)}
                 disabled={isLoading || extractionIds.length === 0}
+                aria-label="Shift all mappings right"
               >
-                <ChevronRight className="size-4" />
+                <ChevronRight />
               </Button>
             </div>
           </div>
@@ -268,29 +385,43 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
                       <ArrowLeft className="size-4 text-muted-foreground shrink-0" />
                     )}
                     <div className="flex items-center gap-2 min-w-[360px]">
-                      <Button variant="outline" size="icon" onClick={() => handleShift(t.id, -1)} disabled={isLoading || extractionIds.length === 0}>
-                        <ChevronLeft className="size-4" />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleShift(t.id, -1)}
+                        disabled={isLoading || extractionIds.length === 0}
+                        aria-label={`Shift mapping for ${t.title || "Untitled"} left`}
+                      >
+                        <ChevronLeft />
                       </Button>
                       <Select value={mappedId ?? undefined} onValueChange={(val) => handleSelectChange(t.id, val)}>
                         <SelectTrigger className="w-[300px]">
                           <SelectValue placeholder="Select extraction" />
                         </SelectTrigger>
                         <SelectContent>
-                          {extractionBatchFiles.map((e) => (
-                            <SelectItem key={e.id} value={e.id}>
-                              <div className="flex flex-col items-start text-sm">
-                                Episode {e.title}
-                                <span className="text-xs text-muted-foreground">
-                                  <span className="font-medium">status: {e.status}</span>
-                                  <span className="font-extralight">{e.description && " - " + e.description}</span>
-                                </span>
-                              </div>
-                            </SelectItem>
-                          ))}
+                          <SelectGroup>
+                            {mappingExtractionBatchFiles.map((e) => (
+                              <SelectItem key={e.id} value={e.id}>
+                                <div className="flex flex-col items-start text-sm">
+                                  Episode {e.title}
+                                  <span className="text-xs text-muted-foreground">
+                                    <span className="font-medium">status: {e.status}</span>
+                                    <span className="font-extralight">{e.description && " - " + e.description}</span>
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
                         </SelectContent>
                       </Select>
-                      <Button variant="outline" size="icon" onClick={() => handleShift(t.id, +1)} disabled={isLoading || extractionIds.length === 0}>
-                        <ChevronRight className="size-4" />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleShift(t.id, +1)}
+                        disabled={isLoading || extractionIds.length === 0}
+                        aria-label={`Shift mapping for ${t.title || "Untitled"} right`}
+                      >
+                        <ChevronRight />
                       </Button>
                     </div>
                   </div>
@@ -307,11 +438,11 @@ export function PopulateContextDialog({ open, onOpenChange, translationBatchFile
           <Button onClick={handleApply} disabled={isApplying || isLoading || translationIds.length === 0}>
             {isApplying ? (
               <>
-                <Loader2 className="size-4 animate-spin" />
-                Applying...
+                <Loader2 data-icon="inline-start" className="animate-spin" />
+                {isLinkMode ? "Linking..." : "Applying..."}
               </>
             ) : (
-              "Apply"
+              isLinkMode ? "Link Context" : "Apply"
             )}
           </Button>
         </DialogFooter>

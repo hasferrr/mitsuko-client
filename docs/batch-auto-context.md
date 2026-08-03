@@ -17,6 +17,8 @@ Each Translation continues to store its linked extraction and recorded predecess
 
 Disabling the project setting preserves all links. Re-enabling reuses usable owned extractions, reruns failed or stopped extractions in place, and creates only missing extractions.
 
+The batch Translation view can also link existing project extractions to Translations in bulk. Linking assigns each selected extraction to one Translation, records the current Context Chain predecessors, and detaches any replaced owned extraction without deleting it. The selected Starting Context cannot also be linked as an owned extraction.
+
 ## Starting Context
 
 Starting Context is either None or one explicitly selected usable Context Extraction in the same project. There is no implicit Latest option.
@@ -61,6 +63,6 @@ If a user manually repairs an extraction result and marks it completed, the pipe
 
 A newly created owned extraction copies the project's default extraction settings. That extraction owns the snapshot afterward. Reruns preserve its saved settings; later project-default changes affect only new extractions.
 
-Owned extractions are titled `Auto Context for {Translation title}`. The Translation UI shows the linked extraction title, status, and Open action. The extraction UI identifies its owning Translation and provides an Open Translation action.
+Auto-created owned extractions are titled `Auto Context for {Translation title}`. The Translation UI shows the linked extraction title, status, and Open action. The extraction UI identifies its owning Translation and provides an Open Translation action.
 
-Deleting a Translation detaches and preserves its owned extraction and that extraction's settings. Moving a Translation also detaches the owned extraction and leaves it in the source project. A manually selected extraction or Starting Context is merely used by the Translation or batch and remains unchanged.
+Deleting a Translation detaches and preserves its owned extraction and that extraction's settings. Moving a Translation also detaches the owned extraction and leaves it in the source project. A manually selected extraction outside the batch Link Context action, or a Starting Context, is merely used by the Translation or batch and remains unchanged.

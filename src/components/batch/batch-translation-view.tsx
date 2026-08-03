@@ -35,12 +35,11 @@ import {
   CheckSquare,
   ListChecks,
   AlertTriangle,
-  FolderInput,
   FastForward,
   Trash,
   Upload
 } from "lucide-react"
-import { RiSparkling2Line } from "@remixicon/react"
+import { RiLinksLine, RiSparkling2Line } from "@remixicon/react"
 import {
   LanguageSelection,
   ModelSelection,
@@ -132,7 +131,7 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
   const [isRestartDialogOpen, setIsRestartDialogOpen] = useState(false)
   const [isStartDialogOpen, setIsStartDialogOpen] = useState(false)
   const [isContinueDialogOpen, setIsContinueDialogOpen] = useState(false)
-  const [isPopulateDialogOpen, setIsPopulateDialogOpen] = useState(false)
+  const [isLinkContextDialogOpen, setIsLinkContextDialogOpen] = useState(false)
   const [isCopySharedDialogOpen, setIsCopySharedDialogOpen] = useState(false)
   const [isExtractionSettingsOpen, setIsExtractionSettingsOpen] = useState(false)
   const [isGlobalExtractionSettingsOpen, setIsGlobalExtractionSettingsOpen] = useState(false)
@@ -200,7 +199,7 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
     autoContextStageMap,
   )
 
-  // Also need extraction files just for "Populate Context" and "Copy Shared Settings" features that might cross-reference
+  // Also need extraction files just for "Link Context" and "Copy Shared Settings" features that might cross-reference
   const { batchFiles: extractionBatchFiles } = useBatchExtractionFiles(
     currentProject?.extractions ?? [],
     new Set()
@@ -456,11 +455,15 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
               variant="outline"
               size="sm"
               className="rounded-lg"
-              onClick={() => setIsPopulateDialogOpen(true)}
-              disabled={isProcessing || batchFiles.length === 0}
+              onClick={() => setIsLinkContextDialogOpen(true)}
+              disabled={
+                isProcessing
+                || batchFiles.length === 0
+                || !currentProject?.isBatchAutoContextEnabled
+              }
             >
-              <FolderInput data-icon="inline-start" />
-              Populate Context
+              <RiLinksLine data-icon="inline-start" />
+              Link Context
             </Button>
           )}
           {!isSelecting && (
@@ -690,10 +693,12 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
 
       {/* Dialogs */}
       <PopulateContextDialog
-        open={isPopulateDialogOpen}
-        onOpenChange={setIsPopulateDialogOpen}
+        open={isLinkContextDialogOpen}
+        onOpenChange={setIsLinkContextDialogOpen}
         translationBatchFiles={batchFiles}
         extractionBatchFiles={extractionBatchFiles}
+        mode="link"
+        startingExtractionId={currentProject?.batchAutoContextStartingExtractionId}
       />
 
       <CopySharedSettingsDialog
