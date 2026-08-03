@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import {
   Download,
   FileText,
+  FileWarning,
   X,
   GripVertical,
   Loader2,
@@ -66,6 +67,7 @@ export function SortableBatchFile({
     : downloadOption === "translated"
       ? "Translated Text"
       : "Original + Translated"
+  const hasAutoContextError = batchFile.status === "error"
 
   return (
     <Card
@@ -165,7 +167,9 @@ export function SortableBatchFile({
                     onPreviewAutoContext(batchFile.id)
                   }}
                 >
-                  <FileText className="size-4" />
+                  {hasAutoContextError
+                    ? <FileWarning className="size-4" />
+                    : <FileText className="size-4" />}
                   <span className="sr-only">Preview final context</span>
                 </Button>
               </TooltipTrigger>
