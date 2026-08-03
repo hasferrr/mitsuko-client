@@ -225,9 +225,25 @@ export const ContextDocumentInput = memo(({
     ? getExtractionProblem(selectedExtraction ?? undefined, translation.projectId, isExtractingSet)
     : null
   const isSelectedAutoOwned = !!(translation && selectedExtraction && isAutoContextOwnedBy(selectedExtraction, translation.id))
+  const autoContextMode = translation?.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
+  const isBatchManagedAutoContext = !!(
+    currentProject?.isBatch
+    && !isTemplateTranslation
+    && translation
+    && translation.projectId === currentProject.id
+  )
+  const isBatchAutoContextEnabled = isBatchManagedAutoContext && !!currentProject?.isBatchAutoContextEnabled
+  const isAutoContextEnabled = isBatchManagedAutoContext
+    ? isBatchAutoContextEnabled
+    : autoContextMode !== "disabled"
 
   const previewCleanedExtraction = (() => {
-    if (!translation || !selectedExtraction || translation.autoContextMode === "disabled") return ""
+    if (!translation || !selectedExtraction) return ""
+    if (isBatchManagedAutoContext) {
+      if (!isBatchAutoContextEnabled || !isSelectedAutoOwned || isSelectedExtractionRunning || selectedProblem) return ""
+      return cleanExtractionResult(selectedExtraction.contextResult)
+    }
+    if (translation.autoContextMode === "disabled") return ""
     if (isSelectedExtractionRunning) return ""
     if (selectedProblem && !isSelectedAutoOwned) return ""
     if (translation.autoContextMode === "create-new") return ""
@@ -239,6 +255,20 @@ export const ContextDocumentInput = memo(({
     : contextDocument
 
   const previewDisplayValue = (() => {
+    if (isBatchManagedAutoContext) {
+      if (!isBatchAutoContextEnabled) return contextDocument || ""
+      const extractionPlaceholder = isSelectedExtractionRunning
+        ? "[Extraction is still running]"
+        : !selectedExtraction || !isSelectedAutoOwned
+          ? "[Extraction has not run yet — it will be created when batch translation starts]"
+          : selectedProblem
+            ? "[Extraction will be regenerated when batch translation starts]"
+            : ""
+      if (!extractionPlaceholder) return previewCombinedContext || ""
+      return contextDocument
+        ? `${contextDocument}\n\n${extractionPlaceholder}`
+        : extractionPlaceholder
+    }
     if (!translation || translation.autoContextMode === "disabled") {
       return previewCombinedContext || ""
     }
@@ -254,17 +284,6 @@ export const ContextDocumentInput = memo(({
       ? `${contextDocument}\n\n${extractionPlaceholder}`
       : extractionPlaceholder
   })()
-
-  const autoContextMode = translation?.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
-  const isBatchManagedAutoContext = !!(
-    currentProject?.isBatch
-    && !isTemplateTranslation
-    && translation
-    && translation.projectId === currentProject.id
-  )
-  const isAutoContextEnabled = isBatchManagedAutoContext
-    ? currentProject.isBatchAutoContextEnabled
-    : autoContextMode !== "disabled"
 
   return (
     <div className="flex flex-col gap-2">
@@ -623,7 +642,10 @@ export const ContextDocumentInput = memo(({
                 </div>
               )}
 
-              {!isTemplateTranslation && autoContextMode !== "disabled" && (
+                </>
+              )}
+
+              {!isTemplateTranslation && (isBatchManagedAutoContext || autoContextMode !== "disabled") && (
                 <Collapsible open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" size="sm" className="w-full justify-between">
@@ -646,8 +668,6 @@ export const ContextDocumentInput = memo(({
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
-              )}
-                </>
               )}
             </div>
 
