@@ -76,35 +76,58 @@ export const moveTranslation = async (
   sourceProjectId: string,
   targetProjectId: string,
   translationId: string,
-): Promise<void> => {
-  return db.transaction('rw', db.projects, db.translations, async () => {
+): Promise<string[]> => {
+  return db.transaction('rw', db.projects, db.translations, db.extractions, async () => {
+    const ownedExtractions = await db.extractions
+      .filter(extraction => extraction.ownerTranslationId === translationId)
+      .toArray()
+    const ownedExtractionIds = ownedExtractions.map(extraction => extraction.id)
+
     await db.translations.update(translationId, { projectId: targetProjectId, updatedAt: new Date() })
+    await Promise.all(ownedExtractionIds.map(id => {
+      return db.extractions.update(id, { projectId: targetProjectId, updatedAt: new Date() })
+    }))
 
     await db.projects.update(sourceProjectId, project => {
       if (!project) return
       project.translations = project.translations.filter(id => id !== translationId)
+      project.extractions = project.extractions.filter(id => !ownedExtractionIds.includes(id))
       project.updatedAt = new Date()
     })
 
     await db.projects.update(targetProjectId, project => {
       if (!project) return
-      project.translations.push(translationId)
+      if (!project.translations.includes(translationId)) project.translations.push(translationId)
+      for (const extractionId of ownedExtractionIds) {
+        if (!project.extractions.includes(extractionId)) project.extractions.push(extractionId)
+      }
       project.updatedAt = new Date()
     })
+
+    return ownedExtractionIds
   })
 }
 
-export const deleteTranslation = async (projectId: string, translationId: string): Promise<void> => {
+export const deleteTranslation = async (projectId: string, translationId: string): Promise<string[]> => {
   return db.transaction('rw', db.projects, db.translations, db.extractions, db.settings, async () => {
     const translation = await db.translations.get(translationId)
-    if (!translation) return
+    if (!translation) return []
+
+    const ownedExtractions = await db.extractions
+      .filter(extraction => extraction.ownerTranslationId === translationId)
+      .toArray()
+    const ownedExtractionIds = ownedExtractions.map(extraction => extraction.id)
+    const ownedSettingsIds = ownedExtractions.map(extraction => extraction.settingsId)
 
     await db.translations.delete(translationId)
+    await db.extractions.bulkDelete(ownedExtractionIds)
     await db.projects.update(projectId, project => {
       if (!project) return
       project.translations = project.translations.filter(tId => tId !== translationId)
+      project.extractions = project.extractions.filter(eId => !ownedExtractionIds.includes(eId))
       project.updatedAt = new Date()
     })
-    await deleteSettingsIfUnreferenced([translation.settingsId])
+    await deleteSettingsIfUnreferenced([translation.settingsId, ...ownedSettingsIds])
+    return ownedExtractionIds
   })
 }

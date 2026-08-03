@@ -10,7 +10,7 @@ When enabled, translation uses:
 currentContextDocumentTextarea + "\n\n" + cleanedExtractionResult
 ```
 
-The saved Context Document textarea is not overwritten. Batch translation is excluded. Continue and Fill Missing Translations also resolve auto context before starting.
+The saved Context Document textarea is not overwritten. Continue and Fill Missing Translations also resolve auto context before starting. Batch projects use the separate deterministic pipeline documented in [batch-auto-context.md](./batch-auto-context.md).
 
 ## Configurable Defaults
 
@@ -48,7 +48,7 @@ The created extraction uses:
 - project default extraction settings if project extraction defaults are enabled
 - global extraction defaults if project extraction defaults are disabled
 - current translation subtitles as `subtitleContent`
-- `[Auto Context] {translation title}` as title
+- `Auto Context for {translation title}` as title
 - translation title as episode number
 - `ownerTranslationId` set to the translation id
 
@@ -107,7 +107,7 @@ When running a newly auto-created extraction or rerunning an owned auto-context 
 
 ## UI
 
-The Context Document section has an Auto button for single translation only.
+The Context Document section has an Auto button. A normal single Translation can configure it directly. A Translation in a batch shows the batch-wide Auto Context state and linked extraction as read-only information instead.
 
 The Auto dialog lets the user:
 
@@ -116,7 +116,7 @@ The Auto dialog lets the user:
 - select or deselect an existing extraction for use-existing
 - choose latest previous context, selected previous context, or no previous context for create-new
 - open selected extraction records in the full `ContextExtractorMain` dialog
-- preview the combined context (auto extraction + manual) that will be sent with the translation request
+- preview the combined context (manual Context Document followed by Auto Context extraction) that will be sent with the translation request
 
 Use-existing hides previous-context controls because it directly reuses the selected extraction result or reruns the owned linked extraction.
 

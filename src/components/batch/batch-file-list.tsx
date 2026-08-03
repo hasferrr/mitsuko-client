@@ -21,6 +21,7 @@ interface BatchFileListProps {
   onDelete: (id: string) => void
   onDownload: (id: string) => void
   onClick: (id: string) => void
+  onOpenExtraction?: (id: string) => void
   onSelectToggle: (id: string) => void
   uploadInputId?: string
 }
@@ -37,6 +38,7 @@ export function BatchFileList({
   onDelete,
   onDownload,
   onClick,
+  onOpenExtraction,
   onSelectToggle,
   uploadInputId,
 }: BatchFileListProps) {
@@ -72,6 +74,8 @@ export function BatchFileList({
                   onDelete={onDelete}
                   onDownload={onDownload}
                   onClick={onClick}
+                  onOpenExtraction={onOpenExtraction}
+                  isProcessing={isProcessing}
                   selectMode={selectMode}
                   selected={selectedIds.has(batchFile.id)}
                   onSelectToggle={onSelectToggle}

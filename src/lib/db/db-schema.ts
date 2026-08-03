@@ -22,6 +22,8 @@ const projectSchema = entitySchema.extend({
   isDefaultTranslationEnabled: z.boolean().optional(),
   isDefaultExtractionEnabled: z.boolean().optional(),
   isDefaultTranscriptionEnabled: z.boolean().optional(),
+  isBatchAutoContextEnabled: z.boolean().optional(),
+  batchAutoContextStartingExtractionId: z.string().nullable().optional(),
   isArchived: z.boolean().optional(),
 }).loose()
 const extractionSchema = childEntitySchema.extend({

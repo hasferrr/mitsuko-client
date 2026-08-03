@@ -5,6 +5,10 @@ import { Extraction, ExtractionStatus } from "@/types/project"
 const EXTRACTION_STATUSES: ExtractionStatus[] = ["idle", "running", "completed", "failed", "stopped"]
 export const AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX = "[Auto Context]"
 
+export function getAutoContextExtractionTitle(translationTitle: string): string {
+  return `Auto Context for ${translationTitle.trim() || "Untitled Translation"}`
+}
+
 export function isExtractionStatus(value: unknown): value is ExtractionStatus {
   return typeof value === "string" && EXTRACTION_STATUSES.includes(value as ExtractionStatus)
 }

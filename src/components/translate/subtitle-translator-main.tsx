@@ -675,30 +675,35 @@ export default function SubtitleTranslatorMain({
 
             <TabsContent value="basic" className="grow space-y-4 mt-4">
             <Card>
-              <CardContent className={cn("space-y-4", isSharedSettings && "pointer-events-none opacity-50")}>
+              <CardContent className="flex flex-col gap-4">
                 {isSharedSettings && (
                   <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 )}
-                <LanguageSelection
+                <div className={cn("flex flex-col gap-4", isSharedSettings && "pointer-events-none opacity-50")}>
+                  <LanguageSelection
                     settingsId={settingsId}
                   />
                   <ModelSelection
                     settingsId={settingsId}
                   />
-                  <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating}>
-                    <ContextDocumentInput
-                      settingsId={settingsId}
-                      translationId={currentId}
-                      onOpenExtraction={openExtractionPreview}
-                      onOpenExtractionSettings={currentProject ? () => setIsExtractionSettingsOpen(true) : undefined}
-                    />
-                  </DragAndDrop>
+                </div>
+                <DragAndDrop onDropFiles={handleContextFileUpload} disabled={isTranslating || !!isSharedSettings}>
+                  <ContextDocumentInput
+                    settingsId={settingsId}
+                    translationId={currentId}
+                    isManualContextReadOnly={!!isSharedSettings}
+                    onOpenExtraction={openExtractionPreview}
+                    onOpenExtractionSettings={currentProject ? () => setIsExtractionSettingsOpen(true) : undefined}
+                  />
+                </DragAndDrop>
+                <div className={cn("flex flex-col gap-4", isSharedSettings && "pointer-events-none opacity-50")}>
                     <CustomInstructionsInput
                       settingsId={settingsId}
                     />
                     <FewShotInput
                       settingsId={settingsId}
                     />
+                </div>
                 </CardContent>
               </Card>
             </TabsContent>

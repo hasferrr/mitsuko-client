@@ -619,6 +619,12 @@ export class MyDatabase extends Dexie {
         }
       })
     })
+    this.version(35).stores({}).upgrade(async tx => {
+      await tx.table('projects').toCollection().modify((project: Record<string, unknown>) => {
+        project.isBatchAutoContextEnabled = false
+        project.batchAutoContextStartingExtractionId = null
+      })
+    })
   }
 }
 

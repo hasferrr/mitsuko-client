@@ -4,7 +4,18 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldTitle,
+} from "@/components/ui/field"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { createUtf8SubtitleBlob } from "@/lib/utils/file"
 import {
@@ -29,6 +40,7 @@ import {
   Trash,
   Upload
 } from "lucide-react"
+import { RiSparkling2Line } from "@remixicon/react"
 import {
   LanguageSelection,
   ModelSelection,
@@ -53,6 +65,7 @@ import { toast } from "sonner"
 import { useSessionStore } from "@/stores/ui/use-session-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { PopulateContextDialog } from "./populate-context-dialog"
 import { CopySharedSettingsDialog } from "./copy-shared-settings-dialog"
@@ -61,25 +74,58 @@ import JSZip from "jszip"
 import SubtitleTranslatorMain from "../translate/subtitle-translator-main"
 import { useBatchTranslationFiles } from "@/hooks/batch/use-batch-translation-files"
 import { useBatchExtractionFiles } from "@/hooks/batch/use-batch-extraction-files"
-import useBatchTranslationHandler from "@/hooks/batch/use-batch-translation-handler"
+import useBatchTranslationHandler, { BatchTranslationRunSummary } from "@/hooks/batch/use-batch-translation-handler"
 import { BatchFileList } from "./batch-file-list"
 import { useBatchSelection } from "@/hooks/batch/use-batch-selection"
 import { ACCEPTED_FORMATS } from "@/constants/subtitle-formats"
 import { MAX_BATCH_CONCURRENT_OPERATION } from "@/constants/limits"
 import { useSetUnsavedChanges } from "@/contexts/unsaved-changes-context"
+import { BatchTranslationStage } from "@/types/batch"
+import { BatchAutoContextSettings } from "@/components/batch/batch-auto-context-settings"
+import { ContextExtractorMain } from "@/components/extract-context/context-extractor-main"
 
 interface BatchTranslationViewProps {
   settingsId: string
+  onOpenExtractionSettings: () => void
 }
 
-export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) {
+function BatchRunSummary({
+  summary,
+  concurrentTranslations,
+}: {
+  summary: BatchTranslationRunSummary | null
+  concurrentTranslations: number
+}) {
+  if (!summary?.autoContextEnabled) return null
+
+  return (
+    <Alert>
+      <RiSparkling2Line />
+      <AlertTitle>Auto Context is on</AlertTitle>
+      <AlertDescription>
+        <ul className="list-disc pl-4">
+          <li>Starting Context: {summary.startingContextTitle ?? "None"}</li>
+          <li>{summary.createCount} extraction{summary.createCount === 1 ? "" : "s"} to create</li>
+          <li>{summary.rerunCount} extraction{summary.rerunCount === 1 ? "" : "s"} to rerun</li>
+          <li>{summary.reuseCount} extraction{summary.reuseCount === 1 ? "" : "s"} to reuse</li>
+          <li>{summary.translationCount} translation{summary.translationCount === 1 ? "" : "s"} to process</li>
+          <li>Extractions run serially; up to {concurrentTranslations} translations run concurrently</li>
+        </ul>
+      </AlertDescription>
+    </Alert>
+  )
+}
+
+export function BatchTranslationView({ settingsId, onOpenExtractionSettings }: BatchTranslationViewProps) {
   const [activeTab, setActiveTab] = useState("basic")
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
   const [toType, setToType] = useState<SubtitleType | "no-change">("no-change")
 
   const [previewId, setPreviewId] = useState<string | null>(null)
+  const [previewExtractionId, setPreviewExtractionId] = useState<string | null>(null)
   const [queueSet, setQueueSet] = useState<Set<string>>(new Set())
+  const [autoContextStageMap, setAutoContextStageMap] = useState<Record<string, BatchTranslationStage>>({})
   const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
 
   // Dialogs
@@ -89,6 +135,8 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
   const [isPopulateDialogOpen, setIsPopulateDialogOpen] = useState(false)
   const [isCopySharedDialogOpen, setIsCopySharedDialogOpen] = useState(false)
   const [translatedStats, setTranslatedStats] = useState({ translated: 0, total: 0 })
+  const [runSummary, setRunSummary] = useState<BatchTranslationRunSummary | null>(null)
+  const [regenerateAutoContext, setRegenerateAutoContext] = useState(false)
 
   // Project Store
   const currentProject = useProjectStore((state) => state.currentProject)
@@ -119,6 +167,9 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
   const loadTranslation = useTranslationDataStore((state) => state.getTranslationDb)
   const setCurrentTranslationId = useTranslationDataStore((state) => state.setCurrentId)
   const saveTranslationData = useTranslationDataStore((state) => state.saveData)
+  const extractionData = useExtractionDataStore((state) => state.data)
+  const getExtractionDb = useExtractionDataStore((state) => state.getExtractionDb)
+  const setCurrentExtractionId = useExtractionDataStore((state) => state.setCurrentId)
 
   const session = useSessionStore((state) => state.session)
 
@@ -129,7 +180,8 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
     isBatchTranslating: isProcessing,
   } = useBatchTranslationFiles(
     localOrder,
-    queueSet
+    queueSet,
+    autoContextStageMap,
   )
 
   // Also need extraction files just for "Populate Context" and "Copy Shared Settings" features that might cross-reference
@@ -155,6 +207,7 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
     handleStartBatchTranslation,
     handleContinueBatchTranslation,
     handleStopBatchTranslation,
+    getBatchRunSummary,
     generateSubtitleContent,
   } = useBatchTranslationHandler({
     settingsId,
@@ -166,6 +219,7 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
       setIsContinueTranslationDialogOpen: setIsContinueDialogOpen,
       setActiveTab,
       setQueueSet,
+      setAutoContextStageMap,
     },
   })
 
@@ -192,6 +246,7 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
   }
 
   const handleDragEnd = (event: import("@dnd-kit/core").DragEndEvent) => {
+    if (isProcessing) return
     const { active, over } = event
     if (!over || !currentProject) return
     if (active.id === over.id) return
@@ -262,7 +317,7 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
     return await zip.generateAsync({ type: "blob" })
   }
 
-  const handleOpenStartBatchDialog = () => {
+  const handleOpenStartBatchDialog = async () => {
     if (batchFiles.length === 0 || isProcessing) return
 
     let totalSubtitles = 0
@@ -274,21 +329,37 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
     })
 
     if (translatedSubtitles > 0) {
+      const summary = await getBatchRunSummary(false, false)
+      if (!summary) return
+      setRunSummary(summary)
+      setRegenerateAutoContext(false)
       setTranslatedStats({ translated: translatedSubtitles, total: totalSubtitles })
       setIsRestartDialogOpen(true)
     } else {
+      const summary = await getBatchRunSummary(false, false)
+      if (!summary) return
+      setRunSummary(summary)
       setTranslatedStats({ translated: 0, total: totalSubtitles })
       setIsStartDialogOpen(true)
     }
   }
 
-  const handleOpenContinueBatchDialog = () => {
+  const handleOpenContinueBatchDialog = async () => {
     if (batchFiles.length === 0 || isProcessing) return
+    const summary = await getBatchRunSummary(true, false)
+    if (!summary) return
+    setRunSummary(summary)
     setTranslatedStats({
       translated: batchFiles.reduce((acc, file) => acc + file.translatedCount, 0),
       total: batchFiles.reduce((acc, file) => acc + file.subtitlesCount, 0)
     })
     setIsContinueDialogOpen(true)
+  }
+
+  const handleRegenerateAutoContextChange = async (checked: boolean) => {
+    setRegenerateAutoContext(checked)
+    const summary = await getBatchRunSummary(false, checked)
+    if (summary) setRunSummary(summary)
   }
 
   const handlePreview = async (id: string) => {
@@ -303,8 +374,18 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
     }
   }
 
+  const handleOpenExtraction = async (id: string) => {
+    const extraction = await getExtractionDb(id)
+    if (!extraction) {
+      toast.error("Linked Auto Context extraction was not found.")
+      return
+    }
+    setCurrentExtractionId(id)
+    setPreviewExtractionId(id)
+  }
+
   const confirmDeleteFile = async () => {
-    if (!currentProject || !deleteFileId) return
+    if (!currentProject || !deleteFileId || isProcessing) return
     try {
       await removeTranslationFromBatch(currentProject.id, deleteFileId)
       setHasChanges(true)
@@ -362,8 +443,8 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
               onClick={() => setIsPopulateDialogOpen(true)}
               disabled={isProcessing || batchFiles.length === 0}
             >
-              <FolderInput className="size-4" />
-              Get Context
+              <FolderInput data-icon="inline-start" />
+              Populate Context
             </Button>
           )}
           {!isSelecting && (
@@ -402,6 +483,7 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
           onDelete={setDeleteFileId}
           onDownload={handleSingleFileDownload}
           onClick={handlePreview}
+          onOpenExtraction={handleOpenExtraction}
           onSelectToggle={handleSelectToggle}
           uploadInputId={uploadInputId}
         />
@@ -472,77 +554,92 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
           </TabsList>
 
           {/* Batch Settings */}
-          <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label htmlFor="shared-settings-switch" className="flex flex-col">
-                <span className="text-sm font-semibold">Settings Mode</span>
-                <span className="text-xs text-muted-foreground">
-                  {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
-                </span>
-              </label>
-              <Switch
-                id="shared-settings-switch"
-                checked={isUseSharedSettings}
-                onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                disabled={isProcessing}
-                className="data-[state=checked]:bg-primary"
-              />
-            </div>
+          <Card size="sm" className="mt-4 w-full">
+            <CardHeader>
+              <CardTitle>Batch Settings</CardTitle>
+              <CardDescription>Control translation concurrency and the context pipeline.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FieldGroup className="gap-5">
+                <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
+                  <FieldContent>
+                    <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
+                    <FieldDescription>
+                      {isUseSharedSettings ? "Using shared batch settings" : "Using individual file settings"}
+                    </FieldDescription>
+                  </FieldContent>
+                  <Switch
+                    id="shared-settings-switch"
+                    checked={isUseSharedSettings}
+                    onCheckedChange={checked => setUseSharedSettings(currentProject?.id ?? "", checked)}
+                    disabled={isProcessing}
+                  />
+                </Field>
 
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold">Max Concurrent Translations</span>
-                <span className="text-xs text-muted-foreground">
-                  Files processed simultaneously (max {MAX_BATCH_CONCURRENT_OPERATION})
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:text-foreground text-lg font-medium select-none"
-                  onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, concurrentOperation - 1))}
-                  disabled={concurrentOperation <= 1}
-                >
-                  -
-                </Button>
-                <input
-                  type="number"
-                  min={1}
-                  max={MAX_BATCH_CONCURRENT_OPERATION}
-                  value={concurrentOperation}
-                  onChange={(e) => setConcurrentOperation(
-                    currentProject?.id ?? "",
-                    Math.max(1, Math.min(MAX_BATCH_CONCURRENT_OPERATION, parseInt(e.target.value) || 1))
-                  )}
-                  className="w-12 h-8 text-center border border-input rounded-md bg-background shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
+                  <FieldContent>
+                    <FieldTitle>Max Concurrent Translations</FieldTitle>
+                    <FieldDescription>
+                      The serial extraction worker runs in addition to these slots. Max {MAX_BATCH_CONCURRENT_OPERATION}.
+                    </FieldDescription>
+                  </FieldContent>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, concurrentOperation - 1))}
+                      disabled={isProcessing || concurrentOperation <= 1}
+                      aria-label="Decrease concurrent translations"
+                    >
+                      −
+                    </Button>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={MAX_BATCH_CONCURRENT_OPERATION}
+                      value={concurrentOperation}
+                      onChange={event => setConcurrentOperation(
+                        currentProject?.id ?? "",
+                        Math.max(1, Math.min(MAX_BATCH_CONCURRENT_OPERATION, parseInt(event.target.value) || 1)),
+                      )}
+                      className="w-12 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      disabled={isProcessing}
+                      aria-label="Concurrent translations"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_BATCH_CONCURRENT_OPERATION, concurrentOperation + 1))}
+                      disabled={isProcessing || concurrentOperation >= MAX_BATCH_CONCURRENT_OPERATION}
+                      aria-label="Increase concurrent translations"
+                    >
+                      +
+                    </Button>
+                  </div>
+                </Field>
+
+                <BatchAutoContextSettings
+                  isProcessing={isProcessing}
+                  onOpenExtractionSettings={onOpenExtractionSettings}
                 />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:text-foreground text-lg font-medium select-none"
-                  onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_BATCH_CONCURRENT_OPERATION, concurrentOperation + 1))}
-                  disabled={concurrentOperation >= MAX_BATCH_CONCURRENT_OPERATION}
-                >
-                  +
-                </Button>
-              </div>
-            </div>
 
-            {/* Copy Shared Settings trigger */}
-            <div className="flex items-center justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-lg"
-                onClick={() => setIsCopySharedDialogOpen(true)}
-                disabled={isProcessing || batchFiles.length === 0}
-              >
-                <ListChecks className="size-4" />
-                Copy Shared Settings...
-              </Button>
-            </div>
-          </CardContent>
+                <Field orientation="horizontal" data-disabled={isProcessing || batchFiles.length === 0 || undefined}>
+                  <FieldContent>
+                    <FieldTitle>Individual Settings</FieldTitle>
+                    <FieldDescription>Copy shared settings into selected translation or extraction files.</FieldDescription>
+                  </FieldContent>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsCopySharedDialogOpen(true)}
+                    disabled={isProcessing || batchFiles.length === 0}
+                  >
+                    <ListChecks data-icon="inline-start" />
+                    Copy Settings
+                  </Button>
+                </Field>
+              </FieldGroup>
+            </CardContent>
           </Card>
 
           <TabsContent value="basic" className="grow space-y-4 mt-4">
@@ -601,7 +698,12 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Remove File</AlertDialogTitle>
-            <AlertDialogDescription>Are you sure you want to remove this file from the batch?</AlertDialogDescription>
+            <AlertDialogDescription>
+              Are you sure you want to remove this file from the batch?
+              {batchFiles.find(file => file.id === deleteFileId)?.linkedExtractionId && (
+                <span className="mt-2 block">Its owned Auto Context extraction will also be deleted.</span>
+              )}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setDeleteFileId(null)}>Cancel</AlertDialogCancel>
@@ -633,16 +735,35 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
               <AlertTriangle className="size-5 text-amber-500" />
               Already Translated Content
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              <span className="block mb-2">
-                You have already translated <strong>{translatedStats.translated}</strong> of <strong>{translatedStats.total}</strong> subtitles.
-              </span>
-              <span className="block">Are you sure you want to translate from the beginning?</span>
+            <AlertDialogDescription asChild>
+              <div className="flex flex-col gap-4">
+                <p>
+                  You have already translated <strong>{translatedStats.translated}</strong> of <strong>{translatedStats.total}</strong> subtitles. Restart from the beginning?
+                </p>
+                <BatchRunSummary summary={runSummary} concurrentTranslations={concurrentOperation} />
+                {runSummary?.autoContextEnabled && (
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      id="regenerate-batch-auto-context"
+                      checked={regenerateAutoContext}
+                      onCheckedChange={checked => void handleRegenerateAutoContextChange(checked === true)}
+                    />
+                    <FieldLabel htmlFor="regenerate-batch-auto-context">
+                      Regenerate Auto Context before restarting
+                    </FieldLabel>
+                  </Field>
+                )}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setIsRestartDialogOpen(false); handleStartBatchTranslation() }}>Restart Translation</AlertDialogAction>
+            <AlertDialogAction onClick={() => {
+              setIsRestartDialogOpen(false)
+              handleStartBatchTranslation(regenerateAutoContext)
+            }}>
+              Restart Translation
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -673,6 +794,9 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
                     Each file uses its own settings.
                   </div>
                 )}
+                <div className="mt-4">
+                  <BatchRunSummary summary={runSummary} concurrentTranslations={concurrentOperation} />
+                </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -691,8 +815,11 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
               <FastForward className="size-5 text-sidebar-primary" />
               Continue Batch Translation
             </AlertDialogTitle>
-            <AlertDialogDescription>
-               <span className="block">Continue translating <strong>{batchFiles.length - finishedCount}</strong> remaining files?</span>
+            <AlertDialogDescription asChild>
+              <div className="flex flex-col gap-4">
+                <p>Continue translating <strong>{batchFiles.length - finishedCount}</strong> remaining files?</p>
+                <BatchRunSummary summary={runSummary} concurrentTranslations={concurrentOperation} />
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -718,6 +845,26 @@ export function BatchTranslationView({ settingsId }: BatchTranslationViewProps) 
                 hideBackButton
               />
             </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!previewExtractionId}
+        onOpenChange={(open) => {
+          if (!open) setPreviewExtractionId(null)
+        }}
+      >
+        <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-[min(1100px,calc(100%-2rem))]">
+          <DialogHeader>
+            <DialogTitle>{previewExtractionId ? extractionData[previewExtractionId]?.title : "Auto Context"}</DialogTitle>
+          </DialogHeader>
+          {previewExtractionId && extractionData[previewExtractionId] && (
+            <ContextExtractorMain
+              currentId={previewExtractionId}
+              settingsId={extractionData[previewExtractionId].settingsId}
+              hideBackButton
+            />
           )}
         </DialogContent>
       </Dialog>

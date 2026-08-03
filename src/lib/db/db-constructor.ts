@@ -230,6 +230,10 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
       defaultExtractionSettingsId: settingsMap.get(project.defaultExtractionSettingsId)?.id ?? project.defaultExtractionSettingsId,
       defaultTranslationId: defaultTranslation?.id ?? project.defaultTranslationId,
       defaultTranscriptionId: defaultTranscription?.id ?? project.defaultTranscriptionId,
+      batchAutoContextStartingExtractionId: project.batchAutoContextStartingExtractionId
+        ? extractionsMap.get(project.batchAutoContextStartingExtractionId)?.id
+          ?? project.batchAutoContextStartingExtractionId
+        : null,
     }
   })
   const projectOrder = data.projectOrders.at(0)
@@ -275,6 +279,8 @@ function projectConstructor(project: Partial<Project>): Project {
     isDefaultTranslationEnabled: project.isDefaultTranslationEnabled ?? false,
     isDefaultExtractionEnabled: project.isDefaultExtractionEnabled ?? false,
     isDefaultTranscriptionEnabled: project.isDefaultTranscriptionEnabled ?? false,
+    isBatchAutoContextEnabled: project.isBatchAutoContextEnabled ?? false,
+    batchAutoContextStartingExtractionId: project.batchAutoContextStartingExtractionId ?? null,
     isArchived: project.isArchived ?? false,
   }
 }

@@ -29,6 +29,7 @@ interface Props {
   settingsId: string
   translationId?: string
   isTemplateTranslation?: boolean
+  isManualContextReadOnly?: boolean
   onOpenExtraction?: (extractionId: string) => void
   onOpenExtractionSettings?: () => void
 }
@@ -84,7 +85,14 @@ function StatusMessage({ variant, children }: { variant: "info" | "warning" | "m
   )
 }
 
-export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplateTranslation = false, onOpenExtraction, onOpenExtractionSettings }: Props) => {
+export const ContextDocumentInput = memo(({
+  settingsId,
+  translationId,
+  isTemplateTranslation = false,
+  isManualContextReadOnly = false,
+  onOpenExtraction,
+  onOpenExtractionSettings,
+}: Props) => {
   const currentProject = useProjectStore((state) => state.currentProject)
   const contextDocument = useSettingsStore((state) => state.getContextDocument(settingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
@@ -248,6 +256,15 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
   })()
 
   const autoContextMode = translation?.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
+  const isBatchManagedAutoContext = !!(
+    currentProject?.isBatch
+    && !isTemplateTranslation
+    && translation
+    && translation.projectId === currentProject.id
+  )
+  const isAutoContextEnabled = isBatchManagedAutoContext
+    ? currentProject.isBatchAutoContextEnabled
+    : autoContextMode !== "disabled"
 
   return (
     <div className="flex flex-col gap-2">
@@ -256,7 +273,7 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
         <div className="flex items-center gap-1.5">
           {translationId && (
             <Button
-              variant={translation?.autoContextMode && translation.autoContextMode !== "disabled" ? "default" : "outline"}
+              variant={isAutoContextEnabled ? "default" : "outline"}
               onClick={() => {
                 loadProjectExtractions()
                 setIsAutoContextDialogOpen(true)
@@ -268,6 +285,7 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
           )}
           <Button
             variant="outline"
+            disabled={isManualContextReadOnly}
             onClick={() => {
               loadProjectExtractions()
               setIsContextDialogOpen(true)
@@ -281,13 +299,20 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
       <Textarea
         value={contextDocument}
         onChange={handleContextDocumentChange}
+        readOnly={isManualContextReadOnly}
         className="min-h-[120px] h-[120px] max-h-[300px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
         placeholder="Add context about the video..."
         onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`)}
       />
       <p className="text-xs text-muted-foreground">
-        Provide context from previous episodes (can be generated using the
-        <span className="font-semibold"> Extract Context</span> feature). This improves accuracy and relevance.
+        {isManualContextReadOnly
+          ? "This batch uses the shared manual Context Document. Auto Context remains linked to this Translation."
+          : (
+            <>
+              Provide context from previous episodes (can be generated using the
+              <span className="font-semibold"> Extract Context</span> feature). This improves accuracy and relevance.
+            </>
+          )}
       </p>
 
       <Dialog open={isContextDialogOpen} onOpenChange={setIsContextDialogOpen}>
@@ -329,11 +354,61 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
             <DialogHeader>
               <DialogTitle>Auto Context</DialogTitle>
               <DialogDescription>
-                Automatically attach extracted context when you start translating.
+                {isBatchManagedAutoContext
+                  ? "This file follows the Auto Context pipeline configured for the whole batch."
+                  : "Automatically attach extracted context when you start translating."}
               </DialogDescription>
             </DialogHeader>
 
             <div className="flex flex-col gap-4 overflow-y-auto -mx-4 px-4">
+              {isBatchManagedAutoContext ? (
+                <>
+                  <StatusMessage variant={currentProject.isBatchAutoContextEnabled ? "info" : "muted"}>
+                    {currentProject.isBatchAutoContextEnabled
+                      ? "Batch Auto Context is on. Per-file Auto Context controls are read-only while this Translation belongs to the batch."
+                      : "Batch Auto Context is off. Existing owned extraction links are preserved and can be reused when it is enabled again."}
+                  </StatusMessage>
+
+                  <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/30 p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">Linked extraction</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {selectedExtraction?.title
+                            || (translation.autoContextExtractionId ? "Loading linked extraction…" : "Not created yet")}
+                        </p>
+                      </div>
+                      {selectedExtraction && (
+                        <ExtractionBadges extraction={selectedExtraction} runningIds={isExtractingSet} size="compact" />
+                      )}
+                    </div>
+
+                    {selectedExtraction ? (
+                      <StatusMessage variant={isSelectedAutoOwned ? "info" : "warning"}>
+                        {isSelectedAutoOwned
+                          ? "Owned by this Translation. Moving or deleting the Translation also moves or deletes this extraction."
+                          : "Used by this Translation, but not owned by it. This extraction remains independent."}
+                      </StatusMessage>
+                    ) : (
+                      <StatusMessage variant="muted">
+                        The next batch run will create one owned extraction for this Translation when needed.
+                      </StatusMessage>
+                    )}
+
+                    {selectedExtraction && (
+                      <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(selectedExtraction.id)}>
+                        <ExternalLink />
+                        Open Linked Extraction
+                      </Button>
+                    )}
+                  </div>
+
+                  <StatusMessage variant="muted">
+                    The manual Context Document remains translation-only and is sent before this file&apos;s extracted Auto Context.
+                  </StatusMessage>
+                </>
+              ) : (
+                <>
               <div className="flex flex-col gap-3">
                 <ModeCard
                   selected={autoContextMode === "disabled"}
@@ -411,6 +486,13 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
                       {isSelectedAutoOwned
                         ? "This auto-context extraction will rerun when translation starts."
                         : selectedProblem}
+                    </StatusMessage>
+                  )}
+                  {selectedExtraction && (
+                    <StatusMessage variant={isSelectedAutoOwned ? "info" : "muted"}>
+                      {isSelectedAutoOwned
+                        ? "Owned by this Translation. Moving or deleting the Translation also moves or deletes this extraction."
+                        : "Used by this Translation, but not owned by it. This extraction remains independent."}
                     </StatusMessage>
                   )}
                   {selectedExtraction && (
@@ -564,6 +646,8 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
+              )}
+                </>
               )}
             </div>
 

@@ -32,6 +32,8 @@ export interface Project {
   isDefaultTranslationEnabled: boolean
   isDefaultExtractionEnabled: boolean
   isDefaultTranscriptionEnabled: boolean
+  isBatchAutoContextEnabled: boolean
+  batchAutoContextStartingExtractionId: string | null
   isArchived: boolean
 }
 

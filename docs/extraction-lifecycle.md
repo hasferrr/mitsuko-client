@@ -16,6 +16,12 @@ Each `Extraction` stores:
 
 `ownerTranslationId` is the auto-context ownership marker. It lets the owning translation rerun its own invalid linked extraction without allowing other translations to rerun manually selected dependencies.
 
+Ownership also controls entity lifecycle:
+
+- deleting a Translation deletes its owned Auto Context extraction and the extraction's settings
+- moving a Translation between projects moves its owned Auto Context extraction and preserves the link
+- manually selected or Starting Context extractions are used by a Translation or batch but are not owned, so they do not cascade
+
 ## Status Rules
 
 Runtime active extraction ids override persisted status as `running`.
@@ -72,6 +78,8 @@ Batch extraction file status derives from extraction metadata:
 Batch “mark done” changes metadata only. It marks clean non-empty non-error results as `completed`, and toggles completed results back to `idle`.
 
 Sequential batch previous-context seeding uses only usable completed extraction results.
+
+Batch Translation Auto Context uses the same lifecycle metadata. A stopped or failed owned extraction is rerun in place by Continue. A manually repaired extraction marked `completed` is usable without rerunning. Deleting an owned extraction leaves a recoverable stale Translation link; the next batch run creates and links a replacement.
 
 ## Legacy `<done>` Migration
 

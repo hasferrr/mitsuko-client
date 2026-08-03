@@ -88,6 +88,7 @@ export function ProjectTranslationList({
   const updateTranslationDb = useTranslationDataStore((state) => state.updateTranslationDb)
   const deleteTranslationDb = useTranslationDataStore((state) => state.deleteTranslationDb)
   const updateProjectItems = useProjectStore((state) => state.updateProjectItems)
+  const loadProjects = useProjectStore((state) => state.loadProjects)
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false)
 
@@ -153,6 +154,7 @@ export function ProjectTranslationList({
             )
           }
           setTranslations(prev => prev.filter(t => t.id !== translation.id))
+          await loadProjects()
         }}
         selectMode={selectMode}
         selected={selectedIds.has(translation.id)}

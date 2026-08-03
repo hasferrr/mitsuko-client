@@ -10,8 +10,8 @@ import {
 } from '@/constants/default'
 import { db } from '@/lib/db/db'
 import { createProject, deleteProject } from '@/lib/db/project'
-import { deleteExtraction } from '@/lib/db/extraction'
-import { createTranslation, deleteTranslation, updateTranslation } from '@/lib/db/translation'
+import { createExtraction, deleteExtraction } from '@/lib/db/extraction'
+import { createTranslation, deleteTranslation, moveTranslation, updateTranslation } from '@/lib/db/translation'
 import { getSettings, updateSettings } from '@/lib/db/settings'
 import { exportDatabase, exportProject, exportProjects, importDatabase } from '@/lib/db/db-io'
 import { useSettingsStore } from '@/stores/settings/use-settings-store'
@@ -390,5 +390,88 @@ describe('unified settings persistence', () => {
     })
     expect((await getSettings(translation.settingsId))?.contextDocument).toBe('Global Translation')
     expect((await getSettings(extraction.settingsId))?.customInstructions).toBe('Global Extraction')
+  })
+})
+
+describe('owned Auto Context extraction lifecycle', () => {
+  test('deleting a Translation cascades only to its owned extraction', async () => {
+    const project = await createProject('Cascade Project')
+    const translation = await createTranslation(project.id, {
+      title: 'Episode 1',
+      subtitles: [],
+      parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
+    })
+    const owned = await createExtraction(project.id, {
+      title: 'Auto Context for Episode 1',
+      episodeNumber: '1',
+      subtitleContent: 'subtitle',
+      previousContext: '',
+      contextResult: 'owned context',
+      ownerTranslationId: translation.id,
+    })
+    const used = await createExtraction(project.id, {
+      title: 'Manually used context',
+      episodeNumber: '0',
+      subtitleContent: 'subtitle',
+      previousContext: '',
+      contextResult: 'manual context',
+    })
+    await updateTranslation(translation.id, { autoContextExtractionId: used.id })
+
+    const deletedIds = await deleteTranslation(project.id, translation.id)
+    const updatedProject = await db.projects.get(project.id)
+
+    expect(deletedIds).toEqual([owned.id])
+    expect(await db.translations.get(translation.id)).toBeUndefined()
+    expect(await db.extractions.get(owned.id)).toBeUndefined()
+    expect(await db.extractions.get(used.id)).toBeDefined()
+    expect(updatedProject?.extractions).toEqual([used.id])
+    expect(await db.settings.get(owned.settingsId)).toBeUndefined()
+    expect(await db.settings.get(used.settingsId)).toBeDefined()
+  })
+
+  test('moving a Translation moves only its owned extraction', async () => {
+    const source = await createProject('Source Project')
+    const target = await createProject('Target Project')
+    const translation = await createTranslation(source.id, {
+      title: 'Episode 2',
+      subtitles: [],
+      parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
+    })
+    const owned = await createExtraction(source.id, {
+      title: 'Auto Context for Episode 2',
+      episodeNumber: '2',
+      subtitleContent: 'subtitle',
+      previousContext: '',
+      contextResult: 'owned context',
+      ownerTranslationId: translation.id,
+    })
+    const used = await createExtraction(source.id, {
+      title: 'Independent context',
+      episodeNumber: '1',
+      subtitleContent: 'subtitle',
+      previousContext: '',
+      contextResult: 'manual context',
+    })
+    await updateTranslation(translation.id, { autoContextExtractionId: used.id })
+
+    const movedIds = await moveTranslation(source.id, target.id, translation.id)
+    const [updatedSource, updatedTarget, movedTranslation, movedOwned, unmovedUsed] = await Promise.all([
+      db.projects.get(source.id),
+      db.projects.get(target.id),
+      db.translations.get(translation.id),
+      db.extractions.get(owned.id),
+      db.extractions.get(used.id),
+    ])
+
+    expect(movedIds).toEqual([owned.id])
+    expect(updatedSource?.translations).not.toContain(translation.id)
+    expect(updatedSource?.extractions).toEqual([used.id])
+    expect(updatedTarget?.translations).toContain(translation.id)
+    expect(updatedTarget?.extractions).toContain(owned.id)
+    expect(movedTranslation?.projectId).toBe(target.id)
+    expect(movedTranslation?.autoContextExtractionId).toBe(used.id)
+    expect(movedOwned?.projectId).toBe(target.id)
+    expect(unmovedUsed?.projectId).toBe(source.id)
   })
 })

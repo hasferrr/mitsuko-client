@@ -294,7 +294,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       if (!currentProject) throw new Error('Project not found')
 
       // Delete translation along with its own settings
-      await deleteTranslation(projectId, translationId)
+      const deletedExtractionIds = await deleteTranslation(projectId, translationId)
 
       const updatedTranslations = currentProject.translations.filter(id => id !== translationId)
       await updateProjectItemsDB(projectId, updatedTranslations, 'translations')
@@ -302,11 +302,23 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       // update translation store
       const translationStore = useTranslationDataStore.getState()
       translationStore.removeData(translationId)
+      const extractionStore = useExtractionDataStore.getState()
+      deletedExtractionIds.forEach(id => extractionStore.removeData(id))
 
       // update local project state
       set(state => ({
-        projects: state.projects.map(p => p.id === projectId ? { ...p, translations: updatedTranslations, updatedAt: new Date() } : p),
-        currentProject: state.currentProject?.id === projectId ? { ...state.currentProject, translations: updatedTranslations, updatedAt: new Date() } : state.currentProject,
+        projects: state.projects.map(p => p.id === projectId ? {
+          ...p,
+          translations: updatedTranslations,
+          extractions: p.extractions.filter(id => !deletedExtractionIds.includes(id)),
+          updatedAt: new Date(),
+        } : p),
+        currentProject: state.currentProject?.id === projectId ? {
+          ...state.currentProject,
+          translations: updatedTranslations,
+          extractions: state.currentProject.extractions.filter(id => !deletedExtractionIds.includes(id)),
+          updatedAt: new Date(),
+        } : state.currentProject,
         loading: false
       }))
     } catch (err) {

@@ -18,6 +18,7 @@ import {
 } from "@/constants/default"
 import { GLOBAL_TRANSLATION_SETTINGS_ID } from "@/constants/global-settings"
 import { resolveNewTranslationAutoContextMode } from "@/lib/translation/auto-context-defaults"
+import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 
 export interface TranslationDataStore {
   currentId: string | null
@@ -141,7 +142,9 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     return translation
   },
   deleteTranslationDb: async (projectId, translationId) => {
-    await deleteDB(projectId, translationId)
+    const deletedExtractionIds = await deleteDB(projectId, translationId)
+    const extractionStore = useExtractionDataStore.getState()
+    deletedExtractionIds.forEach(id => extractionStore.removeData(id))
     set(state => {
       const newData = { ...state.data }
       delete newData[translationId]
@@ -152,13 +155,19 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     }
   },
   moveTranslationDb: async (sourceProjectId, targetProjectId, translationId) => {
-    await moveDB(sourceProjectId, targetProjectId, translationId)
+    const movedExtractionIds = await moveDB(sourceProjectId, targetProjectId, translationId)
     const data = get().data[translationId]
     if (data) {
       set(state => ({
         data: { ...state.data, [translationId]: { ...data, projectId: targetProjectId, updatedAt: new Date() } }
       }))
     }
+    const extractionStore = useExtractionDataStore.getState()
+    movedExtractionIds.forEach(id => {
+      const extraction = extractionStore.data[id]
+      if (!extraction) return
+      extractionStore.upsertData(id, { ...extraction, projectId: targetProjectId, updatedAt: new Date() })
+    })
   },
 
   // setters implementation

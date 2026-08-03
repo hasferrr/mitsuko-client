@@ -8,7 +8,7 @@ import {
   getStoppedAutoContextExtractionPatch,
 } from "@/lib/translation/auto-context"
 import { Extraction } from "@/types/project"
-import { isAutoContextOwnedBy } from "@/lib/extraction/status"
+import { getAutoContextExtractionTitle, isAutoContextOwnedBy } from "@/lib/extraction/status"
 
 const extraction = (id: string, contextResult: string, overrides: Partial<Extraction> = {}): Extraction => ({
   id,
@@ -25,6 +25,11 @@ const extraction = (id: string, contextResult: string, overrides: Partial<Extrac
   projectId: "project-1",
   settingsId: `${id}-settings`,
   ...overrides,
+})
+
+test("owned Auto Context titles name their Translation", () => {
+  expect(getAutoContextExtractionTitle("Episode 4")).toBe("Auto Context for Episode 4")
+  expect(getAutoContextExtractionTitle("   ")).toBe("Auto Context for Untitled Translation")
 })
 
 describe("findLatestExtraction", () => {

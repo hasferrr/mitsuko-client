@@ -185,6 +185,7 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
       setIsContinueTranslationDialogOpen: () => {},
       setActiveTab: () => {},
       setQueueSet: () => {},
+      setAutoContextStageMap: () => {},
     }
   })
 

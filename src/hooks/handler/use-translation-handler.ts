@@ -53,7 +53,7 @@ import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import {
-  AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX,
+  getAutoContextExtractionTitle,
   isAutoContextOwnedBy,
 } from "@/lib/extraction/status"
 import {
@@ -571,8 +571,9 @@ export const useTranslationHandler = ({
     const projectStore = useProjectStore.getState()
     const translation = translationStore.data[currentId]
     const mode = translation.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
+    const contextDocument = useSettingsStore.getState().getContextDocument(settingsId)
 
-    if (isBatch || mode === "disabled") return useSettingsStore.getState().getContextDocument(settingsId)
+    if (isBatch) return contextDocument
 
     const project = await projectStore.getProjectDb(translation.projectId)
     if (!isAutoContextRunActive(currentId, runToken)) return null
@@ -580,6 +581,35 @@ export const useTranslationHandler = ({
       toast.error("Project was not found.")
       return null
     }
+
+    if (project.isBatch) {
+      if (!project.isBatchAutoContextEnabled) return contextDocument
+      const linkedExtraction = translation.autoContextExtractionId
+        ? extractionDataStore.data[translation.autoContextExtractionId]
+          ?? await extractionDataStore.getExtractionDb(translation.autoContextExtractionId)
+        : null
+      if (!isAutoContextRunActive(currentId, runToken)) return null
+      if (linkedExtraction && !isAutoContextOwnedBy(linkedExtraction, currentId)) {
+        toast.error("Linked batch Auto Context is not owned by this Translation. Use Continue Batch Translation to prepare the Context Chain.")
+        return null
+      }
+      const problem = getExtractionProblem(
+        linkedExtraction ?? undefined,
+        project.id,
+        useExtractionStore.getState().isExtractingSet,
+        "Linked batch Auto Context extraction",
+      )
+      if (problem) {
+        toast.error(`${problem} Use Continue Batch Translation to prepare the Context Chain.`)
+        return null
+      }
+      return combineAutoContext(
+        cleanExtractionResult(linkedExtraction?.contextResult ?? ""),
+        contextDocument,
+      )
+    }
+
+    if (mode === "disabled") return contextDocument
 
     const projectExtractions = (await extractionDataStore.getExtractionsDb(project.extractions)).toReversed()
     if (!isAutoContextRunActive(currentId, runToken)) return null
@@ -589,7 +619,7 @@ export const useTranslationHandler = ({
         ?? await useExtractionDataStore.getState().getExtractionDb(extractionId)
       if (!extraction) return false
 
-      useExtractionDataStore.getState().setTitle(extractionId, `${AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX} ${translation.title}`)
+      useExtractionDataStore.getState().setTitle(extractionId, getAutoContextExtractionTitle(translation.title))
       useExtractionDataStore.getState().setEpisodeNumber(extractionId, translation.title)
       useExtractionDataStore.getState().setSubtitleContent(extractionId, getTranslationSubtitleContent(translation))
       await useExtractionDataStore.getState().saveData(extractionId)
@@ -740,7 +770,7 @@ export const useTranslationHandler = ({
     const previousContext = previousExtraction ? cleanExtractionResult(previousExtraction.contextResult) : ""
 
     const created = await extractionDataStore.createExtractionDb(project.id, {
-      title: `${AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX} ${translation.title}`,
+      title: getAutoContextExtractionTitle(translation.title),
       episodeNumber: translation.title,
       subtitleContent: getTranslationSubtitleContent(translation),
       previousContext,
