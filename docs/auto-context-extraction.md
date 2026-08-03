@@ -7,7 +7,7 @@ Auto context extraction lets a single translation resolve an extraction result b
 When enabled, translation uses:
 
 ```text
-cleanedExtractionResult + "\n\n" + currentContextDocumentTextarea
+currentContextDocumentTextarea + "\n\n" + cleanedExtractionResult
 ```
 
 The saved Context Document textarea is not overwritten. Batch translation is excluded. Continue and Fill Missing Translations also resolve auto context before starting.
