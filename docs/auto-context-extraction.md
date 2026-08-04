@@ -116,7 +116,9 @@ When running a newly auto-created extraction or rerunning an owned auto-context 
 
 ## UI
 
-The Context Document section has an Auto button. A normal single Translation can configure it directly. A Translation in a batch shows the batch-wide Auto Context state and linked extraction as read-only information instead.
+The Context Document section has an Auto button. Every Translation uses the same editable Auto Context dialog, whether or not it belongs to a batch project.
+
+The per-Translation dialog and the batch pipeline are separate controls. The dialog edits the Translation's own Auto Context mode and extraction selections. Starting or continuing work from the batch view still follows the batch project's Batch Auto Context setting and deterministic Context Chain.
 
 The Auto dialog lets the user:
 

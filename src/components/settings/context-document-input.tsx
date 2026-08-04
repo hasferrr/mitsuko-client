@@ -14,7 +14,7 @@ import { removeDoneTag } from "@/lib/utils/done-tag"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
-import { cleanExtractionResult, combineAutoContext, getBatchAutoContextPreview, getExtractionProblem, findLatestExtraction } from "@/lib/translation/auto-context"
+import { cleanExtractionResult, combineAutoContext, getExtractionProblem, findLatestExtraction } from "@/lib/translation/auto-context"
 import { isAutoContextOwnedBy } from "@/lib/extraction/status"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ExtractionBadges } from "@/components/extract-context/extraction-badges"
@@ -228,20 +228,10 @@ export const ContextDocumentInput = memo(({
     : null
   const isSelectedAutoOwned = !!(translation && selectedExtraction && isAutoContextOwnedBy(selectedExtraction, translation.id))
   const autoContextMode = translation?.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
-  const isBatchManagedAutoContext = !!(
-    currentProject?.isBatch
-    && !isTemplateTranslation
-    && translation
-    && translation.projectId === currentProject.id
-  )
-  const isBatchAutoContextEnabled = isBatchManagedAutoContext && !!currentProject?.isBatchAutoContextEnabled
-  const isAutoContextEnabled = isBatchManagedAutoContext
-    ? isBatchAutoContextEnabled
-    : autoContextMode !== "disabled"
+  const isAutoContextEnabled = autoContextMode !== "disabled"
 
   const previewCleanedExtraction = (() => {
     if (!translation || !selectedExtraction) return ""
-    if (isBatchManagedAutoContext) return ""
     if (translation.autoContextMode === "disabled") return ""
     if (isSelectedExtractionRunning) return ""
     if (selectedProblem && !isSelectedAutoOwned) return ""
@@ -254,16 +244,6 @@ export const ContextDocumentInput = memo(({
     : contextDocument
 
   const previewDisplayValue = (() => {
-    if (isBatchManagedAutoContext) {
-      return getBatchAutoContextPreview({
-        contextDocument,
-        enabled: isBatchAutoContextEnabled,
-        extraction: selectedExtraction,
-        isOwned: isSelectedAutoOwned,
-        isRunning: isSelectedExtractionRunning,
-        extractionProblem: selectedProblem,
-      })
-    }
     if (!translation || translation.autoContextMode === "disabled") {
       return previewCombinedContext || ""
     }
@@ -372,61 +352,11 @@ export const ContextDocumentInput = memo(({
             <DialogHeader>
               <DialogTitle>Auto Context</DialogTitle>
               <DialogDescription>
-                {isBatchManagedAutoContext
-                  ? "This file follows the Auto Context pipeline configured for the whole batch."
-                  : "Automatically attach extracted context when you start translating."}
+                Automatically attach extracted context when you start translating.
               </DialogDescription>
             </DialogHeader>
 
             <div className="flex flex-col gap-4 overflow-y-auto -mx-4 px-4">
-              {isBatchManagedAutoContext ? (
-                <>
-                  <StatusMessage variant={currentProject.isBatchAutoContextEnabled ? "info" : "muted"}>
-                    {currentProject.isBatchAutoContextEnabled
-                      ? "Batch Auto Context is on. Per-file Auto Context controls are read-only while this Translation belongs to the batch."
-                      : "Batch Auto Context is off. Existing owned extraction links are preserved and can be reused when it is enabled again."}
-                  </StatusMessage>
-
-                  <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/30 p-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium">Linked extraction</p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {selectedExtraction?.title
-                            || (translation.autoContextExtractionId ? "Loading linked extraction…" : "Not created yet")}
-                        </p>
-                      </div>
-                      {selectedExtraction && (
-                        <ExtractionBadges extraction={selectedExtraction} runningIds={isExtractingSet} size="compact" />
-                      )}
-                    </div>
-
-                    {selectedExtraction ? (
-                      <StatusMessage variant={isSelectedAutoOwned ? "info" : "warning"}>
-                        {isSelectedAutoOwned
-                          ? OWNED_EXTRACTION_MESSAGE
-                          : "Used by this Translation, but not owned by it. This extraction remains independent."}
-                      </StatusMessage>
-                    ) : (
-                      <StatusMessage variant="muted">
-                        The next batch run will create one owned extraction for this Translation when needed.
-                      </StatusMessage>
-                    )}
-
-                    {selectedExtraction && (
-                      <Button variant="outline" size="sm" onClick={() => handleOpenExtraction(selectedExtraction.id)}>
-                        <ExternalLink />
-                        Open Linked Extraction
-                      </Button>
-                    )}
-                  </div>
-
-                  <StatusMessage variant="muted">
-                    The manual Context Document remains translation-only and is sent before this file&apos;s extracted Auto Context.
-                  </StatusMessage>
-                </>
-              ) : (
-                <>
               <div className="flex flex-col gap-3">
                 <ModeCard
                   selected={autoContextMode === "disabled"}
@@ -640,11 +570,7 @@ export const ContextDocumentInput = memo(({
                   )}
                 </div>
               )}
-
-                </>
-              )}
-
-              {!isTemplateTranslation && (isBatchManagedAutoContext || autoContextMode !== "disabled") && (
+              {!isTemplateTranslation && autoContextMode !== "disabled" && (
                 <Collapsible open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" size="sm" className="w-full justify-between">

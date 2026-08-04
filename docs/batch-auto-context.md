@@ -4,6 +4,8 @@
 
 Batch Auto Context is an opt-in, durable setting on a batch project. It ensures one owned Context Extraction per Translation by reusing, assigning, recovering, or creating one, then connects those Extractions in the current batch order. It defaults to Off for existing and new projects and is independent of shared versus individual Translation settings.
 
+Opening a Translation inside a batch uses the same editable Auto Context dialog as a Translation in a regular project. Those per-Translation controls apply when that Translation is started directly. Starting or continuing from the batch view remains governed by the batch project's Batch Auto Context setting and Context Chain.
+
 The first extraction receives the explicitly selected Starting Context, or empty previous context when Starting Context is None. Every later extraction receives the usable result of the preceding owned extraction.
 
 ## Persistence
