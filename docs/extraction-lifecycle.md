@@ -11,16 +11,35 @@ This applies to manual extraction, batch extraction, and auto-context extraction
 Each `Extraction` stores:
 
 - `status`: `"idle" | "running" | "completed" | "failed" | "stopped"`
-- `ownerTranslationId`: translation that auto-created the extraction, or `null`
+- `ownerTranslationId`: translation that owns the extraction for Auto Context lifecycle management, or `null`
 - `completedAt`: completion timestamp, or `null`
 
-`ownerTranslationId` is the auto-context ownership marker. It lets the owning translation rerun its own invalid linked extraction without allowing other translations to rerun manually selected dependencies.
+`ownerTranslationId` grants permission to automatically manage an Extraction. It is not simply a reverse link.
 
-Ownership also controls entity lifecycle:
+## Translation–Extraction Relationships
 
-- deleting a Translation clears ownership while preserving the Auto Context extraction and its settings
-- moving a Translation between projects clears ownership while preserving the Auto Context extraction and its settings in the source project
-- manually selected or Starting Context extractions are used by a Translation or batch but are not owned, so they do not cascade
+Use this rule:
+
+- **Linked means read:** `Translation.autoContextExtractionId` identifies the Extraction whose result the Translation reads as context.
+- **Owned means manage:** `Extraction.ownerTranslationId` identifies the Translation allowed to automatically update, rerun, or recover that Extraction.
+
+For example, Translation A manually selects an existing Extraction X. A stores `autoContextExtractionId: X`, while X's `ownerTranslationId` remains unchanged. If X is unowned, it stays `null`; if another Translation owns X, that ownership remains. A can read X, but cannot automatically rerun or overwrite it. If A instead creates X through Auto Context, A stores `autoContextExtractionId: X` and X stores `ownerTranslationId: A`; A can then rerun X after a failure.
+
+The relationships by workflow are:
+
+- single Translation, auto-created Extraction: linked and owned
+- single Translation, manually selected existing Extraction: linked, without assigning ownership to the selecting Translation
+- batch Auto Context, auto-created Extraction: linked and owned
+- batch Link Context assignment: linked and owned because the Extraction becomes a managed item in the one-to-one Context Chain
+- batch Starting Context: read as the chain seed without assigning or changing ownership
+
+Manual selection in a single Translation intentionally does not assign ownership. This permits reuse and prevents a Translation from automatically overwriting a manually managed dependency.
+
+Ownership is used only to detach the relationship when a Translation is deleted or moved. There is no cascading deletion or movement of Extractions:
+
+- deleting a Translation sets `ownerTranslationId` to `null` on its owned Extractions; the Extractions and their settings remain in the project
+- moving a Translation sets `ownerTranslationId` to `null` on its owned Extractions; the Extractions and their settings remain in the source project and are not moved with the Translation
+- manual selection and Starting Context selection do not assign ownership; deleting or moving the selecting Translation does not change those Extractions or any ownership they already have
 
 ## Status Rules
 

@@ -29,6 +29,13 @@ Each `Translation` stores:
 
 `autoContextExtractionId` is intentionally kept after auto-created extraction failures so users can inspect, manually repair, or rerun the linked extraction.
 
+Think of the two fields as **read** versus **manage**:
+
+- `Translation.autoContextExtractionId` means the Translation reads this Extraction as context.
+- `Extraction.ownerTranslationId` means the Translation may automatically update and rerun this Extraction.
+
+For example, if Translation A manually selects Extraction X, A points to X but does not become its owner. X's existing `ownerTranslationId` remains unchanged. A can use X's result but cannot automatically overwrite it. If A creates X through Auto Context, A points to X and X is owned by A, so A can rerun X after a failure.
+
 Changing `autoContextMode` keeps `autoContextExtractionId` and `autoContextPreviousExtractionId` so linked extraction history and previous selections can be restored. It resets `autoContextPreviousMode` to `latest`.
 
 ## Modes
@@ -55,6 +62,8 @@ The created extraction uses:
 ### Use Existing
 
 Translation uses the selected extraction result when it is usable.
+
+Selecting an existing extraction does not assign ownership. The Translation writes the extraction's id to `autoContextExtractionId`, but the extraction's `ownerTranslationId` remains unchanged. An extraction already owned by this Translation may also appear in this mode after Create New changes the mode to Use Existing.
 
 If the selected extraction is currently running, translation waits for it to finish, then reloads and validates the result.
 

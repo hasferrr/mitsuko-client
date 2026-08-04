@@ -2,7 +2,7 @@
 
 ## Summary
 
-Batch Auto Context is an opt-in, durable setting on a batch project. It creates one owned Context Extraction per Translation and connects those extractions in the current batch order. It defaults to Off for existing and new projects and is independent of shared versus individual Translation settings.
+Batch Auto Context is an opt-in, durable setting on a batch project. It ensures one owned Context Extraction per Translation by reusing, assigning, recovering, or creating one, then connects those Extractions in the current batch order. It defaults to Off for existing and new projects and is independent of shared versus individual Translation settings.
 
 The first extraction receives the explicitly selected Starting Context, or empty previous context when Starting Context is None. Every later extraction receives the usable result of the preceding owned extraction.
 
@@ -13,11 +13,13 @@ Each batch `Project` stores:
 - `isBatchAutoContextEnabled`
 - `batchAutoContextStartingExtractionId`
 
-Each Translation continues to store its linked extraction and recorded predecessor through its existing Auto Context fields. Each owned extraction stores `ownerTranslationId` and its own settings snapshot.
+Each Translation stores the Extraction whose context it reads in `autoContextExtractionId`. Each managed Extraction stores the Translation allowed to update and rerun it in `ownerTranslationId`, plus its own settings snapshot.
+
+For example, if batch Translation A is assigned Extraction X, A points to X and X is owned by A. The batch can therefore rerun X for A when X fails. By contrast, selecting a Starting Context only reads it as the chain seed; selection does not assign or change its ownership.
 
 Disabling the project setting preserves all links. Re-enabling reuses usable owned extractions, reruns failed or stopped extractions in place, and creates only missing extractions.
 
-The batch Translation view can also link existing project extractions to Translations in bulk. Linking assigns each selected extraction to one Translation, records the current Context Chain predecessors, and detaches any replaced owned extraction without deleting it. The selected Starting Context cannot also be linked as an owned extraction.
+The batch Translation view can also link existing project extractions to Translations in bulk. Unlike manual selection in a single Translation, this Link Context action explicitly assigns ownership because the Extraction becomes part of the batch-managed one-to-one Context Chain. Linking assigns each selected extraction to one Translation, records the current Context Chain predecessors, and detaches any replaced owned extraction without deleting it. The selected Starting Context cannot also be linked as an owned extraction.
 
 ## Starting Context
 
@@ -41,7 +43,7 @@ owned Auto Context extraction
 
 Continue repairs the extraction chain through completed and unfinished files, but it does not retranslate completed Translations. A failed or stopped extraction is rerun in place without automatically rerunning the usable extractions below it. This allows Auto Context to be enabled after part of a batch has already been translated.
 
-Restart retranslates every file. By default it reuses valid Context Extractions. Selecting Regenerate Auto Context reruns the complete owned extraction chain before and during the restart pipeline.
+Restart retranslates every file. By default it reuses valid Context Extractions. Selecting Regenerate Auto Context reruns each owned Extraction serially as the restart pipeline proceeds. A Translation can start after its own Extraction finishes while later Extractions are still being regenerated.
 
 Stop aborts the current extraction and every active Translation, clears queued work, and preserves completed extractions, partial Translations, and the stopped owned extraction link. Continue reruns that stopped extraction in place and then resumes the chain.
 
@@ -67,4 +69,4 @@ A newly created owned extraction copies the project's default extraction setting
 
 Auto-created owned extractions are titled `Auto Context for {Translation title}`. The Translation UI shows the linked extraction title, status, and Open action. The extraction UI identifies its owning Translation and provides an Open Translation action.
 
-Deleting a Translation detaches and preserves its owned extraction and that extraction's settings. Moving a Translation also detaches the owned extraction and leaves it in the source project. A manually selected extraction outside the batch Link Context action, or a Starting Context, is merely used by the Translation or batch and remains unchanged.
+Deleting a Translation does not delete any Extraction. It sets `ownerTranslationId` to `null` on its owned Extraction and preserves that Extraction and its settings in the project. Moving a Translation does not move any Extraction; it clears ownership and leaves the Extraction and its settings in the source project. Manual selection outside the batch Link Context action and Starting Context selection do not assign ownership, so deleting or moving the selecting Translation does not change those Extractions or any ownership they already have.
