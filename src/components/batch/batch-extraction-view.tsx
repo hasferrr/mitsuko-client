@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
@@ -41,6 +46,7 @@ import {
   SquareCheckBig,
   SquarePen
 } from "lucide-react"
+import { RiArrowDownSLine } from "@remixicon/react"
 import {
   ModelSelection,
   SubtitleCleanupSwitch,
@@ -80,6 +86,7 @@ interface BatchExtractionViewProps {
 
 export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
   const [activeTab, setActiveTab] = useState("basic")
+  const [areSettingsOptionsOpen, setAreSettingsOptionsOpen] = useState(false)
   // Although extraction doesn't support "combinedFormat" or "toType" in the same way,
   // DownloadSection expects these props. We can keep local state or just pass defaults.
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("original")
@@ -558,22 +565,6 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
           {/* Batch Settings */}
           <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="flex flex-col gap-4">
             <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
-              <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
-                <FieldContent>
-                  <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
-                  <FieldDescription>
-                    {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
-                  </FieldDescription>
-                </FieldContent>
-                <Switch
-                  id="shared-settings-switch"
-                  checked={isUseSharedSettings}
-                  onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                  disabled={isProcessing}
-                  className="self-center data-[state=checked]:bg-primary"
-                />
-              </Field>
-
               <Field orientation="horizontal" data-disabled={isSequentialExtraction || undefined}>
                 <FieldContent>
                   <FieldTitle>Max Concurrent Extractions</FieldTitle>
@@ -646,19 +637,55 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
               </Field>
             </FieldGroup>
 
-            {/* Copy Shared Settings trigger */}
-            <div className="flex items-center justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-lg"
-                onClick={() => setIsCopySharedDialogOpen(true)}
-                disabled={isProcessing || batchFiles.length === 0}
-              >
-                <ListChecks className="size-4" />
-                Copy Shared Settings...
-              </Button>
-            </div>
+            <Collapsible
+              open={areSettingsOptionsOpen}
+              onOpenChange={setAreSettingsOptionsOpen}
+              className="flex flex-col gap-2"
+            >
+              <CollapsibleContent>
+                <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
+                  <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
+                    <FieldContent>
+                      <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
+                      <FieldDescription>
+                        {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
+                      </FieldDescription>
+                    </FieldContent>
+                    <Switch
+                      id="shared-settings-switch"
+                      checked={isUseSharedSettings}
+                      onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
+                      disabled={isProcessing}
+                      className="self-center data-[state=checked]:bg-primary"
+                    />
+                  </Field>
+
+                  <div className="flex items-center justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsCopySharedDialogOpen(true)}
+                      disabled={isProcessing || batchFiles.length === 0}
+                    >
+                      <ListChecks data-icon="inline-start" />
+                      Copy Shared Settings...
+                    </Button>
+                  </div>
+                </FieldGroup>
+              </CollapsibleContent>
+
+              <div className="flex justify-center">
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="xs">
+                    {areSettingsOptionsOpen ? "Fewer settings" : "More settings"}
+                    <RiArrowDownSLine
+                      data-icon="inline-end"
+                      className="transition-transform group-data-[state=open]/button:rotate-180"
+                    />
+                  </Button>
+                </CollapsibleTrigger>
+              </div>
+            </Collapsible>
           </CardContent>
           </Card>
 

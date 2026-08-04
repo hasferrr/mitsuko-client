@@ -2,6 +2,11 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
@@ -31,6 +36,7 @@ import {
   AudioLines,
   FastForward,
 } from "lucide-react"
+import { RiArrowDownSLine } from "@remixicon/react"
 import JSZip from "jszip"
 import { DownloadSection } from "@/components/shared/download-section"
 import { arrayMove } from "@dnd-kit/sortable"
@@ -66,6 +72,7 @@ interface BatchTranscriptionViewProps {
 
 export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscriptionViewProps) {
   const [activeTab, setActiveTab] = useState("settings")
+  const [areSettingsOptionsOpen, setAreSettingsOptionsOpen] = useState(false)
 
   const [previewId, setPreviewId] = useState<string | null>(null)
   const [queueSet, setQueueSet] = useState<Set<string>>(new Set())
@@ -602,22 +609,6 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           {/* Batch Settings */}
           <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="flex flex-col gap-4">
             <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
-              <Field orientation="horizontal" data-disabled={isBatchBusy || undefined}>
-                <FieldContent>
-                  <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
-                  <FieldDescription>
-                    {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
-                  </FieldDescription>
-                </FieldContent>
-                <Switch
-                  id="shared-settings-switch"
-                  checked={isUseSharedSettings}
-                  onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                  disabled={isBatchBusy}
-                  className="self-center data-[state=checked]:bg-primary"
-                />
-              </Field>
-
               <Field orientation="horizontal" data-disabled>
                 <FieldContent>
                   <FieldLabel htmlFor="delete-after-switch">Delete After Transcription</FieldLabel>
@@ -634,18 +625,55 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
               </Field>
             </FieldGroup>
 
-            <div className="flex items-center justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-lg"
-                onClick={() => setIsCopySettingsDialogOpen(true)}
-                disabled={isBatchBusy || batchFiles.length === 0}
-              >
-                <ListChecks className="size-4" />
-                Copy Shared Settings...
-              </Button>
-            </div>
+            <Collapsible
+              open={areSettingsOptionsOpen}
+              onOpenChange={setAreSettingsOptionsOpen}
+              className="flex flex-col gap-2"
+            >
+              <CollapsibleContent>
+                <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
+                  <Field orientation="horizontal" data-disabled={isBatchBusy || undefined}>
+                    <FieldContent>
+                      <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
+                      <FieldDescription>
+                        {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
+                      </FieldDescription>
+                    </FieldContent>
+                    <Switch
+                      id="shared-settings-switch"
+                      checked={isUseSharedSettings}
+                      onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
+                      disabled={isBatchBusy}
+                      className="self-center data-[state=checked]:bg-primary"
+                    />
+                  </Field>
+
+                  <div className="flex items-center justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsCopySettingsDialogOpen(true)}
+                      disabled={isBatchBusy || batchFiles.length === 0}
+                    >
+                      <ListChecks data-icon="inline-start" />
+                      Copy Shared Settings...
+                    </Button>
+                  </div>
+                </FieldGroup>
+              </CollapsibleContent>
+
+              <div className="flex justify-center">
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="xs">
+                    {areSettingsOptionsOpen ? "Fewer settings" : "More settings"}
+                    <RiArrowDownSLine
+                      data-icon="inline-end"
+                      className="transition-transform group-data-[state=open]/button:rotate-180"
+                    />
+                  </Button>
+                </CollapsibleTrigger>
+              </div>
+            </Collapsible>
           </CardContent>
           </Card>
 

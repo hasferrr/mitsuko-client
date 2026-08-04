@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
@@ -39,7 +44,7 @@ import {
   Trash,
   Upload
 } from "lucide-react"
-import { RiLinksLine, RiSparkling2Line } from "@remixicon/react"
+import { RiArrowDownSLine, RiLinksLine, RiSparkling2Line } from "@remixicon/react"
 import {
   LanguageSelection,
   ModelSelection,
@@ -116,6 +121,7 @@ function BatchRunSummary({
 
 export function BatchTranslationView({ settingsId }: { settingsId: string }) {
   const [activeTab, setActiveTab] = useState("basic")
+  const [areSettingsOptionsOpen, setAreSettingsOptionsOpen] = useState(false)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
   const [toType, setToType] = useState<SubtitleType | "no-change">("no-change")
@@ -580,22 +586,6 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
               <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
                 <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
                   <FieldContent>
-                    <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
-                    <FieldDescription>
-                      {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
-                    </FieldDescription>
-                  </FieldContent>
-                  <Switch
-                    id="shared-settings-switch"
-                    className="self-center"
-                    checked={isUseSharedSettings}
-                    onCheckedChange={checked => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                    disabled={isProcessing}
-                  />
-                </Field>
-
-                <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
-                  <FieldContent>
                     <FieldTitle>Max Concurrent Translations</FieldTitle>
                     <FieldDescription>
                       The serial extraction worker runs in addition to these slots. Max {MAX_BATCH_CONCURRENT_OPERATION}.
@@ -642,18 +632,55 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
                 />
               </FieldGroup>
 
-              <div className="flex items-center justify-end">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-lg"
-                  onClick={() => setIsCopySharedDialogOpen(true)}
-                  disabled={isProcessing || batchFiles.length === 0}
-                >
-                  <ListChecks data-icon="inline-start" />
-                  Copy Shared Settings...
-                </Button>
-              </div>
+              <Collapsible
+                open={areSettingsOptionsOpen}
+                onOpenChange={setAreSettingsOptionsOpen}
+                className="flex flex-col gap-2"
+              >
+                <CollapsibleContent>
+                  <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
+                    <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
+                      <FieldContent>
+                        <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
+                        <FieldDescription>
+                          {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
+                        </FieldDescription>
+                      </FieldContent>
+                      <Switch
+                        id="shared-settings-switch"
+                        className="self-center"
+                        checked={isUseSharedSettings}
+                        onCheckedChange={checked => setUseSharedSettings(currentProject?.id ?? "", checked)}
+                        disabled={isProcessing}
+                      />
+                    </Field>
+
+                    <div className="flex items-center justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsCopySharedDialogOpen(true)}
+                        disabled={isProcessing || batchFiles.length === 0}
+                      >
+                        <ListChecks data-icon="inline-start" />
+                        Copy Shared Settings...
+                      </Button>
+                    </div>
+                  </FieldGroup>
+                </CollapsibleContent>
+
+                <div className="flex justify-center">
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="xs">
+                      {areSettingsOptionsOpen ? "Fewer settings" : "More settings"}
+                      <RiArrowDownSLine
+                        data-icon="inline-end"
+                        className="transition-transform group-data-[state=open]/button:rotate-180"
+                      />
+                    </Button>
+                  </CollapsibleTrigger>
+                </div>
+              </Collapsible>
             </CardContent>
           </Card>
 
