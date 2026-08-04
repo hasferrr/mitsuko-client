@@ -88,9 +88,9 @@ export function BatchAutoContextSettings({
     <FieldGroup className="gap-4">
       <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
         <FieldContent>
-          <FieldTitle className="text-sm font-semibold">Auto Context</FieldTitle>
+          <FieldTitle className="text-sm font-semibold">Automatic Context</FieldTitle>
           <FieldDescription className="text-xs">
-            Build one linked context extraction per file in batch order.
+            Create context for each file and carry it forward to keep translations consistent.
           </FieldDescription>
         </FieldContent>
         <Switch
@@ -98,7 +98,7 @@ export function BatchAutoContextSettings({
           checked={enabled}
           onCheckedChange={checked => void updateAutoContext({ isBatchAutoContextEnabled: checked })}
           disabled={isProcessing}
-          aria-label="Enable batch Auto Context"
+          aria-label="Enable automatic context for this batch"
         />
       </Field>
 
@@ -144,9 +144,9 @@ export function BatchAutoContextSettings({
 
           <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
             <FieldContent>
-              <FieldTitle className="text-sm font-semibold">Extraction Settings</FieldTitle>
+              <FieldTitle className="text-sm font-semibold">Context Creation Settings</FieldTitle>
               <FieldDescription className="text-xs">
-                New linked extractions copy the project extraction defaults.
+                Choose how Automatic Context analyzes each file in this project.
               </FieldDescription>
             </FieldContent>
             <Button
