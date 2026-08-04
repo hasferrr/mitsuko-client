@@ -30,7 +30,7 @@ export function findLatestExtraction(
 export function combineAutoContext(cleanedExtractionResult: string, contextDocument: string): string {
   return [contextDocument.trim(), cleanedExtractionResult.trim()]
     .filter(Boolean)
-    .join("\n\n")
+    .join("\n\n---\n\n")
 }
 
 export function getBatchAutoContextPreview({

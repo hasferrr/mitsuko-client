@@ -111,7 +111,7 @@ describe("combineAutoContext", () => {
     const autoContext = cleanExtractionResult("  Generated context\n\n<done>  ")
     const manualContext = "Manual context"
 
-    expect(combineAutoContext(autoContext, manualContext)).toBe("Manual context\n\nGenerated context")
+    expect(combineAutoContext(autoContext, manualContext)).toBe("Manual context\n\n---\n\nGenerated context")
   })
 })
 
@@ -126,7 +126,7 @@ describe("getBatchAutoContextPreview", () => {
       isOwned: true,
       isRunning: false,
       extractionProblem: null,
-    })).toBe("Manual context\n\nGenerated context")
+    })).toBe("Manual context\n\n---\n\nGenerated context")
   })
 
   test("previews only manual context when Batch Auto Context is off", () => {
@@ -159,7 +159,7 @@ describe("getBatchAutoContextPreview", () => {
       isOwned: true,
       isRunning: false,
       extractionProblem: "Selected context extraction was stopped.",
-    })).toBe("Manual context\n\n[Extraction will be regenerated when batch translation starts]")
+    })).toBe("Manual context\n\n---\n\n[Extraction will be regenerated when batch translation starts]")
   })
 })
 
