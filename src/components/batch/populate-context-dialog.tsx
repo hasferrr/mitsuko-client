@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
-import { ChevronLeft, ChevronRight, ArrowLeft, Loader2, ListChecks, ListX, ListRestart } from "lucide-react"
+import { ChevronLeft, ChevronRight, ArrowLeft, Loader2, ListChecks, ListX, ListRestart, Unlink } from "lucide-react"
 import type { BatchFile } from "@/types/batch"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
@@ -22,6 +22,8 @@ interface PopulateContextDialogProps {
   mode?: "populate" | "link"
   startingExtractionId?: string | null
 }
+
+const UNLINK_CONTEXT_VALUE = "__unlink-context__"
 
 export function PopulateContextDialog({
   open,
@@ -137,9 +139,15 @@ export function PopulateContextDialog({
     })
   }
 
-  const handleSelectChange = (tId: string, eId: string | null) => {
-    setMapping(prev => ({ ...prev, [tId]: eId }))
-    setSelected(prev => ({ ...prev, [tId]: !!eId }))
+  const handleSelectChange = (tId: string, value: string) => {
+    const extractionId = value === UNLINK_CONTEXT_VALUE ? null : value
+    setMapping(prev => ({ ...prev, [tId]: extractionId }))
+    setSelected(prev => ({ ...prev, [tId]: true }))
+  }
+
+  const handleUnlink = (tId: string) => {
+    setMapping(prev => ({ ...prev, [tId]: null }))
+    setSelected(prev => ({ ...prev, [tId]: true }))
   }
 
   const handleToggleSelected = (tId: string, checked: boolean) => {
@@ -188,6 +196,9 @@ export function PopulateContextDialog({
     setIsApplying(true)
     try {
       if (isLinkMode) {
+        const selectedTranslationIds = new Set(
+          translationIds.filter(translationId => selected[translationId]),
+        )
         const links = translationIds.flatMap(translationId => {
           const extractionId = mapping[translationId]
           return selected[translationId] && extractionId
@@ -200,7 +211,6 @@ export function PopulateContextDialog({
           return
         }
 
-        const selectedTranslationIds = new Set(links.map(link => link.translationId))
         const currentTranslations = useTranslationDataStore.getState().data
         const currentExtractions = useExtractionDataStore.getState().data
         const ownershipConflict = links.find(({ translationId, extractionId }) => {
@@ -233,8 +243,8 @@ export function PopulateContextDialog({
 
         let previousExtractionId = startingExtractionId
         const translationChanges = new Map<string, {
-          autoContextMode: "use-existing"
-          autoContextExtractionId: string
+          autoContextMode: "create-new" | "use-existing"
+          autoContextExtractionId: string | null
           autoContextPreviousMode: "selected" | "none"
           autoContextPreviousExtractionId: string | null
         }>()
@@ -247,9 +257,18 @@ export function PopulateContextDialog({
               autoContextPreviousMode: previousExtractionId ? "selected" : "none",
               autoContextPreviousExtractionId: previousExtractionId,
             })
+          } else if (selectedTranslationIds.has(translationId)) {
+            translationChanges.set(translationId, {
+              autoContextMode: "create-new",
+              autoContextExtractionId: null,
+              autoContextPreviousMode: previousExtractionId ? "selected" : "none",
+              autoContextPreviousExtractionId: previousExtractionId,
+            })
           }
 
-          const projectedExtractionId = linkedId ?? currentTranslations[translationId]?.autoContextExtractionId
+          const projectedExtractionId = selectedTranslationIds.has(translationId)
+            ? linkedId
+            : currentTranslations[translationId]?.autoContextExtractionId
           previousExtractionId = projectedExtractionId
             && plannedOwnerByExtraction.get(projectedExtractionId) === translationId
             ? projectedExtractionId
@@ -267,10 +286,15 @@ export function PopulateContextDialog({
           return updateTranslationDb(translationId, changes)
         }))
 
-        if (links.length > 0) {
+        const unlinkedCount = [...selectedTranslationIds].filter(translationId => !linkedIdByTranslation.has(translationId)).length
+        if (links.length > 0 && unlinkedCount > 0) {
+          toast.success(`Updated context links for ${links.length + unlinkedCount} translations`)
+        } else if (links.length > 0) {
           toast.success(`Linked context for ${links.length} translation${links.length === 1 ? "" : "s"}`)
+        } else if (unlinkedCount > 0) {
+          toast.success(`Unlinked context from ${unlinkedCount} translation${unlinkedCount === 1 ? "" : "s"}`)
         } else {
-          toast.message("Nothing to link")
+          toast.message("Nothing to update")
         }
         onOpenChange(false)
         return
@@ -394,12 +418,20 @@ export function PopulateContextDialog({
                       >
                         <ChevronLeft />
                       </Button>
-                      <Select value={mappedId ?? undefined} onValueChange={(val) => handleSelectChange(t.id, val)}>
+                      <Select
+                        value={isChecked && !mappedId ? UNLINK_CONTEXT_VALUE : mappedId ?? undefined}
+                        onValueChange={(val) => handleSelectChange(t.id, val)}
+                      >
                         <SelectTrigger className="w-[300px]">
                           <SelectValue placeholder="Select extraction" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
+                            {isLinkMode && (
+                              <SelectItem value={UNLINK_CONTEXT_VALUE}>
+                                Unlink context
+                              </SelectItem>
+                            )}
                             {mappingExtractionBatchFiles.map((e) => (
                               <SelectItem key={e.id} value={e.id}>
                                 <div className="flex flex-col items-start text-sm">
@@ -414,6 +446,18 @@ export function PopulateContextDialog({
                           </SelectGroup>
                         </SelectContent>
                       </Select>
+                      {isLinkMode && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleUnlink(t.id)}
+                          disabled={isLoading || !translationStore[t.id]?.autoContextExtractionId}
+                          aria-label={`Unlink context from ${t.title || "Untitled"}`}
+                          title="Unlink context"
+                        >
+                          <Unlink />
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="icon"
