@@ -577,30 +577,31 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
           {/* Batch Settings */}
           <Card size="sm" className="mt-4 w-full shadow-xs">
             <CardContent className="flex flex-col gap-4">
-              <FieldGroup className="gap-4">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="shared-settings-switch" className="flex flex-col">
-                    <span className="text-sm font-semibold">Settings Mode</span>
-                    <span className="text-xs text-muted-foreground">
+              <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
+                <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
+                  <FieldContent>
+                    <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
+                    <FieldDescription>
                       {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
-                    </span>
-                  </label>
+                    </FieldDescription>
+                  </FieldContent>
                   <Switch
                     id="shared-settings-switch"
+                    className="self-center"
                     checked={isUseSharedSettings}
                     onCheckedChange={checked => setUseSharedSettings(currentProject?.id ?? "", checked)}
                     disabled={isProcessing}
                   />
-                </div>
+                </Field>
 
                 <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
                   <FieldContent>
-                    <FieldTitle className="text-sm font-semibold">Max Concurrent Translations</FieldTitle>
-                    <FieldDescription className="text-xs">
+                    <FieldTitle>Max Concurrent Translations</FieldTitle>
+                    <FieldDescription>
                       The serial extraction worker runs in addition to these slots. Max {MAX_BATCH_CONCURRENT_OPERATION}.
                     </FieldDescription>
                   </FieldContent>
-                  <div className="flex items-center gap-1">
+                  <div className="flex shrink-0 items-center gap-1 self-center">
                     <Button
                       variant="ghost"
                       size="icon"

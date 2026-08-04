@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
+import { Field, FieldContent, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { cn } from "@/lib/utils"
 import { createUtf8SubtitleBlob } from "@/lib/utils/file"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
@@ -599,37 +600,39 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           </TabsList>
 
           {/* Batch Settings */}
-          <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label htmlFor="shared-settings-switch" className="flex flex-col">
-                <span className="text-sm font-semibold">Settings Mode</span>
-                <span className="text-xs text-muted-foreground">
-                  {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
-                </span>
-              </label>
-              <Switch
-                id="shared-settings-switch"
-                checked={isUseSharedSettings}
-                onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                disabled={isBatchBusy}
-                className="data-[state=checked]:bg-primary"
-              />
-            </div>
+          <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="flex flex-col gap-4">
+            <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
+              <Field orientation="horizontal" data-disabled={isBatchBusy || undefined}>
+                <FieldContent>
+                  <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
+                  <FieldDescription>
+                    {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
+                  </FieldDescription>
+                </FieldContent>
+                <Switch
+                  id="shared-settings-switch"
+                  checked={isUseSharedSettings}
+                  onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
+                  disabled={isBatchBusy}
+                  className="self-center data-[state=checked]:bg-primary"
+                />
+              </Field>
 
-            <div className="flex items-center justify-between">
-              <label htmlFor="delete-after-switch" className="flex flex-col">
-                <span className="text-sm font-semibold">Delete After Transcription</span>
-                <span className="text-xs text-muted-foreground">
-                  Automatically delete uploaded files after completion
-                </span>
-              </label>
-              <Switch
-                id="delete-after-switch"
-                checked={true}
-                disabled={true}
-                className="data-[state=checked]:bg-primary"
-              />
-            </div>
+              <Field orientation="horizontal" data-disabled>
+                <FieldContent>
+                  <FieldLabel htmlFor="delete-after-switch">Delete After Transcription</FieldLabel>
+                  <FieldDescription>
+                    Automatically delete uploaded files after completion
+                  </FieldDescription>
+                </FieldContent>
+                <Switch
+                  id="delete-after-switch"
+                  checked={true}
+                  disabled={true}
+                  className="self-center data-[state=checked]:bg-primary"
+                />
+              </Field>
+            </FieldGroup>
 
             <div className="flex items-center justify-end">
               <Button

@@ -88,13 +88,14 @@ export function BatchAutoContextSettings({
     <FieldGroup className="gap-4">
       <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
         <FieldContent>
-          <FieldTitle className="text-sm font-semibold">Automatic Context</FieldTitle>
-          <FieldDescription className="text-xs">
+          <FieldTitle>Automatic Context</FieldTitle>
+          <FieldDescription>
             Create context for each file and carry it forward to keep translations consistent.
           </FieldDescription>
         </FieldContent>
         <Switch
           id="batch-auto-context"
+          className="self-center"
           checked={enabled}
           onCheckedChange={checked => void updateAutoContext({ isBatchAutoContextEnabled: checked })}
           disabled={isProcessing}
@@ -105,7 +106,7 @@ export function BatchAutoContextSettings({
       {enabled && (
         <>
           <Field data-invalid={!!selectedProblem || undefined} data-disabled={isProcessing || undefined}>
-            <FieldLabel htmlFor="batch-auto-context-starting-context" className="text-sm font-semibold">
+            <FieldLabel htmlFor="batch-auto-context-starting-context">
               Starting Context
             </FieldLabel>
             <Select
@@ -134,24 +135,25 @@ export function BatchAutoContextSettings({
                 </SelectGroup>
               </SelectContent>
             </Select>
-            <FieldDescription className="text-xs">
+            <FieldDescription>
               {selectedExtraction
                 ? "Used by this batch as Starting Context."
                 : "Optional existing extraction used before the first file. There is no implicit latest selection."}
             </FieldDescription>
-            {selectedProblem && <FieldError className="text-xs">{selectedProblem}</FieldError>}
+            {selectedProblem && <FieldError>{selectedProblem}</FieldError>}
           </Field>
 
           <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
             <FieldContent>
-              <FieldTitle className="text-sm font-semibold">Context Creation Settings</FieldTitle>
-              <FieldDescription className="text-xs">
+              <FieldTitle>Context Creation Settings</FieldTitle>
+              <FieldDescription>
                 Choose how Automatic Context analyzes each file in this project.
               </FieldDescription>
             </FieldContent>
             <Button
               variant="outline"
               size="sm"
+              className="w-fit self-center"
               onClick={onOpenExtractionSettings}
               disabled={isProcessing}
             >
