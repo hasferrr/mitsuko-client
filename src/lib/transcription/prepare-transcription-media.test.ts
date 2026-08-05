@@ -11,7 +11,7 @@ import {
   WEBM,
   type AudioCodec,
 } from "mediabunny"
-import { isAcceptedTranscriptionSelection } from "@/constants/transcription"
+import { isAcceptedTranscriptionSelection, isVideoTranscriptionSelection } from "@/constants/transcription"
 import { MediaPreparationError, prepareTranscriptionMedia } from "./prepare-transcription-media"
 import {
   extractAudioFromVideo,
@@ -61,6 +61,16 @@ describe("transcription file selector", () => {
     [{ name: "movie.avi", type: "video/x-msvideo" }, false],
   ] as const)("accepts %p: %s", (file, expected) => {
     expect(isAcceptedTranscriptionSelection(file)).toBe(expected)
+  })
+
+  test.each([
+    [{ name: "clip.mp4", type: "" }, true],
+    [{ name: "clip.bin", type: "video/quicktime" }, true],
+    [{ name: "recording.webm", type: "audio/webm" }, true],
+    [{ name: "recording.m4a", type: "audio/mp4" }, false],
+    [{ name: "voice.mp3", type: "audio/mpeg" }, false],
+  ] as const)("identifies video selections %p: %s", (file, expected) => {
+    expect(isVideoTranscriptionSelection(file)).toBe(expected)
   })
 })
 

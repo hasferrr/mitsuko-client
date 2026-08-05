@@ -53,6 +53,13 @@ export const isAcceptedTranscriptionSelection = (file: Pick<File, "name" | "type
   ))
 }
 
+export const isVideoTranscriptionSelection = (file: Pick<File, "name" | "type">) => {
+  const lowerName = file.name.toLowerCase()
+  const mimeType = file.type.toLowerCase().split(";", 1)[0]?.trim() ?? ""
+  return mimeType.startsWith("video/") || [".mp4", ".m4v", ".mov", ".mkv", ".webm", ".ts", ".mts", ".m2ts"]
+    .some(extension => lowerName.endsWith(extension))
+}
+
 interface ModelRecord {
   maxDuration: number
 }

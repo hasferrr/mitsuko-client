@@ -22,6 +22,7 @@ import {
   isAcceptedTranscriptionSelection,
   isAsrModel,
   isModelDurationLimitExceeded,
+  isVideoTranscriptionSelection,
 } from "@/constants/transcription"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
@@ -368,6 +369,9 @@ export function TranscriptionMain({ currentId, settingsId, isSharedSettings, hid
         isPrepared: false,
         wasExtracted: false,
       })
+      if (isVideoTranscriptionSelection(selectedFile)) {
+        await ensureCurrentFilePrepared()
+      }
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = ""
     }
