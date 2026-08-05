@@ -28,7 +28,7 @@ export function findLatestExtraction(
 }
 
 export function combineAutoContext(cleanedExtractionResult: string, contextDocument: string): string {
-  return [cleanedExtractionResult.trim(), contextDocument.trim()]
+  return [contextDocument.trim(), cleanedExtractionResult.trim()]
     .filter(Boolean)
     .join("\n\n")
 }

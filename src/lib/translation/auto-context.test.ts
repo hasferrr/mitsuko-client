@@ -101,11 +101,11 @@ describe("getExtractionProblem", () => {
 })
 
 describe("combineAutoContext", () => {
-  test("prepends cleaned auto-context to the manual context document", () => {
+  test("appends cleaned auto-context to the manual context document", () => {
     const autoContext = cleanExtractionResult("  Generated context\n\n<done>  ")
     const manualContext = "Manual context"
 
-    expect(combineAutoContext(autoContext, manualContext)).toBe("Generated context\n\nManual context")
+    expect(combineAutoContext(autoContext, manualContext)).toBe("Manual context\n\nGenerated context")
   })
 })
 

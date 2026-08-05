@@ -243,7 +243,7 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
           : ""
     if (!extractionPlaceholder) return previewCombinedContext || ""
     return contextDocument
-      ? `${extractionPlaceholder}\n\n${contextDocument}`
+      ? `${contextDocument}\n\n${extractionPlaceholder}`
       : extractionPlaceholder
   })()
 
@@ -555,11 +555,9 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
                   <CollapsibleContent>
                     <div className="pt-2">
                       {previewDisplayValue ? (
-                        <Textarea
-                          readOnly
-                          value={previewDisplayValue}
-                          className="font-mono text-xs min-h-[80px] max-h-[200px] resize-none overflow-y-auto bg-muted/30"
-                        />
+                        <div className="min-h-[80px] max-h-[200px] overflow-y-auto whitespace-pre-wrap break-words rounded-md bg-muted/30 p-3 text-xs">
+                          {previewDisplayValue}
+                        </div>
                       ) : (
                         <p className="text-xs text-muted-foreground py-3 text-center">No context will be sent.</p>
                       )}
