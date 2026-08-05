@@ -87,7 +87,6 @@ export default function useBatchTranslationHandler({
   const setJsonResponse = useTranslationDataStore((state) => state.setJsonResponse)
 
   // Translation Store
-  const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
   const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
 
   // Session Store
@@ -122,7 +121,6 @@ export default function useBatchTranslationHandler({
         errorCountRef.current = Math.max(0, errorCountRef.current - 1)
       },
       onErrorTranslation: ({ isContinuation }) => {
-        if (currentProject?.isBatchAutoContextEnabled) return
         if (isContinuation) {
           errorCountRef.current += 1
           if (errorCountRef.current >= 5) {
@@ -264,7 +262,7 @@ export default function useBatchTranslationHandler({
   const runWithoutAutoContext = (isContinuation: boolean) => {
     const ids = batchFiles
       .map(file => file.id)
-      .filter(id => !isTranslatingSet.has(id))
+      .filter(id => !useTranslationStore.getState().isTranslatingSet.has(id))
     if (ids.length === 0) return
 
     setQueueSet(new Set(ids.slice(concurrentTranslations)))
@@ -278,7 +276,7 @@ export default function useBatchTranslationHandler({
       }
 
       const id = ids[index++]
-      if (isTranslatingSet.has(id)) {
+      if (useTranslationStore.getState().isTranslatingSet.has(id)) {
         launch()
         return
       }
@@ -315,7 +313,7 @@ export default function useBatchTranslationHandler({
       return
     }
 
-    const translationIds = project.translations.filter(id => !isTranslatingSet.has(id))
+    const translationIds = project.translations.filter(id => !useTranslationStore.getState().isTranslatingSet.has(id))
     const translationStore = useTranslationDataStore.getState()
     const extractionStore = useExtractionDataStore.getState()
     const extractionOrder = [...project.extractions]
@@ -448,7 +446,11 @@ export default function useBatchTranslationHandler({
         })
         if (runToken !== batchRunTokenRef.current) break
         extractionOrder.push(extraction.id)
-        await useProjectStore.getState().loadProjects()
+        try {
+          await useProjectStore.getState().loadProjects()
+        } catch {
+          // Best-effort — extraction is persisted in DB, pipeline uses local extractionOrder
+        }
       }
 
       if (!extraction) {

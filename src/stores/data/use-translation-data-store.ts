@@ -20,6 +20,15 @@ import { GLOBAL_TRANSLATION_SETTINGS_ID } from "@/constants/global-settings"
 import { resolveNewTranslationAutoContextMode } from "@/lib/translation/auto-context-defaults"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 
+export function detachExtractionsInStore(extractionIds: string[]) {
+  const extractionStore = useExtractionDataStore.getState()
+  for (const id of extractionIds) {
+    const extraction = extractionStore.data[id]
+    if (!extraction) continue
+    extractionStore.upsertData(id, { ...extraction, ownerTranslationId: null, updatedAt: new Date() })
+  }
+}
+
 export interface TranslationDataStore {
   currentId: string | null
   data: Record<string, Translation>
@@ -143,12 +152,7 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
   },
   deleteTranslationDb: async (projectId, translationId) => {
     const detachedExtractionIds = await deleteDB(projectId, translationId)
-    const extractionStore = useExtractionDataStore.getState()
-    detachedExtractionIds.forEach(id => {
-      const extraction = extractionStore.data[id]
-      if (!extraction) return
-      extractionStore.upsertData(id, { ...extraction, ownerTranslationId: null, updatedAt: new Date() })
-    })
+    detachExtractionsInStore(detachedExtractionIds)
     set(state => {
       const newData = { ...state.data }
       delete newData[translationId]
@@ -166,12 +170,7 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
         data: { ...state.data, [translationId]: { ...data, projectId: targetProjectId, updatedAt: new Date() } }
       }))
     }
-    const extractionStore = useExtractionDataStore.getState()
-    detachedExtractionIds.forEach(id => {
-      const extraction = extractionStore.data[id]
-      if (!extraction) return
-      extractionStore.upsertData(id, { ...extraction, ownerTranslationId: null, updatedAt: new Date() })
-    })
+    detachExtractionsInStore(detachedExtractionIds)
   },
 
   // setters implementation

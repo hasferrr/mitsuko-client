@@ -11,7 +11,7 @@ import {
   getProject as getOneProjectDB,
 } from "@/lib/db/project"
 import { useTranscriptionDataStore } from "./use-transcription-data-store"
-import { useTranslationDataStore } from "./use-translation-data-store"
+import { useTranslationDataStore, detachExtractionsInStore } from "./use-translation-data-store"
 import { useExtractionDataStore } from "./use-extraction-data-store"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { getSettings } from "@/lib/db/settings"
@@ -301,12 +301,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       // update translation store
       const translationStore = useTranslationDataStore.getState()
       translationStore.removeData(translationId)
-      const extractionStore = useExtractionDataStore.getState()
-      detachedExtractionIds.forEach(id => {
-        const extraction = extractionStore.data[id]
-        if (!extraction) return
-        extractionStore.upsertData(id, { ...extraction, ownerTranslationId: null, updatedAt: new Date() })
-      })
+      detachExtractionsInStore(detachedExtractionIds)
 
       // update local project state
       set(state => ({
