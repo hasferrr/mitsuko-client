@@ -216,7 +216,7 @@ export function UserSettings() {
                 Enable completion notification
               </Label>
               <p className="text-xs text-muted-foreground max-w-lg">
-                Play a notification sound and show a browser notification when all processing tasks finish. Off by default.
+                Show a browser notification when all processing tasks finish. Off by default.
               </p>
             </div>
             <Switch
