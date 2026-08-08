@@ -129,7 +129,7 @@ export function BatchAutoContextSettings({
                   )}
                   {eligibleExtractions.map(extraction => (
                     <SelectItem key={extraction.id} value={extraction.id}>
-                      {extraction.title || extraction.episodeNumber || "Untitled extraction"}
+                      {extraction.title || `Episode ${extraction.episodeNumber || "X"}`}
                     </SelectItem>
                   ))}
                 </SelectGroup>
