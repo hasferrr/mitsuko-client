@@ -39,14 +39,10 @@ export default function useBatchExtractionHandler({
   const currentProject = useProjectStore((state) => state.currentProject)
 
   // Batch Settings Store
-  const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
   const concurrentExtractions = useBatchSettingsStore(state => state.getConcurrent(currentProject?.id))
   const extractionMode = useBatchSettingsStore(state => state.getExtractionMode(currentProject?.id))
   const getContextResult = useExtractionDataStore(state => state.getContextResult)
   const setPreviousContext = useExtractionDataStore(state => state.setPreviousContext)
-
-  // Extraction Data Store
-  const extractionData = useExtractionDataStore((state) => state.data)
 
   // Extraction Store
   const isExtractingSet = useExtractionStore(state => state.isExtractingSet)
@@ -359,13 +355,9 @@ export default function useBatchExtractionHandler({
     currentId: string,
   ) => {
     // Delegate to centralized extraction handler
-    const settingsIdToUse = isUseSharedSettings
-      ? settingsId
-      : (extractionData[currentId]?.settingsId || settingsId)
-
     await baseStartExtraction(
       currentId,
-      settingsIdToUse,
+      settingsId,
     )
   }
 

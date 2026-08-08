@@ -20,7 +20,7 @@ export const AdvancedSettingsResetButton = ({ settingsId }: Props) => {
   }
 
   return (
-    <Button ref={buttonRef} onClick={handleReset} variant="outline">
+    <Button ref={buttonRef} onClick={handleReset} variant="outline" className="self-start">
       {value}
     </Button>
   )

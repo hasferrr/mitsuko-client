@@ -80,7 +80,6 @@ export default function useBatchTranslationHandler({
   const currentProject = useProjectStore((state) => state.currentProject)
 
   // Batch Settings Store
-  const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
   const concurrentTranslations = useBatchSettingsStore(state => state.getConcurrent(currentProject?.id))
 
   // Translation Data Store
@@ -157,16 +156,9 @@ export default function useBatchTranslationHandler({
     })
   }
 
-  const getSettingsId = (id: string) => {
-    return isUseSharedSettings
-      ? settingsId
-      : (useTranslationDataStore.getState().data[id]?.settingsId || settingsId)
-  }
-
-  const refetchTranslationCredits = (id: string) => {
-    const settingsIdToUse = getSettingsId(id)
-    const modelDetail = getModelDetail(settingsIdToUse)
-    const isUseCustomModel = getIsUseCustomModel(settingsIdToUse)
+  const refetchTranslationCredits = () => {
+    const modelDetail = getModelDetail(settingsId)
+    const isUseCustomModel = getIsUseCustomModel(settingsId)
     if (!isUseCustomModel && modelDetail?.isPaid) refetchUserData()
   }
 
@@ -251,7 +243,7 @@ export default function useBatchTranslationHandler({
   ) => {
     await baseStartTranslation({
       currentId,
-      settingsId: getSettingsId(currentId),
+      settingsId,
       overrideStartIndexParam,
       overrideEndIndexParam,
       isContinuation,
@@ -288,7 +280,7 @@ export default function useBatchTranslationHandler({
         : handleStartTranslation(id)
       operation.finally(() => {
         setIsTranslating(id, false)
-        refetchTranslationCredits(id)
+        refetchTranslationCredits()
         active--
         launch()
       })
@@ -396,7 +388,7 @@ export default function useBatchTranslationHandler({
         } finally {
           if (runToken === batchRunTokenRef.current) {
             setIsTranslating(id, false)
-            refetchTranslationCredits(id)
+            refetchTranslationCredits()
             setAutoContextStage(id, null)
           }
           releaseTranslationSlot()
@@ -510,7 +502,7 @@ export default function useBatchTranslationHandler({
           translationId,
           combineAutoContext(
             cleanExtractionContent(extraction.contextResult),
-            useSettingsStore.getState().getContextDocument(getSettingsId(translationId)),
+            useSettingsStore.getState().getContextDocument(settingsId),
           ),
         )
       } else {

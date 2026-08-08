@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -21,7 +15,6 @@ import {
 } from "@/components/ui/field"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
 import { createUtf8SubtitleBlob } from "@/lib/utils/file"
 import {
   AlertDialog,
@@ -44,7 +37,7 @@ import {
   Trash,
   Upload
 } from "lucide-react"
-import { RiArrowDownSLine, RiLinksLine, RiSparkling2Line } from "@remixicon/react"
+import { RiLinksLine, RiSparkling2Line } from "@remixicon/react"
 import {
   LanguageSelection,
   ModelSelection,
@@ -92,6 +85,17 @@ import { ContextExtractorMain } from "@/components/extract-context/context-extra
 import { SettingsDialogue } from "@/components/settings/settings-dialogue"
 import { GLOBAL_EXTRACTION_SETTINGS_ID } from "@/constants/global-settings"
 
+function CopySharedSettingsButton({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
+  return (
+    <div className="flex justify-end">
+      <Button variant="outline" size="sm" onClick={onClick} disabled={disabled}>
+        <ListChecks data-icon="inline-start" />
+        Copy Shared Settings...
+      </Button>
+    </div>
+  )
+}
+
 function BatchRunSummary({
   summary,
   concurrentTranslations,
@@ -121,7 +125,6 @@ function BatchRunSummary({
 
 export function BatchTranslationView({ settingsId }: { settingsId: string }) {
   const [activeTab, setActiveTab] = useState("basic")
-  const [areSettingsOptionsOpen, setAreSettingsOptionsOpen] = useState(false)
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("translated")
   const [combinedFormat, setCombinedFormat] = useState<CombinedFormat>("o-n-t")
   const [toType, setToType] = useState<SubtitleType | "no-change">("no-change")
@@ -159,8 +162,6 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
   }, [currentProject?.translations])
 
   // Settings Stores
-  const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
-  const setUseSharedSettings = useBatchSettingsStore(state => state.setUseSharedSettings)
   const concurrentOperation = useBatchSettingsStore(state => state.getConcurrent(currentProject?.id))
   const setConcurrentOperation = useBatchSettingsStore(state => state.setConcurrentTranslations)
 
@@ -185,9 +186,7 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
   const previewAutoContextExtraction = previewAutoContextTranslation?.autoContextExtractionId
     ? extractionData[previewAutoContextTranslation.autoContextExtractionId]
     : null
-  const previewAutoContextSettingsId = previewAutoContextTranslation
-    ? (isUseSharedSettings ? settingsId : previewAutoContextTranslation.settingsId)
-    : null
+  const previewAutoContextSettingsId = previewAutoContextTranslation ? settingsId : null
   const previewAutoContextDocument = useSettingsStore((state) => previewAutoContextSettingsId
     ? state.getContextDocument(previewAutoContextSettingsId)
     : "")
@@ -632,74 +631,29 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
                 />
               </FieldGroup>
 
-              <Collapsible
-                open={areSettingsOptionsOpen}
-                onOpenChange={setAreSettingsOptionsOpen}
-                className="flex flex-col gap-2"
-              >
-                <CollapsibleContent>
-                  <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
-                    <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
-                      <FieldContent>
-                        <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
-                        <FieldDescription>
-                          {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
-                        </FieldDescription>
-                      </FieldContent>
-                      <Switch
-                        id="shared-settings-switch"
-                        className="self-center"
-                        checked={isUseSharedSettings}
-                        onCheckedChange={checked => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                        disabled={isProcessing}
-                      />
-                    </Field>
-
-                    <div className="flex items-center justify-end">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsCopySharedDialogOpen(true)}
-                        disabled={isProcessing || batchFiles.length === 0}
-                      >
-                        <ListChecks data-icon="inline-start" />
-                        Copy Shared Settings...
-                      </Button>
-                    </div>
-                  </FieldGroup>
-                </CollapsibleContent>
-
-                <div className="flex justify-center">
-                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" size="xs">
-                      {areSettingsOptionsOpen ? "Fewer settings" : "More settings"}
-                      <RiArrowDownSLine
-                        data-icon="inline-end"
-                        className="transition-transform group-data-[state=open]/button:rotate-180"
-                      />
-                    </Button>
-                  </CollapsibleTrigger>
-                </div>
-              </Collapsible>
             </CardContent>
           </Card>
 
           <TabsContent value="basic" className="grow space-y-4 mt-4">
             <Card>
-              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+              <CardContent className="flex flex-col gap-4">
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <LanguageSelection settingsId={settingsId} />
                 <ModelSelection settingsId={settingsId} />
                 <ContextDocumentInput settingsId={settingsId} />
                 <CustomInstructionsInput settingsId={settingsId} />
                 <FewShotInput settingsId={settingsId} />
+                <CopySharedSettingsButton
+                  onClick={() => setIsCopySharedDialogOpen(true)}
+                  disabled={isProcessing || batchFiles.length === 0}
+                />
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="advanced" className="grow space-y-4 mt-4">
             <Card>
-              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+              <CardContent className="flex flex-col gap-4">
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <ModelDetail settingsId={settingsId} />
                 <TemperatureSlider settingsId={settingsId} />
@@ -713,6 +667,10 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
                 <FullContextMemorySwitch settingsId={settingsId} />
                 <MinimalContextModeSwitch settingsId={settingsId} />
                 <AdvancedSettingsResetButton settingsId={settingsId} />
+                <CopySharedSettingsButton
+                  onClick={() => setIsCopySharedDialogOpen(true)}
+                  disabled={isProcessing || batchFiles.length === 0}
+                />
               </CardContent>
             </Card>
           </TabsContent>
@@ -845,21 +803,14 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
             <AlertDialogDescription asChild>
               <div className="w-full">
                 <span className="block mb-2">Are you sure you want to start translating <strong>{batchFiles.length}</strong> files?</span>
-                {isUseSharedSettings ? (
-                  <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
-                    <span className="block font-semibold">Shared Settings:</span>
-                    <ul className="list-disc list-inside">
-                      <li>Process {concurrentOperation} files concurrently</li>
-                      <li>{sourceLanguage} → {targetLanguage}</li>
-                      <li>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</li>
-                    </ul>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
-                    <span className="block font-semibold">Individual Settings:</span>
-                    Each file uses its own settings.
-                  </div>
-                )}
+                <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
+                  <span className="block font-semibold">Batch Settings:</span>
+                  <ul className="list-disc list-inside">
+                    <li>Process {concurrentOperation} files concurrently</li>
+                    <li>{sourceLanguage} → {targetLanguage}</li>
+                    <li>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</li>
+                  </ul>
+                </div>
                 <div className="mt-4">
                   <BatchRunSummary summary={runSummary} concurrentTranslations={concurrentOperation} />
                 </div>
@@ -906,8 +857,8 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
               <SubtitleTranslatorMain
                 currentId={previewId}
                 translation={translationData[previewId]}
-                settingsId={isUseSharedSettings ? settingsId : translationData[previewId].settingsId}
-                isSharedSettings={isUseSharedSettings}
+                settingsId={settingsId}
+                isSharedSettings
                 hideBackButton
               />
             </div>

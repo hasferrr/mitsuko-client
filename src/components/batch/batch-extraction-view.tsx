@@ -2,17 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldContent, FieldDescription, FieldGroup, FieldLabel, FieldTitle } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
 import { removeDoneTag } from "@/lib/utils/done-tag"
 import {
   AlertDialog,
@@ -46,7 +39,6 @@ import {
   SquareCheckBig,
   SquarePen
 } from "lucide-react"
-import { RiArrowDownSLine } from "@remixicon/react"
 import {
   ModelSelection,
   SubtitleCleanupSwitch,
@@ -84,9 +76,19 @@ interface BatchExtractionViewProps {
   settingsId: string
 }
 
+function CopySharedSettingsButton({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
+  return (
+    <div className="flex justify-end">
+      <Button variant="outline" size="sm" onClick={onClick} disabled={disabled}>
+        <ListChecks data-icon="inline-start" />
+        Copy Shared Settings...
+      </Button>
+    </div>
+  )
+}
+
 export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
   const [activeTab, setActiveTab] = useState("basic")
-  const [areSettingsOptionsOpen, setAreSettingsOptionsOpen] = useState(false)
   // Although extraction doesn't support "combinedFormat" or "toType" in the same way,
   // DownloadSection expects these props. We can keep local state or just pass defaults.
   const [downloadOption, setDownloadOption] = useState<DownloadOption>("original")
@@ -119,8 +121,6 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
   }, [currentProject?.extractions])
 
   // Settings Stores
-  const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
-  const setUseSharedSettings = useBatchSettingsStore(state => state.setUseSharedSettings)
   const concurrentOperation = useBatchSettingsStore(state => state.getConcurrent(currentProject?.id))
   const setConcurrentOperation = useBatchSettingsStore(state => state.setConcurrentTranslations)
   const extractionMode = useBatchSettingsStore(state => state.getExtractionMode(currentProject?.id))
@@ -637,75 +637,28 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
               </Field>
             </FieldGroup>
 
-            <Collapsible
-              open={areSettingsOptionsOpen}
-              onOpenChange={setAreSettingsOptionsOpen}
-              className="flex flex-col gap-2"
-            >
-              <CollapsibleContent>
-                <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
-                  <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
-                    <FieldContent>
-                      <FieldLabel htmlFor="shared-settings-switch">Settings Mode</FieldLabel>
-                      <FieldDescription>
-                        {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
-                      </FieldDescription>
-                    </FieldContent>
-                    <Switch
-                      id="shared-settings-switch"
-                      checked={isUseSharedSettings}
-                      onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                      disabled={isProcessing}
-                      className="self-center data-[state=checked]:bg-primary"
-                    />
-                  </Field>
-
-                  <div className="flex items-center justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsCopySharedDialogOpen(true)}
-                      disabled={isProcessing || batchFiles.length === 0}
-                    >
-                      <ListChecks data-icon="inline-start" />
-                      Copy Shared Settings...
-                    </Button>
-                  </div>
-                </FieldGroup>
-              </CollapsibleContent>
-
-              <div className="flex justify-center">
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" size="xs">
-                    {areSettingsOptionsOpen ? "Fewer settings" : "More settings"}
-                    <RiArrowDownSLine
-                      data-icon="inline-end"
-                      className="transition-transform group-data-[state=open]/button:rotate-180"
-                    />
-                  </Button>
-                </CollapsibleTrigger>
-              </div>
-            </Collapsible>
           </CardContent>
           </Card>
 
           <TabsContent value="basic" className="grow space-y-4 mt-4">
             <Card>
-              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+              <CardContent className="flex flex-col gap-4">
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <ModelSelection settingsId={settingsId} />
                 <SubtitleCleanupSwitch />
+                <CopySharedSettingsButton onClick={() => setIsCopySharedDialogOpen(true)} disabled={isProcessing || batchFiles.length === 0} />
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="advanced" className="grow space-y-4 mt-4">
             <Card>
-              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+              <CardContent className="flex flex-col gap-4">
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <ModelDetail settingsId={settingsId} />
                 <MaxCompletionTokenInput settingsId={settingsId} />
                 <AdvancedSettingsResetButton settingsId={settingsId} />
+                <CopySharedSettingsButton onClick={() => setIsCopySharedDialogOpen(true)} disabled={isProcessing || batchFiles.length === 0} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -797,22 +750,15 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
             <AlertDialogDescription asChild>
               <div className="w-full">
                 <span className="block mb-2">Are you sure you want to start extracting <strong>{batchFiles.length}</strong> files?</span>
-                {isUseSharedSettings ? (
-                  <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
-                    <span className="block font-semibold">Shared Settings:</span>
-                    <ul className="list-disc list-inside">
-                      <li>
-                        {isSequentialExtraction ? "Process one-by-one (Sequential)" : `Process up to ${concurrentOperation} concurrently`}
-                      </li>
-                      <li>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</li>
-                    </ul>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
-                    <span className="block font-semibold">Individual Settings:</span>
-                    Each file uses its own settings.
-                  </div>
-                )}
+                <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
+                  <span className="block font-semibold">Batch Settings:</span>
+                  <ul className="list-disc list-inside">
+                    <li>
+                      {isSequentialExtraction ? "Process one-by-one (Sequential)" : `Process up to ${concurrentOperation} concurrently`}
+                    </li>
+                    <li>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</li>
+                  </ul>
+                </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -852,8 +798,8 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
             <div className="max-h-[80vh] overflow-y-auto">
               <ContextExtractorMain
                 currentId={previewId}
-                settingsId={isUseSharedSettings ? settingsId : extractionData[previewId].settingsId}
-                isSharedSettings={isUseSharedSettings}
+                settingsId={settingsId}
+                isSharedSettings
                 hideBackButton
               />
             </div>
