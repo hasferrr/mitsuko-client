@@ -11,7 +11,13 @@ import {
 import { db } from '@/lib/db/db'
 import { createProject, deleteProject } from '@/lib/db/project'
 import { createExtraction, deleteExtraction } from '@/lib/db/extraction'
-import { createTranslation, deleteTranslation, moveTranslation, updateTranslation } from '@/lib/db/translation'
+import {
+  createTranslation,
+  deleteTranslation,
+  moveTranslation,
+  updateBatchAutoContextLinks,
+  updateTranslation,
+} from '@/lib/db/translation'
 import { getSettings, updateSettings } from '@/lib/db/settings'
 import { exportDatabase, exportProject, exportProjects, importDatabase } from '@/lib/db/db-io'
 import { useSettingsStore } from '@/stores/settings/use-settings-store'
@@ -394,6 +400,38 @@ describe('unified settings persistence', () => {
 })
 
 describe('owned Auto Context extraction lifecycle', () => {
+  test('rolls back batch Auto Context link updates when a referenced record is missing', async () => {
+    const project = await createProject('Atomic Link Project')
+    const translation = await createTranslation(project.id, {
+      title: 'Episode 1',
+      subtitles: [],
+      parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
+    })
+    const extraction = await createExtraction(project.id, {
+      title: 'Existing Context',
+      episodeNumber: '1',
+      subtitleContent: 'subtitle',
+      previousContext: '',
+      contextResult: 'context',
+    })
+
+    await expect(updateBatchAutoContextLinks({
+      extractions: [{ id: extraction.id, ownerTranslationId: translation.id }],
+      translations: [{
+        id: 'missing-translation',
+        changes: {
+          autoContextMode: 'use-existing',
+          autoContextExtractionId: extraction.id,
+          autoContextPreviousMode: 'none',
+          autoContextPreviousExtractionId: null,
+        },
+      }],
+    })).rejects.toThrow('Translation missing-translation was not found')
+
+    expect((await db.extractions.get(extraction.id))?.ownerTranslationId).toBeNull()
+    expect((await db.translations.get(translation.id))?.autoContextExtractionId).toBeNull()
+  })
+
   test('deleting a Translation detaches and preserves its owned extraction', async () => {
     const project = await createProject('Detach Project')
     const translation = await createTranslation(project.id, {

@@ -48,10 +48,9 @@ export function PopulateContextDialog({
   // Stores
   const getTranslationsDb = useTranslationDataStore(s => s.getTranslationsDb)
   const translationStore = useTranslationDataStore(s => s.data)
-  const updateTranslationDb = useTranslationDataStore(s => s.updateTranslationDb)
+  const updateBatchAutoContextLinksDb = useTranslationDataStore(s => s.updateBatchAutoContextLinksDb)
   const getExtractionsDb = useExtractionDataStore(s => s.getExtractionsDb)
   const extractionStore = useExtractionDataStore(s => s.data)
-  const updateExtractionDb = useExtractionDataStore(s => s.updateExtractionDb)
   const setBasicSettingsValue = useSettingsStore(s => s.setBasicSettingsValue)
 
   // Local state
@@ -278,13 +277,13 @@ export function PopulateContextDialog({
         const extractionUpdates = Object.values(currentExtractions).flatMap(extraction => {
           const plannedOwnerId = plannedOwnerByExtraction.get(extraction.id) ?? null
           return extraction.ownerTranslationId !== plannedOwnerId
-            ? [updateExtractionDb(extraction.id, { ownerTranslationId: plannedOwnerId })]
+            ? [{ id: extraction.id, ownerTranslationId: plannedOwnerId }]
             : []
         })
-        await Promise.all(extractionUpdates)
-        await Promise.all([...translationChanges].map(([translationId, changes]) => {
-          return updateTranslationDb(translationId, changes)
-        }))
+        await updateBatchAutoContextLinksDb({
+          extractions: extractionUpdates,
+          translations: [...translationChanges].map(([id, changes]) => ({ id, changes })),
+        })
 
         const unlinkedCount = [...selectedTranslationIds].filter(translationId => !linkedIdByTranslation.has(translationId)).length
         if (links.length > 0 && unlinkedCount > 0) {

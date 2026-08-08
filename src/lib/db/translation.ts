@@ -1,4 +1,4 @@
-import { Settings, Translation } from "@/types/project"
+import { Extraction, Settings, Translation } from "@/types/project"
 import { db } from "@/lib/db/db"
 import {
   DEFAULT_SETTINGS,
@@ -8,6 +8,28 @@ import { createSettings } from "@/lib/db/settings"
 import { deleteSettingsIfUnreferenced } from "@/lib/db/settings-references"
 
 type SettingsData = Omit<Settings, "id" | "createdAt" | "updatedAt">
+
+export interface BatchAutoContextLinkUpdates {
+  extractions: Array<{
+    id: string
+    ownerTranslationId: string | null
+  }>
+  translations: Array<{
+    id: string
+    changes: Pick<
+      Translation,
+      | "autoContextMode"
+      | "autoContextExtractionId"
+      | "autoContextPreviousMode"
+      | "autoContextPreviousExtractionId"
+    >
+  }>
+}
+
+export interface BatchAutoContextLinkUpdateResult {
+  extractions: Extraction[]
+  translations: Translation[]
+}
 
 export const createTranslation = async (
   projectId: string,
@@ -70,6 +92,41 @@ export const updateTranslation = async (
   const updated = await db.translations.get(translationId)
   if (!updated) throw new Error('Translation not found')
   return updated
+}
+
+export const updateBatchAutoContextLinks = async ({
+  extractions,
+  translations,
+}: BatchAutoContextLinkUpdates): Promise<BatchAutoContextLinkUpdateResult> => {
+  return db.transaction('rw', db.translations, db.extractions, async () => {
+    const updatedAt = new Date()
+
+    for (const extraction of extractions) {
+      const updated = await db.extractions.update(extraction.id, {
+        ownerTranslationId: extraction.ownerTranslationId,
+        updatedAt,
+      })
+      if (!updated) throw new Error(`Extraction ${extraction.id} was not found`)
+    }
+
+    for (const translation of translations) {
+      const updated = await db.translations.update(translation.id, {
+        ...translation.changes,
+        updatedAt,
+      })
+      if (!updated) throw new Error(`Translation ${translation.id} was not found`)
+    }
+
+    const [updatedExtractions, updatedTranslations] = await Promise.all([
+      db.extractions.bulkGet(extractions.map(extraction => extraction.id)),
+      db.translations.bulkGet(translations.map(translation => translation.id)),
+    ])
+
+    return {
+      extractions: updatedExtractions.filter((extraction): extraction is Extraction => !!extraction),
+      translations: updatedTranslations.filter((translation): translation is Translation => !!translation),
+    }
+  })
 }
 
 export const moveTranslation = async (

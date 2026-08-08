@@ -8,6 +8,8 @@ import {
   getTranslations as getBulkDB,
   deleteTranslation as deleteDB,
   moveTranslation as moveDB,
+  updateBatchAutoContextLinks as updateBatchAutoContextLinksDB,
+  BatchAutoContextLinkUpdates,
 } from "@/lib/db/translation"
 import { getSettings } from "@/lib/db/settings"
 import { getProject } from "@/lib/db/project"
@@ -43,6 +45,7 @@ export interface TranslationDataStore {
   getTranslationDb: (translationId: string, skipStoreUpdate?: boolean) => Promise<Translation | undefined>
   getTranslationsDb: (translationIds: string[]) => Promise<Translation[]>
   updateTranslationDb: (translationId: string, changes: Partial<Translation>) => Promise<Translation>
+  updateBatchAutoContextLinksDb: (updates: BatchAutoContextLinkUpdates) => Promise<void>
   deleteTranslationDb: (projectId: string, translationId: string) => Promise<void>
   moveTranslationDb: (sourceProjectId: string, targetProjectId: string, translationId: string) => Promise<void>
   // setters
@@ -149,6 +152,23 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     const translation = await updateDB(translationId, changes)
     set(state => ({ data: { ...state.data, [translationId]: translation } }))
     return translation
+  },
+  updateBatchAutoContextLinksDb: async (updates) => {
+    const result = await updateBatchAutoContextLinksDB(updates)
+    if (result.translations.length) {
+      set(state => ({
+        data: {
+          ...state.data,
+          ...Object.fromEntries(result.translations.map(translation => [translation.id, translation])),
+        },
+      }))
+    }
+    if (result.extractions.length) {
+      const extractionStore = useExtractionDataStore.getState()
+      for (const extraction of result.extractions) {
+        extractionStore.upsertData(extraction.id, extraction)
+      }
+    }
   },
   deleteTranslationDb: async (projectId, translationId) => {
     const detachedExtractionIds = await deleteDB(projectId, translationId)
