@@ -5,7 +5,6 @@ import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { useUploadStore } from "@/stores/ui/use-upload-store"
 import { useSessionStore } from "@/stores/ui/use-session-store"
-import { useBatchSettingsStore } from "@/stores/settings/use-batch-settings-store"
 import { BatchFile } from "@/types/batch"
 import { listUploads } from "@/lib/api/uploads"
 import { isModelDurationLimitExceeded } from "@/constants/transcription"
@@ -18,7 +17,6 @@ export const useBatchTranscriptionFiles = (defaultTranscriptionId: string, order
   const uploadProgressMap = useUploadStore((state) => state.uploadMap)
   const currentProject = useProjectStore((state) => state.currentProject)
   const session = useSessionStore((state) => state.session)
-  const isUseSharedSettings = useBatchSettingsStore((state) => state.getIsUseSharedSettings(currentProject?.id))
 
   const { data: uploads = [] } = useQuery({
     queryKey: ["uploads", session?.user?.id],
@@ -79,9 +77,7 @@ export const useBatchTranscriptionFiles = (defaultTranscriptionId: string, order
         descriptionColor = "blue"
       }
 
-      const settingsModel = isUseSharedSettings
-        ? transcriptionData[defaultTranscriptionId]?.models
-        : transcription?.models
+      const settingsModel = transcriptionData[defaultTranscriptionId]?.models
       const duration = uploadExists
         ? (uploads.find(u => u.uploadId === transcription?.selectedUploadId)?.duration || 0)
         : (fileDurations[id] || 0)
@@ -100,7 +96,7 @@ export const useBatchTranscriptionFiles = (defaultTranscriptionId: string, order
         hasDurationWarning,
       }
     })
-  }, [currentProject?.isBatch, order, transcriptionData, isTranscribingSet, files, fileDurations, uploadProgressMap, queueSet, uploads, isUseSharedSettings, defaultTranscriptionId])
+  }, [currentProject?.isBatch, order, transcriptionData, isTranscribingSet, files, fileDurations, uploadProgressMap, queueSet, uploads, defaultTranscriptionId])
 
   const finishedCount = useMemo(() => {
     return batchFiles.filter(file => file.status === "done").length

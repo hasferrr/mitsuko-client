@@ -293,7 +293,6 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       const currentProject = get().projects.find(p => p.id === projectId)
       if (!currentProject) throw new Error('Project not found')
 
-      // Delete translation along with its own settings
       await deleteTranslation(projectId, translationId)
 
       const updatedTranslations = currentProject.translations.filter(id => id !== translationId)
@@ -305,8 +304,16 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
 
       // update local project state
       set(state => ({
-        projects: state.projects.map(p => p.id === projectId ? { ...p, translations: updatedTranslations, updatedAt: new Date() } : p),
-        currentProject: state.currentProject?.id === projectId ? { ...state.currentProject, translations: updatedTranslations, updatedAt: new Date() } : state.currentProject,
+        projects: state.projects.map(p => p.id === projectId ? {
+          ...p,
+          translations: updatedTranslations,
+          updatedAt: new Date(),
+        } : p),
+        currentProject: state.currentProject?.id === projectId ? {
+          ...state.currentProject,
+          translations: updatedTranslations,
+          updatedAt: new Date(),
+        } : state.currentProject,
         loading: false
       }))
     } catch (err) {

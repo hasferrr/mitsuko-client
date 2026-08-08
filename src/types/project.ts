@@ -32,6 +32,8 @@ export interface Project {
   isDefaultTranslationEnabled: boolean
   isDefaultExtractionEnabled: boolean
   isDefaultTranscriptionEnabled: boolean
+  isBatchAutoContextEnabled: boolean
+  batchAutoContextStartingExtractionId: string | null
   isArchived: boolean
 }
 
@@ -88,7 +90,6 @@ export interface Extraction {
   previousContext: string
   contextResult: string
   status: ExtractionStatus
-  ownerTranslationId: string | null
   completedAt: Date | null
   createdAt: Date
   updatedAt: Date

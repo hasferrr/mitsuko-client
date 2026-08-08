@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+import { Field, FieldContent, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { createUtf8SubtitleBlob } from "@/lib/utils/file"
 import { mergeSubtitle } from "@/lib/subtitles/merge-subtitle"
 import {
@@ -33,7 +33,6 @@ import {
 import JSZip from "jszip"
 import { DownloadSection } from "@/components/shared/download-section"
 import { arrayMove } from "@dnd-kit/sortable"
-import { useBatchSettingsStore } from "@/stores/settings/use-batch-settings-store"
 import { toast } from "sonner"
 import { useSessionStore } from "@/stores/ui/use-session-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -98,8 +97,6 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
   }, [currentProject?.transcriptions])
 
   // Settings Stores
-  const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
-  const setUseSharedSettings = useBatchSettingsStore(state => state.setUseSharedSettings)
 
 
   // Transcription Data Store
@@ -134,11 +131,7 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
     batchFiles,
     finishedCount,
     isBatchTranscribing: isProcessing,
-  } = useBatchTranscriptionFiles(
-    defaultTranscriptionId,
-    localOrder,
-    queueSet
-  )
+  } = useBatchTranscriptionFiles(defaultTranscriptionId, localOrder, queueSet)
   const isBatchBusy = isProcessing || Boolean(batchPreparation)
 
   // Selection Hook
@@ -599,58 +592,43 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           </TabsList>
 
           {/* Batch Settings */}
-          <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label htmlFor="shared-settings-switch" className="flex flex-col">
-                <span className="text-sm font-semibold">Settings Mode</span>
-                <span className="text-xs text-muted-foreground">
-                  {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
-                </span>
-              </label>
-              <Switch
-                id="shared-settings-switch"
-                checked={isUseSharedSettings}
-                onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                disabled={isBatchBusy}
-                className="data-[state=checked]:bg-primary"
-              />
-            </div>
+          <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="flex flex-col gap-4">
+            <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
+              <Field orientation="horizontal" data-disabled>
+                <FieldContent>
+                  <FieldLabel htmlFor="delete-after-switch">Delete After Transcription</FieldLabel>
+                  <FieldDescription>
+                    Automatically delete uploaded files after completion
+                  </FieldDescription>
+                </FieldContent>
+                <Switch
+                  id="delete-after-switch"
+                  checked={true}
+                  disabled={true}
+                  className="self-center data-[state=checked]:bg-primary"
+                />
+              </Field>
+            </FieldGroup>
 
-            <div className="flex items-center justify-between">
-              <label htmlFor="delete-after-switch" className="flex flex-col">
-                <span className="text-sm font-semibold">Delete After Transcription</span>
-                <span className="text-xs text-muted-foreground">
-                  Automatically delete uploaded files after completion
-                </span>
-              </label>
-              <Switch
-                id="delete-after-switch"
-                checked={true}
-                disabled={true}
-                className="data-[state=checked]:bg-primary"
-              />
-            </div>
-
-            <div className="flex items-center justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-lg"
-                onClick={() => setIsCopySettingsDialogOpen(true)}
-                disabled={isBatchBusy || batchFiles.length === 0}
-              >
-                <ListChecks className="size-4" />
-                Copy Shared Settings...
-              </Button>
-            </div>
           </CardContent>
           </Card>
 
           <TabsContent value="settings" className="grow space-y-4 mt-4">
             <Card>
-              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+              <CardContent className="flex flex-col gap-4">
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <SettingsTranscription transcriptionId={defaultTranscriptionId} />
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsCopySettingsDialogOpen(true)}
+                    disabled={isBatchBusy || batchFiles.length === 0}
+                  >
+                    <ListChecks data-icon="inline-start" />
+                    Copy Shared Settings...
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -722,20 +700,13 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
             <AlertDialogDescription asChild>
               <div className="w-full">
                 <span className="block">Start transcribing <strong>{batchFiles.length}</strong> files?</span>
-                {isUseSharedSettings ? (
-                  <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
-                    <span className="block font-semibold">Shared Settings:</span>
-                    <ul className="list-disc list-inside">
-                      <li>Sequential processing (1 file at a time)</li>
-                      <li>Files will be deleted after transcription</li>
-                    </ul>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
-                    <span className="block font-semibold">Individual Settings:</span>
-                    Each file uses its own settings.
-                  </div>
-                )}
+                <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
+                  <span className="block font-semibold">Batch Settings:</span>
+                  <ul className="list-disc list-inside">
+                    <li>Sequential processing (1 file at a time)</li>
+                    <li>Files will be deleted after transcription</li>
+                  </ul>
+                </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -815,8 +786,8 @@ export function BatchTranscriptionView({ defaultTranscriptionId }: BatchTranscri
           {previewId && transcriptionData[previewId] && (
             <TranscriptionMain
               currentId={previewId}
-              settingsId={isUseSharedSettings ? defaultTranscriptionId : undefined}
-              isSharedSettings={isUseSharedSettings}
+              settingsId={defaultTranscriptionId}
+              isSharedSettings
               hideBackButton
             />
           )}

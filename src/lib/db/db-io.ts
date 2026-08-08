@@ -165,6 +165,12 @@ export function sanitizeExport(source: DatabaseExport): DatabaseExport {
       settings.fewShot = { ...settings.fewShot, isEnabled: false, linkedId: '' }
     }
   }
+  for (const project of data.projects) {
+    if (project.batchAutoContextStartingExtractionId
+      && !extractionIds.has(project.batchAutoContextStartingExtractionId)) {
+      project.batchAutoContextStartingExtractionId = null
+    }
+  }
   for (const translation of data.translations) {
     if (translation.autoContextExtractionId !== null
       && !extractionIds.has(translation.autoContextExtractionId)) {
@@ -175,11 +181,6 @@ export function sanitizeExport(source: DatabaseExport): DatabaseExport {
       && !extractionIds.has(translation.autoContextPreviousExtractionId)) {
       translation.autoContextPreviousExtractionId = null
       if (translation.autoContextPreviousMode === 'selected') translation.autoContextPreviousMode = 'none'
-    }
-  }
-  for (const extraction of data.extractions) {
-    if (extraction.ownerTranslationId !== null && !translationIds.has(extraction.ownerTranslationId)) {
-      extraction.ownerTranslationId = null
     }
   }
   return data

@@ -75,6 +75,7 @@ export const useExtractionHandler = ({
   const handleStart = async (
     currentId: string,
     settingsId: string,
+    signal?: AbortSignal,
   ) => {
     // Settings Store
     const modelDetail = useSettingsStore.getState().getModelDetail(settingsId)
@@ -91,6 +92,7 @@ export const useExtractionHandler = ({
     const subtitleContent = extData.subtitleContent
     const previousContext = extData.previousContext
     const project = await useProjectStore.getState().getProjectDb(extData.projectId)
+    if (signal?.aborted) return false
     const projectName = project?.name || ""
 
     if (!isBatch) {
@@ -98,6 +100,7 @@ export const useExtractionHandler = ({
     }
 
     await saveData(currentId)
+    if (signal?.aborted) return false
 
     if (episodeNumber.trim() === "") {
       setIsEpisodeNumberValid?.(false)

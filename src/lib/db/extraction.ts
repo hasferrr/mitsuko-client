@@ -6,7 +6,7 @@ import { inferLegacyExtractionStatus, stripExtractionDoneTag } from "@/lib/extra
 import { deleteSettingsIfUnreferenced } from "@/lib/db/settings-references"
 
 export type ExtractionCreateInput = Pick<Extraction, "title" | "episodeNumber" | "subtitleContent" | "previousContext" | "contextResult">
-  & Partial<Pick<Extraction, "status" | "ownerTranslationId" | "completedAt">>
+  & Partial<Pick<Extraction, "status" | "completedAt">>
 
 type SettingsData = Omit<Settings, "id" | "createdAt" | "updatedAt">
 
@@ -30,7 +30,6 @@ export const createExtraction = async (
       ...data,
       contextResult,
       status,
-      ownerTranslationId: data.ownerTranslationId ?? null,
       completedAt: data.completedAt ?? (status === "completed" ? new Date() : null),
       settingsId: settings.id,
       createdAt: new Date(),

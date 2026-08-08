@@ -11,10 +11,17 @@ This applies to manual extraction, batch extraction, and auto-context extraction
 Each `Extraction` stores:
 
 - `status`: `"idle" | "running" | "completed" | "failed" | "stopped"`
-- `ownerTranslationId`: translation that auto-created the extraction, or `null`
 - `completedAt`: completion timestamp, or `null`
 
-`ownerTranslationId` is the auto-context ownership marker. It lets the owning translation rerun its own invalid linked extraction without allowing other translations to rerun manually selected dependencies.
+## Translation–Extraction Relationships
+
+`Translation.autoContextExtractionId` is the only Auto Context relationship. It identifies the live Extraction whose result the Translation reads and that Auto Context may rerun when the result is unusable.
+
+Multiple Translations may reference the same Extraction. The link does not create a private snapshot: editing or rerunning the Extraction changes the result observed by every linked Translation. A shared Extraction is regenerated at most once during one batch run, then every Translation linked to it reuses that result.
+
+Deleting a Translation removes only that Translation's link. The Extraction and links from other Translations remain. Moving a Translation clears its Auto Context and previous-context links because Extractions remain in the source project.
+
+Batch Starting Context and selected previous context are read-only inputs. A Starting Context cannot also be linked as Auto Context by a Translation in the same batch because it would seed itself.
 
 ## Status Rules
 
@@ -72,6 +79,8 @@ Batch extraction file status derives from extraction metadata:
 Batch “mark done” changes metadata only. It marks clean non-empty non-error results as `completed`, and toggles completed results back to `idle`.
 
 Sequential batch previous-context seeding uses only usable completed extraction results.
+
+Batch Translation Auto Context uses the same lifecycle metadata. A stopped or failed linked extraction is rerun in place by Continue. A manually repaired extraction marked `completed` is usable without rerunning. Deleting a linked extraction leaves recoverable stale Translation links; the next batch run creates replacements as needed.
 
 ## Legacy `<done>` Migration
 

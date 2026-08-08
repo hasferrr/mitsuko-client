@@ -1,3 +1,10 @@
+export type BatchTranslationStage =
+  | "waiting-context"
+  | "extracting-context"
+  | "queued-translation"
+  | "translating"
+  | "context-error"
+
 export interface BatchFile {
   id: string
   status: "pending" | "partial" | "uploading" | "processing" | "queued" | "done" | "error"
@@ -10,4 +17,6 @@ export interface BatchFile {
   type: string
   showEpisodePrefix?: boolean
   hasDurationWarning?: boolean
+  translationStage?: BatchTranslationStage
+  linkedExtractionId?: string | null
 }

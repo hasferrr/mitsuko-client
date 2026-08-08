@@ -11,6 +11,15 @@ const meta = { createdAt: new Date("2026-01-01T00:00:00Z"), updatedAt: new Date(
 const setting = (id: string): Settings => ({ ...DEFAULT_SETTINGS, ...meta, id })
 
 describe("database export conversion", () => {
+  test("defaults batch Auto Context project fields", () => {
+    const project = databaseExportConstructor({
+      projects: [{ id: "project-1" } as Project],
+    }).projects[0]
+
+    expect(project.isBatchAutoContextEnabled).toBe(false)
+    expect(project.batchAutoContextStartingExtractionId).toBeNull()
+  })
+
   test("constructs format version 2 exports", () => {
     const data = databaseExportConstructor({ settings: [setting("settings-1")] })
     expect(data.formatVersion).toBe(2)
@@ -185,6 +194,27 @@ describe("database export conversion", () => {
 })
 
 describe("generateNewIds", () => {
+  test("remaps a batch Starting Context extraction", () => {
+    const remapped = generateNewIds(databaseExportConstructor({
+      projects: [{
+        id: "project-1",
+        extractions: ["extraction-1"],
+        batchAutoContextStartingExtractionId: "extraction-1",
+      } as Project],
+      extractions: [{
+        id: "extraction-1",
+        projectId: "project-1",
+        settingsId: "settings-1",
+      } as never],
+      settings: [setting("settings-1")],
+    }))
+
+    expect(remapped.projects[0].batchAutoContextStartingExtractionId)
+      .toBe(remapped.extractions[0].id)
+    expect(remapped.projects[0].batchAutoContextStartingExtractionId)
+      .not.toBe("extraction-1")
+  })
+
   test("remaps unified settings while preserving sharing", () => {
     const project = {
       id: "project-1",

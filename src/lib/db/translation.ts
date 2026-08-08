@@ -9,6 +9,23 @@ import { deleteSettingsIfUnreferenced } from "@/lib/db/settings-references"
 
 type SettingsData = Omit<Settings, "id" | "createdAt" | "updatedAt">
 
+export interface BatchAutoContextLinkUpdates {
+  translations: Array<{
+    id: string
+    changes: Pick<
+      Translation,
+      | "autoContextMode"
+      | "autoContextExtractionId"
+      | "autoContextPreviousMode"
+      | "autoContextPreviousExtractionId"
+    >
+  }>
+}
+
+export interface BatchAutoContextLinkUpdateResult {
+  translations: Translation[]
+}
+
 export const createTranslation = async (
   projectId: string,
   data: Pick<Translation, "title" | "subtitles" | "parsed"> & Partial<Pick<Translation, "response" | "autoContextMode" | "autoContextExtractionId" | "autoContextPreviousMode" | "autoContextPreviousExtractionId">>,
@@ -72,25 +89,62 @@ export const updateTranslation = async (
   return updated
 }
 
+export const updateBatchAutoContextLinks = async ({
+  translations,
+}: BatchAutoContextLinkUpdates): Promise<BatchAutoContextLinkUpdateResult> => {
+  return db.transaction('rw', db.translations, async () => {
+    const updatedAt = new Date()
+
+    for (const translation of translations) {
+      const updated = await db.translations.update(translation.id, {
+        ...translation.changes,
+        updatedAt,
+      })
+      if (!updated) throw new Error(`Translation ${translation.id} was not found`)
+    }
+
+    const updatedTranslations = await db.translations.bulkGet(
+      translations.map(translation => translation.id),
+    )
+
+    return {
+      translations: updatedTranslations.filter((translation): translation is Translation => !!translation),
+    }
+  })
+}
+
 export const moveTranslation = async (
   sourceProjectId: string,
   targetProjectId: string,
   translationId: string,
-): Promise<void> => {
+): Promise<Translation> => {
   return db.transaction('rw', db.projects, db.translations, async () => {
-    await db.translations.update(translationId, { projectId: targetProjectId, updatedAt: new Date() })
+    const updatedAt = new Date()
+
+    await db.translations.update(translationId, {
+      projectId: targetProjectId,
+      autoContextMode: 'disabled',
+      autoContextExtractionId: null,
+      autoContextPreviousMode: 'none',
+      autoContextPreviousExtractionId: null,
+      updatedAt,
+    })
 
     await db.projects.update(sourceProjectId, project => {
       if (!project) return
       project.translations = project.translations.filter(id => id !== translationId)
-      project.updatedAt = new Date()
+      project.updatedAt = updatedAt
     })
 
     await db.projects.update(targetProjectId, project => {
       if (!project) return
-      project.translations.push(translationId)
-      project.updatedAt = new Date()
+      if (!project.translations.includes(translationId)) project.translations.push(translationId)
+      project.updatedAt = updatedAt
     })
+
+    const updated = await db.translations.get(translationId)
+    if (!updated) throw new Error('Translation not found')
+    return updated
   })
 }
 
@@ -98,12 +152,13 @@ export const deleteTranslation = async (projectId: string, translationId: string
   return db.transaction('rw', db.projects, db.translations, db.extractions, db.settings, async () => {
     const translation = await db.translations.get(translationId)
     if (!translation) return
+    const updatedAt = new Date()
 
     await db.translations.delete(translationId)
     await db.projects.update(projectId, project => {
       if (!project) return
       project.translations = project.translations.filter(tId => tId !== translationId)
-      project.updatedAt = new Date()
+      project.updatedAt = updatedAt
     })
     await deleteSettingsIfUnreferenced([translation.settingsId])
   })

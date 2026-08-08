@@ -619,6 +619,15 @@ export class MyDatabase extends Dexie {
         }
       })
     })
+    this.version(35).stores({}).upgrade(async tx => {
+      await tx.table('projects').toCollection().modify((project: Record<string, unknown>) => {
+        project.isBatchAutoContextEnabled = false
+        project.batchAutoContextStartingExtractionId = null
+      })
+      await tx.table('extractions').toCollection().modify((extraction: Record<string, unknown>) => {
+        delete extraction.ownerTranslationId
+      })
+    })
   }
 }
 

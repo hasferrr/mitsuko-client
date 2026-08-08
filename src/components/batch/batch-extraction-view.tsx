@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+import { Field, FieldContent, FieldDescription, FieldGroup, FieldLabel, FieldTitle } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
 import { removeDoneTag } from "@/lib/utils/done-tag"
 import {
   AlertDialog,
@@ -20,6 +20,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -75,6 +76,17 @@ interface BatchExtractionViewProps {
   settingsId: string
 }
 
+function CopySharedSettingsButton({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
+  return (
+    <div className="flex justify-end">
+      <Button variant="outline" size="sm" onClick={onClick} disabled={disabled}>
+        <ListChecks data-icon="inline-start" />
+        Copy Shared Settings...
+      </Button>
+    </div>
+  )
+}
+
 export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
   const [activeTab, setActiveTab] = useState("basic")
   // Although extraction doesn't support "combinedFormat" or "toType" in the same way,
@@ -109,8 +121,6 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
   }, [currentProject?.extractions])
 
   // Settings Stores
-  const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
-  const setUseSharedSettings = useBatchSettingsStore(state => state.setUseSharedSettings)
   const concurrentOperation = useBatchSettingsStore(state => state.getConcurrent(currentProject?.id))
   const setConcurrentOperation = useBatchSettingsStore(state => state.setConcurrentTranslations)
   const extractionMode = useBatchSettingsStore(state => state.getExtractionMode(currentProject?.id))
@@ -185,6 +195,7 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
       setIsContinueTranslationDialogOpen: () => {},
       setActiveTab: () => {},
       setQueueSet: () => {},
+      setAutoContextStageMap: () => {},
     }
   })
 
@@ -552,125 +563,102 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
           </TabsList>
 
           {/* Batch Settings */}
-          <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label htmlFor="shared-settings-switch" className="flex flex-col">
-                <span className="text-sm font-semibold">Settings Mode</span>
-                <span className="text-xs text-muted-foreground">
-                  {isUseSharedSettings ? "Using shared batch settings" : "Individual file settings"}
-                </span>
-              </label>
-              <Switch
-                id="shared-settings-switch"
-                checked={isUseSharedSettings}
-                onCheckedChange={(checked) => setUseSharedSettings(currentProject?.id ?? "", checked)}
-                disabled={isProcessing}
-                className="data-[state=checked]:bg-primary"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold">Max Concurrent Extractions</span>
-                <span className="text-xs text-muted-foreground">
-                   {isSequentialExtraction
-                      ? 'Files processed one-by-one (forced)'
+          <Card size="sm" className="mt-4 w-full shadow-xs"><CardContent className="flex flex-col gap-4">
+            <FieldGroup className="gap-4 [&_[data-slot=field-description]]:text-xs">
+              <Field orientation="horizontal" data-disabled={isSequentialExtraction || undefined}>
+                <FieldContent>
+                  <FieldTitle>Max Concurrent Extractions</FieldTitle>
+                  <FieldDescription>
+                    {isSequentialExtraction
+                      ? "Files processed one-by-one (forced)"
                       : `Files processed simultaneously (max ${MAX_BATCH_CONCURRENT_OPERATION})`}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:text-foreground text-lg font-medium select-none"
-                  onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, concurrentOperation - 1))}
-                  disabled={isSequentialExtraction || concurrentOperation <= 1}
-                >
-                  -
-                </Button>
-                <input
-                  type="number"
-                  min={1}
-                  max={MAX_BATCH_CONCURRENT_OPERATION}
-                  value={isSequentialExtraction ? 1 : concurrentOperation}
-                  onChange={(e) => setConcurrentOperation(
-                    currentProject?.id ?? "",
-                    Math.max(1, Math.min(MAX_BATCH_CONCURRENT_OPERATION, parseInt(e.target.value) || 1))
-                  )}
-                  disabled={isSequentialExtraction}
-                  className="w-12 h-8 text-center border border-input rounded-md bg-background shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:text-foreground text-lg font-medium select-none"
-                  onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_BATCH_CONCURRENT_OPERATION, concurrentOperation + 1))}
-                  disabled={isSequentialExtraction || concurrentOperation >= MAX_BATCH_CONCURRENT_OPERATION}
-                >
-                  +
-                </Button>
-              </div>
-            </div>
+                  </FieldDescription>
+                </FieldContent>
+                <div className="flex shrink-0 items-center gap-1 self-center">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:text-foreground text-lg font-medium select-none"
+                    onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.max(1, concurrentOperation - 1))}
+                    disabled={isSequentialExtraction || concurrentOperation <= 1}
+                  >
+                    -
+                  </Button>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={MAX_BATCH_CONCURRENT_OPERATION}
+                    value={isSequentialExtraction ? 1 : concurrentOperation}
+                    onChange={(e) => setConcurrentOperation(
+                      currentProject?.id ?? "",
+                      Math.max(1, Math.min(MAX_BATCH_CONCURRENT_OPERATION, parseInt(e.target.value) || 1))
+                    )}
+                    disabled={isSequentialExtraction}
+                    className="w-12 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:text-foreground text-lg font-medium select-none"
+                    onClick={() => setConcurrentOperation(currentProject?.id ?? "", Math.min(MAX_BATCH_CONCURRENT_OPERATION, concurrentOperation + 1))}
+                    disabled={isSequentialExtraction || concurrentOperation >= MAX_BATCH_CONCURRENT_OPERATION}
+                  >
+                    +
+                  </Button>
+                </div>
+              </Field>
 
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold">Extraction Mode</span>
-                <span className="text-xs text-muted-foreground">
-                  {extractionMode === 'sequential'
-                    ? 'Sequential: process one-by-one using previous context'
-                    : 'Independent: process files concurrently without sharing context'}
-                </span>
-              </div>
-              <Select
-                value={extractionMode}
-                onValueChange={(value: "independent" | "sequential") => {
-                  setExtractionMode(currentProject?.id ?? "", value)
-                }}
-                disabled={isProcessing}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sequential">Sequential</SelectItem>
-                  <SelectItem value="independent">Independent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
+                <FieldContent>
+                  <FieldLabel htmlFor="extraction-mode-select">Extraction Mode</FieldLabel>
+                  <FieldDescription>
+                    {extractionMode === "sequential"
+                      ? "Sequential: process one-by-one using previous context"
+                      : "Independent: process files concurrently without sharing context"}
+                  </FieldDescription>
+                </FieldContent>
+                <Select
+                  value={extractionMode}
+                  onValueChange={(value: "independent" | "sequential") => {
+                    setExtractionMode(currentProject?.id ?? "", value)
+                  }}
+                  disabled={isProcessing}
+                >
+                  <SelectTrigger id="extraction-mode-select" className="w-fit self-center">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="sequential">Sequential</SelectItem>
+                      <SelectItem value="independent">Independent</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </Field>
+            </FieldGroup>
 
-            {/* Copy Shared Settings trigger */}
-            <div className="flex items-center justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-lg"
-                onClick={() => setIsCopySharedDialogOpen(true)}
-                disabled={isProcessing || batchFiles.length === 0}
-              >
-                <ListChecks className="size-4" />
-                Copy Shared Settings...
-              </Button>
-            </div>
           </CardContent>
           </Card>
 
           <TabsContent value="basic" className="grow space-y-4 mt-4">
             <Card>
-              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+              <CardContent className="flex flex-col gap-4">
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <ModelSelection settingsId={settingsId} />
                 <SubtitleCleanupSwitch />
+                <CopySharedSettingsButton onClick={() => setIsCopySharedDialogOpen(true)} disabled={isProcessing || batchFiles.length === 0} />
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="advanced" className="grow space-y-4 mt-4">
             <Card>
-              <CardContent className={cn("space-y-4", !isUseSharedSettings && "pointer-events-none opacity-50")}>
+              <CardContent className="flex flex-col gap-4">
                 <p className="text-sm font-semibold">Shared Settings (Applied to all files)</p>
                 <ModelDetail settingsId={settingsId} />
                 <MaxCompletionTokenInput settingsId={settingsId} />
                 <AdvancedSettingsResetButton settingsId={settingsId} />
+                <CopySharedSettingsButton onClick={() => setIsCopySharedDialogOpen(true)} disabled={isProcessing || batchFiles.length === 0} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -762,22 +750,15 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
             <AlertDialogDescription asChild>
               <div className="w-full">
                 <span className="block mb-2">Are you sure you want to start extracting <strong>{batchFiles.length}</strong> files?</span>
-                {isUseSharedSettings ? (
-                  <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
-                    <span className="block font-semibold">Shared Settings:</span>
-                    <ul className="list-disc list-inside">
-                      <li>
-                        {isSequentialExtraction ? "Process one-by-one (Sequential)" : `Process up to ${concurrentOperation} concurrently`}
-                      </li>
-                      <li>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</li>
-                    </ul>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
-                    <span className="block font-semibold">Individual Settings:</span>
-                    Each file uses its own settings.
-                  </div>
-                )}
+                <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded mt-2">
+                  <span className="block font-semibold">Batch Settings:</span>
+                  <ul className="list-disc list-inside">
+                    <li>
+                      {isSequentialExtraction ? "Process one-by-one (Sequential)" : `Process up to ${concurrentOperation} concurrently`}
+                    </li>
+                    <li>{isUseCustomModel ? 'Custom Model' : modelDetail?.name}</li>
+                  </ul>
+                </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -817,8 +798,8 @@ export function BatchExtractionView({ settingsId }: BatchExtractionViewProps) {
             <div className="max-h-[80vh] overflow-y-auto">
               <ContextExtractorMain
                 currentId={previewId}
-                settingsId={isUseSharedSettings ? settingsId : extractionData[previewId].settingsId}
-                isSharedSettings={isUseSharedSettings}
+                settingsId={settingsId}
+                isSharedSettings
                 hideBackButton
               />
             </div>

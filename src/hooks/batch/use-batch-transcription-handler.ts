@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react"
 import { useTranscriptionStore } from "@/stores/services/use-transcription-store"
 import { useTranscriptionDataStore } from "@/stores/data/use-transcription-data-store"
-import { useBatchSettingsStore } from "@/stores/settings/use-batch-settings-store"
 import { useUploadStore } from "@/stores/ui/use-upload-store"
 import { useSessionStore } from "@/stores/ui/use-session-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -67,9 +66,6 @@ export default function useBatchTranscriptionHandler({
   // Project Store
   const currentProject = useProjectStore((state) => state.currentProject)
 
-  // Batch Settings Store
-  const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
-
   // Transcription Data Store
   const transcriptionData = useTranscriptionDataStore((state) => state.data)
   const setTranscriptionText = useTranscriptionDataStore((state) => state.setTranscriptionText)
@@ -115,22 +111,12 @@ export default function useBatchTranscriptionHandler({
 
   const getSettingsForTranscription = (id: string) => {
     const defaultTranscription = transcriptionData[defaultTranscriptionId]
-    const individualTranscription = transcriptionData[id]
-
-    if (isUseSharedSettings && defaultTranscription) {
-      return {
-        language: defaultTranscription.language,
-        selectedMode: defaultTranscription.selectedMode,
-        customInstructions: defaultTranscription.customInstructions,
-        models: defaultTranscription.models,
-      }
-    }
 
     return {
-      language: individualTranscription?.language ?? getLanguage(id),
-      selectedMode: individualTranscription?.selectedMode ?? getSelectedMode(id),
-      customInstructions: individualTranscription?.customInstructions ?? getCustomInstructions(id),
-      models: individualTranscription?.models ?? getModels(id),
+      language: defaultTranscription?.language ?? getLanguage(id),
+      selectedMode: defaultTranscription?.selectedMode ?? getSelectedMode(id),
+      customInstructions: defaultTranscription?.customInstructions ?? getCustomInstructions(id),
+      models: defaultTranscription?.models ?? getModels(id),
     }
   }
 
