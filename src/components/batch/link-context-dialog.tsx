@@ -169,6 +169,17 @@ export function LinkContextDialog({
     setSelected(next)
   }
 
+  const handleUnlinkAll = () => {
+    const nextMapping: Record<string, null> = {}
+    const nextSelected: Record<string, boolean> = {}
+    translationIds.forEach(tid => {
+      nextMapping[tid] = null
+      nextSelected[tid] = true
+    })
+    setMapping(nextMapping)
+    setSelected(nextSelected)
+  }
+
   const handleResetMapping = () => {
     const initMap: Record<string, string | null> = {}
     const initSel: Record<string, boolean> = {}
@@ -315,6 +326,10 @@ export function LinkContextDialog({
             <Button variant="outline" size="sm" onClick={handleResetMapping} disabled={isLoading}>
               <ListRestart data-icon="inline-start" />
               Reset Mapping
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleUnlinkAll} disabled={isLoading || translationIds.length === 0}>
+              <Unlink data-icon="inline-start" />
+              Unlink All
             </Button>
 
             {/* Shift all mappings */}
