@@ -52,10 +52,7 @@ import { useProcessingIndicatorStore } from "@/stores/ui/use-processing-indicato
 import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
-import {
-  getAutoContextExtractionTitle,
-  isAutoContextOwnedBy,
-} from "@/lib/extraction/status"
+import { getAutoContextExtractionTitle } from "@/lib/extraction/status"
 import {
   cleanExtractionResult,
   combineAutoContext,
@@ -601,10 +598,6 @@ export const useTranslationHandler = ({
           ?? await extractionDataStore.getExtractionDb(translation.autoContextExtractionId)
         : null
       if (!isAutoContextRunActive(currentId, runToken)) return null
-      if (linkedExtraction && !isAutoContextOwnedBy(linkedExtraction, currentId)) {
-        toast.error("Linked batch Auto Context is not owned by this Translation. Use Continue Batch Translation to prepare the Context Chain.")
-        return null
-      }
       const problem = getExtractionProblem(
         linkedExtraction ?? undefined,
         project.id,
@@ -626,7 +619,7 @@ export const useTranslationHandler = ({
     const projectExtractions = (await extractionDataStore.getExtractionsDb(project.extractions)).toReversed()
     if (!isAutoContextRunActive(currentId, runToken)) return null
 
-    const runOwnedAutoExtraction = async (extractionId: string) => {
+    const rerunAutoContextExtraction = async (extractionId: string) => {
       const extraction = useExtractionDataStore.getState().data[extractionId]
         ?? await useExtractionDataStore.getState().getExtractionDb(extractionId)
       if (!extraction) return false
@@ -685,44 +678,34 @@ export const useTranslationHandler = ({
 
       const problem = getExtractionProblem(extraction, translation.projectId, useExtractionStore.getState().isExtractingSet)
       if (problem) {
-        if (isAutoContextOwnedBy(extraction, currentId)) {
-          const success = await runOwnedAutoExtraction(extraction.id)
-          if (!isAutoContextRunActive(currentId, runToken)) return null
-          if (!success) {
-            toast.error("Auto context extraction failed. Translation was not started.")
-            return null
-          }
-
-          const updatedExtraction = await extractionDataStore.getExtractionDb(extraction.id)
-          if (!isAutoContextRunActive(currentId, runToken)) return null
-          const updatedProblem = getExtractionProblem(
-            updatedExtraction,
-            translation.projectId,
-            useExtractionStore.getState().isExtractingSet,
-          )
-          if (updatedProblem || !updatedExtraction) {
-            toast.error(updatedProblem ?? "Auto context extraction was not found after rerun.", {
-              action: updatedExtraction ? {
-                label: "Open",
-                onClick: () => openExtraction(updatedExtraction.id),
-              } : undefined,
-            })
-            return null
-          }
-
-          return combineAutoContext(
-            cleanExtractionResult(updatedExtraction.contextResult),
-            useSettingsStore.getState().getContextDocument(settingsId),
-          )
+        const success = await rerunAutoContextExtraction(extraction.id)
+        if (!isAutoContextRunActive(currentId, runToken)) return null
+        if (!success) {
+          toast.error("Auto context extraction failed. Translation was not started.")
+          return null
         }
 
-        toast.error(problem, {
-          action: extraction ? {
-            label: "Open",
-            onClick: () => openExtraction(extraction.id),
-          } : undefined,
-        })
-        return null
+        const updatedExtraction = await extractionDataStore.getExtractionDb(extraction.id)
+        if (!isAutoContextRunActive(currentId, runToken)) return null
+        const updatedProblem = getExtractionProblem(
+          updatedExtraction,
+          translation.projectId,
+          useExtractionStore.getState().isExtractingSet,
+        )
+        if (updatedProblem || !updatedExtraction) {
+          toast.error(updatedProblem ?? "Auto context extraction was not found after rerun.", {
+            action: updatedExtraction ? {
+              label: "Open",
+              onClick: () => openExtraction(updatedExtraction.id),
+            } : undefined,
+          })
+          return null
+        }
+
+        return combineAutoContext(
+          cleanExtractionResult(updatedExtraction.contextResult),
+          useSettingsStore.getState().getContextDocument(settingsId),
+        )
       }
 
       return combineAutoContext(
@@ -788,7 +771,6 @@ export const useTranslationHandler = ({
       previousContext,
       contextResult: "",
       status: "idle",
-      ownerTranslationId: currentId,
       completedAt: null,
     })
 
@@ -902,9 +884,9 @@ export const useTranslationHandler = ({
       useProcessingIndicatorStore.getState().markStopped("translation", currentId)
     }
     autoContextRunTokenRef.current.delete(currentId)
-    const ownedExtractionRun = autoCreatedExtractionByTranslationRef.current.get(currentId)
-    if (ownedExtractionRun) {
-      stopExtraction(ownedExtractionRun.extractionId)
+    const autoExtractionRun = autoCreatedExtractionByTranslationRef.current.get(currentId)
+    if (autoExtractionRun) {
+      stopExtraction(autoExtractionRun.extractionId)
     }
     stopTranslation(currentId)
     setIsTranslating(currentId, false)

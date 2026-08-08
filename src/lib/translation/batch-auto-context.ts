@@ -34,7 +34,7 @@ export function getEffectiveBatchTranslationStage({
   if (isTranslating) return "translating"
   if (
     translation
-    && linkedExtraction?.ownerTranslationId === translation.id
+    && linkedExtraction?.id === translation.autoContextExtractionId
     && runningExtractionIds.has(linkedExtraction.id)
   ) {
     return "extracting-context"
@@ -45,7 +45,6 @@ export function getEffectiveBatchTranslationStage({
 interface BatchAutoContextPlanInput {
   projectId: string
   translationIds: string[]
-  extractionIds: string[]
   translations: Record<string, Translation>
   extractions: Record<string, Extraction>
   startingExtractionId: string | null
@@ -53,40 +52,31 @@ interface BatchAutoContextPlanInput {
   regenerate?: boolean
 }
 
-export function findOwnedAutoContextExtraction(
+export function findLinkedAutoContextExtraction(
   translation: Translation,
-  extractionIds: string[],
   extractions: Record<string, Extraction>,
 ): Extraction | null {
-  const linked = translation.autoContextExtractionId
+  return translation.autoContextExtractionId
     ? extractions[translation.autoContextExtractionId]
-    : undefined
-  if (linked?.ownerTranslationId === translation.id) return linked
-
-  for (let index = extractionIds.length - 1; index >= 0; index--) {
-    const extraction = extractions[extractionIds[index]]
-    if (extraction?.ownerTranslationId === translation.id) return extraction
-  }
-  return null
+      ?? null
+    : null
 }
 
 export function getRunningBatchAutoContextExtractionIds({
   translationIds,
   translations,
-  extractions,
   runningIds,
 }: {
   translationIds: string[]
   translations: Record<string, Translation>
-  extractions: Record<string, Extraction>
   runningIds: Set<string>
 }): string[] {
-  return translationIds.flatMap((translationId) => {
+  const linkedRunningIds = translationIds.flatMap((translationId) => {
     const extractionId = translations[translationId]?.autoContextExtractionId
     if (!extractionId || !runningIds.has(extractionId)) return []
-    if (extractions[extractionId]?.ownerTranslationId !== translationId) return []
     return [extractionId]
   })
+  return [...new Set(linkedRunningIds)]
 }
 
 export function getBatchAutoContextAction({
@@ -116,46 +106,53 @@ export function getBatchAutoContextAction({
 export function buildBatchAutoContextPlan({
   projectId,
   translationIds,
-  extractionIds,
   translations,
   extractions,
   startingExtractionId,
   runningIds = new Set(),
   regenerate = false,
 }: BatchAutoContextPlanInput): BatchAutoContextPlan {
-  const batchTranslationIds = new Set(translationIds)
   const startingExtraction = startingExtractionId ? extractions[startingExtractionId] : null
   let startingContextProblem = startingExtractionId
     ? getExtractionValidationProblem(startingExtraction ?? undefined, projectId, runningIds, "Starting Context")
     : null
 
-  if (startingExtraction?.ownerTranslationId && batchTranslationIds.has(startingExtraction.ownerTranslationId)) {
-    startingContextProblem = "Starting Context is owned by a Translation in this batch."
+  const linkedExtractionIds = new Set(translationIds.flatMap(translationId => {
+    const extractionId = translations[translationId]?.autoContextExtractionId
+    return extractionId ? [extractionId] : []
+  }))
+  if (startingExtractionId && linkedExtractionIds.has(startingExtractionId)) {
+    startingContextProblem = "Starting Context is also linked to a Translation in this batch."
   }
 
   let expectedPreviousExtraction = startingExtraction
   let upstreamChanged = false
   const items: BatchAutoContextPlanItem[] = []
+  const preparedExtractionIds = new Set<string>()
 
   for (const translationId of translationIds) {
     const translation = translations[translationId]
     if (!translation) continue
-    const extraction = findOwnedAutoContextExtraction(translation, extractionIds, extractions)
-    const action = getBatchAutoContextAction({
-      extraction,
-      expectedPreviousExtraction,
-      recordedPreviousExtractionId: translation.autoContextPreviousExtractionId,
-      projectId,
-      runningIds,
-      upstreamChanged,
-      regenerate,
-    })
+    const extraction = findLinkedAutoContextExtraction(translation, extractions)
+    const isAlreadyPrepared = !!extraction && preparedExtractionIds.has(extraction.id)
+    const action: BatchAutoContextAction = isAlreadyPrepared
+      ? "reuse"
+      : getBatchAutoContextAction({
+          extraction,
+          expectedPreviousExtraction,
+          recordedPreviousExtractionId: translation.autoContextPreviousExtractionId,
+          projectId,
+          runningIds,
+          upstreamChanged,
+          regenerate,
+        })
 
     items.push({
       translationId,
       extractionId: extraction?.id ?? null,
       action,
     })
+    if (extraction) preparedExtractionIds.add(extraction.id)
     upstreamChanged = upstreamChanged || action === "create"
     expectedPreviousExtraction = extraction
   }

@@ -36,7 +36,7 @@ export const useBatchTranslationFiles = (
         : null
       const inferredContextError = currentProject.isBatchAutoContextEnabled
         && translatedCount < totalSubtitles
-        && linkedExtraction?.ownerTranslationId === id
+        && !!linkedExtraction
         && (linkedExtractionStatus === "failed" || linkedExtractionStatus === "stopped")
       const isTranslating = isTranslatingSet.has(id)
       const translationStage = getEffectiveBatchTranslationStage({

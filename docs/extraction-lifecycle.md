@@ -11,35 +11,17 @@ This applies to manual extraction, batch extraction, and auto-context extraction
 Each `Extraction` stores:
 
 - `status`: `"idle" | "running" | "completed" | "failed" | "stopped"`
-- `ownerTranslationId`: translation that owns the extraction for Auto Context lifecycle management, or `null`
 - `completedAt`: completion timestamp, or `null`
-
-`ownerTranslationId` grants permission to automatically manage an Extraction. It is not simply a reverse link.
 
 ## Translation–Extraction Relationships
 
-Use this rule:
+`Translation.autoContextExtractionId` is the only Auto Context relationship. It identifies the live Extraction whose result the Translation reads and that Auto Context may rerun when the result is unusable.
 
-- **Linked means read:** `Translation.autoContextExtractionId` identifies the Extraction whose result the Translation reads as context.
-- **Owned means manage:** `Extraction.ownerTranslationId` identifies the Translation allowed to automatically update, rerun, or recover that Extraction.
+Multiple Translations may reference the same Extraction. The link does not create a private snapshot: editing or rerunning the Extraction changes the result observed by every linked Translation. A shared Extraction is regenerated at most once during one batch run, then every Translation linked to it reuses that result.
 
-For example, Translation A manually selects an existing Extraction X. A stores `autoContextExtractionId: X`, while X's `ownerTranslationId` remains unchanged. If X is unowned, it stays `null`; if another Translation owns X, that ownership remains. A can read X, but cannot automatically rerun or overwrite it. If A instead creates X through Auto Context, A stores `autoContextExtractionId: X` and X stores `ownerTranslationId: A`; A can then rerun X after a failure.
+Deleting a Translation removes only that Translation's link. The Extraction and links from other Translations remain. Moving a Translation clears its Auto Context and previous-context links because Extractions remain in the source project.
 
-The relationships by workflow are:
-
-- single Translation, auto-created Extraction: linked and owned
-- single Translation, manually selected existing Extraction: linked, without assigning ownership to the selecting Translation
-- batch Auto Context, auto-created Extraction: linked and owned
-- batch Link Context assignment: linked and owned because the Extraction becomes a managed item in the one-to-one Context Chain
-- batch Starting Context: read as the chain seed without assigning or changing ownership
-
-Manual selection in a single Translation intentionally does not assign ownership. This permits reuse and prevents a Translation from automatically overwriting a manually managed dependency.
-
-Ownership is used only to detach the relationship when a Translation is deleted or moved. There is no cascading deletion or movement of Extractions:
-
-- deleting a Translation sets `ownerTranslationId` to `null` on its owned Extractions; the Extractions and their settings remain in the project
-- moving a Translation sets `ownerTranslationId` to `null` on its owned Extractions; the Extractions and their settings remain in the source project and are not moved with the Translation
-- manual selection and Starting Context selection do not assign ownership; deleting or moving the selecting Translation does not change those Extractions or any ownership they already have
+Batch Starting Context and selected previous context are read-only inputs. A Starting Context cannot also be linked as Auto Context by a Translation in the same batch because it would seed itself.
 
 ## Status Rules
 
@@ -98,7 +80,7 @@ Batch “mark done” changes metadata only. It marks clean non-empty non-error 
 
 Sequential batch previous-context seeding uses only usable completed extraction results.
 
-Batch Translation Auto Context uses the same lifecycle metadata. A stopped or failed owned extraction is rerun in place by Continue. A manually repaired extraction marked `completed` is usable without rerunning. Deleting an owned extraction leaves a recoverable stale Translation link; the next batch run creates and links a replacement.
+Batch Translation Auto Context uses the same lifecycle metadata. A stopped or failed linked extraction is rerun in place by Continue. A manually repaired extraction marked `completed` is usable without rerunning. Deleting a linked extraction leaves recoverable stale Translation links; the next batch run creates replacements as needed.
 
 ## Legacy `<done>` Migration
 

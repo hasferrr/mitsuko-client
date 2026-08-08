@@ -250,7 +250,6 @@ describe('self-contained exports', () => {
       previousContext: '',
       contextResult: '',
       status: 'idle',
-      ownerTranslationId: externalTranslation.id,
       completedAt: null,
       projectId: project.id,
       settingsId: project.defaultExtractionSettingsId,
@@ -399,7 +398,43 @@ describe('unified settings persistence', () => {
   })
 })
 
-describe('owned Auto Context extraction lifecycle', () => {
+describe('shared Auto Context extraction lifecycle', () => {
+  test('links the same Extraction to multiple Translations', async () => {
+    const project = await createProject('Shared Link Project')
+    const first = await createTranslation(project.id, {
+      title: 'First',
+      subtitles: [],
+      parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
+    })
+    const second = await createTranslation(project.id, {
+      title: 'Second',
+      subtitles: [],
+      parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
+    })
+    const shared = await createExtraction(project.id, {
+      title: 'Shared Context',
+      episodeNumber: '1',
+      subtitleContent: 'subtitle',
+      previousContext: '',
+      contextResult: 'context',
+    })
+
+    await updateBatchAutoContextLinks({
+      translations: [first, second].map(translation => ({
+        id: translation.id,
+        changes: {
+          autoContextMode: 'use-existing' as const,
+          autoContextExtractionId: shared.id,
+          autoContextPreviousMode: 'none' as const,
+          autoContextPreviousExtractionId: null,
+        },
+      })),
+    })
+
+    const linked = await db.translations.bulkGet([first.id, second.id])
+    expect(linked.map(translation => translation?.autoContextExtractionId)).toEqual([shared.id, shared.id])
+  })
+
   test('rolls back batch Auto Context link updates when a referenced record is missing', async () => {
     const project = await createProject('Atomic Link Project')
     const translation = await createTranslation(project.id, {
@@ -416,103 +451,112 @@ describe('owned Auto Context extraction lifecycle', () => {
     })
 
     await expect(updateBatchAutoContextLinks({
-      extractions: [{ id: extraction.id, ownerTranslationId: translation.id }],
-      translations: [{
-        id: 'missing-translation',
-        changes: {
+      translations: [
+        {
+          id: translation.id,
+          changes: {
+            autoContextMode: 'use-existing',
+            autoContextExtractionId: extraction.id,
+            autoContextPreviousMode: 'none',
+            autoContextPreviousExtractionId: null,
+          },
+        },
+        {
+          id: 'missing-translation',
+          changes: {
           autoContextMode: 'use-existing',
           autoContextExtractionId: extraction.id,
           autoContextPreviousMode: 'none',
           autoContextPreviousExtractionId: null,
+          },
         },
-      }],
+      ],
     })).rejects.toThrow('Translation missing-translation was not found')
 
-    expect((await db.extractions.get(extraction.id))?.ownerTranslationId).toBeNull()
+    expect(await db.extractions.get(extraction.id)).toBeDefined()
     expect((await db.translations.get(translation.id))?.autoContextExtractionId).toBeNull()
   })
 
-  test('deleting a Translation detaches and preserves its owned extraction', async () => {
+  test('deleting one Translation preserves an Extraction shared by another Translation', async () => {
     const project = await createProject('Detach Project')
-    const translation = await createTranslation(project.id, {
-      title: 'Episode 1',
+    const first = await createTranslation(project.id, {
+      title: 'First',
       subtitles: [],
       parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
     })
-    const owned = await createExtraction(project.id, {
-      title: 'Auto Context for Episode 1',
+    const second = await createTranslation(project.id, {
+      title: 'Second',
+      subtitles: [],
+      parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
+    })
+    const shared = await createExtraction(project.id, {
+      title: 'Shared Context',
       episodeNumber: '1',
       subtitleContent: 'subtitle',
       previousContext: '',
-      contextResult: 'owned context',
-      ownerTranslationId: translation.id,
+      contextResult: 'shared context',
     })
-    const used = await createExtraction(project.id, {
-      title: 'Manually used context',
-      episodeNumber: '0',
-      subtitleContent: 'subtitle',
-      previousContext: '',
-      contextResult: 'manual context',
-    })
-    await updateTranslation(translation.id, { autoContextExtractionId: used.id })
+    await updateTranslation(first.id, { autoContextExtractionId: shared.id })
+    await updateTranslation(second.id, { autoContextExtractionId: shared.id })
 
-    const detachedIds = await deleteTranslation(project.id, translation.id)
+    await deleteTranslation(project.id, first.id)
     const updatedProject = await db.projects.get(project.id)
-    const detachedExtraction = await db.extractions.get(owned.id)
+    const remainingTranslation = await db.translations.get(second.id)
 
-    expect(detachedIds).toEqual([owned.id])
-    expect(await db.translations.get(translation.id)).toBeUndefined()
-    expect(detachedExtraction?.ownerTranslationId).toBeNull()
-    expect(await db.extractions.get(used.id)).toBeDefined()
-    expect(updatedProject?.extractions).toEqual([owned.id, used.id])
-    expect(await db.settings.get(owned.settingsId)).toBeDefined()
-    expect(await db.settings.get(used.settingsId)).toBeDefined()
-    expect(await db.settings.get(translation.settingsId)).toBeUndefined()
+    expect(await db.translations.get(first.id)).toBeUndefined()
+    expect(remainingTranslation?.autoContextExtractionId).toBe(shared.id)
+    expect(await db.extractions.get(shared.id)).toBeDefined()
+    expect(updatedProject?.extractions).toEqual([shared.id])
+    expect(await db.settings.get(shared.settingsId)).toBeDefined()
+    expect(await db.settings.get(first.settingsId)).toBeUndefined()
   })
 
-  test('moving a Translation detaches and leaves its owned extraction in the source project', async () => {
+  test('moving a Translation clears project-bound context links without changing shared Extractions', async () => {
     const source = await createProject('Source Project')
     const target = await createProject('Target Project')
-    const translation = await createTranslation(source.id, {
-      title: 'Episode 2',
+    const moved = await createTranslation(source.id, {
+      title: 'Moved',
       subtitles: [],
       parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
     })
-    const owned = await createExtraction(source.id, {
-      title: 'Auto Context for Episode 2',
-      episodeNumber: '2',
-      subtitleContent: 'subtitle',
-      previousContext: '',
-      contextResult: 'owned context',
-      ownerTranslationId: translation.id,
+    const remaining = await createTranslation(source.id, {
+      title: 'Remaining',
+      subtitles: [],
+      parsed: { ...DEFAULT_TRANSLATION_SETTINGS.parsed },
     })
-    const used = await createExtraction(source.id, {
-      title: 'Independent context',
+    const shared = await createExtraction(source.id, {
+      title: 'Shared Context',
       episodeNumber: '1',
       subtitleContent: 'subtitle',
       previousContext: '',
-      contextResult: 'manual context',
+      contextResult: 'shared context',
     })
-    await updateTranslation(translation.id, { autoContextExtractionId: used.id })
+    await updateTranslation(moved.id, {
+      autoContextMode: 'use-existing',
+      autoContextExtractionId: shared.id,
+      autoContextPreviousMode: 'selected',
+      autoContextPreviousExtractionId: shared.id,
+    })
+    await updateTranslation(remaining.id, { autoContextExtractionId: shared.id })
 
-    const detachedIds = await moveTranslation(source.id, target.id, translation.id)
-    const [updatedSource, updatedTarget, movedTranslation, movedOwned, unmovedUsed] = await Promise.all([
+    await moveTranslation(source.id, target.id, moved.id)
+    const [updatedSource, updatedTarget, movedTranslation, remainingTranslation, unmovedShared] = await Promise.all([
       db.projects.get(source.id),
       db.projects.get(target.id),
-      db.translations.get(translation.id),
-      db.extractions.get(owned.id),
-      db.extractions.get(used.id),
+      db.translations.get(moved.id),
+      db.translations.get(remaining.id),
+      db.extractions.get(shared.id),
     ])
 
-    expect(detachedIds).toEqual([owned.id])
-    expect(updatedSource?.translations).not.toContain(translation.id)
-    expect(updatedSource?.extractions).toEqual([owned.id, used.id])
-    expect(updatedTarget?.translations).toContain(translation.id)
+    expect(updatedSource?.translations).not.toContain(moved.id)
+    expect(updatedSource?.extractions).toEqual([shared.id])
+    expect(updatedTarget?.translations).toContain(moved.id)
     expect(updatedTarget?.extractions).toEqual([])
     expect(movedTranslation?.projectId).toBe(target.id)
-    expect(movedTranslation?.autoContextExtractionId).toBe(used.id)
-    expect(movedOwned?.projectId).toBe(source.id)
-    expect(movedOwned?.ownerTranslationId).toBeNull()
-    expect(unmovedUsed?.projectId).toBe(source.id)
+    expect(movedTranslation?.autoContextMode).toBe('disabled')
+    expect(movedTranslation?.autoContextExtractionId).toBeNull()
+    expect(movedTranslation?.autoContextPreviousExtractionId).toBeNull()
+    expect(remainingTranslation?.autoContextExtractionId).toBe(shared.id)
+    expect(unmovedShared?.projectId).toBe(source.id)
   })
 })

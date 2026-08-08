@@ -22,8 +22,9 @@ import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
 import { BatchFile, BatchTranslationStage } from "@/types/batch"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
 import {
+  type BatchAutoContextAction,
   buildBatchAutoContextPlan,
-  findOwnedAutoContextExtraction,
+  findLinkedAutoContextExtraction,
   getBatchAutoContextAction,
   getRunningBatchAutoContextExtractionIds,
 } from "@/lib/translation/batch-auto-context"
@@ -209,7 +210,6 @@ export default function useBatchTranslationHandler({
     const plan = buildBatchAutoContextPlan({
       projectId: project.id,
       translationIds: project.translations,
-      extractionIds: project.extractions,
       translations: useTranslationDataStore.getState().data,
       extractions: useExtractionDataStore.getState().data,
       startingExtractionId: project.batchAutoContextStartingExtractionId,
@@ -313,14 +313,12 @@ export default function useBatchTranslationHandler({
     const translationIds = project.translations.filter(id => !useTranslationStore.getState().isTranslatingSet.has(id))
     const translationStore = useTranslationDataStore.getState()
     const extractionStore = useExtractionDataStore.getState()
-    const extractionOrder = [...project.extractions]
     const startingExtraction = project.batchAutoContextStartingExtractionId
       ? extractionStore.data[project.batchAutoContextStartingExtractionId]
       : null
     const plan = buildBatchAutoContextPlan({
       projectId: project.id,
       translationIds,
-      extractionIds: extractionOrder,
       translations: translationStore.data,
       extractions: extractionStore.data,
       startingExtractionId: project.batchAutoContextStartingExtractionId,
@@ -410,6 +408,8 @@ export default function useBatchTranslationHandler({
     let previousExtraction = startingExtraction
     let upstreamChanged = false
     let failedTranslationId: string | null = null
+    const preparedExtractionIds = new Set<string>()
+    const previousIdByExtractionId = new Map<string, string | null>()
 
     for (const translationId of translationIds) {
       if (queueAbortRef.current || runToken !== batchRunTokenRef.current) break
@@ -417,20 +417,22 @@ export default function useBatchTranslationHandler({
       if (!translation) continue
 
       const currentExtractions = useExtractionDataStore.getState().data
-      let extraction = findOwnedAutoContextExtraction(
+      let extraction = findLinkedAutoContextExtraction(
         translation,
-        extractionOrder,
         currentExtractions,
       )
-      const action = getBatchAutoContextAction({
-        extraction,
-        expectedPreviousExtraction: previousExtraction,
-        recordedPreviousExtractionId: translation.autoContextPreviousExtractionId,
-        projectId: project.id,
-        runningIds: useExtractionStore.getState().isExtractingSet,
-        upstreamChanged,
-        regenerate: regenerateAutoContext,
-      })
+      const isAlreadyPrepared = !!extraction && preparedExtractionIds.has(extraction.id)
+      const action: BatchAutoContextAction = isAlreadyPrepared
+        ? "reuse"
+        : getBatchAutoContextAction({
+            extraction,
+            expectedPreviousExtraction: previousExtraction,
+            recordedPreviousExtractionId: translation.autoContextPreviousExtractionId,
+            projectId: project.id,
+            runningIds: useExtractionStore.getState().isExtractingSet,
+            upstreamChanged,
+            regenerate: regenerateAutoContext,
+          })
       const previousContext = previousExtraction
         ? cleanExtractionContent(previousExtraction.contextResult)
         : ""
@@ -443,15 +445,13 @@ export default function useBatchTranslationHandler({
           previousContext,
           contextResult: "",
           status: "idle",
-          ownerTranslationId: translation.id,
           completedAt: null,
         })
         if (runToken !== batchRunTokenRef.current) break
-        extractionOrder.push(extraction.id)
         try {
           await useProjectStore.getState().loadProjects()
         } catch {
-          // Best-effort — extraction is persisted in DB, pipeline uses local extractionOrder
+          // Best-effort — extraction is already persisted and available in the data store
         }
       }
 
@@ -462,7 +462,9 @@ export default function useBatchTranslationHandler({
         break
       }
 
-      const previousExtractionId = previousExtraction?.id ?? null
+      const previousExtractionId = isAlreadyPrepared
+        ? previousIdByExtractionId.get(extraction.id) ?? null
+        : previousExtraction?.id ?? null
       await useTranslationDataStore.getState().updateTranslationDb(translationId, {
         autoContextMode: "use-existing",
         autoContextExtractionId: extraction.id,
@@ -477,7 +479,6 @@ export default function useBatchTranslationHandler({
           episodeNumber: translation.title,
           subtitleContent: getTranslationSubtitleContent(translation),
           previousContext,
-          ownerTranslationId: translation.id,
         })
         if (signal.aborted || runToken !== batchRunTokenRef.current) break
         setAutoContextStage(translationId, "extracting-context")
@@ -521,6 +522,10 @@ export default function useBatchTranslationHandler({
         removeFromQueue(translationId)
       }
 
+      if (!preparedExtractionIds.has(extraction.id)) {
+        preparedExtractionIds.add(extraction.id)
+        previousIdByExtractionId.set(extraction.id, previousExtractionId)
+      }
       previousExtraction = extraction
       upstreamChanged = upstreamChanged || action === "create"
     }
@@ -635,7 +640,6 @@ export default function useBatchTranslationHandler({
     const runningAutoContextIds = getRunningBatchAutoContextExtractionIds({
       translationIds: batchFiles.map(file => file.id),
       translations: useTranslationDataStore.getState().data,
-      extractions: useExtractionDataStore.getState().data,
       runningIds: useExtractionStore.getState().isExtractingSet,
     })
     if (currentExtractionIdRef.current) runningAutoContextIds.push(currentExtractionIdRef.current)

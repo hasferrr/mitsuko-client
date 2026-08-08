@@ -74,7 +74,6 @@ export const ContextExtractorMain = ({ currentId, settingsId, isSharedSettings, 
   const saveData = useExtractionDataStore((state) => state.saveData)
   const getExtractionsDb = useExtractionDataStore((state) => state.getExtractionsDb)
   const translationData = useTranslationDataStore((state) => state.data)
-  const getTranslationDb = useTranslationDataStore((state) => state.getTranslationDb)
   const getTranslationsDb = useTranslationDataStore((state) => state.getTranslationsDb)
   const setCurrentTranslationId = useTranslationDataStore((state) => state.setCurrentId)
 
@@ -105,11 +104,6 @@ export const ContextExtractorMain = ({ currentId, settingsId, isSharedSettings, 
       saveData(currentId)
     }
   }, [currentId, saveData])
-
-  useEffect(() => {
-    if (!extraction?.ownerTranslationId || translationData[extraction.ownerTranslationId]) return
-    void getTranslationDb(extraction.ownerTranslationId)
-  }, [extraction?.ownerTranslationId, getTranslationDb, translationData])
 
   const onCurrentIdMount = useEffectEvent(() => {
     const trimmedResult = contextResult?.trim() || ""
@@ -278,13 +272,21 @@ export const ContextExtractorMain = ({ currentId, settingsId, isSharedSettings, 
     setProjectTranslations(translationsData.toReversed())
   }, [currentProject, getTranslationsDb])
 
-  const ownerTranslation = extraction?.ownerTranslationId
-    ? translationData[extraction.ownerTranslationId]
-    : null
+  useEffect(() => {
+    if (!currentProject?.translations.length) return
+    void getTranslationsDb(currentProject.translations)
+  }, [currentProject?.translations, getTranslationsDb])
 
-  const handleOpenOwnerTranslation = () => {
-    if (!extraction?.ownerTranslationId) return
-    setCurrentTranslationId(extraction.ownerTranslationId)
+  const linkedTranslations = currentProject?.translations
+    .map(translationId => translationData[translationId])
+    .filter((translation): translation is Translation => (
+      !!translation && translation.autoContextExtractionId === currentId
+    )) ?? []
+
+  const handleOpenLinkedTranslation = () => {
+    const linkedTranslation = linkedTranslations[0]
+    if (!linkedTranslation) return
+    setCurrentTranslationId(linkedTranslation.id)
     router.push("/translate")
   }
 
@@ -308,21 +310,25 @@ export const ContextExtractorMain = ({ currentId, settingsId, isSharedSettings, 
         />
       </div>
 
-      {extraction?.ownerTranslationId && (
+      {linkedTranslations.length > 0 && (
         <div className="md:col-span-2 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-primary/5 p-3">
           <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-sidebar-primary">
             <RiLinksLine className="size-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium">Owned Auto Context</p>
+            <p className="text-sm font-medium">
+              Used by {linkedTranslations.length} Translation{linkedTranslations.length === 1 ? "" : "s"}
+            </p>
             <p className="truncate text-xs text-muted-foreground">
-              Linked to Translation: {ownerTranslation?.title || "Loading Translation…"}
+              {linkedTranslations.map(translation => translation.title || "Untitled Translation").join(", ")}
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={handleOpenOwnerTranslation}>
-            <RiExternalLinkLine />
-            Open Translation
-          </Button>
+          {linkedTranslations.length === 1 && (
+            <Button variant="outline" size="sm" onClick={handleOpenLinkedTranslation}>
+              <RiExternalLinkLine />
+              Open Translation
+            </Button>
+          )}
         </div>
       )}
 

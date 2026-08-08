@@ -183,11 +183,6 @@ export function sanitizeExport(source: DatabaseExport): DatabaseExport {
       if (translation.autoContextPreviousMode === 'selected') translation.autoContextPreviousMode = 'none'
     }
   }
-  for (const extraction of data.extractions) {
-    if (extraction.ownerTranslationId !== null && !translationIds.has(extraction.ownerTranslationId)) {
-      extraction.ownerTranslationId = null
-    }
-  }
   return data
 }
 

@@ -1,3 +1,7 @@
+---
+status: superseded by ADR-0002
+---
+
 # Pipeline batch Auto Context
 
 Batch Auto Context is a durable, opt-in batch-project mode that defaults to Off and is independent of whether translation settings are shared or individual, while each resulting Context Extraction remains owned by one Translation. Extractions run serially in batch order to form a deterministic Context Chain. Each Translation may begin as soon as its own extraction completes, subject to the existing translation concurrency limit, so translation overlaps later context preparation. If an extraction fails, active translations finish but later queued work is cleared; Continue schedules the unfinished work again, reruns the failed linked extraction, and resumes the chain after it succeeds. Stop aborts the current extraction and all active translations while preserving completed extractions, partial translations, and linked stopped extractions; Continue reuses completed work and reruns the stopped extraction in place.

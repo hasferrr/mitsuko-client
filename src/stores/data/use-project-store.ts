@@ -11,7 +11,7 @@ import {
   getProject as getOneProjectDB,
 } from "@/lib/db/project"
 import { useTranscriptionDataStore } from "./use-transcription-data-store"
-import { useTranslationDataStore, detachExtractionsInStore } from "./use-translation-data-store"
+import { useTranslationDataStore } from "./use-translation-data-store"
 import { useExtractionDataStore } from "./use-extraction-data-store"
 import { parseSubtitle } from "@/lib/subtitles/parse-subtitle"
 import { getSettings } from "@/lib/db/settings"
@@ -293,7 +293,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       const currentProject = get().projects.find(p => p.id === projectId)
       if (!currentProject) throw new Error('Project not found')
 
-      const detachedExtractionIds = await deleteTranslation(projectId, translationId)
+      await deleteTranslation(projectId, translationId)
 
       const updatedTranslations = currentProject.translations.filter(id => id !== translationId)
       await updateProjectItemsDB(projectId, updatedTranslations, 'translations')
@@ -301,7 +301,6 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       // update translation store
       const translationStore = useTranslationDataStore.getState()
       translationStore.removeData(translationId)
-      detachExtractionsInStore(detachedExtractionIds)
 
       // update local project state
       set(state => ({

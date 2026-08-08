@@ -15,7 +15,6 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { cleanExtractionResult, combineAutoContext, getExtractionProblem, findLatestExtraction } from "@/lib/translation/auto-context"
-import { isAutoContextOwnedBy } from "@/lib/extraction/status"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ExtractionBadges } from "@/components/extract-context/extraction-badges"
 import { cn } from "@/lib/utils"
@@ -24,8 +23,6 @@ import { DEFAULT_TRANSLATION_SETTINGS } from "@/constants/default"
 
 type AutoContextKey = "autoContextMode" | "autoContextExtractionId" | "autoContextPreviousMode" | "autoContextPreviousExtractionId"
 type AutoContextSetterMap = { [K in AutoContextKey]: (id: string, value: Translation[K]) => void }
-
-const OWNED_EXTRACTION_MESSAGE = "Created for this Translation."
 
 interface Props {
   settingsId: string
@@ -99,9 +96,11 @@ export const ContextDocumentInput = memo(({
   const contextDocument = useSettingsStore((state) => state.getContextDocument(settingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
   const setContextDocument = (doc: string) => setBasicSettingsValue(settingsId, "contextDocument", doc)
-  const translation = useTranslationDataStore((state) => translationId ? state.data[translationId] : null)
+  const translationData = useTranslationDataStore((state) => state.data)
+  const translation = translationId ? translationData[translationId] : null
   const saveTranslation = useTranslationDataStore((state) => state.saveData)
   const getTranslationDb = useTranslationDataStore((state) => state.getTranslationDb)
+  const getTranslationsDb = useTranslationDataStore((state) => state.getTranslationsDb)
   const setAutoContextMode = useTranslationDataStore((state) => state.setAutoContextMode)
   const setAutoContextExtractionId = useTranslationDataStore((state) => state.setAutoContextExtractionId)
   const setAutoContextPreviousMode = useTranslationDataStore((state) => state.setAutoContextPreviousMode)
@@ -131,10 +130,13 @@ export const ContextDocumentInput = memo(({
 
   useEffect(() => {
     if (!isAutoContextDialogOpen || !currentProject) return
-    getExtractionsDb(currentProject.extractions).then((extractions) => {
-      setProjectExtractions(extractions.toReversed())
-    })
-  }, [currentProject, getExtractionsDb, isAutoContextDialogOpen])
+    void Promise.all([
+      getExtractionsDb(currentProject.extractions).then((extractions) => {
+        setProjectExtractions(extractions.toReversed())
+      }),
+      getTranslationsDb(currentProject.translations),
+    ])
+  }, [currentProject, getExtractionsDb, getTranslationsDb, isAutoContextDialogOpen])
 
   useEffect(() => {
     if (!isAutoContextDialogOpen || !translation) return
@@ -226,7 +228,12 @@ export const ContextDocumentInput = memo(({
   const selectedProblem = translation && translation.autoContextExtractionId && !isSelectedExtractionRunning
     ? getExtractionProblem(selectedExtraction ?? undefined, translation.projectId, isExtractingSet)
     : null
-  const isSelectedAutoOwned = !!(translation && selectedExtraction && isAutoContextOwnedBy(selectedExtraction, translation.id))
+  const linkedTranslationCount = selectedExtraction
+    ? Object.values(translationData).filter(item => (
+        item.projectId === selectedExtraction.projectId
+        && item.autoContextExtractionId === selectedExtraction.id
+      )).length
+    : 0
   const autoContextMode = translation?.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
   const isAutoContextEnabled = autoContextMode !== "disabled"
 
@@ -234,7 +241,7 @@ export const ContextDocumentInput = memo(({
     if (!translation || !selectedExtraction) return ""
     if (translation.autoContextMode === "disabled") return ""
     if (isSelectedExtractionRunning) return ""
-    if (selectedProblem && !isSelectedAutoOwned) return ""
+    if (selectedProblem) return ""
     if (translation.autoContextMode === "create-new") return ""
     return cleanExtractionResult(selectedExtraction.contextResult)
   })()
@@ -249,8 +256,8 @@ export const ContextDocumentInput = memo(({
     }
     const extractionPlaceholder = isSelectedExtractionRunning
       ? "[Extraction is still running]"
-      : selectedProblem && !isSelectedAutoOwned
-        ? `[${selectedProblem}]`
+      : selectedProblem
+        ? "[Extraction will be regenerated when translation starts]"
         : translation.autoContextMode === "create-new"
           ? "[Extraction has not run yet — it will be created when translation starts]"
           : ""
@@ -430,17 +437,15 @@ export const ContextDocumentInput = memo(({
                     </StatusMessage>
                   )}
                   {!isSelectedExtractionRunning && selectedProblem && (
-                    <StatusMessage variant={isSelectedAutoOwned ? "info" : "warning"}>
-                      {isSelectedAutoOwned
-                        ? "This auto-context extraction will rerun when translation starts."
-                        : selectedProblem}
+                    <StatusMessage variant="info">
+                      This extraction will rerun when translation starts. Every Translation linked to it will use the updated result.
                     </StatusMessage>
                   )}
                   {selectedExtraction && (
-                    <StatusMessage variant={isSelectedAutoOwned ? "info" : "muted"}>
-                      {isSelectedAutoOwned
-                        ? OWNED_EXTRACTION_MESSAGE
-                        : "Used by this Translation, but not owned by it. This extraction remains independent."}
+                    <StatusMessage variant="muted">
+                      {linkedTranslationCount > 1
+                        ? `Shared by ${linkedTranslationCount} Translations. Changes to this Extraction affect all of them.`
+                        : "Linked as Auto Context. Changes to this Extraction are reflected here."}
                     </StatusMessage>
                   )}
                   {selectedExtraction && (

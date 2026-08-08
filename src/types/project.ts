@@ -90,7 +90,6 @@ export interface Extraction {
   previousContext: string
   contextResult: string
   status: ExtractionStatus
-  ownerTranslationId: string | null
   completedAt: Date | null
   createdAt: Date
   updatedAt: Date

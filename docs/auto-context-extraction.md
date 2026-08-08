@@ -29,12 +29,7 @@ Each `Translation` stores:
 
 `autoContextExtractionId` is intentionally kept after auto-created extraction failures so users can inspect, manually repair, or rerun the linked extraction.
 
-Think of the two fields as **read** versus **manage**:
-
-- `Translation.autoContextExtractionId` means the Translation reads this Extraction as context.
-- `Extraction.ownerTranslationId` means the Translation may automatically update and rerun this Extraction.
-
-For example, if Translation A manually selects Extraction X, A points to X but does not become its owner. X's existing `ownerTranslationId` remains unchanged. A can use X's result but cannot automatically overwrite it. If A creates X through Auto Context, A points to X and X is owned by A, so A can rerun X after a failure.
+`Translation.autoContextExtractionId` is the only relationship between a Translation and its Auto Context Extraction. It is a live, shared reference: multiple Translations may point to the same Extraction, and changes to that Extraction are visible to every linked Translation.
 
 Changing `autoContextMode` keeps `autoContextExtractionId` and `autoContextPreviousExtractionId` so linked extraction history and previous selections can be restored. It resets `autoContextPreviousMode` to `latest`.
 
@@ -57,19 +52,16 @@ The created extraction uses:
 - current translation subtitles as `subtitleContent`
 - `Auto Context for {translation title}` as title
 - translation title as episode number
-- `ownerTranslationId` set to the translation id
 
 ### Use Existing
 
 Translation uses the selected extraction result when it is usable.
 
-Selecting an existing extraction does not assign ownership. The Translation writes the extraction's id to `autoContextExtractionId`, but the extraction's `ownerTranslationId` remains unchanged. An extraction already owned by this Translation may also appear in this mode after Create New changes the mode to Use Existing.
+Selecting an existing extraction writes its id to `autoContextExtractionId`. The same Extraction may be selected by other Translations.
 
 If the selected extraction is currently running, translation waits for it to finish, then reloads and validates the result.
 
-If the selected extraction is auto-owned by the same translation (matching `ownerTranslationId`) and is not usable, translation reruns that same extraction entity in place. The rerun updates title, episode number, subtitle content, and result status, while preserving the existing extraction settings and previous context.
-
-If the selected extraction is not owned by the current translation, invalid results abort the flow. The app does not rerun manually selected extraction dependencies.
+If the selected extraction is not usable, translation reruns that same extraction entity in place. The rerun updates title, episode number, subtitle content, and result status while preserving its saved settings and previous context. Because links are live and shared, every other Translation linked to that Extraction observes the updated result.
 
 ## Previous Context For Create New
 
@@ -101,7 +93,7 @@ Extraction lifecycle status is defined in [extraction-lifecycle.md](./extraction
 
 1. User starts or restarts a single translation.
 2. If auto context is disabled, translation starts normally.
-3. If mode is `use-existing`, validate, wait for, or rerun the selected extraction depending on ownership and status.
+3. If mode is `use-existing`, validate, wait for, or rerun the selected extraction depending on status.
 4. If mode is `create-new`, resolve previous context, create a linked extraction, run extraction, then validate the result.
 5. Combine the cleaned extraction result with the current Context Document textarea.
 6. Start translation with the combined context document override.
@@ -112,7 +104,7 @@ Stop always prevents translation from starting if translation has not started ye
 
 When waiting for an existing selected extraction, Stop cancels only the translation wait. It does not abort the existing extraction.
 
-When running a newly auto-created extraction or rerunning an owned auto-context extraction, Stop aborts that owned extraction. The extraction remains linked with stopped status and can be rerun in place on the next translation start.
+When running a newly auto-created extraction or rerunning a linked extraction, Stop aborts that extraction. It remains linked with stopped status and can be rerun in place on the next translation start.
 
 ## UI
 
@@ -129,7 +121,7 @@ The Auto dialog lets the user:
 - open selected extraction records in the full `ContextExtractorMain` dialog
 - preview the combined context (manual Context Document followed by Auto Context extraction) that will be sent with the translation request
 
-Use-existing hides previous-context controls because it directly reuses the selected extraction result or reruns the owned linked extraction.
+Use-existing hides previous-context controls because it directly reuses or reruns the selected Extraction.
 
 ## Error Handling
 
@@ -137,9 +129,8 @@ The whole flow stops with no translation if:
 
 - no existing extraction is selected in `use-existing`
 - a selected extraction is missing or outside the project
-- a manually selected extraction result is not usable
 - a selected previous extraction for create-new is invalid
-- auto-created or auto-owned rerun extraction fails because of network/API/parsing/validation error
+- auto-created or linked rerun extraction fails because of network/API/parsing/validation error
 - the user presses Stop before translation starts
 
-Failed and stopped auto-created extraction entities remain linked and visible so users can inspect them, manually repair them, or rerun them in place.
+Failed and stopped extraction entities remain linked and visible so users can inspect them, manually repair them, or rerun them in place.

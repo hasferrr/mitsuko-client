@@ -13,7 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { getBatchAutoContextPreview, getExtractionProblem } from "@/lib/translation/auto-context"
-import { isAutoContextOwnedBy } from "@/lib/extraction/status"
 import { Extraction, Translation } from "@/types/project"
 
 interface BatchAutoContextPreviewDialogProps {
@@ -38,7 +37,6 @@ export function BatchAutoContextPreviewDialog({
   onOpenExtraction,
 }: BatchAutoContextPreviewDialogProps) {
   const isRunning = extraction ? runningIds.has(extraction.id) : false
-  const isOwned = extraction ? isAutoContextOwnedBy(extraction, translation.id) : false
   const extractionProblem = !extraction || isRunning
     ? null
     : getExtractionProblem(extraction, translation.projectId, runningIds)
@@ -46,7 +44,6 @@ export function BatchAutoContextPreviewDialog({
     contextDocument,
     enabled: autoContextEnabled,
     extraction,
-    isOwned,
     isRunning,
     extractionProblem,
   })

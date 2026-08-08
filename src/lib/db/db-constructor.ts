@@ -17,7 +17,7 @@ import {
   Translation,
 } from '@/types/project'
 import { LegacyAdvancedSettings, LegacyExtraction, LegacyProject, LegacyTranslation } from '@/types/legacy-project'
-import { AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX, normalizeExtractionStatus, stripExtractionDoneTag } from '@/lib/extraction/status'
+import { normalizeExtractionStatus, stripExtractionDoneTag } from '@/lib/extraction/status'
 
 const uuidv4 = () => crypto.randomUUID()
 
@@ -47,12 +47,6 @@ export function databaseExportConstructor(data: Partial<DatabaseExport>): Databa
   const extractionInputs = data.extractions ?? []
   const settingsOwnership = buildSettingsOwnership(projects, translations, extractionInputs)
   const projectIsBatch = new Map(projects.map(project => [project.id, project.isBatch]))
-  const linkedOwner = new Map<string, string>()
-  for (const translation of translations) {
-    if (translation.autoContextExtractionId && !linkedOwner.has(translation.autoContextExtractionId)) {
-      linkedOwner.set(translation.autoContextExtractionId, translation.id)
-    }
-  }
   return {
     formatVersion: 2,
     projects,
@@ -61,7 +55,6 @@ export function databaseExportConstructor(data: Partial<DatabaseExport>): Databa
     extractions: convertDates(data.extractions?.map(extraction => extractionConstructor(
       extraction,
       projectIsBatch.get(extraction.projectId ?? '') ?? false,
-      linkedOwner.get(extraction.id ?? ''),
     )) ?? []),
     projectOrders: convertDates(data.projectOrders?.map(projectOrderConstructor) ?? []),
     settings: convertDates(data.settings?.map(settings => settingsConstructor(
@@ -168,9 +161,6 @@ export function generateNewIds(data: DatabaseExport): DatabaseExport {
     id: uuidv4(),
     projectId: '',
     settingsId: settingsMap.get(extraction.settingsId)?.id ?? extraction.settingsId,
-    ownerTranslationId: extraction.ownerTranslationId
-      ? translationsMap.get(extraction.ownerTranslationId)?.id ?? extraction.ownerTranslationId
-      : null,
   }]))
   const transcriptionsMap = new Map(data.transcriptions.map(transcription => [transcription.id, {
     ...transcription,
@@ -335,13 +325,10 @@ function transcriptionConstructor(transcription: Partial<Transcription>): Transc
   }
 }
 
-function extractionConstructor(extraction: Partial<Extraction>, isBatch = false, linkedOwnerId?: string): Extraction {
+function extractionConstructor(extraction: Partial<Extraction>, isBatch = false): Extraction {
   const rawContextResult = extraction.contextResult ?? ''
   const status = normalizeExtractionStatus(extraction.status, rawContextResult, isBatch)
   const contextResult = stripExtractionDoneTag(rawContextResult)
-  const looksAutoCreated = !!linkedOwnerId
-    && typeof extraction.title === 'string'
-    && extraction.title.startsWith(AUTO_CONTEXT_EXTRACTION_TITLE_PREFIX)
   const completedAt = extraction.completedAt instanceof Date
     ? extraction.completedAt
     : extraction.completedAt ? new Date(extraction.completedAt) : null
@@ -353,7 +340,6 @@ function extractionConstructor(extraction: Partial<Extraction>, isBatch = false,
     previousContext: extraction.previousContext ?? '',
     contextResult,
     status,
-    ownerTranslationId: extraction.ownerTranslationId ?? (looksAutoCreated ? linkedOwnerId ?? null : null),
     completedAt: status === 'completed' ? completedAt ?? new Date() : null,
     projectId: extraction.projectId ?? '',
     settingsId: extraction.settingsId ?? '',

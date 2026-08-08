@@ -1,4 +1,4 @@
-import { Extraction, Settings, Translation } from "@/types/project"
+import { Settings, Translation } from "@/types/project"
 import { db } from "@/lib/db/db"
 import {
   DEFAULT_SETTINGS,
@@ -10,10 +10,6 @@ import { deleteSettingsIfUnreferenced } from "@/lib/db/settings-references"
 type SettingsData = Omit<Settings, "id" | "createdAt" | "updatedAt">
 
 export interface BatchAutoContextLinkUpdates {
-  extractions: Array<{
-    id: string
-    ownerTranslationId: string | null
-  }>
   translations: Array<{
     id: string
     changes: Pick<
@@ -27,7 +23,6 @@ export interface BatchAutoContextLinkUpdates {
 }
 
 export interface BatchAutoContextLinkUpdateResult {
-  extractions: Extraction[]
   translations: Translation[]
 }
 
@@ -95,19 +90,10 @@ export const updateTranslation = async (
 }
 
 export const updateBatchAutoContextLinks = async ({
-  extractions,
   translations,
 }: BatchAutoContextLinkUpdates): Promise<BatchAutoContextLinkUpdateResult> => {
-  return db.transaction('rw', db.translations, db.extractions, async () => {
+  return db.transaction('rw', db.translations, async () => {
     const updatedAt = new Date()
-
-    for (const extraction of extractions) {
-      const updated = await db.extractions.update(extraction.id, {
-        ownerTranslationId: extraction.ownerTranslationId,
-        updatedAt,
-      })
-      if (!updated) throw new Error(`Extraction ${extraction.id} was not found`)
-    }
 
     for (const translation of translations) {
       const updated = await db.translations.update(translation.id, {
@@ -117,13 +103,11 @@ export const updateBatchAutoContextLinks = async ({
       if (!updated) throw new Error(`Translation ${translation.id} was not found`)
     }
 
-    const [updatedExtractions, updatedTranslations] = await Promise.all([
-      db.extractions.bulkGet(extractions.map(extraction => extraction.id)),
-      db.translations.bulkGet(translations.map(translation => translation.id)),
-    ])
+    const updatedTranslations = await db.translations.bulkGet(
+      translations.map(translation => translation.id),
+    )
 
     return {
-      extractions: updatedExtractions.filter((extraction): extraction is Extraction => !!extraction),
       translations: updatedTranslations.filter((translation): translation is Translation => !!translation),
     }
   })
@@ -133,18 +117,18 @@ export const moveTranslation = async (
   sourceProjectId: string,
   targetProjectId: string,
   translationId: string,
-): Promise<string[]> => {
-  return db.transaction('rw', db.projects, db.translations, db.extractions, async () => {
-    const ownedExtractions = await db.extractions
-      .filter(extraction => extraction.ownerTranslationId === translationId)
-      .toArray()
-    const ownedExtractionIds = ownedExtractions.map(extraction => extraction.id)
+): Promise<Translation> => {
+  return db.transaction('rw', db.projects, db.translations, async () => {
     const updatedAt = new Date()
 
-    await db.translations.update(translationId, { projectId: targetProjectId, updatedAt })
-    await Promise.all(ownedExtractionIds.map(id => {
-      return db.extractions.update(id, { ownerTranslationId: null, updatedAt })
-    }))
+    await db.translations.update(translationId, {
+      projectId: targetProjectId,
+      autoContextMode: 'disabled',
+      autoContextExtractionId: null,
+      autoContextPreviousMode: 'none',
+      autoContextPreviousExtractionId: null,
+      updatedAt,
+    })
 
     await db.projects.update(sourceProjectId, project => {
       if (!project) return
@@ -158,31 +142,24 @@ export const moveTranslation = async (
       project.updatedAt = updatedAt
     })
 
-    return ownedExtractionIds
+    const updated = await db.translations.get(translationId)
+    if (!updated) throw new Error('Translation not found')
+    return updated
   })
 }
 
-export const deleteTranslation = async (projectId: string, translationId: string): Promise<string[]> => {
+export const deleteTranslation = async (projectId: string, translationId: string): Promise<void> => {
   return db.transaction('rw', db.projects, db.translations, db.extractions, db.settings, async () => {
     const translation = await db.translations.get(translationId)
-    if (!translation) return []
-
-    const ownedExtractions = await db.extractions
-      .filter(extraction => extraction.ownerTranslationId === translationId)
-      .toArray()
-    const ownedExtractionIds = ownedExtractions.map(extraction => extraction.id)
+    if (!translation) return
     const updatedAt = new Date()
 
     await db.translations.delete(translationId)
-    await Promise.all(ownedExtractionIds.map(extractionId => {
-      return db.extractions.update(extractionId, { ownerTranslationId: null, updatedAt })
-    }))
     await db.projects.update(projectId, project => {
       if (!project) return
       project.translations = project.translations.filter(tId => tId !== translationId)
       project.updatedAt = updatedAt
     })
     await deleteSettingsIfUnreferenced([translation.settingsId])
-    return ownedExtractionIds
   })
 }

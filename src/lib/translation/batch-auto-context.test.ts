@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import {
   buildBatchAutoContextPlan,
-  findOwnedAutoContextExtraction,
+  findLinkedAutoContextExtraction,
   getEffectiveBatchTranslationStage,
   getRunningBatchAutoContextExtractionIds,
 } from "@/lib/translation/batch-auto-context"
@@ -26,7 +26,7 @@ const translation = (id: string, overrides: Partial<Translation> = {}): Translat
   ...overrides,
 })
 
-const extraction = (id: string, ownerTranslationId: string | null, overrides: Partial<Extraction> = {}): Extraction => ({
+const extraction = (id: string, overrides: Partial<Extraction> = {}): Extraction => ({
   id,
   title: id,
   episodeNumber: id,
@@ -34,7 +34,6 @@ const extraction = (id: string, ownerTranslationId: string | null, overrides: Pa
   previousContext: "",
   contextResult: "usable context",
   status: "completed",
-  ownerTranslationId,
   completedAt,
   createdAt: completedAt,
   updatedAt: completedAt,
@@ -43,22 +42,19 @@ const extraction = (id: string, ownerTranslationId: string | null, overrides: Pa
   ...overrides,
 })
 
-describe("findOwnedAutoContextExtraction", () => {
-  test("does not treat a manually selected extraction as owned", () => {
-    const item = translation("translation-1", { autoContextExtractionId: "manual" })
-    const extractions = {
-      manual: extraction("manual", null),
-      owned: extraction("owned", "translation-1"),
-    }
+describe("findLinkedAutoContextExtraction", () => {
+  test("returns the extraction selected by the Translation", () => {
+    const item = translation("translation-1", { autoContextExtractionId: "shared" })
+    const shared = extraction("shared")
 
-    expect(findOwnedAutoContextExtraction(item, ["manual", "owned"], extractions)?.id).toBe("owned")
+    expect(findLinkedAutoContextExtraction(item, { shared })).toBe(shared)
   })
 })
 
 describe("getEffectiveBatchTranslationStage", () => {
-  test("restores the extracting stage from the active linked extraction after a remount", () => {
+  test("restores the extracting stage from an active linked extraction", () => {
     const item = translation("translation-1")
-    const linkedExtraction = extraction("translation-1-extraction", item.id, {
+    const linkedExtraction = extraction("translation-1-extraction", {
       status: "idle",
       contextResult: "",
       completedAt: null,
@@ -72,18 +68,6 @@ describe("getEffectiveBatchTranslationStage", () => {
     })).toBe("extracting-context")
   })
 
-  test("does not attribute an active manually linked extraction to the batch item", () => {
-    const item = translation("translation-1", { autoContextExtractionId: "manual" })
-    const linkedExtraction = extraction("manual", null)
-
-    expect(getEffectiveBatchTranslationStage({
-      translation: item,
-      linkedExtraction,
-      runningExtractionIds: new Set([linkedExtraction.id]),
-      isTranslating: false,
-    })).toBeUndefined()
-  })
-
   test.each([
     "waiting-context",
     "queued-translation",
@@ -92,7 +76,7 @@ describe("getEffectiveBatchTranslationStage", () => {
 
     expect(getEffectiveBatchTranslationStage({
       translation: item,
-      linkedExtraction: extraction("translation-1-extraction", item.id),
+      linkedExtraction: extraction("translation-1-extraction"),
       runningExtractionIds: new Set(),
       isTranslating: false,
       recordedStage,
@@ -104,50 +88,24 @@ describe("getEffectiveBatchTranslationStage", () => {
 
     expect(getEffectiveBatchTranslationStage({
       translation: item,
-      linkedExtraction: extraction("translation-1-extraction", item.id),
+      linkedExtraction: extraction("translation-1-extraction"),
       runningExtractionIds: new Set(),
       isTranslating: true,
       recordedStage: "queued-translation",
     })).toBe("translating")
   })
-
-  test("prefers authoritative extraction activity over a recorded waiting stage", () => {
-    const item = translation("translation-1")
-    const linkedExtraction = extraction("translation-1-extraction", item.id)
-
-    expect(getEffectiveBatchTranslationStage({
-      translation: item,
-      linkedExtraction,
-      runningExtractionIds: new Set([linkedExtraction.id]),
-      isTranslating: false,
-      recordedStage: "waiting-context",
-    })).toBe("extracting-context")
-  })
 })
 
 describe("getRunningBatchAutoContextExtractionIds", () => {
-  test("finds an active owned extraction without relying on runtime refs", () => {
-    const item = translation("translation-1")
-    const linkedExtraction = extraction("translation-1-extraction", item.id)
+  test("finds active linked extractions and removes duplicates", () => {
+    const first = translation("translation-1", { autoContextExtractionId: "shared" })
+    const second = translation("translation-2", { autoContextExtractionId: "shared" })
 
     expect(getRunningBatchAutoContextExtractionIds({
-      translationIds: [item.id],
-      translations: { [item.id]: item },
-      extractions: { [linkedExtraction.id]: linkedExtraction },
-      runningIds: new Set([linkedExtraction.id]),
-    })).toEqual([linkedExtraction.id])
-  })
-
-  test("does not stop an active manually linked extraction", () => {
-    const item = translation("translation-1", { autoContextExtractionId: "manual" })
-    const manuallyLinked = extraction("manual", null)
-
-    expect(getRunningBatchAutoContextExtractionIds({
-      translationIds: [item.id],
-      translations: { [item.id]: item },
-      extractions: { [manuallyLinked.id]: manuallyLinked },
-      runningIds: new Set([manuallyLinked.id]),
-    })).toEqual([])
+      translationIds: [first.id, second.id],
+      translations: { [first.id]: first, [second.id]: second },
+      runningIds: new Set(["shared"]),
+    })).toEqual(["shared"])
   })
 })
 
@@ -158,14 +116,13 @@ describe("buildBatchAutoContextPlan", () => {
       autoContextPreviousExtractionId: "translation-1-extraction",
     })
     const extractions = {
-      "translation-1-extraction": extraction("translation-1-extraction", first.id),
-      "translation-2-extraction": extraction("translation-2-extraction", second.id),
+      "translation-1-extraction": extraction("translation-1-extraction"),
+      "translation-2-extraction": extraction("translation-2-extraction"),
     }
 
     const plan = buildBatchAutoContextPlan({
       projectId: "project-1",
       translationIds: [first.id, second.id],
-      extractionIds: Object.keys(extractions),
       translations: { [first.id]: first, [second.id]: second },
       extractions,
       startingExtractionId: null,
@@ -177,12 +134,11 @@ describe("buildBatchAutoContextPlan", () => {
   test("reruns the suffix after a missing extraction", () => {
     const first = translation("translation-1", { autoContextExtractionId: null })
     const second = translation("translation-2", { autoContextPreviousExtractionId: "missing" })
-    const secondExtraction = extraction("translation-2-extraction", second.id)
+    const secondExtraction = extraction("translation-2-extraction")
 
     const plan = buildBatchAutoContextPlan({
       projectId: "project-1",
       translationIds: [first.id, second.id],
-      extractionIds: [secondExtraction.id],
       translations: { [first.id]: first, [second.id]: second },
       extractions: { [secondExtraction.id]: secondExtraction },
       startingExtractionId: null,
@@ -197,16 +153,15 @@ describe("buildBatchAutoContextPlan", () => {
       autoContextPreviousExtractionId: "translation-1-extraction",
     })
     const extractions = {
-      "translation-1-extraction": extraction("translation-1-extraction", first.id, {
+      "translation-1-extraction": extraction("translation-1-extraction", {
         completedAt: new Date("2026-01-02T00:00:00.000Z"),
       }),
-      "translation-2-extraction": extraction("translation-2-extraction", second.id),
+      "translation-2-extraction": extraction("translation-2-extraction"),
     }
 
     const plan = buildBatchAutoContextPlan({
       projectId: "project-1",
       translationIds: [first.id, second.id],
-      extractionIds: Object.keys(extractions),
       translations: { [first.id]: first, [second.id]: second },
       extractions,
       startingExtractionId: null,
@@ -215,7 +170,7 @@ describe("buildBatchAutoContextPlan", () => {
     expect(plan.items.map(item => item.action)).toEqual(["reuse", "reuse"])
   })
 
-  test("reruns only the failed owned extraction when the chain identity is unchanged", () => {
+  test("reruns only the failed linked extraction when chain identity is unchanged", () => {
     const first = translation("translation-1")
     const second = translation("translation-2", {
       autoContextPreviousExtractionId: "translation-1-extraction",
@@ -224,19 +179,18 @@ describe("buildBatchAutoContextPlan", () => {
       autoContextPreviousExtractionId: "translation-2-extraction",
     })
     const extractions = {
-      "translation-1-extraction": extraction("translation-1-extraction", first.id),
-      "translation-2-extraction": extraction("translation-2-extraction", second.id, {
+      "translation-1-extraction": extraction("translation-1-extraction"),
+      "translation-2-extraction": extraction("translation-2-extraction", {
         status: "failed",
         contextResult: "<error>failed</error>",
         completedAt: null,
       }),
-      "translation-3-extraction": extraction("translation-3-extraction", third.id),
+      "translation-3-extraction": extraction("translation-3-extraction"),
     }
 
     const plan = buildBatchAutoContextPlan({
       projectId: "project-1",
       translationIds: [first.id, second.id, third.id],
-      extractionIds: Object.keys(extractions),
       translations: { [first.id]: first, [second.id]: second, [third.id]: third },
       extractions,
       startingExtractionId: null,
@@ -249,27 +203,24 @@ describe("buildBatchAutoContextPlan", () => {
     ])
   })
 
-  test("regenerates every existing owned extraction on Restart", () => {
-    const first = translation("translation-1")
+  test("regenerates every distinct linked extraction once on Restart", () => {
+    const first = translation("translation-1", { autoContextExtractionId: "shared" })
     const second = translation("translation-2", {
-      autoContextPreviousExtractionId: "translation-1-extraction",
+      autoContextExtractionId: "shared",
+      autoContextPreviousExtractionId: null,
     })
-    const extractions = {
-      "translation-1-extraction": extraction("translation-1-extraction", first.id),
-      "translation-2-extraction": extraction("translation-2-extraction", second.id),
-    }
+    const shared = extraction("shared")
 
     const plan = buildBatchAutoContextPlan({
       projectId: "project-1",
       translationIds: [first.id, second.id],
-      extractionIds: Object.keys(extractions),
       translations: { [first.id]: first, [second.id]: second },
-      extractions,
+      extractions: { shared },
       startingExtractionId: null,
       regenerate: true,
     })
 
-    expect(plan.items.map(item => item.action)).toEqual(["rerun", "rerun"])
+    expect(plan.items.map(item => item.action)).toEqual(["rerun", "reuse"])
   })
 
   test("blocks a missing Starting Context without falling back", () => {
@@ -278,7 +229,6 @@ describe("buildBatchAutoContextPlan", () => {
     const plan = buildBatchAutoContextPlan({
       projectId: "project-1",
       translationIds: [first.id],
-      extractionIds: [],
       translations: { [first.id]: first },
       extractions: {},
       startingExtractionId: "missing",
@@ -287,19 +237,18 @@ describe("buildBatchAutoContextPlan", () => {
     expect(plan.startingContextProblem).toBe("Starting Context was not found.")
   })
 
-  test("rejects a Starting Context owned inside the batch", () => {
-    const first = translation("translation-1")
-    const starting = extraction("starting", first.id)
+  test("rejects a Starting Context linked inside the batch", () => {
+    const first = translation("translation-1", { autoContextExtractionId: "starting" })
+    const starting = extraction("starting")
 
     const plan = buildBatchAutoContextPlan({
       projectId: "project-1",
       translationIds: [first.id],
-      extractionIds: [starting.id],
       translations: { [first.id]: first },
       extractions: { [starting.id]: starting },
       startingExtractionId: starting.id,
     })
 
-    expect(plan.startingContextProblem).toBe("Starting Context is owned by a Translation in this batch.")
+    expect(plan.startingContextProblem).toBe("Starting Context is also linked to a Translation in this batch.")
   })
 })

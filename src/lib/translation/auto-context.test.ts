@@ -9,7 +9,7 @@ import {
   getStoppedAutoContextExtractionPatch,
 } from "@/lib/translation/auto-context"
 import { Extraction } from "@/types/project"
-import { getAutoContextExtractionTitle, isAutoContextOwnedBy } from "@/lib/extraction/status"
+import { getAutoContextExtractionTitle } from "@/lib/extraction/status"
 
 const extraction = (id: string, contextResult: string, overrides: Partial<Extraction> = {}): Extraction => ({
   id,
@@ -19,7 +19,6 @@ const extraction = (id: string, contextResult: string, overrides: Partial<Extrac
   previousContext: "",
   contextResult,
   status: "completed",
-  ownerTranslationId: null,
   completedAt: new Date(),
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -28,7 +27,7 @@ const extraction = (id: string, contextResult: string, overrides: Partial<Extrac
   ...overrides,
 })
 
-test("owned Auto Context titles name their Translation", () => {
+test("Auto Context titles name their Translation", () => {
   expect(getAutoContextExtractionTitle("Episode 4")).toBe("Auto Context for Episode 4")
   expect(getAutoContextExtractionTitle("   ")).toBe("Auto Context for Untitled Translation")
 })
@@ -42,9 +41,7 @@ describe("findLatestExtraction", () => {
   })
 
   test("includes a linked auto-context extraction when it is latest and usable", () => {
-    const latest = extraction("episode-3", "latest context", {
-      ownerTranslationId: "translation-1",
-    })
+    const latest = extraction("episode-3", "latest context")
     const previous = extraction("episode-2", "previous context")
 
     expect(findLatestExtraction([latest, previous], "project-1")).toBe(latest)
@@ -96,14 +93,6 @@ describe("getExtractionProblem", () => {
     )).toBe("Selected previous context is empty.")
   })
 
-  test("identifies auto-context owner", () => {
-    expect(isAutoContextOwnedBy(
-      extraction("episode-1", "context", {
-        ownerTranslationId: "translation-1",
-      }),
-      "translation-1",
-    )).toBe(true)
-  })
 })
 
 describe("combineAutoContext", () => {
@@ -116,14 +105,11 @@ describe("combineAutoContext", () => {
 })
 
 describe("getBatchAutoContextPreview", () => {
-  test("combines manual context with a completed owned extraction", () => {
+  test("combines manual context with a completed linked extraction", () => {
     expect(getBatchAutoContextPreview({
       contextDocument: "Manual context",
       enabled: true,
-      extraction: extraction("episode-1", "Generated context\n\n<done>", {
-        ownerTranslationId: "translation-1",
-      }),
-      isOwned: true,
+      extraction: extraction("episode-1", "Generated context\n\n<done>"),
       isRunning: false,
       extractionProblem: null,
     })).toBe("Manual context\n\n---\n\nGenerated context")
@@ -134,29 +120,26 @@ describe("getBatchAutoContextPreview", () => {
       contextDocument: "Manual context",
       enabled: false,
       extraction: extraction("episode-1", "Generated context"),
-      isOwned: true,
       isRunning: false,
       extractionProblem: null,
     })).toBe("Manual context")
   })
 
-  test("explains when an owned extraction still needs to be created", () => {
+  test("explains when a linked extraction still needs to be created", () => {
     expect(getBatchAutoContextPreview({
       contextDocument: "",
       enabled: true,
       extraction: null,
-      isOwned: false,
       isRunning: false,
       extractionProblem: null,
     })).toBe("[Extraction has not run yet — it will be created when batch translation starts]")
   })
 
-  test("explains when an invalid owned extraction will be regenerated", () => {
+  test("explains when an invalid linked extraction will be regenerated", () => {
     expect(getBatchAutoContextPreview({
       contextDocument: "Manual context",
       enabled: true,
       extraction: extraction("episode-1", "partial", { status: "stopped" }),
-      isOwned: true,
       isRunning: false,
       extractionProblem: "Selected context extraction was stopped.",
     })).toBe("Manual context\n\n---\n\n[Extraction will be regenerated when batch translation starts]")

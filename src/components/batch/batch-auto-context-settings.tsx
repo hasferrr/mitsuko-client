@@ -26,6 +26,7 @@ import { useSetUnsavedChanges } from "@/contexts/unsaved-changes-context"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
+import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 
 interface BatchAutoContextSettingsProps {
   isProcessing: boolean
@@ -42,24 +43,36 @@ export function BatchAutoContextSettings({
   const updateProject = useProjectStore(state => state.updateProject)
   const extractionData = useExtractionDataStore(state => state.data)
   const getExtractionsDb = useExtractionDataStore(state => state.getExtractionsDb)
+  const translationData = useTranslationDataStore(state => state.data)
+  const getTranslationsDb = useTranslationDataStore(state => state.getTranslationsDb)
   const isExtractingSet = useExtractionStore(state => state.isExtractingSet)
   const setHasChanges = useSetUnsavedChanges()
 
   useEffect(() => {
-    if (!currentProject?.extractions.length) return
-    void getExtractionsDb(currentProject.extractions)
-  }, [currentProject?.extractions, getExtractionsDb])
+    if (!currentProject) return
+    void Promise.all([
+      getExtractionsDb(currentProject.extractions),
+      getTranslationsDb(currentProject.translations),
+    ])
+  }, [currentProject, getExtractionsDb, getTranslationsDb])
+
+  const linkedBatchExtractionIds = useMemo(() => {
+    if (!currentProject) return new Set<string>()
+    return new Set(currentProject.translations.flatMap(translationId => {
+      const extractionId = translationData[translationId]?.autoContextExtractionId
+      return extractionId ? [extractionId] : []
+    }))
+  }, [currentProject, translationData])
 
   const eligibleExtractions = useMemo(() => {
     if (!currentProject) return []
-    const batchTranslationIds = new Set(currentProject.translations)
     return currentProject.extractions
       .map(id => extractionData[id])
       .filter(extraction => {
         if (!isExtractionUsable(extraction, currentProject.id, isExtractingSet)) return false
-        return !extraction.ownerTranslationId || !batchTranslationIds.has(extraction.ownerTranslationId)
+        return !linkedBatchExtractionIds.has(extraction.id)
       })
-  }, [currentProject, extractionData, isExtractingSet])
+  }, [currentProject, extractionData, isExtractingSet, linkedBatchExtractionIds])
 
   if (!currentProject) return null
 
@@ -68,8 +81,8 @@ export function BatchAutoContextSettings({
   const selectedExtraction = selectedId ? extractionData[selectedId] : null
   const selectedProblem = selectedId
     ? getExtractionValidationProblem(selectedExtraction ?? undefined, currentProject.id, isExtractingSet, "Starting Context")
-      ?? (selectedExtraction?.ownerTranslationId && currentProject.translations.includes(selectedExtraction.ownerTranslationId)
-        ? "Starting Context is owned by a Translation in this batch."
+      ?? (linkedBatchExtractionIds.has(selectedId)
+        ? "Starting Context is also linked to a Translation in this batch."
         : null)
     : null
   const selectedIsEligible = selectedId

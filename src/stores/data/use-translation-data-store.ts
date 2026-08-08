@@ -20,16 +20,6 @@ import {
 } from "@/constants/default"
 import { GLOBAL_TRANSLATION_SETTINGS_ID } from "@/constants/global-settings"
 import { resolveNewTranslationAutoContextMode } from "@/lib/translation/auto-context-defaults"
-import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
-
-export function detachExtractionsInStore(extractionIds: string[]) {
-  const extractionStore = useExtractionDataStore.getState()
-  for (const id of extractionIds) {
-    const extraction = extractionStore.data[id]
-    if (!extraction) continue
-    extractionStore.upsertData(id, { ...extraction, ownerTranslationId: null, updatedAt: new Date() })
-  }
-}
 
 export interface TranslationDataStore {
   currentId: string | null
@@ -163,16 +153,9 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
         },
       }))
     }
-    if (result.extractions.length) {
-      const extractionStore = useExtractionDataStore.getState()
-      for (const extraction of result.extractions) {
-        extractionStore.upsertData(extraction.id, extraction)
-      }
-    }
   },
   deleteTranslationDb: async (projectId, translationId) => {
-    const detachedExtractionIds = await deleteDB(projectId, translationId)
-    detachExtractionsInStore(detachedExtractionIds)
+    await deleteDB(projectId, translationId)
     set(state => {
       const newData = { ...state.data }
       delete newData[translationId]
@@ -183,14 +166,8 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     }
   },
   moveTranslationDb: async (sourceProjectId, targetProjectId, translationId) => {
-    const detachedExtractionIds = await moveDB(sourceProjectId, targetProjectId, translationId)
-    const data = get().data[translationId]
-    if (data) {
-      set(state => ({
-        data: { ...state.data, [translationId]: { ...data, projectId: targetProjectId, updatedAt: new Date() } }
-      }))
-    }
-    detachExtractionsInStore(detachedExtractionIds)
+    const translation = await moveDB(sourceProjectId, targetProjectId, translationId)
+    set(state => ({ data: { ...state.data, [translationId]: translation } }))
   },
 
   // setters implementation

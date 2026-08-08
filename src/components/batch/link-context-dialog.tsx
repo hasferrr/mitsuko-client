@@ -205,43 +205,12 @@ export function LinkContextDialog({
           ? [{ translationId, extractionId }]
           : []
       })
-      const linkedExtractionIds = links.map(link => link.extractionId)
-      if (new Set(linkedExtractionIds).size !== linkedExtractionIds.length) {
-        toast.error("Each extraction can only be linked to one translation.")
-        return
-      }
 
       const currentTranslations = useTranslationDataStore.getState().data
-      const currentExtractions = useExtractionDataStore.getState().data
-      const ownershipConflict = links.find(({ translationId, extractionId }) => {
-        const ownerId = currentExtractions[extractionId]?.ownerTranslationId
-        return ownerId && ownerId !== translationId && !selectedTranslationIds.has(ownerId)
-      })
-      if (ownershipConflict) {
-        const extraction = currentExtractions[ownershipConflict.extractionId]
-        const owner = extraction.ownerTranslationId ? currentTranslations[extraction.ownerTranslationId] : null
-        toast.error(`${extraction.title || "This extraction"} is already linked to ${owner?.title || "another translation"}.`)
-        return
-      }
-
       const linkedIdByTranslation = new Map(links.map(link => [link.translationId, link.extractionId]))
-      const plannedOwnerByExtraction = new Map(
-        Object.values(currentExtractions).map(extraction => [extraction.id, extraction.ownerTranslationId]),
-      )
-      for (const extraction of Object.values(currentExtractions)) {
-        if (
-          extraction.ownerTranslationId
-          && selectedTranslationIds.has(extraction.ownerTranslationId)
-          && linkedIdByTranslation.get(extraction.ownerTranslationId) !== extraction.id
-        ) {
-          plannedOwnerByExtraction.set(extraction.id, null)
-        }
-      }
-      links.forEach(({ translationId, extractionId }) => {
-        plannedOwnerByExtraction.set(extractionId, translationId)
-      })
 
       let previousExtractionId = startingExtractionId
+      const previousIdByExtractionId = new Map<string, string | null>()
       const translationChanges = new Map<string, {
         autoContextMode: "create-new" | "use-existing"
         autoContextExtractionId: string | null
@@ -251,11 +220,15 @@ export function LinkContextDialog({
       for (const translationId of translationIds) {
         const linkedId = linkedIdByTranslation.get(translationId)
         if (linkedId) {
+          const linkedPreviousId = previousIdByExtractionId.has(linkedId)
+            ? previousIdByExtractionId.get(linkedId) ?? null
+            : previousExtractionId
+          previousIdByExtractionId.set(linkedId, linkedPreviousId)
           translationChanges.set(translationId, {
             autoContextMode: "use-existing",
             autoContextExtractionId: linkedId,
-            autoContextPreviousMode: previousExtractionId ? "selected" : "none",
-            autoContextPreviousExtractionId: previousExtractionId,
+            autoContextPreviousMode: linkedPreviousId ? "selected" : "none",
+            autoContextPreviousExtractionId: linkedPreviousId,
           })
         } else if (selectedTranslationIds.has(translationId)) {
           translationChanges.set(translationId, {
@@ -269,20 +242,10 @@ export function LinkContextDialog({
         const projectedExtractionId = selectedTranslationIds.has(translationId)
           ? linkedId
           : currentTranslations[translationId]?.autoContextExtractionId
-        previousExtractionId = projectedExtractionId
-          && plannedOwnerByExtraction.get(projectedExtractionId) === translationId
-          ? projectedExtractionId
-          : null
+        previousExtractionId = projectedExtractionId ?? null
       }
 
-      const extractionUpdates = Object.values(currentExtractions).flatMap(extraction => {
-        const plannedOwnerId = plannedOwnerByExtraction.get(extraction.id) ?? null
-        return extraction.ownerTranslationId !== plannedOwnerId
-          ? [{ id: extraction.id, ownerTranslationId: plannedOwnerId }]
-          : []
-      })
       await updateBatchAutoContextLinksDb({
-        extractions: extractionUpdates,
         translations: [...translationChanges].map(([id, changes]) => ({ id, changes })),
       })
 

@@ -85,7 +85,3 @@ export function isExtractionUsable(
 ): extraction is Extraction {
   return getExtractionValidationProblem(extraction, projectId, runningIds) === null
 }
-
-export function isAutoContextOwnedBy(extraction: Extraction, translationId: string): boolean {
-  return extraction.ownerTranslationId === translationId
-}
