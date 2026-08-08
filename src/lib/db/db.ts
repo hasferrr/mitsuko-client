@@ -624,8 +624,6 @@ export class MyDatabase extends Dexie {
         project.isBatchAutoContextEnabled = false
         project.batchAutoContextStartingExtractionId = null
       })
-    })
-    this.version(36).stores({}).upgrade(async tx => {
       await tx.table('extractions').toCollection().modify((extraction: Record<string, unknown>) => {
         delete extraction.ownerTranslationId
       })

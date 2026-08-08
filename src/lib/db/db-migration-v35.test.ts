@@ -12,23 +12,30 @@ afterEach(async () => {
 })
 
 describe("version 35 batch Auto Context migration", () => {
-  test("defaults existing projects to disabled with no Starting Context", async () => {
+  test("defaults project settings and removes reverse Extraction ownership", async () => {
     const name = `migration-v35-${crypto.randomUUID()}`
     databaseNames.push(name)
     const legacy = new Dexie(name)
     legacy.version(34).stores({
       projects: "id, name, createdAt, updatedAt, defaultTranslationSettingsId, defaultExtractionSettingsId",
+      extractions: "id, projectId, settingsId, episodeNumber, createdAt, updatedAt",
     })
     await legacy.open()
     await legacy.table("projects").bulkAdd([
       { id: "batch-project", isBatch: true },
       { id: "single-project", isBatch: false },
     ])
+    await legacy.table("extractions").add({
+      id: "extraction-1",
+      projectId: "batch-project",
+      ownerTranslationId: "translation-1",
+    })
     legacy.close()
 
     const upgraded = new MyDatabase(name)
     await upgraded.open()
     const projects = await upgraded.projects.toArray()
+    const extraction = await upgraded.extractions.get("extraction-1") as unknown as Record<string, unknown>
 
     expect(projects.map(project => ({
       id: project.id,
@@ -38,6 +45,7 @@ describe("version 35 batch Auto Context migration", () => {
       { id: "batch-project", enabled: false, startingId: null },
       { id: "single-project", enabled: false, startingId: null },
     ])
+    expect(extraction).not.toHaveProperty("ownerTranslationId")
     upgraded.close()
   })
 })
