@@ -172,7 +172,6 @@ export function SortableBatchFile({
                 <Button
                   variant="ghost"
                   size="sm"
-                  disabled={isProcessing}
                   onClick={(event) => {
                     event.stopPropagation()
                     onPreviewAutoContext(batchFile.id)
