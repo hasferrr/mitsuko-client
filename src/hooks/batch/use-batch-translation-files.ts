@@ -44,6 +44,7 @@ export const useBatchTranslationFiles = (
         linkedExtraction,
         runningExtractionIds: isExtractingSet,
         isTranslating,
+        autoContextEnabled: currentProject.isBatchAutoContextEnabled,
         recordedStage: autoContextStageMap[id],
       })
 

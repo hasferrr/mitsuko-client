@@ -65,6 +65,7 @@ describe("getEffectiveBatchTranslationStage", () => {
       linkedExtraction,
       runningExtractionIds: new Set([linkedExtraction.id]),
       isTranslating: false,
+      autoContextEnabled: true,
     })).toBe("extracting-context")
   })
 
@@ -79,6 +80,7 @@ describe("getEffectiveBatchTranslationStage", () => {
       linkedExtraction: extraction("translation-1-extraction"),
       runningExtractionIds: new Set(),
       isTranslating: false,
+      autoContextEnabled: true,
       recordedStage,
     })).toBe(recordedStage)
   })
@@ -91,8 +93,23 @@ describe("getEffectiveBatchTranslationStage", () => {
       linkedExtraction: extraction("translation-1-extraction"),
       runningExtractionIds: new Set(),
       isTranslating: true,
+      autoContextEnabled: true,
       recordedStage: "queued-translation",
     })).toBe("translating")
+  })
+
+  test("ignores linked extraction activity when batch Auto Context is disabled", () => {
+    const item = translation("translation-1")
+    const linkedExtraction = extraction("translation-1-extraction")
+
+    expect(getEffectiveBatchTranslationStage({
+      translation: item,
+      linkedExtraction,
+      runningExtractionIds: new Set([linkedExtraction.id]),
+      isTranslating: false,
+      autoContextEnabled: false,
+      recordedStage: "extracting-context",
+    })).toBeUndefined()
   })
 })
 
@@ -250,5 +267,24 @@ describe("buildBatchAutoContextPlan", () => {
     })
 
     expect(plan.startingContextProblem).toBe("Starting Context is also linked to a Translation in this batch.")
+  })
+
+  test("creates a local replacement for a foreign-project linked extraction", () => {
+    const first = translation("translation-1")
+    const foreign = extraction("translation-1-extraction", { projectId: "project-2" })
+
+    const plan = buildBatchAutoContextPlan({
+      projectId: "project-1",
+      translationIds: [first.id],
+      translations: { [first.id]: first },
+      extractions: { [foreign.id]: foreign },
+      startingExtractionId: null,
+    })
+
+    expect(plan.items).toEqual([
+      { translationId: first.id, extractionId: foreign.id, action: "create" },
+    ])
+    expect(plan.createCount).toBe(1)
+    expect(plan.rerunCount).toBe(0)
   })
 })

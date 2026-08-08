@@ -637,11 +637,13 @@ export default function useBatchTranslationHandler({
     wakeTranslationWaitersRef.current?.()
     setQueueSet(new Set())
     setAutoContextStageMap({})
-    const runningAutoContextIds = getRunningBatchAutoContextExtractionIds({
-      translationIds: batchFiles.map(file => file.id),
-      translations: useTranslationDataStore.getState().data,
-      runningIds: useExtractionStore.getState().isExtractingSet,
-    })
+    const runningAutoContextIds = currentProject?.isBatchAutoContextEnabled
+      ? getRunningBatchAutoContextExtractionIds({
+          translationIds: batchFiles.map(file => file.id),
+          translations: useTranslationDataStore.getState().data,
+          runningIds: useExtractionStore.getState().isExtractingSet,
+        })
+      : []
     if (currentExtractionIdRef.current) runningAutoContextIds.push(currentExtractionIdRef.current)
     new Set(runningAutoContextIds).forEach(id => void baseStopExtraction(id))
     currentExtractionIdRef.current = null

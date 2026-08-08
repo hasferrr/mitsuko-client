@@ -23,15 +23,18 @@ export function getEffectiveBatchTranslationStage({
   linkedExtraction,
   runningExtractionIds,
   isTranslating,
+  autoContextEnabled,
   recordedStage,
 }: {
   translation: Translation | undefined
   linkedExtraction: Extraction | null
   runningExtractionIds: Set<string>
   isTranslating: boolean
+  autoContextEnabled: boolean
   recordedStage?: BatchTranslationStage
 }): BatchTranslationStage | undefined {
   if (isTranslating) return "translating"
+  if (!autoContextEnabled) return undefined
   if (
     translation
     && linkedExtraction?.id === translation.autoContextExtractionId
@@ -97,6 +100,7 @@ export function getBatchAutoContextAction({
   regenerate: boolean
 }): BatchAutoContextAction {
   if (!extraction) return "create"
+  if (extraction.projectId !== projectId) return "create"
   if (regenerate || upstreamChanged) return "rerun"
   if (recordedPreviousExtractionId !== (expectedPreviousExtraction?.id ?? null)) return "rerun"
   if (!isExtractionUsable(extraction, projectId, runningIds)) return "rerun"
