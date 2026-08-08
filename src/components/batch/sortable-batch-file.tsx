@@ -76,10 +76,9 @@ export function SortableBatchFile({
       ? "Translated Text"
       : "Original + Translated"
   const hasAutoContextError = batchFile.translationStage === "context-error"
-  const linkedExtractionIsEmptyOrDraft = linkedExtraction
-    ? getEffectiveExtractionStatus(linkedExtraction, isExtractingSet) === "idle"
-      || cleanExtractionContent(linkedExtraction.contextResult) === ""
-    : false
+  const linkedExtractionIsEmptyOrDraft = !linkedExtraction
+    || getEffectiveExtractionStatus(linkedExtraction, isExtractingSet) === "idle"
+    || cleanExtractionContent(linkedExtraction.contextResult) === ""
 
   return (
     <Card
@@ -167,7 +166,7 @@ export function SortableBatchFile({
               {batchFile.translationStage === "context-error" ? "Context error" : "Error"}
             </Badge>
           )}
-          {batchFile.linkedExtractionId && onPreviewAutoContext && (
+          {onPreviewAutoContext && (
             <Tooltip delayDuration={50}>
               <TooltipTrigger asChild>
                 <Button

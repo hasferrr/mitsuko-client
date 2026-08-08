@@ -20,7 +20,7 @@ interface BatchAutoContextPreviewDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   translation: Translation
-  extraction: Extraction
+  extraction: Extraction | null
   contextDocument: string
   autoContextEnabled: boolean
   runningIds: Set<string>
@@ -37,9 +37,9 @@ export function BatchAutoContextPreviewDialog({
   runningIds,
   onOpenExtraction,
 }: BatchAutoContextPreviewDialogProps) {
-  const isRunning = runningIds.has(extraction.id)
-  const isOwned = isAutoContextOwnedBy(extraction, translation.id)
-  const extractionProblem = isRunning
+  const isRunning = extraction ? runningIds.has(extraction.id) : false
+  const isOwned = extraction ? isAutoContextOwnedBy(extraction, translation.id) : false
+  const extractionProblem = !extraction || isRunning
     ? null
     : getExtractionProblem(extraction, translation.projectId, runningIds)
   const preview = getBatchAutoContextPreview({
@@ -76,12 +76,14 @@ export function BatchAutoContextPreviewDialog({
               <div className="min-w-0">
                 <div className="text-sm font-medium">Preview final context</div>
                 <div className="line-clamp-1 break-all text-xs text-muted-foreground">
-                  {extraction.title || "Untitled context"}
-                  {extraction.episodeNumber && ` · Episode ${extraction.episodeNumber}`}
+                  {extraction?.title || "Context will be generated when translation starts"}
+                  {extraction?.episodeNumber && ` · Episode ${extraction.episodeNumber}`}
                 </div>
               </div>
             </div>
-            <ExtractionBadges extraction={extraction} runningIds={runningIds} size="compact" className="shrink-0" />
+            {extraction && (
+              <ExtractionBadges extraction={extraction} runningIds={runningIds} size="compact" className="shrink-0" />
+            )}
           </div>
 
           {preview ? (
@@ -96,16 +98,18 @@ export function BatchAutoContextPreviewDialog({
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => {
-              onOpenChange(false)
-              onOpenExtraction(extraction.id)
-            }}
-          >
-            <ExternalLink data-icon="inline-start" />
-            Open Linked Extraction
-          </Button>
+          {extraction && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                onOpenChange(false)
+                onOpenExtraction(extraction.id)
+              }}
+            >
+              <ExternalLink data-icon="inline-start" />
+              Open Linked Extraction
+            </Button>
+          )}
           <Button onClick={() => onOpenChange(false)}>Done</Button>
         </DialogFooter>
       </DialogContent>

@@ -866,7 +866,7 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
         </DialogContent>
       </Dialog>
 
-      {previewAutoContextTranslation && previewAutoContextExtraction && (
+      {previewAutoContextTranslation && (
         <BatchAutoContextPreviewDialog
           open={!!previewAutoContextId}
           onOpenChange={(open) => {
