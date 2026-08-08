@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test"
 import {
   buildBatchAutoContextPlan,
   findOwnedAutoContextExtraction,
+  getEffectiveBatchTranslationStage,
 } from "@/lib/translation/batch-auto-context"
 import { Extraction, Translation } from "@/types/project"
 
@@ -50,6 +51,76 @@ describe("findOwnedAutoContextExtraction", () => {
     }
 
     expect(findOwnedAutoContextExtraction(item, ["manual", "owned"], extractions)?.id).toBe("owned")
+  })
+})
+
+describe("getEffectiveBatchTranslationStage", () => {
+  test("restores the extracting stage from the active linked extraction after a remount", () => {
+    const item = translation("translation-1")
+    const linkedExtraction = extraction("translation-1-extraction", item.id, {
+      status: "idle",
+      contextResult: "",
+      completedAt: null,
+    })
+
+    expect(getEffectiveBatchTranslationStage({
+      translation: item,
+      linkedExtraction,
+      runningExtractionIds: new Set([linkedExtraction.id]),
+      isTranslating: false,
+    })).toBe("extracting-context")
+  })
+
+  test("does not attribute an active manually linked extraction to the batch item", () => {
+    const item = translation("translation-1", { autoContextExtractionId: "manual" })
+    const linkedExtraction = extraction("manual", null)
+
+    expect(getEffectiveBatchTranslationStage({
+      translation: item,
+      linkedExtraction,
+      runningExtractionIds: new Set([linkedExtraction.id]),
+      isTranslating: false,
+    })).toBeUndefined()
+  })
+
+  test.each([
+    "waiting-context",
+    "queued-translation",
+  ] as const)("restores the recorded %s stage after a remount", (recordedStage) => {
+    const item = translation("translation-1")
+
+    expect(getEffectiveBatchTranslationStage({
+      translation: item,
+      linkedExtraction: extraction("translation-1-extraction", item.id),
+      runningExtractionIds: new Set(),
+      isTranslating: false,
+      recordedStage,
+    })).toBe(recordedStage)
+  })
+
+  test("prefers authoritative translation activity over a recorded waiting stage", () => {
+    const item = translation("translation-1")
+
+    expect(getEffectiveBatchTranslationStage({
+      translation: item,
+      linkedExtraction: extraction("translation-1-extraction", item.id),
+      runningExtractionIds: new Set(),
+      isTranslating: true,
+      recordedStage: "queued-translation",
+    })).toBe("translating")
+  })
+
+  test("prefers authoritative extraction activity over a recorded waiting stage", () => {
+    const item = translation("translation-1")
+    const linkedExtraction = extraction("translation-1-extraction", item.id)
+
+    expect(getEffectiveBatchTranslationStage({
+      translation: item,
+      linkedExtraction,
+      runningExtractionIds: new Set([linkedExtraction.id]),
+      isTranslating: false,
+      recordedStage: "waiting-context",
+    })).toBe("extracting-context")
   })
 })
 

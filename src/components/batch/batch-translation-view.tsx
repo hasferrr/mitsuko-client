@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
@@ -64,6 +64,11 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
+import {
+  EMPTY_BATCH_TRANSLATION_QUEUE,
+  EMPTY_BATCH_TRANSLATION_STAGE_MAP,
+  useBatchTranslationRuntimeStore,
+} from "@/stores/services/use-batch-translation-runtime-store"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { LinkContextDialog } from "./link-context-dialog"
 import { CopySharedSettingsDialog } from "./copy-shared-settings-dialog"
@@ -132,8 +137,6 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
   const [previewId, setPreviewId] = useState<string | null>(null)
   const [previewAutoContextId, setPreviewAutoContextId] = useState<string | null>(null)
   const [previewExtractionId, setPreviewExtractionId] = useState<string | null>(null)
-  const [queueSet, setQueueSet] = useState<Set<string>>(new Set())
-  const [autoContextStageMap, setAutoContextStageMap] = useState<Record<string, BatchTranslationStage>>({})
   const [deleteFileId, setDeleteFileId] = useState<string | null>(null)
 
   // Dialogs
@@ -154,6 +157,21 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
   const createTranslationForBatch = useProjectStore((state) => state.createTranslationForBatch)
   const removeTranslationFromBatch = useProjectStore((state) => state.removeTranslationFromBatch)
   const setHasChanges = useSetUnsavedChanges()
+  const projectId = currentProject?.id
+  const queueSet = useBatchTranslationRuntimeStore((state) => (
+    projectId ? state.queueSetMap[projectId] ?? EMPTY_BATCH_TRANSLATION_QUEUE : EMPTY_BATCH_TRANSLATION_QUEUE
+  ))
+  const autoContextStageMap = useBatchTranslationRuntimeStore((state) => (
+    projectId ? state.stageMap[projectId] ?? EMPTY_BATCH_TRANSLATION_STAGE_MAP : EMPTY_BATCH_TRANSLATION_STAGE_MAP
+  ))
+  const setRuntimeQueueSet = useBatchTranslationRuntimeStore((state) => state.setQueueSet)
+  const setRuntimeStageMap = useBatchTranslationRuntimeStore((state) => state.setStageMap)
+  const setQueueSet = useCallback<React.Dispatch<React.SetStateAction<Set<string>>>>((value) => {
+    if (projectId) setRuntimeQueueSet(projectId, value)
+  }, [projectId, setRuntimeQueueSet])
+  const setAutoContextStageMap = useCallback<React.Dispatch<React.SetStateAction<Record<string, BatchTranslationStage>>>>((value) => {
+    if (projectId) setRuntimeStageMap(projectId, value)
+  }, [projectId, setRuntimeStageMap])
 
   const [localOrder, setLocalOrder] = useState<string[]>(currentProject?.translations ?? [])
 

@@ -1,4 +1,5 @@
 import { getExtractionValidationProblem, isExtractionUsable } from "@/lib/extraction/status"
+import { BatchTranslationStage } from "@/types/batch"
 import { Extraction, Translation } from "@/types/project"
 
 export type BatchAutoContextAction = "create" | "rerun" | "reuse"
@@ -15,6 +16,30 @@ export interface BatchAutoContextPlan {
   rerunCount: number
   reuseCount: number
   startingContextProblem: string | null
+}
+
+export function getEffectiveBatchTranslationStage({
+  translation,
+  linkedExtraction,
+  runningExtractionIds,
+  isTranslating,
+  recordedStage,
+}: {
+  translation: Translation | undefined
+  linkedExtraction: Extraction | null
+  runningExtractionIds: Set<string>
+  isTranslating: boolean
+  recordedStage?: BatchTranslationStage
+}): BatchTranslationStage | undefined {
+  if (isTranslating) return "translating"
+  if (
+    translation
+    && linkedExtraction?.ownerTranslationId === translation.id
+    && runningExtractionIds.has(linkedExtraction.id)
+  ) {
+    return "extracting-context"
+  }
+  return recordedStage
 }
 
 interface BatchAutoContextPlanInput {
