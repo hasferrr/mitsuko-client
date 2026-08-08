@@ -587,7 +587,7 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
                   <FieldContent>
                     <FieldTitle>Max Concurrent Translations</FieldTitle>
                     <FieldDescription>
-                      The serial extraction worker runs in addition to these slots. Max {MAX_BATCH_CONCURRENT_OPERATION}.
+                      Files processed simultaneously (max 5)
                     </FieldDescription>
                   </FieldContent>
                   <div className="flex shrink-0 items-center gap-1 self-center">
