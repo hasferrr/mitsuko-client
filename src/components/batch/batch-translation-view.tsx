@@ -112,11 +112,11 @@ function BatchRunSummary({
       <AlertDescription>
         <ul className="list-disc pl-4">
           <li>Starting Context: {summary.startingContextTitle ?? "None"}</li>
-          <li>{summary.createCount} extraction{summary.createCount === 1 ? "" : "s"} to create</li>
-          <li>{summary.rerunCount} extraction{summary.rerunCount === 1 ? "" : "s"} to rerun</li>
-          <li>{summary.reuseCount} extraction{summary.reuseCount === 1 ? "" : "s"} to reuse</li>
+          <li>{summary.createCount} context{summary.createCount === 1 ? "" : "s"} to create</li>
+          <li>{summary.rerunCount} context{summary.rerunCount === 1 ? "" : "s"} to rerun</li>
+          <li>{summary.reuseCount} context{summary.reuseCount === 1 ? "" : "s"} to reuse</li>
           <li>{summary.translationCount} translation{summary.translationCount === 1 ? "" : "s"} to process</li>
-          <li>Extractions run serially; up to {concurrentTranslations} translations run concurrently</li>
+          <li>Contexts run serially; up to {concurrentTranslations} translations run concurrently</li>
         </ul>
       </AlertDescription>
     </Alert>
