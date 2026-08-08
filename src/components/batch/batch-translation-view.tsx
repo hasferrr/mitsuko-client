@@ -65,7 +65,7 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { PopulateContextDialog } from "./populate-context-dialog"
+import { LinkContextDialog } from "./link-context-dialog"
 import { CopySharedSettingsDialog } from "./copy-shared-settings-dialog"
 import { DownloadSection } from "@/components/shared/download-section"
 import JSZip from "jszip"
@@ -678,12 +678,11 @@ export function BatchTranslationView({ settingsId }: { settingsId: string }) {
       </div>
 
       {/* Dialogs */}
-      <PopulateContextDialog
+      <LinkContextDialog
         open={isLinkContextDialogOpen}
         onOpenChange={setIsLinkContextDialogOpen}
         translationBatchFiles={batchFiles}
         extractionBatchFiles={extractionBatchFiles}
-        mode="link"
         startingExtractionId={currentProject?.batchAutoContextStartingExtractionId}
       />
 

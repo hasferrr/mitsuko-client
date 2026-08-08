@@ -10,36 +10,29 @@ import { ChevronLeft, ChevronRight, ArrowLeft, Loader2, ListChecks, ListX, ListR
 import type { BatchFile } from "@/types/batch"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
-import { useSettingsStore } from "@/stores/settings/use-settings-store"
-import { getContent } from "@/lib/parser/parser"
-import { removeDoneTag } from "@/lib/utils/done-tag"
 
-interface PopulateContextDialogProps {
+interface LinkContextDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   translationBatchFiles: BatchFile[]
   extractionBatchFiles: BatchFile[]
-  mode?: "populate" | "link"
   startingExtractionId?: string | null
 }
 
 const UNLINK_CONTEXT_VALUE = "__unlink-context__"
 
-export function PopulateContextDialog({
+export function LinkContextDialog({
   open,
   onOpenChange,
   translationBatchFiles,
   extractionBatchFiles,
-  mode = "populate",
   startingExtractionId = null,
-}: PopulateContextDialogProps) {
-  const isLinkMode = mode === "link"
+}: LinkContextDialogProps) {
   const translationIds = useMemo(() => translationBatchFiles.map(b => b.id), [translationBatchFiles])
-  const mappingExtractionBatchFiles = useMemo(() => {
-    return isLinkMode
-      ? extractionBatchFiles.filter(file => file.id !== startingExtractionId)
-      : extractionBatchFiles
-  }, [extractionBatchFiles, isLinkMode, startingExtractionId])
+  const mappingExtractionBatchFiles = useMemo(
+    () => extractionBatchFiles.filter(file => file.id !== startingExtractionId),
+    [extractionBatchFiles, startingExtractionId],
+  )
   const extractionIds = useMemo(
     () => mappingExtractionBatchFiles.map(b => b.id),
     [mappingExtractionBatchFiles],
@@ -50,8 +43,6 @@ export function PopulateContextDialog({
   const translationStore = useTranslationDataStore(s => s.data)
   const updateBatchAutoContextLinksDb = useTranslationDataStore(s => s.updateBatchAutoContextLinksDb)
   const getExtractionsDb = useExtractionDataStore(s => s.getExtractionsDb)
-  const extractionStore = useExtractionDataStore(s => s.data)
-  const setBasicSettingsValue = useSettingsStore(s => s.setBasicSettingsValue)
 
   // Local state
   const [mapping, setMapping] = useState<Record<string, string | null>>({})
@@ -85,7 +76,7 @@ export function PopulateContextDialog({
         for (let i = 0; i < translationIds.length; i++) {
           const tId = translationIds[i]
           const linkedId = loadedTranslations[tId]?.autoContextExtractionId
-          const eId = isLinkMode && linkedId && extractionIds.includes(linkedId)
+          const eId = linkedId && extractionIds.includes(linkedId)
             ? linkedId
             : extractionIds[i] ?? null
           initMap[tId] = eId
@@ -94,7 +85,7 @@ export function PopulateContextDialog({
         setMapping(initMap)
         setSelected(initSel)
       } catch (e) {
-        console.error(`Failed to load items for ${isLinkMode ? "Link" : "Populate"} Context dialog`, e)
+        console.error("Failed to load items for Link Context dialog", e)
         toast.error("Failed to load items")
       } finally {
         setIsLoading(false)
@@ -103,7 +94,7 @@ export function PopulateContextDialog({
     load()
     return () => { cancelled = true }
     // oxlint-disable-next-line react/exhaustive-deps
-  }, [open, isLinkMode, translationIds.join("|"), extractionIds.join("|")])
+  }, [open, translationIds.join("|"), extractionIds.join("|")])
 
   const handleShift = (tId: string, dir: -1 | 1) => {
     const cur = mapping[tId]
@@ -194,135 +185,110 @@ export function PopulateContextDialog({
   const handleApply = async () => {
     setIsApplying(true)
     try {
-      if (isLinkMode) {
-        const selectedTranslationIds = new Set(
-          translationIds.filter(translationId => selected[translationId]),
-        )
-        const links = translationIds.flatMap(translationId => {
-          const extractionId = mapping[translationId]
-          return selected[translationId] && extractionId
-            ? [{ translationId, extractionId }]
-            : []
-        })
-        const linkedExtractionIds = links.map(link => link.extractionId)
-        if (new Set(linkedExtractionIds).size !== linkedExtractionIds.length) {
-          toast.error("Each extraction can only be linked to one translation.")
-          return
-        }
-
-        const currentTranslations = useTranslationDataStore.getState().data
-        const currentExtractions = useExtractionDataStore.getState().data
-        const ownershipConflict = links.find(({ translationId, extractionId }) => {
-          const ownerId = currentExtractions[extractionId]?.ownerTranslationId
-          return ownerId && ownerId !== translationId && !selectedTranslationIds.has(ownerId)
-        })
-        if (ownershipConflict) {
-          const extraction = currentExtractions[ownershipConflict.extractionId]
-          const owner = extraction.ownerTranslationId ? currentTranslations[extraction.ownerTranslationId] : null
-          toast.error(`${extraction.title || "This extraction"} is already linked to ${owner?.title || "another translation"}.`)
-          return
-        }
-
-        const linkedIdByTranslation = new Map(links.map(link => [link.translationId, link.extractionId]))
-        const plannedOwnerByExtraction = new Map(
-          Object.values(currentExtractions).map(extraction => [extraction.id, extraction.ownerTranslationId]),
-        )
-        for (const extraction of Object.values(currentExtractions)) {
-          if (
-            extraction.ownerTranslationId
-            && selectedTranslationIds.has(extraction.ownerTranslationId)
-            && linkedIdByTranslation.get(extraction.ownerTranslationId) !== extraction.id
-          ) {
-            plannedOwnerByExtraction.set(extraction.id, null)
-          }
-        }
-        links.forEach(({ translationId, extractionId }) => {
-          plannedOwnerByExtraction.set(extractionId, translationId)
-        })
-
-        let previousExtractionId = startingExtractionId
-        const translationChanges = new Map<string, {
-          autoContextMode: "create-new" | "use-existing"
-          autoContextExtractionId: string | null
-          autoContextPreviousMode: "selected" | "none"
-          autoContextPreviousExtractionId: string | null
-        }>()
-        for (const translationId of translationIds) {
-          const linkedId = linkedIdByTranslation.get(translationId)
-          if (linkedId) {
-            translationChanges.set(translationId, {
-              autoContextMode: "use-existing",
-              autoContextExtractionId: linkedId,
-              autoContextPreviousMode: previousExtractionId ? "selected" : "none",
-              autoContextPreviousExtractionId: previousExtractionId,
-            })
-          } else if (selectedTranslationIds.has(translationId)) {
-            translationChanges.set(translationId, {
-              autoContextMode: "create-new",
-              autoContextExtractionId: null,
-              autoContextPreviousMode: previousExtractionId ? "selected" : "none",
-              autoContextPreviousExtractionId: previousExtractionId,
-            })
-          }
-
-          const projectedExtractionId = selectedTranslationIds.has(translationId)
-            ? linkedId
-            : currentTranslations[translationId]?.autoContextExtractionId
-          previousExtractionId = projectedExtractionId
-            && plannedOwnerByExtraction.get(projectedExtractionId) === translationId
-            ? projectedExtractionId
-            : null
-        }
-
-        const extractionUpdates = Object.values(currentExtractions).flatMap(extraction => {
-          const plannedOwnerId = plannedOwnerByExtraction.get(extraction.id) ?? null
-          return extraction.ownerTranslationId !== plannedOwnerId
-            ? [{ id: extraction.id, ownerTranslationId: plannedOwnerId }]
-            : []
-        })
-        await updateBatchAutoContextLinksDb({
-          extractions: extractionUpdates,
-          translations: [...translationChanges].map(([id, changes]) => ({ id, changes })),
-        })
-
-        const unlinkedCount = [...selectedTranslationIds].filter(translationId => !linkedIdByTranslation.has(translationId)).length
-        if (links.length > 0 && unlinkedCount > 0) {
-          toast.success(`Updated context links for ${links.length + unlinkedCount} translations`)
-        } else if (links.length > 0) {
-          toast.success(`Linked context for ${links.length} translation${links.length === 1 ? "" : "s"}`)
-        } else if (unlinkedCount > 0) {
-          toast.success(`Unlinked context from ${unlinkedCount} translation${unlinkedCount === 1 ? "" : "s"}`)
-        } else {
-          toast.message("Nothing to update")
-        }
-        onOpenChange(false)
+      const selectedTranslationIds = new Set(
+        translationIds.filter(translationId => selected[translationId]),
+      )
+      const links = translationIds.flatMap(translationId => {
+        const extractionId = mapping[translationId]
+        return selected[translationId] && extractionId
+          ? [{ translationId, extractionId }]
+          : []
+      })
+      const linkedExtractionIds = links.map(link => link.extractionId)
+      if (new Set(linkedExtractionIds).size !== linkedExtractionIds.length) {
+        toast.error("Each extraction can only be linked to one translation.")
         return
       }
 
-      let applied = 0
-      let empties = 0
-      for (const tId of translationIds) {
-        if (!selected[tId]) continue
-        const eId = mapping[tId]
-        if (!eId) continue
-        const extraction = extractionStore[eId]
-        const translation = translationStore[tId]
-        if (!translation) continue
-        const bsId = translation.settingsId
-        const context = removeDoneTag(getContent(extraction?.contextResult ?? "")).trim()
-        if (!context) empties += 1
-        setBasicSettingsValue(bsId, "contextDocument", context)
-        applied += 1
+      const currentTranslations = useTranslationDataStore.getState().data
+      const currentExtractions = useExtractionDataStore.getState().data
+      const ownershipConflict = links.find(({ translationId, extractionId }) => {
+        const ownerId = currentExtractions[extractionId]?.ownerTranslationId
+        return ownerId && ownerId !== translationId && !selectedTranslationIds.has(ownerId)
+      })
+      if (ownershipConflict) {
+        const extraction = currentExtractions[ownershipConflict.extractionId]
+        const owner = extraction.ownerTranslationId ? currentTranslations[extraction.ownerTranslationId] : null
+        toast.error(`${extraction.title || "This extraction"} is already linked to ${owner?.title || "another translation"}.`)
+        return
       }
-      if (applied > 0) {
-        toast.success(`Populated context for ${applied} translation${applied === 1 ? "" : "s"}${empties ? ` (${empties} empty)` : ""}`)
+
+      const linkedIdByTranslation = new Map(links.map(link => [link.translationId, link.extractionId]))
+      const plannedOwnerByExtraction = new Map(
+        Object.values(currentExtractions).map(extraction => [extraction.id, extraction.ownerTranslationId]),
+      )
+      for (const extraction of Object.values(currentExtractions)) {
+        if (
+          extraction.ownerTranslationId
+          && selectedTranslationIds.has(extraction.ownerTranslationId)
+          && linkedIdByTranslation.get(extraction.ownerTranslationId) !== extraction.id
+        ) {
+          plannedOwnerByExtraction.set(extraction.id, null)
+        }
+      }
+      links.forEach(({ translationId, extractionId }) => {
+        plannedOwnerByExtraction.set(extractionId, translationId)
+      })
+
+      let previousExtractionId = startingExtractionId
+      const translationChanges = new Map<string, {
+        autoContextMode: "create-new" | "use-existing"
+        autoContextExtractionId: string | null
+        autoContextPreviousMode: "selected" | "none"
+        autoContextPreviousExtractionId: string | null
+      }>()
+      for (const translationId of translationIds) {
+        const linkedId = linkedIdByTranslation.get(translationId)
+        if (linkedId) {
+          translationChanges.set(translationId, {
+            autoContextMode: "use-existing",
+            autoContextExtractionId: linkedId,
+            autoContextPreviousMode: previousExtractionId ? "selected" : "none",
+            autoContextPreviousExtractionId: previousExtractionId,
+          })
+        } else if (selectedTranslationIds.has(translationId)) {
+          translationChanges.set(translationId, {
+            autoContextMode: "create-new",
+            autoContextExtractionId: null,
+            autoContextPreviousMode: previousExtractionId ? "selected" : "none",
+            autoContextPreviousExtractionId: previousExtractionId,
+          })
+        }
+
+        const projectedExtractionId = selectedTranslationIds.has(translationId)
+          ? linkedId
+          : currentTranslations[translationId]?.autoContextExtractionId
+        previousExtractionId = projectedExtractionId
+          && plannedOwnerByExtraction.get(projectedExtractionId) === translationId
+          ? projectedExtractionId
+          : null
+      }
+
+      const extractionUpdates = Object.values(currentExtractions).flatMap(extraction => {
+        const plannedOwnerId = plannedOwnerByExtraction.get(extraction.id) ?? null
+        return extraction.ownerTranslationId !== plannedOwnerId
+          ? [{ id: extraction.id, ownerTranslationId: plannedOwnerId }]
+          : []
+      })
+      await updateBatchAutoContextLinksDb({
+        extractions: extractionUpdates,
+        translations: [...translationChanges].map(([id, changes]) => ({ id, changes })),
+      })
+
+      const unlinkedCount = [...selectedTranslationIds].filter(translationId => !linkedIdByTranslation.has(translationId)).length
+      if (links.length > 0 && unlinkedCount > 0) {
+        toast.success(`Updated context links for ${links.length + unlinkedCount} translations`)
+      } else if (links.length > 0) {
+        toast.success(`Linked context for ${links.length} translation${links.length === 1 ? "" : "s"}`)
+      } else if (unlinkedCount > 0) {
+        toast.success(`Unlinked context from ${unlinkedCount} translation${unlinkedCount === 1 ? "" : "s"}`)
       } else {
-        toast.message("Nothing to apply")
+        toast.message("Nothing to update")
       }
       onOpenChange(false)
     } catch (e) {
       console.error(e)
-      toast.error("Failed to populate context")
+      toast.error("Failed to link context")
     } finally {
       setIsApplying(false)
     }
@@ -332,11 +298,7 @@ export function PopulateContextDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
-          <DialogTitle>
-            {isLinkMode
-              ? "Link Context Extractions to Translations"
-              : "Populate Context Document from Extractions"}
-          </DialogTitle>
+          <DialogTitle>Link Context Extractions to Translations</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-3">
@@ -426,11 +388,9 @@ export function PopulateContextDialog({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {isLinkMode && (
-                              <SelectItem value={UNLINK_CONTEXT_VALUE}>
-                                Unlink context
-                              </SelectItem>
-                            )}
+                            <SelectItem value={UNLINK_CONTEXT_VALUE}>
+                              Unlink context
+                            </SelectItem>
                             {mappingExtractionBatchFiles.map((e) => (
                               <SelectItem key={e.id} value={e.id}>
                                 <div className="flex flex-col items-start text-sm">
@@ -445,18 +405,16 @@ export function PopulateContextDialog({
                           </SelectGroup>
                         </SelectContent>
                       </Select>
-                      {isLinkMode && (
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleUnlink(t.id)}
-                          disabled={isLoading || !translationStore[t.id]?.autoContextExtractionId}
-                          aria-label={`Unlink context from ${t.title || "Untitled"}`}
-                          title="Unlink context"
-                        >
-                          <Unlink />
-                        </Button>
-                      )}
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleUnlink(t.id)}
+                        disabled={isLoading || !translationStore[t.id]?.autoContextExtractionId}
+                        aria-label={`Unlink context from ${t.title || "Untitled"}`}
+                        title="Unlink context"
+                      >
+                        <Unlink />
+                      </Button>
                       <Button
                         variant="outline"
                         size="icon"
@@ -482,10 +440,10 @@ export function PopulateContextDialog({
             {isApplying ? (
               <>
                 <Loader2 data-icon="inline-start" className="animate-spin" />
-                {isLinkMode ? "Linking..." : "Applying..."}
+                Linking...
               </>
             ) : (
-              isLinkMode ? "Link Context" : "Apply"
+              "Link Context"
             )}
           </Button>
         </DialogFooter>
