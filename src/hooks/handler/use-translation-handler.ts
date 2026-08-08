@@ -235,6 +235,7 @@ export const useTranslationHandler = ({
     overrideEndIndexParam?: number
     isContinuation?: boolean
     contextDocumentOverride?: string
+    signal?: AbortSignal
   }
 
   const handleStart = async ({
@@ -244,6 +245,7 @@ export const useTranslationHandler = ({
     overrideEndIndexParam,
     isContinuation,
     contextDocumentOverride,
+    signal,
   }: HandleStartParams) => {
     // Get current translation data
     const translation = useTranslationDataStore.getState().data[currentId]
@@ -251,6 +253,7 @@ export const useTranslationHandler = ({
     const subtitles = translation.subtitles
     const parsed = translation.parsed
     const project = await useProjectStore.getState().getProjectDb(translation.projectId)
+    if (signal?.aborted) return
     const projectName = project?.name || ""
 
     // Basic Settings Store
@@ -301,6 +304,10 @@ export const useTranslationHandler = ({
     }
 
     await saveData(currentId)
+    if (signal?.aborted) {
+      setIsTranslating(currentId, false)
+      return
+    }
 
     // Validate few shot
     const fewShotSchema = z.object({
@@ -331,6 +338,10 @@ export const useTranslationHandler = ({
         }
       } else if (fewShot.type === "linked") {
         const linkedTranslation = await useTranslationDataStore.getState().getTranslationDb(fewShot.linkedId)
+        if (signal?.aborted) {
+          setIsTranslating(currentId, false)
+          return
+        }
         if (linkedTranslation) {
           usedFewShot = linkedTranslation.subtitles
             .slice(fewShot.fewShotStartIndex, (fewShot.fewShotEndIndex ?? 0) + 1)
@@ -387,6 +398,7 @@ export const useTranslationHandler = ({
     let sameChunkCount = 0
 
     while (subtitleChunks.length > 0) {
+      if (signal?.aborted || !useTranslationStore.getState().isTranslatingSet.has(currentId)) break
       const chunk = subtitleChunks.shift()!
       console.log(`Translation: ${title} (Chunk ${chunkNumber + 1})`)
 

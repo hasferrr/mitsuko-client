@@ -3,6 +3,7 @@ import {
   buildBatchAutoContextPlan,
   findOwnedAutoContextExtraction,
   getEffectiveBatchTranslationStage,
+  getRunningBatchAutoContextExtractionIds,
 } from "@/lib/translation/batch-auto-context"
 import { Extraction, Translation } from "@/types/project"
 
@@ -121,6 +122,32 @@ describe("getEffectiveBatchTranslationStage", () => {
       isTranslating: false,
       recordedStage: "waiting-context",
     })).toBe("extracting-context")
+  })
+})
+
+describe("getRunningBatchAutoContextExtractionIds", () => {
+  test("finds an active owned extraction without relying on runtime refs", () => {
+    const item = translation("translation-1")
+    const linkedExtraction = extraction("translation-1-extraction", item.id)
+
+    expect(getRunningBatchAutoContextExtractionIds({
+      translationIds: [item.id],
+      translations: { [item.id]: item },
+      extractions: { [linkedExtraction.id]: linkedExtraction },
+      runningIds: new Set([linkedExtraction.id]),
+    })).toEqual([linkedExtraction.id])
+  })
+
+  test("does not stop an active manually linked extraction", () => {
+    const item = translation("translation-1", { autoContextExtractionId: "manual" })
+    const manuallyLinked = extraction("manual", null)
+
+    expect(getRunningBatchAutoContextExtractionIds({
+      translationIds: [item.id],
+      translations: { [item.id]: item },
+      extractions: { [manuallyLinked.id]: manuallyLinked },
+      runningIds: new Set([manuallyLinked.id]),
+    })).toEqual([])
   })
 })
 

@@ -70,6 +70,25 @@ export function findOwnedAutoContextExtraction(
   return null
 }
 
+export function getRunningBatchAutoContextExtractionIds({
+  translationIds,
+  translations,
+  extractions,
+  runningIds,
+}: {
+  translationIds: string[]
+  translations: Record<string, Translation>
+  extractions: Record<string, Extraction>
+  runningIds: Set<string>
+}): string[] {
+  return translationIds.flatMap((translationId) => {
+    const extractionId = translations[translationId]?.autoContextExtractionId
+    if (!extractionId || !runningIds.has(extractionId)) return []
+    if (extractions[extractionId]?.ownerTranslationId !== translationId) return []
+    return [extractionId]
+  })
+}
+
 export function getBatchAutoContextAction({
   extraction,
   expectedPreviousExtraction,
