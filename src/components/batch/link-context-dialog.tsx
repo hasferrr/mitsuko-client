@@ -380,7 +380,7 @@ export function LinkContextDialog({
                         <ChevronLeft />
                       </Button>
                       <Select
-                        value={isChecked && !mappedId ? UNLINK_CONTEXT_VALUE : mappedId ?? undefined}
+                        value={isChecked && !mappedId ? UNLINK_CONTEXT_VALUE : mappedId ?? ""}
                         onValueChange={(val) => handleSelectChange(t.id, val)}
                       >
                         <SelectTrigger className="w-[300px]">
