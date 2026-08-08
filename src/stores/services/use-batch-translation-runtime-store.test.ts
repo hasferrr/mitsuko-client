@@ -3,7 +3,7 @@ import { useBatchTranslationRuntimeStore } from "@/stores/services/use-batch-tra
 
 describe("useBatchTranslationRuntimeStore", () => {
   beforeEach(() => {
-    useBatchTranslationRuntimeStore.setState({ queueSetMap: {}, stageMap: {} })
+    useBatchTranslationRuntimeStore.setState({ queueSetMap: {}, stageMap: {}, runControlMap: {} })
   })
 
   test("keeps waiting stages outside the batch page component lifecycle", () => {
@@ -54,5 +54,25 @@ describe("useBatchTranslationRuntimeStore", () => {
     expect(state.queueSetMap["project-2"]).toEqual(new Set(["translation-2"]))
     expect(state.stageMap["project-1"]).toEqual({ "translation-1": "waiting-context" })
     expect(state.stageMap["project-2"]).toEqual({ "translation-2": "queued-translation" })
+  })
+
+  test("lets a remounted view stop the existing run", () => {
+    const firstView = useBatchTranslationRuntimeStore.getState()
+    const run = firstView.beginRun("project-1")
+    let waiterWasWoken = false
+    run.control.currentExtractionId = "extraction-1"
+    run.control.currentExtractionRunToken = run.runToken
+    run.control.wakeTranslationWaiters = () => {
+      waiterWasWoken = true
+    }
+
+    const remountedView = useBatchTranslationRuntimeStore.getState()
+    const stopped = remountedView.stopRun("project-1")
+
+    expect(stopped).toEqual({ currentExtractionId: "extraction-1" })
+    expect(run.signal.aborted).toBe(true)
+    expect(run.control.queueAborted).toBe(true)
+    expect(run.control.runToken).not.toBe(run.runToken)
+    expect(waiterWasWoken).toBe(true)
   })
 })

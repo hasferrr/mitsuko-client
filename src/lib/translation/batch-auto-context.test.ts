@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test"
 import {
   buildBatchAutoContextPlan,
   findLinkedAutoContextExtraction,
+  getBatchAutoContextPreparationIds,
   getEffectiveBatchTranslationStage,
   getRunningBatchAutoContextExtractionIds,
 } from "@/lib/translation/batch-auto-context"
@@ -155,6 +156,27 @@ describe("getRunningBatchAutoContextExtractionIds", () => {
   })
 })
 
+describe("getBatchAutoContextPreparationIds", () => {
+  test("keeps completed predecessors needed by unfinished translations", () => {
+    expect(getBatchAutoContextPreparationIds(
+      ["translation-1", "translation-2", "translation-3"],
+      new Set(["translation-1", "translation-3"]),
+    )).toEqual(["translation-1", "translation-2"])
+  })
+
+  test("returns no preparation work when every translation is complete", () => {
+    expect(getBatchAutoContextPreparationIds(
+      ["translation-1", "translation-2"],
+      new Set(["translation-1", "translation-2"]),
+    )).toEqual([])
+  })
+
+  test("keeps the complete chain for a restart", () => {
+    const ids = ["translation-1", "translation-2"]
+    expect(getBatchAutoContextPreparationIds(ids)).toBe(ids)
+  })
+})
+
 describe("buildBatchAutoContextPlan", () => {
   test("reuses a valid deterministic chain", () => {
     const first = translation("translation-1")
@@ -216,7 +238,7 @@ describe("buildBatchAutoContextPlan", () => {
     expect(plan.items.map(item => item.action)).toEqual(["reuse", "reuse"])
   })
 
-  test("reruns only the failed linked extraction when chain identity is unchanged", () => {
+  test("reruns the suffix after a linked extraction is rerun", () => {
     const first = translation("translation-1")
     const second = translation("translation-2", {
       autoContextPreviousExtractionId: "translation-1-extraction",
@@ -245,11 +267,11 @@ describe("buildBatchAutoContextPlan", () => {
     expect(plan.items).toEqual([
       { translationId: first.id, extractionId: "translation-1-extraction", action: "reuse" },
       { translationId: second.id, extractionId: "translation-2-extraction", action: "rerun" },
-      { translationId: third.id, extractionId: "translation-3-extraction", action: "reuse" },
+      { translationId: third.id, extractionId: "translation-3-extraction", action: "rerun" },
     ])
   })
 
-  test("skips a completed translation without rerunning its stopped extraction", () => {
+  test("repairs a stopped predecessor and its downstream extraction", () => {
     const first = translation("translation-1")
     const second = translation("translation-2", {
       autoContextPreviousExtractionId: "translation-1-extraction",
@@ -268,13 +290,13 @@ describe("buildBatchAutoContextPlan", () => {
       translations: { [first.id]: first, [second.id]: second },
       extractions,
       startingExtractionId: null,
-      skipTranslationIds: new Set([first.id]),
     })
 
     expect(plan.items).toEqual([
-      { translationId: second.id, extractionId: "translation-2-extraction", action: "reuse" },
+      { translationId: first.id, extractionId: "translation-1-extraction", action: "rerun" },
+      { translationId: second.id, extractionId: "translation-2-extraction", action: "rerun" },
     ])
-    expect(plan.rerunCount).toBe(0)
+    expect(plan.rerunCount).toBe(2)
   })
 
   test("regenerates every distinct linked extraction once on Restart", () => {

@@ -25,6 +25,7 @@ import {
   type BatchAutoContextAction,
   buildBatchAutoContextPlan,
   findLinkedAutoContextExtraction,
+  getBatchAutoContextPreparationIds,
   getBatchAutoContextAction,
   getRunningBatchAutoContextExtractionIds,
 } from "@/lib/translation/batch-auto-context"
@@ -34,6 +35,10 @@ import {
   isExtractionUsable,
 } from "@/lib/extraction/status"
 import { combineAutoContext, getTranslationSubtitleContent } from "@/lib/translation/auto-context"
+import {
+  BatchTranslationRunControl,
+  useBatchTranslationRuntimeStore,
+} from "@/stores/services/use-batch-translation-runtime-store"
 
 export interface BatchTranslationRunSummary {
   autoContextEnabled: boolean
@@ -71,13 +76,7 @@ export default function useBatchTranslationHandler({
     setAutoContextStageMap,
   },
 }: UseBatchTranslationHandlerProps) {
-  const queueAbortRef = useRef(false)
   const errorCountRef = useRef(0)
-  const currentExtractionIdRef = useRef<string | null>(null)
-  const currentExtractionRunTokenRef = useRef<number | null>(null)
-  const wakeTranslationWaitersRef = useRef<(() => void) | null>(null)
-  const batchRunTokenRef = useRef(0)
-  const batchAbortControllerRef = useRef<AbortController | null>(null)
 
   // Project Store
   const currentProject = useProjectStore((state) => state.currentProject)
@@ -90,6 +89,9 @@ export default function useBatchTranslationHandler({
 
   // Translation Store
   const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
+
+  const beginBatchRun = useBatchTranslationRuntimeStore(state => state.beginRun)
+  const stopBatchRun = useBatchTranslationRuntimeStore(state => state.stopRun)
 
   // Session Store
   const session = useSessionStore((state) => state.session)
@@ -207,18 +209,21 @@ export default function useBatchTranslationHandler({
       return null
     }
 
-    const skippedTranslationIds = new Set(isContinuation
-      ? project.translations.filter(isTranslationComplete)
-      : [])
+    const completedTranslationIds = isContinuation
+      ? new Set(project.translations.filter(isTranslationComplete))
+      : undefined
+    const translationIds = getBatchAutoContextPreparationIds(
+      project.translations,
+      completedTranslationIds,
+    )
     const plan = buildBatchAutoContextPlan({
       projectId: project.id,
-      translationIds: project.translations,
+      translationIds,
       translations: useTranslationDataStore.getState().data,
       extractions: useExtractionDataStore.getState().data,
       startingExtractionId: project.batchAutoContextStartingExtractionId,
       runningIds: useExtractionStore.getState().isExtractingSet,
       regenerate: regenerateAutoContext,
-      skipTranslationIds: skippedTranslationIds,
     })
     if (plan.startingContextProblem) {
       toast.error(plan.startingContextProblem)
@@ -234,7 +239,7 @@ export default function useBatchTranslationHandler({
       createCount: plan.createCount,
       rerunCount: plan.rerunCount,
       reuseCount: plan.reuseCount,
-      translationCount: project.translations.length - skippedTranslationIds.size,
+      translationCount: project.translations.filter(id => !isTranslationComplete(id)).length,
     }
   }
 
@@ -257,7 +262,12 @@ export default function useBatchTranslationHandler({
     })
   }
 
-  const runWithoutAutoContext = (isContinuation: boolean, signal: AbortSignal) => {
+  const runWithoutAutoContext = (
+    isContinuation: boolean,
+    control: BatchTranslationRunControl,
+    runToken: number,
+    signal: AbortSignal,
+  ) => {
     const ids = batchFiles
       .map(file => file.id)
       .filter(id => !useTranslationStore.getState().isTranslatingSet.has(id))
@@ -268,7 +278,7 @@ export default function useBatchTranslationHandler({
     let active = 0
 
     const launch = () => {
-      if (signal.aborted || queueAbortRef.current || index >= ids.length) {
+      if (signal.aborted || control.queueAborted || runToken !== control.runToken || index >= ids.length) {
         if (active === 0) setQueueSet(new Set())
         return
       }
@@ -300,11 +310,12 @@ export default function useBatchTranslationHandler({
   const runWithAutoContext = async (
     isContinuation: boolean,
     regenerateAutoContext: boolean,
+    control: BatchTranslationRunControl,
     runToken: number,
     signal: AbortSignal,
   ) => {
     const project = await loadBatchAutoContextData()
-    if (runToken !== batchRunTokenRef.current) return
+    if (runToken !== control.runToken) return
     if (!project) {
       setQueueSet(new Set())
       setAutoContextStageMap({})
@@ -312,11 +323,15 @@ export default function useBatchTranslationHandler({
       return
     }
 
-    const translationIds = project.translations.filter(id => !useTranslationStore.getState().isTranslatingSet.has(id))
-    const skippedTranslationIds = new Set(isContinuation
-      ? translationIds.filter(isTranslationComplete)
-      : [])
-    const queuedTranslationIds = translationIds.filter(id => !skippedTranslationIds.has(id))
+    const availableTranslationIds = project.translations.filter(id => !useTranslationStore.getState().isTranslatingSet.has(id))
+    const completedTranslationIds = isContinuation
+      ? new Set(availableTranslationIds.filter(isTranslationComplete))
+      : undefined
+    const translationIds = getBatchAutoContextPreparationIds(
+      availableTranslationIds,
+      completedTranslationIds,
+    )
+    const queuedTranslationIds = translationIds.filter(id => !isContinuation || !isTranslationComplete(id))
     const translationStore = useTranslationDataStore.getState()
     const extractionStore = useExtractionDataStore.getState()
     const startingExtraction = project.batchAutoContextStartingExtractionId
@@ -330,7 +345,6 @@ export default function useBatchTranslationHandler({
       startingExtractionId: project.batchAutoContextStartingExtractionId,
       runningIds: useExtractionStore.getState().isExtractingSet,
       regenerate: regenerateAutoContext,
-      skipTranslationIds: skippedTranslationIds,
     })
     if (plan.startingContextProblem) {
       setQueueSet(new Set())
@@ -351,21 +365,21 @@ export default function useBatchTranslationHandler({
     const wakeAllWaiters = () => {
       slotWaiters.splice(0).forEach(resolve => resolve())
     }
-    wakeTranslationWaitersRef.current = wakeAllWaiters
+    control.wakeTranslationWaiters = wakeAllWaiters
 
     const acquireTranslationSlot = async () => {
       while (
         activeTranslations >= concurrentTranslations
-        && !queueAbortRef.current
+        && !control.queueAborted
         && !translationSchedulingHalted
-        && runToken === batchRunTokenRef.current
+        && runToken === control.runToken
       ) {
         await new Promise<void>(resolve => slotWaiters.push(resolve))
       }
       if (
-        queueAbortRef.current
+        control.queueAborted
         || translationSchedulingHalted
-        || runToken !== batchRunTokenRef.current
+        || runToken !== control.runToken
       ) return false
       activeTranslations++
       return true
@@ -380,14 +394,14 @@ export default function useBatchTranslationHandler({
       const task = (async () => {
         const acquired = await acquireTranslationSlot()
         if (!acquired) {
-          if (runToken === batchRunTokenRef.current) {
+          if (runToken === control.runToken) {
             setAutoContextStage(id, null)
             removeFromQueue(id)
           }
           return
         }
 
-        if (signal.aborted || runToken !== batchRunTokenRef.current) {
+        if (signal.aborted || runToken !== control.runToken) {
           releaseTranslationSlot()
           return
         }
@@ -401,7 +415,7 @@ export default function useBatchTranslationHandler({
             await handleStartTranslation(id, undefined, undefined, false, contextDocumentOverride, signal)
           }
         } finally {
-          if (runToken === batchRunTokenRef.current) {
+          if (runToken === control.runToken) {
             setIsTranslating(id, false)
             refetchTranslationCredits()
             setAutoContextStage(id, null)
@@ -419,7 +433,7 @@ export default function useBatchTranslationHandler({
     const previousIdByExtractionId = new Map<string, string | null>()
 
     for (const translationId of translationIds) {
-      if (queueAbortRef.current || runToken !== batchRunTokenRef.current) break
+      if (control.queueAborted || runToken !== control.runToken) break
       const translation = useTranslationDataStore.getState().data[translationId]
       if (!translation) continue
 
@@ -428,10 +442,6 @@ export default function useBatchTranslationHandler({
         translation,
         currentExtractions,
       )
-      if (skippedTranslationIds.has(translationId)) {
-        previousExtraction = extraction
-        continue
-      }
       const isAlreadyPrepared = !!extraction && preparedExtractionIds.has(extraction.id)
       const action: BatchAutoContextAction = isAlreadyPrepared
         ? "reuse"
@@ -458,7 +468,7 @@ export default function useBatchTranslationHandler({
           status: "idle",
           completedAt: null,
         })
-        if (runToken !== batchRunTokenRef.current) break
+        if (runToken !== control.runToken) break
         try {
           await useProjectStore.getState().loadProjects()
         } catch {
@@ -482,7 +492,7 @@ export default function useBatchTranslationHandler({
         autoContextPreviousMode: previousExtractionId ? "selected" : "none",
         autoContextPreviousExtractionId: previousExtractionId,
       })
-      if (runToken !== batchRunTokenRef.current) break
+      if (runToken !== control.runToken) break
 
       if (action !== "reuse") {
         await useExtractionDataStore.getState().updateExtractionDb(extraction.id, {
@@ -491,18 +501,18 @@ export default function useBatchTranslationHandler({
           subtitleContent: getTranslationSubtitleContent(translation),
           previousContext,
         })
-        if (signal.aborted || runToken !== batchRunTokenRef.current) break
+        if (signal.aborted || runToken !== control.runToken) break
         setAutoContextStage(translationId, "extracting-context")
-        currentExtractionIdRef.current = extraction.id
-        currentExtractionRunTokenRef.current = runToken
+        control.currentExtractionId = extraction.id
+        control.currentExtractionRunToken = runToken
         const success = await baseStartExtraction(extraction.id, extraction.settingsId, signal)
-        if (currentExtractionRunTokenRef.current === runToken) {
-          currentExtractionIdRef.current = null
-          currentExtractionRunTokenRef.current = null
+        if (control.currentExtractionRunToken === runToken) {
+          control.currentExtractionId = null
+          control.currentExtractionRunToken = null
         }
-        if (runToken !== batchRunTokenRef.current) break
+        if (runToken !== control.runToken) break
         if (!success) {
-          if (!queueAbortRef.current) {
+          if (!control.queueAborted) {
             failedTranslationId = translationId
             setAutoContextStage(translationId, "context-error")
             toast.error(`Auto Context extraction failed for ${translation.title}. Later work was halted.`)
@@ -538,12 +548,12 @@ export default function useBatchTranslationHandler({
         previousIdByExtractionId.set(extraction.id, previousExtractionId)
       }
       previousExtraction = extraction
-      upstreamChanged = upstreamChanged || action === "create"
+      upstreamChanged = upstreamChanged || action !== "reuse"
     }
 
-    if (runToken !== batchRunTokenRef.current) return
+    if (runToken !== control.runToken) return
 
-    if (failedTranslationId || queueAbortRef.current) {
+    if (failedTranslationId || control.queueAborted) {
       translationSchedulingHalted = true
       wakeAllWaiters()
       setAutoContextStageMap(previous => Object.fromEntries(
@@ -559,53 +569,49 @@ export default function useBatchTranslationHandler({
     setAutoContextStageMap(previous => Object.fromEntries(
       Object.entries(previous).filter(([, stage]) => stage === "context-error"),
     ))
-    wakeTranslationWaitersRef.current = null
-    if (currentExtractionRunTokenRef.current === runToken) {
-      currentExtractionIdRef.current = null
-      currentExtractionRunTokenRef.current = null
+    control.wakeTranslationWaiters = null
+    if (control.currentExtractionRunToken === runToken) {
+      control.currentExtractionId = null
+      control.currentExtractionRunToken = null
     }
   }
 
   const safelyRunWithAutoContext = async (
     isContinuation: boolean,
     regenerateAutoContext: boolean,
+    control: BatchTranslationRunControl,
     runToken: number,
     signal: AbortSignal,
   ) => {
     try {
-      await runWithAutoContext(isContinuation, regenerateAutoContext, runToken, signal)
+      await runWithAutoContext(isContinuation, regenerateAutoContext, control, runToken, signal)
     } catch (error) {
-      if (runToken !== batchRunTokenRef.current) return
+      if (runToken !== control.runToken) return
       console.error("Failed to run batch Auto Context", error)
-      queueAbortRef.current = true
-      wakeTranslationWaitersRef.current?.()
+      control.queueAborted = true
+      control.wakeTranslationWaiters?.()
       setQueueSet(new Set())
       setAutoContextStageMap(previous => Object.fromEntries(
         Object.entries(previous).filter(([, stage]) => stage === "translating"),
       ))
       toast.error("Failed to prepare batch Auto Context. Later work was halted.")
     } finally {
-      if (runToken === batchRunTokenRef.current) {
-        wakeTranslationWaitersRef.current = null
-        currentExtractionIdRef.current = null
-        currentExtractionRunTokenRef.current = null
+      if (runToken === control.runToken) {
+        control.wakeTranslationWaiters = null
+        control.currentExtractionId = null
+        control.currentExtractionRunToken = null
       }
     }
   }
 
   const prepareRun = () => {
-    batchAbortControllerRef.current?.abort()
-    batchAbortControllerRef.current = new AbortController()
-    batchRunTokenRef.current += 1
+    if (!currentProject) return null
+    const run = beginBatchRun(currentProject.id)
     scrollToTop()
-    queueAbortRef.current = false
     errorCountRef.current = 0
     setHasChanges(true)
     setAutoContextStageMap({})
-    return {
-      runToken: batchRunTokenRef.current,
-      signal: batchAbortControllerRef.current.signal,
-    }
+    return run
   }
 
   const markAutoContextRunPreparing = () => {
@@ -619,33 +625,33 @@ export default function useBatchTranslationHandler({
   const handleStartBatchTranslation = (regenerateAutoContext = false) => {
     if (batchFiles.length === 0 || isBatchTranslating) return
     setIsRestartTranslationDialogOpen(false)
-    const { runToken, signal } = prepareRun()
+    const run = prepareRun()
+    if (!run) return
+    const { control, runToken, signal } = run
     if (currentProject?.isBatchAutoContextEnabled) {
       markAutoContextRunPreparing()
-      void safelyRunWithAutoContext(false, regenerateAutoContext, runToken, signal)
+      void safelyRunWithAutoContext(false, regenerateAutoContext, control, runToken, signal)
     } else {
-      runWithoutAutoContext(false, signal)
+      runWithoutAutoContext(false, control, runToken, signal)
     }
   }
 
   const handleContinueBatchTranslation = () => {
     if (batchFiles.length === 0 || isBatchTranslating) return
     setIsContinueTranslationDialogOpen(false)
-    const { runToken, signal } = prepareRun()
+    const run = prepareRun()
+    if (!run) return
+    const { control, runToken, signal } = run
     if (currentProject?.isBatchAutoContextEnabled) {
       markAutoContextRunPreparing()
-      void safelyRunWithAutoContext(true, false, runToken, signal)
+      void safelyRunWithAutoContext(true, false, control, runToken, signal)
     } else {
-      runWithoutAutoContext(true, signal)
+      runWithoutAutoContext(true, control, runToken, signal)
     }
   }
 
   const handleStopBatchTranslation = () => {
-    batchAbortControllerRef.current?.abort()
-    batchAbortControllerRef.current = null
-    batchRunTokenRef.current += 1
-    queueAbortRef.current = true
-    wakeTranslationWaitersRef.current?.()
+    const stoppedRun = currentProject ? stopBatchRun(currentProject.id) : null
     setQueueSet(new Set())
     setAutoContextStageMap({})
     const runningAutoContextIds = currentProject?.isBatchAutoContextEnabled
@@ -655,10 +661,8 @@ export default function useBatchTranslationHandler({
           runningIds: useExtractionStore.getState().isExtractingSet,
         })
       : []
-    if (currentExtractionIdRef.current) runningAutoContextIds.push(currentExtractionIdRef.current)
+    if (stoppedRun?.currentExtractionId) runningAutoContextIds.push(stoppedRun.currentExtractionId)
     new Set(runningAutoContextIds).forEach(id => void baseStopExtraction(id))
-    currentExtractionIdRef.current = null
-    currentExtractionRunTokenRef.current = null
     batchFiles.forEach(file => baseStopTranslation(file.id))
   }
 

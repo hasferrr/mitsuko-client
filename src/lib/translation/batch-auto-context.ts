@@ -55,7 +55,6 @@ interface BatchAutoContextPlanInput {
   startingExtractionId: string | null
   runningIds?: Set<string>
   regenerate?: boolean
-  skipTranslationIds?: Set<string>
 }
 
 export function findLinkedAutoContextExtraction(
@@ -83,6 +82,15 @@ export function getRunningBatchAutoContextExtractionIds({
     return [extractionId]
   })
   return [...new Set(linkedRunningIds)]
+}
+
+export function getBatchAutoContextPreparationIds(
+  translationIds: string[],
+  completedTranslationIds?: Set<string>,
+): string[] {
+  if (!completedTranslationIds) return translationIds
+  const lastIncompleteIndex = translationIds.findLastIndex(id => !completedTranslationIds.has(id))
+  return lastIncompleteIndex === -1 ? [] : translationIds.slice(0, lastIncompleteIndex + 1)
 }
 
 export function getBatchAutoContextAction({
@@ -118,7 +126,6 @@ export function buildBatchAutoContextPlan({
   startingExtractionId,
   runningIds = new Set(),
   regenerate = false,
-  skipTranslationIds = new Set(),
 }: BatchAutoContextPlanInput): BatchAutoContextPlan {
   const startingExtraction = startingExtractionId ? extractions[startingExtractionId] : null
   let startingContextProblem = startingExtractionId
@@ -142,10 +149,6 @@ export function buildBatchAutoContextPlan({
     const translation = translations[translationId]
     if (!translation) continue
     const extraction = findLinkedAutoContextExtraction(translation, extractions)
-    if (skipTranslationIds.has(translationId)) {
-      expectedPreviousExtraction = extraction
-      continue
-    }
     const isAlreadyPrepared = !!extraction && preparedExtractionIds.has(extraction.id)
     const action: BatchAutoContextAction = isAlreadyPrepared
       ? "reuse"
@@ -165,7 +168,7 @@ export function buildBatchAutoContextPlan({
       action,
     })
     if (extraction) preparedExtractionIds.add(extraction.id)
-    upstreamChanged = upstreamChanged || action === "create"
+    upstreamChanged = upstreamChanged || action !== "reuse"
     expectedPreviousExtraction = extraction
   }
 
