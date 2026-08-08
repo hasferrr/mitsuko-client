@@ -98,6 +98,35 @@ describe("getEffectiveBatchTranslationStage", () => {
     })).toBe("translating")
   })
 
+  test.each(["failed", "stopped"] as const)(
+    "restores the context-error stage from a %s linked extraction",
+    (status) => {
+      const item = translation("translation-1", {
+        subtitles: [{
+          index: 1,
+          timestamp: {
+            start: { h: 0, m: 0, s: 0, ms: 0 },
+            end: { h: 0, m: 0, s: 1, ms: 0 },
+          },
+          actor: "",
+          content: "Original",
+          translated: "Translated",
+        }],
+      })
+
+      expect(getEffectiveBatchTranslationStage({
+        translation: item,
+        linkedExtraction: extraction("translation-1-extraction", {
+          status,
+          completedAt: null,
+        }),
+        runningExtractionIds: new Set(),
+        isTranslating: false,
+        autoContextEnabled: true,
+      })).toBe("context-error")
+    },
+  )
+
   test("ignores linked extraction activity when batch Auto Context is disabled", () => {
     const item = translation("translation-1")
     const linkedExtraction = extraction("translation-1-extraction")
@@ -218,6 +247,34 @@ describe("buildBatchAutoContextPlan", () => {
       { translationId: second.id, extractionId: "translation-2-extraction", action: "rerun" },
       { translationId: third.id, extractionId: "translation-3-extraction", action: "reuse" },
     ])
+  })
+
+  test("skips a completed translation without rerunning its stopped extraction", () => {
+    const first = translation("translation-1")
+    const second = translation("translation-2", {
+      autoContextPreviousExtractionId: "translation-1-extraction",
+    })
+    const extractions = {
+      "translation-1-extraction": extraction("translation-1-extraction", {
+        status: "stopped",
+        completedAt: null,
+      }),
+      "translation-2-extraction": extraction("translation-2-extraction"),
+    }
+
+    const plan = buildBatchAutoContextPlan({
+      projectId: "project-1",
+      translationIds: [first.id, second.id],
+      translations: { [first.id]: first, [second.id]: second },
+      extractions,
+      startingExtractionId: null,
+      skipTranslationIds: new Set([first.id]),
+    })
+
+    expect(plan.items).toEqual([
+      { translationId: second.id, extractionId: "translation-2-extraction", action: "reuse" },
+    ])
+    expect(plan.rerunCount).toBe(0)
   })
 
   test("regenerates every distinct linked extraction once on Restart", () => {

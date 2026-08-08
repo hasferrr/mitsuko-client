@@ -1,4 +1,8 @@
-import { getExtractionValidationProblem, isExtractionUsable } from "@/lib/extraction/status"
+import {
+  getEffectiveExtractionStatus,
+  getExtractionValidationProblem,
+  isExtractionUsable,
+} from "@/lib/extraction/status"
 import { BatchTranslationStage } from "@/types/batch"
 import { Extraction, Translation } from "@/types/project"
 
@@ -35,12 +39,10 @@ export function getEffectiveBatchTranslationStage({
 }): BatchTranslationStage | undefined {
   if (isTranslating) return "translating"
   if (!autoContextEnabled) return undefined
-  if (
-    translation
-    && linkedExtraction?.id === translation.autoContextExtractionId
-    && runningExtractionIds.has(linkedExtraction.id)
-  ) {
-    return "extracting-context"
+  if (translation && linkedExtraction?.id === translation.autoContextExtractionId) {
+    const extractionStatus = getEffectiveExtractionStatus(linkedExtraction, runningExtractionIds)
+    if (extractionStatus === "running") return "extracting-context"
+    if (extractionStatus === "failed" || extractionStatus === "stopped") return "context-error"
   }
   return recordedStage
 }
@@ -53,6 +55,7 @@ interface BatchAutoContextPlanInput {
   startingExtractionId: string | null
   runningIds?: Set<string>
   regenerate?: boolean
+  skipTranslationIds?: Set<string>
 }
 
 export function findLinkedAutoContextExtraction(
@@ -115,6 +118,7 @@ export function buildBatchAutoContextPlan({
   startingExtractionId,
   runningIds = new Set(),
   regenerate = false,
+  skipTranslationIds = new Set(),
 }: BatchAutoContextPlanInput): BatchAutoContextPlan {
   const startingExtraction = startingExtractionId ? extractions[startingExtractionId] : null
   let startingContextProblem = startingExtractionId
@@ -138,6 +142,10 @@ export function buildBatchAutoContextPlan({
     const translation = translations[translationId]
     if (!translation) continue
     const extraction = findLinkedAutoContextExtraction(translation, extractions)
+    if (skipTranslationIds.has(translationId)) {
+      expectedPreviousExtraction = extraction
+      continue
+    }
     const isAlreadyPrepared = !!extraction && preparedExtractionIds.has(extraction.id)
     const action: BatchAutoContextAction = isAlreadyPrepared
       ? "reuse"

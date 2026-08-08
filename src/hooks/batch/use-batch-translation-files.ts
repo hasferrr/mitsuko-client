@@ -6,7 +6,6 @@ import { BatchFile } from "@/types/batch"
 import { BatchTranslationStage } from "@/types/batch"
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
-import { getEffectiveExtractionStatus } from "@/lib/extraction/status"
 import { getEffectiveBatchTranslationStage } from "@/lib/translation/batch-auto-context"
 
 export const useBatchTranslationFiles = (
@@ -31,13 +30,6 @@ export const useBatchTranslationFiles = (
       const linkedExtraction = translation?.autoContextExtractionId
         ? extractionData[translation.autoContextExtractionId]
         : null
-      const linkedExtractionStatus = linkedExtraction
-        ? getEffectiveExtractionStatus(linkedExtraction, isExtractingSet)
-        : null
-      const inferredContextError = currentProject.isBatchAutoContextEnabled
-        && translatedCount < totalSubtitles
-        && !!linkedExtraction
-        && (linkedExtractionStatus === "failed" || linkedExtractionStatus === "stopped")
       const isTranslating = isTranslatingSet.has(id)
       const translationStage = getEffectiveBatchTranslationStage({
         translation,
@@ -50,7 +42,7 @@ export const useBatchTranslationFiles = (
 
       let status: BatchFile["status"]
 
-      if (translationStage === "context-error" || inferredContextError) {
+      if (translationStage === "context-error" && translatedCount < totalSubtitles) {
         status = "error"
       } else if (
         translationStage === "extracting-context"
@@ -81,7 +73,7 @@ export const useBatchTranslationFiles = (
         status,
         progress,
         type: translation?.parsed?.type || "srt",
-        translationStage: translationStage ?? (inferredContextError ? "context-error" : undefined),
+        translationStage,
         linkedExtractionId: linkedExtraction?.id ?? null,
       }
     })

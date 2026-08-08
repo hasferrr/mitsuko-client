@@ -207,6 +207,9 @@ export default function useBatchTranslationHandler({
       return null
     }
 
+    const skippedTranslationIds = new Set(isContinuation
+      ? project.translations.filter(isTranslationComplete)
+      : [])
     const plan = buildBatchAutoContextPlan({
       projectId: project.id,
       translationIds: project.translations,
@@ -215,6 +218,7 @@ export default function useBatchTranslationHandler({
       startingExtractionId: project.batchAutoContextStartingExtractionId,
       runningIds: useExtractionStore.getState().isExtractingSet,
       regenerate: regenerateAutoContext,
+      skipTranslationIds: skippedTranslationIds,
     })
     if (plan.startingContextProblem) {
       toast.error(plan.startingContextProblem)
@@ -230,9 +234,7 @@ export default function useBatchTranslationHandler({
       createCount: plan.createCount,
       rerunCount: plan.rerunCount,
       reuseCount: plan.reuseCount,
-      translationCount: isContinuation
-        ? project.translations.filter(id => !isTranslationComplete(id)).length
-        : project.translations.length,
+      translationCount: project.translations.length - skippedTranslationIds.size,
     }
   }
 
@@ -311,6 +313,10 @@ export default function useBatchTranslationHandler({
     }
 
     const translationIds = project.translations.filter(id => !useTranslationStore.getState().isTranslatingSet.has(id))
+    const skippedTranslationIds = new Set(isContinuation
+      ? translationIds.filter(isTranslationComplete)
+      : [])
+    const queuedTranslationIds = translationIds.filter(id => !skippedTranslationIds.has(id))
     const translationStore = useTranslationDataStore.getState()
     const extractionStore = useExtractionDataStore.getState()
     const startingExtraction = project.batchAutoContextStartingExtractionId
@@ -324,6 +330,7 @@ export default function useBatchTranslationHandler({
       startingExtractionId: project.batchAutoContextStartingExtractionId,
       runningIds: useExtractionStore.getState().isExtractingSet,
       regenerate: regenerateAutoContext,
+      skipTranslationIds: skippedTranslationIds,
     })
     if (plan.startingContextProblem) {
       setQueueSet(new Set())
@@ -332,9 +339,9 @@ export default function useBatchTranslationHandler({
       return
     }
 
-    setQueueSet(new Set(translationIds))
+    setQueueSet(new Set(queuedTranslationIds))
     setAutoContextStageMap(Object.fromEntries(
-      translationIds.map(id => [id, "waiting-context" as BatchTranslationStage]),
+      queuedTranslationIds.map(id => [id, "waiting-context" as BatchTranslationStage]),
     ))
 
     let activeTranslations = 0
@@ -421,6 +428,10 @@ export default function useBatchTranslationHandler({
         translation,
         currentExtractions,
       )
+      if (skippedTranslationIds.has(translationId)) {
+        previousExtraction = extraction
+        continue
+      }
       const isAlreadyPrepared = !!extraction && preparedExtractionIds.has(extraction.id)
       const action: BatchAutoContextAction = isAlreadyPrepared
         ? "reuse"
