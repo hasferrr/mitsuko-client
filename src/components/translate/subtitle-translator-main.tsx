@@ -17,7 +17,6 @@ import {
   History as HistoryIcon,
   Box,
   SquareChartGantt,
-  SaveIcon,
   Eye,
   EyeOff,
   FastForward,
@@ -167,7 +166,6 @@ export default function SubtitleTranslatorMain({
   const [pendingContextFile, setPendingContextFile] = useState<File | null>(null)
   const [toolsOpen, setToolsOpen] = useState(false)
   const [progressOpen, setProgressOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
   const [isASSGuidanceDialogOpen, setIsASSGuidanceDialogOpen] = useState(false)
   const [isASSGuidanceDontShowAgain, setIsASSGuidanceDontShowAgain] = useState(false)
   const [subtitlesHidden, setSubtitlesHidden] = useState(true)
@@ -431,12 +429,6 @@ export default function SubtitleTranslatorMain({
     await saveData(currentId)
   }
 
-  const handleSave = async () => {
-    setIsSaving(true)
-    await saveData(currentId)
-    setIsSaving(false)
-  }
-
   const handleInitialUploadDialogChange = (isOpen: boolean) => {
     setIsInitialUploadDialogOpen(isOpen)
     if (!isOpen) {
@@ -480,21 +472,13 @@ export default function SubtitleTranslatorMain({
           <Upload className="size-4" />
           Upload
         </Button>
-        {/* Save Button */}
-        <Button
-          variant="outline"
-          onClick={handleSave}
-          disabled={isTranslating || isSaving}
-        >
-          <SaveIcon className="size-4" />
-          Save
-        </Button>
         {/* History Button */}
         <Button
           variant={isHistoryOpen ? "default" : "outline"}
           onClick={() => setIsHistoryOpen(!isHistoryOpen)}
         >
           <HistoryIcon className="size-4" />
+          History
         </Button>
       </div>
 
