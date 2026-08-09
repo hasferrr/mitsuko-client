@@ -2,7 +2,16 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { AlertCircle, CheckCircle2, ChevronUp, Loader2, OctagonX, X } from "lucide-react"
+import {
+  AlertCircle,
+  CheckCircle2,
+  ChevronUp,
+  Loader2,
+  Maximize2,
+  Minimize2,
+  OctagonX,
+  X,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
@@ -29,6 +38,7 @@ const TYPE_ORDER: ProjectType[] = ["translation", "transcription", "extraction"]
 export function ProcessingIndicator() {
   const router = useRouter()
   const [expanded, setExpanded] = useState(false)
+  const [isActivityExpanded, setIsActivityExpanded] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const isTranslatingSet = useTranslationStore((s) => s.isTranslatingSet)
@@ -141,16 +151,37 @@ export function ProcessingIndicator() {
   return (
     <div ref={containerRef} className="flex flex-col items-end gap-2">
       {expanded && (
-        <div className="animate-in fade-in slide-in-from-bottom-2 duration-150 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl bg-popover/95 text-popover-foreground shadow-xl ring-1 ring-foreground/10 backdrop-blur-md">
+        <div
+          className={cn(
+            "animate-in fade-in slide-in-from-bottom-2 duration-150 flex w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-xl bg-popover/95 text-popover-foreground shadow-xl ring-1 ring-foreground/10 backdrop-blur-md transition-[width,height] duration-200",
+            isActivityExpanded && "w-[min(32rem,calc(100vw-2rem))]",
+          )}
+          >
           <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2">
             <span className="text-sm font-semibold">Processing activity</span>
-            {finishedCount > 0 && (
-              <Button variant="ghost" size="xs" onClick={clearCompleted}>
-                Clear finished
+            <div className="ml-auto flex items-center gap-1">
+              {finishedCount > 0 && (
+                <Button variant="ghost" size="xs" onClick={clearCompleted}>
+                  Clear finished
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => setIsActivityExpanded((value) => !value)}
+                aria-label={isActivityExpanded ? "Reduce activity panel size" : "Expand activity panel size"}
+                title={isActivityExpanded ? "Reduce panel" : "Expand panel"}
+              >
+                {isActivityExpanded ? <Minimize2 /> : <Maximize2 />}
               </Button>
-            )}
+            </div>
           </div>
-          <div className="flex max-h-72 flex-col gap-3 overflow-y-auto p-2">
+          <div
+            className={cn(
+              "flex max-h-72 flex-col gap-3 overflow-y-auto p-2",
+              isActivityExpanded && "max-h-96",
+            )}
+          >
             {TYPE_ORDER.map((type) => {
               const list = grouped?.[type] ?? []
               if (list.length === 0) return null
