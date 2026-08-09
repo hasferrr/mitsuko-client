@@ -8,7 +8,6 @@ import { useSessionStore } from "@/stores/ui/use-session-store"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import NavLinks from "./nav-links"
 import { usePathname } from "next/navigation"
-import { ProcessingPopover } from "@/components/layout/processing-popover"
 
 export default function Navbar() {
   const session = useSessionStore((state) => state.session)
@@ -56,7 +55,6 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center gap-4 md:gap-6">
-            <ProcessingPopover />
             <ThemeToggle />
             <Link
               href="/auth/login"

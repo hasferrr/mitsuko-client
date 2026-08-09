@@ -14,7 +14,6 @@ import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { UserCreditData } from "@/types/user"
 import { cn } from "@/lib/utils"
 import { FeedbackWrapper } from "@/components/feedback/feedback-wrapper"
-import { ProcessingPopover } from "@/components/layout/processing-popover"
 
 interface Breadcrumb {
   name: string
@@ -75,9 +74,6 @@ export function Navbar() {
               Feedback
             </Button>
           </FeedbackWrapper>
-
-          <ProcessingPopover />
-
           <Button variant="ghost" size="sm" className="text-sm" asChild>
             <Link
               href="/auth/login"
