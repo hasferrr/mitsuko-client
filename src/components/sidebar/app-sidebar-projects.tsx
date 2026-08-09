@@ -32,6 +32,7 @@ import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { ArchiveDialog } from "../ui-custom/archive-dialog"
 import { ExportImportDialogue } from "../ui-custom/export-import-dialogue"
 import { useState } from "react"
+import { ProjectProcessingIcon } from "@/components/shared/project-processing-icon"
 
 interface AppSidebarProjectsProps {
   projects: Project[],
@@ -112,6 +113,10 @@ export function AppSidebarProjects({
             >
               <span>{project.name}</span>
             </SidebarMenuButton>
+            <ProjectProcessingIcon
+              project={project}
+              className="pointer-events-none absolute top-1.5 right-1 flex size-5 items-center justify-center text-sidebar-foreground opacity-50 transition-opacity group-hover/menu-item:opacity-0 group-focus-within/menu-item:opacity-0"
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuAction showOnHover>

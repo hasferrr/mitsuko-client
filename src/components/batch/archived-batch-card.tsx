@@ -11,6 +11,7 @@ import {
 import { ArchiveRestore, MoreHorizontal, Trash, Upload } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Project } from "@/types/project"
+import { ProjectProcessingIcon } from "@/components/shared/project-processing-icon"
 
 interface ArchivedBatchCardProps {
   project: Project
@@ -52,6 +53,7 @@ export function ArchivedBatchCard({ project, onSelect, onToggleArchive, onExport
             />
           )}
           <CardTitle className="truncate">{project.name}</CardTitle>
+          <ProjectProcessingIcon project={project} className="shrink-0 text-muted-foreground" />
         </div>
         {!selectMode && (
           <DropdownMenu>

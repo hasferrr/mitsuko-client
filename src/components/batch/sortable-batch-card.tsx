@@ -14,6 +14,7 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
 import type { Project } from "@/types/project"
+import { ProjectProcessingIcon } from "@/components/shared/project-processing-icon"
 
 interface SortableBatchCardProps {
   project: Project
@@ -66,6 +67,7 @@ export function SortableBatchCard({ project, onSelect, onToggleArchive, onExport
             />
           )}
           <CardTitle className="truncate">{project.name}</CardTitle>
+          <ProjectProcessingIcon project={project} className="shrink-0 text-muted-foreground" />
         </div>
         {!selectMode && (
           <div className="flex items-center gap-4">

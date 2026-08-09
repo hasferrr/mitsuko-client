@@ -37,6 +37,7 @@ import {
 import { DeleteDialogue } from "../ui-custom/delete-dialogue"
 import { ConfirmDialogue } from "@/components/shared/confirm-dialogue"
 import { useState, useEffect, useRef, useEffectEvent } from "react"
+import { ProjectProcessingIcon } from "@/components/shared/project-processing-icon"
 
 export const Project = () => {
   const projects = useProjectStore(state => state.projects)
@@ -189,6 +190,7 @@ export const Project = () => {
               />
             )}
             <CardTitle className="truncate">{project.name}</CardTitle>
+            <ProjectProcessingIcon project={project} className="shrink-0 text-muted-foreground" />
           </div>
           {!selectMode && (
             <div className="flex items-center gap-4">
@@ -284,6 +286,7 @@ export const Project = () => {
               />
             )}
             <CardTitle className="truncate">{project.name}</CardTitle>
+            <ProjectProcessingIcon project={project} className="shrink-0 text-muted-foreground" />
           </div>
           {!selectMode && (
             <div className="flex items-center gap-4">
