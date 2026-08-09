@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Trash, Archive, ArchiveRestore, Upload, X, CheckCircle2, ChevronUp } from "lucide-react"
@@ -74,11 +76,11 @@ export function CardGridSelectionBar({
     return startCloseTransition()
   }, [open])
 
-  const renderSelectAllButton = () => {
+  const renderSelectMenu = () => {
     if (allSelected) {
       return (
         <Button variant="ghost" size="sm" onClick={onSelectAllToggle}>
-          <CheckCircle2 className="size-4" />
+          <CheckCircle2 data-icon="inline-start" />
           Deselect All
         </Button>
       )
@@ -87,49 +89,45 @@ export function CardGridSelectionBar({
     if (!hasBothSections) {
       return (
         <Button variant="ghost" size="sm" onClick={onSelectAllToggle}>
-          <CheckCircle2 className="size-4" />
+          <CheckCircle2 data-icon="inline-start" />
           Select All
         </Button>
       )
     }
 
     return (
-      <div className="flex">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onSelectAllToggle}
-          className="rounded-r-none pr-1.5"
-        >
-          <CheckCircle2 className="size-4" />
-          Select All
-        </Button>
-        <DropdownMenu open={selectMenuOpen} onOpenChange={setSelectMenuOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-l-none border-l px-1.5"
-            >
-              <ChevronUp className="size-3" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" side="top" className="w-fit">
+      <DropdownMenu open={selectMenuOpen} onOpenChange={setSelectMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm">
+            <CheckCircle2 data-icon="inline-start" />
+            Select All
+            <ChevronUp data-icon="inline-end" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="center" side="top" className="w-fit">
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={onSelectAllToggle}>
+              <CheckCircle2 />
+              {allSelected ? "Deselect All" : "Select All"}
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
             {hasActiveItems && (
               <DropdownMenuItem onClick={() => { onSelectActiveOnly(); setSelectMenuOpen(false) }}>
-                <Archive className="size-4" />
+                <Archive />
                 Select Active Only
               </DropdownMenuItem>
             )}
             {hasArchivedItems && (
               <DropdownMenuItem onClick={() => { onSelectArchivedOnly(); setSelectMenuOpen(false) }}>
-                <ArchiveRestore className="size-4" />
+                <ArchiveRestore />
                 Select Archived Only
               </DropdownMenuItem>
             )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     )
   }
 
@@ -151,7 +149,7 @@ export function CardGridSelectionBar({
       >
         <span className="text-sm font-medium text-muted-foreground">0 selected</span>
         <div className="h-4 w-px bg-border" />
-        {renderSelectAllButton()}
+        {renderSelectMenu()}
         <Button variant="ghost" size="sm" onClick={onCancel}>
           <X className="size-4" />
           Cancel
@@ -194,7 +192,7 @@ export function CardGridSelectionBar({
         Export
       </Button>
       <div className="h-4 w-px bg-border" />
-      {renderSelectAllButton()}
+      {renderSelectMenu()}
       <Button variant="ghost" size="sm" onClick={onCancel}>
         <X className="size-4" />
         Cancel

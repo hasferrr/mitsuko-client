@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Trash, SquareArrowOutUpRight, X, CheckCircle2, ChevronUp, Globe, Headphones, FileText } from "lucide-react"
@@ -30,9 +32,9 @@ interface ProjectItemSelectionBarProps {
 }
 
 const typeIcons: Record<ItemType, React.ReactNode> = {
-  translation: <Globe className="size-4" />,
-  transcription: <Headphones className="size-4" />,
-  extraction: <FileText className="size-4" />,
+  translation: <Globe />,
+  transcription: <Headphones />,
+  extraction: <FileText />,
 }
 
 const typeLabels: Record<ItemType, string> = {
@@ -85,11 +87,11 @@ export function ProjectItemSelectionBar({
     return startCloseTransition()
   }, [open])
 
-  const renderSelectAllButton = () => {
+  const renderSelectMenu = () => {
     if (allSelected) {
       return (
         <Button variant="ghost" size="sm" onClick={onSelectAllToggle}>
-          <CheckCircle2 className="size-4" />
+          <CheckCircle2 data-icon="inline-start" />
           Deselect All
         </Button>
       )
@@ -98,34 +100,30 @@ export function ProjectItemSelectionBar({
     if (!hasMultipleTypes) {
       return (
         <Button variant="ghost" size="sm" onClick={onSelectAllToggle}>
-          <CheckCircle2 className="size-4" />
+          <CheckCircle2 data-icon="inline-start" />
           Select All
         </Button>
       )
     }
 
     return (
-      <div className="flex">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onSelectAllToggle}
-          className="rounded-r-none pr-1.5"
-        >
-          <CheckCircle2 className="size-4" />
-          Select All
-        </Button>
-        <DropdownMenu open={selectMenuOpen} onOpenChange={setSelectMenuOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-l-none border-l px-1.5"
-            >
-              <ChevronUp className="size-3" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" side="top" className="w-fit">
+      <DropdownMenu open={selectMenuOpen} onOpenChange={setSelectMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm">
+            <CheckCircle2 data-icon="inline-start" />
+            Select All
+            <ChevronUp data-icon="inline-end" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="center" side="top" className="w-fit">
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={onSelectAllToggle}>
+              <CheckCircle2 />
+              {allSelected ? "Deselect All" : "Select All"}
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
             {hasTranslations && (
               <DropdownMenuItem onClick={() => { onSelectTypeOnly("translation"); setSelectMenuOpen(false) }}>
                 {typeIcons.translation}
@@ -144,9 +142,9 @@ export function ProjectItemSelectionBar({
                 Select {typeLabels.extraction} Only
               </DropdownMenuItem>
             )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     )
   }
 
@@ -168,7 +166,7 @@ export function ProjectItemSelectionBar({
       >
         <span className="text-sm font-medium text-muted-foreground">0 selected</span>
         <div className="h-4 w-px bg-border" />
-        {renderSelectAllButton()}
+        {renderSelectMenu()}
         <Button variant="ghost" size="sm" onClick={onCancel}>
           <X className="size-4" />
           Cancel
@@ -209,7 +207,7 @@ export function ProjectItemSelectionBar({
         Move
       </Button>
       <div className="h-4 w-px bg-border" />
-      {renderSelectAllButton()}
+      {renderSelectMenu()}
       <Button variant="ghost" size="sm" onClick={onCancel}>
         <X className="size-4" />
         Cancel
