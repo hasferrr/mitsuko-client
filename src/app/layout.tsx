@@ -6,6 +6,7 @@ import { DEPLOYMENT_URL } from '@/constants/external-links'
 import { cn } from '@/lib/utils'
 import Providers from '@/contexts/providers'
 import Script from 'next/script'
+import { FloatingIndicators } from '@/components/layout/floating-indicators'
 
 const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
 
@@ -107,6 +108,7 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <Providers>
           {children}
+          <FloatingIndicators />
         </Providers>
       </body>
     </html>
