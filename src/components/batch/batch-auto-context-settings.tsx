@@ -27,7 +27,6 @@ import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
-import { useBatchSettingsStore } from "@/stores/settings/use-batch-settings-store"
 
 interface BatchAutoContextSettingsProps {
   isProcessing: boolean
@@ -48,10 +47,6 @@ export function BatchAutoContextSettings({
   const getTranslationsDb = useTranslationDataStore(state => state.getTranslationsDb)
   const isExtractingSet = useExtractionStore(state => state.isExtractingSet)
   const setHasChanges = useSetUnsavedChanges()
-  const reuseCompleted = useBatchSettingsStore(state => (
-    state.getReuseCompletedAutoContext(currentProject?.id)
-  ))
-  const setReuseCompleted = useBatchSettingsStore(state => state.setReuseCompletedAutoContext)
 
   useEffect(() => {
     if (!currentProject) return
@@ -159,23 +154,6 @@ export function BatchAutoContextSettings({
                 : "Optional existing extraction used before the first file. There is no implicit latest selection."}
             </FieldDescription>
             {selectedProblem && <FieldError>{selectedProblem}</FieldError>}
-          </Field>
-
-          <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
-            <FieldContent>
-              <FieldTitle>Reuse Completed Contexts</FieldTitle>
-              <FieldDescription>
-                Reuse finished context even if the previous context failed. Default On.
-              </FieldDescription>
-            </FieldContent>
-            <Switch
-              id="batch-auto-context-reuse-completed"
-              className="self-center"
-              checked={reuseCompleted}
-              onCheckedChange={checked => setReuseCompleted(currentProject.id, checked)}
-              disabled={isProcessing}
-              aria-label="Reuse completed automatic context results"
-            />
           </Field>
 
           <Field orientation="horizontal" data-disabled={isProcessing || undefined}>
