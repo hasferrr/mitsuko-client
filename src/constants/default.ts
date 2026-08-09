@@ -1,15 +1,16 @@
-import { FREE_MODELS } from "./model-collection"
+import { FREE_MODELS, PAID_MODELS } from "./model-collection"
 import { AdvancedSettings, BasicSettings, Settings, Translation, Transcription } from "@/types/project"
 
-const getDefaultModel = (modelName: string) => {
-  const freeModels = FREE_MODELS["Free Models"].models
-  return freeModels.find((model) => model.name === modelName) || freeModels[0] || null
+const getDefaultModel = (modelName: string, isPaid = false) => {
+  const collection = isPaid ? PAID_MODELS : FREE_MODELS
+  const models = Object.values(collection).flatMap(group => group.models)
+  return models.find((model) => model.name === modelName) || models[0] || null
 }
 
-const createBasicSettings = (modelName: string): Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> => ({
+const createBasicSettings = (modelName: string, isPaid = false): Omit<BasicSettings, "id" | "createdAt" | "updatedAt"> => ({
   sourceLanguage: "Japanese",
   targetLanguage: "Indonesian",
-  modelDetail: getDefaultModel(modelName),
+  modelDetail: getDefaultModel(modelName, isPaid),
   isUseCustomModel: false,
   contextDocument: "",
   customInstructions: "",
@@ -24,7 +25,7 @@ const createBasicSettings = (modelName: string): Omit<BasicSettings, "id" | "cre
 })
 
 export const DEFAULT_BASIC_SETTINGS = createBasicSettings("Gemini 3.6 Flash")
-export const DEFAULT_EXTRACTION_BASIC_SETTINGS = createBasicSettings("GLM 5.2")
+export const DEFAULT_EXTRACTION_BASIC_SETTINGS = createBasicSettings("Gemini 3.6 Flash", true)
 
 export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {
   temperature: 1,

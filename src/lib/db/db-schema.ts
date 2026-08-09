@@ -22,11 +22,12 @@ const projectSchema = entitySchema.extend({
   isDefaultTranslationEnabled: z.boolean().optional(),
   isDefaultExtractionEnabled: z.boolean().optional(),
   isDefaultTranscriptionEnabled: z.boolean().optional(),
+  isBatchAutoContextEnabled: z.boolean().optional(),
+  batchAutoContextStartingExtractionId: z.string().nullable().optional(),
   isArchived: z.boolean().optional(),
 }).loose()
 const extractionSchema = childEntitySchema.extend({
   status: z.enum(["idle", "running", "completed", "failed", "stopped"]).optional(),
-  ownerTranslationId: z.string().nullable().optional(),
   completedAt: z.union([z.string(), z.date()]).nullable().optional(),
 }).loose()
 const projectOrderSchema = entitySchema.extend({ order: z.array(z.string()).optional() }).loose()

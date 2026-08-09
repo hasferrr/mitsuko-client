@@ -7,6 +7,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
   Download,
+  File,
+  FileText,
+  FileWarning,
   X,
   GripVertical,
   Loader2,
@@ -14,6 +17,9 @@ import {
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
+import { cleanExtractionContent, getEffectiveExtractionStatus } from "@/lib/extraction/status"
+import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
+import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { DownloadOption } from "@/types/subtitles"
 import { BatchFile } from "../../types/batch"
 
@@ -22,6 +28,8 @@ interface SortableBatchFileProps {
   onDelete: (id: string) => void
   onDownload: (id: string) => void
   onClick: (id: string) => void
+  onPreviewAutoContext?: (id: string) => void
+  isProcessing?: boolean
   selectMode?: boolean
   selected?: boolean
   onSelectToggle?: (id: string) => void
@@ -33,13 +41,22 @@ export function SortableBatchFile({
   onDelete,
   onDownload,
   onClick,
+  onPreviewAutoContext,
+  isProcessing = false,
   selectMode = false,
   selected = false,
   onSelectToggle,
   downloadOption,
 }: SortableBatchFileProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: batchFile.id, disabled: selectMode })
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id: batchFile.id,
+    disabled: selectMode || isProcessing,
+  })
   const style = { transform: CSS.Transform.toString(transform), transition }
+  const linkedExtraction = useExtractionDataStore((state) => (
+    batchFile.linkedExtractionId ? state.data[batchFile.linkedExtractionId] : undefined
+  ))
+  const isExtractingSet = useExtractionStore((state) => state.isExtractingSet)
 
   const handleTitleClick = () => {
     if (!selectMode) {
@@ -58,6 +75,10 @@ export function SortableBatchFile({
     : downloadOption === "translated"
       ? "Translated Text"
       : "Original + Translated"
+  const hasAutoContextError = batchFile.translationStage === "context-error"
+  const linkedExtractionIsEmptyOrDraft = !linkedExtraction
+    || getEffectiveExtractionStatus(linkedExtraction, isExtractingSet) === "idle"
+    || cleanExtractionContent(linkedExtraction.contextResult) === ""
 
   return (
     <Card
@@ -79,7 +100,13 @@ export function SortableBatchFile({
             className="shrink-0"
           />
         ) : (
-          <button {...attributes} {...listeners} className="cursor-grab shrink-0">
+          <button
+            {...attributes}
+            {...listeners}
+            disabled={isProcessing}
+            className={cn("shrink-0", isProcessing ? "cursor-not-allowed opacity-40" : "cursor-grab")}
+            aria-label={isProcessing ? "Reordering is locked while processing" : "Reorder file"}
+          >
             <GripVertical className="size-5 text-muted-foreground" />
           </button>
         )}
@@ -109,10 +136,18 @@ export function SortableBatchFile({
           {batchFile.status === 'processing' && (
             <Badge variant="outline">
               <Loader2 data-icon="inline-start" className="animate-spin" />
-              Processing ({batchFile.progress.toFixed(0)}%)
+              {batchFile.translationStage === "extracting-context"
+                ? "Extracting context"
+                : `Translating (${batchFile.progress.toFixed(0)}%)`}
             </Badge>
           )}
-          {batchFile.status === 'queued' && <Badge variant="secondary" className="bg-transparent">Queued</Badge>}
+          {batchFile.status === 'queued' && (
+            <Badge variant="secondary" className="bg-transparent">
+              {batchFile.translationStage === "waiting-context"
+                ? "Waiting for context"
+                : "Waiting to translate"}
+            </Badge>
+          )}
           {batchFile.status === 'done' && (
             <>
               <Tooltip delayDuration={50}>
@@ -126,9 +161,40 @@ export function SortableBatchFile({
               <Badge variant="default">Done</Badge>
             </>
           )}
-          {batchFile.status === 'error' && <Badge variant="destructive">Error</Badge>}
+          {batchFile.status === 'error' && (
+            <Badge variant="destructive">
+              {batchFile.translationStage === "context-error" ? "Context error" : "Error"}
+            </Badge>
+          )}
+          {onPreviewAutoContext && (
+            <Tooltip delayDuration={50}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onPreviewAutoContext(batchFile.id)
+                  }}
+                >
+                  {hasAutoContextError
+                    ? <FileWarning className="size-4" />
+                    : linkedExtractionIsEmptyOrDraft
+                      ? <File className="size-4" />
+                      : <FileText className="size-4" />}
+                  <span className="sr-only">Preview final context</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Preview final context</TooltipContent>
+            </Tooltip>
+          )}
           {!selectMode && (
-            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDelete(batchFile.id) }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={isProcessing}
+              onClick={(e) => { e.stopPropagation(); onDelete(batchFile.id) }}
+            >
               <X className="size-4" />
             </Button>
           )}

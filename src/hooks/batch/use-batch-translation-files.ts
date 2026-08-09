@@ -3,10 +3,20 @@ import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
 import { useTranslationStore } from "@/stores/services/use-translation-store"
 import { BatchFile } from "@/types/batch"
+import { BatchTranslationStage } from "@/types/batch"
+import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
+import { useExtractionStore } from "@/stores/services/use-extraction-store"
+import { getEffectiveBatchTranslationStage } from "@/lib/translation/batch-auto-context"
 
-export const useBatchTranslationFiles = (order: string[], queueSet: Set<string>) => {
+export const useBatchTranslationFiles = (
+  order: string[],
+  queueSet: Set<string>,
+  autoContextStageMap: Record<string, BatchTranslationStage> = {},
+) => {
   const translationData = useTranslationDataStore((state) => state.data)
+  const extractionData = useExtractionDataStore((state) => state.data)
   const isTranslatingSet = useTranslationStore((state) => state.isTranslatingSet)
+  const isExtractingSet = useExtractionStore((state) => state.isExtractingSet)
   const currentProject = useProjectStore((state) => state.currentProject)
 
   const batchFiles: BatchFile[] = useMemo(() => {
@@ -17,12 +27,34 @@ export const useBatchTranslationFiles = (order: string[], queueSet: Set<string>)
       const totalSubtitles = translation?.subtitles?.length || 0
       const translatedCount = translation?.subtitles?.filter(s => s.translated && s.translated.trim() !== "").length || 0
       const progress = totalSubtitles ? (translatedCount / totalSubtitles) * 100 : 0
+      const linkedExtraction = translation?.autoContextExtractionId
+        ? extractionData[translation.autoContextExtractionId]
+        : null
+      const isTranslating = isTranslatingSet.has(id)
+      const translationStage = getEffectiveBatchTranslationStage({
+        translation,
+        linkedExtraction,
+        runningExtractionIds: isExtractingSet,
+        isTranslating,
+        autoContextEnabled: currentProject.isBatchAutoContextEnabled,
+        recordedStage: autoContextStageMap[id],
+      })
 
       let status: BatchFile["status"]
 
-      if (isTranslatingSet.has(id)) {
+      if (translationStage === "context-error" && translatedCount < totalSubtitles) {
+        status = "error"
+      } else if (
+        translationStage === "extracting-context"
+        || translationStage === "translating"
+        || isTranslating
+      ) {
         status = "processing"
-      } else if (queueSet.has(id)) {
+      } else if (
+        translationStage === "waiting-context"
+        || translationStage === "queued-translation"
+        || queueSet.has(id)
+      ) {
         status = "queued"
       } else if (translatedCount === 0) {
         status = "pending"
@@ -41,9 +73,21 @@ export const useBatchTranslationFiles = (order: string[], queueSet: Set<string>)
         status,
         progress,
         type: translation?.parsed?.type || "srt",
+        translationStage,
+        linkedExtractionId: linkedExtraction?.id ?? null,
       }
     })
-  }, [currentProject?.isBatch, order, translationData, isTranslatingSet, queueSet])
+  }, [
+    currentProject?.isBatch,
+    currentProject?.isBatchAutoContextEnabled,
+    order,
+    translationData,
+    extractionData,
+    isTranslatingSet,
+    isExtractingSet,
+    queueSet,
+    autoContextStageMap,
+  ])
 
   const finishedCount = useMemo(() => {
     return batchFiles.filter(file => file.status === "done").length

@@ -8,6 +8,8 @@ import {
   getTranslations as getBulkDB,
   deleteTranslation as deleteDB,
   moveTranslation as moveDB,
+  updateBatchAutoContextLinks as updateBatchAutoContextLinksDB,
+  BatchAutoContextLinkUpdates,
 } from "@/lib/db/translation"
 import { getSettings } from "@/lib/db/settings"
 import { getProject } from "@/lib/db/project"
@@ -33,6 +35,7 @@ export interface TranslationDataStore {
   getTranslationDb: (translationId: string, skipStoreUpdate?: boolean) => Promise<Translation | undefined>
   getTranslationsDb: (translationIds: string[]) => Promise<Translation[]>
   updateTranslationDb: (translationId: string, changes: Partial<Translation>) => Promise<Translation>
+  updateBatchAutoContextLinksDb: (updates: BatchAutoContextLinkUpdates) => Promise<void>
   deleteTranslationDb: (projectId: string, translationId: string) => Promise<void>
   moveTranslationDb: (sourceProjectId: string, targetProjectId: string, translationId: string) => Promise<void>
   // setters
@@ -140,6 +143,17 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     set(state => ({ data: { ...state.data, [translationId]: translation } }))
     return translation
   },
+  updateBatchAutoContextLinksDb: async (updates) => {
+    const result = await updateBatchAutoContextLinksDB(updates)
+    if (result.translations.length) {
+      set(state => ({
+        data: {
+          ...state.data,
+          ...Object.fromEntries(result.translations.map(translation => [translation.id, translation])),
+        },
+      }))
+    }
+  },
   deleteTranslationDb: async (projectId, translationId) => {
     await deleteDB(projectId, translationId)
     set(state => {
@@ -152,13 +166,8 @@ export const useTranslationDataStore = create<TranslationDataStore>((set, get) =
     }
   },
   moveTranslationDb: async (sourceProjectId, targetProjectId, translationId) => {
-    await moveDB(sourceProjectId, targetProjectId, translationId)
-    const data = get().data[translationId]
-    if (data) {
-      set(state => ({
-        data: { ...state.data, [translationId]: { ...data, projectId: targetProjectId, updatedAt: new Date() } }
-      }))
-    }
+    const translation = await moveDB(sourceProjectId, targetProjectId, translationId)
+    set(state => ({ data: { ...state.data, [translationId]: translation } }))
   },
 
   // setters implementation

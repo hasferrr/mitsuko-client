@@ -619,6 +619,28 @@ export class MyDatabase extends Dexie {
         }
       })
     })
+    this.version(35).stores({}).upgrade(async tx => {
+      await tx.table('projects').toCollection().modify((project: Record<string, unknown>) => {
+        project.isBatchAutoContextEnabled = false
+        project.batchAutoContextStartingExtractionId = null
+      })
+      await tx.table('extractions').toCollection().modify((extraction: Record<string, unknown>) => {
+        delete extraction.ownerTranslationId
+      })
+    })
+    this.version(36).stores({}).upgrade(async tx => {
+      const projects = await tx.table('projects').toArray() as CurrentProject[]
+      const extractionSettingsIds = [
+        GLOBAL_EXTRACTION_SETTINGS_ID,
+        ...projects.map(project => project.defaultExtractionSettingsId),
+      ]
+
+      await tx.table('settings').where('id').anyOf(extractionSettingsIds).modify((settings: Settings) => {
+        if (settings.modelDetail?.name === 'GLM 5.2' && settings.modelDetail.isPaid === false) {
+          settings.modelDetail = DEFAULT_EXTRACTION_BASIC_SETTINGS.modelDetail
+        }
+      })
+    })
   }
 }
 

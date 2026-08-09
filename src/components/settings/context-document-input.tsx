@@ -15,7 +15,6 @@ import { useTranslationDataStore } from "@/stores/data/use-translation-data-stor
 import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
 import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { cleanExtractionResult, combineAutoContext, getExtractionProblem, findLatestExtraction } from "@/lib/translation/auto-context"
-import { isAutoContextOwnedBy } from "@/lib/extraction/status"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ExtractionBadges } from "@/components/extract-context/extraction-badges"
 import { cn } from "@/lib/utils"
@@ -29,6 +28,7 @@ interface Props {
   settingsId: string
   translationId?: string
   isTemplateTranslation?: boolean
+  isDisabled?: boolean
   onOpenExtraction?: (extractionId: string) => void
   onOpenExtractionSettings?: () => void
 }
@@ -84,14 +84,23 @@ function StatusMessage({ variant, children }: { variant: "info" | "warning" | "m
   )
 }
 
-export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplateTranslation = false, onOpenExtraction, onOpenExtractionSettings }: Props) => {
+export const ContextDocumentInput = memo(({
+  settingsId,
+  translationId,
+  isTemplateTranslation = false,
+  isDisabled = false,
+  onOpenExtraction,
+  onOpenExtractionSettings,
+}: Props) => {
   const currentProject = useProjectStore((state) => state.currentProject)
   const contextDocument = useSettingsStore((state) => state.getContextDocument(settingsId))
   const setBasicSettingsValue = useSettingsStore((state) => state.setBasicSettingsValue)
   const setContextDocument = (doc: string) => setBasicSettingsValue(settingsId, "contextDocument", doc)
-  const translation = useTranslationDataStore((state) => translationId ? state.data[translationId] : null)
+  const translationData = useTranslationDataStore((state) => state.data)
+  const translation = translationId ? translationData[translationId] : null
   const saveTranslation = useTranslationDataStore((state) => state.saveData)
   const getTranslationDb = useTranslationDataStore((state) => state.getTranslationDb)
+  const getTranslationsDb = useTranslationDataStore((state) => state.getTranslationsDb)
   const setAutoContextMode = useTranslationDataStore((state) => state.setAutoContextMode)
   const setAutoContextExtractionId = useTranslationDataStore((state) => state.setAutoContextExtractionId)
   const setAutoContextPreviousMode = useTranslationDataStore((state) => state.setAutoContextPreviousMode)
@@ -121,10 +130,13 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
 
   useEffect(() => {
     if (!isAutoContextDialogOpen || !currentProject) return
-    getExtractionsDb(currentProject.extractions).then((extractions) => {
-      setProjectExtractions(extractions.toReversed())
-    })
-  }, [currentProject, getExtractionsDb, isAutoContextDialogOpen])
+    void Promise.all([
+      getExtractionsDb(currentProject.extractions).then((extractions) => {
+        setProjectExtractions(extractions.toReversed())
+      }),
+      getTranslationsDb(currentProject.translations),
+    ])
+  }, [currentProject, getExtractionsDb, getTranslationsDb, isAutoContextDialogOpen])
 
   useEffect(() => {
     if (!isAutoContextDialogOpen || !translation) return
@@ -216,12 +228,20 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
   const selectedProblem = translation && translation.autoContextExtractionId && !isSelectedExtractionRunning
     ? getExtractionProblem(selectedExtraction ?? undefined, translation.projectId, isExtractingSet)
     : null
-  const isSelectedAutoOwned = !!(translation && selectedExtraction && isAutoContextOwnedBy(selectedExtraction, translation.id))
+  const linkedTranslationCount = selectedExtraction
+    ? Object.values(translationData).filter(item => (
+        item.projectId === selectedExtraction.projectId
+        && item.autoContextExtractionId === selectedExtraction.id
+      )).length
+    : 0
+  const autoContextMode = translation?.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
+  const isAutoContextEnabled = autoContextMode !== "disabled"
 
   const previewCleanedExtraction = (() => {
-    if (!translation || !selectedExtraction || translation.autoContextMode === "disabled") return ""
+    if (!translation || !selectedExtraction) return ""
+    if (translation.autoContextMode === "disabled") return ""
     if (isSelectedExtractionRunning) return ""
-    if (selectedProblem && !isSelectedAutoOwned) return ""
+    if (selectedProblem) return ""
     if (translation.autoContextMode === "create-new") return ""
     return cleanExtractionResult(selectedExtraction.contextResult)
   })()
@@ -236,8 +256,8 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
     }
     const extractionPlaceholder = isSelectedExtractionRunning
       ? "[Extraction is still running]"
-      : selectedProblem && !isSelectedAutoOwned
-        ? `[${selectedProblem}]`
+      : selectedProblem
+        ? "[Extraction will be regenerated when translation starts]"
         : translation.autoContextMode === "create-new"
           ? "[Extraction has not run yet — it will be created when translation starts]"
           : ""
@@ -247,22 +267,25 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
       : extractionPlaceholder
   })()
 
-  const autoContextMode = translation?.autoContextMode ?? DEFAULT_TRANSLATION_SETTINGS.autoContextMode
-
   return (
-    <div className="flex flex-col gap-2">
+    <div
+      data-disabled={isDisabled || undefined}
+      aria-disabled={isDisabled}
+      inert={isDisabled ? true : undefined}
+      className={cn("flex flex-col gap-2", isDisabled && "pointer-events-none opacity-50")}
+    >
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium">Context Document</label>
         <div className="flex items-center gap-1.5">
           {translationId && (
             <Button
-              variant={translation?.autoContextMode && translation.autoContextMode !== "disabled" ? "default" : "outline"}
+              variant={isAutoContextEnabled ? "default" : "outline"}
               onClick={() => {
                 loadProjectExtractions()
                 setIsAutoContextDialogOpen(true)
               }}
             >
-              <WandSparkles />
+              <WandSparkles data-icon="inline-start" />
               Auto
             </Button>
           )}
@@ -273,7 +296,7 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
               setIsContextDialogOpen(true)
             }}
           >
-            <FolderDown />
+            <FolderDown data-icon="inline-start" />
             Import
           </Button>
         </div>
@@ -281,13 +304,20 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
       <Textarea
         value={contextDocument}
         onChange={handleContextDocumentChange}
+        readOnly={isDisabled}
         className="min-h-[120px] h-[120px] max-h-[300px] bg-background dark:bg-muted/30 resize-none overflow-y-auto"
         placeholder="Add context about the video..."
         onFocus={(e) => (e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`)}
       />
       <p className="text-xs text-muted-foreground">
-        Provide context from previous episodes (can be generated using the
-        <span className="font-semibold"> Extract Context</span> feature). This improves accuracy and relevance.
+        {isDisabled
+          ? "This batch uses the shared manual Context Document. Auto Context remains linked to this Translation."
+          : (
+            <>
+              Provide context from previous episodes (can be generated using the
+              <span className="font-semibold"> Extract Context</span> feature). This improves accuracy and relevance.
+            </>
+          )}
       </p>
 
       <Dialog open={isContextDialogOpen} onOpenChange={setIsContextDialogOpen}>
@@ -407,10 +437,15 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
                     </StatusMessage>
                   )}
                   {!isSelectedExtractionRunning && selectedProblem && (
-                    <StatusMessage variant={isSelectedAutoOwned ? "info" : "warning"}>
-                      {isSelectedAutoOwned
-                        ? "This auto-context extraction will rerun when translation starts."
-                        : selectedProblem}
+                    <StatusMessage variant="info">
+                      This extraction will rerun when translation starts. Every Translation linked to it will use the updated result.
+                    </StatusMessage>
+                  )}
+                  {selectedExtraction && (
+                    <StatusMessage variant="muted">
+                      {linkedTranslationCount > 1
+                        ? `Shared by ${linkedTranslationCount} Translations. Changes to this Extraction affect all of them.`
+                        : "Linked as Auto Context. Changes to this Extraction are reflected here."}
                     </StatusMessage>
                   )}
                   {selectedExtraction && (
@@ -540,7 +575,6 @@ export const ContextDocumentInput = memo(({ settingsId, translationId, isTemplat
                   )}
                 </div>
               )}
-
               {!isTemplateTranslation && autoContextMode !== "disabled" && (
                 <Collapsible open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
                   <CollapsibleTrigger asChild>

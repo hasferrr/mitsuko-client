@@ -70,6 +70,8 @@ export const createProject = async (name: string, isBatch = false, isAutoEnableP
       isDefaultTranslationEnabled: enableFlags,
       isDefaultExtractionEnabled: enableFlags,
       isDefaultTranscriptionEnabled: enableFlags,
+      isBatchAutoContextEnabled: false,
+      batchAutoContextStartingExtractionId: null,
       isArchived: false,
     }
 

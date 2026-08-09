@@ -14,6 +14,10 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### August 9
+
+- ✨ **Auto Context for Batch Translation:** Automatically build and carry context from one subtitle file to the next for more consistent translations across episodes. You can choose a starting context, preview the context for each file, and resume unfinished batches without recreating completed context.
+
 ### August 2
 
 - 🎬 **Video Transcription:** Upload MP4, MOV, MKV, WebM, and MPEG-TS videos directly. Mitsuko extracts their audio in your browser, with progress tracking and support for canceling the preparation step.

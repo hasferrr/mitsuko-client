@@ -30,7 +30,33 @@ export function findLatestExtraction(
 export function combineAutoContext(cleanedExtractionResult: string, contextDocument: string): string {
   return [contextDocument.trim(), cleanedExtractionResult.trim()]
     .filter(Boolean)
-    .join("\n\n")
+    .join("\n\n---\n\n")
+}
+
+export function getBatchAutoContextPreview({
+  contextDocument,
+  enabled,
+  extraction,
+  isRunning,
+  extractionProblem,
+}: {
+  contextDocument: string
+  enabled: boolean
+  extraction: Extraction | null
+  isRunning: boolean
+  extractionProblem: string | null
+}): string {
+  if (!enabled) return contextDocument
+
+  const autoContext = !extraction
+    ? "[Extraction has not run yet — it will be created when batch translation starts]"
+    : isRunning
+      ? "[Extraction is still running]"
+      : extractionProblem
+        ? "[Extraction will be regenerated when batch translation starts]"
+        : cleanExtractionResult(extraction.contextResult)
+
+  return combineAutoContext(autoContext, contextDocument)
 }
 
 export function getAutoContextCreatedTranslationPatch(

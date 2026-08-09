@@ -10,14 +10,44 @@ import { toast } from "sonner"
 import { useSessionStore } from "@/stores/ui/use-session-store"
 import { useProjectStore } from "@/stores/data/use-project-store"
 import { useTranslationDataStore } from "@/stores/data/use-translation-data-store"
+import { useExtractionDataStore } from "@/stores/data/use-extraction-data-store"
+import { useExtractionStore } from "@/stores/services/use-extraction-store"
 import { mergeIntervalsWithGap } from "@/lib/subtitles/utils/merge-intervals-w-gap"
 import { countUntranslatedLines } from "@/lib/subtitles/utils/count-untranslated"
 import { UserCreditData } from "@/types/user"
 import { fetchUserCreditData } from "@/lib/api/user-credit"
 import { useQuery } from "@tanstack/react-query"
 import { useTranslationHandler } from "@/hooks/handler/use-translation-handler"
-import { BatchFile } from "@/types/batch"
+import { useExtractionHandler } from "@/hooks/handler/use-extraction-handler"
+import { BatchFile, BatchTranslationStage } from "@/types/batch"
 import { useScrollToTop } from "@/hooks/use-scroll-to-top"
+import {
+  type BatchAutoContextAction,
+  buildBatchAutoContextPlan,
+  findLinkedAutoContextExtraction,
+  getBatchAutoContextPreparationIds,
+  getBatchAutoContextAction,
+  getRunningBatchAutoContextExtractionIds,
+} from "@/lib/translation/batch-auto-context"
+import {
+  cleanExtractionContent,
+  getAutoContextExtractionTitle,
+  isExtractionUsable,
+} from "@/lib/extraction/status"
+import { combineAutoContext, getTranslationSubtitleContent } from "@/lib/translation/auto-context"
+import {
+  BatchTranslationRunControl,
+  useBatchTranslationRuntimeStore,
+} from "@/stores/services/use-batch-translation-runtime-store"
+
+export interface BatchTranslationRunSummary {
+  autoContextEnabled: boolean
+  startingContextTitle: string | null
+  createCount: number
+  rerunCount: number
+  reuseCount: number
+  translationCount: number
+}
 
 interface UseBatchTranslationHandlerProps {
   settingsId: string
@@ -29,6 +59,7 @@ interface UseBatchTranslationHandlerProps {
     setIsContinueTranslationDialogOpen: (open: boolean) => void
     setActiveTab: (tab: string) => void
     setQueueSet: React.Dispatch<React.SetStateAction<Set<string>>>
+    setAutoContextStageMap: React.Dispatch<React.SetStateAction<Record<string, BatchTranslationStage>>>
   }
 }
 
@@ -42,25 +73,25 @@ export default function useBatchTranslationHandler({
     setIsContinueTranslationDialogOpen,
     setActiveTab,
     setQueueSet,
+    setAutoContextStageMap,
   },
 }: UseBatchTranslationHandlerProps) {
-  const queueAbortRef = useRef(false)
   const errorCountRef = useRef(0)
 
   // Project Store
   const currentProject = useProjectStore((state) => state.currentProject)
 
   // Batch Settings Store
-  const isUseSharedSettings = useBatchSettingsStore(state => state.getIsUseSharedSettings(currentProject?.id))
   const concurrentTranslations = useBatchSettingsStore(state => state.getConcurrent(currentProject?.id))
 
   // Translation Data Store
-  const translationData = useTranslationDataStore((state) => state.data)
   const setJsonResponse = useTranslationDataStore((state) => state.setJsonResponse)
 
   // Translation Store
-  const isTranslatingSet = useTranslationStore(state => state.isTranslatingSet)
   const setIsTranslating = useTranslationStore((state) => state.setIsTranslating)
+
+  const beginBatchRun = useBatchTranslationRuntimeStore(state => state.beginRun)
+  const stopBatchRun = useBatchTranslationRuntimeStore(state => state.stopRun)
 
   // Session Store
   const session = useSessionStore((state) => state.session)
@@ -105,167 +136,552 @@ export default function useBatchTranslationHandler({
     }
   })
 
-  const handleStartBatchTranslation = () => {
-    if (batchFiles.length === 0 || isBatchTranslating) return
+  const {
+    handleStart: baseStartExtraction,
+    handleStop: baseStopExtraction,
+  } = useExtractionHandler({
+    setActiveTab: () => {},
+    isBatch: true,
+  })
 
-    scrollToTop()
-
-    setIsRestartTranslationDialogOpen(false)
-    queueAbortRef.current = false
-    errorCountRef.current = 0
-    setHasChanges(true)
-
-    const ids = batchFiles
-      .map(f => f.id)
-      .filter(id => !isTranslatingSet.has(id))
-
-    if (ids.length === 0) {
-      return
-    }
-
-    setQueueSet(new Set(ids.slice(concurrentTranslations)))
-
-    let index = 0
-    let active = 0
-
-    const launch = () => {
-      if (queueAbortRef.current) {
-        if (active === 0) {
-          setQueueSet(new Set())
-        }
-        return
-      }
-      if (index >= ids.length) {
-        if (active === 0) {
-          setQueueSet(new Set())
-        }
-        return
-      }
-      const id = ids[index++]
-
-      if (isTranslatingSet.has(id)) {
-        launch()
-        return
-      }
-
-      setQueueSet(prev => {
-        const next = new Set(prev)
-        next.delete(id)
-        return next
-      })
-
-      active++
-      handleStartTranslation(id).finally(() => {
-        setIsTranslating(id, false)
-
-        // Refetch user credits after each file completes
-        const bsIdToUse = isUseSharedSettings
-          ? settingsId
-          : (translationData[id]?.settingsId || settingsId)
-        const modelDetail = getModelDetail(bsIdToUse)
-        const isUseCustomModel = getIsUseCustomModel(bsIdToUse)
-        const isUsingCredits = !isUseCustomModel && !!modelDetail?.isPaid
-        if (isUsingCredits) refetchUserData()
-
-        active--
-        launch()
-      })
-    }
-
-    for (let i = 0; i < concurrentTranslations && i < ids.length; i++) {
-      launch()
-    }
+  const setAutoContextStage = (id: string, stage: BatchTranslationStage | null) => {
+    setAutoContextStageMap(previous => {
+      const next = { ...previous }
+      if (stage) next[id] = stage
+      else delete next[id]
+      return next
+    })
   }
 
-  const handleContinueBatchTranslation = () => {
-    setIsContinueTranslationDialogOpen(false)
-
-    scrollToTop()
-
-    queueAbortRef.current = false
-    errorCountRef.current = 0
-    setHasChanges(true)
-
-    const ids = batchFiles
-      .map(f => f.id)
-      .filter(id => !isTranslatingSet.has(id))
-
-    if (ids.length === 0) {
-      return
-    }
-
-    setQueueSet(new Set(ids.slice(concurrentTranslations)))
-
-    let index = 0
-    let active = 0
-
-    const launch = () => {
-      if (queueAbortRef.current) {
-        if (active === 0) {
-          setQueueSet(new Set())
-        }
-        return
-      }
-      if (index >= ids.length) {
-        if (active === 0) {
-          setQueueSet(new Set())
-        }
-        return
-      }
-      const id = ids[index++]
-
-      if (isTranslatingSet.has(id)) {
-        launch()
-        return
-      }
-
-      setQueueSet(prev => {
-        const next = new Set(prev)
-        next.delete(id)
-        return next
-      })
-
-      active++
-      handleContinueTranslation(id).finally(() => {
-        setIsTranslating(id, false)
-        active--
-        launch()
-      })
-    }
-
-    for (let i = 0; i < concurrentTranslations && i < ids.length; i++) {
-      launch()
-    }
+  const removeFromQueue = (id: string) => {
+    setQueueSet(previous => {
+      const next = new Set(previous)
+      next.delete(id)
+      return next
+    })
   }
 
-  const handleStopBatchTranslation = () => {
-    queueAbortRef.current = true
-    setQueueSet(new Set())
-    batchFiles.forEach(f => baseStopTranslation(f.id))
+  const refetchTranslationCredits = () => {
+    const modelDetail = getModelDetail(settingsId)
+    const isUseCustomModel = getIsUseCustomModel(settingsId)
+    if (!isUseCustomModel && modelDetail?.isPaid) refetchUserData()
+  }
+
+  const isTranslationComplete = (id: string) => {
+    const subtitles = useTranslationDataStore.getState().data[id]?.subtitles ?? []
+    return subtitles.length > 0 && subtitles.every(subtitle => subtitle.translated.trim() !== "")
+  }
+
+  const loadBatchAutoContextData = async () => {
+    if (!currentProject) return null
+    const project = await useProjectStore.getState().getProjectDb(currentProject.id)
+    if (!project) return null
+
+    await useTranslationDataStore.getState().getTranslationsDb(project.translations)
+    const extractionIds = project.batchAutoContextStartingExtractionId
+      ? [...new Set([...project.extractions, project.batchAutoContextStartingExtractionId])]
+      : project.extractions
+    await useExtractionDataStore.getState().getExtractionsDb(extractionIds)
+    return project
+  }
+
+  const getBatchRunSummary = async (
+    isContinuation: boolean,
+    regenerateAutoContext = false,
+  ): Promise<BatchTranslationRunSummary | null> => {
+    if (!currentProject) return null
+    if (!currentProject.isBatchAutoContextEnabled) {
+      return {
+        autoContextEnabled: false,
+        startingContextTitle: null,
+        createCount: 0,
+        rerunCount: 0,
+        reuseCount: 0,
+        translationCount: isContinuation
+          ? batchFiles.filter(file => file.status !== "done").length
+          : batchFiles.length,
+      }
+    }
+
+    const project = await loadBatchAutoContextData()
+    if (!project) {
+      toast.error("Batch project was not found.")
+      return null
+    }
+
+    const completedTranslationIds = isContinuation
+      ? new Set(project.translations.filter(isTranslationComplete))
+      : undefined
+    const translationIds = getBatchAutoContextPreparationIds(
+      project.translations,
+      completedTranslationIds,
+    )
+    const plan = buildBatchAutoContextPlan({
+      projectId: project.id,
+      translationIds,
+      translations: useTranslationDataStore.getState().data,
+      extractions: useExtractionDataStore.getState().data,
+      startingExtractionId: project.batchAutoContextStartingExtractionId,
+      runningIds: useExtractionStore.getState().isExtractingSet,
+      regenerate: regenerateAutoContext,
+    })
+    if (plan.startingContextProblem) {
+      toast.error(plan.startingContextProblem)
+      return null
+    }
+
+    const startingContext = project.batchAutoContextStartingExtractionId
+      ? useExtractionDataStore.getState().data[project.batchAutoContextStartingExtractionId]
+      : null
+    return {
+      autoContextEnabled: true,
+      startingContextTitle: startingContext?.title || startingContext?.episodeNumber || null,
+      createCount: plan.createCount,
+      rerunCount: plan.rerunCount,
+      reuseCount: plan.reuseCount,
+      translationCount: isContinuation
+        ? project.translations.filter(id => !isTranslationComplete(id)).length
+        : project.translations.length,
+    }
   }
 
   const handleStartTranslation = async (
     currentId: string,
     overrideStartIndexParam?: number,
     overrideEndIndexParam?: number,
-    isContinuation?: boolean
+    isContinuation?: boolean,
+    contextDocumentOverride?: string,
+    signal?: AbortSignal,
   ) => {
-    // Delegate to centralized translation handler
-    const settingsIdToUse = isUseSharedSettings
-      ? settingsId
-      : (translationData[currentId]?.settingsId || settingsId)
-
     await baseStartTranslation({
       currentId,
-      settingsId: settingsIdToUse,
+      settingsId,
       overrideStartIndexParam,
       overrideEndIndexParam,
-      isContinuation
+      isContinuation,
+      contextDocumentOverride,
+      signal,
     })
   }
 
-  const handleContinueTranslation = async (currentId: string) => {
-    const subtitles = translationData[currentId]?.subtitles ?? []
+  const runWithoutAutoContext = (
+    isContinuation: boolean,
+    control: BatchTranslationRunControl,
+    runToken: number,
+    signal: AbortSignal,
+  ) => {
+    const ids = batchFiles
+      .map(file => file.id)
+      .filter(id => !useTranslationStore.getState().isTranslatingSet.has(id))
+    if (ids.length === 0) return
+
+    setQueueSet(new Set(ids.slice(concurrentTranslations)))
+    let index = 0
+    let active = 0
+
+    const launch = () => {
+      if (signal.aborted || control.queueAborted || runToken !== control.runToken || index >= ids.length) {
+        if (active === 0) setQueueSet(new Set())
+        return
+      }
+
+      const id = ids[index++]
+      if (useTranslationStore.getState().isTranslatingSet.has(id)) {
+        launch()
+        return
+      }
+      removeFromQueue(id)
+
+      active++
+      const operation = isContinuation
+        ? handleContinueTranslation(id, undefined, signal)
+        : handleStartTranslation(id, undefined, undefined, false, undefined, signal)
+      operation.finally(() => {
+        setIsTranslating(id, false)
+        refetchTranslationCredits()
+        active--
+        launch()
+      })
+    }
+
+    for (let index = 0; index < concurrentTranslations && index < ids.length; index++) {
+      launch()
+    }
+  }
+
+  const runWithAutoContext = async (
+    isContinuation: boolean,
+    regenerateAutoContext: boolean,
+    control: BatchTranslationRunControl,
+    runToken: number,
+    signal: AbortSignal,
+  ) => {
+    const project = await loadBatchAutoContextData()
+    if (runToken !== control.runToken) return
+    if (!project) {
+      setQueueSet(new Set())
+      setAutoContextStageMap({})
+      toast.error("Batch project was not found.")
+      return
+    }
+
+    const availableTranslationIds = project.translations.filter(id => !useTranslationStore.getState().isTranslatingSet.has(id))
+    const completedTranslationIds = isContinuation
+      ? new Set(availableTranslationIds.filter(isTranslationComplete))
+      : undefined
+    const translationIds = getBatchAutoContextPreparationIds(
+      availableTranslationIds,
+      completedTranslationIds,
+    )
+    const queuedTranslationIds = translationIds.filter(id => !isContinuation || !isTranslationComplete(id))
+    const translationStore = useTranslationDataStore.getState()
+    const extractionStore = useExtractionDataStore.getState()
+    const startingExtraction = project.batchAutoContextStartingExtractionId
+      ? extractionStore.data[project.batchAutoContextStartingExtractionId]
+      : null
+    const plan = buildBatchAutoContextPlan({
+      projectId: project.id,
+      translationIds,
+      translations: translationStore.data,
+      extractions: extractionStore.data,
+      startingExtractionId: project.batchAutoContextStartingExtractionId,
+      runningIds: useExtractionStore.getState().isExtractingSet,
+      regenerate: regenerateAutoContext,
+    })
+    if (plan.startingContextProblem) {
+      setQueueSet(new Set())
+      setAutoContextStageMap({})
+      toast.error(plan.startingContextProblem)
+      return
+    }
+
+    setQueueSet(new Set(queuedTranslationIds))
+    setAutoContextStageMap(Object.fromEntries(
+      queuedTranslationIds.map(id => [id, "waiting-context" as BatchTranslationStage]),
+    ))
+
+    let activeTranslations = 0
+    let translationSchedulingHalted = false
+    const slotWaiters: Array<() => void> = []
+    const translationTasks: Array<Promise<void>> = []
+    const wakeAllWaiters = () => {
+      slotWaiters.splice(0).forEach(resolve => resolve())
+    }
+    control.wakeTranslationWaiters = wakeAllWaiters
+
+    const acquireTranslationSlot = async () => {
+      while (
+        activeTranslations >= concurrentTranslations
+        && !control.queueAborted
+        && !translationSchedulingHalted
+        && runToken === control.runToken
+      ) {
+        await new Promise<void>(resolve => slotWaiters.push(resolve))
+      }
+      if (
+        control.queueAborted
+        || translationSchedulingHalted
+        || runToken !== control.runToken
+      ) return false
+      activeTranslations++
+      return true
+    }
+    const releaseTranslationSlot = () => {
+      activeTranslations = Math.max(0, activeTranslations - 1)
+      slotWaiters.shift()?.()
+    }
+
+    const scheduleTranslation = (id: string, contextDocumentOverride: string) => {
+      setAutoContextStage(id, "queued-translation")
+      const task = (async () => {
+        const acquired = await acquireTranslationSlot()
+        if (!acquired) {
+          if (runToken === control.runToken) {
+            setAutoContextStage(id, null)
+            removeFromQueue(id)
+          }
+          return
+        }
+
+        if (signal.aborted || runToken !== control.runToken) {
+          releaseTranslationSlot()
+          return
+        }
+
+        setAutoContextStage(id, "translating")
+        removeFromQueue(id)
+        try {
+          if (isContinuation) {
+            await handleContinueTranslation(id, contextDocumentOverride, signal)
+          } else {
+            await handleStartTranslation(id, undefined, undefined, false, contextDocumentOverride, signal)
+          }
+        } finally {
+          if (runToken === control.runToken) {
+            setIsTranslating(id, false)
+            refetchTranslationCredits()
+            setAutoContextStage(id, null)
+          }
+          releaseTranslationSlot()
+        }
+      })()
+      translationTasks.push(task)
+    }
+
+    let previousExtraction = startingExtraction
+    let failedTranslationId: string | null = null
+    const preparedExtractionIds = new Set<string>()
+    const previousIdByExtractionId = new Map<string, string | null>()
+
+    for (const translationId of translationIds) {
+      if (control.queueAborted || runToken !== control.runToken) break
+      const translation = useTranslationDataStore.getState().data[translationId]
+      if (!translation) continue
+
+      const currentExtractions = useExtractionDataStore.getState().data
+      let extraction = findLinkedAutoContextExtraction(
+        translation,
+        currentExtractions,
+      )
+      const isAlreadyPrepared = !!extraction && preparedExtractionIds.has(extraction.id)
+      const action: BatchAutoContextAction = isAlreadyPrepared
+        ? "reuse"
+        : getBatchAutoContextAction({
+            extraction,
+            projectId: project.id,
+            runningIds: useExtractionStore.getState().isExtractingSet,
+            regenerate: regenerateAutoContext,
+          })
+      const previousContext = previousExtraction
+        ? cleanExtractionContent(previousExtraction.contextResult)
+        : ""
+
+      if (action === "create") {
+        extraction = await useExtractionDataStore.getState().createExtractionDb(project.id, {
+          title: getAutoContextExtractionTitle(translation.title),
+          episodeNumber: translation.title,
+          subtitleContent: getTranslationSubtitleContent(translation),
+          previousContext,
+          contextResult: "",
+          status: "idle",
+          completedAt: null,
+        })
+        if (runToken !== control.runToken) break
+        try {
+          await useProjectStore.getState().loadProjects()
+        } catch {
+          // Best-effort — extraction is already persisted and available in the data store
+        }
+      }
+
+      if (!extraction) {
+        failedTranslationId = translationId
+        setAutoContextStage(translationId, "context-error")
+        toast.error(`Failed to prepare Auto Context for ${translation.title}.`)
+        break
+      }
+
+      const previousExtractionId = isAlreadyPrepared
+        ? previousIdByExtractionId.get(extraction.id) ?? null
+        : action === "reuse"
+          ? translation.autoContextPreviousExtractionId
+          : previousExtraction?.id ?? null
+      await useTranslationDataStore.getState().updateTranslationDb(translationId, {
+        autoContextMode: "use-existing",
+        autoContextExtractionId: extraction.id,
+        autoContextPreviousMode: previousExtractionId ? "selected" : "none",
+        autoContextPreviousExtractionId: previousExtractionId,
+      })
+      if (runToken !== control.runToken) break
+
+      if (action !== "reuse") {
+        await useExtractionDataStore.getState().updateExtractionDb(extraction.id, {
+          title: getAutoContextExtractionTitle(translation.title),
+          episodeNumber: translation.title,
+          subtitleContent: getTranslationSubtitleContent(translation),
+          previousContext,
+        })
+        if (signal.aborted || runToken !== control.runToken) break
+        setAutoContextStage(translationId, "extracting-context")
+        control.currentExtractionId = extraction.id
+        control.currentExtractionRunToken = runToken
+        const success = await baseStartExtraction(extraction.id, extraction.settingsId, signal)
+        if (control.currentExtractionRunToken === runToken) {
+          control.currentExtractionId = null
+          control.currentExtractionRunToken = null
+        }
+        if (runToken !== control.runToken) break
+        if (!success) {
+          if (!control.queueAborted) {
+            setAutoContextStage(translationId, "context-error")
+            if (!regenerateAutoContext) {
+              toast.error(`Auto Context extraction failed for ${translation.title}. Skipping it and continuing with completed contexts.`)
+            } else {
+              failedTranslationId = translationId
+              toast.error(`Auto Context extraction failed for ${translation.title}. Later work was halted.`)
+            }
+          }
+          if (!regenerateAutoContext && !control.queueAborted) {
+            continue
+          }
+          break
+        }
+        extraction = await useExtractionDataStore.getState().getExtractionDb(extraction.id) ?? extraction
+      }
+
+      if (!isExtractionUsable(extraction, project.id, useExtractionStore.getState().isExtractingSet)) {
+        setAutoContextStage(translationId, "context-error")
+        if (!regenerateAutoContext) {
+          toast.error(`Auto Context is not usable for ${translation.title}. Skipping it and continuing with completed contexts.`)
+          continue
+        }
+        failedTranslationId = translationId
+        toast.error(`Auto Context is not usable for ${translation.title}. Later work was halted.`)
+        break
+      }
+
+      const shouldTranslate = !isContinuation || !isTranslationComplete(translationId)
+      if (shouldTranslate) {
+        scheduleTranslation(
+          translationId,
+          combineAutoContext(
+            cleanExtractionContent(extraction.contextResult),
+            useSettingsStore.getState().getContextDocument(settingsId),
+          ),
+        )
+      } else {
+        setAutoContextStage(translationId, null)
+        removeFromQueue(translationId)
+      }
+
+      if (!preparedExtractionIds.has(extraction.id)) {
+        preparedExtractionIds.add(extraction.id)
+        previousIdByExtractionId.set(extraction.id, previousExtractionId)
+      }
+      previousExtraction = extraction
+    }
+
+    if (runToken !== control.runToken) return
+
+    if (failedTranslationId || control.queueAborted) {
+      translationSchedulingHalted = true
+      wakeAllWaiters()
+      setAutoContextStageMap(previous => Object.fromEntries(
+        Object.entries(previous).filter(([id, stage]) => {
+          return stage === "translating" || (id === failedTranslationId && stage === "context-error")
+        }),
+      ))
+      setQueueSet(new Set())
+    }
+
+    await Promise.allSettled(translationTasks)
+    setQueueSet(new Set())
+    setAutoContextStageMap(previous => Object.fromEntries(
+      Object.entries(previous).filter(([, stage]) => stage === "context-error"),
+    ))
+    control.wakeTranslationWaiters = null
+    if (control.currentExtractionRunToken === runToken) {
+      control.currentExtractionId = null
+      control.currentExtractionRunToken = null
+    }
+  }
+
+  const safelyRunWithAutoContext = async (
+    isContinuation: boolean,
+    regenerateAutoContext: boolean,
+    control: BatchTranslationRunControl,
+    runToken: number,
+    signal: AbortSignal,
+  ) => {
+    try {
+      await runWithAutoContext(isContinuation, regenerateAutoContext, control, runToken, signal)
+    } catch (error) {
+      if (runToken !== control.runToken) return
+      console.error("Failed to run batch Auto Context", error)
+      control.queueAborted = true
+      control.wakeTranslationWaiters?.()
+      setQueueSet(new Set())
+      setAutoContextStageMap(previous => Object.fromEntries(
+        Object.entries(previous).filter(([, stage]) => stage === "translating"),
+      ))
+      toast.error("Failed to prepare batch Auto Context. Later work was halted.")
+    } finally {
+      if (runToken === control.runToken) {
+        control.wakeTranslationWaiters = null
+        control.currentExtractionId = null
+        control.currentExtractionRunToken = null
+      }
+    }
+  }
+
+  const prepareRun = () => {
+    if (!currentProject) return null
+    const run = beginBatchRun(currentProject.id)
+    scrollToTop()
+    errorCountRef.current = 0
+    setHasChanges(true)
+    setAutoContextStageMap({})
+    return run
+  }
+
+  const markAutoContextRunPreparing = () => {
+    const ids = batchFiles.map(file => file.id)
+    setQueueSet(new Set(ids))
+    setAutoContextStageMap(Object.fromEntries(
+      ids.map(id => [id, "waiting-context" as BatchTranslationStage]),
+    ))
+  }
+
+  const handleStartBatchTranslation = (regenerateAutoContext = false) => {
+    if (batchFiles.length === 0 || isBatchTranslating) return
+    setIsRestartTranslationDialogOpen(false)
+    const run = prepareRun()
+    if (!run) return
+    const { control, runToken, signal } = run
+    if (currentProject?.isBatchAutoContextEnabled) {
+      markAutoContextRunPreparing()
+      void safelyRunWithAutoContext(false, regenerateAutoContext, control, runToken, signal)
+    } else {
+      runWithoutAutoContext(false, control, runToken, signal)
+    }
+  }
+
+  const handleContinueBatchTranslation = () => {
+    if (batchFiles.length === 0 || isBatchTranslating) return
+    setIsContinueTranslationDialogOpen(false)
+    const run = prepareRun()
+    if (!run) return
+    const { control, runToken, signal } = run
+    if (currentProject?.isBatchAutoContextEnabled) {
+      markAutoContextRunPreparing()
+      void safelyRunWithAutoContext(true, false, control, runToken, signal)
+    } else {
+      runWithoutAutoContext(true, control, runToken, signal)
+    }
+  }
+
+  const handleStopBatchTranslation = () => {
+    const stoppedRun = currentProject ? stopBatchRun(currentProject.id) : null
+    setQueueSet(new Set())
+    setAutoContextStageMap({})
+    const runningAutoContextIds = currentProject?.isBatchAutoContextEnabled
+      ? getRunningBatchAutoContextExtractionIds({
+          translationIds: batchFiles.map(file => file.id),
+          translations: useTranslationDataStore.getState().data,
+          runningIds: useExtractionStore.getState().isExtractingSet,
+        })
+      : []
+    if (stoppedRun?.currentExtractionId) runningAutoContextIds.push(stoppedRun.currentExtractionId)
+    new Set(runningAutoContextIds).forEach(id => void baseStopExtraction(id))
+    batchFiles.forEach(file => baseStopTranslation(file.id))
+  }
+
+  const handleContinueTranslation = async (
+    currentId: string,
+    contextDocumentOverride?: string,
+    signal?: AbortSignal,
+  ) => {
+    const subtitles = useTranslationDataStore.getState().data[currentId]?.subtitles ?? []
 
     // TODO: Refactor to separate function
     // --- COPY PASTE FROM SUBTITLE TRANSLATOR MAIN ---
@@ -288,7 +704,7 @@ export default function useBatchTranslationHandler({
     // }, 300)
 
     for (const block of untranslated) {
-      if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) {
+      if (signal?.aborted || !useTranslationStore.getState().isTranslatingSet.has(currentId)) {
         console.log("Continue Translation: Operation stopped by user before processing a block.")
         break
       }
@@ -297,8 +713,8 @@ export default function useBatchTranslationHandler({
       console.log(`Continue Translation: Processing block from index ${startIdx} to ${endIdx}.`)
 
       try {
-        await handleStartTranslation(currentId, startIdx, endIdx, true)
-        if (!useTranslationStore.getState().isTranslatingSet.has(currentId)) {
+        await handleStartTranslation(currentId, startIdx, endIdx, true, contextDocumentOverride, signal)
+        if (signal?.aborted || !useTranslationStore.getState().isTranslatingSet.has(currentId)) {
           console.log("Continue Translation: Operation stopped by user during processing of a block.")
           break
         }
@@ -309,19 +725,13 @@ export default function useBatchTranslationHandler({
     }
 
     setIsTranslating(currentId, false)
-    const bsIdToUse = isUseSharedSettings
-      ? settingsId
-      : (translationData[currentId]?.settingsId || settingsId)
-    const modelDetail = getModelDetail(bsIdToUse)
-    const isUseCustomModel = getIsUseCustomModel(bsIdToUse)
-    const isUsingCredits = !isUseCustomModel && !!modelDetail?.isPaid
-    if (isUsingCredits) refetchUserData()
   }
 
   return {
     handleStartBatchTranslation,
     handleContinueBatchTranslation,
     handleStopBatchTranslation,
+    getBatchRunSummary,
     generateSubtitleContent,
   }
 }
