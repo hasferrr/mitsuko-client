@@ -156,6 +156,9 @@ export function ProjectTranslationList({
           setTranslations(prev => prev.filter(t => t.id !== translation.id))
           await loadProjects()
         }}
+        handleMoved={() => {
+          setTranslations(prev => prev.filter(t => t.id !== translation.id))
+        }}
         selectMode={selectMode}
         selected={selectedIds.has(translation.id)}
         onSelectToggle={() => onSelectToggle(translation.id, "translation")}

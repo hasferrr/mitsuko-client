@@ -128,6 +128,9 @@ export function ProjectExtractionList({
         }
         setExtractions(prev => prev.filter(e => e.id !== extraction.id))
       }}
+      handleMoved={() => {
+        setExtractions(prev => prev.filter(e => e.id !== extraction.id))
+      }}
       selectMode={selectMode}
       selected={selectedIds.has(extraction.id)}
       onSelectToggle={() => onSelectToggle(extraction.id, "extraction")}

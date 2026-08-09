@@ -118,6 +118,9 @@ export function ProjectTranscriptionList({
         }
         setTranscriptions(prev => prev.filter(t => t.id !== transcription.id))
       }}
+      handleMoved={() => {
+        setTranscriptions(prev => prev.filter(t => t.id !== transcription.id))
+      }}
       selectMode={selectMode}
       selected={selectedIds.has(transcription.id)}
       onSelectToggle={() => onSelectToggle(transcription.id, "transcription")}

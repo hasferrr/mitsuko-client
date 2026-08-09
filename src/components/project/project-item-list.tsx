@@ -28,6 +28,7 @@ interface ProjectItemListProps {
   date: string
   handleEdit: (newName: string) => Promise<void>
   handleDelete: () => Promise<void>
+  handleMoved: () => void
   badges?: React.ReactNode
   selectMode?: boolean
   selected?: boolean
@@ -45,6 +46,7 @@ export const ProjectItemList = ({
   date,
   handleEdit,
   handleDelete,
+  handleMoved,
   badges,
   selectMode = false,
   selected = false,
@@ -126,16 +128,20 @@ export const ProjectItemList = ({
 
   const handleMove = async (targetProjectId: string) => {
     setIsProcessing(true)
-    if (type === "translation") {
-      await moveTranslationDb(projectId, targetProjectId, id)
-    } else if (type === "transcription") {
-      await moveTranscriptionDb(projectId, targetProjectId, id)
-    } else {
-      await moveExtractionDb(projectId, targetProjectId, id)
+    try {
+      if (type === "translation") {
+        await moveTranslationDb(projectId, targetProjectId, id)
+      } else if (type === "transcription") {
+        await moveTranscriptionDb(projectId, targetProjectId, id)
+      } else {
+        await moveExtractionDb(projectId, targetProjectId, id)
+      }
+      handleMoved()
+      setIsMoveOpen(false)
+      await loadProjects()
+    } finally {
+      setIsProcessing(false)
     }
-    await loadProjects()
-    setIsMoveOpen(false)
-    setIsProcessing(false)
   }
 
   return (
