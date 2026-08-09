@@ -239,7 +239,9 @@ export default function useBatchTranslationHandler({
       createCount: plan.createCount,
       rerunCount: plan.rerunCount,
       reuseCount: plan.reuseCount,
-      translationCount: project.translations.filter(id => !isTranslationComplete(id)).length,
+      translationCount: isContinuation
+        ? project.translations.filter(id => !isTranslationComplete(id)).length
+        : project.translations.length,
     }
   }
 
