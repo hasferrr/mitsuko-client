@@ -55,6 +55,7 @@ interface BatchAutoContextPlanInput {
   startingExtractionId: string | null
   runningIds?: Set<string>
   regenerate?: boolean
+  reuseCompleted?: boolean
 }
 
 export function findLinkedAutoContextExtraction(
@@ -101,6 +102,7 @@ export function getBatchAutoContextAction({
   runningIds,
   upstreamChanged,
   regenerate,
+  reuseCompleted,
 }: {
   extraction: Extraction | null
   expectedPreviousExtraction: Extraction | null
@@ -109,10 +111,13 @@ export function getBatchAutoContextAction({
   runningIds: Set<string>
   upstreamChanged: boolean
   regenerate: boolean
+  reuseCompleted: boolean
 }): BatchAutoContextAction {
   if (!extraction) return "create"
   if (extraction.projectId !== projectId) return "create"
-  if (regenerate || upstreamChanged) return "rerun"
+  if (regenerate) return "rerun"
+  if (reuseCompleted && isExtractionUsable(extraction, projectId, runningIds)) return "reuse"
+  if (upstreamChanged) return "rerun"
   if (recordedPreviousExtractionId !== (expectedPreviousExtraction?.id ?? null)) return "rerun"
   if (!isExtractionUsable(extraction, projectId, runningIds)) return "rerun"
   return "reuse"
@@ -126,6 +131,7 @@ export function buildBatchAutoContextPlan({
   startingExtractionId,
   runningIds = new Set(),
   regenerate = false,
+  reuseCompleted = false,
 }: BatchAutoContextPlanInput): BatchAutoContextPlan {
   const startingExtraction = startingExtractionId ? extractions[startingExtractionId] : null
   let startingContextProblem = startingExtractionId
@@ -160,6 +166,7 @@ export function buildBatchAutoContextPlan({
           runningIds,
           upstreamChanged,
           regenerate,
+          reuseCompleted,
         })
 
     items.push({
