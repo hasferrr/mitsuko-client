@@ -95,19 +95,27 @@ export function getBatchAutoContextPreparationIds(
 
 export function getBatchAutoContextAction({
   extraction,
+  expectedPreviousExtraction,
+  recordedPreviousExtractionId,
   projectId,
   runningIds,
+  upstreamChanged,
   regenerate,
 }: {
   extraction: Extraction | null
+  expectedPreviousExtraction: Extraction | null
+  recordedPreviousExtractionId: string | null
   projectId: string
   runningIds: Set<string>
+  upstreamChanged: boolean
   regenerate: boolean
 }): BatchAutoContextAction {
   if (!extraction) return "create"
   if (extraction.projectId !== projectId) return "create"
-  if (regenerate) return "rerun"
-  return isExtractionUsable(extraction, projectId, runningIds) ? "reuse" : "rerun"
+  if (regenerate || upstreamChanged) return "rerun"
+  if (recordedPreviousExtractionId !== (expectedPreviousExtraction?.id ?? null)) return "rerun"
+  if (!isExtractionUsable(extraction, projectId, runningIds)) return "rerun"
+  return "reuse"
 }
 
 export function buildBatchAutoContextPlan({
@@ -132,6 +140,8 @@ export function buildBatchAutoContextPlan({
     startingContextProblem = "Starting Context is also linked to a Translation in this batch."
   }
 
+  let expectedPreviousExtraction = startingExtraction
+  let upstreamChanged = false
   const items: BatchAutoContextPlanItem[] = []
   const preparedExtractionIds = new Set<string>()
 
@@ -144,8 +154,11 @@ export function buildBatchAutoContextPlan({
       ? "reuse"
       : getBatchAutoContextAction({
           extraction,
+          expectedPreviousExtraction,
+          recordedPreviousExtractionId: translation.autoContextPreviousExtractionId,
           projectId,
           runningIds,
+          upstreamChanged,
           regenerate,
         })
 
@@ -155,6 +168,8 @@ export function buildBatchAutoContextPlan({
       action,
     })
     if (extraction) preparedExtractionIds.add(extraction.id)
+    upstreamChanged = upstreamChanged || action !== "reuse"
+    expectedPreviousExtraction = extraction
   }
 
   return {

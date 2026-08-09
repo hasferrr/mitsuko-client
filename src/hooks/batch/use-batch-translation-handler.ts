@@ -429,6 +429,7 @@ export default function useBatchTranslationHandler({
     }
 
     let previousExtraction = startingExtraction
+    let upstreamChanged = false
     let failedTranslationId: string | null = null
     const preparedExtractionIds = new Set<string>()
     const previousIdByExtractionId = new Map<string, string | null>()
@@ -448,8 +449,11 @@ export default function useBatchTranslationHandler({
         ? "reuse"
         : getBatchAutoContextAction({
             extraction,
+            expectedPreviousExtraction: previousExtraction,
+            recordedPreviousExtractionId: translation.autoContextPreviousExtractionId,
             projectId: project.id,
             runningIds: useExtractionStore.getState().isExtractingSet,
+            upstreamChanged,
             regenerate: regenerateAutoContext,
           })
       const previousContext = previousExtraction
@@ -483,9 +487,7 @@ export default function useBatchTranslationHandler({
 
       const previousExtractionId = isAlreadyPrepared
         ? previousIdByExtractionId.get(extraction.id) ?? null
-        : action === "reuse"
-          ? translation.autoContextPreviousExtractionId
-          : previousExtraction?.id ?? null
+        : previousExtraction?.id ?? null
       await useTranslationDataStore.getState().updateTranslationDb(translationId, {
         autoContextMode: "use-existing",
         autoContextExtractionId: extraction.id,
@@ -513,16 +515,9 @@ export default function useBatchTranslationHandler({
         if (runToken !== control.runToken) break
         if (!success) {
           if (!control.queueAborted) {
+            failedTranslationId = translationId
             setAutoContextStage(translationId, "context-error")
-            if (!regenerateAutoContext) {
-              toast.error(`Auto Context extraction failed for ${translation.title}. Skipping it and continuing with completed contexts.`)
-            } else {
-              failedTranslationId = translationId
-              toast.error(`Auto Context extraction failed for ${translation.title}. Later work was halted.`)
-            }
-          }
-          if (!regenerateAutoContext && !control.queueAborted) {
-            continue
+            toast.error(`Auto Context extraction failed for ${translation.title}. Later work was halted.`)
           }
           break
         }
@@ -530,12 +525,8 @@ export default function useBatchTranslationHandler({
       }
 
       if (!isExtractionUsable(extraction, project.id, useExtractionStore.getState().isExtractingSet)) {
-        setAutoContextStage(translationId, "context-error")
-        if (!regenerateAutoContext) {
-          toast.error(`Auto Context is not usable for ${translation.title}. Skipping it and continuing with completed contexts.`)
-          continue
-        }
         failedTranslationId = translationId
+        setAutoContextStage(translationId, "context-error")
         toast.error(`Auto Context is not usable for ${translation.title}. Later work was halted.`)
         break
       }
@@ -559,6 +550,7 @@ export default function useBatchTranslationHandler({
         previousIdByExtractionId.set(extraction.id, previousExtractionId)
       }
       previousExtraction = extraction
+      upstreamChanged = upstreamChanged || action !== "reuse"
     }
 
     if (runToken !== control.runToken) return
