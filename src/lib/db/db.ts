@@ -628,6 +628,19 @@ export class MyDatabase extends Dexie {
         delete extraction.ownerTranslationId
       })
     })
+    this.version(36).stores({}).upgrade(async tx => {
+      const projects = await tx.table('projects').toArray() as CurrentProject[]
+      const extractionSettingsIds = [
+        GLOBAL_EXTRACTION_SETTINGS_ID,
+        ...projects.map(project => project.defaultExtractionSettingsId),
+      ]
+
+      await tx.table('settings').where('id').anyOf(extractionSettingsIds).modify((settings: Settings) => {
+        if (settings.modelDetail?.name === 'GLM 5.2' && settings.modelDetail.isPaid === false) {
+          settings.modelDetail = DEFAULT_EXTRACTION_BASIC_SETTINGS.modelDetail
+        }
+      })
+    })
   }
 }
 
