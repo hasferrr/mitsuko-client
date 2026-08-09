@@ -20,8 +20,10 @@ const SIDEBAR_TAGLINES = [
   "Atelier de Sous-titres",
   "Compagnon de Trad",
   "Studio Sottotitoli",
-  "字幕工房",
   "翻訳の相棒",
+  "字幕の工房",
+  "Laboratorium Bahasa",
+  "Teman Penerjemah",
   "Kawaii subs (o^^o)",
   "Yatta! Tools (^-^)/",
 ]
