@@ -52,36 +52,8 @@ const RAW_FREE_MODELS: FreeModelCollection = {
     provider: "unknown",
     models: [
       {
-        name: "Gemini 3.6 Flash",
-        subName: "gemini-3.6-flash",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini 3.5 Flash",
-        subName: "gemini-3.5-flash",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini 3 Flash",
-        subName: "gemini-3-flash-preview",
+        name: "Gemini 3.7 Flash",
+        subName: "gemini-3.7-flash",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -109,7 +81,21 @@ const RAW_FREE_MODELS: FreeModelCollection = {
       },
       {
         name: "DeepSeek V4 Pro",
-        subName: "deepseek-v4-pro",
+        subName: "deepseek-v4-pro-0813",
+        maxInput: 1_048_576,
+        maxOutput: 384_000,
+        structuredOutput: false,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: false
+        }
+      },
+      {
+        name: "DeepSeek V4 Flash",
+        subName: "deepseek-v4-flash-0731",
         maxInput: 1_048_576,
         maxOutput: 384_000,
         structuredOutput: false,
@@ -150,6 +136,20 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         usage: "high",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "Gemini 3.7 Flash",
+        subName: "gemini-3.7-flash",
+        maxInput: 1_048_576,
+        maxOutput: 65536,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "medium",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
@@ -232,7 +232,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "anthropic",
     models: [
       {
-        name: "Claude Opus 4.8",
+        name: "Claude Opus 5",
         maxInput: 1_000_000,
         maxOutput: 128_000,
         structuredOutput: true,
@@ -248,19 +248,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         name: "Claude Sonnet 5",
         maxInput: 1_000_000,
         maxOutput: 128_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "very high",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Claude Sonnet 4.6",
-        maxInput: 200_000,
-        maxOutput: 64_000,
         structuredOutput: true,
         isPaid: true,
         usage: "very high",
@@ -288,6 +275,19 @@ const RAW_PAID_MODELS: PaidModelCollection = {
   xAI: {
     provider: "xai",
     models: [
+      {
+        name: "Grok 4.6",
+        maxInput: 500_000,
+        maxOutput: 500_000,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "high",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
       {
         name: "Grok 4.5",
         maxInput: 500_000,
@@ -545,7 +545,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     models: [
       {
         name: "DeepSeek V4 Pro",
-        subName: "deepseek-v4-pro",
+        subName: "deepseek-v4-pro-0813",
         maxInput: 1_048_576,
         maxOutput: 384_000,
         structuredOutput: false,
@@ -559,7 +559,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       },
       {
         name: "DeepSeek V4 Pro (CN)",
-        subName: "deepseek-v4-pro",
+        subName: "deepseek-v4-pro-0813",
         maxInput: 1_048_576,
         maxOutput: 384_000,
         structuredOutput: false,
@@ -581,20 +581,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         usage: "very low",
         default: {
           temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: false
-        }
-      },
-      {
-        name: "DeepSeek V3.2",
-        subName: "deepseek-v3.2",
-        maxInput: 131072,
-        maxOutput: 65536,
-        structuredOutput: false,
-        isPaid: true,
-        usage: "low",
-        default: {
-          temperature: 0.6,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false
         }
