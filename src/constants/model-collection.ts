@@ -149,7 +149,7 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         maxOutput: 65536,
         structuredOutput: true,
         isPaid: true,
-        usage: "medium",
+        usage: "high",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
