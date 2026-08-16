@@ -30,6 +30,7 @@ import SubtitleViewer from "./subtitle-viewer"
 import SubtitleRawViewer from "./subtitle-raw-viewer"
 import { DragAndDrop } from "@/components/ui-custom/drag-and-drop"
 import { toast } from "sonner"
+import { X } from "lucide-react"
 
 function parseTimestampToMs(timestampStr: string): number {
   const [h, m, s_cs] = timestampStr.split(':')
@@ -43,6 +44,7 @@ function parseTimestampToMs(timestampStr: string): number {
 
 export default function Tools() {
   const highlightInitialized = useRef(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const isDarkMode = useThemeStore(state => state.isDarkMode)
   const subtitleEvents = useToolsStore(state => state.subtitleEvents)
   const setSubtitleEvents = useToolsStore(state => state.setSubtitleEvents)
@@ -61,6 +63,7 @@ export default function Tools() {
   const setParsedData = useToolsStore(state => state.setParsedData)
   const rawContent = useToolsStore(state => state.rawContent)
   const setRawContent = useToolsStore(state => state.setRawContent)
+  const reset = useToolsStore(state => state.reset)
 
   useEffect(() => {
     if (!highlightInitialized.current) {
@@ -133,27 +136,33 @@ export default function Tools() {
     }
   }
 
-  const handleExportCSV = () => {
-    if (subtitleEvents.length === 0) return
+  const handleFormatChange = (nextType: SubtitleType) => {
+    if (!parsedData || subtitles.length === 0) {
+      setToType(nextType)
+      return
+    }
 
-    const headers = ['Start', 'End', 'CPS', 'Style', 'Actor', 'Text']
-    const rows = subtitleEvents.map(event => {
-      const cps = calculateCPS(event)
-      const text = `"${event.text.replace(/"/g, '""')}"`
-      return [event.start, event.end, cps === -1 ? 'Invalid' : cps, event.style, event.name, text].join(',')
+    const currentContent = mergeSubtitle({
+      subtitles,
+      parsed: parsedData,
     })
+    const convertedContent = convertSubtitle(currentContent, parsedData.type, nextType)
+    const parseResult = parseSubtitle({ content: convertedContent, type: nextType })
 
-    const csvContent = [headers.join(','), ...rows].join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    const baseName = getFileNameWithoutExtension(fileName) || 'subtitle'
-    link.setAttribute('download', `${baseName}.csv`)
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    setToType(nextType)
+    setSubtitleEvents(
+      parseResult.parsed.type === "ass" && parseResult.parsed.data
+        ? parseResult.parsed.data.events
+        : convertSubtitlesToSubtitleEvents(parseResult.subtitles)
+    )
+    setRawContent(convertedContent)
+  }
+
+  const handleCloseSubtitle = () => {
+    reset()
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
   }
 
   const handleRemoveTags = () => {
@@ -281,7 +290,13 @@ export default function Tools() {
         </div>
 
         <div className="flex items-center space-x-4 mb-4">
-          <Input type="file" onChange={handleFileChange} accept={ACCEPTED_FORMATS.join(',')} className="max-w-xs min-w-48" />
+          <Input
+            ref={fileInputRef}
+            type="file"
+            onChange={handleFileChange}
+            accept={ACCEPTED_FORMATS.join(',')}
+            className="max-w-xs min-w-48"
+          />
           <DownloadSection
             generateContent={generateContent}
             fileName={getFileNameWithoutExtension(fileName) || "subtitle"}
@@ -291,11 +306,18 @@ export default function Tools() {
             combinedFormat={combinedFormat}
             setCombinedFormat={setCombinedFormat}
             toType={toType}
-            setToType={setToType}
+            setToType={handleFormatChange}
             hideTextOptionSelector
             inlineLayout
           />
-          <Button onClick={handleExportCSV} disabled={subtitleEvents.length === 0}>Export to CSV</Button>
+          <Button
+            variant="outline"
+            onClick={handleCloseSubtitle}
+            disabled={!fileName}
+          >
+            <X data-icon="inline-start" />
+            Close
+          </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" disabled={subtitleEvents.length === 0}>Remove Tags</Button>
