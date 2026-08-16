@@ -161,7 +161,14 @@ export function ProcessingIndicator() {
             <span className="text-sm font-semibold">Processing activity</span>
             <div className="ml-auto flex items-center gap-1">
               {finishedCount > 0 && (
-                <Button variant="ghost" size="xs" onClick={clearCompleted}>
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={() => {
+                    clearCompleted()
+                    setExpanded(false)
+                  }}
+                >
                   Clear finished
                 </Button>
               )}
