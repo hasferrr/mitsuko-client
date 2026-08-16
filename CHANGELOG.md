@@ -14,6 +14,10 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### August 16
+
+- 🤖 **Model Updates:** Added Gemini 3.7 Flash, Claude Opus 5, and Grok 4.6. The free lineup now includes the latest DeepSeek V4 Pro and Flash releases, while older Gemini, Claude, and DeepSeek options have been retired.
+
 ### August 9
 
 - ✨ **Auto Context for Batch Translation:** Automatically build and carry context from one subtitle file to the next for more consistent translations across episodes. You can choose a starting context, preview the context for each file, and resume unfinished batches without recreating completed context.
