@@ -17,6 +17,7 @@ Use the same style. The intent is for users to get rid of the technical details 
 ### August 30
 
 - 🤖 **Model Updates:** Upgraded GLM 5.2 to GLM 5.3 and added GLM 5.3 Flash in both free and paid tiers. Both models support up to 1M tokens of context and structured output, with Flash offering a faster, lower-cost option.
+- 🛑 **Model Deprecations:** Retired older free and paid model options to keep the available lineup focused on current models.
 
 ### August 16
 

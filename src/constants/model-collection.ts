@@ -80,20 +80,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "DeepSeek V4 Pro",
-        subName: "deepseek-v4-pro-0813",
-        maxInput: 1_048_576,
-        maxOutput: 384_000,
-        structuredOutput: false,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: false
-        }
-      },
-      {
         name: "DeepSeek V4 Flash",
         subName: "deepseek-v4-flash-0731",
         maxInput: 1_048_576,
@@ -105,19 +91,6 @@ const RAW_FREE_MODELS: FreeModelCollection = {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: false
-        }
-      },
-      {
-        name: "GLM 5.3",
-        maxInput: 1_040_000,
-        maxOutput: 131_072,
-        structuredOutput: true,
-        isPaid: false,
-        usage: "N/A",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
         }
       },
       {
@@ -158,34 +131,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
       {
         name: "Gemini 3.7 Flash",
         subName: "gemini-3.7-flash",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "high",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini 3.6 Flash",
-        subName: "gemini-3.6-flash",
-        maxInput: 1_048_576,
-        maxOutput: 65536,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "high",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Gemini 3.5 Flash",
-        subName: "gemini-3.5-flash",
         maxInput: 1_048_576,
         maxOutput: 65536,
         structuredOutput: true,
@@ -270,19 +215,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
           isUseStructuredOutput: true
         }
       },
-      {
-        name: "Claude Haiku 4.5",
-        maxInput: 200_000,
-        maxOutput: 64_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "medium",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
     ]
   },
   xAI: {
@@ -290,19 +222,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     models: [
       {
         name: "Grok 4.6",
-        maxInput: 500_000,
-        maxOutput: 500_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "high",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "Grok 4.5",
         maxInput: 500_000,
         maxOutput: 500_000,
         structuredOutput: true,
@@ -367,20 +286,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         structuredOutput: true,
         isPaid: true,
         usage: "medium",
-        isFormatReasoning: true,
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "GPT-5.5",
-        maxInput: 1_050_000,
-        maxOutput: 128_000,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "extremely high",
         isFormatReasoning: true,
         default: {
           temperature: 1,
@@ -480,71 +385,6 @@ const RAW_PAID_MODELS: PaidModelCollection = {
         isPaid: true,
         usage: "high",
         isFormatReasoning: true,
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "GPT-4.1",
-        maxInput: 1_047_576,
-        maxOutput: 32_768,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "medium",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "GPT-4.1 mini",
-        maxInput: 1_047_576,
-        maxOutput: 32_768,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "low",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "GPT-4.1 nano",
-        maxInput: 1_047_576,
-        maxOutput: 32_768,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "very low",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "GPT-4o",
-        maxInput: 128_000,
-        maxOutput: 16_384,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "medium",
-        default: {
-          temperature: 1,
-          isMaxCompletionTokensAuto: true,
-          isUseStructuredOutput: true
-        }
-      },
-      {
-        name: "GPT-4o mini",
-        maxInput: 128_000,
-        maxOutput: 16_384,
-        structuredOutput: true,
-        isPaid: true,
-        usage: "low",
         default: {
           temperature: 1,
           isMaxCompletionTokensAuto: true,
