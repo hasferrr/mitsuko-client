@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Globe, Headphones, ArrowRight, Layers, Check } from "lucide-react"
+import { Globe, Headphones, ArrowRight, Layers, Check, LoaderCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useProjectStore } from "@/stores/data/use-project-store"
@@ -70,6 +70,8 @@ export function FeaturesOptions() {
   const setCurrentProject = useProjectStore((state) => state.setCurrentProject)
 
   const handleOptionClick = async (option: string) => {
+    if (selectedOption) return
+
     setSelectedOption(option)
 
     let defaultProject = projects.find(p => p.name === "Default" && !p.isBatch && !p.isArchived)
@@ -148,9 +150,9 @@ export function FeaturesOptions() {
             ))}
           </div>
 
-          <Button className="mt-6 w-full bg-blue-600/80 dark:bg-blue-600/40 hover:bg-blue-700/80 dark:hover:bg-blue-700/60 text-white">
+          <Button disabled={selectedOption !== null} className="mt-6 w-full bg-blue-600/80 dark:bg-blue-600/40 hover:bg-blue-700/80 dark:hover:bg-blue-700/60 text-white">
             Start Translation
-            <ArrowRight className="size-4" />
+            {selectedOption === "translate" ? <LoaderCircle data-icon="inline-end" className="animate-spin" /> : <ArrowRight data-icon="inline-end" />}
           </Button>
         </div>
       </div>
@@ -182,9 +184,9 @@ export function FeaturesOptions() {
             ))}
           </div>
 
-          <Button className="mt-6 w-full bg-green-600/80 dark:bg-green-600/40 hover:bg-green-700/80 dark:hover:bg-green-700/60 text-white">
+          <Button disabled={selectedOption !== null} className="mt-6 w-full bg-green-600/80 dark:bg-green-600/40 hover:bg-green-700/80 dark:hover:bg-green-700/60 text-white">
             Start Transcription
-            <ArrowRight className="size-4" />
+            {selectedOption === "transcribe" ? <LoaderCircle data-icon="inline-end" className="animate-spin" /> : <ArrowRight data-icon="inline-end" />}
           </Button>
         </div>
       </div>
@@ -216,9 +218,9 @@ export function FeaturesOptions() {
             ))}
           </div>
 
-          <Button className="mt-6 w-full bg-purple-600/80 dark:bg-purple-600/40 hover:bg-purple-700/80 dark:hover:bg-purple-700/60 text-white">
+          <Button disabled={selectedOption !== null} className="mt-6 w-full bg-purple-600/80 dark:bg-purple-600/40 hover:bg-purple-700/80 dark:hover:bg-purple-700/60 text-white">
             Start Extraction
-            <ArrowRight className="size-4" />
+            {selectedOption === "extract-context" ? <LoaderCircle data-icon="inline-end" className="animate-spin" /> : <ArrowRight data-icon="inline-end" />}
           </Button>
         </div>
       </div>
