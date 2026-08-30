@@ -14,6 +14,10 @@ Use the same style. The intent is for users to get rid of the technical details 
 
 ## 2026
 
+### August 30
+
+- 🤖 **Model Updates:** Upgraded GLM 5.2 to GLM 5.3 and added GLM 5.3 Flash in both free and paid tiers. Both models support up to 1M tokens of context and structured output, with Flash offering a faster, lower-cost option.
+
 ### August 16
 
 - 🤖 **Model Updates:** Added Gemini 3.7 Flash, Claude Opus 5, and Grok 4.6. The free lineup now includes the latest DeepSeek V4 Pro and Flash releases, while older Gemini, Claude, and DeepSeek options have been retired.

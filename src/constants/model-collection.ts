@@ -108,14 +108,27 @@ const RAW_FREE_MODELS: FreeModelCollection = {
         }
       },
       {
-        name: "GLM 5.2",
+        name: "GLM 5.3",
         maxInput: 1_040_000,
         maxOutput: 131_072,
         structuredOutput: true,
         isPaid: false,
         usage: "N/A",
         default: {
-          temperature: 0.6,
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
+      {
+        name: "GLM 5.3 Flash",
+        maxInput: 1_040_000,
+        maxOutput: 131_072,
+        structuredOutput: true,
+        isPaid: false,
+        usage: "N/A",
+        default: {
+          temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
@@ -605,18 +618,31 @@ const RAW_PAID_MODELS: PaidModelCollection = {
     provider: "zai",
     models: [
       {
-        name: "GLM 5.2",
+        name: "GLM 5.3",
         maxInput: 1_040_000,
         maxOutput: 131_072,
         structuredOutput: true,
         isPaid: true,
         usage: "medium",
         default: {
-          temperature: 0.6,
+          temperature: 1,
           isMaxCompletionTokensAuto: true,
           isUseStructuredOutput: true
         }
-      }
+      },
+      {
+        name: "GLM 5.3 Flash",
+        maxInput: 1_040_000,
+        maxOutput: 131_072,
+        structuredOutput: true,
+        isPaid: true,
+        usage: "very low",
+        default: {
+          temperature: 1,
+          isMaxCompletionTokensAuto: true,
+          isUseStructuredOutput: true
+        }
+      },
     ]
   },
 }
