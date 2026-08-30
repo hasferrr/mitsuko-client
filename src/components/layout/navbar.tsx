@@ -53,7 +53,7 @@ export function Navbar() {
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="h-4 data-vertical:self-center" />
         </div>
-        <Breadcrumb>
+        <Breadcrumb className="hidden md:block">
           <BreadcrumbList>
             {breadcrumbs.flatMap((breadcrumb, index) => [
               index > 0 && <BreadcrumbSeparator key={`sep-${index}`} />,
