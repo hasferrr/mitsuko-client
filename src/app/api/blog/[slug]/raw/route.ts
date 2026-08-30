@@ -5,6 +5,8 @@ import { parseFrontmatter } from '@/lib/content/frontmatter'
 import { toSlug } from '@/lib/content/blog'
 import { DEPLOYMENT_URL } from '@/constants/external-links'
 
+export const dynamic = 'force-static'
+
 const BLOG_DIR = path.join(process.cwd(), 'content', 'blog')
 
 async function findMarkdownFile(slug: string): Promise<string | null> {
