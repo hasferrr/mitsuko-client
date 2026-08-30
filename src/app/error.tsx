@@ -6,7 +6,6 @@ import { useEffect } from 'react'
 import Navbar from '@/components/landing/navbar'
 import * as Sentry from '@sentry/nextjs'
 import posthog from 'posthog-js'
-import { isBrowserTranslationError } from '@/lib/utils/translate-error'
 
 export default function Error({
   error,
@@ -42,12 +41,10 @@ export default function Error({
             Go back home
           </Link>
         </div>
-        {isBrowserTranslationError(error) && (
-          <p className="text-muted-foreground max-w-md text-center py-2 border rounded-md mt-4">
-            Please turn off Google Translate or any translation extension for
-            Mitsuko website and try again.
-          </p>
-        )}
+        <p className="text-muted-foreground max-w-md text-center py-2 border rounded-md mt-4">
+          Please turn off Google Translate or any translation extension for
+          Mitsuko website and try again.
+        </p>
       </div>
     </div>
   )
