@@ -24,8 +24,8 @@ const createBasicSettings = (modelName: string, isPaid = false): Omit<BasicSetti
   },
 })
 
-export const DEFAULT_BASIC_SETTINGS = createBasicSettings("Gemini 3.6 Flash")
-export const DEFAULT_EXTRACTION_BASIC_SETTINGS = createBasicSettings("Gemini 3.6 Flash", true)
+export const DEFAULT_BASIC_SETTINGS = createBasicSettings("Gemini 3.7 Flash")
+export const DEFAULT_EXTRACTION_BASIC_SETTINGS = createBasicSettings("Gemini 3.7 Flash", true)
 
 export const DEFAULT_ADVANCED_SETTINGS: Omit<AdvancedSettings, "id" | "createdAt" | "updatedAt"> = {
   temperature: 1,
