@@ -84,7 +84,7 @@ export default function BatchMain() {
   }
 
   return (
-    <div translate="no" className="flex flex-col gap-4 max-w-5xl mx-auto container py-6 px-4">
+    <div className="flex flex-col gap-4 max-w-5xl mx-auto container py-6 px-4">
       {/* Header */}
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex-1 min-w-40 flex items-center gap-2">

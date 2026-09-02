@@ -227,7 +227,7 @@ export default function Batch() {
           <>
             {activeBatchProjects.length > 0 && (
               selection.isSelecting ? (
-                <div translate="no" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {activeBatchProjects.map((b) => (
                     <SortableBatchCard
                       key={b.id}
@@ -252,7 +252,7 @@ export default function Batch() {
                     items={activeBatchProjects.map(p => p.id)}
                     strategy={rectSortingStrategy}
                   >
-                    <div translate="no" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {activeBatchProjects.map((b) => (
                         <SortableBatchCard key={b.id} project={b} onSelect={(id) => setCurrentProject(id)} onToggleArchive={handleArchive} onExport={handleExport} onDelete={promptDelete} />
                       ))}

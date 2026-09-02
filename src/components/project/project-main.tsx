@@ -92,7 +92,7 @@ export const ProjectMain = ({ currentProject }: ProjectMainProps) => {
   }
 
   return (
-    <div translate="no" className="flex-1 p-6 max-w-5xl mx-auto">
+    <div className="flex-1 p-6 max-w-5xl mx-auto">
       <ProjectHeader currentProject={currentProject} />
 
       <SettingsDialogue

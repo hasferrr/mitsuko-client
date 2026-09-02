@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: PropsWithChildren) {
   return (
-    <div className="bg-background text-foreground min-h-screen">
+    <div translate="no" className="notranslate bg-background text-foreground min-h-screen">
       <AppSidebarWrapper header={<><MaintenanceBanner /><Navbar /></>}>
         <div className="flex flex-col min-h-[calc(100vh-3.6rem)]">
           <FeaturesPrefetcher />

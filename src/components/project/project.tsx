@@ -395,7 +395,7 @@ export const Project = () => {
           <>
             {activeProjects.length > 0 && (
               selection.isSelecting ? (
-                <div translate="no" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {activeProjects.map(p => (
                     <SortableProjectCard
                       key={p.id}
@@ -416,7 +416,7 @@ export const Project = () => {
                     items={activeProjects.map(p => p.id)}
                     strategy={rectSortingStrategy}
                   >
-                    <div translate="no" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {activeProjects.map(p => (
                         <SortableProjectCard key={p.id} project={p} />
                       ))}
